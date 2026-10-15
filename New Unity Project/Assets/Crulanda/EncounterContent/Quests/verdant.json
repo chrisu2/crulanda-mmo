@@ -101,6 +101,20 @@
       "title": "Brother Wystan's Last Page",
       "text": "Folded small in the lining of a silver mask, in a hand that grows larger and less careful as it goes:\n\nBelow the root-stair. I have lost count of the days; the light of the sap does not change.\nIselle is right that there is a gap where the Third Note should be. She is wrong that it is empty. Something is in it. It is very low and very cold and very patient, and it fits the gap exactly. Too exactly, I think. A key that fits a lock is not always the key.\n\nThe note is louder here. I must hear it closer.\n\nThe fog is in the lower rooms. It is not unpleasant. It is quiet. It takes things away one at a time, and you do not miss them as they go.\n\nI have scratched my name inside my mask, in case.\n\n(Under that there are no more words: only three circles, the third filled in.)",
       "canonStatus": "GAME-ONLY: Brother Wystan and his page. The Silent Pilgrims, their silver masks and the Original Song's three notes are CANON (book3 ch.5); the cold note under the Temple is PROVISIONAL foreshadowing of the Pale."
+    },
+    {
+      "id": "doc.verdant.lantern_count",
+      "title": "The Lantern Count",
+      "kind": "lore",
+      "text": "Cut into a shelf of bark and left on the mossy rock above the glade, in Moss-Lantern's small, even strokes:\n\nThe First Cycle: the Root-Mother dreamed, and the dream had light in it, and the light was kept. That is the first lantern.\n\nThe cycle before this one ended in cold. The trees remember it in their rings and will show you, if you ask and do not take. That is the second lantern, and it is lit for what was lost.\n\nThis cycle: the glade's caps make their own light, and the Keepers borrow it, a little at a time, and give it back at dawn. That is the third lantern, and it is the one your kind never understands. You keep what you take. We give back what we borrow. That is the whole of the difference between us, and it is enough.\n\nThere is a cold in the east again. I have begun to make a fourth lantern. I do not yet know what it is for.",
+      "canonStatus": "CANON-EXPANDED: the Root-Mother, the First Cycle, the trees that remember and the Keepers' rule against hoarding are CANON (book3 ch.2, 6-7; world_bible.md); Moss-Lantern and her count are GAME-ONLY, the fourth lantern PROVISIONAL foreshadowing."
+    },
+    {
+      "id": "doc.verdant.falls_remember",
+      "title": "What the Falls Remember",
+      "kind": "lore",
+      "text": "Pressed into the moss at the lip of the falls, a strip of pale bark in Willow-Whisper's spiral-script, which the wood reads out for whoever asks:\n\nThe river has run over this lip since the Root-Mother first dreamed water. It remembers every face that looked down from here. Most of them were ours.\n\nI have looked down from here and seen, far off, a line of white that is the sea; and I have seen the sea turn black in a dream, and the air fill with ash, and people come over the ridge with nothing, and ask. I have seen a pine grow where nothing should. I have seen a wall of salt.\n\nI do not know when. The river does not know when. It only knows that it will still be running. I have left this here so that when they come, and climb, and look down, they will know that someone looked first and did not turn them away.\n\nThe wood will keep this leaf green. It keeps what is asked of it, and gives it back.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother, the Verdant Ocean running to the sea, the survivors who crest the Ridge of Long Shadows, the First Seed and the Salt-Wall are CANON (book3 ch.1-4, 7; world_bible.md), shown before their time; Willow-Whisper's leaf is GAME-ONLY."
     }
   ],
   "quests": [

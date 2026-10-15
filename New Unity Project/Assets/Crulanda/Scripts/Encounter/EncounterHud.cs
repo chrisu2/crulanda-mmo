@@ -89,9 +89,9 @@ namespace Crulanda.Encounter
             GUI.color = Color.white;
             using (mWorld.Auto()) DrawWorldLabels();
             // The movable panels (playtest note 97): each drawn where the player put it (EncounterHud.Display, PanelOffset).
-            using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
+            using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); DrawBuffs(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
             using (mMap.Auto()) { At("minimap"); maps.DrawMinimap(session, gold); }
-            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); At(null); if (session.SpellbookOpen) DrawSpellbook(); At("pet"); DrawPetBar(); At("bar"); DrawMicroMenu(); DrawXpBar(); At(null); }
+            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); At(null); if (session.SpellbookOpen) DrawSpellbook(); At("pet"); DrawPetBar(); At("nerve"); DrawNervePanel(); At("bar"); DrawMicroMenu(); DrawXpBar(); At(null); }
             var windows = mWindows.Auto();
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
@@ -228,6 +228,42 @@ namespace Crulanda.Encounter
             }
         }
         static readonly Color WeaverViolet = new Color(.68f, .5f, 1);
+        /// <summary>The buffs and songs on you and on each of the party (Chris, 2026-10-14: "we need a buff ui so i know what buff/songs
+        /// are on the party"): a row of chips beside each frame, each a status effect on that one (its name and seconds left) or the
+        /// kit's own buff on the whole party (a verse, a rally).</summary>
+        void DrawBuffs()
+        {
+            var kit = session.Kit; if (kit == null || session.Player == null) return;
+            var party = new List<(string, float)>(kit.PartyBuffs());
+            Chips(new Rect(352, 88, 420, 18), Buffs(session.Player, party));
+            var m = session.Companion;
+            if (m != null && m.actor != null && session.Progress.recruited) Chips(new Rect(334, 142, 460, 18), Buffs(m.actor, party));
+            for (int i = 0; i < session.PartySims.Count; i++)
+            {
+                var c = session.PartySims[i]; if (c == null || c.actor == null) continue;
+                Chips(new Rect(388, 200 + 46 * i + 16, 420, 18), Buffs(c.actor, party));
+            }
+        }
+        List<(string, float)> Buffs(Crulanda.Gameplay.Actor a, List<(string, float)> party)
+        {
+            var list = new List<(string, float)>();
+            var cb = a != null ? a.GetComponent<Crulanda.Combat.Combatant>() : null;
+            if (cb != null && cb.Statuses != null) cb.Statuses.Each(Time.time, (id, rem) => list.Add((session.StatusName(id), rem)));
+            list.AddRange(party);
+            return list;
+        }
+        void Chips(Rect row, List<(string name, float remaining)> buffs)
+        {
+            float x = row.x;
+            foreach (var (name, remaining) in buffs)
+            {
+                string text = remaining > 0 ? name + " " + Mathf.CeilToInt(remaining) + "s" : name;
+                float w = tiny.CalcSize(new GUIContent(text)).x + 10; if (x + w > row.xMax) break;
+                Fill(new Rect(x, row.y, w, row.height), new Color(.08f, .1f, .06f, .72f));
+                Shadow(new Rect(x + 5, row.y - 1, w, row.height + 2), text, tiny, remaining > 0 && remaining < 5 ? new Color(1, .8f, .6f) : new Color(.8f, 1, .8f));
+                x += w + 4;
+            }
+        }
         /// <summary>The target frame's line under a game animal's health (GAME-ONLY).</summary>
         public const string GameLine = "Game: it won't fight, but it will run. Skin it for its hide.";
         void DrawTargetFrame()
@@ -383,6 +419,19 @@ namespace Crulanda.Encounter
         /// </summary>
         /// <summary>The pet frame's name: the Bonecaller's thrall is not a wolf (step-4 frames).</summary>
         public static string PetLabel(string kind) { return kind == "thrall" ? "Thrall" : "Wolf"; }
+        /// <summary>The Scoundrel's Nerve, its own small panel to move where you like (Chris, 2026-10-14: "need to see how much nerve the
+        /// scoundrel has built up", "a seperate small ui element i can move around"): the number, and ten pips, one lit for each tenth
+        /// built; lit gold when there is enough for Settle the Score to be worth it (half or more).</summary>
+        void DrawNervePanel()
+        {
+            var cls = session.ClassDef; if (cls == null || cls.id != "class.scoundrel" || session.Player == null) return;
+            var pool = session.Player.Resource.Pool; var box = new Rect(380, 96, 250, 44);
+            Fill(box, new Color(.07f, .06f, .05f, .9f)); Fill(new Rect(box.x, box.y, box.width, 2), new Color(.9f, .72f, .3f));
+            Shadow(new Rect(box.x + 10, box.y + 4, 120, 20), "Nerve", tiny, new Color(1, .92f, .75f));
+            Shadow(new Rect(box.x + 150, box.y + 4, 90, 20), pool.Current + " / " + pool.Max, tiny, Color.white);
+            int lit = Mathf.FloorToInt(pool.Ratio * 10 + .001f); var gold = pool.Ratio >= .5f ? new Color(1, .82f, .3f) : new Color(.85f, .6f, .25f);
+            for (int i = 0; i < 10; i++) Fill(new Rect(box.x + 10 + i * 23.2f, box.y + 26, 20, 10), i < lit ? gold : new Color(.25f, .22f, .16f, .9f));
+        }
         void DrawPetBar()
         {
             var pet = session.Pet; if (pet == null || pet.actor == null || !pet.actor.IsAlive) return;
@@ -589,7 +638,7 @@ namespace Crulanda.Encounter
             // (2026-10-13, Chris: "cant see all classes. need another mechanism to be able to choose": one button a class ran off the screen
             // at ten classes; now a grid of three across.)
             int rows = (others.Count + 2) / 3;
-            Frame(new Rect(475, 325, 490, 240 + 48 * rows));
+            Frame(new Rect(475, 325, 490, 296 + 48 * rows));
             GUI.Label(new Rect(525, 351, 400, 35), "EXPEDITION PAUSED", heading);
             GUI.Label(new Rect(525, 398, 400, 35), "Progress autosaves out of combat.", text);
             if (controlsOpen) { DrawControls(); return; }
@@ -602,6 +651,8 @@ namespace Crulanda.Encounter
             for (int i = 0; i < others.Count; i++)
                 if (GUI.Button(new Rect(525 + (i % 3) * 132, 534 + 48 * (i / 3), 126, 44), others[i].definition.displayName, button)) { session.SwitchCharacter(others[i].definition.id); break; }
             GUI.enabled = true;
+            // Chris 2026-10-14: "all need an exit command to close the .exe" (also /exit and /quit in the chat): saved first, out of combat.
+            if (GUI.Button(new Rect(525, 540 + 48 * rows + 8, 126, 44), "Quit game", button)) session.Quit();
         }
         public static string ResourceName(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Shift Breath" : kind.ToString(); }
         static string ResourceShort(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Breath" : kind.ToString(); }

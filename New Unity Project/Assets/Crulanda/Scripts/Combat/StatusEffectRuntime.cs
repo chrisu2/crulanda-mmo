@@ -68,6 +68,11 @@ namespace Crulanda.Combat
             }
             return active.Contains(entry);
         }
+        /// <summary>Every effect on, with its time left (the HUD's buff row, 2026-10-14).</summary>
+        public void Each(float now, Action<string, float> visit)
+        {
+            foreach (var entry in active) if (entry.expires > now) visit(entry.id, entry.expires - now);
+        }
         public float Remaining(string id, float now)
         {
             var found = active.Find(e => e.id == id);

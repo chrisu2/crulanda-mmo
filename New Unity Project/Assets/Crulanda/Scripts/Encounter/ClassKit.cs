@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using System;
 using Crulanda.Abilities;
 using Crulanda.Combat;
@@ -54,6 +55,9 @@ namespace Crulanda.Encounter
         public virtual float NoticeShrink { get { return 0; } }
         /// <summary>Extra HUD line under the resource bar (e.g. weapon pressure, current form pool).</summary>
         public virtual string StatusLine { get { return null; } }
+        /// <summary>The kit's own buffs on the whole party, with the seconds left (0: for as long as it is kept up): the buff row by the
+        /// party frames (Chris, 2026-10-14: "we need a buff ui so i know what buff/songs are on the party").</summary>
+        public virtual IEnumerable<(string name, float remaining)> PartyBuffs() { yield break; }
         /// <summary>Extra target-frame text (e.g. EXPOSED 2.1s, Rooted).</summary>
         public virtual string TargetStatus(EncounterEnemy enemy) { return null; }
 

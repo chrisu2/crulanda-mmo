@@ -3,7 +3,7 @@
   "displayName": "The Verdant Shore",
   "subtitle": "The Verdant Ocean and the Whispering Woods of the western coast, where the Veridian Keepers keep the Shore of the First Cycle",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon (book3 ch.1-7, world_bible.md): the Verdant Shore, the 'Verdant Ocean' of the Western Coast, a forest 'that didn't know when to stop': giant trees with trunks as wide as houses, broad flat leaves that sway like a green tide, a thousand greens from obsidian moss to emerald-glowing new ferns (ch.1); the Ridge of Long Shadows, the basalt divide the survivors crest to see it, with a harbour at its foot (ch.1, 3); the Veridian Keepers, beings of living wood and moss, and Oak-Bane and Willow-Whisper (ch.2, world_bible.md); the Veridian Temple, a stair of calcified roots down to the Root-Mother (ch.7); Ghost-Oaks tapped for Veridian sap 'the color of liquid emerald' (ch.4); the Whispering Glade and the mossy outcrop over it (ch.5); glass-frogs (ch.2); the Salt-Flats (ch.3); and the mists below the ridge, where an unnatural violet fog that tastes of ozone brings the Void-Touchers and the Pale Shadows (ch.2-4, 8). The game is set before the books' exodus: the survivors, Elara's First Seed (the Veridian Pine), the Salt-Wall and Salt-Mender's Landing are not here yet, and the Pale's touch is shown early, as foreshadowing (PROVISIONAL). The mountains between the Rim and the Shore are Book 3's ash-mountains (book2 ch.26: the Ashlands of the lower North were once the forested Verdant Spine); the road over them is GAME-ONLY. GAME-ONLY: Rootfast and every Keeper but Oak-Bane and Willow-Whisper, Mossveil Falls, the Wending, the Mistmere, the Fern Hollow, the Fallen Ghost-Oak, the Antler Meadow, the Greying, Palemist Hollow (canon's 'mists below the ridge'), the creatures and camps, and all placement. The Root-Mother's Deep under the Temple (its root-stair, Sap Well, the cold in the root and the Hollow Root-Warden) is GAME-ONLY. The filled-out shore (2026-10-04): creeping briars in the Fern Hollow, spiders on the basalt shoulder of the Ridge of Long Shadows (CANON place), the Void-Touchers the violet fog brings below the ridge (CANON, shown early: PROVISIONAL), Old Brine-Tusk in the south-west wood, and their quests; all placement GAME-ONLY.",
+  "canonNote": "Canon (book3 ch.1-7, world_bible.md): the Verdant Shore, the 'Verdant Ocean' of the Western Coast, a forest 'that didn't know when to stop': giant trees with trunks as wide as houses, broad flat leaves that sway like a green tide, a thousand greens from obsidian moss to emerald-glowing new ferns (ch.1); the Ridge of Long Shadows, the basalt divide the survivors crest to see it, with a harbour at its foot (ch.1, 3); the Veridian Keepers, beings of living wood and moss, and Oak-Bane and Willow-Whisper (ch.2, world_bible.md); the Veridian Temple, a stair of calcified roots down to the Root-Mother (ch.7); Ghost-Oaks tapped for Veridian sap 'the color of liquid emerald' (ch.4); the Whispering Glade and the mossy outcrop over it (ch.5); glass-frogs (ch.2); the Salt-Flats (ch.3); and the mists below the ridge, where an unnatural violet fog that tastes of ozone brings the Void-Touchers and the Pale Shadows (ch.2-4, 8). The game is set before the books' exodus: the survivors, Elara's First Seed (the Veridian Pine), the Salt-Wall and Salt-Mender's Landing are not here yet, and the Pale's touch is shown early, as foreshadowing (PROVISIONAL). The mountains between the Rim and the Shore are Book 3's ash-mountains (book2 ch.26: the Ashlands of the lower North were once the forested Verdant Spine); the road over them is GAME-ONLY. GAME-ONLY: Rootfast and every Keeper but Oak-Bane and Willow-Whisper, Mossveil Falls, the Wending, the Mistmere, the Fern Hollow, the Fallen Ghost-Oak, the Antler Meadow, the Greying, Palemist Hollow (canon's 'mists below the ridge'), the creatures and camps, and all placement. The Root-Mother's Deep under the Temple (its root-stair, Sap Well, the cold in the root and the Hollow Root-Warden) is GAME-ONLY. The filled-out shore (2026-10-04): creeping briars in the Fern Hollow, spiders on the basalt shoulder of the Ridge of Long Shadows (CANON place), the Void-Touchers the violet fog brings below the ridge (CANON, shown early: PROVISIONAL), Old Brine-Tusk in the south-west wood, and their quests; all placement GAME-ONLY. The residents' and villagers' stories, and the secrets' clues and hints (2026-10-15), are GAME-ONLY lines about the canon things named here; the book of lore's two pages here are labelled on the page.",
   "size": 430,
   "levelMin": 13,
   "levelMax": 15,
@@ -2174,6 +2174,7 @@
       "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
     }
   ],
+  "woods": { "cover": 0.65, "from": 70, "ramp": 50, "spacing": 9, "edge": 12, "scale": 90, "deepAbove": 0.6, "deepOaks": 0.45, "oaks": 0.08, "oakScale": 0.9, "snags": 0.02, "pineAbove": 0.8, "floor": 1.2 },
   "groves": [
     {
       "name": "The Emerald Cathedral",
@@ -2994,7 +2995,12 @@
           "x": -4,
           "y": 47
         },
-        "look": "keeper"
+        "look": "keeper",
+        "stories": [
+          "The Root-Mother dreamed this shore in the First Cycle, before your kind had words. We are what she dreamed to keep it. We sing so that she dreams well. Lately the dream has a cold in it.",
+          "There was a cycle before this one. It ended in cold. The trees remember it in their rings, if you know where to count. I know where to count.",
+          "One day people will come over the ridge with nothing, and ask. I have dreamed it. I do not know yet what I will answer. I would like to have practised on you."
+        ]
       },
       {
         "name": "Moss-Lantern",
@@ -3004,7 +3010,12 @@
           "x": 9,
           "y": 36
         },
-        "look": "keeper"
+        "look": "keeper",
+        "stories": [
+          "A lantern is a little of the day, kept. The caps in the glade make their own. We only borrow it. Borrowing is the whole of the Keepers' law, and the whole of what your kind forgets.",
+          "I keep the lanterns on the ridge road lit for the ones who will come down it. None have come, yet. One lights a lantern for the coming, not the come.",
+          "Sap-cakes, warm from the stone. I learned the stone from Alder-Knot and the sap from asking. Two each, this once."
+        ]
       },
       {
         "name": "Alder-Knot",
@@ -3014,7 +3025,12 @@
           "x": -17,
           "y": 35
         },
-        "look": "keeper"
+        "look": "keeper",
+        "stories": [
+          "Wood, bone and patience. Iron rusts on this shore in a season; the salt in the air sees to it. The glass-ship woman's boat is coming apart at every nail. I offered treenails. She is thinking about it.",
+          "I carved Thorn-Hand's staff before the Greying took him. A Keeper is grown from a heart that is still green. I am keeping a cutting. Do not tell Oak-Bane.",
+          "The briars hunt now. Briars did not hunt when I was a sapling. Something in the fog below the ridge has taught them. I would like to cut one open and see what."
+        ]
       },
       {
         "name": "Reed-Song",
@@ -3024,7 +3040,12 @@
           "x": -54,
           "y": -70
         },
-        "look": "keeper"
+        "look": "keeper",
+        "stories": [
+          "The glass-frogs sing the mere's hours. When they stop along a line, something has walked that line. They have stopped from the hollow toward the mere, lately. I count the quiet every night.",
+          "The mere keeps its mist till noon. It is shy. It has been shy for a thousand years and I see no reason to hurry it.",
+          "A Keeper slept a hundred years under the ferns south of the grove, once, and the moss there still glows. That was my grandmother. Do not step on her."
+        ]
       },
       {
         "name": "Oak-Bane",
@@ -3034,7 +3055,12 @@
           "x": -95,
           "y": 111
         },
-        "look": "keeper"
+        "look": "keeper",
+        "stories": [
+          "I was grown to keep the deep wood. I have kept it eight hundred years. In eight hundred years nothing came through the briar way that I did not let through. You, I let through. Do not make me regret the exception.",
+          "The grey is in Greyheart's rings. A Keeper does not die. A Keeper is laid down. I have laid down four this season. I was grown to fight. There is nothing to fight.",
+          "The flesh-folk come for the sap. Always the sap. One of them asked first. I remember her. I remember all of them. That is the trouble with being a tree."
+        ]
       },
       {
         "name": "Sister Iselle",
@@ -3043,7 +3069,12 @@
         "at": {
           "x": 24,
           "y": 101
-        }
+        },
+        "stories": [
+          "The Original Song has three notes: Earth, Spirit, Silence. Elder Orym hears all three at once. I have heard two in this glade. The third is what the fog is made of, I think, and I would rather not hear it.",
+          "Brother Wystan came west with me to listen at the Temple. He went down the root-stair and did not come back up. The Archive will want his page. I want him.",
+          "We wear silver masks in the south so that our faces do not get in the way of listening. Here I have taken mine off. The wood already knows what I look like."
+        ]
       },
       {
         "name": "Ondine Varro",
@@ -3052,7 +3083,12 @@
         "at": {
           "x": -141,
           "y": -31
-        }
+        },
+        "stories": [
+          "Port Caelum builds ships of glass, and the Trade Princes keep pleasure barges in the Gilded Bay. I scout coves for the former so I never have to crew the latter.",
+          "Veridian sap, the colour of liquid emerald. House Glass will pay a ship's worth for three flasks. The Keepers let it be taken a little at a time, by those who ask. I asked. I'm still asking.",
+          "A glass-ship put in under this ridge before my time and never sailed out. The log was never found. I'd give a year's pay to read it, and I'd not tell House Glass what it said."
+        ]
       }
     ]
   },
@@ -3067,6 +3103,8 @@
       },
       "radius": 4,
       "text": "From the lip of the falls the Wending runs away west in long green loops, under trees as tall as towers, all the way to a line of white that must be the sea.",
+      "clue": "Climb to the lip of the falls in the north-east. From there the river runs away west in green loops to a line of white that must be the sea.",
+      "hint": "Moss-Lantern says the flesh-folk never climb to the lip of the falls, north-east of the grove. From there, she says, you can see the river all the way to the sea.",
       "xp": 210,
       "canonStatus": "GAME-ONLY: Mossveil Falls and this lookout. The Verdant Ocean running down to the sea is CANON (book3 ch.1)."
     },
@@ -3080,6 +3118,8 @@
       },
       "radius": 3.5,
       "text": "A shelf of mossy rock above the Whispering Glade. From up here the glowing caps below look like a second sky, and the glade's hum comes up through the moss into your hands.",
+      "clue": "A shelf of mossy rock above the glade of the glowing caps in the north. From up there they look like a second sky.",
+      "hint": "Sister Iselle says there's a shelf of rock above the glade to the north, and from it the caps below look like stars. The hum comes up through the moss, she says.",
       "xp": 200,
       "canonStatus": "CANON-EXPANDED: a moss-covered outcrop overlooking the Whispering Glade (book3 ch.5); the lookout is GAME-ONLY."
     },
@@ -3094,6 +3134,8 @@
       },
       "rotation": 40,
       "text": "Somebody used this stump as a cupboard: a bone spout, a stoppered flask gone dry, and a pair of gloves stained green to the wrist. The Keepers let the sap be taken a little at a time, by those who ask.",
+      "clue": "South-west, where the old Ghost-Oaks are tapped, somebody used a hollow stump as a cupboard: a bone spout, a dry flask, green-stained gloves.",
+      "hint": "Alder-Knot says the sap-tapper before Ondine kept his tools in a hollow stump among the old Ghost-Oaks in the south-west. Gloves stained green to the wrist. He asked first, that one.",
       "item": "item.tappers_gloves",
       "xp": 200,
       "gold": 30,
@@ -3110,6 +3152,8 @@
       },
       "rotation": 210,
       "text": "Pushed under a bleached drift-log above the tide-line: an oilcloth packet with a few pages of a ship's log in it, the ink run but readable.",
+      "clue": "On the salt shore in the far south-west, above the tide-line, an oilcloth packet is pushed under a bleached drift-log.",
+      "hint": "Ondine Varro says a glass-ship put in under the ridge once and didn't leave by sea. Somebody kept the log dry under a drift-log above the tide-line, on the salt shore to the south-west.",
       "document": "doc.verdant.ship_log",
       "xp": 190,
       "gold": 25,
@@ -3125,6 +3169,8 @@
         "y": -80
       },
       "text": "A cushion of moss that glows like a banked coal under the ferns, gold-green and warm to the touch. The Keepers say it grows where one of them once slept for a hundred years.",
+      "clue": "Under the ferns south-east of the grove, a cushion of moss glows like a banked coal, warm to the touch. A Keeper slept there a hundred years.",
+      "hint": "Reed-Song says a Keeper slept a hundred years under the ferns south-east of the grove, and the moss there still glows like a banked coal. Warm, if you put your hand on it.",
       "item": "herb.lantern_moss",
       "xp": 180,
       "canonStatus": "GAME-ONLY"
@@ -3141,10 +3187,46 @@
       "rotation": 250,
       "prompt": "Search the pack by the sap-pool",
       "text": "A Silent Pilgrim's travelling pack, the straps chewed through, left by the sap-pool: a listening-tube of brass, bent, and a purse nobody came back for.",
+      "clue": "By the sap-pool in the far north-west, a traveller's pack with its straps chewed through: a bent brass listening-tube in it, and a purse nobody came back for.",
+      "hint": "Willow-Whisper says one of the silent ones laid down a pack by the sap-pool in the far north-west and did not pick it up again. The wood does not take such things. It only waits.",
       "xp": 220,
       "gold": 60,
       "item": "potion.dewfern",
       "canonStatus": "GAME-ONLY: the pack; the Silent Pilgrims are CANON."
+    },
+    {
+      "id": "secret.verdant.lantern-count",
+      "name": "The Lantern Count",
+      "kind": "note",
+      "prompt": "Lift the bark from the moss",
+      "at": {
+        "x": 54.6,
+        "y": 119.6
+      },
+      "rotation": 210,
+      "text": "A shelf of bark laid on the moss at the outcrop's edge, cut with small, even strokes: Moss-Lantern's count of the lanterns, from the First Cycle to one she has not finished.",
+      "clue": "On the shelf of mossy rock above the glade of the glowing caps in the north, a Keeper cut her count of the lanterns into a piece of bark.",
+      "hint": "Moss-Lantern says she cut the count of the lanterns into bark and left it on the rock above the glade, in the north, for any flesh-folk who climb that high. Few do. She would like one to.",
+      "document": "doc.verdant.lantern_count",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: the Root-Mother, the First Cycle and the Keepers' rule against hoarding are CANON (book3 ch.2, 6-7; world_bible.md); Moss-Lantern and her count are GAME-ONLY."
+    },
+    {
+      "id": "secret.verdant.falls-page",
+      "name": "Willow-Whisper's Leaf",
+      "kind": "note",
+      "prompt": "Ease the strip of bark out of the moss",
+      "at": {
+        "x": 122.4,
+        "y": 68.9
+      },
+      "rotation": 230,
+      "text": "Pressed into the moss at the lip of the falls, kept green by the wood: a strip of pale bark in the Keepers' spiral-script, left for whoever climbs up here to look down, and for who comes after.",
+      "clue": "At the lip of the falls in the north-east, pressed into the moss, a strip of pale bark in the Keepers' spiral-script waits for whoever climbs up to look down.",
+      "hint": "Willow-Whisper says she left a leaf at the lip of the falls, north-east of the grove, for the ones who will come over the ridge one day. She says you may read it first, since you asked. She says you always ask. That is why.",
+      "document": "doc.verdant.falls_remember",
+      "xp": 60,
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother, the river to the sea and the survivors who crest the Ridge of Long Shadows are CANON (book3 ch.1-4, 7); Willow-Whisper's leaf is GAME-ONLY."
     }
   ],
   "nodes": [

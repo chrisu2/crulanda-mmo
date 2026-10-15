@@ -76,6 +76,20 @@
       "title": "The Deacon's Tally",
       "text": "Given to the light at the pit, this moon, that the Kings may know us ready.\n\nRidge salt, two casks. It would not burn. Buried it, deep.\nA wain-horse off the salt road. Old. It went quietly.\nThe last rafters of Wain's Rest, for the fire.\nA hound that came too near the pit. It did not mean to be given. Few do.\nOne Ash-Walker, young, taken on the knoll. Given on the third night.\nHe would not kneel. He would not say the words. He said his aunt would come for him, and said it again, and then he said nothing.\nHis harpoon would not burn. I keep it. A thing the light refuses is a thing to be studied.\n\nThe eternal Void hungers for the light. Feed it.",
       "canonStatus": "CANON-EXPANDED: 'The eternal Void hungers for the light' is the cult's cry (book1 ch.10), and preparing for the Kings belongs to the later House of Ash (series_bible.md), used early as in the Litany; the Ash-Deacon, his tally and Kesh are GAME-ONLY."
+    },
+    {
+      "id": "doc.ashrim.salt_line",
+      "title": "How a Salt Line Is Laid",
+      "kind": "lore",
+      "text": "Scratched on a slab of petrified bark and left at the gap in the Ridge, where the line is laid:\n\nSalt of the First Sea is not thrown. It is walked. One hand low, the grains falling in a thread, the feet never crossing the thread once it is down. Sing the chant under the breath, not aloud: the grey has no ears, but the Eaters do.\n\nThe line holds a season if the wind is kind, a month if it is not. It is laid again by whoever is Salt-Speaker, alone, at dusk. Nobody watches her lay it. That is not a rule. It is manners.\n\nPast the line the ash goes on a little way and then it doesn't. Do not step past the line to see. You have been told what is there. Believe it, and keep your thread.",
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers binding Weave-Eaters with Salt of the First Sea and the chant are CANON (book1 ch.20); the laying of a line, the slab and its rules are GAME-ONLY."
+    },
+    {
+      "id": "doc.ashrim.faceless",
+      "title": "The Faceless One",
+      "kind": "lore",
+      "text": "A page in Chieftain Grohl's square hand, left at the foot of the standing stone by the grey:\n\nThird watch at the Statue. It does not move. I have said this before. I say it again because the ash round its feet is further from it every dawn, as if it had stepped back in the night and stepped forward again before I woke. It has no face. I have begun to think it had one once and gave it up, the way we give our dead to the old sea.\n\nThe Walkers before my grandfather said the faceless stones were set up by the Weave itself, to mark where it had been mended and would not be mended again. The cult say they are the Void's own teeth. I say a thing that stands still at the edge of the grey for a hundred years is doing something, and I will know what before I am given to the sea.\n\nLast-light grows at its feet. I did not pick it.",
+      "canonStatus": "CANON-EXPANDED: the Silent Statues, faceless monoliths in the Wasting, are CANON (world_bible.md), and so are the Ash-Walkers and the Cult of Ash (book1 ch.10, ch.20); Grohl's watch and this page are GAME-ONLY."
     }
   ],
   "quests": [

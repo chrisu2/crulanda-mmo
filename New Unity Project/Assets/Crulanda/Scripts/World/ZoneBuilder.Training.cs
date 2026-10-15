@@ -72,12 +72,12 @@ namespace Crulanda.World
             }
             // Archery butts down the right, facing in.
             string[] butts = { "SmallProps/PracticeTarget_1_A", "SmallProps/PracticeTarget_2_A", "Megapack/Models/Arrow Target", "SmallProps/PracticeTarget_1_B" };
-            // Each faces into the yard, its back to the fence (Chris, 14:25). The pack's butts are made facing along their own x, the
-            // Megapack's along its z (read from their shapes: the face's thin axis, the legs behind it), so they turn differently.
-            // (PracticeTarget_2 faces the other way from PracticeTarget_1: Chris, 15:20, "one target still backwards".)
+            // Each faces into the yard, its back to the fence (Chris, 14:25). Settled from the frames and Chris's three reports
+            // (2026-10-14, "still a couple are backwards", "now three are backward"; the butts' turns logged by FaceLane): the Small
+            // Props targets face the lane at 180, the second kind too (its paint is on the far side from its legs), the Megapack's at 90.
             for (int i = 0; i < butts.Length; i++)
             {
-                GroundProp(t, butts[i], new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), butts[i].StartsWith("SmallProps/PracticeTarget_2") ? 0 : butts[i].StartsWith("SmallProps") ? 180 : -90, 1.7f, true);   // their lanes clear of the healer's corner
+                GroundProp(t, butts[i], new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), butts[i].StartsWith("SmallProps") ? 180 : 90, 1.7f, true);   // their lanes clear of the healer's corner
                 Mark(t, new Vector3(hx - 1.4f, 0, 1.0f + i * 1.9f), new Vector3(hx - 9.4f, 0, 1.0f + i * 1.9f), true);   // a sim with a bow or a spell across the yard
             }
             // Weapon stands by the left tent and against the back fence (the Fantasy peg rack is a wall board 35 cm high: it came in lying flat
@@ -95,6 +95,41 @@ namespace Crulanda.World
             GroundProp(t, "SmallProps/Stool_A", new Vector3(hx - 5.4f, 0, -hz + 5.6f), 20, .45f);
             GroundProp(t, "SmallProps/Bucket_1_A", new Vector3(hx - 4.6f, 0, -hz + 5.2f), 0, .35f);
             GroundProp(t, "SmallProps/Basin_A", new Vector3(hx - 6.4f, 0, -hz + 5.8f), 0, .3f);
+        }
+        /// <summary>
+        /// Turns a standing target (an archery butt) about the vertical so its face looks at <paramref name="toward"/>, from its own
+        /// shape: the face is the upper part's thinnest horizontal spread; a tripod butt stands on two legs splayed under its face
+        /// with a short prop behind, so the lower part's middle lies in front of the disc (the Small Props targets, read from their
+        /// meshes 2026-10-14: the legs' middle 3-12 cm out on the painted side; turned the other way they all faced the fence, Chris,
+        /// "now three are backward"). Left as it is when its meshes cannot be read or the legs stand under the disc (the Megapack's).
+        /// </summary>
+        public static bool FaceLane(GameObject go, Vector3 toward)
+        {
+            var pts = new List<Vector3>();
+            foreach (var mf in go.GetComponentsInChildren<MeshFilter>())
+            {
+                var m = mf.sharedMesh; if (m == null || !m.isReadable) continue;
+                var vs = m.vertices; var to = mf.transform.localToWorldMatrix; int step = Mathf.Max(1, vs.Length / 600);
+                for (int i = 0; i < vs.Length; i += step) pts.Add(to.MultiplyPoint3x4(vs[i]));
+            }
+            if (pts.Count < 12) return false;
+            float lo = float.MaxValue, hi = float.MinValue; foreach (var p in pts) { lo = Mathf.Min(lo, p.y); hi = Mathf.Max(hi, p.y); }
+            var up = pts.FindAll(p => p.y > lo + (hi - lo) * .55f); var low = pts.FindAll(p => p.y < lo + (hi - lo) * .3f);
+            if (up.Count < 4 || low.Count < 4) return false;
+            Vector3 Mid(List<Vector3> l) { var c = Vector3.zero; foreach (var p in l) c += p; return c / l.Count; }
+            var cu = Mid(up); var cl = Mid(low);
+            // The face's normal: the horizontal direction the upper part spreads least along (a 2 x 2 covariance's smaller axis).
+            float xx = 0, zz = 0, xz = 0; foreach (var p in up) { float dx = p.x - cu.x, dz = p.z - cu.z; xx += dx * dx; zz += dz * dz; xz += dx * dz; }
+            float angle = .5f * Mathf.Atan2(2 * xz, xx - zz);   // the major axis
+            var n = new Vector3(-Mathf.Sin(angle), 0, Mathf.Cos(angle));   // at right angles to it
+            float behind = Vector3.Dot(cl - cu, n);
+            if (Mathf.Abs(behind) < .02f) return false;
+            var front = behind > 0 ? n : -n;   // the legs' side
+            var want = toward - cu; want.y = 0; if (want.sqrMagnitude < .01f) return false;
+            float turn = Vector3.SignedAngle(front, want.normalized, Vector3.up);
+            go.transform.RotateAround(new Vector3(cu.x, go.transform.position.y, cu.z), Vector3.up, turn);
+            Debug.Log("Butt " + go.name + ": legs " + (behind * 100).ToString("0") + " cm off the disc, turned " + turn.ToString("0") + " degrees to its lane.");
+            return true;
         }
         /// <summary>The dummy's look under <paramref name="t"/>, its feet at <paramref name="foot"/> (local).</summary>
         public void TrainingDummyLook(Transform t, Vector3 foot, bool mending)

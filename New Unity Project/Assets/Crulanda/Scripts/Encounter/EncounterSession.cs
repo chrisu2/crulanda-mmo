@@ -575,6 +575,7 @@ namespace Crulanda.Encounter
             if (Inventory.Room(Progress, Items, def.item) == 0 && !questWants) { Message(ProfessionLog.BagsFullLine); return; }
             var trade = Professions.Db.Profession(def.profession);
             StartWork(WorkLabel(trade.verb), Professions.WorkSeconds(def, hard), () => GatherNow(i));
+            workPose = trade.verb == "Mine" ? ActorPose.Mine : trade.verb == "Cut" ? ActorPose.Chop : ActorPose.Gather;   // the work shows (Kevin's crafting clips, 2026-10-14)
         }
         /// <summary>"Mining", "Cutting", "Gathering": the work bar's label from the trade's verb.</summary>
         static string WorkLabel(string verb)
@@ -625,9 +626,11 @@ namespace Crulanda.Encounter
         public bool Working { get { return workDone != null; } }
         void StartWork(string name, float seconds, Action done, RecipeDef recipe = null)
         {
-            workRecipe = recipe; workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
+            workPose = ActorPose.None; workRecipe = recipe; workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
         }
         /// <summary>Stops the work in hand, if any (nothing is gathered), saying so when <paramref name="say"/>.</summary>
+        /// <summary>Saves and closes the game (the pause menu's Quit, /exit and /quit; Chris, 2026-10-14).</summary>
+        public void Quit() { try { if (Player != null && Player.IsAlive && !InCombat) Save(); } catch (Exception) { } Application.Quit(); }
         public void CancelWork(bool say = false) { if (workDone == null) return; workDone = null; workName = null; if (say) Message(WorkStoppedLine); }
         void TickWork()
         {
@@ -1148,19 +1151,46 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>
-        /// The quest book's Discoveries tab: every zone, this one first and the rest by level, with how many secrets each holds and
-        /// the ones found (the rest are only counted). This zone's are the ones in play here (SecretSpots); other zones' come from
-        /// their data.
+        /// The quest book's Discoveries tab: every zone, this one first and the rest by level, with how many secrets each holds, the
+        /// ones found and a clue for the rest (ZoneLore merges a zone's side file of clues in first). This zone's are the ones in play
+        /// here (SecretSpots); other zones' come from their data.
         /// </summary>
         public List<DiscoveryLog.Tally> DiscoveryTallies()
         {
             var list = new List<DiscoveryLog.Tally>();
             if (Discoveries == null || Zone == null) return list;
+            ZoneLore.Apply(Zone.Zone);
             var here = new List<Crulanda.World.ZoneSecret>(); foreach (var spot in SecretSpots) here.Add(spot.def);
             list.Add(Discoveries.TallyOf(Zone.Zone.id, Zone.Zone.displayName, here, true));
             var others = Zone.AllZones().FindAll(z => z != null && z.id != Zone.Zone.id);
             others.Sort((a, b) => a.levelMin != b.levelMin ? a.levelMin.CompareTo(b.levelMin) : string.CompareOrdinal(a.id, b.id));
-            foreach (var z in others) list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false));
+            foreach (var z in others) { ZoneLore.Apply(z); list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false)); }
+            return list;
+        }
+        /// <summary>A page of the book of lore (<see cref="LorePages"/>): the page, the zone whose hidden find holds it, whether it is found.</summary>
+        public sealed class LorePage { public DocumentDef doc; public string zoneName; public bool found; }
+        /// <summary>
+        /// The book of lore (the quest book's Lore tab; 2026-10-15, Chris: "book of lore"): every page of kind "lore" in the quest
+        /// content, zone by zone in the Discoveries tab's order (this zone first, then by level) as their hidden finds hold them, and
+        /// last any held by no find (given another way, or not placed yet: its zone is empty).
+        /// </summary>
+        public List<LorePage> LorePages()
+        {
+            var list = new List<LorePage>(); var seen = new HashSet<string>(StringComparer.Ordinal);
+            if (Quests == null || Progress == null) return list;
+            if (Zone != null)
+            {
+                var zones = new List<Crulanda.World.ZoneDefinition> { Zone.Zone };
+                var others = Zone.AllZones().FindAll(z => z != null && z.id != Zone.Zone.id);
+                others.Sort((a, b) => a.levelMin != b.levelMin ? a.levelMin.CompareTo(b.levelMin) : string.CompareOrdinal(a.id, b.id));
+                zones.AddRange(others);
+                foreach (var z in zones)
+                    foreach (var s in z.secrets ?? NoSecrets)
+                        if (s != null && !string.IsNullOrEmpty(s.document) && seen.Add(s.document) && Quests.Db.Documents.TryGetValue(s.document, out var doc) && doc.IsLore)
+                            list.Add(new LorePage { doc = doc, zoneName = z.displayName, found = Progress.documents.Contains(doc.id) });
+            }
+            foreach (var doc in Quests.Db.Documents.Values)
+                if (doc != null && doc.IsLore && seen.Add(doc.id)) list.Add(new LorePage { doc = doc, zoneName = "", found = Progress.documents.Contains(doc.id) });
             return list;
         }
 
@@ -1215,15 +1245,19 @@ namespace Crulanda.Encounter
         public float CooldownRemaining(AbilityDefinition ability) { return abilities.Remaining(ability, Time.time); }
         /// <summary>A cast in progress, or work (gathering) on the same bar.</summary>
         public bool PlayerCasting { get { return abilities.IsCasting || Working; } }
+        /// <summary>A status effect's name for the HUD's buff row (its id when the content has no name for it).</summary>
+        public string StatusName(string id) { var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id; }
         /// <summary>The player's figure (blows, flinches and casts on it: playtest note 25).</summary>
         public ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
-        ActorVisual playerFigure; bool castPosed;
+        ActorVisual playerFigure; bool castPosed; string castMotion; ActorPose workPose; (GameObject hand, GameObject circle) castFx;
         /// <summary>A cast being drawn holds the spell pose; when it ends standing (not moved off it), the spell is let fly.</summary>
         void TickCastPose()
         {
             var f = PlayerFigure; if (f == null) return;
             bool drawing = abilities.IsCasting;
-            if (castPosed && !drawing && Player.IsAlive && !Player.GetComponent<AdventurerMotor>().Moving) f.CastRelease();
+            if (castPosed && !drawing && Player.IsAlive && !Player.GetComponent<AdventurerMotor>().Moving) f.CastRelease(castMotion);
+            if (drawing && !castPosed) { castMotion = ActorVisual.MotionFor(abilities.Casting); castFx = SpellFx.CastBegin(abilities.Casting, f.RightHandle, Player.transform); }   // what the drawn cast lets fly (ActorVisual.Motions.cs), its glow in the hand (SpellFx)
+            if (!drawing && castPosed) SpellFx.CastEnd(castFx);
             if (drawing != castPosed) { f.Casting = drawing; castPosed = drawing; }
         }
         public float PlayerCastProgress { get { return abilities.IsCasting ? abilities.CastProgress(Time.time) : Working ? Mathf.Clamp01((Time.time - workStart) / workSeconds) : 0; } }
@@ -1236,11 +1270,19 @@ namespace Crulanda.Encounter
             var result = abilities.TryStart(a, Time.time, cost => {
                 if (Player.Resource.Pool.Current < cost) return false;
                 Player.Resource.Pool.Change(-cost); return true;
-            }, effect);
+            }, effect == null ? null : (Action)(() => SpellFx.Run(a, this, effect)));   // shown as it resolves (SpellFx: every ability's effect)
             if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + (string.IsNullOrEmpty(ClassDef.resourceName) ? ClassDef.resource.ToString() : ClassDef.resourceName) + ".");
             // An instant blow or spell on a target shows (playtest note 25): a swing in melee, a release at range. Casts are TickCastPose's.
             if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive && !Kit.OwnBlow(a))
-            { if (Kit.MeleeAutoAttacks || a.range <= 5 || (Distance(Target) < 3.5f && !Kit.RangedAutoAttacks)) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease(); }   // a bow's shot is loosed at any range
+            {
+                string motion = ActorVisual.MotionFor(a);
+                bool spell = motion == "call" || motion == "omni" || (motion != null && motion.StartsWith("bolt"));
+                if (a.range <= .5f && motion == null) { }   // a buff on oneself with no motion of its own (a guard, a stance)
+                else if (!spell && (Kit.MeleeAutoAttacks || a.range <= 5 || (Distance(Target) < 3.5f && !Kit.RangedAutoAttacks))) PlayerFigure?.Strike(motion);
+                else PlayerFigure?.CastRelease(motion);   // a bow's shot is loosed at any range
+            }
+            // What works round the caster shows with no target too (a shout, a song, a ward on the ground, a thrall raised).
+            else if (result == AbilityStartResult.Started && a.castTime <= 0 && !Kit.OwnBlow(a) && ActorVisual.ShowsUntargeted(a)) PlayerFigure?.CastRelease(ActorVisual.MotionFor(a));
             return result;
         }
         public bool EnemyInRange(EncounterEnemy enemy, float range) { return enemy != null && enemy.actor.IsAlive && Distance(enemy) <= range; }
@@ -1756,7 +1798,7 @@ namespace Crulanda.Encounter
             TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickFeats(); TickNodes(); TickWork(); TickCastPose();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
             var motor = Player.GetComponent<AdventurerMotor>(); var look = Player.GetComponent<ActorVisual>();
-            if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : ActorPose.None;
+            if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : workDone != null ? workPose : ActorPose.None;
             if (!BuildOpen && EncounterInput.Press(KeyCode.Tab)) CycleTarget();
             if (EncounterInput.Click && !EncounterHud.BlocksPointer(EncounterInput.Pointer))
             {
@@ -1792,7 +1834,7 @@ namespace Crulanda.Encounter
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)
             {
                 nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
-                if (Kit.MeleeAutoAttacks) PlayerFigure?.Strike(); else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
+                if (Kit.MeleeAutoAttacks) { PlayerFigure?.Strike(); SpellFx.Slash(Player.transform, Target.transform, false, .6f); } else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
                 Target.Receive(WeaponDamage, Player); Kit.OnAutoHit();
             }
             if (Time.time >= nextRegen)

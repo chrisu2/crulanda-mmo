@@ -1,0 +1,365 @@
+{
+  "zone": "zone.oakhaven",
+  "canonStatus": "GAME-ONLY: every clue, hint and story here is the game's. What they tell of is CANON or CANON-EXPANDED as oakhaven.json's canonNote says: the Wasting unmaking the land (world_bible.md), Hallow's Creek as the first settlement it took (world_bible.md), the Council's collectors and the ledger of souls (book1 ch.4), the First Kin, Oakhaven's deep springs and cider (book1 ch.4), the Salt-Menders, the Preservationists and the Archive (world_bible.md), the Sandthrone company (world_bible.md), Port Caelum's glass ships (world_bible.md). Wren Harrow, Mira, Quill, Warden Ivel, the deserters of Crowsfoot Hollow and every villager are GAME-ONLY. Written 2026-10-15 apart from oakhaven.json (another hand had it that night; fold these into it when it is free: clue and hint onto each secret, stories onto life.stories and the residents, Hesper Crane's among them).",
+  "secrets": [
+    {
+      "id": "secret.oakhaven.roads-end",
+      "clue": "Follow the east ruts until there is nothing left to follow. Someone stacked three stones to say so.",
+      "hint": "Old Tobin says the east ruts don't end at the grey, they stop. Somebody's stacked three stones where they stop, and nobody will say who."
+    },
+    {
+      "id": "secret.oakhaven.poachers-camp",
+      "clue": "South-west of the village, under the eaves of a copse, a cold fire and a snare line; whoever ran left their bundle behind.",
+      "hint": "Garet Moss found snares in the copse south-west of the fields that aren't his. A cold fire there, he says, and a bundle nobody's come back for."
+    },
+    {
+      "id": "secret.oakhaven.menders-drop",
+      "clue": "Salt-stiff cord and a careful hand: a Mender's drop, pushed in behind the plinth of the shrine on the east road.",
+      "hint": "Quill says his people leave drops behind shrines for one another. Behind the plinth, he said, where the collectors won't kneel."
+    },
+    {
+      "id": "secret.oakhaven.chapel-leaf",
+      "clue": "By the chapel wall an old stump has gone hollow, and someone pushed a leaf of the chapel book deep into it, out of the damp.",
+      "hint": "Corwin Ashby says the chapel book's missing a leaf. Somebody cut it out and hid it, and not far: there's a hollow stump by the chapel wall nobody's looked in."
+    },
+    {
+      "id": "secret.oakhaven.moonbells",
+      "clue": "Pale bells that glow in the shade of the copse east of the village; the hedge-wives say the ground there is still sure of itself.",
+      "hint": "Lisbet Crane says moonbells still come up in the copse east of the green, in the shade. They glow of an evening, if the ground's still sure of itself."
+    },
+    {
+      "id": "secret.oakhaven.strongbox-key",
+      "clue": "In the deserters' cave under the north hills, where a sentry stands over the Drop, a key hangs on a nail within reach of a lazy hand.",
+      "hint": "Wil Carder heard the deserters keep their pay chest locked and the key on a nail by the Drop in their cave, where the sentry can reach it without looking."
+    },
+    {
+      "id": "secret.oakhaven.quartermasters-strongbox",
+      "clue": "The deserters' pay chest sits in the store caves under the north hills. It opens for the key on the sentry's nail.",
+      "hint": "Tamsin Reed says Hesk kept a strongbox in the store caves under the hills: company silver, his lantern, and the King's orders. Locked, mind."
+    },
+    {
+      "id": "secret.oakhaven.overlook",
+      "clue": "Climb the knob of the hill above the hunter's lodge in the north-west. From the top the valley lies open, and the haze past the farthest field is the wrong colour.",
+      "hint": "Pim dares everyone to climb the rocks on the hill over Garet's lodge. From the top you can see the whole valley, he says, and the grey past it."
+    },
+    {
+      "id": "secret.oakhaven.shepherds-tin",
+      "clue": "Where the shepherds sit out of the wind at the fold in the west, the wall has a gap at its foot, and the gap has a tin.",
+      "hint": "Tam Sedge keeps a tin in the fold wall, where they sit out of the wind. Cheese, a few coins and the tally. Don't tell Nell I said."
+    },
+    {
+      "id": "secret.oakhaven.robbers-bundle",
+      "clue": "Someone threw down the door-stone of the barrow in the south and lost their nerve. Their bundle lies among the stones before the door.",
+      "hint": "Old Tobin says someone's had the door-stone off the barrow south of the fields. Dropped their bundle by the door and ran, by the look of it. He won't go and see."
+    },
+    {
+      "id": "secret.oakhaven.hallows-creek-letter",
+      "clue": "The farmhouse nearest the grey in the east has a crack in its wall, and a letter folded small in the crack, much read.",
+      "hint": "Nan Pennock says Ada Hollin kept a letter from her kin at Hallow's Creek and read it till it wore thin. If it's anywhere, it's in the wall of that farmhouse by the grey."
+    },
+    {
+      "id": "secret.oakhaven.watch-book",
+      "clue": "The watchers east of the village kept a book, and the last of them left a page under a flat stone at the tower's foot for the next.",
+      "hint": "Old Tobin says the watch kept a book in the tower east of the village, and each watcher left word for the next under a flat stone at its foot."
+    },
+    {
+      "id": "secret.oakhaven.long-view",
+      "clue": "The hill with stones on its crown, in the far south-west by the bound: from there the west road is a thread, and the sky over Khaven is the colour of a bruise.",
+      "hint": "Sel Harrow says from the stones on the hill at the far south-west corner you can see the whole west road to the bound, and the sky over Khaven that never gets any lighter."
+    },
+    {
+      "id": "secret.oakhaven.carters-stash",
+      "clue": "On the west road, where the carters rest their horses, a tin sits behind the little shrine where a man could reach it from the box without getting down.",
+      "hint": "Nan Pennock's boy says the carters keep a tin behind the little shrine on the west road, where they rest the horses. Coins against a broken axle, and a lucky acorn."
+    },
+    {
+      "id": "secret.oakhaven.carder-sack",
+      "clue": "Where the north track starts to climb into the hills, a seed-corn sack was kicked under a stone to be fetched later. It never was.",
+      "hint": "Wil Carder says one of his seed sacks went up the north road with the deserters and never came back. Dropped where the track starts to climb and kicked under a stone, he reckons."
+    },
+    {
+      "id": "secret.oakhaven.bee-wifes-tin",
+      "clue": "East by the grey, where the bee-wife sat to watch her flight holes, a tin is pushed in under the bench. The bees went west in the night; the honey-money didn't.",
+      "hint": "Nan Pennock says the Hollins' bee-wife kept her honey-money under the bench by the skeps, out east. The bees left in the night, all together. The tin didn't."
+    },
+    {
+      "id": "secret.oakhaven.under-the-watcher",
+      "clue": "Far to the north-east, where the grey begins, a hooded stone stands and casts the only shadow on that ground. Stand close under it at noon.",
+      "hint": "Old Tobin says there's a hooded stone out north-east on the edge of the grey, and its shadow lies the wrong way at noon. He's stood under it once. He won't say what it felt like."
+    },
+    {
+      "id": "secret.oakhaven.cowmans-tin",
+      "clue": "South-east, where a cowman's cot burned, the fire didn't want the door-stone. Under it, a tin, and one word scratched in the lid over and over.",
+      "hint": "Grete Lowe says Ferris Wick kept the Brook farm's cow-money in a tin under his door-stone, out south-east, and the fire that took his cot didn't take the stone."
+    },
+    {
+      "id": "secret.oakhaven.cutters-tin",
+      "clue": "In the south wood, where the cutters sit on a fallen trunk for their bread, a tin is pushed under the trunk with a whetstone and the pay owed to the Cask.",
+      "hint": "Osk Farrow left his tin under the trunk where the cutters sit for their bread, down in the south wood. A pasty, a whetstone and what he owes Hob. He's not been back for it."
+    },
+    {
+      "id": "secret.oakhaven.quarrymans-tin",
+      "clue": "In the old quarry far to the south-west, where the face came down, a tin is wedged in the cleft of the fallen rock, with a mason's mark cut in the lid.",
+      "hint": "Brannoc Vell says the old quarryman kept his wedge-money in the cleft where the face came down, out in the delf to the south-west. There's a mark on the lid, he says, the same as under the well's kerb."
+    },
+    {
+      "id": "secret.oakhaven.elins-cairn",
+      "clue": "On the crown of a knoll far to the west, a pile of stones grows by one every week, laid by a father who watched the wagon out of sight from there.",
+      "hint": "Ilse Brandt says Sel Harrow climbs the knoll out west every seventh day and puts a stone on a pile there. One for every week since the wagon. Nobody goes with him."
+    },
+    {
+      "id": "secret.oakhaven.hespers-simples",
+      "clue": "Up at the old herb-wife's hut in the north-west hills, under the board where she dries her simples, a tin of what she will not sell and a note from her granddaughter.",
+      "hint": "Lisbet Crane says her gran keeps a tin under the drying board at her hut in the north-west hills, with the simples she won't sell. She wrote her a note asking her to come down. She says Gran's not read it."
+    },
+    {
+      "id": "secret.oakhaven.foragers-sack",
+      "clue": "At the edge of the camp the foragers keep north-east of the village, kicked under a bush to be carried up the hill later, a sack with the Carder mark and a tally in a careful hand.",
+      "hint": "Wil Carder says the deserters' foragers kicked one of his sacks under a bush at the edge of their camp, north-east of the fields, meaning to fetch it later. He wants the tally that's in it more than the seed."
+    },
+    {
+      "id": "secret.oakhaven.swineherds-bundle",
+      "clue": "Far to the south-east, where the sallows are webbed, a swineherd's bundle is wedged in the roots where he dropped it, running barefoot from the spiders.",
+      "hint": "Grete Lowe says Col Pennock went in after the pigs in the sallows far south-east at the first frost and came out barefoot. His bundle's still in the roots. He won't go back for it."
+    },
+    {
+      "id": "secret.oakhaven.foragers-pack",
+      "clue": "North of the village, at the bottom of a pit dug for wolves, a forager left his pack to climb out: the north farms' eggs, broken, and a letter he never answered.",
+      "hint": "Garet Moss says one of Caddock's foragers fell in the pit north of the fields, the one dug for wolves, and climbed out without his pack. It's still down there, he says, with the Carders' eggs in it."
+    }
+  ],
+  "stories": [
+    {
+      "name": "Brannoc Vell",
+      "lines": [
+        "My father shod the Council's horses when they first came east, twenty years back. Bowed, and took their coin. I'd not bow now. I'd not take it either.",
+        "The best iron I ever had came out of the Peaks on a mule, before the Company put a gate across the road. Now I beat old nails straight and call it a trade.",
+        "Wren Harrow used to sit on that stool and work the bellows for a penny. She hummed. The forge has been quiet since they took her."
+      ]
+    },
+    {
+      "name": "Wil Carder",
+      "lines": [
+        "My grandfather broke the north field with one ox and a borrowed plough. The Concord's tithe took a third of it last year. The grey will take the rest if we let it.",
+        "I kept a jar of seed from every harvest since I was a boy. Thirty jars on a shelf. The deserters took the shelf.",
+        "Hallow's Creek sent us seed-corn the year the blight came. Good people. There's a square of nothing where they were now, and I never sent so much as a loaf back."
+      ]
+    },
+    {
+      "name": "Ama Rusk",
+      "lines": [
+        "I had a carter from Port Caelum at the stall once, with glass beads and a cask of blue salt. He laughed at our prices and went east. Nobody came back west along that road after him.",
+        "The collectors take a tithe of the stall and write it in a book. I've seen the book. Half the page is names, not goods.",
+        "My mother sold apples under the oak for forty years. She said the tree listened. I say it's a tree. I still talk to it when the stall's quiet."
+      ]
+    },
+    {
+      "name": "Hedda Thorne",
+      "lines": [
+        "The oven was my grandmother's, and her mother's before. Forty years the fire's not gone out. I'll not be the one to let it.",
+        "The first morning the flour came up grey, I baked it anyway. Nobody ate the loaves. The crows wouldn't either, and crows eat anything.",
+        "Wren Harrow came for the heel of the first loaf every morning. I still cut one. Old Tobin eats it, and doesn't ask why."
+      ]
+    },
+    {
+      "name": "Sel Harrow",
+      "lines": [
+        "They told me my girl had 'resonance' and the Council needed it. Needed. As if she were a bushel of barley.",
+        "My father swore by the First Kin whenever he lost a wager, and he lost most of them. I've taken to swearing by them myself. It's all I have of him.",
+        "The deep springs under the farm have never run dry, not in the worst summer. The well in the square went bitter the week the wagon came. Tell me that's chance."
+      ]
+    },
+    {
+      "name": "Garet Moss",
+      "lines": [
+        "I tracked a stag to the grey once, before it came this close. The slot went in and didn't come out. Not dead. Gone. I don't hunt east now.",
+        "A Preservationist warden came through when I was a boy and showed my father how to read a grey-hearted oak. Ivel's the first I've seen since. They're few, and they're late.",
+        "My lodge is the last roof before the hills. Some nights I hear the hollow sing up there, if the wind's north. It isn't the deserters."
+      ]
+    },
+    {
+      "name": "Old Tobin",
+      "lines": [
+        "I was a watchman on the east tower when there was a watch to keep. We watched for Sandthrone riders. Nobody told us to watch the sky.",
+        "I saw Hallow's Creek go. Not go: stop. I was on the ridge with a cart of their apples. I drank for a year after. Nobody blames me, and I wish they would.",
+        "My Edda says I drink to forget. I drink to remember. Sober, the grey's just weather."
+      ]
+    },
+    {
+      "name": "Pim",
+      "lines": [
+        "Dad says the First Kin are under the barrow and they'll come up if the grey gets too near. I touched the door-stone once. It was warm.",
+        "Wren could whistle so the dogs came from the far fields. She was teaching me. I can nearly do it.",
+        "When I'm big I'm going to Khaven to find the wagon and bring everybody back. Mum cried when I said it, so I don't say it now."
+      ]
+    },
+    {
+      "name": "Osk Farrow",
+      "lines": [
+        "I felled an oak east of the Harrow wood that was grey to the heart. The axe went through it like bread. I burned it in the yard and the smoke went up straight, no wind, like it had somewhere to be.",
+        "My Pim thinks I'm not afraid of anything. That's the whole of my job now: letting him think it.",
+        "The Cask's roof beams are mine. Set them the year Hob took the inn. Whatever comes, that roof stands."
+      ]
+    },
+    {
+      "name": "Lisbet Crane",
+      "lines": [
+        "Yarrow, comfrey, marigold. My mother knew forty herbs, and the grey has taken the ground for half of them. I write the names down so they're not lost twice.",
+        "Mira came to me the first week, asking what grew here. I told her. She wrote nothing down. The Menders carry it in their heads, she said. Safer.",
+        "There are herbs that only grow where the ground remembers being alive. Moonbell is one. When it stops coming up near the green, it's time to go."
+      ]
+    },
+    {
+      "name": "Ilse Brandt",
+      "lines": [
+        "I came to the Harrows as a hand the summer Wren was born. I'm still a hand. I'd have gone in the wagon in her place if they'd let me.",
+        "The ewes won't graze east of the fold wall any more. Sheep know. We should have listened to sheep.",
+        "There's a wolf on the downs older than I am, with a white foot. My father saw him. We'll both be gone before he is."
+      ]
+    },
+    {
+      "name": "Corwin Ashby",
+      "lines": [
+        "Oakhaven fed the whole eastern Rings once. Grain barges down the creek, the mill never still. The ledger in the chapel goes back two hundred years. I've not written in it since the wagon came.",
+        "A Seeker stood where you stand and told me the Council would keep Oakhaven safe. I believed him. That is the worst thing I have done, and I have been elder forty years.",
+        "The lullaby's older than the village. My grandmother said it was older than the Council. 'Sleep now, stone and sky.' Stone and sky are what the grey takes last."
+      ]
+    },
+    {
+      "name": "Aldo Crisp",
+      "lines": [
+        "My boy's eleven. The collectors looked at him the way Ama looks at a good ham. I've a hiding place in the mill. I'll not say where, not even to you.",
+        "The wheel's turned on Oak creek since before the Concord. Less grain under the stone every year, but it turns. Some mornings that's enough.",
+        "The flour tastes of ash. Hedda says so and she's right. It's not ash. Ash is something. This is less than that."
+      ]
+    },
+    {
+      "name": "Maud Tanner",
+      "lines": [
+        "I tanned a hide for a Sandthrone captain once, red as blood, for a saddle. He paid in good coin. I still hate the look of it.",
+        "A wolf pelt from the Upper pines, before the grey, was black as the inside of a boot. Now they come in grey at one edge, like the beast had been leaning on something.",
+        "Fen says I work too long. Nettie says the shop smells. They're both right, and the belts hold."
+      ]
+    },
+    {
+      "name": "Fen Walker",
+      "lines": [
+        "I walked the pelts to Khaven twice a year when the road was safe. The last time, the gallows were full and the inn had no bread. I didn't go a third time.",
+        "Hunger stinks worse than the yard does. I've smelt both.",
+        "My Nettie wants to see the sea. I've never seen it. There's a port in the west with ships made of glass, they say. I'd like to say I didn't believe it."
+      ]
+    },
+    {
+      "name": "Edda Pell",
+      "lines": [
+        "Tobin was the best watchman the east tower ever had. He saw Hallow's Creek go and he's not been right since. I'd not be right either.",
+        "Two women came through last spring with their faces hidden and took rooms at the Cask. Salt-Menders, Hob says. Mira's one. The other's in the corner still.",
+        "My sister married into Hallow's Creek. I had a letter every midsummer. I've stopped waiting for the next."
+      ]
+    },
+    {
+      "name": "Nettie",
+      "lines": [
+        "Mum says the shop smells of money. It smells of dead cow.",
+        "There's a lady at the Cask who never takes her hood off. I asked her why. She said the salt in her hair frightens horses. I think she was being funny.",
+        "Dad's going to take me to see the glass ships when the road's safe. Pim says the road's never going to be safe. Pim says a lot of things."
+      ]
+    },
+    {
+      "name": "Tamsin Reed",
+      "lines": [
+        "Hesk's men took four pence worth of kettle off my stall and wrote 'requisitioned' in a book. I want the book.",
+        "My husband went to Khaven with a cart of cloth three winters back. The horse came home. I keep the stall because it's what we had.",
+        "The Concord taxes the carts twice and the deserters a third time. The grey, at least, has never asked for a tithe."
+      ]
+    },
+    {
+      "name": "Jory",
+      "lines": [
+        "I was a carter till the Company put a gate on the Peaks road. Now I'm a man with a horse and nowhere to drive it.",
+        "I drove the road to Hallow's Creek a hundred times. Last time there was a milestone and then there wasn't a road. I turned the cart round very slowly.",
+        "Hob lets me sit as long as I buy one. I buy one. Sometimes two, if the grey's been loud."
+      ]
+    },
+    {
+      "name": "Grete Lowe",
+      "lines": [
+        "The Brook pigs went wild in Sallow Bottom two winters back and the Concord tithes me for them still. They'd tithe me for the rain if they could count it.",
+        "My Nan lodges with me since her boy took the wain. She watches the west road from the step every evening. I've stopped telling her to come in.",
+        "The pond's gone brown at the east edge. Not mud. Brown the way a bruise goes. I don't water the cows from that side now."
+      ]
+    },
+    {
+      "name": "Hob Linden",
+      "lines": [
+        "The Cask stood before the Concord. My grandfather poured for the first Seeker who rode through, and spat in it. We've a tradition.",
+        "Mira took the corner table the day she came and mended a child's arm for a bowl of stew. I've not charged her for a bed since. She pays anyway.",
+        "Nine seats and a hearth. On a bad night I've had forty in here, standing. Nobody wants to be in their own house when the grey's loud."
+      ]
+    },
+    {
+      "name": "Quill",
+      "lines": [
+        "We mend. The Council pins; the Menders mend. It's slower, and it holds. Mostly.",
+        "There was a Mender at Hallow's Creek. She sent one letter after it was gone: 'Not enough salt in the world.' She was wrong, I think. There was not enough time.",
+        "Salt remembers the sea, and the sea remembers the beginning. That's the whole of our craft, and it took me ten years to learn to say it."
+      ]
+    },
+    {
+      "name": "Warden Ivel",
+      "lines": [
+        "The Archive remembers the First Era, when the Weave ran free. We are its wardens, few and far between. I was sent to count the grey oaks. I was not sent to stop them.",
+        "Hallow's Creek had a warden too. Her last report said the roots were sound. The roots were the last thing to go.",
+        "The Council calls us hoarders of old books. The Spoke is the last thing we warned against. Nobody reads the old books."
+      ]
+    },
+    {
+      "name": "Goody Marl",
+      "lines": [
+        "I'm Sel's aunt, and Wren's great-aunt, and the hens knew her better than they know me. They went off laying for a week when the wagon left.",
+        "The lullaby's three verses, and I have the first. My mother sang it the night the Council's first tax-man came, to settle us all. It worked, then.",
+        "A speckled hen will tell you more about the weather than the Council's almanac, and she's never once lied to me."
+      ]
+    },
+    {
+      "name": "Hettie Brook",
+      "lines": [
+        "The second verse of the lullaby is mine. 'Sleep now, root and rafter.' Old Tobin has the third, when he's sober enough to find it.",
+        "I was born in Hallow's Creek. I came here to marry a Carder. The Carders are all dead but Wil, and Hallow's Creek is all dead but me.",
+        "Foxes won't come near the grey. The hens know it. They lay nearer the house every week, and the house is nearer the grey."
+      ]
+    },
+    {
+      "name": "Nan Pennock",
+      "lines": [
+        "My boy drives the wain to Khaven. Drove. The horse came home with the traces cut clean. A wolf doesn't cut clean.",
+        "I lodge with Grete now. My own house is east of the Hollins', and the Hollins' house is in the grey.",
+        "I kept hens through two plagues and a Sandthrone winter. I'll keep them through this, or they'll outlast me."
+      ]
+    },
+    {
+      "name": "Tam Sedge",
+      "lines": [
+        "Thirty-one in the fold. Thirty-six, before the thing on the downs started taking one a week. I count them twice a night.",
+        "The Harrows' bell-wether had a bell my grandfather cast. I'd hear it from the lodge on a still night. I don't hear it now.",
+        "The high pasture's grey. The sheep won't go up and I don't ask them. There's a ewe that stands at the wall and looks up there, though. Every evening."
+      ]
+    },
+    {
+      "name": "Nell Sedge",
+      "lines": [
+        "Tam counts them twice. I count them three times. Between us we've never lost one to counting.",
+        "Shear in the warm and they forgive you by supper. Shear in the cold and they remember all winter. Sheep hold a grudge better than Khaven folk.",
+        "My grandmother said the grey was a story to keep children off the east road. She died before she had to say she was wrong. I envy her that."
+      ]
+    },
+    {
+      "name": "Hesper Crane",
+      "lines": [
+        "Lisbet wants me down in the village. The village has a well that's gone bitter and a wagon that comes for children. Up here I have the hill and forty herbs. I know which I'd rather.",
+        "I taught Lisbet every herb she knows, and her mother before her. The moonbell was the last one I taught. It's the first one the grey takes. I wanted her to know it while it was still there to know.",
+        "A hedge-witch in Khaven sent me a cutting of mourner's cap, years back. It grows on graves. I planted it by the door. It's the only thing up here that's doing well."
+      ]
+    }
+  ]
+}

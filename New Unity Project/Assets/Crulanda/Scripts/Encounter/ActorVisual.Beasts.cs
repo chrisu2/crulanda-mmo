@@ -316,10 +316,14 @@ namespace Crulanda.Encounter
             bool fighting = enemyRef != null && enemyRef.Engaged;
             float t = Time.time + beastPhase;
             string rest = LyingLow ? "headlow" : fighting ? "idle" : beastModel.Kind == "Wolf" ? (Mathf.Sin(t * .21f) > .6f ? "idle2" : "idle") : (Mathf.Sin(t * .3f) > 0 ? "eat" : "idle");
-            beastModel.Drive(LyingLow ? 0 : speed, rest);
+            // In the air (the player's orc jumping; the packs have no jump clip): the legs run, not stand (Chris, 2026-10-14 18:55:
+            // "when orc jump his legs dont move or bend").
+            if (!motorChecked) { motor = GetComponent<AdventurerMotor>(); motorChecked = true; }
+            bool airborne = motor != null && motor.Airborne;
+            beastModel.Drive(LyingLow ? 0 : airborne ? Mathf.Max(speed, 4.5f) : speed, rest);
         }
         /// <summary>A blow as it lands (EncounterEnemy): a modelled beast attacks (a wolf bites, a stag drives its antlers, a doe kicks).</summary>
-        public void Strike()
+        public void Strike(string motion = null)
         {
             if (beastModel != null)
             {
@@ -327,14 +331,19 @@ namespace Crulanda.Encounter
                 if (beastModel.Has("attack2")) { blow = (blow + 1) % 3; beastModel.Play(blow == 0 ? "attack" : blow == 1 ? "attack2" : "attack3"); return; }
                 beastModel.Play(beastModel.Kind == "Deer" ? "kick" : "attack"); return;
             }
-            // A modelled person (playtest note 25): a sword's swing armed (anything held), a jab or a cross bare-handed.
-            if (model != null) model.Act(held != null && held.Length > 0 && !gearStowed ? "swing" : (punchLeft = !punchLeft) ? "jab" : "cross");
+            // A modelled person (playtest note 25): a blow by what the hands hold (ActorVisual.Motions.cs), a jab or a cross bare-handed.
+            if (model != null) model.Act(MeleeSlot(motion));
         }
         bool punchLeft; int blow;
         /// <summary>A thrust whatever the hands hold (the Ranger's spear work, the bow slung: the jab and the cross in turn).</summary>
-        public void Thrust() { if (model != null) model.Act((punchLeft = !punchLeft) ? "jab" : "cross"); else Strike(); }
+        public void Thrust() { if (model != null) model.Act(model.HasAct("thrustP") ? "thrustP" : (punchLeft = !punchLeft) ? "jab" : "cross"); else Strike(); }   // Kevin's polearm thrust (2026-10-14)
         /// <summary>A spell let fly (an instant one, or a cast as it completes): the release over the walk.</summary>
-        public void CastRelease() { if (BowReady) { Shoot(); return; } if (model != null) model.Act("castshot"); else if (beastModel != null && beastModel.Has("cast")) beastModel.Play("cast"); }   // a bow looses an arrow (and comes out to)
+        public void CastRelease(string motion = null)
+        {
+            if (BowReady && (motion == null || motion.StartsWith("bolt"))) { Shoot(); return; }   // a bow looses an arrow; a call, a song or a throw is not a shot
+            if (model != null) model.Release(motion ?? DefaultRelease(), castingNow);   // Kevin's spellcasting (ActorVisual.Motions.cs): its release alone after a drawn cast
+            else if (beastModel != null && beastModel.Has("cast")) beastModel.Play("cast");
+        }   // a bow looses an arrow (and comes out to)
         /// <summary>A cast being drawn: the spell pose held over the walk.</summary>
         bool castingNow;
         public bool Casting { get { return castingNow; } set { castingNow = value; bool bow = value && BowReady; drawing = bow; if (model != null) model.Casting = value && !bow; } }   // a bow is drawn, not a spell

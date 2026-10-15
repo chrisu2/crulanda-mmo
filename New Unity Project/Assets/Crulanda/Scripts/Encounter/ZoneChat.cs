@@ -158,6 +158,7 @@ namespace Crulanda.Encounter
                     case "/assist": case "/a": Assist(arg); return;
                     case "/lead": case "/run": Lead(arg); return;
                     case "/dungeon": LeadDungeon(arg); return;   // "/dungeon quick", "/dungeon full" (the Adit rework)
+                    case "/exit": case "/quit": Quit(); return;   // Chris 2026-10-14: "all need an exit command to close the .exe"
                     case "/scorecard": ScorecardOpen = !ScorecardOpen; if (ScorecardOpen && ScorecardTitle == null) ScorecardTitle = (Meter.RunName ?? "The run") + " so far"; return;
                     case "/level": TesterLevel(arg); return;   // Chris, 2026-10-13: "i need a way to fast level for testing" / "and then reset to 1 when not testing"
                     case "/aa": TesterAa(arg); return;

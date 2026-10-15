@@ -76,6 +76,20 @@
       "title": "Orders, the Khaven Picket",
       "text": "Oiled sheets in a leather tube, each with the Company's seal pressed into the wax: a sun on a bar of sand.\n\nThe Khaven picket, at the old north watch. Orders as given, copied fair.\n\nItem. Khaven pays toll at its own gate as at the road: one in ten of coin, of beasts and of grain. The Company counts. The village does not.\n\nItem (at the thaw). One Harl Emmet, of Khaven, struck a Company man at the gate over a goat taken in toll. The Company's hand is not struck twice. Hang him at the village tree, the village keeper to tie the knot and the village to watch. No salt to be laid on him. Bury him low by the creek, so that Khaven sees him walk.\n\nItem (at the dark of the moon). A Bureau wagon comes in by the Gloom road with cargo for the Concord escort. Take the Bureau's coin at the gate, and the cargo with it, and ride it north. Ask nothing of the cargo. Count it, and send the count up the road.\n\nItem. Any man of the picket found drinking at the Cracked Hearth pays his own score.",
       "canonStatus": "GAME-ONLY: the picket, its orders and Harl Emmet. The Sandthrone are CANON (world_bible.md), and so is the Investigation Bureau's wagon (book1 ch.4)."
+    },
+    {
+      "id": "doc.khaven.beacon_roll",
+      "title": "The Beacon Roll",
+      "kind": "lore",
+      "text": "Scratched on a slate and kept under the beacon stones, the roll of the nights Khaven lit its fire:\n\nThe fever year. Lit three nights. Oakhaven did not answer. (Hollis Grane, bearer.)\nThe winter the well went red. Lit one night, for the Peaks. No answer.\nThe night the Company came. Not lit. They had the mound by dusk.\nThe night the wagon came through with the children. Not lit. Tamsin says we should have. Ansel says who for.\n\n(In another hand:) A beacon is a question. Khaven has stopped asking.",
+      "canonStatus": "GAME-ONLY: the beacon, its roll and the nights. The Blood-Stone Well and the Cracked Hearth are CANON (the Khaven village map); the Sandthrone and the Council's wagon are CANON (world_bible.md, book1 ch.4)."
+    },
+    {
+      "id": "doc.khaven.crow_count",
+      "title": "What the Crows Wait For",
+      "kind": "lore",
+      "text": "Left in a tin under the cairn on the Heights, in Old Kestrel's hand:\n\nThe crows sit in rows on the lip and wait, and the village says they wait for the dead. They do not. I have sat with them nine nights. They wait for the pale one at the barrow to finish its sum. When it stands, they lift. When it sits, they settle. A crow knows a reckoning when it sees one.\n\nIt counts the lamps in the village. I counted with it. The village has fewer lamps than it had, and the sum comes out the same every night, which means it is counting something else as well.\n\nIf you find this, light a lamp in Khaven. Make the sum wrong.",
+      "canonStatus": "CANON-EXPANDED: the Pale Things as cosmic auditors are CANON (world_bible.md), and so are the Carrion Cliffs (the Khaven village map); Old Kestrel, the Reckoner and this page are GAME-ONLY."
     }
   ],
   "quests": [

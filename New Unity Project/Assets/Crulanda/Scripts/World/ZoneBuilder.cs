@@ -85,6 +85,9 @@ namespace Crulanda.World
             }
             Zone = Zone ?? (RequestedZoneId != null ? ParsedZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
             RequestedZoneId = null;
+            // The woods keep clear of the gathering nodes and stations as the file has them, filter or no filter (NodeStreamTests builds
+            // the zone without its nodes and wants the same woods: ZoneBuilder.Woods.cs).
+            if (Zone != null) WoodsKeepClear = Zone.nodes.Where(n => n != null).Select(n => (n.at, 5f)).Concat((Zone.stations ?? new ZoneStation[0]).Where(s => s != null).Select(s => (s.at, 6f))).ToArray();
             if (Zone != null && DefinitionFilter != null) Zone = DefinitionFilter(Zone);
             if (Zone == null || string.IsNullOrEmpty(Zone.id) || art == null) { Debug.LogError("Zone definition or art missing."); enabled = false; return; }
             Active = this;
@@ -94,7 +97,7 @@ namespace Crulanda.World
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); Lap("prepare");
-            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
+            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
             BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
@@ -125,6 +128,7 @@ namespace Crulanda.World
             Lap("batching");
             // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).
             MapTexture = RenderMap(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 4 / 256f) * 256, 1024, 2048));
+            CullWoodsFloor();   // after the map: from above, the woods would be culled off it
             Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
             BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves
@@ -1153,8 +1157,10 @@ namespace Crulanda.World
                 bool drop = (p.kind == "ruin" || p.kind == "ruined_house") && !ClearOfBuildings(p, t);
                 if (p.kind == "wall") WarnWallInBuilding(p);
                 // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
-                // every later prop, tree and rock keeps the layout it had.
-                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" ? 0 : -1;
+                // every later prop, tree and rock keeps the layout it had. A ruined_house of variant 1 (Wick's cot, Oakhaven's fill,
+                // 2026-10-15: a ruin added after the zone was laid out) draws from its own stream too, so the groves after it keep
+                // their trees; variant 0 (the Hollins' and the other zones' ruins) draws from the zone's, as it always did.
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" || p.kind == "skep" || (p.kind == "ruined_house" && p.variant == 1) ? 0 : -1;
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
@@ -1237,6 +1243,7 @@ namespace Crulanda.World
                     case "wallow": Wallow(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "cave": Cave(t, p.size.x > 0 ? p.size.x : 20); break;
                     case "shelter": Shelter(t); break;
+                    case "skep": Skep(t); break;   // a bee-wife's straw hives on a bench (Oakhaven's fill, 2026-10-15)
                     case "brazier": Brazier(t, Vector3.zero, p.variant == 1 ? Bone : null); Solid(t, new Vector3(0, .6f, 0), new Vector3(.8f, 1.2f, .8f)); break;
                     case "brood": Brood(t, p.size.x > 0 ? p.size.x : 5); break;
                     case "rib": Rib(t, p.size.x > 0 ? p.size.x : 6, p.size.y > 0 ? p.size.y : 7); break;
@@ -1868,7 +1875,7 @@ namespace Crulanda.World
             if (WalksIn(t.name, size)) { WalkInBarn(t, w, d); return; }
             var boards = Tint(art.timber, new Color(.4f, .25f, .16f));
             BoxPart(t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
-            Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors
+            Footing(t, w + .5f, d + .5f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors; 10 cm proud of the boards (flush, it flickered stone and wood: Chris 2026-10-14 19:45)
             for (float x = -w / 2; x <= w / 2 + .01f; x += 1.2f)
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x, h / 2, sz * (d / 2 + .04f)), new Vector3(.12f, h, .08f), art.timber);
             // The doors in a frame of two posts and a lintel, braced corner to corner, down to the highest ground across the
@@ -3690,6 +3697,7 @@ namespace Crulanda.World
             float open = 1;
             foreach (var g in Zone.groves)
                 if (Mathf.Abs(p.x - g.center.x) < g.size.x / 2 && Mathf.Abs(p.y - g.center.y) < g.size.y / 2) open = g.kind == "dead" ? .15f : .45f;
+            if (InWoods(p)) open = Mathf.Min(open, .55f);   // under the wild woods' canopy (ZoneBuilder.Woods.cs)
             foreach (var (at, r) in grassBuildings) if ((p - at).sqrMagnitude < r * r) return 0;
             if (p.magnitude < Zone.flatRadius * .45f) open *= .35f;
             if (Zone.biome == "ash") return 0;                       // nothing grows in the ash
@@ -5202,15 +5210,27 @@ namespace Crulanda.World
             Glow(t, tip + inward * .3f + Vector3.up * .2f, 7.5f, 1.35f, new Color(1, .6f, .3f), 1.35f).gameObject.AddComponent<Flicker>();
         }
         /// <summary>A campfire: a ring of stones, crossed logs on a bed of embers, two flames, a flickering light.</summary>
+        /// <summary>Real flames under a prop (Vefects' Free Fire VFX in Resources/Fx/Fire, its shaders written for the built-in pipeline;
+        /// 2026-10-14, Chris: "i added ... fire to myassets"): false when the pack is missing, for the painted flames instead. Draws nothing.</summary>
+        bool RealFire(Transform t, Vector3 local, float scale, string kind = "VFX_Fire_01_Small_Simple")
+        {
+            var src = Resources.Load<GameObject>("Fx/Fire/Particles/" + kind); if (src == null) return false;
+            var f = Instantiate(src, t); f.name = "Fire"; f.transform.localPosition = local; f.transform.localRotation = Quaternion.identity; f.transform.localScale = Vector3.one * scale;
+            foreach (var ps in f.GetComponentsInChildren<ParticleSystem>(true)) { var m = ps.main; m.scalingMode = ParticleSystemScalingMode.Hierarchy; }
+            return true;
+        }
         void Campfire(Transform t, Vector3 at)
         {
             var stone = Tint(art.stone, new Color(.34f, .32f, .3f)); var wood = Tint(art.timber, new Color(.22f, .15f, .09f));
             for (int i = 0; i < 9; i++) { var q = Quaternion.Euler(0, i * 40, 0); Lump(BoulderAt(i), t, at + q * new Vector3(0, .08f, .72f), new Vector3(.34f, .24f, .3f), stone, i * 47); }
             for (int i = 0; i < 3; i++) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .14f, 0), new Vector3(.1f, .5f, .1f), wood, Quaternion.Euler(0, i * 60, 70));
             Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .05f, 0), new Vector3(.9f, .03f, .9f), art.glass);
-            if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-            MeshPart(cone, t, at + new Vector3(0, .1f, 0), Glowing(new Color(1, .5f, .15f), 2.6f)).transform.localScale = new Vector3(.4f, .9f, .4f);
-            MeshPart(cone, t, at + new Vector3(.12f, .1f, -.08f), Glowing(new Color(1, .75f, .3f), 2.2f)).transform.localScale = new Vector3(.22f, .6f, .22f);
+            if (!RealFire(t, at + new Vector3(0, .06f, 0), .55f))
+            {
+                if (cone == null) cone = ZoneMeshes.Cone(1, 1);
+                MeshPart(cone, t, at + new Vector3(0, .1f, 0), Glowing(new Color(1, .5f, .15f), 2.6f)).transform.localScale = new Vector3(.4f, .9f, .4f);
+                MeshPart(cone, t, at + new Vector3(.12f, .1f, -.08f), Glowing(new Color(1, .75f, .3f), 2.2f)).transform.localScale = new Vector3(.22f, .6f, .22f);
+            }
             Glow(t, at + new Vector3(0, 1.1f, 0), 11, 1.9f, new Color(1, .55f, .25f), 1.9f).gameObject.AddComponent<Flicker>();
         }
         /// <summary>A torn company banner on a pole: two strips of sand-coloured cloth, one hanging shorter where it ripped, a faded red stripe.</summary>
@@ -5247,6 +5267,31 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, new Vector3(1.1f, .22f, .5f), new Vector3(.6f, .22f, .6f), Tint(art.hay, new Color(.45f, .38f, .26f)));   // basket
             Part(PrimitiveType.Cube, t, new Vector3(1.1f, .5f, .5f), new Vector3(.35f, .2f, .3f), Tint(art.stone, new Color(.94f, .94f, .91f)));   // salt
             Solid(t, new Vector3(0, 1.1f, .2f), new Vector3(4, 2.2f, 3.8f));
+        }
+        /// <summary>
+        /// A bee-wife's skeps (GAME-ONLY, Oakhaven's fill, 2026-10-15): three straw domes on a plank bench laid across two stone
+        /// blocks, each with its dark flight hole to the front, a flat stone weighting the lid of the last. Front faces -Z. Draws from
+        /// its own stream (TreeRandom, as the haystacks do), so nothing else in the zone moves.
+        /// </summary>
+        void Skep(Transform t)
+        {
+            var sr = TreeRandom(t.position); float S() { return (float)sr.NextDouble(); }
+            var stone = Tint(art.stone, new Color(.5f, .49f, .46f)); var plank = Tint(art.timber, Wither(new Color(.46f, .38f, .27f)));
+            var hole = Tint(art.stone, new Color(.05f, .045f, .04f));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .95f, .21f, 0), new Vector3(.5f, .42f, .5f), stone, Quaternion.Euler(0, (S() - .5f) * 10, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(0, .45f, 0), new Vector3(2.7f, .06f, .62f), plank);
+            float lidX = 0, lidY = 0;
+            for (int k = -1; k <= 1; k++)
+            {
+                var straw = Tint(art.hay, new Color(.72f + S() * .1f, .6f + S() * .08f, .34f + S() * .06f));
+                float x = k * .82f + (S() - .5f) * .06f, r = .25f + S() * .04f, h = .3f + S() * .05f;
+                Part(PrimitiveType.Cylinder, t, new Vector3(x, .48f + h / 2, 0), new Vector3(r * 2, h / 2, r * 2), straw);   // the straw coil's straight sides
+                Part(PrimitiveType.Sphere, t, new Vector3(x, .48f + h, 0), new Vector3(r * 2, r * 1.35f, r * 2), straw);   // its dome
+                Part(PrimitiveType.Cube, t, new Vector3(x, .56f, -r), new Vector3(.08f, .05f, .03f), hole);   // the flight hole
+                lidX = x; lidY = .48f + h + r * 1.35f / 2;
+            }
+            Part(PrimitiveType.Cube, t, new Vector3(lidX, lidY + .01f, 0), new Vector3(.28f, .05f, .24f), stone, Quaternion.Euler(0, S() * 40, 0));   // a flat stone weighting the last lid
+            Solid(t, new Vector3(0, .55f, 0), new Vector3(3, 1.1f, .8f));
         }
         /// <summary>A fire-bowl on three legs (iron, or bone) with glowing coals and a flame; burns day and night.</summary>
         void Brazier(Transform t, Vector3 at, Material legs)
@@ -5887,7 +5932,7 @@ namespace Crulanda.World
                 case "signpost": return 1.3f;
                 case "cart": return 2.4f;
                 case "rock": return 1.2f * (1 + Mathf.Max(0, p.variant) * .6f);
-                case "monolith": case "grave": case "wayshrine": case "idol": case "shrine": case "board": case "brazier": case "barrels": case "crates": case "haystack": case "woodpile": case "target": case "dummy": case "banner": return 1.2f;
+                case "monolith": case "grave": case "wayshrine": case "idol": case "shrine": case "board": case "brazier": case "barrels": case "crates": case "haystack": case "woodpile": case "target": case "dummy": case "banner": case "skep": return 1.2f;
             }
             return 0;
         }

@@ -1,5 +1,180 @@
 # Changelog
 
+## 2026-10-15, 00:40-01:45: the small hours with three helpers (Chris: "you can run 3 bots at most")
+Chris (verbatim, PLAYTEST_NOTES 203-212): "the villagers and npcs need better ai"; "more things to do. more incentives for
+gathering/professions. make better gear. have gear change the way your character looks when equipping"; "running into each other and
+sometimes get stuck or delayed at door of inn.."; "work on phase 8"; "launch a bot that fills in some open areas in oakhaven. work on new
+dungeons. improve polish, secrets, lore, clues, stories from npcs, etc"; of the chapel's frame "just the shape and design is bad", "use some
+of the dungeon assedt not just plain walls and arch"; the dungeon packs, the shaders, the music and the fantasy props in Downloads and the
+store cache; a picture of fly-out hotbar buttons: "keep this in mind when designing hotbar and ui."
+- **The Adit (branch `adit-rework`):** every floor reachable from the yard and the nav, camps, gate and release tests 26/26 at 01:41
+  (ADIT_REWORK.md section 18: the altar in the cloister doorway, the island under Lusk's stage, the stair's foot 1.5 m low, a parent's
+  knoll crossing each branch, the reach tests measuring a search budget). New: `AditDataTests` (every reference in the zone file
+  resolves), the Adit camera tour (`--crulanda-adit-tour`, 28 frames), the release of `after` camps (a boss's relief shift, the Wake's
+  waves, the keg), the chapter-house's end walls from the kit (then the packs: in progress).
+- **Oakhaven's open ground:** eleven places on the empty meadows (the Hollin skeps, the grey picket, the Silent Watcher, Wick's cot, the
+  Farrows' stand, the Old Delf, the Harrow knoll and Wren's cairn, Hesper Crane's hut, the foragers' camp, the webbed sallows, the wolf
+  pit): ten secrets, four camps, a resident; a `skep` prop. Not yet run in Unity.
+- **Secrets, clues, lore, stories:** a riddle for each of 63 secrets in the Discoveries tab and a villager's spoken hint for the unfound;
+  two or three stories for 58 named people; a Lore tab with eight lore pages found at new note secrets; all labelled. Not yet run in Unity.
+- **Plans written:** `PHASE8_6_LIVING_WORLD.md` (the villagers' way-finding and the inn's door — a 1.6 m door and a navmesh at radius .5
+  leave a 0.6 m strip — crafting loot, recipes, the book of lore, secrets, gear looks; fourteen decisions), `DUNGEON2_DESIGN.md`
+  (Hallow's Creek, levels 16-18; thirteen decisions), `DUNGEONS_3_AND_4.md`; ACTION_BAR.md's fly-out slots.
+- **In flight at 01:45:** the dungeon packs (KayKit, the Modular Pack) into the builder; the water, grass and candle shaders as built-in
+  shaders; zone music from the three packs and the Fantasy pack's market props.
+
+## 2026-10-15, 01:05 on: clues to every secret, stories from everyone, the book of lore (a helper's pass; OPEN until Chris's build)
+Chris (2026-10-14 23:40, verbatim): "find recipes/ book of lore/still havent found many secrets. all this for ALL Zones"; (2026-10-15 01:05):
+"improve polish, secrets, lore, clues, stories from npcs, etc". Phase 8.6 3c-3e, the secrets and the book first (recipes to find not yet).
+- **Clues to every secret, every zone** (`ZoneSecret.clue` and `hint`; `Scripts/Encounter/ZoneLore.cs`): the Discoveries tab names
+  the found and, under "STILL HIDDEN", gives a riddle a line for the rest (`DiscoveryLog.Tally.clues`); villagers spoken to say a
+  secret's hint one time in four (after their stories), the innkeeper's charmed rumour one time in three, only of secrets not yet
+  found and not shut behind a key (`ZoneLore.SecretHint`). Neither line names a landmark on the map (`DiscoveryLog.Validate`,
+  `DiscoveryLog.Mentions`). 48 secrets have their two lines: the four zone files carry theirs; Oakhaven's 25 (another hand grew it
+  from 15 the same night) are in `Resources/Lore/oakhaven.json`, merged in by `ZoneLore.Apply`, to be folded into oakhaven.json.
+- **Stories from everyone** (`ZoneResident.stories`, `ZoneLife.stories`, `ZoneStory`): two or three lines each for 57 named people
+  (Oakhaven's 20 villagers, three hen-wives, two shepherds and four residents; Khaven's six and four; the Peaks' seven; the Rim's four;
+  the Shore's seven), memories, grudges and hopes tied to the canon (Hallow's Creek, the collectors and the Harrow girl, the Hollow
+  Men, the Silent Pilgrims and the Archive, the Salt-Menders, the Sandthrone, the Pale Things as auditors, the Ash-Walkers' salt, the
+  Root-Mother and the cycles), said one time in three when spoken to (`VillageLife.LineFor`, `ZoneLore.Story`). All GAME-ONLY lines.
+- **The book of lore** (`DocumentDef.kind = "lore"`, `EncounterSession.LorePages`, `EncounterHud.BookLore`): a Lore tab in the quest
+  book (seven tabs now, 100 apart) lists the lore pages found, how many lie unread in each zone, then every other page found; a
+  revealed lore page opens there. Eight pages at eight new `note` secrets (two each in Khaven, the Peaks, the Rim and the Shore,
+  labelled CANON-EXPANDED / GAME-ONLY / PROVISIONAL): the Beacon Roll, What the Crows Wait For, the Pilgrims' Crossings, What the
+  Watchers Count, How a Salt Line Is Laid, The Faceless One, The Lantern Count, What the Falls Remember.
+- Tests: `ZoneLoreTests` (seven: every secret's two lines and no landmark in them, every named person's stories and no orphans, every
+  lore page at a find, the hint rule, the story rule, the side file's merge, the book's clue list) and the landmark case in
+  `DiscoveryLogTests`. Compile-checked only (Roslyn); OPEN: the EditMode run, `SecretPlacementTests` over the eight new notes (placed
+  1.8 m from proven spots), a look at the Discoveries and Lore tabs, and the seven tabs' fit at 1440 wide.
+
+## 2026-10-14, 11:40 on: the woods, Kevin's motions, every spell's effect, real fire, the Adit's elites
+Chris (11:40-14:40, verbatim in PLAYTEST_NOTES 179-188): "Filling the zones in the Elwynn style. is next.", "you can start expanding
+adit so not so empty next on the agenda.", "we need more spell animations and melee animations also", "here is elwyn very dense area
+for good level adventures" (eight pictures), "you now have these animations to implement in game", "id like to keep some of the trees we
+have now. only the big tree in some areas maybe making it a dense forest area.", "ploughing would be good one to use on the hoe", "we
+need new spell effects also for ALL spells", "i added some spell effects, aoe effects, melee effects, fire to myassets", "still a couple
+are backwards", "traps need to be something besides a circle on the ground", "now three are backward".
+- **The wild woods** (`ZoneBuilder.Woods.cs`, `ZoneDefinition.woods`; every zone): the open wild is one canopy of the zone's own trees
+  with the roads, water, camps, fields and sights cut into it; a few old-forest patches are dense, with great oaks (the Verdant giant at
+  half size) only there; the floor open with ferns, bushes, fallen trunks, stumps, mushrooms and stones; the woods thin toward the
+  village. Oakhaven: 1,558 wooded cells of 8 m, 53 great oaks, 1,082 broadleaves, 161 pines, 780 things on the floor; mostly green and
+  gold (the even leaf mix read as a wood of reds). The frame rate: 110 a second in the tour, then 79 once the woods were greener (the
+  kit's common tree is the heavier), so the woods' own trees are not drawn past 220-300 m, in the fog. WoodsTests.
+- **Kevin Iglesias's motions** (his Melee, Spellcasting, Throwing and Crafting Animations FREE, 90 clips, `ModelFigure.KiActs/KiWork`,
+  `ActorVisual.Motions.cs`): a blow by what the hands hold (one-handed from the right and the left, two-handed, the polearm's thrust, the
+  shield's bash); a spell by what it does (a bolt from the right hand, a mend from the left, a long cast from both, a thing called down
+  or raised, all round the caster; a knife, a flask, a net thrown); the cast held in Kevin's pose; the plough's stroke working the
+  farmer's body under the hand-set hoe stroke; gathering, the pick at a seam and at the block. SpellFxTests checks every ability's
+  motion has its clip for both bodies.
+- **Every spell's effect** (`SpellFx.cs`; Hovl's Magic Effects FREE, Matthew Guz's Slash Effects FREE, Vefects' Free Fire VFX in
+  `Resources/Fx`, 95 MB): each of the 148 abilities has an element and a look (a slash across the foe, a burst on every foe struck, a
+  glow on every one mended and a circle for a mend of the party, a ward's shield, a hex's shadow, a ground effect for what is called
+  down; 40 with a look of their own); a cast glows in the hand with a circle under the feet for a long one; bolts burst with the pack's
+  hits. The fire pack's three URP shaders were written again for the built-in pipeline (same GUIDs); the Mage's fire spells and
+  Consecrate burn with real flames, and so do the camps' campfires and the cookfires. CombatCapture (`--crulanda-combat-capture`)
+  frames every class's abilities at the training dummy: `D:/crulanda-work/ui-captures/combat2/<class>/sheet-b.png`.
+- **Fixes from Chris's reports:** the archery butts turned by their own shape to face their lanes (a tripod's legs splay under its
+  painted face; the first rule turned three to the fence); the Snare Trap a jaw trap with teeth, a pan, springs and a chain to a stake
+  that snaps shut on what it catches; the Morro idles on Morro's own man (112b, the pack downloaded again); squirrels never hunted.
+- **The Adit rework (branch `adit-rework`, pushed):** the twelve new elites' moves (the engine's moves only) and signature loot
+  (nineteen pieces, icons painted); ADIT_REWORK.md sections 16-17. Still red there: the cave web's joins, rock tops, unreachable camps
+  and the run order (section 16).
+- **Parked:** the Stylized Newbie Weapons Pack (skinned meshes driven by the pack's own script; a bake is needed before they can be held).
+- **Runs:** chainR70 (the merge) EditMode 484/485, the touched PlayMode classes 54/56 (the hoe stroke count under the clip, the parked
+  shaft); chainR71 23/24 (the plough's stroke period); the final run (chainR72, 14:36-16:33): EditMode 484/485, the full PlayMode suite 345/349 (NodeStreamTests, the woods grown
+  differently without the nodes, and FieldWorkTests, the fists under the ploughing clip, fixed in the published build; SocialPullTests'
+  linked group 3.5 m from home, and the parked tool shaft), the Mage and the Rogue 2/2 with all 43 builds in range, the release build
+  (0 shader errors), Oakhaven's tour 109 a second. **Published 16:33** (the 16:28 build); the save backed up to
+  `save-backups/20261014-1633-before-woods-publish`.
+- **After the publish (16:40-17:10; verified by chainR76, 14/14 and the yard frame; published again at 18:24, the save backed up to `save-backups/20261014-1822-before-butts-publish`):** the frames of the published build: the casters'
+  effects under the raised camera (`ui-captures/combat3`), the jaw trap, the yard. The butts: the shape rule's logged turns showed the
+  three Small Props butts had sat where the hand-set turns put them, so the four turns are set outright (the second kind is painted on
+  the far side from its legs; the Megapack's turned the other way). The woods keep clear of the gathering nodes and stations as the
+  zone file has them, whatever a test's filter strips (NodeStreamTests), and a tree pushed off a trunk never lands in the village's
+  reach (WoodsTests). The pack's dust and smoke puffs at a fifth of their size (they filled the frame).
+- **The evening's reports (18:55-20:40, PLAYTEST_NOTES 189-199), fixed and built twice more:**
+  - The orc's legs run in the air (the packs have no jump clip; "when orc jump his legs dont move or bend"); the giant at half size
+    read as "mushroom looking tree tops", so the old-forest big trees are now the zone's own broadleaf grown large ("Old oak"), the
+    Verdant Shore keeping its giants; the giants' roots bark-coloured, five to eight buttresses unevenly round, some without a root;
+    the fallen trunks the kit's dead trees laid down (the built trunk's black end and moss blob were "coloring is off"); the glades
+    fuller with bushes and ferns ("still empty feeling").
+  - **The buff row** (`EncounterHud.DrawBuffs`): the buffs and songs on you and on each of the party as chips by the frames, with
+    their seconds left; a kit's party-wide buff (the Scoundrel's verse, a rally) through `ClassKit.PartyBuffs`. **The Nerve panel**
+    (`DrawNervePanel`): a small movable panel of ten pips, one lit a tenth of Nerve built, dragged like the other panels.
+  - The Living Birds' hops and flights stay where the code puts the bird (root travel and turn baked out at import; "birds hop around
+    funny..looks like maybe back and forth"); the Morro idles back on their own avatars (on Morro's man the villagers stood with their
+    arms spread and what they carried floated: the farmer's sack, the skinner's bundle); the fire pack's stand-in sparks and trails off
+    (white stars at the forge: "that glint was coming from the blacksmith"); the barn's stone sill 10 cm proud of the boards (it
+    flickered) and Harrow barn turned to its cows; a poor or common drop's glint goes out after three minutes untaken.
+  - **Quit:** a "Quit game" button on the pause menu and `/exit`, `/quit` in the chat, saved first and out of combat ("all need an
+    exit command to close the .exe").
+  - **A shepherd a flock** (`ZoneFold`, `VillageWork` "shepherd"; "does anyone feed or tend to this flock of sheep?", "or extract their
+    wool for market?"): Oakhaven's two flocks have Tam and Nell Sedge, who count the flock at the gate at first light, shear through
+    the morning (a fleece a sheep, once a day), carry the fleeces to the produce stall after the midday meal (the merchant then offers
+    them) and feed the flock in the afternoon. GAME-ONLY, on the hen-wife's pattern. VillageDayTests counts the folds and shepherds;
+    VillageWorkTests knows the fold's places.
+  - The combat capture stands in front of the dummy, along its facing into the yard; it had stood on the line from the spawn, through
+    the fence ("why do they run test outside the area?").
+  - **The inn's tables and benches** (note 194a; "all the tables and benches are turned on their sides"): the Fantasy pack's one-mesh
+    files carry Blender's -90 on the prefab root, and ModelProp zeroed it, so every table, bench, stool and mug of that pack lay on
+    its side, the mugs set at table height floating; the root's turn is kept now. KitPropTests checks every Fantasy prop stands up.
+  - Still open: a sheep in the fold's wall (196): fixed after (the flock's radius 5 of a 7 m fold; the 20:12 tour frame).
+- **After the shutdown (23:15-23:30; Chris back: notes 200-204):** the Living Birds' motion node is Bip01 (the hop's travel sat on it,
+  below the root the clips' locks were on: "birds still hopping"; creature import 7; BirdMotionTests, 1/1 at 23:44: a crow's Bip01 strays under 15 cm over 2.5 s of hopping);
+  the Scoundrel's Nerve starts at nothing when the kit wakes and drains six seconds after the last blow, never while auto-attacking
+  a dummy ("scoundrel nerve should start at 0", no finisher at a fight's start), and a swing builds none ("shouldn't get nerve on auto
+  attack"). chainR94: ScoundrelLoopTests and HudTests 8/8, the release build, **published 23:30**, the save backed up to
+  `save-backups/20261014-2330-before-nerve-publish`. Chris's briefs of 23:30-23:35 (villager and NPC AI; more to do, gathering and
+  the professions worth doing; better gear that changes the look) are queued as ROADMAP.md's Phase 8.6.
+- **The Adit rework, the evening's runs (20:00-21:40, `adit-rework`; ADIT_REWORK.md section 18):** the overseers' walk down out of
+  the shell, a cave's blocks tried through their whole height, solid decks' bodies filled against a walkable island, the decks named
+  for the diagnostics, the EditMode set 44/44; then the diagnostics' floor map found the reach tests themselves measuring a search's
+  budget, and the hop map (R90) found four real blocks: the Pen, the Cutting Drift (and so the Foundry), the Chapel's west half.
+  - **Runs:** chainR78 (the fixes to 20:00): WoodsTests, MovablePanelTests, ScoundrelLoopTests, OrcMotionTests, NodeStreamTests and
+    HudTests 17/17, the release build (0 shader errors), the Scoundrel frames (`ui-captures/combat4/scoundrel`), the creature tour
+    (`creatures-evening`), the life capture (`life-evening`), Oakhaven's tour 109 a second; **published 19:42**, the save backed up to
+    `save-backups/20261014-1942-before-evening-publish`. chainR79 (the shepherds, the inn's tables,
+    the capture in the yard): EditMode VillageWorkTests, VillageEconomyTests and KitPropTests 16/16; PlayMode VillageDayTests,
+    VillageErrandTests, VillageHomeTests and VillageStreamTests 15/16 (the home test's count of folk, 24, now 26 with the shepherds:
+    fixed after); the release build (0 shader errors); the Scoundrel frames inside the yard (`ui-captures/combat5/scoundrel`);
+    **published 19:54**, the save backed up to `save-backups/20261014-1954-before-shepherd-publish`. chainR81 (20:06): the same build
+    again (nothing newer: the fold's flock was in it), Oakhaven's tour 111 a second with the inn's tables standing
+    (`world-captures/oakhaven-99-inn-drinkers-night.png`) and the Old Fold's flock inside its walls, the shepherd shearing
+    (`oakhaven-23-the-old-fold-night.png`); the save backed up again (`20261014-2012-before-night-publish`).
+
+## 2026-10-14, 00:20 to the end: play-test fixes, the Scoundrel, the drowned dead, the dungeons after the Adit
+Chris (23:40-00:10, play-testing): "cant see all classes", "only thing on orc that move is belt, staff and teeth", "at level 1 the orc
+shaman only has healing spells?", "there is no target or self or party bars"; then "after scoundrel design. build him and put in game";
+at 01:30, "i think adit dungeon need to be more complex like wow's wailing caves or the deadmine. adit is nothing like those".
+- **Play-test fixes (00:20, published):** the pause menu shows the characters in a grid of three; a panel keeps 40 px on the screen (the
+  frames had been saved off a smaller window); the Shaman's Thunderhead at level 2, its mends at 3 and 4.
+- **The orc moves as the pack made it (01:51, published 01:53):** CreatureImport took each of the Orc Army Pack's clip files whole (a
+  27 s master take), so the orc stood still and the staff swung. It now slices the pack's own frame ranges (walk, run, idle, battle cry,
+  block, three attacks, two casts, hit, die). OrcMotionTests: the staff stays within 3 cm of the hand.
+- **The creature tour** (`--crulanda-creature-tour`, in the release build): boars at a camp, in a fight and dead; a bird and a squirrel
+  close up. Frames in `D:\crulanda-work\ui-captures\creatures`.
+- **Khaven's drowned dead are DzenGames' Fantasy Skeleton**, its take sliced into the pack's seven clips (CreatureImport version 5);
+  they crumble to bones on death. The thrall flinches when struck (a creature with no hit clip rocks back).
+- **The run bot fights with its kit:** a mend when the party is under 45%, else the first ready damage ability; casters and archers
+  fight from 12 m (the Shaman's run had been 14 a second).
+- **The Scoundrel (built):** `class.scoundrel` (GAME-ONLY), Nerve as its resource, 12 abilities over three paths of 17 ranks: Cutthroat
+  (Settle the Score, Poisoned Wine, Mark the Debt), Silver Tongue (Glimmer dazes up to four, the Jagged Verse, Stay) and Fixer (War-Verse,
+  Rallying Verse, Bribe, Call in a Favour). The charm: a tenth off and a tenth more at merchants, a haggle once a day per merchant (a
+  further twentieth, kept for the session), an innkeeper's rumour. Human and orc. Cutthroat scaled 0.86 (80.2 to 69.0 on the dummies).
+  ScoundrelRulesTests and ScoundrelLoopTests 8/8 (the Glimmer test plays in Oakhaven's camps).
+- **The hoe grip and the foot after a jump** (failing for days): fixed in ActorVisual.Field/Grounding/Model. FieldWorkTests and FootTests 3/3.
+- **The three dungeons after the Adit, designed** (DUNGEON_DESIGN.md, each in the Adit's nine-section format; built when the level cap
+  rises past 15): the Sludge-Tunnels (18-20), the Deep Veins (23-25), the Transit Hub (27-29).
+- **The Adit rework (Chris's 01:30 brief): on its own branch, not live.** `Docs/ADIT_REWORK.md` on branch `adit-rework` (pushed): a
+  web of wings at three heights round a great cave, the Singing Gallery, after the lessons of Chris's three dungeons (no names or layouts
+  copied). 18 caves, about 2.9 km, 97 camps, 9 gates, run wing by wing. Build steps 1-3 of 7 are written. Its first Unity run: EditMode
+  488/495 and Adit PlayMode 19/30, so it is TESTED as failing. Section 16 lists what is red: the caves' joins, rock tops, unreachable camps,
+  the run order, and the twelve new elites still to write.
+- **The full run on main (chainR69, 11:20):** EditMode 480/481 (the CraftPix boar test inconclusive); the full PlayMode suite 344/348:
+  EliteFightTests (no graphics device in batch mode), GroundingTests (a sim's sole 2.8 cm up), HuntTests (squirrels were not on the
+  never-hunted list: fixed), VillageDayTests (the parked tool shaft through a leg). The balance sets and the group run did not run: a
+  Unity licensing helper left behind held the chain for an hour (a watchdog clears them now, D:/crulanda-work/licwatch.ps1).
+
 ## 2026-10-13, 22:00 on: whole orcs and Chris's new creatures
 Chris: "ok but we had whole orc assets", "that was the whole point of adding those asset", "their mouth and teeth dont line up"; at 22:50,
 "Use Toon RS Unit - Undead for the bonecaller's pet. Living Birds to replace all birds in game. Wild Boar to replace the boars. Furry

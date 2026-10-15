@@ -20,7 +20,7 @@ namespace Crulanda.EditorTools
         const string Root = "Assets/Crulanda/Resources/Creatures/";
         /// <summary>Raised when these rules change, so Unity imports the creatures again (2026-10-13: the makers' normals for the new models,
         /// and the loop of an "Armature|" take by its own name; 2026-10-14: the Orc Shaman's clips cut to the pack's own frames).</summary>
-        public override uint GetVersion() { return 5; }
+        public override uint GetVersion() { return 7; }
         /// <summary>
         /// The Orc Shaman's clip files (the Orc Army Pack, 24 fps): each holds the pack's whole master take (frames 0-650, every clip in a
         /// row), and the pack cuts its own clip out of it by these frames. Its body (the skinned Character1 bones) is baked only inside
@@ -57,6 +57,10 @@ namespace Crulanda.EditorTools
             // A model and the files of its clips each keep their top node (2026-10-13: a clip file with one top node lost it on import, its
             // bones' paths no longer matched the model's, and only the staff, belt and teeth moved: Chris, "the only thing on orc that move").
             if (file.StartsWith("Orc") || file.StartsWith("UndeadUnit") || file.StartsWith("Bird")) m.preserveHierarchy = true;
+            // The Living Birds are a Biped: the hop's and the flight's travel sits on "Bip01", a child of the file's root, so the clips' root
+            // locks (below) did nothing to it and the bird still went forward and snapped back (Chris, 2026-10-14 23:15: "birds still
+            // hopping"). Bip01 is the motion node: its travel is what the locks bake out.
+            if (file.StartsWith("Bird")) m.motionNodeName = "Bip01";
         }
         /// <summary>A palette texture (CraftPix's swatches): no mipmaps or compression to bleed one swatch into the next.</summary>
         void OnPreprocessTexture()
@@ -87,6 +91,10 @@ namespace Crulanda.EditorTools
                 var only = clips.OrderByDescending(c => c.lastFrame - c.firstFrame).First();   // the file's real take (each has a one-frame one too)
                 only.name = u >= 0 ? file.Substring(u + 1) : file;
                 only.loopTime = System.Array.IndexOf(Loops, only.name) >= 0;
+                // The Living Birds' hops and flights carry the bird forward in the clip and snap it back at the loop (Chris, 2026-10-14 19:20:
+                // "birds hop around funny..looks like maybe back and forth"): the root's travel and turn are baked to where the clip began,
+                // and the code moves the bird.
+                if (file.StartsWith("Bird_")) { only.lockRootPositionXZ = true; only.keepOriginalPositionXZ = true; only.lockRootHeightY = true; only.keepOriginalPositionY = true; only.lockRootRotation = true; only.keepOriginalOrientation = true; }
                 // The Orc Shaman's: the pack's own frames out of its master take (its cycles' ends blended to meet, as the pack has them).
                 if (file.StartsWith("OrcShaman_") && OrcShamanFrames.TryGetValue(only.name, out var frames))
                 { only.firstFrame = frames.first; only.lastFrame = frames.last; only.loopPose = only.loopTime; }

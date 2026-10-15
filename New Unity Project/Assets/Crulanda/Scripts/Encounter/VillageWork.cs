@@ -114,6 +114,13 @@ namespace Crulanda.Encounter
                 new Errand("the afternoon feed", 14.6f, 17, "trough", null, Load.None, null, "Chook-chook-chook-chook!") { work = 16 },
                 new Errand("eggs to the stall", 15.4f, 17.2f, "nest", "stall", Load.Eggs, "eggs", "{n} eggs, fresh. And don't start about the Concord's tax.") { toRole = "merchant" },
                 new Errand("eggs for the pot", 17.2f, 18.6f, "nest", "home", Load.Eggs, "eggs", "{n} for the pot.")) },
+            // The shepherd (GAME-ONLY; Chris 2026-10-14): the flock counted at the gate at first light, sheared through the morning, the
+            // fleeces to the produce stall after the midday meal, fed in the afternoon, and the fold until dusk.
+            { "shepherd", new WorkDay(new[] { new Shift(5.8f, 12.2f, "fold", "fold", "foldgate", "well"), new Shift(12.2f, 13.5f, "home"), new Shift(13.5f, 18.5f, "fold", "fold", "foldgate", "green"), new Shift(18.5f, Night, "foldgate", "home") },
+                new Errand("the morning count", 5.8f, 8, "foldgate", null, Load.None, null, "Hup, hup. Thirty... thirty-one. All there.") { work = 14, pose = ActorPose.Talk },
+                new Errand("the shearing", 8.2f, 11.6f, "fold", null, Load.None, null, "Hold still, you great lump. There.") { work = 34, pose = ActorPose.Gather },
+                new Errand("fleeces to the stall", 13.5f, 16, "fold", "stall", Load.Goods, "wool", "{n} fleeces off the fold. Washed, mostly.") { toRole = "merchant", pose = ActorPose.Gather },
+                new Errand("the afternoon feed", 15.5f, 17.5f, "foldtrough", null, Load.None, null, "Hup! Hup! Come on, then, before the crows do.") { work = 14 }) },
             // The innkeeper (GAME-ONLY; Oakhaven's Hob Linden, who sleeps over the Golden Cask): the kitchen from first light, then the
             // bar and the kitchen turn about until the last table. Water for the pot, the pot on, and dinner out to the tables.
             { "innkeeper", new WorkDay(new[] { new Shift(InnkeeperUp, 7, "kitchen"), new Shift(7, 11.5f, "kitchen", "kitchen", "bar"), new Shift(11.5f, 14, "bar", "bar", "kitchen"), new Shift(14, 17, "kitchen", "bar", "well"), new Shift(17, InnkeeperBed, "bar", "bar", "bar", "kitchen") },

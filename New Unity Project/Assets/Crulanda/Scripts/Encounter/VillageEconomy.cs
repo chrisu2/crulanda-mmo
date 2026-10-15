@@ -52,7 +52,7 @@ namespace Crulanda.Encounter
         /// the hen-wife and the merchant eggs. Null for the rest.</summary>
         public static string Makes(string role)
         {
-            switch (role) { case "baker": return "bread"; case "lumberjack": case "hunter": return "firewood"; case "henwife": case "merchant": return "eggs"; default: return null; }
+            switch (role) { case "baker": return "bread"; case "lumberjack": case "hunter": return "firewood"; case "henwife": case "merchant": return "eggs"; case "shepherd": return "wool"; default: return null; }
         }
         /// <summary>The trade whose household is paid for a need: bread the baker's, firewood the woodcutter's, eggs a merchant's.</summary>
         public static string SoldBy(string need)

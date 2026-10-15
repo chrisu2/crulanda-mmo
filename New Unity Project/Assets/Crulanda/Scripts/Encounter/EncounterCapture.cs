@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         }
         public static bool Requested
         {
-            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || TrainingCapture.Requested || CreatureTourCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || RunCapture.Requested || FixesCapture.Requested || Step4Capture.Requested || AditTourCapture.Requested; }
+            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || TrainingCapture.Requested || CreatureTourCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || CombatCapture.Requested || RunCapture.Requested || FixesCapture.Requested || Step4Capture.Requested || AditTourCapture.Requested; }
         }
         IEnumerator Start()
         {
@@ -44,6 +44,8 @@ namespace Crulanda.Encounter
             if (fixes >= 0 && fixes + 1 < args.Length) { yield return gameObject.AddComponent<FixesCapture>().Run(session, args[fixes + 1]); yield break; }
             int run = Array.IndexOf(args, RunCapture.Flag);
             if (run >= 0 && run + 1 < args.Length) { yield return gameObject.AddComponent<RunCapture>().Run(session, args[run + 1]); yield break; }
+            int combat = Array.IndexOf(args, CombatCapture.Flag);
+            if (combat >= 0 && combat + 1 < args.Length) { yield return gameObject.AddComponent<CombatCapture>().Run(session, args[combat + 1]); yield break; }
             int motion = Array.IndexOf(args, MotionCapture.Flag);
             if (motion >= 0 && motion + 1 < args.Length) { yield return gameObject.AddComponent<MotionCapture>().Run(session, args[motion + 1]); yield break; }
             int elite = Array.IndexOf(args, EliteCapture.Flag);

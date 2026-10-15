@@ -35,7 +35,9 @@ namespace Crulanda.Encounter
             ("frames", "Your frames", new Rect(10, 10, 705, 240), -1), ("minimap", "Minimap", new Rect(1215, 0, 225, 240), 1),
             ("tracker", "Quest tracker", new Rect(1110, 236, 330, 200), 1), ("bar", "Action bar", new Rect(150, 772, 1140, 128), 0),
             // Chris 2026-10-12 1:29, "meter should be movable in the ui. pet bar should be movable in the ui."
-            ("meter", "Damage meter", new Rect(1100, 456, 340, 148), 1), ("pet", "Pet bar", new Rect(85, 800, 250, 76), 0) };
+            ("meter", "Damage meter", new Rect(1100, 456, 340, 148), 1), ("pet", "Pet bar", new Rect(85, 800, 250, 76), 0),
+            // Chris 2026-10-14 19:15, "i need the nerve now but probably need a seperate small ui element i can move around".
+            ("nerve", "Nerve", new Rect(380, 96, 250, 44), -1) };
         /// <summary>A panel's rect on the canvas where it is drawn now (its place plus the offset the player gave it).</summary>
         public static Rect PanelRect(string id) { foreach (var pn in Panels) if (pn.id == id) { var r = pn.rect; r.position += PanelOffset(id); return r; } return Rect.zero; }
         /// <summary>Move a panel by an offset from its place (what a drag does), saved.</summary>

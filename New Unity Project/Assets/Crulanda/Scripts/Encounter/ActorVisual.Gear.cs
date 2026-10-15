@@ -130,6 +130,7 @@ namespace Crulanda.Encounter
         void ClearSlot(int s)
         {
             Kill(gearRoots[s]); Kill(gearStows[s]); gearRoots[s] = gearStows[s] = null; if (s == (int)EquipSlot.MainHand) mainBow = false;
+            if (s == (int)EquipSlot.MainHand) handFamily[0] = null; else if (s == (int)EquipSlot.OffHand) handFamily[1] = null;
             if (gearMore[s] != null) { foreach (var t in gearMore[s]) Kill(t); gearMore[s].Clear(); }
             Uncover((EquipSlot)s);
         }
@@ -170,6 +171,7 @@ namespace Crulanda.Encounter
                 BuildArmor(slot, look); return;
             }
             if (slot == EquipSlot.MainHand) mainBow = IsBow(look);
+            if (slot == EquipSlot.MainHand) handFamily[0] = look.family; else if (slot == EquipSlot.OffHand) handFamily[1] = look.family;   // the blow's motion (ActorVisual.Motions.cs)
             gearRoots[s] = Mount(slot, look.family, false, false, slot == EquipSlot.MainHand && mainBow); BuildGear(look, gearRoots[s]);
             if (slot == EquipSlot.MainHand || slot == EquipSlot.OffHand) { gearStows[s] = Mount(slot, look.family, true, Short(look)); BuildGear(look, gearStows[s]); }
             if (Hung(look.family)) gearRoots[s].gameObject.AddComponent<GearHang>().wearer = transform;

@@ -298,13 +298,52 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponD
         {
             return Start(a, () => {
                 if (trap != null) UnityEngine.Object.Destroy(trap);
-                trap = GameObject.CreatePrimitive(PrimitiveType.Cylinder); trap.name = "Snare trap";
-                UnityEngine.Object.Destroy(trap.GetComponent<Collider>());
-                trap.transform.position = GroundAtFeet(s.Player.transform) + Vector3.up * .03f; trap.transform.localScale = new Vector3(1.1f, .03f, 1.1f);
-                var mr = trap.GetComponent<Renderer>(); mr.material.color = new Color(.35f, .27f, .18f);
+                trap = JawTrap(GroundAtFeet(s.Player.transform), s.Player.transform.eulerAngles.y);
                 trapUntil = Time.time + 60; trapHold = a.duration;
                 s.Message("Snare Trap set: the first to step in is held " + a.duration + " seconds.");
             });
+        }
+        /// <summary>
+        /// A hunter's jaw trap laid open on the ground (2026-10-14, Chris: "traps need to be something besides a circle on the ground"):
+        /// two iron jaws in a ring 70 cm across, their teeth turned up, a round pan in the middle on its cross-bars, a spring at each
+        /// hinge, and a short chain to a wooden stake driven in beside it. GAME-ONLY dressing; the trap's reach is TickTrap's.
+        /// </summary>
+        static GameObject JawTrap(Vector3 at, float yaw)
+        {
+            var root = new GameObject("Snare trap"); root.transform.position = at + Vector3.up * .01f; root.transform.rotation = Quaternion.Euler(0, yaw, 0);
+            var iron = new Material(Shader.Find("Standard")) { color = new Color(.2f, .2f, .22f) }; iron.SetFloat("_Metallic", .6f); iron.SetFloat("_Glossiness", .35f);
+            var rust = new Material(Shader.Find("Standard")) { color = new Color(.38f, .24f, .14f) }; rust.SetFloat("_Glossiness", .15f);
+            var wood = new Material(Shader.Find("Standard")) { color = new Color(.36f, .26f, .16f) }; wood.SetFloat("_Glossiness", .1f);
+            GameObject Bit(PrimitiveType type, Transform parent, Vector3 pos, Vector3 size, Material m, Quaternion? rot = null)
+            {
+                var o = GameObject.CreatePrimitive(type); UnityEngine.Object.Destroy(o.GetComponent<Collider>());
+                o.transform.SetParent(parent, false); o.transform.localPosition = pos; o.transform.localScale = size; if (rot.HasValue) o.transform.localRotation = rot.Value;
+                var r = o.GetComponent<Renderer>(); r.sharedMaterial = m; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; return o;
+            }
+            // The cross-bars and the pan.
+            Bit(PrimitiveType.Cube, root.transform, new Vector3(0, .015f, 0), new Vector3(.86f, .025f, .07f), iron);
+            Bit(PrimitiveType.Cube, root.transform, new Vector3(0, .015f, 0), new Vector3(.07f, .025f, .5f), iron);
+            Bit(PrimitiveType.Cylinder, root.transform, new Vector3(0, .035f, 0), new Vector3(.2f, .012f, .2f), rust);
+            // Each jaw: a half ring of short bars on its hinge (at the ends of the long bar), its teeth up; laid open flat.
+            var jaws = new Transform[2];
+            for (int j = 0; j < 2; j++)
+            {
+                var hinge = new GameObject("Jaw " + j).transform; hinge.SetParent(root.transform, false); hinge.localPosition = new Vector3(0, .03f, 0);
+                jaws[j] = hinge; float side = j == 0 ? 1 : -1;
+                for (int k = 0; k <= 8; k++)
+                {
+                    float a = Mathf.PI * k / 8; var p = new Vector3(Mathf.Cos(a) * .36f, 0, side * Mathf.Sin(a) * .36f);
+                    float tangent = Mathf.Atan2(side * Mathf.Cos(a), -Mathf.Sin(a)) * Mathf.Rad2Deg;
+                    Bit(PrimitiveType.Cube, hinge, p, new Vector3(.03f, .03f, .15f), iron, Quaternion.Euler(0, tangent, 0));
+                    if (k > 0 && k < 8) Bit(PrimitiveType.Cube, hinge, p * .93f + Vector3.up * .035f, new Vector3(.02f, .06f, .025f), iron, Quaternion.Euler(0, tangent, side * 12));   // a tooth
+                }
+                Bit(PrimitiveType.Cylinder, root.transform, new Vector3(side * .44f, .03f, 0), new Vector3(.06f, .07f, .06f), rust, Quaternion.Euler(0, 0, 90));   // the spring at the hinge
+            }
+            // The chain to its stake.
+            for (int k = 0; k < 5; k++) Bit(PrimitiveType.Cube, root.transform, new Vector3(.5f + k * .07f, .012f, -.06f - k * .025f), new Vector3(.06f, .015f, .03f), iron, Quaternion.Euler(0, 20 + (k % 2) * 50, 0));
+            Bit(PrimitiveType.Cylinder, root.transform, new Vector3(.9f, .1f, -.2f), new Vector3(.06f, .14f, .06f), wood, Quaternion.Euler(6, 0, -8));
+            root.AddComponent<TrapJaws>().jaws = jaws;
+            return root;
         }
         /// <summary>The ground under someone's feet: down from the bottom of their capsule to the first thing that is not a person.
         /// (Playtest note 123, Chris, 2026-10-11: "trap set up in the air". It was set at the player's middle, a metre up: the
@@ -330,7 +369,9 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponD
                 var d = e.transform.position - trap.transform.position; d.y = 0; if (d.magnitude > 1.4f) continue;
                 string why = e.Apply("incap", s.Player, trapHold);
                 s.Message(why == null ? "Snare Trap: " + e.actor.DisplayName + " is caught." : e.actor.DisplayName + " springs the trap: " + why + ".");
-                UnityEngine.Object.Destroy(trap); trap = null; return;
+                // The jaws snap shut round it and the sprung trap lies there a while (2026-10-14).
+                var sprung = trap; trap = null; var snap = sprung.GetComponent<TrapJaws>(); if (snap != null) snap.Spring(e.transform);
+                UnityEngine.Object.Destroy(sprung, why == null ? trapHold + 1 : 2); return;
             }
         }
         public override void ResetState()
@@ -369,6 +410,19 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponD
             if (periodic.Has("wound", enemy)) parts.Add("Wounded");
             if (Feinted(enemy)) parts.Add("FEINTED");
             return parts.Count == 0 ? null : string.Join("  ·  ", parts);
+        }
+    }
+
+    /// <summary>The jaw trap's two jaws, laid open; sprung, they swing up about the long bar and close (a quarter second).</summary>
+    public sealed class TrapJaws : MonoBehaviour
+    {
+        public Transform[] jaws; float sprungAt = -1; Transform held;
+        public void Spring(Transform on) { sprungAt = Time.time; held = on; }
+        void Update()
+        {
+            if (sprungAt < 0 || jaws == null) return;
+            float u = Mathf.SmoothStep(0, 1, Mathf.Clamp01((Time.time - sprungAt) / .25f));
+            for (int j = 0; j < jaws.Length; j++) if (jaws[j] != null) jaws[j].localRotation = Quaternion.Euler((j == 0 ? -1 : 1) * 82 * u, 0, 0);
         }
     }
 }

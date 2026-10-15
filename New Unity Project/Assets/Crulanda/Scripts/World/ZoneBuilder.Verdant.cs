@@ -23,11 +23,13 @@ namespace Crulanda.World
             LeafTrees.Add(t.position);
             var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
             var bark = Tint(art.bark, Wither(Color.Lerp(new Color(.34f, .27f, .2f), new Color(.4f, .34f, .27f), T())));
-            var moss = Tint(art.bark, Wither(Color.Lerp(new Color(.2f, .27f, .13f), new Color(.26f, .33f, .15f), T())));   // the flare and roots, mossed over
+            // The flare and roots: bark with a little moss in it, each tree its own (Chris, 2026-10-14: "these tree roots need to be a
+            // little more randomized. coloring is off": they were one flat green).
+            var moss = Tint(art.bark, Wither(Color.Lerp(new Color(.3f, .25f, .17f), new Color(.27f, .3f, .16f), T() * .6f)));
             float h = 15 + T() * 3, r0 = 2.05f + T() * .4f;
             float lx = (T() - .5f) * .03f, lz = (T() - .5f) * .03f, bend = (T() - .5f) * .8f, ph = T() * 6.3f, seed = T() * 60;
-            const int Buttresses = 7; var bAt = new float[Buttresses]; var bW = new float[Buttresses];
-            for (int i = 0; i < Buttresses; i++) { bAt[i] = (i + (T() - .5f) * .55f) * 2 * Mathf.PI / Buttresses; bW[i] = .7f + T() * .5f; }
+            int Buttresses = 5 + (int)(T() * 3.99f); var bAt = new float[Buttresses]; var bW = new float[Buttresses];   // five to eight, unevenly round, some slight and some great
+            for (int i = 0; i < Buttresses; i++) { bAt[i] = (i + (T() - .5f) * .9f) * 2 * Mathf.PI / Buttresses; bW[i] = .35f + T() * 1.05f; }
             Vector3 Axis(float y) { float s = Mathf.Sin(y / h * 2.6f + ph) * bend; return new Vector3(lx * y + s, y, lz * y + s * .6f); }
             float Girth(float y, float a)
             {
@@ -45,7 +47,8 @@ namespace Crulanda.World
             var roots = new List<CombineInstance>();
             for (int i = 0; i < Buttresses; i++)
             {
-                float a = bAt[i], len = 3.2f + T() * 2.6f, rr = .55f * bW[i] + .2f, wig = (T() - .5f) * 1.2f, ph2 = T() * 6;
+                float a = bAt[i], len = 1.8f + T() * 4.4f, rr = .55f * bW[i] + .15f, wig = (T() - .5f) * 2, ph2 = T() * 6;
+                if (T() < .2f) continue;   // a buttress with no root running out
                 var dir = new Vector3(Mathf.Cos(a), 0, -Mathf.Sin(a)); var across = new Vector3(-dir.z, 0, dir.x);
                 Vector3 C(float s) { var p = dir * (r0 * 1.5f + len * s) + across * (wig * Mathf.Sin(s * 3 + ph2) * s); return new Vector3(p.x, LocalGround(t, p.x, p.z) + .45f - .8f * s, p.z); }
                 float R(float s, float ang) { return Mathf.Lerp(rr, .1f, s) * (1 - .4f * Mathf.Abs(Mathf.Cos(ang))); }

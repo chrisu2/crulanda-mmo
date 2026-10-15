@@ -123,6 +123,8 @@ namespace Crulanda.Tests
             Assert.AreEqual(14, hens.Count, "Every Oakhaven chicken belongs to a coop.");
             Assert.IsTrue(hens.All(h => h.Roosting), "Hens roost at night.");
             Assert.AreEqual(3, life.Villagers.Count(v => v.Role == "henwife"));
+            Assert.AreEqual(2, life.Folds.Count, "Oakhaven has two folds of sheep, a shepherd each.");
+            Assert.AreEqual(2, life.Villagers.Count(v => v.Role == "shepherd" && v.Fold != null));
             Assert.IsTrue(life.Villagers.Where(v => v.Role != "drinker" && !v.Resident).All(v => !v.Visible), "Everyone but the last drinkers (and residents at their posts) is abed.");
             Assert.IsTrue(life.Villagers.Where(v => v.Resident).All(v => v.Visible), "Residents keep their posts at night.");
             Assert.Greater(WorldClock.Darkness, .9f);

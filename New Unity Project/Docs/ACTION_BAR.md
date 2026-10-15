@@ -27,3 +27,12 @@ Each class kit has a fixed bar of 11 to 13 abilities in a fixed order (`BarIds`)
 - Alternate advancement: **up to four more slots, 14 in all** (keys -, =, [ and ] after 1-0).
 - Each extra slot costs **1, 2, 3, then 4** AA points (one point fills like a level's worth of experience past the cap).
 - The Druid's four forms sit on **a small bar of their own** and do not use up the ten.
+
+## Fly-out slots (Chris, 2026-10-15 01:25: "keep this in mind when designing hotbar and ui.")
+From his picture (a slot with a small arrow at its edge; hovering or holding it opens a row of three related abilities beside the bar,
+each with its charge count; the one last used sits on the slot's face): a hotbar slot may hold a *family* of actions and open into them.
+Families this game has: the Scoundrel's verses, the Ranger's traps, the potions and foods, the Mage's wards, mounts or waystones later.
+The idea only, not the art: no borrowed icons or frames (GAME-ONLY UI). Rules for the pass that builds it: the face shows the last-used
+member and its cooldown; the row opens on hover after a quarter second or on a held press, closes when the pointer leaves; keys 1-0 still
+fire the face; the row's members can be dragged onto their own slots as today. Record where the family comes from in the data (an
+ability's `family` field) rather than hand lists.

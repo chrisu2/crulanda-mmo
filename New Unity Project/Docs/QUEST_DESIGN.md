@@ -70,6 +70,10 @@ entries. Gameplay raises events (EnemyKilled, Talked, Collected, Visited, Intera
 - **Quest book (L)** has four tabs:
   - **Quests:** grouped by zone and kind, with details and track / abandon buttons.
   - **Chronicle:** completed story, plus documents found, such as the ledger page as a readable item. Pages found as secrets land here too.
+  - **Lore** (2026-10-15, Chris: "book of lore"): the book of lore. A document with `"kind": "lore"` is a page of it (eight so far, each
+    at a `note` secret with its `document`: two in Khaven, the Peaks, the Rim and the Shore); the tab lists the found ones to read, how
+    many lie unread in each zone, and then every other page found, so one tab holds all there is to read. `DocumentDef.kind`,
+    `EncounterSession.LorePages`, `EncounterHud.BookLore`; ZoneLoreTests checks every lore page lies at a hidden find.
   - **Reputation:** each faction's standing on six tiers: Hostile, Distrusted, Neutral, Trusted, Honoured, Sworn.
   - **Discoveries** (2026-09-30):
     - each zone's hidden finds, found out of total, with the current zone first;

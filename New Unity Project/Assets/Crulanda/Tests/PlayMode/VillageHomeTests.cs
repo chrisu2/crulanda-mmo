@@ -66,7 +66,7 @@ namespace Crulanda.Tests
             yield return Load(19);
             var life = VillageLife.Active; Assert.IsNotNull(life, "Oakhaven has village life.");
             var folk = life.Villagers.Where(v => !v.Resident && !v.Farmhand).ToList();
-            Assert.AreEqual(24, folk.Count, "Twenty villagers, three hen-wives and the innkeeper.");
+            Assert.AreEqual(26, folk.Count, "Twenty villagers, three hen-wives, two shepherds and the innkeeper.");
             // The farmhands (2026-10-06, playtest note 61): of no household, but each with a house to go home to.
             var hands = life.Villagers.Where(v => v.Farmhand).ToList();
             Assert.Greater(hands.Count, 0, "Some fields have farmhands.");

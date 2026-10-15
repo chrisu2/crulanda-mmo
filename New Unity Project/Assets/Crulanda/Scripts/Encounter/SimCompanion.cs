@@ -618,7 +618,7 @@ namespace Crulanda.Encounter
                 {
                     int healed = who.GetComponent<Combatant>().Heal(MendFor(who), actor);
                     session.FloatText(who.transform.position, "+" + healed, new Color(.3f, 1, .7f)); session.HealThreat(actor, healed);
-                    visual?.CastRelease(); if (healed > 0) HealFx.Show(who.transform);
+                    visual?.CastRelease("boltL"); if (healed > 0) HealFx.Show(who.transform);
                 }
             }
             // The party's healer (a Druid, or a Paladin with no Druid along) mends as Mira does: whoever is most hurt within reach, under

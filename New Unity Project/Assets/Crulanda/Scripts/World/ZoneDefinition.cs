@@ -38,6 +38,8 @@ namespace Crulanda.World
         public string[] objectives = new string[0];
         public ZoneExit[] exits = new ZoneExit[0];
         public ZoneGrove[] groves = new ZoneGrove[0];
+        /// <summary>The wild woods round the village (ZoneBuilder.Woods.cs); cover 0 (the default): none.</summary>
+        public ZoneWoods woods = new ZoneWoods();
         public string waterTint;   // optional hex, e.g. dark Gloom Creek
         public float waterReflect; // optional sky reflection face-on 0..1 (0 = the water material's own); murky water ~.3
         /// <summary>
@@ -105,13 +107,19 @@ namespace Crulanda.World
         public ZoneHousehold[] households = new ZoneHousehold[0];
         /// <summary>Whose workshop a prop is (a trade then works its own rather than any of the kind).</summary>
         public ZoneWorkshop[] workshops = new ZoneWorkshop[0];
+        /// <summary>Stories of the villagers who are not residents (the named folk of names), by name; a resident's go on the resident.
+        /// Said one time in three when spoken to (ZoneLore.Story; 2026-10-15, Chris: "stories from npcs").</summary>
+        public ZoneStory[] stories = new ZoneStory[0];
     }
     /// <summary>
     /// role: any villager role, or stranger (keeps to one place). place: a place kind (inn, green, woods...).
     /// title: the nameplate subtitle. works: an ordinary villager with the role's working day and a home (an innkeeper), not
-    /// one who keeps a post day and night.
+    /// one who keeps a post day and night. stories: two or three lines of their own, memories, grudges and hopes tied to the
+    /// canon (GAME-ONLY lines about CANON things), said one time in three when spoken to (ZoneLore.Story).
     /// </summary>
-    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; public bool works; }
+    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; public bool works; public string[] stories = new string[0]; }
+    /// <summary>A named person's stories (<see cref="ZoneLife.stories"/>): name as the villager is named, and their lines.</summary>
+    [Serializable] public sealed class ZoneStory { public string name; public string[] lines = new string[0]; }
     /// <summary>
     /// A household (GAME-ONLY): the folk who share one house. house names a prop of kind house, mill or barn (a barn gets a door
     /// of its own) or inn (its rooms upstairs). members name spawned villagers, hen-wives and residents; kin is free text for
@@ -192,10 +200,13 @@ namespace Crulanda.World
     ///   key: a key hidden somewhere else, for a chest that names it in needs. These are found by searching (E, prompt).
     /// Rewards: xp, gold, an item id, a document id (a readable page, as quests give). height lifts the prop off the ground
     /// (something tucked up under a bridge or in a tree); rotation turns it. canonStatus as everywhere.
+    /// clue: the Discoveries tab's line for it while it is not found, a riddle in the book's voice that points at the region and
+    /// the hiding place; hint: what a villager says about it, in theirs (2026-10-15, Chris: "still havent found many secrets";
+    /// Phase 8.6 3e). Neither names a landmark on the map (DiscoveryLog.Validate); either stands in for the other when missing.
     /// </summary>
     [Serializable] public sealed class ZoneSecret
     {
-        public string id, name, kind = "cache", prompt, text, item, document, needs, canonStatus;
+        public string id, name, kind = "cache", prompt, text, item, document, needs, canonStatus, clue, hint;
         public Vector2 at; public float radius = 2.5f, rotation, height;
         public int xp, gold;
         /// <summary>In a cave (the Adit rework): which cave, how far in, how far to the right of its middle and how far above its floor it
@@ -208,6 +219,20 @@ namespace Crulanda.World
     /// <summary>One kind of weather a zone can have and how often (a weight, relative to the zone's other kinds).</summary>
     [Serializable] public sealed class ZoneWeather { public string kind; public float weight = 1; }
     /// <summary>An area filled with trees. kind: dead (grey, leafless, darkened ground), pine, broadleaf.</summary>
+    /// <summary>
+    /// The wild woods (Chris, 2026-10-14, "Filling the zones in the Elwynn style"; ZoneBuilder.Woods.cs). cover: the share of the open
+    /// wild that is wood (0: none). from: no woods nearer the middle than this; ramp: over the next ramp metres they thin in. spacing:
+    /// one tree a cell this wide. edge: kept back from the zone's edge (its own forest ring stands there). scale: the noise's feature
+    /// size in metres (glades and stands). deepAbove: the old forest (always wood, its great oaks a deepOaks share of its trees)
+    /// where a slow noise is above this (1: none); oaks: the great oaks' share elsewhere (0: none); snags: dead snags' share; pineAbove:
+    /// pine stands (never in the old forest) where a third noise is above this (0: all pine). oakScale: the great oaks' size (.5 about
+    /// 14 m; 1 a giant of the Verdant Shore). floor: the forest floor's density. seed: varies them.
+    /// </summary>
+    [Serializable] public sealed class ZoneWoods
+    {
+        public float cover, from = 80, ramp = 60, spacing = 8, edge = 12, scale = 90, deepAbove = 1, deepOaks = .55f, oaks, oakScale = .5f, snags = .04f, pineAbove = .62f, floor = 1;
+        public int seed;
+    }
     [Serializable] public sealed class ZoneGrove { public string name, kind = "dead"; public Vector2 center, size; public int count = 30; }
     [Serializable] public sealed class ZoneLighting
     {

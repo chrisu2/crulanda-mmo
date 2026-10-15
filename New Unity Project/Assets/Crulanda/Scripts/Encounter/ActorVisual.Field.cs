@@ -17,6 +17,33 @@ namespace Crulanda.Encounter
         /// <summary>Where in the stroke the head meets the soil (0-1 of the period).</summary>
         const float StrikeAt = .47f;
         float hoeTime; bool hoeActive; Vector3 hoeButt, hoeDir; float tradeToolHeadReach = .05f;
+        /// <summary>The hoe worked by Kevin's ploughing clip this frame (PoseOf), not the hand-set stroke.</summary>
+        bool ploughing;
+        /// <summary>One of Kevin's three gathering motions, fixed for the figure.</summary>
+        string GatherSlot { get { if (gatherPick < 0) gatherPick = gatherNext++ % 3; return "k.gather" + (1 + gatherPick); } }
+        int gatherPick = -1; static int gatherNext;
+        /// <summary>The ploughing clip has the hands: the hoe's shaft runs from just behind the upper fist through the lower one, the
+        /// blade on past it to the ground; the fingers close round it.</summary>
+        void PloughHands()
+        {
+            Vector3 Grip(Transform hand, Transform middle) { return middle != null ? Vector3.Lerp(hand.position, middle.position, .55f) : hand.position; }
+            Vector3 gl = Grip(model.HandL, model.MiddleL), gr = Grip(model.HandR, model.MiddleR);
+            Vector3 top = gl.y >= gr.y ? gl : gr, low = gl.y >= gr.y ? gr : gl, d = low - top;
+            if (d.sqrMagnitude < .01f) d = -body.up * .6f + body.forward * .4f;
+            hoeDir = d.normalized; hoeButt = top - hoeDir * .1f; hoeActive = true;
+            float scale = tradeTool != null ? tradeTool.lossyScale.y : 1, ground = Ground();
+            bool was = BladeInSoil;
+            BladeEdge = hoeButt + hoeDir * (tradeToolShaft * scale + tradeToolHeadReach); BladeInSoil = BladeEdge.y < ground + .03f;
+            // The same measures as the hand-set stroke (FieldWorkTests): the hands' spread and height, a stroke each time the blade goes in.
+            HandSpread = Vector3.Distance(gl, gr);
+            Vector3 ahead = body.forward; ahead.y = 0; ahead.Normalize();
+            var ch = model.Chest != null ? model.Chest.position : transform.position + Vector3.up * .3f; float sh = Mathf.Min(model.UpperArmL.position.y, model.UpperArmR.position.y);
+            PoseHandOverShoulder = Mathf.Max(gl.y, gr.y) - sh; PoseHandAhead = Mathf.Min(Vector3.Dot(gl - ch, ahead), Vector3.Dot(gr - ch, ahead));
+            PoseElbowOverShoulder = Mathf.Max(model.LowerArmL.position.y - model.UpperArmL.position.y, model.LowerArmR.position.y - model.UpperArmR.position.y);
+            if (BladeInSoil && !was) { StrokeCount++; StrikeGap = BladeEdge.y - ground; Puff(new Vector3(BladeEdge.x, ground + .03f, BladeEdge.z)); }
+            CurlRound(model.FingersR, model.HandR, model.MiddleR, gr, body.right, .8f);
+            CurlRound(model.FingersL, model.HandL, model.MiddleL, gl, body.right, .8f);
+        }
         /// <summary>Strokes struck so far (the farmer steps along the row after each: Villager).</summary>
         public int StrokeCount { get; private set; }
         /// <summary>The tool head's lowest point over the ground at the last strike, in metres (negative: into the soil).</summary>
@@ -93,6 +120,7 @@ namespace Crulanda.Encounter
                 CurlRound(model.FingersL, model.HandL, model.MiddleL, handsL.Value, body.right, .8f);
                 return;
             }
+            if (hoe && ploughing && HoeReady) { PloughHands(); return; }
             if (!hoe || !HoeReady) { hoeTime = 0; if (clod != null) clod.gameObject.SetActive(false); return; }
             float before = HoeK; hoeTime += dt; float k = HoeK;
             StrokeAt(k, out var key, out var edge, out float draw);

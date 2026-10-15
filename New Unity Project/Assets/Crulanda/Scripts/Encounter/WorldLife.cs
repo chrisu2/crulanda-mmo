@@ -26,6 +26,9 @@ namespace Crulanda.Encounter
         static readonly string[] Names = { "Brannoc Vell", "Wil Carder", "Ama Rusk", "Hedda Thorne", "Sel Harrow", "Garet Moss", "Old Tobin", "Pim",
             "Osk Farrow", "Lisbet Crane", "Ilse Brandt", "Corwin Ashby", "Aldo Crisp", "Maud Tanner", "Fen Walker", "Edda Pell", "Nettie", "Tamsin Reed",
             "Jory", "Grete Lowe", "Hob Linden", "Wenna Scrope" };
+        /// <summary>The villagers' names a zone spawns, in order: its own list (life.names) or, without one, Oakhaven's (ZoneLoreTests
+        /// checks every one of them has stories; 2026-10-15).</summary>
+        public static string[] VillagerNames(ZoneLife life) { return life != null && life.names != null && life.names.Length > 0 ? life.names : Names; }
         // The trades come first so a small village still gets its smith and baker; a trade whose workplace the zone
         // lacks falls back to farming or gossip (see Init).
         static readonly string[] Roles = { "blacksmith", "farmer", "merchant", "baker", "gossip", "hunter", "drinker", "child", "lumberjack", "herbalist",
@@ -45,7 +48,7 @@ namespace Crulanda.Encounter
         {
             switch (role)
             {
-                case "blacksmith": return "Blacksmith"; case "merchant": return "Merchant"; case "baker": return "Baker"; case "henwife": return "Hen-wife";
+                case "blacksmith": return "Blacksmith"; case "merchant": return "Merchant"; case "baker": return "Baker"; case "henwife": return "Hen-wife"; case "shepherd": return "Shepherd";
                 case "farmer": return "Farmer"; case "hunter": return "Hunter"; case "leatherworker": return "Leatherworker"; case "skinner": return "Skinner";
                 case "lumberjack": return "Woodcutter"; case "herbalist": return "Herbalist"; case "miller": return "Miller"; case "elder": return "Village Elder";
                 case "innkeeper": return "Innkeeper";
@@ -154,6 +157,28 @@ namespace Crulanda.Encounter
                 var start = NavMesh.SamplePosition(coop.yard, out var hit, 4, NavMesh.AllAreas) ? hit.position : coop.yard;
                 Settle(Villager.Spawn(this, name, "henwife", 40 + i, household?.house ?? lodging, start, coop), household);
             }
+            // One shepherd per flock of sheep (Chris, 2026-10-14: "does anyone feed or tend to this flock of sheep?"): the fold is the
+            // flock's own ground, its gate toward the village; the shepherd lives in the house nearest it.
+            foreach (var group in z.life.critters)
+            {
+                if (group == null || group.kind != "sheep" || Zone == null) continue;
+                // The gate on the side toward the village, snapped to the nearer axis (a fold's walls run square, its gap mid-side: the
+                // Old Fold's east wall); the trough the fold's own crate where the zone has one by the flock.
+                var yard = Zone.Ground(group.center); var toVillage = -new Vector2(group.center.x, group.center.y);
+                toVillage = toVillage.sqrMagnitude < 1 ? Vector2.up : Mathf.Abs(toVillage.x) > Mathf.Abs(toVillage.y) ? new Vector2(Mathf.Sign(toVillage.x), 0) : new Vector2(0, Mathf.Sign(toVillage.y));
+                var side = new Vector2(-toVillage.y, toVillage.x);
+                var fold = new ZoneFold { name = "The fold", yard = yard, radius = group.radius, sheep = group.count,
+                    gate = Zone.Ground(group.center + toVillage * (group.radius + 2.2f)), trough = Zone.Ground(group.center + side * group.radius * .55f) };
+                foreach (var l in z.landmarks) if (l != null && Vector2.Distance(l.at, group.center) < l.radius + 4) { fold.name = l.name; break; }
+                foreach (var p in z.props) if (p != null && p.name != null && p.name.IndexOf("trough", System.StringComparison.OrdinalIgnoreCase) >= 0 && Vector2.Distance(p.at, group.center) < group.radius + 4) { fold.trough = Zone.Ground(p.at + (group.center - p.at).normalized * 1.1f); break; }
+                Folds.Add(fold);
+                string name = ShepherdNames[(Folds.Count - 1) % ShepherdNames.Length];
+                ZoneDoor near = null; float best = float.MaxValue;
+                foreach (var h in Homes) { float d = (h.position - fold.gate).sqrMagnitude; if (d < best) { best = d; near = h; } }
+                var household = named ? HouseholdOf(name) : near != null ? Households.Find(h => h.house == near) ?? Derived(near) : null;
+                var start = NavMesh.SamplePosition(fold.gate, out var fh, 4, NavMesh.AllAreas) ? fh.position : fold.gate;
+                Settle(Villager.Spawn(this, name, "shepherd", 50 + Folds.Count, household?.house ?? lodging, start, null, null, null, null, fold), household);
+            }
             // Deer and rabbits are game the player can hunt: the session spawns them (EncounterSession.SpawnGame), not the village.
             // Their draws are still taken from this stream, so the hens, crows, sheep and cats after them stand where they always did.
             foreach (var group in z.life.critters)
@@ -175,7 +200,11 @@ namespace Crulanda.Encounter
                 }
             }
         }
-        static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
+        /// <summary>The folds' shepherds, in order (GAME-ONLY).</summary>
+        public static readonly string[] ShepherdNames = { "Tam Sedge", "Nell Sedge" };
+        /// <summary>The sheep folds of this zone, a shepherd each.</summary>
+        public readonly List<ZoneFold> Folds = new List<ZoneFold>();
+        public static readonly string[] KeeperNames = { "Goody Marl", "Hettie Brook", "Nan Pennock", "Old Sorrel" };
         public static string[] DefaultNames { get { return Names; } }
         /// <summary>The trades of the default villagers, by index (before a trade this village lacks a place for falls back).</summary>
         public static string[] DefaultRoles { get { return Roles; } }
@@ -516,7 +545,7 @@ namespace Crulanda.Encounter
             if (WorldClock.Between(4, 5)) { Stock.Clear(); MorningCask(); }   // the stock is the day's deliveries: yesterday's are eaten, sold or burnt
             foreach (var coop in Zone.Coops)
             {
-                if (WorldClock.Between(4, 5)) coop.LaidToday = 0;
+                if (WorldClock.Between(4, 5)) { coop.LaidToday = 0; foreach (var f in Folds) f.Shorn = false; }
                 if (!WorldClock.Between(7, 16.5f)) continue;
                 int hens = 0; foreach (var c in Critters) if (c.Coop == coop) hens++;
                 if (coop.LaidToday < hens && R01 < .35f) { coop.Eggs++; coop.LaidToday++; }
@@ -727,6 +756,7 @@ namespace Crulanda.Encounter
             "Hens know when weather's turning. Lately they know when the grey's moving, too.",
             "Scatter the grain wide or the bossy ones get it all." };
         static readonly Dictionary<string, string[]> TradeLines = new Dictionary<string, string[]> {
+            { "shepherd", new[] { "Thirty-one this morning, thirty-one tonight, or I'll know the reason.", "Shear them in the warm and they forgive you by supper.", "The grey took the high pasture. They graze the fold and like it.", "Fleeces go to the stall. What the stall does with them is the stall's affair." } },
             { "blacksmith", new[] { "The collectors took my best iron. 'Tithe,' they called it.", "Mind the sparks. Nails and hinges, mostly. Nobody orders blades any more.", "Bring me good ore and I'll make you something worth the carrying." } },
             { "merchant", new[] { "Prices are up. Nothing comes from the east now, and precious little from the west.", "Cloth, pots, a good knife. Coin or trade, I'm not proud.", "The Concord taxes the carts twice: once on the road, once at the stall." } },
             { "baker", new[] { "Bread's thin this week. The flour tastes faintly of ash.", "First loaves come out at dawn. Last ones go to whoever's still standing.", "Fire's never gone out in this oven. Not once, in forty years." } },
@@ -740,17 +770,27 @@ namespace Crulanda.Encounter
             { "innkeeper", new[] { "Ale's thin and the stew's thinner. Sit where you like.", "The Cask stood before the Concord and it'll stand after." } } };
         /// <summary>The innkeeper on Mira, while she still sits in the corner of his taproom (before she joins you).</summary>
         const string InnkeeperOnMira = "Mira's in the corner. Don't crowd her; she's the only mender we've got.";
+        /// <summary>
+        /// What someone says when spoken to (toPlayer) or among themselves. Spoken to, one time in three it is one of their own stories
+        /// (ZoneLore.Story, the zone's data: memories, grudges and hopes), and one time in four after that a hint at one of the zone's
+        /// secrets not yet found (ZoneLore.SecretHint; 2026-10-15, Chris: "still havent found many secrets", "stories from npcs");
+        /// then the day's news, the trade's lines and the village's mood as before.
+        /// </summary>
         public string LineFor(Villager v, bool toPlayer)
         {
             if (Zone.Zone.life.mood == "keepers")
             {
                 // The Verdant Shore: the Keepers and the two travellers among them have their own lines, and none of Oakhaven's talk.
                 if (!toPlayer) return KeeperChatter[rng.Next(KeeperChatter.Length)];
+                if (rng.Next(3) == 0) { var tale = ZoneLore.Story(Zone.Zone, v.Name, rng); if (tale != null) return tale; }
+                if (rng.Next(4) == 0) { var hint = ZoneLore.SecretHint(Zone.Zone, Session.Discoveries, rng); if (hint != null) return hint; }
                 if (OwnLines.TryGetValue(v.Name, out var own) && rng.Next(2) == 0) return own[rng.Next(own.Length)];
                 return v.Keeper ? Keepers[rng.Next(Keepers.Length)] : OwnLines.TryGetValue(v.Name, out var mine) ? mine[rng.Next(mine.Length)] : Keepers[rng.Next(Keepers.Length)];
             }
             if (v.PassedOut) return "Zzz...";
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
+            if (rng.Next(3) == 0) { var tale = ZoneLore.Story(Zone.Zone, v.Name, rng); if (tale != null) return tale; }
+            if (rng.Next(4) == 0) { var hint = ZoneLore.SecretHint(Zone.Zone, Session.Discoveries, rng); if (hint != null) return hint; }
             if (rng.Next(3) == 0) { var day = StockLine(v); if (day != null) return day; }
             var purse = PurseLine(v); if (purse != null && rng.Next(3) == 0) return purse;
             if (v.Role == "innkeeper" && Session.Progress != null && !Session.Progress.recruited && rng.Next(3) == 0) return InnkeeperOnMira;
@@ -770,9 +810,11 @@ namespace Crulanda.Encounter
             return pool[rng.Next(pool.Length)];
         }
         /// <summary>The Scoundrel's charm at the inn (Docs/CLASS_SCOUNDREL.md; GAME-ONLY): the innkeeper lets slip a rumour, work that someone
-        /// here has going (a quest you could take now) or an elite seen about (one of this zone's camps); null when there is nothing to tell.</summary>
+        /// here has going (a quest you could take now), an elite seen about (one of this zone's camps) or, one time in three, where something
+        /// lies hidden (a secret's hint, 2026-10-15); null when there is nothing to tell.</summary>
         string Rumour()
         {
+            if (rng.Next(3) == 0) { var hint = ZoneLore.SecretHint(Zone.Zone, Session.Discoveries, rng); if (hint != null) return hint; }
             string zoneId = Zone.Zone.id; var work = new List<QuestDef>();
             if (Session.Quests != null)
                 foreach (var q in Session.Quests.Db.Ordered)
@@ -795,7 +837,7 @@ namespace Crulanda.Encounter
         {
             switch (v.Role)
             {
-                case "merchant": return Count("stall.eggs") > 0 ? "Eggs in from the hen-wife, if you want them. Fresh today." : Count("sold.stall.herbs") > 0 ? "Fresh-cut herbs on the stall. Somebody's been in the meadow." : Count("stall.flour") > 0 ? "Flour from the mill, ground this afternoon. Dear, mind." : Count("stall.goods") > 0 ? "Belts and nails and hinges, all village-made. Nothing from the east." : null;
+                case "merchant": return Count("stall.wool") > 0 ? "Fleeces in from the fold, if you've a loom or a cold winter coming." : Count("stall.eggs") > 0 ? "Eggs in from the hen-wife, if you want them. Fresh today." : Count("sold.stall.herbs") > 0 ? "Fresh-cut herbs on the stall. Somebody's been in the meadow." : Count("stall.flour") > 0 ? "Flour from the mill, ground this afternoon. Dear, mind." : Count("stall.goods") > 0 ? "Belts and nails and hinges, all village-made. Nothing from the east." : null;
                 case "baker": return Count("oven.flour") > 0 ? "The miller's flour came in. Thin stuff, but it rises." : WorldClock.Between(10, 19) ? "No flour from the mill yet today. The loaves'll be late." : null;
                 case "blacksmith":
                     if (Count("forge.ore") > 0) return Zone.Zone.id == "zone.oakhaven" ? "Someone's been up the Crowsfoot with a pick. First ore I've not had to beg for." : "Someone's been out with a pick. First ore I've not had to beg for.";
@@ -872,6 +914,8 @@ namespace Crulanda.Encounter
         public bool Visible { get { return state != State.Hidden; } }
         /// <summary>The coop a hen-wife keeps (null for everyone else).</summary>
         public ZoneCoop Coop { get; private set; }
+        /// <summary>The fold a shepherd keeps (null for everyone else).</summary>
+        public ZoneFold Fold { get; private set; }
         public string Activity { get { return activity; } }
         /// <summary>Goods in hand (see <see cref="Load"/>), carried on an errand between trades.</summary>
         public bool Carrying { get { return load != null; } }
@@ -904,7 +948,7 @@ namespace Crulanda.Encounter
         /// <summary>When a hunter who lives at a lodge sets off for bed: Oakhaven's is about a game hour's walk from the green.</summary>
         public const float HunterBed = 19.8f;
 
-        public static Villager Spawn(VillageLife life, string name, string role, int index, ZoneDoor home, Vector3 at, ZoneCoop coop = null, string fixedPlace = null, string title = null, string look = null)
+        public static Villager Spawn(VillageLife life, string name, string role, int index, ZoneDoor home, Vector3 at, ZoneCoop coop = null, string fixedPlace = null, string title = null, string look = null, ZoneFold fold = null)
         {
             var go = new GameObject(name); go.SetActive(false); go.transform.position = at + Vector3.up;
             go.transform.SetParent(life.transform, false); go.transform.position = at + Vector3.up;
@@ -919,7 +963,7 @@ namespace Crulanda.Encounter
             v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper ? null : role);
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
-            v.Coop = coop;
+            v.Coop = coop; v.Fold = fold;
             // Bed and rising: the baker is up before dawn for the first loaves, the drinkers last to bed and last up, children early to bed;
             // the hunter early too where he has a lodge, for the long walk out to it; the innkeeper up at first light and last to bed
             // but the drinkers.
@@ -1101,6 +1145,9 @@ namespace Crulanda.Encounter
                 case "trough": return Coop != null ? Coop.trough : (Vector3?)null;
                 case "pan": return Coop != null ? Coop.pan : (Vector3?)null;
                 case "yard": return Coop != null ? Around(Coop.yard, 3) : null;
+                case "fold": return Fold != null ? Around(Fold.yard, Fold.radius * .55f) : null;
+                case "foldgate": return Fold != null ? Fold.gate : (Vector3?)null;
+                case "foldtrough": return Fold != null ? Fold.trough : (Vector3?)null;
             }
             if (life.OwnPlaces(this, place) != null) return life.RandomPlace(place, this);
             return life.WorkedPlace(place, this, role) ?? life.RandomPlace(place);
@@ -1117,6 +1164,9 @@ namespace Crulanda.Encounter
                 int n = e.amount;
                 if (e.from == "nest") { n = Coop.Eggs; Coop.Eggs = 0; Face(Coop.door + (Coop.nest - Coop.door) * 2); }
                 if (e.from == "trough") { Coop.FedAt = Time.time; Coop.FeedSpot = Coop.trough; Face(Coop.trough + (Coop.trough - Coop.yard)); }
+                if (Fold != null && e.id == "the shearing") { n = Fold.Shear(); Face(Fold.yard); }
+                if (Fold != null && e.good == "wool") { n = Fold.Wool; Fold.Wool = 0; Face(Fold.yard); }
+                if (Fold != null && e.from == "foldtrough") { Fold.FedAt = Time.time; Fold.FeedSpot = Fold.trough; Face(Fold.yard); }
                 visual.Pose = e.pose; until = Time.time + e.work; loadCount = n;
                 string pick = e.from == "nest" ? EggLine(n) : e.pickupLine ?? (e.to == null ? e.line : null);
                 if (pick != null && pick.Contains("{seller}")) { var seller = life.SellerName(e.need); pick = seller != null ? pick.Replace("{seller}", seller) : pick.Replace(", {seller}", ""); }
@@ -1208,6 +1258,8 @@ namespace Crulanda.Encounter
                     var crop = Crulanda.World.CropField.At(transform.position);
                     return crop == null ? ActorPose.Work : crop.Stage == "sown" || crop.Stage == "reaped" ? ActorPose.Gather : crop.Stage == "ripe" ? ActorPose.Chop : ActorPose.Work;
                 }
+                case "fold": return ActorPose.Gather;
+                case "foldgate": return ActorPose.Talk;
                 case "mill": return ActorPose.Work;
                 case "well": return life.R01 < .5f ? ActorPose.Work : ActorPose.Talk;
                 case "inn": case "sleep": return ActorPose.Sit;

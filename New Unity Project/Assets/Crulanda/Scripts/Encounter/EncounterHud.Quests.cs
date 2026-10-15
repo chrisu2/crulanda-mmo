@@ -5,8 +5,8 @@ namespace Crulanda.Encounter
 {
     /// <summary>
     /// Quest interface: tracker (under the minimap), ! and ? over quest givers, the parchment conversation window, and the
-    /// quest book (L) with Quests, Chronicle, Standing, Discoveries and Armoury tabs (the last two in EncounterHud.Discoveries.cs and
-    /// EncounterHud.Armoury.cs).
+    /// quest book (L) with Quests, Chronicle, Lore (the book of lore, 2026-10-15), Standing, Discoveries, Achievements and Armoury
+    /// tabs (the last three in EncounterHud.Discoveries.cs, EncounterHud.Achievements.cs and EncounterHud.Armoury.cs).
     /// </summary>
     public sealed partial class EncounterHud
     {
@@ -308,15 +308,18 @@ namespace Crulanda.Encounter
             Fill(new Rect(w.x - 4, w.y - 4, w.width + 8, w.height + 8), new Color(.25f, .17f, .08f, .98f));
             Fill(w, new Color(.1f, .09f, .08f, .97f));
             Shadow(new Rect(w.x + 24, w.y + 14, 400, 32), "QUEST BOOK", heading, gold);
-            // A newly revealed page jumps to the Chronicle once; after that the reader can switch tabs freely.
-            if (!string.IsNullOrEmpty(session.ReadingDocument) && session.ReadingDocument != lastReading) BookTab = "chronicle";
+            // A newly revealed page jumps to the Chronicle once (a page of the book of lore to the Lore tab); after that the reader can
+            // switch tabs freely.
+            if (!string.IsNullOrEmpty(session.ReadingDocument) && session.ReadingDocument != lastReading)
+                BookTab = log.Db.Documents.TryGetValue(session.ReadingDocument, out var revealed) && revealed.IsLore ? "lore" : "chronicle";
             lastReading = session.ReadingDocument;
-            string[] tabs = { "quests", "chronicle", "standing", "discoveries", "achievements", "armoury" };
-            string[] names = { "Quests", "Chronicle", "Standing", "Discoveries", "Achievements", "Armoury" + (session.ArmouryUnseen > 0 ? "  +" + session.ArmouryUnseen : "") };
+            // Seven tabs since the Lore tab (2026-10-15): 100 apart and 96 wide, so the last ends before the Close button.
+            string[] tabs = { "quests", "chronicle", "lore", "standing", "discoveries", "achievements", "armoury" };
+            string[] names = { "Quests", "Chronicle", "Lore", "Standing", "Discoveries", "Achievements", "Armoury" + (session.ArmouryUnseen > 0 ? "  +" + session.ArmouryUnseen : "") };
             for (int i = 0; i < tabs.Length; i++)
             {
                 GUI.enabled = BookTab != tabs[i];
-                if (GUI.Button(new Rect(w.x + 236 + i * 111, w.y + 16, 106, 30), names[i], micro)) { BookTab = tabs[i]; if (tabs[i] != "chronicle") session.ReadingDocument = null; }
+                if (GUI.Button(new Rect(w.x + 212 + i * 100, w.y + 16, 96, 30), names[i], micro)) { BookTab = tabs[i]; if (tabs[i] != "chronicle" && tabs[i] != "lore") session.ReadingDocument = null; }
                 GUI.enabled = true;
             }
             if (GUI.Button(new Rect(w.xMax - 124, w.y + 16, 100, 30), "Close [L]", micro)) { session.QuestBookOpen = false; session.ReadingDocument = null; }
@@ -324,6 +327,7 @@ namespace Crulanda.Encounter
             Fill(list, new Color(1, 1, 1, .04f));
             if (BookTab == "quests") BookQuests(log, list, page);
             else if (BookTab == "chronicle") BookChronicle(log, list, page);
+            else if (BookTab == "lore") BookLore(log, list, page);
             else if (BookTab == "discoveries") BookDiscoveries(list, page);
             else if (BookTab == "achievements") BookAchievements(list, page);
             else if (BookTab == "armoury") BookArmoury(list, page);
@@ -385,8 +389,14 @@ namespace Crulanda.Encounter
             foreach (var id in log.Progress.questsDone)
             { var q = log.Def(id); if (q == null || !q.IsMain) continue; Shadow(new Rect(list.x + 16, y, list.width - 24, 20), "◆ " + q.title, tiny, new Color(1, .86f, .5f)); y += 20; }
             foreach (var (q, s) in log.Active()) if (q.IsMain) { Shadow(new Rect(list.x + 16, y, list.width - 24, 20), "◇ " + q.title + " (now)", tiny, new Color(.85f, .8f, .7f)); y += 20; }
+            ReadPage(log, page, log.Progress.documents.Count == 0 ? "Letters, ledgers and songs you find are kept here." : "Choose a page to read.");
+        }
+        /// <summary>The page being read (session.ReadingDocument) on parchment: its title, its text in a scroll view, its lore status; or a
+        /// word on what the pane is for when nothing is chosen. Shared by the Chronicle and the Lore tab.</summary>
+        void ReadPage(QuestLog log, Rect page, string empty)
+        {
             if (session.ReadingDocument == null || !log.Db.Documents.TryGetValue(session.ReadingDocument, out var reading))
-            { Shadow(new Rect(page.x, page.y + 10, page.width, 60), log.Progress.documents.Count == 0 ? "Letters, ledgers and songs you find are kept here." : "Choose a page to read.", text, new Color(.8f, .8f, .8f)); return; }
+            { Shadow(new Rect(page.x, page.y + 10, page.width, 60), empty, text, new Color(.8f, .8f, .8f)); return; }
             Fill(page, new Color(.93f, .88f, .76f, 1));
             Ink(new Rect(page.x + 30, page.y + 20, page.width - 60, 34), reading.title, qTitle, new Color(.3f, .16f, .05f));
             var view = new Rect(page.x + 30, page.y + 64, page.width - 50, page.height - 128);
@@ -395,6 +405,39 @@ namespace Crulanda.Encounter
             Ink(new Rect(0, 0, view.width - 24, th), reading.text, qBody, InkBrown);
             GUI.EndScrollView();
             if (!string.IsNullOrEmpty(reading.canonStatus)) Ink(new Rect(page.x + 30, page.yMax - 56, page.width - 60, 48), "Lore status: " + reading.canonStatus, qSmall, new Color(.45f, .38f, .28f));
+        }
+        /// <summary>
+        /// The book of lore (2026-10-15, Chris: "find recipes/ book of lore"): the pages of kind "lore" found at the zones' hidden
+        /// finds (EncounterSession.LorePages), the found ones to read and, zone by zone, how many more lie unread; then every other
+        /// page found (the Chronicle's letters and ledgers), so one tab holds all there is to read.
+        /// </summary>
+        void BookLore(QuestLog log, Rect list, Rect page)
+        {
+            var pages = session.LorePages(); int found = 0; foreach (var p in pages) if (p.found) found++;
+            float y = list.y + 8;
+            Shadow(new Rect(list.x + 10, y, list.width, 20), "THE BOOK OF LORE  (" + found + " / " + pages.Count + ")", qHead, gold); y += 26;
+            foreach (var p in pages)
+            {
+                if (!p.found) continue;
+                GUI.enabled = session.ReadingDocument != p.doc.id;
+                if (GUI.Button(new Rect(list.x + 8, y, list.width - 16, 34), p.doc.title, qList)) { session.ReadingDocument = p.doc.id; textScroll = Vector2.zero; }
+                GUI.enabled = true; y += 38;
+            }
+            if (found == 0) { Shadow(new Rect(list.x + 10, y, list.width - 20, 40), "Pages of the old lore lie at the zones' hidden places. Find them and they are kept here.", tiny, new Color(.8f, .8f, .8f)); y += 44; }
+            // Unread pages, by zone, in the pages' order (this zone first, then by level).
+            var zones = new List<string>(); var unread = new Dictionary<string, int>();
+            foreach (var p in pages) { if (p.found) continue; string z = string.IsNullOrEmpty(p.zoneName) ? "elsewhere" : p.zoneName; if (!unread.ContainsKey(z)) { zones.Add(z); unread[z] = 0; } unread[z]++; }
+            foreach (var z in zones) { Shadow(new Rect(list.x + 16, y, list.width - 24, 20), unread[z] + (unread[z] == 1 ? " page lies unread " : " pages lie unread ") + (z == "elsewhere" ? "elsewhere" : "in " + z) + ".", tiny, new Color(.72f, .7f, .65f)); y += 20; }
+            int others = 0; foreach (var id in log.Progress.documents) if (log.Db.Documents.TryGetValue(id, out var d) && !d.IsLore) others++;
+            y += 10; Shadow(new Rect(list.x + 10, y, list.width, 20), "LETTERS AND LEDGERS  (" + others + ")", qHead, new Color(.7f, .7f, .7f)); y += 24;
+            foreach (var id in log.Progress.documents)
+            {
+                if (y > list.yMax - 40 || !log.Db.Documents.TryGetValue(id, out var doc) || doc.IsLore) continue;
+                GUI.enabled = session.ReadingDocument != id;
+                if (GUI.Button(new Rect(list.x + 8, y, list.width - 16, 30), doc.title, qList)) { session.ReadingDocument = id; textScroll = Vector2.zero; }
+                GUI.enabled = true; y += 34;
+            }
+            ReadPage(log, page, found + others == 0 ? "What the world remembers, as you find it written: the old lore at the hidden places, and the letters, ledgers and songs." : "Choose a page to read.");
         }
         void BookStanding(QuestLog log, Rect area)
         {

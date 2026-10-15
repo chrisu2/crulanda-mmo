@@ -84,13 +84,16 @@ namespace Crulanda.Encounter
 
         // ---------- the quest book's Discoveries tab ----------
         /// <summary>
-        /// One zone in the Discoveries tab: how many secrets it holds and the ones found. The rest are only counted: nothing else
-        /// about them (name, place or kind) is kept here, so the book can't give them away.
+        /// One zone in the Discoveries tab: how many secrets it holds, the ones found, and a clue each for the rest (ZoneSecret.clue,
+        /// written to point at the region and the hiding place without naming the spot; 2026-10-15, Chris: "still havent found many
+        /// secrets"). Nothing else about the unfound (name, place or kind) is kept here, so the book can't give them away.
         /// </summary>
         public sealed class Tally
         {
             public string zoneId, zoneName; public bool here; public int total;
             public readonly List<ZoneSecret> found = new List<ZoneSecret>();
+            /// <summary>The clues of the secrets not found, in the zone's order (one without a clue is counted and no more).</summary>
+            public readonly List<string> clues = new List<string>();
             public int Hidden { get { return total - found.Count; } }
         }
         public Tally TallyOf(string zoneId, string zoneName, IEnumerable<ZoneSecret> secrets, bool here = false)
@@ -100,7 +103,9 @@ namespace Crulanda.Encounter
                 foreach (var s in secrets)
                 {
                     if (s == null || string.IsNullOrEmpty(s.id) || !seen.Add(s.id)) continue;
-                    t.total++; if (IsFound(s)) t.found.Add(s);
+                    t.total++;
+                    if (IsFound(s)) t.found.Add(s);
+                    else { var c = ZoneLore.Clue(s); if (c != null) t.clues.Add(c); }
                 }
             return t;
         }
@@ -112,7 +117,9 @@ namespace Crulanda.Encounter
         /// - an unknown kind; no name or canonStatus; a searchable with no prompt; a lookout with no radius; negative rewards;
         /// - needs naming no secret or itself, or needs that never end (a circle); a key that no chest needs;
         /// - an item or Chronicle page that doesn't exist (checked when those databases are given);
-        /// - a landmark with a secret's name: landmarks are written on the zone map and over the world, so it would give it away.
+        /// - a landmark with a secret's name: landmarks are written on the zone map and over the world, so it would give it away;
+        /// - a clue or hint that names a landmark (2026-10-15): the same give-away, in words. (That every secret has a clue is
+        ///   ZoneLoreTests' check, after the side files are merged in.)
         /// </summary>
         public static List<string> Validate(IEnumerable<ZoneDefinition> zones, ItemDatabase items = null, QuestDatabase content = null)
         {
@@ -156,9 +163,16 @@ namespace Crulanda.Encounter
                     if (items != null && !string.IsNullOrEmpty(s.item) && items.Get(s.item) == null) problems.Add(p + "unknown item '" + s.item + "'.");
                     if (content != null && !string.IsNullOrEmpty(s.document) && !content.Documents.ContainsKey(s.document)) problems.Add(p + "unknown Chronicle page '" + s.document + "' (add it to a quest file's documents).");
                     if (!string.IsNullOrEmpty(s.name) && landmarks.Contains(s.name)) problems.Add(p + "a landmark has its name, so the map would give it away.");
+                    foreach (var l in landmarks)
+                        if (Mentions(s.clue, l) || Mentions(s.hint, l)) problems.Add(p + "its clue or hint names the landmark '" + l + "', which the map shows.");
                 }
             }
             return problems;
+        }
+        /// <summary>Whether a clue or hint carries a landmark's name, in any case ("the watchtower" gives away The Watchtower).</summary>
+        public static bool Mentions(string line, string landmark)
+        {
+            return !string.IsNullOrEmpty(line) && !string.IsNullOrEmpty(landmark) && line.IndexOf(landmark, StringComparison.OrdinalIgnoreCase) >= 0;
         }
         /// <summary>Following needs from this secret comes back round to one already passed.</summary>
         static bool Circular(ZoneSecret s, Dictionary<string, ZoneSecret> all)

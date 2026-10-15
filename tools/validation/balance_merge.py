@@ -11,7 +11,7 @@ SLACK = .03
 
 rows = {}   # (class, build, role) -> {scenario: [dps...], 'hps': [hps...]}
 tanks = {}  # (class, build) -> lists of the tank test's figures ("# tank" lines: taken, self-heal, net, threat a second; refills)
-files = sorted(glob.glob(os.path.join(folder, 'balance-*.csv')), key=os.path.getmtime)
+files = sorted((f for f in glob.glob(os.path.join(folder, 'balance-*.csv')) if not os.path.basename(f).startswith(('balance-summary', 'balance-runs', 'balance-all'))), key=os.path.getmtime)   # not the sheets this writes
 for f in files:
     if '_TABLE' in f: continue
     with open(f, encoding='utf-8') as h:
@@ -36,6 +36,64 @@ for (cls, build, role), d in rows.items():
     single = mean(d.get('single', [])); aoe = mean(d.get('aoe3', []))
     hps = max(mean(d.get('hps:heal', [])), mean(d.get('hps:single', [])))
     table.append(dict(cls=cls, build=build, role=role, single=single, aoe=aoe, hps=hps))
+# Two CSVs to sort in a spreadsheet (Chris, 2026-10-14: "give me a balance sheet for all that is sortable. csv?", "well it is not
+# sortable in a spreadsheet", "dps is mixed with single and aoe3. i need these seperate"): balance-summary.csv, one row a build with
+# single-target DPS, DPS against three and HPS in their own columns and every number plain (the target as its two ends, blanks for
+# none); balance-runs.csv, one row a build and seed with the same columns from that seed's runs.
+def _csvs():
+    import csv
+    name = {'dps': 'DPS', 'tank': 'Tank', 'support': 'Support', 'healer': 'Healer', 'control': 'CC', 'pet': 'DPS (pet)', 'utility': 'Support (utility)'}
+    target = {'dps': (62, 72), 'pet': (62, 72), 'control': (45, 52), 'support': (45, 52), 'utility': (45, 52), 'healer': (0, 35), 'tank': (42, 55)}
+    out_rows = [['class', 'build', 'role', 'dps_single', 'dps_vs_3', 'vs3_over_single', 'hps', 'target_min', 'target_max', 'in_range']]
+    for t in sorted(table, key=lambda t: (t['cls'], t['role'], t['build'])):
+        lo, hi = target.get(t['role'], (0, 0))
+        out_rows.append([t['cls'], t['build'], name.get(t['role'], t['role']), round(t['single'], 1), round(t['aoe'], 1), round(t['aoe'] / t['single'], 2) if t['single'] > 0 else '',
+                         round(t['hps'], 1) if t['hps'] > 0 else '', lo, hi, 1 if (lo <= t['single'] <= hi or (lo == 0 and t['single'] <= hi)) else 0])
+    with open(os.path.join(folder, 'balance-summary.csv'), 'w', encoding='utf-8', newline='') as h: csv.writer(h).writerows(out_rows)
+    runs = {}
+    for f in files:
+        if '_TABLE' in f: continue
+        with open(f, encoding='utf-8') as h:
+            for r in csv.reader(h):
+                if not r or r[0].startswith('#') or r[0] == 'class' or len(r) < 8: continue
+                try: dps, hps = float(r[6]), float(r[7])
+                except ValueError: continue
+                k = (r[0].replace('class.', ''), r[1], name.get(r[2], r[2]), r[4]); d = runs.setdefault(k, {})
+                d['dps_' + r[3]] = dps; d['hps_' + r[3]] = hps
+    run_rows = [['class', 'build', 'role', 'seed', 'dps_single', 'dps_vs_3', 'hps_heal', 'hps_single']]
+    for k in sorted(runs):
+        d = runs[k]; run_rows.append(list(k) + [d.get('dps_single', ''), d.get('dps_aoe3', ''), d.get('hps_heal', '') or '', d.get('hps_single', '') or ''])
+    with open(os.path.join(folder, 'balance-runs.csv'), 'w', encoding='utf-8', newline='') as h: csv.writer(h).writerows(run_rows)
+    # And a workbook of both, numbers as numbers with filters (Chris: "balance runs still not sortable"); skipped without openpyxl.
+    try:
+        from openpyxl import Workbook
+        from openpyxl.styles import Font
+        wb = Workbook(); ws = wb.active
+        for k, (title, rows_) in enumerate((('Summary', out_rows), ('Runs', run_rows))):
+            if k: ws = wb.create_sheet()
+            ws.title = title
+            for r in rows_: ws.append([None if c == '' else c for c in r])
+            for c in ws[1]: c.font = Font(bold=True)
+            ws.freeze_panes = 'A2'; ws.auto_filter.ref = ws.dimensions
+            for col in ws.columns: ws.column_dimensions[col[0].column_letter].width = max(10, min(28, max(len(str(c.value or '')) for c in col) + 2))
+        wb.save(os.path.join(folder, 'balance.xlsx'))
+    except ImportError: pass
+    # And a page that sorts by itself (click a heading), for a machine with no spreadsheet (Chris: "still can't sort number in a spreadsheet").
+    import html as _h, time as _t
+    def _table(tid, rows_):
+        head = ''.join('<th onclick="sortBy(' + "'%s',%d" % (tid, i) + ')">%s</th>' % _h.escape(str(c)) for i, c in enumerate(rows_[0]))
+        body = ''.join('<tr>' + ''.join('<td class="%s">%s</td>' % ('n' if isinstance(c, (int, float)) else 't', '' if c in ('', None) else _h.escape(str(c))) for c in r) + '</tr>' for r in rows_[1:])
+        return '<table id="%s"><thead><tr>%s</tr></thead><tbody>%s</tbody></table>' % (tid, head, body)
+    page = ('<!doctype html><html><head><meta charset="utf-8"><title>Crulanda balance</title><style>body{font-family:Segoe UI,Arial,sans-serif;margin:16px;background:#1b1b1b;color:#eee}'
+            'h1{font-size:20px}h2{font-size:16px;margin-top:28px}table{border-collapse:collapse;font-size:13px}th{cursor:pointer;background:#333;position:sticky;top:0;padding:4px 8px;text-align:left;user-select:none}'
+            'th:hover{background:#444}td{padding:3px 8px;border-bottom:1px solid #2a2a2a}td.n{text-align:right;font-variant-numeric:tabular-nums}tr:nth-child(even){background:#222}</style></head><body>'
+            '<h1>Crulanda balance: fixed dummies at level 15 (' + _t.strftime('%Y-%m-%d %H:%M') + ')</h1><p>Click a heading to sort; again to reverse. in_range 1 = inside the targets (DPS 62-72, CC and Support 45-52, Healer at most 35, Tank 42-55).</p>'
+            '<h2>Summary (one row a build)</h2>' + _table('t0', out_rows) + '<h2>Runs (one row a build and seed)</h2>' + _table('t1', run_rows) +
+            '<script>var dir={};function sortBy(id,col){var t=document.getElementById(id),tb=t.tBodies[0],rows=Array.from(tb.rows);var k=id+col;dir[k]=!dir[k];'
+            'rows.sort(function(a,b){var x=a.cells[col].textContent,y=b.cells[col].textContent,nx=parseFloat(x),ny=parseFloat(y);'
+            "var c=(!isNaN(nx)&&!isNaN(ny))?nx-ny:(x===''?1:y===''?-1:x.localeCompare(y));return dir[k]?c:-c});rows.forEach(function(r){tb.appendChild(r)});}</script></body></html>")
+    open(os.path.join(folder, 'balance.html'), 'w', encoding='utf-8').write(page)
+_csvs()
 dps_median = statistics.median([t['single'] for t in table if t['role'] == 'dps']) if any(t['role'] == 'dps' for t in table) else 0
 medians = {}
 for role in set(t['role'] for t in table):
@@ -88,4 +146,3 @@ lines += ['', 'In range: %d of %d builds.' % (counts.get(True, 0), len(table)),
           'Role medians (single DPS): ' + ', '.join('%s %.1f' % (NAME.get(r, r), m) for r, m in sorted(medians.items())) + '; DPS median %.1f.' % dps_median,
           'Files: ' + ', '.join(os.path.basename(f) for f in files if '_TABLE' not in f)]
 open(out, 'w', encoding='utf-8').write('\n'.join(lines) + '\n')
-print('\n'.join(lines))

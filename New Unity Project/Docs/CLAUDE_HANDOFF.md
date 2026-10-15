@@ -1,34 +1,69 @@
-# Crulanda: Claude handoff (Start here rewritten 2026-10-13 19:10; covers the work to the evening of Oct 13)
+# Crulanda: Claude handoff (Start here rewritten 2026-10-14 23:00; covers the work to the night of Oct 14)
 
 ## Start here
 
-**Current state: the evening of 2026-10-13** (Chris away 15:16 to about 23:00: "keep working through all phases ... all balanced and
-testing new dungeons and builds as needed. all zones full of quests. more sims throughout the world"). What was done, in order, is in
-`Docs/TONIGHT_2026-10-13.md` (Progress) and `Docs/CHANGELOG.md` (2026-10-13, 15:20 on). Nothing is VERIFIED until Chris has seen it.
-- **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge without Chris. Last commits tonight: 3d89ef0 (quests, sims, orc, heals),
-  e10a915 (the group-run leader's stall rule), 9deb508 (suite fixes), the "Immune" fix, c347252 (the carriage gunners), then the docs.
-- **Published:** the release build of 9dfb8e4 at 23:27 to `D:/crulanda-work/outputs/Crulanda-Playable`: whole orcs and Chris's new
-  creatures (CHANGELOG, 2026-10-13 22:00 on). Save backed up first: `D:/crulanda-work/save-backups/20261013-2325-before-creatures-publish`.
-- **Orcs and creatures (TESTED, not seen by Chris):** every orc is a whole orc: the Orc Shaman for Shamans and Mages, the axe orc for
-  Warriors, Rangers and Rogues. Wild boars, the Toon RTS undead as the Bonecaller's thrall (it crumbles), the Living Birds in place of the
-  crows, squirrels in the groves. Frames: `D:/crulanda-work/ui-captures/creatures/brief-*.png`, `.../figures/orcs-*.png`, and
-  `.../training-shaman-20261013-2238` (the orc Shaman in play). Our gear does not show on a whole orc (it wears its own).
-- **Tests (TESTED):** EditMode 470/470. Full PlayMode suite 319/327 at 18:36; the 6 new failures fixed and rerun green (43/44, then the
-  Adit nav test 4/4 with its rider rule). Still failing, known and parked: the hoe hand spread, the foot after a jump (Chris parked it).
-- **Balance (TESTED):** all 40 builds in their ranges (BALANCE_ALL.md in `D:\crulanda-work\outputs\balance`). Party heal of five:
-  Sanctuary 73, Mender 75, Cantor 75, Rootmend 88, Lantern 90, Choir 98, Rainspeaker 108.
-- **The Adit group run (TESTED, not seen by Chris):** to the end for the first time, 66 of 67 camps in 78 game minutes
-  (`D:\crulanda-work\run-captures\adit-group-1013-evening-2`), then as an orc Shaman (`adit-group-1013-shaman`) and once more
-  (`adit-group-1013-evening-3`: every camp cleared, the carriage gunners too, in 71 game minutes).
-  - The warps are the run tool moving its auto-pilot player when it sticks; party sims catch up by themselves.
-  - The tank still falls to the gang-boss and the elites. That is the boss pressure Chris settled on.
-  - The "Immune" column over the Cinder-Warden is fixed.
-- **For Chris to look at first:** the training yard with sims practising (they go in by themselves; grey numbers when you are near;
-  frame: `D:/crulanda-work/ui-captures/training-20261013-2034/tf-06-sims-practising.png`);
-  the orc look (`D:\crulanda-work\ui-captures\figures\orcs-*.png`, a first pass on the human head: green, tusks, taller); any of the 52
-  new quests (Oakhaven's start at levels 2-3: Ama Rusk, Sel Harrow, Grete Lowe, Pim).
-- **Next, in order:** Chris's reactions; an orc face from the packs in `D:\crulanda-work\imports\orcs` if he wants more than the first
-  pass; the run bot playing the Shaman's kit better (14 a second against the Paladin's 33); the Scoundrel (designed in `Docs/CLASS_SCOUNDREL.md`, not started); the parked animation items.
+**Current state: the night of 2026-10-14, 23:00** (Chris away from 20:30: "keep working till 11pm then backup, publish, and create a
+handoff. i wont be here to approve anything so you have full reign. shutdown at 11pm"). His words of the day verbatim in
+PLAYTEST_NOTES 179-199; what was done, in order, in `Docs/CHANGELOG.md` (2026-10-14, 11:40 on, and "The evening's reports").
+Nothing is VERIFIED until Chris has seen it in his build.
+- **Branch:** `feet-bow-adit-kit`, PR #2, pushed. Do not merge to `main` without Chris. The Adit rework is on `adit-rework` (worktree
+  `D:\code\mmo-adit`, pushed, not merged).
+- **Published (the playable build):** 19:54, the build of 19:51; the same build again at 20:12 (nothing newer). Saves backed up to
+  `D:/crulanda-work/save-backups/20261014-1954-before-shepherd-publish` and `-2012-before-night-publish`. It holds everything below.
+- **New today, for Chris to look at first (all BUILT, OPEN until he sees them):**
+  - **The wild woods** in every zone (the "Elwynn" brief): the zone's own trees as one canopy, old oaks (the broadleaf grown large,
+    not the half giant) only in the dense old-forest patches, fallen trunks the kit's dead trees, fuller glades. Frames:
+    `D:/crulanda-work/world-captures/oakhaven-21-the-mastwood.png`, `-37-lark-hill.png`, `-38-sallow-bottom.png`. Tour 111 a second.
+  - **Kevin's melee, spell and work motions** and **every spell's effect**: `D:/crulanda-work/ui-captures/combat3/<class>/sheet-b.png`;
+    the Scoundrel inside the yard: `ui-captures/combat5/scoundrel`.
+  - **The buff row** by the frames and **the Nerve panel** (movable): `ui-captures/combat4/scoundrel/10-scoundrel_rallying_verse-b.png`.
+  - **The inn's tables and benches standing** (the Fantasy pack's root turn kept in ModelProp; every table, bench, stool and mug of
+    that pack had lain on its side): `world-captures/oakhaven-99-inn-drinkers-night.png`.
+  - **The shepherds** Tam and Nell Sedge at Oakhaven's two flocks (the count at the gate, the shearing, the fleeces to the stall, the
+    afternoon feed; the merchant offers fleeces), the Old Fold's flock inside its walls: `world-captures/oakhaven-23-the-old-fold-night.png`.
+  - **Quit**: the pause menu's "Quit game", `/exit` and `/quit` (saved first, out of combat).
+  - Also: the orc's legs run in the air, the giants' roots, the birds' hops, the Morro villagers on their own avatars (the farmer's
+    sack and the skinner's bundle in their hands), the forge's sparks off, the barn's sill and turn, a poor drop's glint fading.
+- **Tests (TESTED):** the full PlayMode suite 345/349 at 16:33 (chainR72; see CHANGELOG); after that only the classes each change
+  touched (test-budget: Chris, "you just tested for 7 hours"): chainR76 14/14, R78 17/17, R79 EditMode 16/16 and PlayMode 15/16
+  (the home test's count, fixed). Balance 49 of 49 builds in range (`D:/crulanda-work/outputs/balance/balance.html`, the page Chris sorts).
+- **The Adit rework (`adit-rework`; ADIT_REWORK.md section 18):** the evening's runs took it from 18/29 Adit PlayMode classes to
+  20/29 at 20:06 and 19/29 after (one test, the fixture trestle's rail raycast, went red when the deck blocks were
+  named and not yet looked at); EditMode 44/44. The decks are whole and joined; the big find at 20:55 was that every branch cave's floor was cut off a few metres past
+  its mouth by its parent's knoll and shell (faces metres wide crossing the passage with their middles in the rock): `ZoneBuilder.Cut`
+  now drops a face with a corner inside another passage. That lifted the Sunless River (9 to 59 of 341 samples reached) and the Dry Ledge (0 to 54) but not the
+  Pen, the Cutting Drift, the Foundry, the Muster Yard, the Chapel or the Breach: the R87 map (21:12) then showed most "unreached" floor was PathComplete from a
+  reached sample metres away: one `NavMesh.CalculatePath` from the yard gives up part way through the drawn-out dungeon, so the
+  camps test, the breadcrumbs and the run order were measuring the search budget, not the caves. `NavReach.Length` now searches
+  leg by leg without giving up on a leg that ends farther off as the crow flies, and the camps test and the map use it (R88: Adit classes 16/23, AditGateTests green); still a leg-by-leg search ends in pockets,
+  so the map now also floods by hops (R90, the measure of the mesh itself): the River, the Dry Ledge, the Breach, the Quiet Miner's
+  Drift, the Pitch Pit and the Scriptorium are wholly reachable; **really cut off were four places;** the Pen was opened at
+  21:48 (the Spoil heaps camp's dressing blocks had walled the strip beside Lusk's stage: the camp is on the west side now, R92).
+  The Cutting Drift and the whole Geode Foundry opened at 21:56 (a knoll face wider than the drift's tube: `Cut` now tries each
+  edge's middle). The chapel opened at 23:41 (the altar stood in the doorway to the cloister stair) and the island under Lusk's stage
+  went at 00:13 (shelves inside a solid deck's body): **every floor of the Adit is reachable from the yard** (R99), the camps,
+  gates and breadcrumbs tests green, the Adit nav set 19/23 (R100, 00:24). The "solid" with mesh on its top was a buried cave's knoll poking into the hall (fixed 00:49).
+  Three helpers worked the small hours (Chris: "you can run 3 bots at most"): `AditDataTests` (every reference in the Adit's data
+  resolves), the Adit camera tour (`Crulanda.exe --crulanda-adit-tour <dir> --crulanda-zone zone.adit --crulanda-temp-save`,
+  28 frames: `D:/crulanda-work/world-captures/adit-tour` once it has run), and the release of `after` camps (bosses' relief shifts,
+  the Wake's waves), which the data named and nothing spawned. **The Phase 8.6 plan** is written:
+  `Docs/PHASE8_6_LIVING_WORLD.md` (PROVISIONAL; fourteen one-line decisions for Chris at its end; the inn-door jam's cause is in it:
+  a 1.6 m door and a navmesh baked at agent radius .5 leave a 0.6 m strip, one body at a time). **The Adit's nav, camps, gate and release tests are 26/26 (01:41):** every floor reachable, the way home
+  down the cloister stair (its foot was 1.5 m below the Gallery's floor), the bosses' relief shifts, the Wake's waves and the keg's
+  release written and tested. Left: the fixture test's knoll ray and rail check; the built rooms on the dungeon packs (a helper);
+  then play the run. The Adit camera tour ran once (28 frames, too dark: a lamp on its camera now, re-run pending); the release of `after`
+  camps is being written (ADIT_REWORK.md section 18).
+  The real short blocks the map names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183)), and the
+  Cutting Drift's own floor past its Company door. Start the next Adit session from `adit-nav-diagnostics-R88.txt`. The diagnostics (`AditNavDiagnostics`, lane A) write
+  `D:/crulanda-work/encounter-validation/adit-nav-diagnostics.txt`: the deck tables, a floor map of every hall (reached from the yard
+  or not, what stands by the first unreached sample), each gate's crossing. Run the Adit set with a copy of `D:\crulanda-work\chainR86.ps1`.
+- **The small hours (00:40-01:45; CHANGELOG's top entry):** three helpers at a time (Chris: "you can run 3 bots at most"): Oakhaven's open
+  ground filled (eleven places, ten secrets), secrets' clues and villagers' stories in every zone with a Lore tab, the Phase 8.6 and
+  Hallow's Creek plans (decisions for Chris at their ends), the Adit's releases, camera tour and data check. In flight when this was
+  written: the dungeon packs into the builder (worktree), the water/grass/candle shaders, zone music and the Fantasy props (main).
+  Their files land uncommitted in each repo: compile with the scratch Roslyn check, commit by path, run the touched tests.
+- **Next, in order:** Chris's reactions to the above; the Adit (section 18's "still red"); the Stylized Newbie Weapons Pack (skinned
+  meshes: a bake before they can be held); the fixture test's knoll ray; the older list below.
 
 ## Oct 12 night (history; these runs were stopped and replaced on Oct 13)
 
@@ -185,25 +220,25 @@ further down this section are from the night of Oct 12 and are history: those ru
 - Their rigs and scale haven't been checked against the humanoid/ModelFigure rig yet.
 
 ## TODO, in order
-1. Read `suiteQ`, `editR`, `socialR` and `balC`. Fix compile and test failures.
-2. Cleric and Shaman DPS and HPS: retune against the medians and caps, and check the party heal test with 3 sims.
-3. Orcs:
-   - Check the rig and scale of the orc packs.
-   - Build the orc figure. Gear fit, feet and the hoe then need re-checking at the new size.
-   - Add a race pick at character creation, restricted to the classes each race allows.
-4. Foot flake: "running after a jump, left foot down but turned 178 degrees" (parked by Chris 23:13).
-5. Hoe hand spread: hands are 33-43 cm apart (45-60 wanted), and the left hand is 6-7 cm off the shaft.
-6. Spell effects: cast poses, trails, impacts and lingering effects for the Mage/Bonecaller, Archivist and Salt-Mender, with frames.
-7. Bonecaller tiers 4-6.
-8. An enemy that applies the grey (Adit/Wasting).
-9. HUD cutoff (note 114), with a test that measures it.
-10. The sim-follow flake.
-11. Elwynn-style zone fill (note 172, `Docs/ZONE_FILL_PLAN.md`).
-12. 112b, the Morro clips on the pack's avatar: waiting on Chris (the pack needs downloading again).
-13. Republish, only with Chris's OK. Back up saves first.
-14. (From Oct 11, dropped from this list by mistake:) **the kit's column and plinth tops are walkable in the NavMesh bake** (ZoneBuilder.Adit), so a
-    mob or the run's leader ends up standing on a pedestal and a group run of the Adit stalls (`tools\validation\group_run.ps1`; the 18:44
-    run on Oct 11). Exclude those tops from the bake, then rerun the group run to the end for its scorecard.
+1. **Chris's reactions** to the woods, the motions, the effects, the butts and the trap (the frames named under Start here).
+2. **The Adit rework** (Chris: "adit dungeon need to be more complex like wow's wailing caves or the deadmine"; "you can start expanding
+   adit so not so empty next on the agenda"): branch `adit-rework`, worktree `D:\code\mmo-adit`, `Docs/ADIT_REWORK.md`. Build steps 1-3
+   written, the twelve new elites' moves and loot written (sections 14-17). Its first Unity run: EditMode 488/495, Adit PlayMode 19/30.
+   Red, in the order to fix (section 16): the cave web's joins (the Cutting Drift's lip into the Foundry), rock tops the navmesh bakes
+   on, the Sandthrone pickets 12 m up with no way there, two overseers 1.2 m apart, the run order from the bridge's tower, Lusk's door
+   after his death, the planner's modes test. Then S4-S7 (the releases, the Wake, the NEW moves, the cave map), then Chris's decisions
+   (section 1), then merge. Test with `rt.ps1` against the worktree's Assets (chainR68.ps1 is the pattern).
+3. **The Stylized Newbie Weapons Pack** (downloaded 12:01): its weapons are skinned meshes driven by the pack's own character script;
+   bake each to a plain mesh (an editor method) before `model.weapon` looks can hold them. Low-level gear.
+4. The hoe stroke's measures under the ploughing clip (FieldWorkTests: a stroke every 1-3 s), if the final run shows it red.
+5. Spell effects, second pass: each class's own colours and shapes where the packs' stock looks repeat (the healing glow is one green
+   for every healer; a cast's hand glow is the same sparks for all).
+6. Bonecaller tiers 4-6.
+7. An enemy that applies the grey (Adit/Wasting).
+8. The sim-follow flake.
+9. GroundingTests' sim 2.8 cm up; the parked tool shaft (VillageDayTests); EliteFightTests under -nographics.
+10. The three later dungeons (DUNGEON_DESIGN.md) when the level cap rises past 15.
+11. Republish only with Chris's OK; back up the save first (`chainR61.ps1` is the pattern).
 
 ## Key docs (in `Docs\`)
 - `BALANCE_REPORT.md`: harness rounds v1-v8, caps, retunes.

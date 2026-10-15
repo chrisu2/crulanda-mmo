@@ -92,7 +92,7 @@ namespace Crulanda.Encounter
                 cc = "disorient", ccName = "Shaken", ccSeconds = 3, ccEvery = 20, ccReach = 5, ccText = "The floor heaves under the Rock-Eater: the cave swims round you.",
                 call = "The Rock-Eater bellows across the workshop. The guards come running.", callShort = "Bellow",
                 enrage = "The crystals on the Rock-Eater's back blaze violet and it tears at the floor." },
-            new EliteMove { mob = "Nix, the turncoat", name = "Goad-Hook", windup = 1.6f, blow = 3.0f, reach = 3.4f, every = 9, disarm = 4, health = .8f, callReach = 66, holdable = true,   // (22 before the Adit was drawn out); holdable: the duo's play is to hold him
+            new EliteMove { mob = "Nix, the turncoat", name = "Goad-Hook", windup = 1.6f, blow = 3.6f, reach = 3.4f, every = 9, disarm = 4, health = .8f, callReach = 66, holdable = true,   // (22 before the Adit was drawn out); holdable: the duo's play is to hold him
                 cc = "fear", ccName = "Shriek", ccSeconds = 3, ccEvery = 25, ccReach = 4, ccText = "Nix shrieks in your face and you run before you know it.",
                 deathText = "Boots on the far ramp behind you: the Berth's night crew comes down it, three cutters.",   // his death releases the Berth night crew (ADIT_REWORK 5.3; 2026-10-15)
                 call = "Nix shrieks: \"Get them off me!\"", callShort = "Get them off me!",

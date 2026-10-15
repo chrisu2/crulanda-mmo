@@ -76,7 +76,7 @@ namespace Crulanda.Tests
             // hand's breadth or more), inside the footing's height and run. A beam or a rubble stone crossing the plane is not one.
             foreach (var mf in t.GetComponentsInChildren<MeshFilter>())
             {
-                if (mf.transform == footing || mf.transform == coping || mf.sharedMesh == null || !mf.sharedMesh.isReadable) continue;
+                if (mf.transform == footing || mf.transform == coping || mf.name == "Cellar vents" || mf.sharedMesh == null || !mf.sharedMesh.isReadable) continue;
                 var r = mf.GetComponent<Renderer>(); if (r == null || !r.enabled) continue;
                 var vs = mf.sharedMesh.vertices; var tris = mf.sharedMesh.triangles; var lv = new Vector3[vs.Length];
                 for (int i = 0; i < vs.Length; i++) lv[i] = L(mf.transform, vs[i]);

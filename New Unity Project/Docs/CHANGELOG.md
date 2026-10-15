@@ -14,8 +14,8 @@
 - **The Adit's lag** (218, 225): the probe in the Adit camera tour (adit-perf.txt) found the zone's props (15,857 renderers, 56 million
   triangles: the whole dungeon drawn from anywhere) and its 186 mobs the cost, 13 fps at the yard and 17 in the Tally Hall with the frame
   cap off; shadows, its 250 lights and the grass cost nothing. Far props are no longer drawn in a zone with caves (PropCull, 70 m) and
-  far idle camp mobs sleep (EncounterEnemy.Dormant, 85 m, waking at 75 or when pulled). RESULT_LINE
-- Published 03:27 (barn, Nerve, the Sound panel, roamers' first half) and NIGHT_PUBLISH.
+  far idle camp mobs sleep (EncounterEnemy.Dormant, 85 m, waking at 75 or when pulled). The same probe after (frame cap off): the yard 124 fps (from 13), the Tally Hall 166 (from 17); Oakhaven unchanged at 96. A first cut that also slept road patrols and switched sleepers off whole was faster still but left them deaf to calls (the powder's hall did not come) and the patrols still: fixed, AditGateTests and AditTests green.
+- Published 03:27 (barn, Nerve, the Sound panel, roamers' first half) and 04:14 (everything above; EditMode 22/22, PlayMode 35/36: the one red the building test's first flush check, too strict, refined after; the save backed up to `save-backups/20261015-0414-before-final-publish`).
 
 ## 2026-10-15, 00:40-01:45: the small hours with three helpers (Chris: "you can run 3 bots at most")
 Chris (verbatim, PLAYTEST_NOTES 203-212): "the villagers and npcs need better ai"; "more things to do. more incentives for

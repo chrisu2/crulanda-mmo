@@ -72,7 +72,9 @@ namespace Crulanda.Tests
                     float aside = h.Half[h.Nearest(new Vector2(h.At(s).x, h.At(s).z), out _)] * .62f; NavMeshHit next = default; bool on = false;
                     foreach (var off in new[] { 0f, aside, -aside }) if (NavMesh.SamplePosition(h.At(s, off) + Vector3.up * .2f, out next, 2, NavMesh.AllAreas)) { on = true; break; }
                     Assert.IsTrue(on, h.Name + ": the floor " + s + " m in is on the navmesh (" + h.At(s) + ")");
-                    Assert.IsTrue(NavMesh.CalculatePath(from, next.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, h.Name + ": walkable from " + from + " to " + next.position + " (" + s + " m in)");
+                    // Leg by leg (NavReach): a cave whose first row is out in its parent's air starts this walk from the yard, and one search
+                    // from there gives up part way through the drawn-out dungeon (the Foundry's first floor, 2026-10-15 00:13).
+                    Assert.IsFalse(float.IsPositiveInfinity(NavReach.Length(from, next.position)), h.Name + ": walkable from " + from + " to " + next.position + " (" + s + " m in)");
                     from = next.position; walked.Add((h, s, next.position));
                 }
             }

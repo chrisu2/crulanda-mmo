@@ -70,7 +70,16 @@ namespace Crulanda.Tests
                     if (!h.Floored(h.Nearest(new Vector2(h.At(s).x, h.At(s).z), out _))) continue;
                     // The middle of the way, or beside it where the middle is not floor (the Ember Vent's lake of molten rock).
                     float aside = h.Half[h.Nearest(new Vector2(h.At(s).x, h.At(s).z), out _)] * .62f; NavMeshHit next = default; bool on = false;
-                    foreach (var off in new[] { 0f, aside, -aside }) if (NavMesh.SamplePosition(h.At(s, off) + Vector3.up * .2f, out next, 2, NavMesh.AllAreas)) { on = true; break; }
+                    // (R130) A floor under swim-deep water (the Black Cove's black water, 2.6 m) is swum, not walked: no agent's navmesh is on it, so
+                    // such a point is not asked about. Where every point of a step is swim-deep the step is passed by; wading water still counts.
+                    bool SwimDeep(Vector3 p) { return zone.WaterAtPoint(p + Vector3.up * .2f, out _, out float d) && d > 1.45f; }
+                    bool anyDry = false;
+                    foreach (var off in new[] { 0f, aside, -aside })
+                    {
+                        if (SwimDeep(h.At(s, off))) continue; anyDry = true;
+                        if (NavMesh.SamplePosition(h.At(s, off) + Vector3.up * .2f, out next, 2, NavMesh.AllAreas)) { on = true; break; }
+                    }
+                    if (!anyDry) continue;
                     Assert.IsTrue(on, h.Name + ": the floor " + s + " m in is on the navmesh (" + h.At(s) + ")");
                     // Leg by leg (NavReach): a cave whose first row is out in its parent's air starts this walk from the yard, and one search
                     // from there gives up part way through the drawn-out dungeon (the Foundry's first floor, 2026-10-15 00:13).

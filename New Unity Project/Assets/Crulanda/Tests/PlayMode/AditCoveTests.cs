@@ -47,6 +47,15 @@ namespace Crulanda.Tests
             if (Directory.Exists(root)) Directory.Delete(root, true);
         }
         static IEnumerator Frames(int n) { for (int i = 0; i < n; i++) yield return null; }
+        /// <summary>Another visit to the Adit. (R130: ZoneBuilder takes RequestedZoneId once, as it builds; without setting it again the
+        /// reload built Oakhaven, where there is no haul and no carriage.)</summary>
+        IEnumerator Reload()
+        {
+            ZoneBuilder.RequestedZoneId = "zone.adit";
+            yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single); yield return Frames(4);
+            session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            Assert.AreEqual("zone.adit", session.Zone.Zone.id, "back in the Adit");
+        }
         ZoneInteractable Thing(string kind) { var i = session.Zone.Interactables.Find(x => x.kind == kind); Assert.NotNull(i, "the Adit has its " + kind); return i; }
         int CampIndex(string name) { int c = Array.FindIndex(session.Zone.Zone.camps, x => x != null && x.name == name); Assert.GreaterOrEqual(c, 0, "the Adit has the camp " + name); return c; }
         ZoneCamp Camp(string name) { return session.Zone.Zone.camps[CampIndex(name)]; }
@@ -148,7 +157,7 @@ namespace Crulanda.Tests
             Assert.IsEmpty(Mine(CampIndex("Up from the hold (first)")), "aground, nobody comes up out of the hold");
 
             // Another visit: the warps cut at the bollards stop it as well.
-            yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single); yield return Frames(4);
+            yield return Reload();
             session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             for (float until = Time.time + 10; session.Haul == null && Time.time < until;) yield return null;   // (R129: null four frames in on the second load)
             haul = session.Haul;
@@ -212,7 +221,7 @@ namespace Crulanda.Tests
             Assert.IsFalse(session.Working);
             Assert.Less(Vector3.Distance(session.Player.transform.position, yard), 4, "at the siding under the yard");
             // A new visit, Danner standing again: the lock alone frees it, as before S6.
-            yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single); yield return Frames(4);
+            yield return Reload();
             session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             Assert.IsFalse(session.DannerDead, "every camp is back on a new visit");
             Assert.IsFalse(session.RideAllowed);

@@ -62,6 +62,12 @@
       "title": "A Pitch-Boiler's Tally",
       "text": "Chalked on a board by the platform's end, the chalk smeared by a sleeve:\n\nPITCH FOR THE SLEEPERS AND THE AXLES.\nBarrels boiled: 14. Barrels sent up: 11. Barrels \"lost\": 3.\nWho boils it: Old Kettle, north-west, past the stacked sleepers. Knock first. Do not knock twice.",
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "doc.adit.lamp_oil",
+      "title": "The Lamp-Men's Mixing Card",
+      "text": "A greasy card pinned inside the niche, the lamp-men's own mixing card, every line of it thumbed:\n\nGALLERY OIL, ONE CASK\nRendered mule fat, four parts. Pitch from the boiler, one part (no more: it smokes). Salt, a fistful, against the damp.\nWarm it, do not boil it. Stir with a stick, not a hand.\nFill to the second ring of the lamp and no higher, or it climbs the wick and you will be up the trestle in the dark.\n\nUnder it, in another hand: Pay day is the seventh shift. The niche is not a bank. Lock it.",
+      "canonStatus": "GAME-ONLY (a lamp-men's card; the old workings' lamps are CANON, book2 ch.19)"
     }
   ],
   "quests": [

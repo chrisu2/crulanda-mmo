@@ -33,7 +33,7 @@ namespace Crulanda.Tests
         /// <summary>Every camp's mob, and the elites' mobs (what "kill:", "loose:", opensOn and lord may name).</summary>
         static HashSet<string> mobs, elites;
         /// <summary>Event keys the code raises without a ZoneEvent (Docs/ADIT_REWORK.md E4: taking the keg releases Hobb and his sappers).</summary>
-        static readonly string[] CodeEvents = { "powder" };
+        static readonly string[] CodeEvents = { "powder", "greyline1", "greyline2", "greyline3" };   // (S7) the Grey Spreads' lines (EncounterSession.GreySpread.cs)
 
         [OneTimeSetUp] public void Load()
         {
@@ -293,6 +293,48 @@ namespace Crulanda.Tests
             var strays = EliteMoves.All.Select(m => m.mob).Where(m => !all.Contains(m)).ToList();
             CollectionAssert.AreEquivalent(new[] { EncounterSession.RockEaterName }, strays, "moves for mobs no elite camp has: " + string.Join(", ", strays));
             Assert.IsTrue(elites.All(e => EliteMoves.All.Any(m => m.mob == e)), "every Adit elite has a move (SocialRulesTests says more about it)");
+        }
+
+        /// <summary>(S7) The Grey Spreads in the data: three lines across the Grey Breach in order, each with its seep of crawlers 25 m behind it,
+        /// released by the line's key (EncounterSession.GreyLineKey) and by nothing else, in the Breach's wing, no step of the run; and the lines
+        /// lie in the quiet between the Breach's fights (no step's camp within 12 m of a line along the cave).</summary>
+        [Test] public void The_grey_lines_cross_the_breach_in_order_each_with_its_seep_behind_it()
+        {
+            var lines = zone.anchors.Where(a => a != null && a.name != null && a.name.StartsWith(ZoneBuilder.GreyLineAnchor)).OrderBy(a => a.name).ToList();
+            Assert.AreEqual(3, lines.Count, "three grey lines");
+            for (int n = 1; n <= 3; n++)
+            {
+                var a = lines[n - 1]; Assert.AreEqual(ZoneBuilder.GreyLineAnchor + n, a.name); Assert.AreEqual(EncounterSession.GreyCave, a.cave, a.name + " is in the Breach");
+                if (n > 1) Assert.Greater(a.along, lines[n - 2].along, a.name + " lies past the one before");
+                var seeps = zone.camps.Where(c => c != null && c.after == EncounterSession.GreyLineKey(n)).ToList();
+                Assert.AreEqual(1, seeps.Count, "one seep for " + a.name);
+                var seep = seeps[0];
+                Assert.AreEqual(EncounterSession.GreyCave, seep.cave); Assert.AreEqual(a.along - 25, seep.along, .5f, seep.name + " waits 25 m behind its line");
+                Assert.AreEqual("breach", seep.wing); Assert.AreEqual(0, seep.step); Assert.IsFalse(seep.elite);
+                foreach (var c in zone.camps.Where(c => c != null && c.cave == EncounterSession.GreyCave && c.step > 0))
+                    Assert.Greater(Mathf.Abs(c.along - a.along), 12, a.name + " is not in the middle of " + c.name + "'s fight");
+            }
+            Assert.IsTrue(elites.Contains(EncounterSession.GreyForeman), "the Foreman who stops it is there");
+        }
+        /// <summary>(S7) Every Adit secret pays something worth the finding: experience, and coin, a piece, a page, or the key to another.</summary>
+        [Test] public void Every_adit_secret_pays_something_worth_finding()
+        {
+            var bad = new List<string>();
+            foreach (var s in zone.secrets)
+            {
+                if (s == null) continue;
+                if (s.xp <= 0) bad.Add(s.id + " gives no experience");
+                if (s.gold <= 0 && string.IsNullOrEmpty(s.item) && string.IsNullOrEmpty(s.document) && s.kind != "key") bad.Add(s.id + " pays no coin, piece, page or key");
+            }
+            Assert.IsEmpty(bad, string.Join("; ", bad));
+            Assert.GreaterOrEqual(zone.secrets.Count(s => s != null && !string.IsNullOrEmpty(s.item)), 3, "three of them a piece or a herb to carry out");
+        }
+        /// <summary>(S7) The Foundry's swing-loads: three, on its high walks (12 m up: the catwalk and the cross-walk).</summary>
+        [Test] public void The_swing_loads_hang_over_the_foundrys_high_walks()
+        {
+            var loads = zone.anchors.Where(a => a != null && a.name != null && a.name.StartsWith(ZoneBuilder.SwingLoadAnchor)).ToList();
+            Assert.AreEqual(3, loads.Count);
+            foreach (var a in loads) { Assert.AreEqual("The Geode Foundry", a.cave, a.name); Assert.AreEqual(12, a.rise, .01f, a.name + " is on a high walk"); }
         }
     }
 }

@@ -218,6 +218,13 @@ the next dungeon.
 
 ## 4. The layout
 
+> **The reworked Adit (2026-10-14/15; Docs/ADIT_REWORK.md governs; on the `adit-rework` branch, not live yet).** Sections 4-9 below are
+> Draft 1's Adit, kept for what it chose and why. The rework makes it a web: the Old Workings down to an overlook 14 m up the Singing
+> Gallery's wall; the Gallery crossed at three heights (the trestle, the rope bridge and its tower, the floor and island); three sigil wings
+> in any order (the Geode Foundry, entered high and left by the chute; the Cult of Ash's chapter-house, a fork that meets at the Chapel of
+> Embers; the Sunless River into the Grey Breach, left by the falls); the Wake on the island opens the singing door (the winch gate's
+> successor) to the Deep Way and the Rail Hall. Notes marked **(S7)** below are the polish built 2026-10-15 (ADIT_REWORK section 21).
+
 ```
  THE SHATTERED PEAKS
    Adit yard (outside: Sandthrone pickets, spoil heap, quest givers near by)
@@ -283,6 +290,10 @@ the next dungeon.
   - when it breaks, Nix, the goblin who sold out his own Warren (a Razzle-like traitor; GAME-ONLY), jumps out and fights on
     foot, vibration-locking your weapon (disarm for 4 s).
 - Drops the **Amber Sigil**.
+- **(S7) The Geode Foundry's swing-loads** (Chris, 2026-10-15: "Yes, add them"; GAME-ONLY): three ore buckets on ropes from blocks
+  lashed under timber tie-beams, swinging across the high catwalk (two) and the cross-walk (one), hauled out on tag lines by rope teams
+  on the hall floor (pressed goblins and a Sandthrone hand). Cross between swings; a bucket that meets you knocks you back along the
+  walk, never off it, with no damage. Rope and people only: no wheel, winch or crane (0.05).
 
 ### [3b] The Ember Vent (the Cult of Ash: the lava chasm)
 - A hot fissure off the workings. A path runs round a lake of molten rock, with ash in the air and red light.
@@ -312,6 +323,9 @@ the next dungeon.
 - **Rare (one run in five): the Quiet Miner**, an older, wholly grey shape who walks the deepest drift.
 - Drops the **Grey Sigil**.
 - Killing the Foreman opens a **short way back** to the Gallery (the waterfall-shortcut lesson).
+- **(S7) The Grey Spreads** (GAME-ONLY): three lines across the Breach. Crossing one greys the lamps behind you, shows the static there
+  and lets a seep of two crawlers out 25 m behind you. The Foreman's death stops it, and the lamps come back a little. (The short way
+  back is built in the rework: the sluice-boards open on his death, and the falls drop into the Gallery's plunge pool.)
 
 ### [4] The Rail Hall (the finale)
 - **The winch gate** (the cage-lift until 2026-10-11, 0.05) is wound open by hand when the three sigils are set in its frame.
@@ -338,6 +352,8 @@ the next dungeon.
   - He carries **a sealed letter** addressed to the Sandthrone's commander (CANON; named only), which starts the next chain.
 - **Hidden boss: Old Kettle** (13, elite), the hall's cook, below the platform's far side. Drop down to find him. He throws
   the pot.
+  - *In the rework he is a pitch-boiler in the Pitch Pit off the Rail Hall's north-west corner (a chalked tally by the platform points
+    to him). (S7) His pitch holds 2 s every 20 (was 3 every 18), so it seldom holds you inside his Hot Pitch ring.*
 - **The way out:** with the lock matched, the goblins set the carriage to run **back up the line** to a siding under the Adit
   yard. One ride takes you out.
 
@@ -407,6 +423,9 @@ the next dungeon.
   - Breach: grey with no shadows;
   - Hall: cold blue lamps.
 - **Readable layout:** every branch has one landmark you can see from the hub, and the hub's light behind you.
+- **(S7) The living lichen:** a faint glowing trail on the floor along the run's dark ways (the dark drift, where no lamp is; the falls
+  stair; the Breach; the cloister stair home; the shaft stair), drawn out toward the way on, giving out for a stride round the rusted key.
+- **(S7) The Breach goes grey behind you** as you cross its lines (above), and the Foundry's buckets creak across the catwalk.
 
 ## 9. What has to be built (build work, in order)
 
@@ -444,6 +463,11 @@ the next dungeon.
    Mira and the sims stand at the siding under the yard (EncounterSession.Adit.RideCarriage). The carriage does not move on screen yet.*
 
 Biggest risk: step 1 (the largest cavern by far) and the knockback into lava (it must never put anyone under the world).
+
+**(S7, 2026-10-15; ADIT_REWORK section 21; made and compiled, not yet run in Unity):** the Grey Spreads; the swing-loads; the lichen
+built from the zone's crumbs; every secret paying something worth finding (two Adit-Runner pieces, a Last-light, the lamp-men's mixing
+card, more coin); the Old Burrower and Old Kettle eased; `/dungeon quick|full` named in /help; the deck rails, posts and bodies standing
+where they belong again (they had stood at the root since 2026-10-14); a cave's face straddling a raised mouth's or lip's passage cut.
 
 # The three later dungeons: the rules they share (2026-10-14)
 

@@ -631,6 +631,19 @@ One model answers all of these, so they always agree: what is drawn (meshes), wh
   Quartermaster's strongbox (a secret chest; its key is on the Drop) holds company silver, Hesk's Shuttered Lantern
   (off-hand) and the King's orders (a Chronicle page).
 
+### The Sealed Adit (zone.adit, the dungeon under the Peaks; the rework: Docs/ADIT_REWORK.md, on `adit-rework`, not live yet)
+- A network of 18 caves (about 2.9 km) written by `tools/wip/dungeon/adit_layout.py` into `Zones/adit.json`: caves `within` another
+  (a branch, its mouth on the parent's floor or `rise` metres up its wall) and caves that `joins` another (a way through, or a lip over a
+  hall); decks (trestles, catwalks, a rope bridge, stages, the island), one-way drops (the chute, the falls), sunk pools, gates and anchors,
+  all in data (`ZoneBuilder.AditDecks.cs`). Where one cave opens into another, the faces of its rock (shell and knoll) in the other's air
+  are cut away; since 2026-10-15 (S7) a face is also cut when any point of it, sampled every half metre, is in the air of a cave whose
+  mouth or lip is raised in it (`Hollow.OpenOnFace`), so no slab stands across a raised passage by its wall.
+- Decks are walked (their tops are in the navmesh); their posts, rails and solid bodies are NavBlocker boxes standing where the deck is
+  (they had all stood at the root from 2026-10-14 to 10-15: no rail was solid; fixed in S7).
+- **(S7) Polish, all GAME-ONLY** (`ZoneBuilder.AditPolish.cs`): the living lichen along the zone's crumb trails (faint glowing floor
+  patches, no light, no collider); the Geode Foundry's three swing-loads (tie-beams, lashed blocks, ropes, ore buckets; swung by
+  `AditSwingLoad`); the Grey Breach's hidden seeps of static and its lamps greyed behind each grey line (`EncounterSession.GreySpread.cs`).
+
 ### The Root-Mother's Deep (the Verdant Shore; GAME-ONLY, under a CANON Temple)
 - A `cavern` with `variant: 1` (`ZoneBuilder.RootDeepPlan`, `RootDeepInterior`): the same `Hollow` passage model, but grown through
   earth and root instead of cut through rock. Its mouth is the Veridian Temple's root-stair at (-112, 130), facing south into the

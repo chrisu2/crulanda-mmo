@@ -305,6 +305,7 @@ namespace Crulanda.World
             JoinAprons(solidRoot);
             BuildCaveWater(root, look);
             foreach (var dl in dropLooks) BuildDrop(dl.def, dl.from, dl.to, root, look);
+            BuildAditPolish(root, look);   // (S7) the lichen, the swing-loads, the Breach's hidden seeps (ZoneBuilder.AditPolish.cs)
             if (Application.isPlaying && look.childCount > 0) StaticBatchingUtility.Combine(look.gameObject);
         }
         /// <summary>A short apron of planks from each raised lip or mouth of a cave to the nearest deck end within 5 m and 2 m of its
@@ -340,7 +341,11 @@ namespace Crulanda.World
         /// <summary>A solid box (a post, a rail) standing on <paramref name="foot"/>: in the way of you and every agent (NavBlocker).</summary>
         static void DeckBlock(Transform parent, Vector3 foot, Vector3 size, Quaternion rot, string what = null)
         {
-            var o = new GameObject(what == null ? "Solid" : "Solid: " + what); o.transform.SetParent(parent, false);   // named for AditNavDiagnostics (what stands in a deck's way) o.transform.localPosition = foot + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;
+            // Named for AditNavDiagnostics (what stands in a deck's way). (2026-10-15, S7: the naming comment of cbc484dc had swallowed the
+            // line that places the block, so every post, rail and body stood at the root's origin and no trestle had a solid rail: the
+            // fixture test's "a rail along its open side".)
+            var o = new GameObject(what == null ? "Solid" : "Solid: " + what); o.transform.SetParent(parent, false);
+            o.transform.localPosition = foot + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;
             o.AddComponent<BoxCollider>().size = size; o.AddComponent<NavBlocker>();
         }
 

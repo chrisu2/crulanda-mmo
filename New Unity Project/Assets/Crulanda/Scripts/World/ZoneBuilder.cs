@@ -4486,7 +4486,13 @@ namespace Crulanda.World
                 // And its edges' middles: the Gallery's knoll is some 13 m thick where the Cutting Drift's mouth sits 12 m up its wall, and a
                 // face there is wider than the drift's tube, spanning it with every corner and its middle in the rock (R91's picture, 21:45).
                 if (Hollow.OpenInOther(h, t.TransformPoint((a + b2) / 2), .7f) || Hollow.OpenInOther(h, t.TransformPoint((b2 + d) / 2), .7f) || Hollow.OpenInOther(h, t.TransformPoint((d + a) / 2), .7f)) return true;
-                return sharp.Count > 0 && (SharpOpen(t.TransformPoint(a)) || SharpOpen(t.TransformPoint(b2)) || SharpOpen(t.TransformPoint(d)));
+                if (sharp.Count == 0) return false;
+                Vector3 wa = t.TransformPoint(a), wb = t.TransformPoint(b2), wd = t.TransformPoint(d);
+                if (SharpOpen(wa) || SharpOpen(wb) || SharpOpen(wd)) return true;
+                // (S7, 2026-10-15) And anywhere on it: a face of the hall's knoll straddled the fixture loop's tube where the loop comes
+                // through it to its lip, corners above and below the passage, and stood across it by its wall (AditCaveBuildTests).
+                foreach (var o in sharp) if (o.OpenOnFace(wa, wb, wd)) return true;
+                return false;
             }
             for (int i = 0; i + 1 < n; i++)
                 for (int k = 0; k + 1 < P; k++)

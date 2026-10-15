@@ -158,13 +158,16 @@ namespace Crulanda.Encounter
                 call = "Brack bangs the bucket on the chain: \"Bail!\"", callShort = "Bail!", enrage = "Brack wades in up to the waist and keeps coming." },
             new EliteMove { mob = "Old Bristle", name = "Charge", windup = 1.5f, blow = 3.8f, reach = 4.6f, every = 9, knock = 5,
                 cc = "disorient", ccName = "Trample", ccSeconds = 3, ccEvery = 18, ccReach = 5, ccText = "Old Bristle's trotters go over you.", enrage = "Old Bristle's bristles stand straight up." },
-            new EliteMove { mob = "The Old Burrower", name = "Earth-Heave", windup = 2, blow = 4, reach = 3.8f, every = 10, knock = 6,
-                cc = "disorient", ccName = "Burrow", ccSeconds = 3, ccEvery = 16, ccReach = 6, ccText = "The Old Burrower goes under and comes up beneath you.", enrage = "The Old Burrower stops circling." },
+            // (S7 tuning, 2026-10-15) The Old Burrower is level 13 in a level-11 wing and optional: its throw 6 to 4 m and its Burrow's reach 6 to
+            // 5 m, so the party is not thrown out of its own healer's reach round the Lurker's Pool; Old Kettle's pitch holds 2 s, not 3, every 20
+            // s, not 18, so it seldom holds you in his Hot Pitch ring (both on a 14 s clock). Worth the side trip, not a wall on it.
+            new EliteMove { mob = "The Old Burrower", name = "Earth-Heave", windup = 2, blow = 4, reach = 3.8f, every = 10, knock = 4,
+                cc = "disorient", ccName = "Burrow", ccSeconds = 3, ccEvery = 16, ccReach = 5, ccText = "The Old Burrower goes under and comes up beneath you.", enrage = "The Old Burrower stops circling." },
             new EliteMove { mob = "Powder-Sergeant Hobb", name = "Fuse-Pick", windup = 1.8f, blow = 3.8f, reach = 3.6f, every = 10, callReach = 30, callMost = 2,
                 ringEvery = 12, ringReach = 4.5f, ringName = "Short Fuse",
                 call = "Hobb whistles for the sappers.", callShort = "Sappers!", enrage = "Hobb lights the whole bandolier." },
             new EliteMove { mob = "Old Kettle, the pitch-boiler", name = "Ladle", windup = 2, blow = 4, reach = 3.6f, every = 11, ringEvery = 14, ringReach = 4.5f, ringName = "Hot Pitch",
-                cc = "root", ccName = "Stuck in the pitch", ccSeconds = 3, ccEvery = 18, ccReach = 4.5f, ccText = "The pitch takes your boots and holds them.",
+                cc = "root", ccName = "Stuck in the pitch", ccSeconds = 2, ccEvery = 20, ccReach = 4.5f, ccText = "The pitch takes your boots and holds them.",
                 callReach = 26, callMost = 2, call = "Old Kettle bangs the ladle on the pot: \"Who's hungry?\"", callShort = "Who's hungry?", enrage = "Old Kettle tips the pot over." },
         };
         static readonly EliteMove Blow = new EliteMove { name = "Heavy Blow" }, Lunge = new EliteMove { name = "Savage Lunge", windup = 1.7f, blow = 3.8f, reach = 4.2f, every = 10 };

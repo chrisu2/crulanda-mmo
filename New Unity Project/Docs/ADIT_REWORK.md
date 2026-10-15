@@ -1184,7 +1184,12 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   round the Gallery does); now a leg only has to get somewhere. The map and the camps test use it. The real short blocks the map
   names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183): PathPartial over 11 m) and the Cutting
   Drift's floor from the Gallery below it (the drift is entered by the bridge; its own floor from the Company door needs the walk
-  from the bridge, not the floor). R88 (the map and AditNavTests, AditTests, AditGateTests with the new search): R88 RESULT.
+  from the bridge, not the floor). R88 (the map and AditNavTests, AditTests, AditGateTests with the new search): 16/23, AditGateTests all
+  green (the second's wait after a door opens); the map's reach rose (the Scriptorium 114/115, the Muster Yard 174/218, the Chapel
+  124/263, the River 90, the Dry Ledge 119, the Deep Way 659/1142) but "unreached" samples complete from a reached one 3 m off
+  remained, and sixty-four legs (R89) changed nothing: a leg-by-leg search ends in a pocket the straight-line heuristic prefers. R90
+  adds the honest measure, a flood fill by hops (reached sample to unreached within 30 m by a short complete path, until nothing
+  changes): see its "reached by hops" table. The tests' reach (NavReach) wants the same hop search next.
 - **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),
   the centreline walk at the tally stage, the fixture trestle's rail (a raycast; new in R83, not looked at), the fixture knoll ray,

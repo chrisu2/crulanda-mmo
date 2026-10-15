@@ -77,7 +77,7 @@ namespace Crulanda.Encounter
         /// renderers of each of the zone's six biggest groups (the caves among them). With Unity's counters at the end. Written to
         /// adit-perf.txt beside the frames.
         /// </summary>
-        IEnumerator YardProbe(Vector3 eye, Vector3 at, Vector3 stand)
+        IEnumerator YardProbe(string where, Vector3 eye, Vector3 at, Vector3 stand)
         {
             var lines = new List<string>(); var view = session.View.transform; var look = Quaternion.LookRotation(at - eye);
             session.Player.GetComponent<AdventurerMotor>().Teleport(stand);
@@ -88,7 +88,7 @@ namespace Crulanda.Encounter
                 int frames = 0; float t0 = Time.realtimeSinceStartup;
                 while (Time.realtimeSinceStartup - t0 < 2.5f) { frames++; view.SetPositionAndRotation(eye, look); yield return null; }
                 float fps = frames / (Time.realtimeSinceStartup - t0);
-                var line = "PERF yard " + label + " " + fps.ToString("0") + " fps " + (1000 / Mathf.Max(1, fps)).ToString("0.0") + " ms"; Debug.Log(line); lines.Add(line);
+                var line = "PERF " + where + " " + label + " " + fps.ToString("0") + " fps " + (1000 / Mathf.Max(1, fps)).ToString("0.0") + " ms"; Debug.Log(line); lines.Add(line);
             }
             IEnumerator Run(IEnumerator m) { while (m.MoveNext()) yield return m.Current; }
             yield return Run(Measure("all"));
@@ -97,6 +97,11 @@ namespace Crulanda.Encounter
             int shadowed = 0; foreach (var l in lights) if (l.shadows != LightShadows.None) shadowed++;
             lines.Add("COUNT point and spot lights " + lights.Length + " (" + shadowed + " casting shadows)");
             foreach (var l in lights) l.enabled = false; yield return Run(Measure("no-point-lights")); foreach (var l in lights) if (l != null) l.enabled = true;
+            // Every mob in the zone (the whole dungeon's camps, near or not) switched off a moment: their animation, AI and agents.
+            var mobs = new List<GameObject>(); foreach (var e in session.Enemies) if (e != null && e.gameObject.activeSelf) mobs.Add(e.gameObject);
+            int animators = 0; foreach (var m in mobs) animators += m.GetComponentsInChildren<Animator>().Length;
+            lines.Add("COUNT mobs " + mobs.Count + " (" + animators + " animators)");
+            foreach (var m in mobs) m.SetActive(false); yield return Run(Measure("no-mobs")); foreach (var m in mobs) if (m != null) m.SetActive(true);
             var fields = new List<Behaviour>(); fields.AddRange(FindObjectsByType<GrassField>(FindObjectsSortMode.None)); fields.AddRange(FindObjectsByType<PlantField>(FindObjectsSortMode.None));
             foreach (var f in fields) f.enabled = false; yield return Run(Measure("no-grass")); foreach (var f in fields) f.enabled = true;
             // The renderers by the zone's top-level group: the six biggest, each switched off in turn.
@@ -116,11 +121,12 @@ namespace Crulanda.Encounter
             }
             // Unity's counters at the yard's view, everything on, over 120 frames.
             var names = new[] { ("Internal", "Main Thread"), ("Internal", "Render Thread"), ("Render", "Camera.Render"), ("Render", "Culling"), ("Render", "Shadows.RenderShadowMap"),
-                ("Render", "Batches Count"), ("Render", "SetPass Calls Count"), ("Render", "Draw Calls Count"), ("Render", "Triangles Count"), ("Render", "Shadow Casters Count"), ("Scripts", "BehaviourUpdate") };
+                ("Render", "Batches Count"), ("Render", "SetPass Calls Count"), ("Render", "Draw Calls Count"), ("Render", "Triangles Count"), ("Render", "Shadow Casters Count"), ("Scripts", "BehaviourUpdate"), ("Scripts", "PERF.Enemy"), ("Scripts", "PERF.ActorVisual"), ("Scripts", "PERF.Session"),
+                ("Animation", "PreLateUpdate.DirectorUpdateAnimationEnd"), ("Animation", "MeshSkinning.Update"), ("Physics", "Physics.Processing"), ("Render", "PostLateUpdate.UpdateAllRenderers") };
             var recs = new List<(string, Unity.Profiling.ProfilerRecorder)>();
             foreach (var (cat, n) in names)
             {
-                var c = cat == "Internal" ? Unity.Profiling.ProfilerCategory.Internal : cat == "Scripts" ? Unity.Profiling.ProfilerCategory.Scripts : Unity.Profiling.ProfilerCategory.Render;
+                var c = cat == "Internal" ? Unity.Profiling.ProfilerCategory.Internal : cat == "Scripts" ? Unity.Profiling.ProfilerCategory.Scripts : cat == "Animation" ? Unity.Profiling.ProfilerCategory.Animation : cat == "Physics" ? Unity.Profiling.ProfilerCategory.Physics : Unity.Profiling.ProfilerCategory.Render;
                 recs.Add((n, Unity.Profiling.ProfilerRecorder.StartNew(c, n, 1, Unity.Profiling.ProfilerRecorderOptions.SumAllSamplesInFrame | Unity.Profiling.ProfilerRecorderOptions.Default)));
             }
             var sums = new double[recs.Count];
@@ -128,10 +134,10 @@ namespace Crulanda.Encounter
             for (int i = 0; i < recs.Count; i++)
             {
                 var (n, r) = recs[i]; double avg = sums[i] / 120; bool time = r.UnitType == Unity.Profiling.ProfilerMarkerDataUnit.TimeNanoseconds;
-                lines.Add("PROF " + n + " " + (r.Valid ? (time ? (avg / 1e6).ToString("0.00") + " ms" : avg.ToString("0")) : "n/a")); r.Dispose();
+                lines.Add("PROF " + where + " " + n + " " + (r.Valid ? (time ? (avg / 1e6).ToString("0.00") + " ms" : avg.ToString("0")) : "n/a")); r.Dispose();
             }
             QualitySettings.vSyncCount = vs; Application.targetFrameRate = cap;
-            File.WriteAllLines(Path.Combine(dir, "adit-perf.txt"), lines);
+            File.AppendAllLines(Path.Combine(dir, "adit-perf.txt"), lines);
         }
 
         public IEnumerator Run(EncounterSession s, string directory)
@@ -214,7 +220,7 @@ namespace Crulanda.Encounter
             Shot("rail-hall", Deep, 178, 0, 0, 4.5f, Deep, 232, 0, 3, "the Rail Hall from the platform gate: the platform, the carriage and its line");
             Shot("pitch-pit", Pit, 8, 0, 0, 2.6f, Pit, 42, 0, .5f, "the Pitch Pit from its mouth off the Rail Hall");
 
-            if (shots.Count > 0) { lamp.enabled = false; yield return YardProbe(shots[0].eye, shots[0].at, shots[0].stand); lamp.enabled = true; }
+            if (shots.Count > 4) { lamp.enabled = false; yield return YardProbe("yard", shots[0].eye, shots[0].at, shots[0].stand); yield return YardProbe(shots[4].place, shots[4].eye, shots[4].at, shots[4].stand); lamp.enabled = true; }
             foreach (var f in shots) yield return Frame(f.place, f.eye, f.at, f.stand, f.where);
 
             motor.enabled = true; foreach (var r in body) r.enabled = true;

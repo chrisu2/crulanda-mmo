@@ -20,6 +20,9 @@ namespace Crulanda.World
         {
             var list = new List<Renderer>(props.GetComponentsInChildren<Renderer>(true));
             list.RemoveAll(r => r is ParticleSystemRenderer || r is TrailRenderer || r is LineRenderer);
+            // Never the caves themselves (a shell, knoll, floor or lining, one mesh a cave) nor anything big: a far cave's shell not drawn
+            // left its neighbour's mouth open on the sky (the 14:36 tour: white panes at the Black Cove and the Foundry's far end).
+            list.RemoveAll(r => { var n = r.gameObject.name; return n.EndsWith(" shell") || n.EndsWith(" knoll") || n.EndsWith(" floor") || n.EndsWith(" lining") || r.bounds.extents.magnitude > 20; });
             renderers = list.ToArray(); spheres = new BoundingSphere[renderers.Length];
             for (int i = 0; i < renderers.Length; i++) { var b = renderers[i].bounds; spheres[i] = new BoundingSphere(b.center, b.extents.magnitude); }
             group = new CullingGroup(); group.SetBoundingSpheres(spheres); group.SetBoundingSphereCount(spheres.Length);

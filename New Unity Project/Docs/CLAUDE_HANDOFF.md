@@ -1,29 +1,35 @@
-# Crulanda: Claude handoff (Start here rewritten 2026-10-15 02:45; covers the work to the small hours of Oct 15)
+# Crulanda: Claude handoff (Start here rewritten 2026-10-15 04:10; covers the work to the small hours of Oct 15)
 
 ## Start here
 
-**Current state: 2026-10-15, 02:45.** Chris was on and off all night (the 23:00 shutdown he asked for was cancelled because he kept
-writing). His words verbatim in PLAYTEST_NOTES 199-215; what was done, in order, in CHANGELOG's 2026-10-15 entries. Nothing is
-VERIFIED until Chris has seen it in his build. Talk to him in game terms, not run names (memory: plain-words-no-run-names).
-- **Branches:** `feet-bow-adit-kit` (PR #2) and `adit-rework` (worktree `D:\code\mmo-adit`, main merged in at 02:34), both pushed.
-  Do not merge either to `main` without Chris. **The published build comes from `adit-rework`** so Chris sees the Adit with everything.
-- **Published:** 02:27 (the chapter-house on KayKit's grid with open doorways, the water/grass/candle shaders, zone music, the market
-  props, the new Oakhaven places and the lore) and, if the game was shut, again by the 02:35 run (it was: 02:35, the save backed up to `save-backups/20261015-0235-before-sound-publish`; EditMode 6/6 on the sound and node tests; shader errors 0). Save backups in
-  `D:/crulanda-work/save-backups/20261015-*`.
-- **New tonight, for Chris to look at (BUILT, OPEN):** the birds' walk (no hop); the Scoundrel's Nerve starting at 0, draining out of a
-  fight and not filled by auto-attack; the combat captures inside the yard; eleven new Oakhaven places and sixteen market pieces; clues
-  to every secret and stories for 58 villagers in a Lore tab; the music by zone, night, fight and cave with `/music`; the chapter-house
-  rooms of the Adit from the KayKit pack with doors that open; worked nodes vanishing whole and back sooner the more people about;
-  the Sound panel in the pause menu (master, music, combat music, effects, ambient; a slider and a mute each).
-- **Waiting on Chris:** the 14 decisions at the end of `PHASE8_6_LIVING_WORLD.md` (villagers' way-finding, the inn's double doors,
-  crafting loot, recipes, the book of lore, gear that shows) and the 13 at the end of `DUNGEON2_DESIGN.md` (Hallow's Creek). He also
-  asked about the bandit camp, the Bandit King and loot: not yet answered beyond the plans.
-- **Open work, in order:** the chapel's tour frame (02:35: the camera stood in the east door's jamb; moved to along 31 on the axis, not yet rebuilt); the
-  fixture cave's two reds (its rail and the loop over the hall: the test cave's, not the Adit's); the Adit played through; Phase 8.6
-  once Chris decides; sound effects and ambient sounds to feed the Sound panel's two empty channels (`AudioMix.Effective`).
-- **How work ran tonight:** up to three helpers at a time (Chris: "you can run 3 bots at most"), none running Unity; their files
-  compiled with the scratch Roslyn check (`scratchpad/ccf/build.py` for main, `scratchpad/cc/build.py` for the worktree), committed by
-  path; one Unity job at a time through hidden chains in `D:/crulanda-work/chainRNN.ps1` (R119 the last).
+**Current state: 2026-10-15, about 04:30, the PC shut down at Chris's word** ("once all is done and clear. shutdown the computer").
+Chris played the Adit build through the small hours; his words verbatim in PLAYTEST_NOTES 199-225, what was done in CHANGELOG's
+2026-10-15 entries. Nothing is VERIFIED until Chris has seen it in his build. Talk to him in game terms, not run names
+(memory: plain-words-no-run-names).
+- **Branches:** `feet-bow-adit-kit` (PR #2) and `adit-rework` (worktree `D:\code\mmo-adit`, main merged in to the last commit), both
+  pushed. Do not merge either to `main` without Chris. **The published build comes from `adit-rework`.**
+- **Published:** FINAL_PUBLISH. Save backups in `D:/crulanda-work/save-backups/20261015-*`.
+- **The Adit's lag (notes 218, 225) is the night's big fix:** with the frame cap off, the yard went from 13 to 248 frames a second and the
+  Tally Hall from 17 to 282 (the probe in the Adit camera tour: `D:/crulanda-work/world-captures/adit-tour/adit-perf.txt`). The cost
+  was the zone's props (the whole dungeon drawn from anywhere: 15,857 renderers, 56 million triangles) and its 186 mobs. Now in a zone
+  with caves a prop more than 70 m from the camera is not drawn (`PropCull`), and a camp's idle mob more than 85 m from you sleeps
+  (`EncounterEnemy.Dormant`; wakes at 75 m, or the moment a call, threat or foe reaches it; road patrols never sleep). Watch for pop-in in
+  the biggest halls (the Foundry) and for any event whose mobs should move while you are far: they stand until you come or call them.
+- **New tonight, for Chris to look at (BUILT, OPEN):** the walk-in barns' walls no longer flicker; Nerve stays at 0 out of a fight; Mira
+  runs out of mana in long fights, warns, drinks between fights, and casts Briar Lash and Kindled Seed when nobody needs healing; cave
+  water without sunlit streaks, glow or foam lines; roamers outside half the open-air camps; worked nodes vanish whole and return sooner
+  with more people about; the Sound panel in the pause menu; the chapter-house doors open; the chapel's tour frame fixed.
+- **Asked of Chris, not answered:** whether "slow the progress down" (note 219) also means slower levelling (less XP); the 14
+  decisions at the end of `PHASE8_6_LIVING_WORLD.md` and the 13 at the end of `DUNGEON2_DESIGN.md`; the bandit camp, the Bandit King and
+  loot.
+- **Open work, in order:** Chris's reactions; FINAL_TESTS; the fixture cave's two reds in `AditCaveBuildTests` (the test cave's rail and
+  loop, not the Adit's); sound effects and ambient sounds for the Sound panel's two empty channels (`AudioMix.Effective`); the Adit
+  played through; Phase 8.6 once Chris decides.
+- **How work runs:** up to three helpers (Chris: "you can run 3 bots at most"), none running Unity; compile with the scratch Roslyn
+  check (`scratchpad/ccf/build.py` for main, `scratchpad/cc/build.py` for the worktree; a new session must rebuild these, they live in
+  the old session's temp folder), commit by path; one Unity job at a time through hidden chains `D:/crulanda-work/chainRNN.ps1`
+  (R124 the last). Chains wait while the game is open. Never write a chain's paths through Python without raw strings: a backslash-a in
+  "\adit-perf" became a bell character tonight.
 
 ## Oct 14 night (history; Start here as it stood at 23:00)
 

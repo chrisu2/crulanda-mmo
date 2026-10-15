@@ -514,7 +514,11 @@ namespace Crulanda.World
             bool CarriesOn(Vector3 edge, Vector3 outward, float top)
             {
                 var probe = new Vector2(edge.x + outward.x * .8f, edge.z + outward.z * .8f);
-                foreach (var o in DeckSpots) if (o != spot && o.Top(probe, out float y) && Mathf.Abs(y - top) < .7f) return true;
+                // (S7, chainR129) And at the edge itself: the north ramp leaves the cross-walk's end falling a third, so 0.8 m out its planks
+                // were 0.77 m down and the cross-walk's rail stood across its head (the whole Geode Foundry cut off from the drift); the
+                // overlook balcony's rail stood on the trestle head's planks.
+                var at = new Vector2(edge.x + outward.x * .15f, edge.z + outward.z * .15f);
+                foreach (var o in DeckSpots) if (o != spot && ((o.Top(probe, out float y) && Mathf.Abs(y - top) < .7f) || (o.Top(at, out float y2) && Mathf.Abs(y2 - top) < .7f))) return true;
                 foreach (var c in Hollow.All) if (c.FloorAt(probe, out float f) && Mathf.Abs(f - BasinDip(c, probe) - top) < .7f) return true;
                 foreach (var dl in dropLooks)
                     if (!dl.def.scenery && Mathf.Abs(dl.from.y - top) < 1.5f && Vector2.Distance(new Vector2(dl.from.x, dl.from.z), new Vector2(edge.x, edge.z)) < (dl.def.width > 0 ? dl.def.width : 2) / 2 + 1.2f) return true;

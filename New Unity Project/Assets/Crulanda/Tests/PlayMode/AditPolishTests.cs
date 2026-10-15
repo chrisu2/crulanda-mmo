@@ -117,8 +117,9 @@ namespace Crulanda.Tests
             var load = session.SwingLoads[0]; var sp = load.spot;
             load.Clock = 0; load.Pose(0);
             Assert.IsTrue(NavMesh.SamplePosition(sp.bottom + Vector3.up * .2f, out var on, 1, NavMesh.AllAreas), "the walk under the bucket is walkable");
-            session.Player.GetComponent<AdventurerMotor>().Teleport(on.position + sp.walk * .3f + Vector3.up); yield return null;
-            var before = session.Player.transform.position; int health = session.Player.Health.Pool.Current;
+            // (chainR129: "before" was read a frame after the teleport, when the bucket had already thrown you: moved 0. Read it here.)
+            var before = on.position + sp.walk * .3f + Vector3.up; int health = session.Player.Health.Pool.Current;
+            session.Player.GetComponent<AdventurerMotor>().Teleport(before); yield return null;
             for (int i = 0; i < 3; i++) yield return null;
             Assert.AreEqual(1, load.Hits, "the bucket meets you");
             var moved = session.Player.transform.position - before;

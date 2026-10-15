@@ -120,13 +120,15 @@ namespace Crulanda.Tests
             var order = new List<string>(); var at = new List<float>(); float t = 0;
             while (t < 9 && order.Count < ev.waves.Length)
             {
-                foreach (var w in ev.waves) if (!order.Contains(w.camp) && Mine(CampIndex(w.camp)).Count > 0) { order.Add(w.camp); at.Add(session.EventClock); }
+                // Each wave where it stands as it comes (chainR129: read after the last wave, the porters had walked 10 m toward the island
+                // in the 4.5 s the others took to come: sent at you, as they should be).
+                foreach (var w in ev.waves) if (!order.Contains(w.camp) && Mine(CampIndex(w.camp)).Count > 0) { order.Add(w.camp); at.Add(session.EventClock); Stood(w.camp, Camp(w.camp).count); }
                 t += Time.deltaTime; yield return null;
             }
             CollectionAssert.AreEqual(ev.waves.Select(w => w.camp).ToList(), order, "the waves in the data's order");
             for (int k = 0; k < ev.waves.Length; k++) Assert.GreaterOrEqual(at[k] + .5f, ev.waves[k].at, order[k] + " not before its second");
             Assert.AreEqual(ev.waves.Length, session.EventWave);
-            foreach (var w in ev.waves) Stood(w.camp, Camp(w.camp).count);
+            foreach (var w in ev.waves) Assert.AreEqual(Camp(w.camp).count, Mine(CampIndex(w.camp)).Count(e => e.actor.IsAlive), w.camp + ": all of them still stand");
             var hollowsong = Mine(CampIndex("Brother Hollowsong")).First(); Assert.IsTrue(hollowsong.Elite, "the Wake's boss"); Assert.IsNotNull(hollowsong.Move);
             Assert.AreEqual(.5f, hollowsong.Move.callAt, 1e-5f, "his call at half (ADIT_REWORK section 9)");
             Assert.AreEqual("loose:Brother Hollowsong", Camp("Hollowsong's choir").after); Assert.IsEmpty(Mine(choir), "the choir waits for his call");

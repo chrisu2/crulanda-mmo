@@ -213,6 +213,29 @@ namespace Crulanda.Tests
                 bool under = d.cave != null && d.cave.FloorAt(new Vector2(midp.x, midp.z), out fy) && NavMesh.SamplePosition(new Vector3(midp.x, fy + .2f, midp.z), out uh, .8f, NavMesh.AllAreas) && Mathf.Abs(uh.position.y - fy) < .8f;
                 sb.AppendLine(d.def.name + " | " + bodies.Count + " | " + (bodies.Count > 0 ? lo.ToString("0.0") + ".." + hi.ToString("0.0") : "-") + " | " + under + (under ? " (" + uh.position.ToString("0.0") + ")" : ""));
             }
+            // Each cave walked end to end in 3 m steps along its middle (or beside it where the middle has no floor), each step a path from
+            // the one before: where a step is not complete, the cave's floor is broken there (the cloister stair's way home came out
+            // 236 m, the long way round, 2026-10-15 00:38: a gap on the stair).
+            sb.AppendLine(); sb.AppendLine("cave | steps | broken steps (from -> to)");
+            foreach (var h in Hollow.All)
+            {
+                int steps = 0; var broken = new List<string>(); Vector3? prev = null;
+                for (float along = 1; along < h.Length - 1; along += 3)
+                {
+                    int i = h.Nearest(new Vector2(h.At(along).x, h.At(along).z), out _); if (!h.Floored(i)) { prev = null; continue; }
+                    float aside = h.Half[i] * .62f; NavMeshHit here = default; bool on = false;
+                    foreach (var off in new[] { 0f, aside, -aside }) if (NavMesh.SamplePosition(h.At(along, off) + Vector3.up * .2f, out here, 2, NavMesh.AllAreas)) { on = true; break; }
+                    if (!on) { prev = null; continue; }
+                    if (prev.HasValue)
+                    {
+                        steps++;
+                        var sp = new NavMeshPath();
+                        if (!(NavMesh.CalculatePath(prev.Value, here.position, NavMesh.AllAreas, sp) && sp.status == NavMeshPathStatus.PathComplete)) broken.Add(prev.Value.ToString("0") + " -> " + here.position.ToString("0") + " (" + along.ToString("0") + " m in)");
+                    }
+                    prev = here.position;
+                }
+                if (broken.Count > 0) sb.AppendLine(h.Name + " | " + steps + " | " + broken.Count + ": " + string.Join("; ", broken.Take(6)));
+            }
             sb.AppendLine(); sb.AppendLine("gate | at | open | crossed (2 m before to 2 m beyond)");
             foreach (var g in zone.Gates)
             {

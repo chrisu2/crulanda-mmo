@@ -98,6 +98,17 @@ namespace Crulanda.Tests
                         if (NavMesh.SamplePosition(h.At(s, off) + Vector3.up * .2f, out var hit, 2, NavMesh.AllAreas)) { crumbs.Add(hit.position); cave.Add(c); break; }
                 }
             }
+            // And the decks (the Adit rework): a hall entered by a catwalk or a trestle (the Geode Foundry from the Cutting Drift's lip, 12 m
+            // over its floor) has no floor crumb within a hop of the cave above it; the decks' planks are crumbs of their own, each deck
+            // its own chain, joined to the floors and to each other within a hop (2026-10-15 00:38).
+            var zone = ZoneBuilder.Active;
+            if (zone != null)
+                for (int d = 0; d < zone.DeckSpots.Count; d++)
+                {
+                    var spot = zone.DeckSpots[d]; if (spot == null || spot.mid == null) continue;
+                    for (int k = 0; k < spot.mid.Length; k += 2)
+                        if (NavMesh.SamplePosition(spot.mid[k] + Vector3.up * .3f, out var hit, 1.5f, NavMesh.AllAreas) && Mathf.Abs(hit.position.y - spot.mid[k].y) < 1.5f) { crumbs.Add(hit.position); cave.Add(1000 + d); }
+                }
             if (crumbs.Count == 0) return crumbs;
             var path = new NavMeshPath();
             List<int> Near(int i)

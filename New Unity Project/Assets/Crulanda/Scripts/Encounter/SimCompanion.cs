@@ -161,6 +161,8 @@ namespace Crulanda.Encounter
         public RollChoice RollFor(ItemDef d)
         {
             if (d == null) return RollChoice.Pass;
+            if (d.kind == "gear" && !string.IsNullOrEmpty(d.classOnly))   // a class set's piece (loot DESIGN.md 3.8): Need it for its own class (unless worn already), never for another's
+                return d.classOnly == sim.classId && d.level <= sim.level && SimEconomy.Worn(sim, d.slot) != d.id ? RollChoice.Need : RollChoice.Greed;
             if (d.kind == "gear")
             {
                 bool mine = d.slot == "mainhand" || d.slot == "offhand" ? SimGear.CarriesWeapon(sim.classId) : SimGear.Suits(sim.classId, d.name);

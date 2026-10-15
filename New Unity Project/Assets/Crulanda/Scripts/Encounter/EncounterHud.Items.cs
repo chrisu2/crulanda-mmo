@@ -88,6 +88,8 @@ namespace Crulanda.Encounter
             var holder = string.IsNullOrEmpty(d.pouch) ? null : Inventory.BagFor(session.Items, d.pouch);
             if (holder != null) lines.Add("Goes in " + Article(holder.name) + " " + LowerFirst(holder.name) + ".");
             var named = LootLines(d); if (named != null) lines.Add(named);
+            if (!string.IsNullOrEmpty(d.classOnly))   // a class set's piece (loot DESIGN.md 3.8): red when it is not your class
+            { bool yours = Inventory.ClassMayWear(d, session.Progress.classId); lines.Add((yours ? "" : "<color=#ff5544>") + "Class: " + SimRoster.ClassName(d.classOnly) + (yours ? "" : "</color>")); }
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
             lines.Add("Sells for " + Charm.Pay(session.Progress, d.value) + " crowns");   // the Scoundrel's charm (Charm.cs)

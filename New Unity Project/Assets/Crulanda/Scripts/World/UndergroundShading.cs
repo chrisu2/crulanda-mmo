@@ -21,7 +21,7 @@ namespace Crulanda.World
         }
         void Update()
         {
-            var cam = Camera.main; bool inside = cam != null && Hollow.All.Count > 0 && Hollow.InsideAny(cam.transform.position, 1);
+            var cam = Camera.main; bool inside = cam != null && Hollow.All.Count > 0 && Hollow.UndergroundAt(cam.transform.position, 1);
             now = Mathf.MoveTowards(now, inside ? 1 : 0, Time.unscaledDeltaTime * 2);
             Shader.SetGlobalFloat(Id, now);
         }

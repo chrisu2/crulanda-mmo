@@ -182,6 +182,21 @@ namespace Crulanda.World
             return best;
         }
         /// <summary>Whether a point is inside the passage's volume (its walls taken at their widest, <paramref name="margin"/> added): the ground is cut there.</summary>
+        /// <summary>Under rock anywhere in the world (UndergroundShading): inside a cave, where a cave that opens off another counts all
+        /// the way to its walls (Inside's mouth rule is for a mouth on the land: a wide branch, the Black Cove, was half "outside").</summary>
+        public static bool UndergroundAt(Vector3 p, float margin)
+        {
+            foreach (var h in All) if (h.Parent != null ? h.WithinWalls(p, margin) : h.Inside(p, margin)) return true;
+            return false;
+        }
+        bool WithinWalls(Vector3 p, float margin)
+        {
+            var q = new Vector2(p.x, p.z);
+            if (Centre.Count == 0 || !box.Contains(q) || p.y < low - margin || p.y > high + margin) return false;
+            for (int i = 0; i < Centre.Count; i++)
+                if (Vector2.Distance(q, new Vector2(Centre[i].x, Centre[i].z)) < Half[i] * 1.2f + margin && p.y > Centre[i].y - .4f - margin && p.y < Roof(i) + margin) return true;
+            return false;
+        }
         public bool Inside(Vector3 p, float margin)
         {
             var q = new Vector2(p.x, p.z);

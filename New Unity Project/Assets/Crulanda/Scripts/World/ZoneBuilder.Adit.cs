@@ -414,7 +414,7 @@ namespace Crulanda.World
                 if (door) { Run(4, w - 2); Run(-(w - 2), -4); } else Run(-(w - 2), w - 2);
                 if (!door) return;
                 var mid = On(s, 0); if (!Free(mid)) return;
-                if (Kit("wall_arched", mid, yaw, new Vector3(8, 8, KitThick)) == null) return;   // the kit's arched passage at twice its size: 4 m clear, 8 m tall
+                if (Kit("wall_doorway", mid, yaw, new Vector3(8, 8, KitThick)) == null) return;   // the kit's open doorway at twice its size: 4 m clear, 8 m tall (wall_arched is a blind arch, stone inside it: the 02:00 frames, Chris: "now this looks blocked??")
                 foreach (int side in new[] { -1, 1 }) Block(On(s, side * 3), new Vector3(2, 8, KitThick), q);
                 if (!greatWindow || !Free(mid + Vector3.up * 11.5f)) return;
                 foreach (float a in new[] { -2f, 2f }) Kit("wall_archedwindow_open", On(s, a) + Vector3.up * 8, yaw, new Vector3(4, 4, KitThick));

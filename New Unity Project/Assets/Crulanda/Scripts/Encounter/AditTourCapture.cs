@@ -138,7 +138,7 @@ namespace Crulanda.Encounter
             Shot("ash-garden", Ash, 50, 0, 0, 3.5f, Ash, 82, 0, 1, "the Ash Garden past its gatehouse: the urns, the Urn-Keeper at the far end");
             Shot("scriptorium", Scriptorium, 16, 0, 0, 3, Scriptorium, 48, 0, 1.2f, "the Scriptorium: the copyists' desks and the Loremaster");
             Shot("muster-yard", Muster, 42, 0, 0, 3.5f, Muster, 82, 0, 1.2f, "the Muster Yard: the zealots in ranks, the armourers and Corvane");
-            Shot("chapel-of-embers", Chapel, 17, 0, 0, 4.5f, Chapel, 63, 0, 1, "the Chapel of Embers from inside its east door: the nave, the lake of fire, the altar at the far end");   // inside the nave, back from the lake (at along 26 the camera stood in it: the 01:29 frame) (from its door the frame was the east wall with the fire through the arch: Chris, 01:10)
+            Shot("chapel-of-embers", Chapel, 24, 0, 0, 4.5f, Chapel, 63, 0, 1, "the Chapel of Embers from inside its east door: the nave, the lake of fire, the altar at the far end");   // inside the nave, back from the lake (at along 26 the camera stood in it: the 01:29 frame) (from its door the frame was the east wall with the fire through the arch: Chris, 01:10)
             Shot("cloister-stair", Chapel, 88, 0, 0, 2.6f, Chapel, 118, 0, 1.2f, "the cloister stair past the cloister door, on toward the Gallery");
             // The river wing and the Breach.
             Shot("sunless-river", River, 30, 0, 0, 3, River, 72, 0, .5f, "the Sunless River from near its mouth, looking downstream");

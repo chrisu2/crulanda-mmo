@@ -193,7 +193,7 @@ namespace Crulanda.Tests
             foreach (var z in zones) foreach (var c in z.camps)
             {
                 if (c == null || (c.look != "wolf" && c.look != "boar" && c.look != "stag" && c.look != "bear")) continue;
-                beasts++; var t = db.Loot.Find(x => x.tag == c.tag);
+                beasts++; var t = db.Loot.Find(x => x.tag == c.tag && c.levelMin >= x.levelMin && c.levelMax <= x.levelMax) ?? db.Loot.Find(x => x.tag == c.tag);   // the table for its levels (a tag may have one a band: the stags, 2026-10-15)
                 Assert.NotNull(t, z.id + " " + c.mob + ": a loot table for " + c.tag);
                 Assert.IsTrue(t.entries.Any(x => Inventory.IsHide(db.Get(x.item)) && x.chance > 0), z.id + " " + c.mob + " (" + c.tag + ") drops a hide.");
                 Assert.IsTrue(c.levelMin >= t.levelMin && c.levelMax <= t.levelMax, z.id + " " + c.mob + ": its levels are inside its table's band.");

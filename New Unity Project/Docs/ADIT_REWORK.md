@@ -1160,8 +1160,8 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
 - **Lusk's tally stage** (solid, 3.5 m up): the navmesh read the body's faces under the floor and left the floor under the stage a
   walkable island, walled in; the centreline walk, the Pen's mouth and the Flooded Working's join all targeted it. A first fix (the
   body stopping half a metre over the floor, a skirt below) made the body's own underside the island (R83); now a block that is not
-  walkable fills a solid body from under the floor to a hand under the planks (R84: still the point at -24.52 under the stage is
-  sampled: R85 RESULT).
+  walkable fills a solid body from under the floor to a hand under the planks (R84-R86: the centreline walk still samples a point at
+  -24.52 under the stage within 2 m, so the test's own sample needs a look as much as the mesh).
 - **A camp's mobs** drawn again when the navmesh puts two on one footing (the rim's overseers 1.2 m apart on a 3 m deck).
 - **The EditMode set** after the elites' moves and loot: Ysolt's guard pair (the data names Sister Ashe Varrow), fifteen answered
   calls, 94 rares, the Old Burrower's Earth-Heave (a second Rock-Crush), Brother Hollowsong among the end bosses, the planner test's
@@ -1171,8 +1171,16 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   (9/213), the Geode Foundry, the Muster Yard, the Chapel (2/263), the Sunless River (9/340), the Dry Ledge, the Grey Breach, the Quiet
   Miner's Drift and the Pitch Pit not at all. Each branch is reached only for its first metres past its mouth. The tests waited three
   frames after `OpenGates()`; a gate's carve (NavMeshObstacle) is lifted by the navmesh's own update, so they wait a second now, and
-  R85 says per gate whether the way crosses it and what stands by each hall's first unreached sample: R85 RESULT.
-- **Still red after R85:** R85 RED.
+  R85: every gate crossed, open; the first unreached sample of each hall has a neighbouring cave's shell or knoll within 1.5 m (the
+  Pen the Sealed Adit's shell, the Cutting Drift the Gallery's knoll, the Muster Yard the Ash Garden's knoll, the Chapel the
+  Scriptorium's knoll, the Dry Ledge the River's knoll). `ZoneBuilder.Cut` now also drops a face with a corner well inside another
+  cave's passage (shrink .7): R86 reached the Sunless River 59/341 (was 9) and the Dry Ledge 54/189 (was 0), the rest unchanged, so
+  the corner rule is not the whole of it. R87's map names, for each hall, the path status from the nearest reached sample to the
+  first unreached one and what the straight line between them meets: read `adit-nav-diagnostics-R87.txt` first.
+- **Still red after R86 (PlayMode 19/29):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
+  the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),
+  the centreline walk at the tally stage, the fixture trestle's rail (a raycast; new in R83, not looked at), the fixture knoll ray,
+  the solid tops. The first of these is the one to fix: every branch floor reachable, and most of the rest follows.
 - The fixture test's "loop opens over the hall" ray meets the Hub's own knoll (the knoll is not cut by a joining cave's air); the two
   solids with walkable tops (the bowl at (11, -6, -303), the Muster Yard) and the Scriptorium's; the breadcrumbs (56 of 480) and the
   run order follow the floor map.

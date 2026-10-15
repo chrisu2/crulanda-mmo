@@ -1123,6 +1123,10 @@ namespace Crulanda.World
                 var nave = Span(0, h.Length, cw); if (nave.x < 0 || nave.y - nave.x < 12) return;
                 int lake = AnchorRing("lake"), altarI = AnchorRing("altar");
                 float altarAt = altarI >= 0 ? h.Along[altarI] : nave.y - 6, e = Mathf.Min(nave.y, altarAt + 5);
+                // The altar stands 4.5 m before the nave's west wall, never in its doorway: the cave narrows at the altar's anchor, so the
+                // wall came there too and the altar's block and candelabra filled the door to the cloister stair (the R91 picture: one
+                // straight wall at x 110; the chapel's west half and the way home cut off from the altar, AditNavTests).
+                altarAt = Mathf.Min(altarAt, e - 4.5f);
                 float lakeAt = lake >= 0 ? h.Along[lake] : -1, rx = lake >= 0 ? h.Half[lake] * .42f : 0, rz = lake >= 0 ? Mathf.Min(8, h.Half[lake] * .45f) : 0;
                 // The lake leaves a walkway 2.6 m wide either side of it, whatever the ring's width (its rim and its blocks spanned the whole
                 // nave at x about 110: the cloister stair and the chapel's west half were cut off from the altar, the R91 picture).

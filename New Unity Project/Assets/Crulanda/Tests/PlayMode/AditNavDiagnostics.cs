@@ -178,11 +178,11 @@ namespace Crulanda.Tests
             }
             sb.AppendLine(); sb.AppendLine("cave | floor samples | reached from the start | not reached (extents x, z; the first few)");
             var startAt = zone.Ground(zone.Zone.spawns.player, .2f); bool haveStart = NavMesh.SamplePosition(startAt, out var sh, 3, NavMesh.AllAreas);
-            var regionPath = new NavMeshPath();
+            var regionPath = new NavMeshPath(); var allGot = new List<Vector3>();
             foreach (var h in Hollow.All)
             {
                 if (!h.Half.Any(x => x >= 8)) continue;
-                int total = 0, reached = 0; var lost = new List<Vector3>();
+                int total = 0, reached = 0; var lost = new List<Vector3>(); var got = new List<Vector3>();
                 for (float along = 1; along < h.Length; along += 3)
                 {
                     int i = h.Nearest(new Vector2(h.At(along).x, h.At(along).z), out _); if (!h.Floored(i)) continue;
@@ -191,7 +191,7 @@ namespace Crulanda.Tests
                         var p = h.At(along, aside); if (!h.FloorAt(new Vector2(p.x, p.z), out float fy)) continue;
                         if (!NavMesh.SamplePosition(new Vector3(p.x, fy + .2f, p.z), out var hit, 1f, NavMesh.AllAreas)) continue;
                         total++;
-                        if (haveStart && NavMesh.CalculatePath(sh.position, hit.position, NavMesh.AllAreas, regionPath) && regionPath.status == NavMeshPathStatus.PathComplete) reached++; else lost.Add(hit.position);
+                        if (haveStart && NavMesh.CalculatePath(sh.position, hit.position, NavMesh.AllAreas, regionPath) && regionPath.status == NavMeshPathStatus.PathComplete) { reached++; got.Add(hit.position); } else lost.Add(hit.position);
                     }
                 }
                 string ext = lost.Count == 0 ? "-" : "x " + lost.Min(v => v.x).ToString("0") + ".." + lost.Max(v => v.x).ToString("0") + ", z " + lost.Min(v => v.z).ToString("0") + ".." + lost.Max(v => v.z).ToString("0") + "; " + string.Join(" ", lost.Take(4).Select(v => v.ToString("0")));
@@ -200,8 +200,20 @@ namespace Crulanda.Tests
                 {
                     var hits = Physics.OverlapBox(lost[0] + Vector3.up * 1.1f, new Vector3(1.5f, 1, 1.5f), Quaternion.identity, ~0, QueryTriggerInteraction.Ignore);
                     near = " | by the first: " + string.Join("; ", hits.Where(x => x != null).Select(x => x.transform.root.name + "/" + x.name).Distinct().Take(5));
+                    // From the nearest sample the way in does reach (in this cave or any) to the first it does not: the path's status and
+                    // what the straight line between them meets (the floors left out), so the blocker is named, not guessed.
+                    Vector3? from = null; float best = float.MaxValue;
+                    foreach (var g in allGot) { float dd = (g - lost[0]).sqrMagnitude; if (dd < best) { best = dd; from = g; } }
+                    if (from.HasValue)
+                    {
+                        string status = NavMesh.CalculatePath(from.Value, lost[0], NavMesh.AllAreas, regionPath) ? regionPath.status.ToString() : "none";
+                        var ray = Physics.RaycastAll(from.Value + Vector3.up * 1f, (lost[0] - from.Value).normalized, Vector3.Distance(from.Value, lost[0]), ~0, QueryTriggerInteraction.Ignore)
+                            .Where(x => x.collider != null && !x.collider.name.EndsWith(" floor")).OrderBy(x => x.distance).Select(x => x.collider.transform.root.name + "/" + x.collider.name + " at " + x.point.ToString("0")).Distinct().Take(4);
+                        near += " | from the nearest reached " + from.Value.ToString("0") + " (" + Mathf.Sqrt(best).ToString("0.0") + " m): " + status + "; the line meets " + string.Join("; ", ray);
+                    }
                 }
                 sb.AppendLine(h.Name + " | " + total + " | " + reached + " | " + lost.Count + " (" + ext + ")" + near);
+                allGot.AddRange(got);
             }
             sb.AppendLine(); sb.AppendLine("camp | centre | floor under | navmesh within 1.2 m | within 6 m (nearest y)");
             foreach (var c in zone.Zone.camps)

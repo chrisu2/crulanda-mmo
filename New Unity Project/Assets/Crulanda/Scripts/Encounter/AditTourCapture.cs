@@ -29,7 +29,8 @@ namespace Crulanda.Encounter
 
         const string Adit = "The Sealed Adit", Flooded = "The Flooded Working", Pen = "The Pen", Gallery = "The Singing Gallery", Drift = "The Cutting Drift",
             Foundry = "The Geode Foundry", Ash = "The Ash Garden", Scriptorium = "The Scriptorium", Muster = "The Muster Yard", Chapel = "The Chapel of Embers",
-            River = "The Sunless River", Ledge = "The Dry Ledge", Breach = "The Grey Breach", Deep = "The Deep Way", Pit = "The Pitch Pit";
+            River = "The Sunless River", Ledge = "The Dry Ledge", Breach = "The Grey Breach", Deep = "The Deep Way", Pit = "The Pitch Pit",
+            DeadLine = "The Dead Line", Cove = "The Black Cove";
 
         /// <summary>A cave by its name (the "cavern" props of adit.json), or null.</summary>
         static Hollow Cave(string name) { return Hollow.All.Find(h => h.Name == name); }
@@ -222,6 +223,11 @@ namespace Crulanda.Encounter
             Shot("deep-way", Deep, 20, 0, 0, 3.5f, Deep, 60, 0, .5f, "the Deep Way past the singing door: the stair down");
             Shot("rail-hall", Deep, 178, 0, 0, 4.5f, Deep, 232, 0, 3, "the Rail Hall from the platform gate: the platform, the carriage and its line");
             Shot("pitch-pit", Pit, 8, 0, 0, 2.6f, Pit, 42, 0, .5f, "the Pitch Pit from its mouth off the Rail Hall");
+            // (S6) The Dead Line and the Black Cove (asides to the right going south: the quay and the barge are on the west side).
+            Shot("dead-line", DeadLine, 30, 0, 0, 3, DeadLine, 72, 0, 1.2f, "the Dead Line past the Rail Hall: the line on down the tunnel, the first siding");
+            Shot("black-cove", Cove, 70, 8, 0, 6, Cove, 150, 12, 3, "the Black Cove from its beach: the quay along the west wall, the scaffold, the barge and her stern castle");
+            Shot("ore-barge", Cove, 122, 28.5f, 3.4f, 2, Cove, 134, 14.5f, 9, "the ore barge from the quay: the scaffold's tiers, the gangway, her stern castle");
+            Shot("stern-castle", Cove, 96, 14.5f, 6.8f, 1.8f, Cove, 136, 14.5f, 10, "along the barge's deck from her bow: the geode crates, the stair, Danner's stern castle");
 
             if (shots.Count > 4) { lamp.enabled = false; yield return YardProbe("yard", shots[0].eye, shots[0].at, shots[0].stand); yield return YardProbe(shots[4].place, shots[4].eye, shots[4].at, shots[4].stand); lamp.enabled = true; }
             foreach (var f in shots) yield return Frame(f.place, f.eye, f.at, f.stand, f.where);

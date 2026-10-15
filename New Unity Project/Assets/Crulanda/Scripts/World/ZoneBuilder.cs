@@ -4283,8 +4283,8 @@ namespace Crulanda.World
             }
             if (cone == null) cone = ZoneMeshes.Cone(1, 1);
             Part(PrimitiveType.Cylinder, t, new Vector3(0, gy + .06f, .5f), new Vector3(1.2f, .05f, .7f), art.glass);   // embers on the cave floor
-            MeshPart(cone, t, new Vector3(0, gy + .08f, .55f), Glowing(new Color(1, .55f, .2f), 2.2f)).transform.localScale = new Vector3(.35f, 1, .3f);
-            Glow(t, new Vector3(0, gy + 1.5f, -.2f), 10, 1.5f, new Color(1, .55f, .25f), 2.4f);
+            var caveFire = Glow(t, new Vector3(0, gy + 1.5f, -.2f), 10, 1.5f, new Color(1, .55f, .25f), 2.4f);
+            CandleFlame.Attach(MeshPart(cone, t, new Vector3(0, gy + .08f, .55f), Glowing(new Color(1, .55f, .2f), 2.2f)), caveFire).transform.localScale = new Vector3(.35f, 1, .3f);   // wavering with its light (2026-10-15)
             float bx = g.y / 2 + 2;
             for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, t, new Vector3(bx + (i == 2 ? .35f : i * .75f), Floor(bx) + (i == 2 ? .75f : .25f), -1.5f), new Vector3(.7f, .5f, .5f), salt, Quaternion.Euler(0, R01 * 20 - 10, 0));
             Solid(t, new Vector3(bx + .4f, Floor(bx) + .5f, -1.5f), new Vector3(1.8f, 1, .8f));
@@ -5086,8 +5086,9 @@ namespace Crulanda.World
             var tip = wallAt + lean * .6f;
             Part(PrimitiveType.Sphere, t, tip, Vector3.one * .14f, art.glass);
             if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-            MeshPart(cone, t, tip + Vector3.up * .04f, Glowing(new Color(1, .55f, .2f), 2.2f)).transform.localScale = new Vector3(.13f, .34f, .13f);
-            Glow(t, tip + inward * .3f + Vector3.up * .2f, 7.5f, 1.35f, new Color(1, .6f, .3f), 1.35f).gameObject.AddComponent<Flicker>();
+            // The flame wavers with its light (CandleFlame, from Chris's candle shader, 2026-10-15: "use these where appropriate").
+            var torchLight = Glow(t, tip + inward * .3f + Vector3.up * .2f, 7.5f, 1.35f, new Color(1, .6f, .3f), 1.35f); torchLight.gameObject.AddComponent<Flicker>();
+            CandleFlame.Attach(MeshPart(cone, t, tip + Vector3.up * .04f, Glowing(new Color(1, .55f, .2f), 2.2f)), torchLight).transform.localScale = new Vector3(.13f, .34f, .13f);
         }
         /// <summary>A campfire: a ring of stones, crossed logs on a bed of embers, two flames, a flickering light.</summary>
         /// <summary>Real flames under a prop (Vefects' Free Fire VFX in Resources/Fx/Fire, its shaders written for the built-in pipeline;
@@ -5106,12 +5107,13 @@ namespace Crulanda.World
             for (int i = 0; i < 3; i++) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .14f, 0), new Vector3(.1f, .5f, .1f), wood, Quaternion.Euler(0, i * 60, 70));
             Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .05f, 0), new Vector3(.9f, .03f, .9f), art.glass);
             if (!RealFire(t, at + new Vector3(0, .06f, 0), .55f))
+            var fireLight = Glow(t, at + new Vector3(0, 1.1f, 0), 11, 1.9f, new Color(1, .55f, .25f), 1.9f); fireLight.gameObject.AddComponent<Flicker>();
             {
                 if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-                MeshPart(cone, t, at + new Vector3(0, .1f, 0), Glowing(new Color(1, .5f, .15f), 2.6f)).transform.localScale = new Vector3(.4f, .9f, .4f);
-                MeshPart(cone, t, at + new Vector3(.12f, .1f, -.08f), Glowing(new Color(1, .75f, .3f), 2.2f)).transform.localScale = new Vector3(.22f, .6f, .22f);
+                // The painted tongues waver with the light (CandleFlame, 2026-10-15).
+                CandleFlame.Attach(MeshPart(cone, t, at + new Vector3(0, .1f, 0), Glowing(new Color(1, .5f, .15f), 2.6f)), fireLight).transform.localScale = new Vector3(.4f, .9f, .4f);
+                CandleFlame.Attach(MeshPart(cone, t, at + new Vector3(.12f, .1f, -.08f), Glowing(new Color(1, .75f, .3f), 2.2f)), fireLight).transform.localScale = new Vector3(.22f, .6f, .22f);
             }
-            Glow(t, at + new Vector3(0, 1.1f, 0), 11, 1.9f, new Color(1, .55f, .25f), 1.9f).gameObject.AddComponent<Flicker>();
         }
         /// <summary>A torn company banner on a pole: two strips of sand-coloured cloth, one hanging shorter where it ripped, a faded red stripe.</summary>
         void Banner(Transform t, Vector3 at, float yaw, Material cloth, Material wood, float height)
@@ -5181,8 +5183,8 @@ namespace Crulanda.World
             Part(PrimitiveType.Sphere, t, at + new Vector3(0, 1, 0), new Vector3(.8f, .3f, .8f), iron);
             Part(PrimitiveType.Sphere, t, at + new Vector3(0, 1.07f, 0), new Vector3(.66f, .18f, .66f), art.glass);   // coals heaped in the bowl, showing over its rim
             if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-            MeshPart(cone, t, at + new Vector3(0, 1.12f, 0), Glowing(new Color(1, .55f, .2f), 2.2f)).transform.localScale = new Vector3(.2f, .55f, .2f);
-            Glow(t, at + new Vector3(0, 1.7f, 0), 7, 1.2f, new Color(1, .58f, .28f), 1.9f);
+            var brazierLight = Glow(t, at + new Vector3(0, 1.7f, 0), 7, 1.2f, new Color(1, .58f, .28f), 1.9f);
+            CandleFlame.Attach(MeshPart(cone, t, at + new Vector3(0, 1.12f, 0), Glowing(new Color(1, .55f, .2f), 2.2f)), brazierLight).transform.localScale = new Vector3(.2f, .55f, .2f);   // wavering with its light (2026-10-15)
         }
         /// <summary>
         /// The Weave-Eater brood (GAME-ONLY; Weave-Eaters born of the frayed threads of the broken Weave are CANON, book1

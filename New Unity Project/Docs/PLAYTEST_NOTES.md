@@ -766,3 +766,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 221 (03:25, two pictures in a cave: a flat pale grey sheet with a hard edge under dark rock and timber) "weird effect. seems to not fit"
   (taken to be a cave pool: the water's colour was lit by the sun as well as the ambient, so in the dark it read as a pale sheet. With the
   camera in a cave the sun is out of it now, as in note 220. If it is not water, it is still OPEN: ask where. OPEN.)
+- 222 (03:30, two pictures of a cave floor under a pale sheet, thin jagged white lines across it) "weird on the floor. i move and it
+  changes" (a flood's water lies a few centimetres over a rough floor and its foam traced every ridge near the surface, moving with the
+  eye's depth. With the camera in a cave the foam all but goes, and none where the water is under 3 cm. OPEN.)

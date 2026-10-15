@@ -216,6 +216,10 @@ Shader "Crulanda/Water"
             wash *= smoothstep(0, 0.3, phase) * (1 - smoothstep(0.75, 1, phase)) * smoothstep(0.3, 0.55, WaterNoise(fp * 1.9 + 5.1));
             foam = max(foam, wash * 0.8 * _FoamWaves * lerp(1, 0.5, flowing));
             foam *= _FoamColor.a * lerp(0.55, 1, dim) * show;
+            // In a cave the water is still and a flood lies a few centimetres over a rough floor: the foam traced every ridge that came
+            // near the surface as thin lines that moved with the eye (note 222). Underground the foam all but goes: a quarter of it, and
+            // none where the water is under 3 cm deep (so no ridge a centimetre under draws a line; a steep bank keeps a faint rim).
+            foam *= lerp(1, 0.25 * smoothstep(0.03, 0.12, d), _CrulandaUnderground);
 
             // Foam is white paint only by day: at night the moonlit ambient would light it brighter than the grass around the
             // pond (a glowing rim), so it greys down with the light (dim is about 1 by day, 0.4 on a moonlit night).

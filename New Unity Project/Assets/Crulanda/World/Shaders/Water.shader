@@ -146,7 +146,7 @@ Shader "Crulanda/Water"
 
             // The scene's light now (ambient from above plus the sun or moon from above). The water's own colours follow it and
             // dim a little faster than it, so dusk and night water sit darker than the land around them instead of glowing.
-            float3 lightNow = ShadeSH9(float4(0, 1, 0, 1)) + _LightColor0.rgb * saturate(_WorldSpaceLightPos0.y) * 0.6;
+            float3 lightNow = ShadeSH9(float4(0, 1, 0, 1)) + _LightColor0.rgb * saturate(_WorldSpaceLightPos0.y) * 0.6 * (1 - _CrulandaUnderground);   // no sun on a cave's pool (note 221: it read as a pale sheet in the dark)
             float dim = saturate(dot(lightNow, float3(0.333, 0.333, 0.333)) * 1.15);
 
             // What is behind the water, the metres of water the view ray crosses to reach it (thick), and how deep the water is

@@ -763,3 +763,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 220 (03:20, the Flooded Working's pool: black water streaked with fine white lines) "looks bad with these white ripples" (the water
   lit its painted highlights, the sun's glints and tonight's caustics by the sun, in a cave. With the camera inside a cave they are off now
   (UndergroundShading, the shader's _CrulandaUnderground). OPEN until the tour frame and Chris's look.)
+- 221 (03:25, two pictures in a cave: a flat pale grey sheet with a hard edge under dark rock and timber) "weird effect. seems to not fit"
+  (taken to be a cave pool: the water's colour was lit by the sun as well as the ambient, so in the dark it read as a pale sheet. With the
+  camera in a cave the sun is out of it now, as in note 220. If it is not water, it is still OPEN: ask where. OPEN.)

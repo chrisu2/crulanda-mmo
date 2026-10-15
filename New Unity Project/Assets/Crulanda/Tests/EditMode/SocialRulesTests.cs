@@ -35,7 +35,8 @@ namespace Crulanda.Tests
             { "platformguard", SocialKind.Call }, { "docker", SocialKind.Call }, { "railquartermaster", SocialKind.Call }, { "gunner", SocialKind.Call }, { "railcaptain", SocialKind.Call }, { "cutter", SocialKind.Call }, { "sorter", SocialKind.Call },
             { "nix", SocialKind.Call }, { "ashinitiate", SocialKind.Call }, { "ashmender", SocialKind.Call }, { "ysolt", SocialKind.Call }, { "foreman", SocialKind.Call }, { "venthound", SocialKind.Solitary }, { "crawler", SocialKind.Pack }, { "greybear", SocialKind.Solitary },
             { "quietminer", SocialKind.Solitary },   // D3: the rare keeps to himself
-            { "warden", SocialKind.Call }   // the grey picket (2026-10-15): Concord wardens, people: they call
+            { "warden", SocialKind.Call },   // the grey picket (2026-10-15): Concord wardens, people: they call
+            { "forager", SocialKind.Call }   // the foragers' camp (2026-10-15): deserters living rough; its data says call
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()

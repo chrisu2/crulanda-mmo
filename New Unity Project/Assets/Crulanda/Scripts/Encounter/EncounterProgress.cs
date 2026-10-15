@@ -196,6 +196,8 @@ namespace Crulanda.Encounter
             return best;
         }
         public void Clear() { values.Clear(); forced = null; until = 0; }
+        /// <summary>Whether anyone is on it (a sleeping mob with threat wakes: EncounterSession.TickDormant).</summary>
+        public bool Any { get { return values.Count > 0 || forced != null; } }
         public void Remove(string id) { if (id != null) values.Remove(id); if (forced == id) { forced = null; until = 0; } }
         public bool IsEmpty { get { return values.Count == 0; } }
         /// <summary>The threat held by one party member (0 if none); the balance harness's tank test reads it.</summary>

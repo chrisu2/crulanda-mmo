@@ -775,3 +775,9 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 224 (03:40) "need mobs patrolling more instead of just standing in one spot" (camp mobs strolled only inside their camp, resting 3-9 s at
   each spot, and only the Adit had patrol roads. Now in every other open-air camp of two or more, its last mob roams a loop of five points
   well outside the camp, there and back, while anyone is within 70 m; and a camp's mobs rest 2-6 s. RoamerTests. OPEN.)
+- 225 (03:45, after 218) "whole zone needs optimized laggy" (the Adit's probe at 03:27, the frame cap off: 13 fps at the yard, 17 in the
+  Tally Hall. Shadows, the 250 point lights and the grass cost nothing; the zone's props (15,857 renderers, 56 million triangles, 82,000
+  draw passes: the whole dungeon drawn wherever you stand) about 38 ms of 79, and the 186 mobs about 30 ms. Now in a zone with caves a
+  prop more than 70 m from the camera is not drawn (PropCull), and a camp's mob alive, idle and standing more than 85 m from you sleeps,
+  its update, figure, animators and drawing off, until you are within 75 m or it is pulled (EncounterEnemy.Dormant). OPEN until the next
+  probe and Chris's look.)

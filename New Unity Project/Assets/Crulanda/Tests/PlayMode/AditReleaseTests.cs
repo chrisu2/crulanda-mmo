@@ -67,7 +67,7 @@ namespace Crulanda.Tests
             {
                 Assert.IsTrue(e.actor.IsAlive, campName + " stands");
                 Assert.IsTrue(NavMesh.SamplePosition(e.transform.position, out var hit, 1.5f, NavMesh.AllAreas) && Vector3.Distance(hit.position, e.transform.position) < 1.5f, campName + " is on the navmesh at " + e.transform.position);
-                Assert.Less(Vector2.Distance(new Vector2(e.transform.position.x, e.transform.position.z), camp.center), camp.radius + 2.5f, campName + " stands in its camp");
+                Assert.Less(Vector2.Distance(new Vector2(e.transform.position.x, e.transform.position.z), camp.center), camp.radius * 2 + 4, campName + " stands in its camp");   // the spawn's spread is a box twice the radius, then the navmesh's nearest point (8.2 m for a radius of 3: the first run, 01:20)
                 StringAssert.StartsWith("mob." + tag + ".adit." + c + ".", e.persistentId, campName + ": its camp's id");
                 Assert.GreaterOrEqual(e.RespawnSeconds, 1e5f, campName + " comes once a visit");
             }

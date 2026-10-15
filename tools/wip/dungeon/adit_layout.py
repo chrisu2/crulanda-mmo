@@ -236,7 +236,7 @@ CAVES = [
     Cave('VC', 'The Chapel of Embers', 'chapel', [
         (172, 147.5, 4, 5, None), (166, 149, 6, 7, -70), (160, 151, 13, 14, -70), (152, 152, 17, 18, -70), (130, 152, 17, 20, -70), (108, 152, 17, 18, -70),
         (100, 152, 10, 10, -70), (94, 151, 4.2, 5.4, -70), (91, 146, 3.6, 4.8, -69.5), (90, 132, 3.6, 4.8, -68), (89, 116, 3.6, 4.8, -66),
-        (86, 102, 3.6, 4.8, -63.5), (81, 92, 3.8, 5, -60.5), (75, 86, 4, 5, -58.5), (70, 83, 4, 5, -58)],
+        (86, 102, 3.6, 4.8, -63.5), (81, 92, 3.8, 5, -59.5), (75, 86, 4, 5, -57.3), (70, 83, 4, 5, -56.5)],   # the stair's foot meets the Gallery's floor (-56.5): 1.5 m below it, the way home went 321 m round (the step walk, 2026-10-15 01:20)
         within='VS', joins='G', canon='GAME-ONLY chapter-house; CANON cult (the Cult of Ash)'),
     # R The Sunless River: west out of the Gallery's floor, the wet way, the Lurker's Pool, the falls stair up beside the water.
     Cave('R', 'The Sunless River', 'river', [

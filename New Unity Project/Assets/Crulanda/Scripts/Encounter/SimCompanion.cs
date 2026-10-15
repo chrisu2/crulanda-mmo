@@ -133,7 +133,15 @@ namespace Crulanda.Encounter
         public float Interval { get { return Melee ? 2.0f : 2.4f; } }
         /// <summary>A sim's blow: a player's of its level, near enough (2026-10-11, the group run's meter: sims at 8-15 a second against you at 30,
         /// "still low for most"; they hit (6 + 2.4 a level) before, 40% of a player's).</summary>
-        public int Hit { get { return sim.Practised((Melee ? 12 : 10) + (Melee ? 4f : 3.6f) * sim.level); } }   // its yard practice too (SimFigure)
+        /// <summary>Its blow before its party role (melee or ranged, its level and its yard practice: SimFigure).</summary>
+        public int BaseHit { get { return sim.Practised((Melee ? 12 : 10) + (Melee ? 4f : 3.6f) * sim.level); } }
+        /// <summary>
+        /// Its blow in a party, by its role (Chris, 2026-10-15, watching a group run: "tank is really doing too much damage compared to actual
+        /// dps users": the Warrior tank 29/s, the Rogue 13, the Ranger 12 and its wolf 8, the Druid healer 12). A damage-dealer hits 1.6
+        /// times its blow, a tank and a healer half, so a tank does about 70% of a damage-dealer (the balance bands: tanks 42-55, damage 62-72).
+        /// </summary>
+        public static float RoleDamage(PartyRole role) { return role == PartyRole.Damage ? 1.6f : .5f; }
+        public int Hit { get { return Mathf.Max(1, Mathf.RoundToInt(BaseHit * RoleDamage(Role))); } }
         public int HealAmount { get { return Mathf.RoundToInt(12 + 5 * sim.level); } }
         /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
         public void GainXp(int xp)
@@ -726,7 +734,7 @@ namespace Crulanda.Encounter
                         Bolt.Fire(from, quarry.transform, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
                     }
                     quarry.Receive(dmg, actor);
-                    if (Role == PartyRole.Tank) quarry.threat.Add(actor.EntityId.Value, dmg * 1.5f);   // a tank's blows hold attention
+                    if (Role == PartyRole.Tank) quarry.threat.Add(actor.EntityId.Value, BaseHit * 3f);   // a tank's blows hold attention: three of its full blows a swing on top of the half it lands, over the damage-dealers' 1.6 (2026-10-15)
                 }
                 return;
             }

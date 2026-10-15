@@ -70,7 +70,8 @@ namespace Crulanda.Tests
             Assert.AreEqual(wArmour, warrior.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor), "worn as a stat (it had none)");
             Assert.AreEqual(dArmour, druid.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor));
             Assert.GreaterOrEqual(wArmour, dArmour, "mail over leather");
-            Assert.GreaterOrEqual(warrior.Hit, 12 + 4 * sims[0].level, "a player's blow at its level (it hit 6 + 2.4 a level before)");
+            Assert.GreaterOrEqual(warrior.BaseHit, 12 + 4 * sims[0].level, "a player's blow at its level (it hit 6 + 2.4 a level before)");
+            Assert.Less(warrior.Hit, warrior.BaseHit, "a tank hits under its blow (Chris 2026-10-15: the tank out-damaged the damage-dealers)");
             yield return null;
         }
         [UnityTest] public IEnumerator No_single_blow_takes_more_than_three_fifths_of_a_members_health()

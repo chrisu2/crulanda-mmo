@@ -225,7 +225,7 @@ namespace Crulanda.Tests
             int was = c.sim.level; Assert.Less(was, 11);
             c.MatchLevel(11);
             Assert.AreEqual(11, c.sim.level); Assert.AreEqual(EncounterProgress.XpForLevel(11), c.sim.experience);
-            Assert.AreEqual(c.actor.Health.Pool.Max, c.actor.Health.Pool.Current, "whole at the new level"); Assert.Greater(c.Hit, 6 + 2.4f * was, "hits like an eleven");
+            Assert.AreEqual(c.actor.Health.Pool.Max, c.actor.Health.Pool.Current, "whole at the new level"); Assert.Greater(c.BaseHit, 6 + 2.4f * was, "hits like an eleven");
             c.MatchLevel(5); Assert.AreEqual(11, c.sim.level, "never down");
         }
         [UnityTest] public IEnumerator A_party_sim_fights_your_target()

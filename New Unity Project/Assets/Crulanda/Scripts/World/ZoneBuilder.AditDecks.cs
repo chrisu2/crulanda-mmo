@@ -395,6 +395,20 @@ namespace Crulanda.World
                     fm.Quad(R(k), R(k + 1), Down(R(k + 1), k + 1), Down(R(k), k), side, new Vector2(r0, R(k).y / 2), new Vector2(r1, R(k + 1).y / 2), new Vector2(r1, Down(R(k + 1), k + 1).y / 2), new Vector2(r0, Down(R(k), k).y / 2));
                     fm.Quad(L(k), L(k + 1), Down(L(k + 1), k + 1), Down(L(k), k), -side, new Vector2(r0, L(k).y / 2), new Vector2(r1, L(k + 1).y / 2), new Vector2(r1, Down(L(k + 1), k + 1).y / 2), new Vector2(r0, Down(L(k), k).y / 2));
                     fm.Quad(Down(L(k), k), Down(R(k), k), Down(R(k + 1), k + 1), Down(L(k + 1), k + 1), Vector3.down, new Vector2(0, r0), new Vector2(spot.half, r0), new Vector2(spot.half, r1), new Vector2(0, r1));
+                    // Shelves inside a solid body, every 1.2 m or less: the bake reads surfaces, and the floor under a body with its bottom
+                    // below the floor kept its head-room and stayed a walkable island (under Lusk's tally stage: the tests walked to it,
+                    // 2026-10-14; a block marked not walkable inside did not take it either). No span between two shelves, nor between the
+                    // floor and the first, is tall enough to stand in.
+                    if (spot.solid[k] && spot.solid[k + 1])
+                    {
+                        float lo = Mathf.Max(Down(L(k), k).y, Down(L(k + 1), k + 1).y), hi = Mathf.Min(L(k).y, L(k + 1).y) - thick; int n = Mathf.CeilToInt((hi - lo) / 1.2f);
+                        for (int j = 1; j < n; j++)
+                        {
+                            float y = lo + (hi - lo) * j / n;
+                            Vector3 At(Vector3 p) { p.y = y; return p; }
+                            fm.Quad(At(L(k)), At(R(k)), At(R(k + 1)), At(L(k + 1)), Vector3.up, new Vector2(0, r0), new Vector2(spot.half, r0), new Vector2(spot.half, r1), new Vector2(0, r1));
+                        }
+                    }
                 }
                 fm.Quad(L(0), R(0), Down(R(0), 0), Down(L(0), 0), back, new Vector2(0, L(0).y / 2), new Vector2(spot.half, R(0).y / 2), new Vector2(spot.half, Down(R(0), 0).y / 2), new Vector2(0, Down(L(0), 0).y / 2));
                 fm.Quad(L(N), R(N), Down(R(N), N), Down(L(N), N), on, new Vector2(0, L(N).y / 2), new Vector2(spot.half, R(N).y / 2), new Vector2(spot.half, Down(R(N), N).y / 2), new Vector2(0, Down(L(N), N).y / 2));

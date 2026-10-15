@@ -772,3 +772,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 223 (03:35) "mira/druid should have some damage spells when not healing" (she had only a free 7-power bolt. Now, while everyone is
   above 80% and she is above half mana: Briar Lash, instant every 8 s, and Kindled Seed, a 2 s cast; both cost mana and grow with your
   level as her heal does; the bolt stays as her free filler. GAME-ONLY names. OPEN.)
+- 224 (03:40) "need mobs patrolling more instead of just standing in one spot" (camp mobs strolled only inside their camp, resting 3-9 s at
+  each spot, and only the Adit had patrol roads. Now in every other open-air camp of two or more, its last mob roams a loop of five points
+  well outside the camp, there and back, while anyone is within 70 m; and a camp's mobs rest 2-6 s. RoamerTests. OPEN.)

@@ -165,6 +165,9 @@ namespace Crulanda.Encounter
         // patrol. all mobs just stand in one place"): every mob had walked back to the spot it was spawned on, every frame ----------
         /// <summary>A patrol's road, walked back and forth while it has nobody to fight (ZoneCamp.route); null: it strolls about its camp.</summary>
         public Vector3[] Patrol;
+        /// <summary>A camp's roamer (EncounterSession.RoamLoop): it walks its loop only with someone within StrollRange, as a stroller does
+        /// (a road-patrol walks at any range).</summary>
+        public bool Roamer;
         /// <summary>How far apart two of a camp keep (a bear's length, a man's shoulders; EncounterSession.GapFor).</summary>
         public float Gap = 1.4f;
         /// <summary>A stroll's pace against its run: about 1.2 m/s for most.</summary>
@@ -186,7 +189,7 @@ namespace Crulanda.Encounter
             if (!Camp || Evading || Inside != null) { agent.SetDestination(home); strolling = Camp && Evading; return; }
             // Far from everyone (no party member within 70 m): it stands; the strolling's path-finding for a hundred and fifty mobs at once pegged
             // the CPU (Chris, 2026-10-11, watching the group run: "pegging cpu 100% alot of times").
-            if (Patrol == null && session.Player != null && (transform.position - session.Player.transform.position).sqrMagnitude > StrollRange * StrollRange)
+            if ((Patrol == null || Roamer) && session.Player != null && (transform.position - session.Player.transform.position).sqrMagnitude > StrollRange * StrollRange)
             {
                 // Not yet home (back from a chase): it walks home first, then stands (SocialPullTests, 2026-10-13: a linked group's second mob stopped short of home).
                 // Asked at most every 2 s and only when not already on its way: a beast halts 2.1 m short, and asking every frame cost a
@@ -205,7 +208,7 @@ namespace Crulanda.Encounter
             agent.speed = baseSpeed * StrollPace * (Slowed ? slowFactor : 1);
             bool there = !agent.pathPending && agent.remainingDistance <= Mathf.Max(.5f, agent.stoppingDistance);
             if (strolling && !there) return;
-            if (strolling) { strolling = false; idleUntil = Time.time + (Patrol != null ? Random.Range(1.5f, 4f) : Random.Range(3f, 9f)); }
+            if (strolling) { strolling = false; idleUntil = Time.time + (Patrol != null ? Random.Range(1.5f, 4f) : Random.Range(2f, 6f)); }   // a shorter rest at each spot (note 224)
             if (Time.time < idleUntil) return;
             Vector3 to;
             if (Patrol != null && Patrol.Length > 1)

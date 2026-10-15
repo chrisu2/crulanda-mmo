@@ -1666,6 +1666,11 @@ namespace Crulanda.Encounter
                         for (int r = 0; r < road.Length; r++) road[r] = Zone.StandAt(camp.route[r] + side, float.NegativeInfinity, 1);   // on its cave's floor, as the camps
                         enemy.Patrol = road;
                     }
+                    else if (!camp.ambush && !elite && camp.count >= 2 && n == camp.count - 1 && c % 2 == 0 && !Zone.Zone.groupZone && !Crulanda.World.Hollow.InsideAny(point, 2))
+                    {
+                        var loop = RoamLoop(camp, c);
+                        if (loop != null) { enemy.Patrol = loop; enemy.Roamer = true; }
+                    }
                     a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
                     if (camp.ambush) enemy.Hide();
                     bool tough = Zone.Zone.groupZone && !elite; enemy.Tough = tough;   // a group zone: every mob at an elite's strength (round 29)
@@ -1771,6 +1776,26 @@ namespace Crulanda.Encounter
         /// <summary>Whom a mob may fight: your party, or a sim in the world that came for it (Phase 5.3a).</summary>
         public Actor CombatActor(string id) { return PartyActor(id) ?? SimPopulation.Active?.FighterActor(id); }
         public bool IsLivingCombatant(string id) { var a = CombatActor(id); return a != null && a.IsAlive; }
+        /// <summary>
+        /// A roamer's loop (Chris, 2026-10-15: "need mobs patrolling more instead of just standing in one spot"): in every other open-air camp
+        /// of two or more, its last mob walks five points on a ring well outside the camp (two and a half times its radius and 6 m more),
+        /// there and back, each point on the walkable ground; its own dice, so no other spawn moves. Null if fewer than three points stand.
+        /// </summary>
+        Vector3[] RoamLoop(Crulanda.World.ZoneCamp camp, int c)
+        {
+            var r = new System.Random(c * 7919 + (Zone.Zone.id ?? "").Length * 104729 + 17);
+            float ring = camp.radius * 2.5f + 6, turn = (float)r.NextDouble() * Mathf.PI * 2;
+            var points = new List<Vector3>();
+            for (int k = 0; k < 5; k++)
+            {
+                float a = turn + k * Mathf.PI * 2 / 5 + ((float)r.NextDouble() - .5f) * .5f, reach = ring * (.8f + (float)r.NextDouble() * .4f);
+                var p = Zone.StandAt(camp.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * reach, float.NegativeInfinity, 1);
+                if (NavMesh.SamplePosition(p, out var hit, 3, NavMesh.AllAreas)) points.Add(hit.position);
+            }
+            if (points.Count < 3) return null;
+            points.Add(points[0]);   // round the loop and back the same way (EncounterEnemy walks a road back and forth)
+            return points.ToArray();
+        }
         /// <summary>A sim worked a node: it rests until its respawn as if you had (nothing comes to you).</summary>
         public NodeDef SimGathered(Crulanda.World.ZoneInteractable i)
         {

@@ -173,5 +173,26 @@ namespace Crulanda.Encounter
             if (GUI.Button(new Rect(box.xMax - 128, box.y + 16, 100, 30), "Done", slim)) displayOpen = false;
             Shadow(new Rect(box.x + 28, box.y + 316, 450, 20), "Full screen is always your monitor's own size; the window size is for a window.", tiny, new Color(.85f, .85f, .8f));
         }
+        static bool soundOpen;
+        /// <summary>The sound panel (Chris, 2026-10-15: "need to be able to mute/adjust sliders for music, sounds, enviromental sounds,
+        /// combat music, etc."): a slider and a mute for each of AudioMix's channels; changes are heard at once and kept.</summary>
+        void DrawSound()
+        {
+            var chans = Crulanda.World.AudioMix.All;
+            var box = new Rect(470, 200, 500, 120 + 48 * chans.Length); Frame(box);
+            GUI.Label(new Rect(box.x + 28, box.y + 16, 400, 34), "SOUND", heading);
+            for (int i = 0; i < chans.Length; i++)
+            {
+                var c = chans[i]; float y = box.y + 74 + 48 * i; bool muted = Crulanda.World.AudioMix.Muted(c);
+                Shadow(new Rect(box.x + 28, y + 4, 140, 24), Crulanda.World.AudioMix.Label(c), tiny, muted ? new Color(.6f, .6f, .6f) : Color.white);
+                float now = Crulanda.World.AudioMix.Level(c);
+                float v = GUI.HorizontalSlider(new Rect(box.x + 170, y + 10, 180, 20), now, 0, 1);
+                if (Mathf.Abs(v - now) > .005f) Crulanda.World.AudioMix.SetLevel(c, Mathf.Round(v * 20) / 20);
+                Shadow(new Rect(box.x + 360, y + 4, 50, 24), Mathf.RoundToInt(Crulanda.World.AudioMix.Level(c) * 100) + "%", tiny, new Color(1, .84f, .45f));
+                if (GUI.Button(new Rect(box.x + 412, y, 66, 30), muted ? "Unmute" : "Mute", slim)) Crulanda.World.AudioMix.SetMuted(c, !muted);
+            }
+            if (GUI.Button(new Rect(box.xMax - 128, box.y + 16, 100, 30), "Done", slim)) soundOpen = false;
+            Shadow(new Rect(box.x + 28, box.yMax - 36, 450, 20), "Master sets them all; muting one leaves its level as it was.", tiny, new Color(.85f, .85f, .8f));
+        }
     }
 }

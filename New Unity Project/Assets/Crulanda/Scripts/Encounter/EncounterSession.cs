@@ -599,16 +599,28 @@ namespace Crulanda.Encounter
             if (got > 0) FloatText(i.position, "+" + got + " " + ItemName(def.item), new Color(.86f, .95f, .66f));
             bool quest = QuestUse(i);
             if (got == 0 && !quest) { if (why != null) Message(why); return false; }   // nothing went in and no quest took it: the node stays
-            RestNode(i, def.respawn);
+            RestNode(i, NodeRespawn(def));
             Save(false);
             return got > 0;
         }
-        /// <summary>A worked node rests: it cannot be used until then, and its part (or all of it) is hidden until it comes back.</summary>
+        /// <summary>
+        /// How long a worked node stays gone (Chris, 2026-10-15: "when a node is harvest it needs to disappear for a certain amount of
+        /// time. i guess it depends on population"): its own respawn with nobody else about, shorter the more people are in the zone
+        /// (the sims here and online, and your party): half with ten, two fifths at most from fifteen on.
+        /// </summary>
+        public float NodeRespawn(NodeDef def)
+        {
+            int people = (SimPopulation.Active != null ? SimPopulation.Active.Figures.Count : 0) + PartySims.Count;
+            return NodeRespawn(def.respawn, people);
+        }
+        public static float NodeRespawn(float respawn, int people) { return respawn * Mathf.Max(.4f, 1f / (1 + Mathf.Max(0, people) / 10f)); }
+        /// <summary>A worked node rests: it cannot be used until then, and the whole of it (the seam's rock too, the fallen trunk)
+        /// is gone until it comes back.</summary>
         void RestNode(Crulanda.World.ZoneInteractable i, float seconds)
         {
             if (seconds <= 0 || Zone == null) return;
             i.hiddenUntil = Time.time + seconds; nodeReadyAt[i.Key(Zone.Zone.id)] = i.hiddenUntil;
-            var hide = i.part != null ? i.part : i.root;
+            var hide = i.root != null ? i.root : i.part;
             if (hide != null) StartCoroutine(HideFor(hide, seconds));
         }
         bool nodesRested;
@@ -1763,7 +1775,7 @@ namespace Crulanda.Encounter
         public NodeDef SimGathered(Crulanda.World.ZoneInteractable i)
         {
             if (i == null || i.node == null || Professions == null || Zone == null) return null;
-            var def = Professions.Db.Node(i.node); if (def != null) RestNode(i, def.respawn);
+            var def = Professions.Db.Node(i.node); if (def != null) RestNode(i, NodeRespawn(def));
             return def;
         }
         // Timed for the performance probe (playtest note 23).

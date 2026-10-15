@@ -74,7 +74,10 @@ namespace Crulanda.Encounter
         void Update()
         {
             if (session == null || session.Paused) return;
-            if (!actor.IsAlive || !session.Player.IsAlive)
+            // While you are down she fights on if the party is still in a fight (2026-10-15: mobs no longer reset when you fall while a
+            // party member is near them; she had stood idle, "Recovering", while they turned on her).
+            bool partyFighting = !session.Player.IsAlive && session.Enemies.Exists(e => e != null && e.actor.IsAlive && e.Victim != null && e.Victim.IsAlive && session.PartyNear(e));
+            if (!actor.IsAlive || (!session.Player.IsAlive && !partyFighting))
             {
                 abilities.Interrupt(); castingTarget = null; Activity = "Recovering";
                 if (agent.isOnNavMesh) agent.isStopped = true;
@@ -111,7 +114,7 @@ namespace Crulanda.Encounter
             }
             // Whom to mend: the most hurt of the party within reach: you, herself, the sims in your party (Chris, 2026-10-09: "Mira not
             // healing a sim in our party"), and Mother Quillet on her way to the lock (D4). You, when it is even.
-            var recipient = session.Player;
+            var recipient = session.Player.IsAlive ? session.Player : actor;   // you down: herself first, then the most hurt of the party
             void Consider(Actor who) { if (who != null && who.IsAlive && who.Health.Pool.Ratio < recipient.Health.Pool.Ratio && Vector3.Distance(who.transform.position, transform.position) <= heal.range) recipient = who; }
             Consider(actor);
             foreach (var c in session.PartySims) if (c != null) Consider(c.actor);

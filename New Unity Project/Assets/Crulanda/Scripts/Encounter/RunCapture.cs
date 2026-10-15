@@ -196,7 +196,7 @@ namespace Crulanda.Encounter
                 if (dist > reach)
                 {
                     if (Time.time >= pathAt || pathGoal != goal) { pathAt = Time.time + .5f; pathGoal = goal; if (path == null) path = new NavMeshPath(); NavMesh.SamplePosition(goal, out var g, 3, NavMesh.AllAreas); NavMesh.CalculatePath(me, g.hit ? g.position : goal, NavMesh.AllAreas, path); }
-                    var step = to; if (path != null && path.corners.Length > 1) { int ci = 1; while (ci < path.corners.Length - 1 && Vector3.Distance(new Vector3(path.corners[ci].x, 0, path.corners[ci].z), new Vector3(me.x, 0, me.z)) < 1.2f) ci++; step = path.corners[ci] - me; step.y = 0; }
+                    var step = to; if (path != null && path.corners.Length > 1) { int ci = 1; while (ci < path.corners.Length - 1 && Vector3.Distance(new Vector3(path.corners[ci].x, 0, path.corners[ci].z), new Vector3(me.x, 0, me.z)) < .45f) ci++; step = path.corners[ci] - me; step.y = 0; }   // each corner taken, not cut (at 1.2 m the bot cut the decks' turns and stepped off their open junctions: adit-final3, a wipe at Vosk)
                     if (step.sqrMagnitude < .01f) step = to;
                     motor.SetView(Mathf.Atan2(step.x, step.z) * Mathf.Rad2Deg, 14, 7); EncounterInput.Scripted = Vector2.up;
                 }

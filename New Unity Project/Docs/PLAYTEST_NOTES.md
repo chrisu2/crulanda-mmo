@@ -752,3 +752,7 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 217 (02:50, the Nerve panel at 97 / 100 out of combat) "goes up and down from 90-100..never reset to 0 and should not fill up until i
   start fighting" (the class's resting regeneration, 12 a second, refilled what the drain took. The Scoundrel has none now: Nerve fills
   only in a fight and drains to 0 after. OPEN.)
+- 218 (03:00, the Sealed Adit's yard with the party and two Sandthrone pickets at the mouth) "outside the cave is very slow and laggy"
+  (not yet known why. The Adit camera tour now times the yard's view with each suspect off in turn: shadows, the point lights, the grass,
+  each big group of the zone's scenery (the caves behind the hill among them), and Unity's counters: adit-perf.txt beside the frames.
+  OPEN.)

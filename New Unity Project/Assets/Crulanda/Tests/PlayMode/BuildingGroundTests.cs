@@ -62,7 +62,7 @@ namespace Crulanda.Tests
         /// <summary>
         /// A wall face in the footing's own face flickers stone and wood as the camera moves (Chris, 2026-10-14 19:45 and 2026-10-15,
         /// note 216: the walk-in barns' boards). The footing's face on each side is its coping's outermost vertex less the coping's
-        /// 5 cm; any other mesh's vertex within 1.5 cm of that plane, inside the footing's height and run, is a face in it. Null if none.
+        /// 5 cm; another mesh's triangle lying in that plane, inside the footing's height and run, is a face in it. Null if none.
         /// </summary>
         static string FlushWithFooting(Transform t, Transform footing)
         {
@@ -72,16 +72,24 @@ namespace Crulanda.Tests
             foreach (var v in coping.GetComponent<MeshFilter>().sharedMesh.vertices) { var l = L(coping, v); px = Mathf.Max(px, l.x); nx = Mathf.Min(nx, l.x); pz = Mathf.Max(pz, l.z); nz = Mathf.Min(nz, l.z); top = Mathf.Max(top, l.y); }
             foreach (var v in footing.GetComponent<MeshFilter>().sharedMesh.vertices) foot = Mathf.Min(foot, L(footing, v).y);
             px -= .05f; nx += .05f; pz -= .05f; nz += .05f;
+            // A face in the footing's: a triangle lying in its plane (all three corners within 1.5 cm of it, facing out along it, a
+            // hand's breadth or more), inside the footing's height and run. A beam or a rubble stone crossing the plane is not one.
             foreach (var mf in t.GetComponentsInChildren<MeshFilter>())
             {
                 if (mf.transform == footing || mf.transform == coping || mf.sharedMesh == null || !mf.sharedMesh.isReadable) continue;
                 var r = mf.GetComponent<Renderer>(); if (r == null || !r.enabled) continue;
-                foreach (var v in mf.sharedMesh.vertices)
+                var vs = mf.sharedMesh.vertices; var tris = mf.sharedMesh.triangles; var lv = new Vector3[vs.Length];
+                for (int i = 0; i < vs.Length; i++) lv[i] = L(mf.transform, vs[i]);
+                for (int i = 0; i + 2 < tris.Length; i += 3)
                 {
-                    var l = L(mf.transform, v); if (l.y < foot || l.y > top - .1f) continue;
-                    bool inX = l.x > nx + .02f && l.x < px - .02f, inZ = l.z > nz + .02f && l.z < pz - .02f;
-                    if ((Mathf.Abs(l.x - px) < .015f || Mathf.Abs(l.x - nx) < .015f) && inZ) return "'" + mf.name + "' has a face in its footing's side (x " + l.x.ToString("0.00") + ")";
-                    if ((Mathf.Abs(l.z - pz) < .015f || Mathf.Abs(l.z - nz) < .015f) && inX) return "'" + mf.name + "' has a face in its footing's front or back (z " + l.z.ToString("0.00") + ")";
+                    Vector3 a = lv[tris[i]], b = lv[tris[i + 1]], c = lv[tris[i + 2]];
+                    var n = Vector3.Cross(b - a, c - a); float area = n.magnitude / 2; if (area < .01f) continue; n /= 2 * area;
+                    var mid = (a + b + c) / 3; if (mid.y < foot || mid.y > top - .1f) continue;
+                    bool In(float x, float plane) { return Mathf.Abs(x - plane) < .015f; }
+                    if (Mathf.Abs(n.x) > .95f && mid.z > nz + .02f && mid.z < pz - .02f)
+                        foreach (var plane in new[] { px, nx }) if (In(a.x, plane) && In(b.x, plane) && In(c.x, plane)) return "'" + mf.name + "' has a face in its footing's side (x " + plane.ToString("0.00") + ")";
+                    if (Mathf.Abs(n.z) > .95f && mid.x > nx + .02f && mid.x < px - .02f)
+                        foreach (var plane in new[] { pz, nz }) if (In(a.z, plane) && In(b.z, plane) && In(c.z, plane)) return "'" + mf.name + "' has a face in its footing's front or back (z " + plane.ToString("0.00") + ")";
                 }
             }
             return null;

@@ -191,7 +191,7 @@ namespace Crulanda.Tests
                         var p = h.At(along, aside); if (!h.FloorAt(new Vector2(p.x, p.z), out float fy)) continue;
                         if (!NavMesh.SamplePosition(new Vector3(p.x, fy + .2f, p.z), out var hit, 1f, NavMesh.AllAreas)) continue;
                         total++;
-                        if (haveStart && NavMesh.CalculatePath(sh.position, hit.position, NavMesh.AllAreas, regionPath) && regionPath.status == NavMeshPathStatus.PathComplete) { reached++; got.Add(hit.position); } else lost.Add(hit.position);
+                        if (haveStart && !float.IsPositiveInfinity(NavReach.Length(sh.position, hit.position))) { reached++; got.Add(hit.position); } else lost.Add(hit.position);   // leg by leg: one search gives up part way (21:12)
                     }
                 }
                 string ext = lost.Count == 0 ? "-" : "x " + lost.Min(v => v.x).ToString("0") + ".." + lost.Max(v => v.x).ToString("0") + ", z " + lost.Min(v => v.z).ToString("0") + ".." + lost.Max(v => v.z).ToString("0") + "; " + string.Join(" ", lost.Take(4).Select(v => v.ToString("0")));

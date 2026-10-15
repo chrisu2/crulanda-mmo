@@ -43,7 +43,9 @@ namespace Crulanda.Tests
                 for (int i = 1; i < path.corners.Length; i++) total += Vector3.Distance(path.corners[i - 1], path.corners[i]);
                 if (path.status == NavMeshPathStatus.PathComplete) return total;
                 var end = path.corners[path.corners.Length - 1];
-                if ((end - from).sqrMagnitude < 1 || (end - to).sqrMagnitude >= (from - to).sqrMagnitude - .25f) return float.PositiveInfinity;
+                // Each leg must get somewhere (not: nearer as the crow flies; a leg round the Gallery or down a winding drift ends farther
+                // off than it began, and the search gave up on the whole reworked Adit for that: the floor map of 2026-10-14 21:12).
+                if ((end - from).sqrMagnitude < 1) return float.PositiveInfinity;
                 from = end;
             }
             return float.PositiveInfinity;

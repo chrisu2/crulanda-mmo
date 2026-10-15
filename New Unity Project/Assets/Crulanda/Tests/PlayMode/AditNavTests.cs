@@ -104,12 +104,15 @@ namespace Crulanda.Tests
                 if (e == null || !e.Camp || e.Game) continue; n++;
                 if (e.MobName == EncounterSession.NixName) continue;   // a rider: Nix sits in the Rock-Eater's saddle, up off the floor
                 if (!NavMesh.SamplePosition(e.transform.position, out var at, 4f, NavMesh.AllAreas)) { bad.Add(e.Name + " at " + e.transform.position.ToString("0.0") + ": off the mesh"); continue; }
-                if (!NavMesh.CalculatePath(start.position, at.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete)
+                // NavReach.Length walks the search leg by leg: one CalculatePath from the yard gives up part way through the drawn-out dungeon
+                // and called every far camp unreachable (the floor map, 2026-10-14 21:12).
+                if (float.IsPositiveInfinity(NavReach.Length(start.position, at.position)))
                 {
+                    NavMesh.CalculatePath(start.position, at.position, NavMesh.AllAreas, path);
                     // Up on a ledge it can come down from (a one-way drop: the Ember Vent's chapel, the lava ledge): pulled, it comes to the party
                     // (the evening run's 47:28 frame), so that is a way to it.
                     var back = new NavMeshPath();
-                    if (NavMesh.CalculatePath(at.position, start.position, NavMesh.AllAreas, back) && back.status == NavMeshPathStatus.PathComplete) { ledges++; continue; }
+                    if (!float.IsPositiveInfinity(NavReach.Length(at.position, start.position))) { ledges++; continue; }
                     var near = path.corners.Length > 0 ? path.corners[path.corners.Length - 1] : start.position;   // as near as a path comes
                     bad.Add(e.Name + " at " + e.transform.position.ToString("0.0") + ": no way there (" + path.status + "; the nearest reachable " + near.ToString("0.0") + ", " + Vector3.Distance(near, at.position).ToString("0.0") + " m off, " + (at.position.y - near.y).ToString("0.0") + " m up; " + WalkableNear(at.position, start.position) + ")");
                 }

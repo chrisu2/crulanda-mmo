@@ -193,7 +193,7 @@
         "side.adit.pressed"
       ],
       "canonStatus": "CANON-EXPANDED: the goblins and the locks they hum open are CANON (the Weavers of the Warrens); Mother Quillet, the carriage's resonance lock and the walk down the platform are GAME-ONLY.",
-      "summary": "Mother Quillet, the eldest of the pressed goblins, went down to the Rail Hall instead of running. Have the freed goblins open the platform gate quietly, then walk her down to the carriage and keep the Company off her while she matches its lock.",
+      "summary": "Mother Quillet, the eldest of the pressed goblins, went down to the Rail Hall instead of running. Have the freed goblins open the platform gate quietly, then walk her down to the carriage and keep the Company off her while she matches its lock. With the lock matched (or Rail-Captain Danner dead on his barge, down the line in the Black Cove) the goblins will walk the carriage up the line and you with it.",
       "offer": "Pib is where you left him, behind the barrels, but he is not hiding now. He is packing a very small bag. \"She went down. Old Quillet. I knew she would.\" He pulls the strap tight with his teeth.\n\n\"There's a lock on that carriage, a singing lock, and she's the only one of us old enough to know its note. Every stone they load is somebody's memory, cut out of the mountain and sold south. She'll match the lock and let them go, if the Company lets her live long enough.\" He looks up at you. \"Our people will open the gate at the bottom for you, quiet, and she'll be waiting by it. Walk her down. Don't let her stop to think. She hates that.\"",
       "progress": "\"Is she still down there? Then go back down. I'll not sleep till you do.\"",
       "complete": "Pib hears it all with his whole face again. When you tell him the stones went dark he sits down on the bag he packed. \"Let go. All of them.\" He wipes his nose on his wrist. \"She'll be insufferable now. She was insufferable before.\"\n\nHe presses a fistful of small coins into your hand, warm from his pocket. \"From the Warrens. Everyone that's left put something in.\"",
@@ -413,13 +413,13 @@
         "side.adit.toll"
       ],
       "canonStatus": "CANON-EXPANDED: the mag-rail south under the range (book2 ch.19) and the Sandthrone (world_bible) are CANON; the Rail Hall, the carriage, Sorrel and Danner are GAME-ONLY.",
-      "summary": "The geodes go south on the old mag-rail, from a hall at the bottom of the Sealed Adit. Go down to the Rail Hall and stop the carriage: bring down Quartermaster Brannigan Sorrel and Rail-Captain Orsk Danner.",
+      "summary": "The geodes go south on the old mag-rail, from a hall at the bottom of the Sealed Adit. Go down to the Rail Hall and stop the carriage: bring down Quartermaster Brannigan Sorrel there, and Rail-Captain Orsk Danner on his ore barge in the Black Cove, where the dead line runs on to the water.",
       "offer": "Yara has a map of the pass spread on her counter, the old kind, with the mine-workings inked under it in red. She has her finger on a line that runs south off the bottom of the page. \"The old line. Everyone knows it's dead. The Company said so, the year they bricked the adit.\"\n\n\"It isn't dead. It's how two hundred geodes a week go south without passing my counter or anyone's.\" She rolls the map up. \"Somewhere at the bottom of that mine there's a carriage, and a quartermaster loading it, and a captain riding it. Stop it. I'll find you something worth the walk. I've a few pieces put by that I can't sell on this pass without questions.\"",
       "progress": "\"Still running, is it? I can hear it, some nights. Or I think I can.\"",
       "complete": "Yara hears you out, then goes to the back of the shop and comes out with three things wrapped in sacking. \"I've been keeping these for someone. Take your pick, and don't tell me where you'll carry it.\"\n\nShe sits. \"No carriage. So no geodes south, and no Company pay this winter, and fifty hungry mercenaries on my pass.\" She laughs, short. \"That'll be interesting. Find out who that letter's for. Someone up the chain is going to want their money.\"",
       "steps": [
         {
-          "text": "Go down past the singing door at the Singing Gallery's north end (its three sockets want the rail sigils) to the Rail Hall at the bottom of the Sealed Adit. Bring down Quartermaster Brannigan Sorrel and Rail-Captain Orsk Danner on his carriage.",
+          "text": "Go down past the singing door at the Singing Gallery's north end (its three sockets want the rail sigils) to the Rail Hall at the bottom of the Sealed Adit. Bring down Quartermaster Brannigan Sorrel in the Rail Hall, then follow the Dead Line on into the Black Cove and bring down Rail-Captain Orsk Danner on the stern castle of his ore barge.",
           "objectives": [
             {
               "type": "kill",
@@ -435,7 +435,7 @@
               "target": "mob.railcaptain.adit.*",
               "count": 1,
               "text": "Rail-Captain Orsk Danner",
-              "say": "Danner goes over the carriage's rail and does not get up. The geodes in their crates flicker, and go on glowing."
+              "say": "Danner goes down on the planks of his stern castle and does not get up. In the barge's waist the geodes in their crates flicker, and go on glowing."
             },
             {
               "type": "collect",

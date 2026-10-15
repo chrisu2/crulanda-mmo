@@ -967,6 +967,7 @@ The work:
 - Save backed up. A lane B group run with --crulanda-run-events, timed against 60-75 minutes, with the scorecard; frames to Chris.
 
 ### S6. The Deadmines end-piece (last, cuttable; only if Q3 is yes)
+Built 2026-10-15 on branch `adit-cove` (Q3 "Build the Cove"): section 20 says what was made and what Unity must run.
 - D grows the Dead Line and the Black Cove (quay, scaffold, barge, stern castle decks; swim water).
 - NEW EncounterSession.Haul.cs and AditHaul.cs (E5); netters' Weighted Net; bargemen.
 - Danner stays in the Rail Hall and keeps rising in the Weaver escort until the Cove's own group run passes. Only then:
@@ -1287,6 +1288,117 @@ the dungeon assedt not just plain walls and arch") and of the Scriptorium's door
   boxed over the slot would fake one but shows its sill; not done). Commit e7f5f6a1; proven by R118's tour frame, not yet by Chris.
 - The chapel's tour shot (R116's frame 19 was a pink close-up: the camera at 4.5 m up stood in a wall) now from 9 m up by the east door.
 
+
+## 20. S6 as built: the Cove (2026-10-15; branch `adit-cove` off `adit-rework`; WRITTEN, compiled outside Unity, not run in Unity, OPEN)
+Chris, 2026-10-15 (the question prompt, verbatim): Q3 "Build the Cove"; Q2 "Keep ~75 min (Recommended)". All of it **GAME-ONLY** (the
+Sandthrone are CANON; the old line is CANON-EXPANDED, book2 ch.19); the Deadmines' ship in its cove is a lesson in shape only, nothing
+copied. **No machine of any kind** (memory rule, "i told you NO Machines!"): rails, timber, rope, rubble and hands. No save-format change.
+
+**What was made:**
+- **Two caves** (`tools/wip/dungeon/adit_layout.py`; `--live` wrote `Zones/adit.json`, the staged copy matches):
+  - **The Dead Line** (style `deadline`, 182 m): out of the Rail Hall's far end, west. A rail tunnel, -100 to -114, two sidings.
+  - **The Black Cove** (style `cove`, 200 m): off the Dead Line's end, a beach of black scree down into a natural cave 88 m across and 36
+    high. Black water wall to wall (`caveWater` flood, 2.6 m over a floor 121 m under the yard: swum, not walked).
+  - 20 caves, about 3.24 km (was 2.86).
+- **Ten decks** (the plan's section 3, D4):
+  - the quay along the west wall (water +0.8, railed on the water side);
+  - the scaffold: tier 1 (quay +2.2, its ramp at the north end), tier 2 (+3.4, its ramp at the south end);
+  - the gangway from tier 2 onto the barge;
+  - the ore barge (35 m of deck at water +4.2, a solid plank hull from the floor);
+  - the stern castle (10 m at +7.5, so the barge is 45 m) and its stair up the barge's east side;
+  - the scree landing stage at the quay's south end, where a swimmer climbs out.
+  - Check 6 lets a deck's end stop in the open on purpose (`free=`: the barge's bow, the castle's ends).
+- **Anchors:** `carriage` (where the carriage stood, 14 m short of Danner's old camp, so the Weaver's lock, waves and mules do not move),
+  `cove`, `haul`, `bollards north`, `bollards south`, `barge bow`, `stern castle`, `drain`.
+- **Camps** (after every camp of the rework, so none before them moves; only the patrols and the Quiet Miner move on six places):
+  - Danner (pinned 16) and his guard (15) on the stern castle, wing `cove`, step 5;
+  - the Siding rearguard (3 dockers, the Dead Line's first siding, step 1);
+  - Rope team (north) and Rope team (south) (3 Sandthrone bargemen each, on the quay, steps 2 and 4);
+  - the Harbour netters (3, on tier 1, step 3);
+  - Up from the hold (first) and (second) (2 bargemen each, released by `event:haul1` and `event:haul2`).
+  - The Rail Hall's Siding dockers are optional now (time, Q2).
+  - 103 camps, 244 mobs. Wing `cove` comes after `deep`. Two scaffold caches (secrets `scaffold_a`, `scaffold_b`). Two places on the map.
+  - One switch: `COVE_FINALE` in the layout (True here). False writes the zone as it was before S6. Then revert the two quest texts below.
+- **The dressing** (`ZoneBuilder.Adit.cs`, `DeadLine()` and `BlackCove()`):
+  - the Dead Line: rails, cold lamps, a spare wagon and stacked sleepers at each siding, the buffer-stop, and the spare wagon at the line's
+    end (a second "carriage": the way home from the Cove is not the walk back, lesson L2);
+  - the Cove: lantern posts on the quay, three timber bollards to a group, and the warps from them to the barge's bow and stern
+    (`ZoneBuilder.CoveWarps`, and "Cut the warps" at the north bollards);
+  - the barge: iron bands down her hull, the hold's hatch, geode crates under a violet glow, racked oars, her stem post, a long steering
+    sweep, a lantern on the stern castle; the drain's dark mouth at the south end.
+- **The Haul** (E5, `EncounterSession.Haul.cs`, `AditHaul.cs`):
+  - The barge lies aground on the bar beside the scaffold. Two rope teams heave her off, hand over hand round the bollards.
+  - It starts when you come onto the quay (26 m of the `haul` anchor) or a hauler is struck.
+  - It goes on only while bargemen are on the ropes (alive, not fighting, within 8 m of their place), at the share of them still hauling:
+    75 s with all six.
+  - Every hauler dead, or the warps cut (E at the bollards, with nobody on that rope), and she stays fast.
+  - Floated, each of Danner's calls (the pull, and his "More." at half) brings two of her crew up out of the hold (`HaulCall` from
+    `Rally`), twice a visit at most.
+  - Nothing is saved.
+  - (This is the task's "the barge hauled by rope teams". The plan's older E5 had the haulers drag the carriage down the line. That would
+    take the ride-out carriage away, so the barge is hauled instead.)
+- **The netters' Weighted Net:** `MobCast` kind `net` (new fields `cc`, `seconds`, `area`). A 1.8 s cast, every 14 s, up to 18 m. It roots
+  everyone of the party within 4 m of its target for 3 s. Interrupting the cast stops it.
+- **Danner** (`CoveFinale`: true when his camp stands in a cave of style `cove`; read from the data):
+  - he no longer lies hidden for the Weaver's escort, and does not rise at half the lock (`StartWeaver`, `WeaverHalfway`);
+  - he fights on the stern castle with his guard;
+  - `RideAllowed`: the lock matched, **or** Danner dead this visit (`DannerDead`). The ride's refusal says where he is.
+- **Quest text** (`Quests/adit.json`):
+  - The Dead Line: Sorrel in the Rail Hall, Danner on the stern castle of his barge; his death line.
+  - The Weaver's Lock: one sentence in its summary (the lock, or Danner dead, frees the carriage).
+- **Found on the way and fixed (its own commit):** `ZoneBuilder.DeckBlock`'s position and turn had stood inside a trailing comment since
+  cbc484dc (2026-10-14 20:11).
+  - So every deck's post, rail and solid body block was built at the Decks root's origin, not where it belongs. The R97-R99 fight with
+    "the body blocks did not take it" under Lusk's stage was likely this.
+  - The tour lamp's colour and shadows were the same mistake.
+  - **This changes every deck in the Adit** (rails and posts now block where they stand): run the nav tests below before reading anything
+    else.
+
+**Time (Q2, keep about 75 minutes), at evening-3's pace:**
+- What it adds:
+  - about 0.4 km more walking, about 2.5 minutes;
+  - four more trash fights (the rearguard, two rope teams, the netters), about 3 minutes;
+  - Danner's fight moves; it is not added.
+- What it takes off:
+  - the Siding dockers are optional (about 0.75 minutes);
+  - the spare wagon at the line's end saves the walk back up the Dead Line to the carriage.
+- **Net: about +5 minutes.** The required run goes from about 68 to about 73 minutes; the default run from about 75 to about 80.
+- To come back to 75: make the Rail Hall's Platform guards optional, or make the two rope teams one fight. Each saves about 45 s. Not done
+  without Chris.
+
+**Untested (nothing here has run in Unity):**
+- the navmesh over the quay, scaffold, gangway, barge and castle;
+- the flood's swim area round the barge's hull;
+- the warps' and crates' places;
+- the haul's timing at 75 s against a real party;
+- whether the haulers' working pose reads;
+- the netters' net in a fight;
+- the hold's crew on the barge's deck;
+- the carriage anchor reproducing the old carriage place exactly;
+- whether the run's planner takes the Cove last;
+- the drain's mouth;
+- the time.
+
+**What Unity must run (lane A, one job at a time; then lane B for the frames):**
+- EditMode:
+  - `AditDataTests` (haul events, the run ends in the Cove);
+  - `SocialRulesTests` (the `bargeman` and `netter` tags);
+  - `DungeonPlanTests`, `QuestDataTests`, `LootDataTests`, `EliteBalanceTests`.
+- PlayMode, in this order:
+  - `AditNavTests` and `AditNavDiagnostics` (the DeckBlock fix touches every deck, then the Cove's decks);
+  - `AditCoveTests` (new, five tests: the Cove walked from the Rail Hall and its water swum; the haul run and floated; stopped by its
+    haulers or the warps cut; Danner on his stern castle and his loot; the carriage on the lock or his death, and the spare wagon);
+  - `AditWeaverTests` (updated: Danner keeps his barge, no rise);
+  - `AditTests` (every camp where it stands, deck camps on their decks);
+  - `AditGateTests`, `AditReleaseTests`, `AditCaveBuildTests`, `MobBehaviourTests`, `BossPhaseTests`.
+- The Adit camera tour (`--crulanda-adit-tour <dir> --crulanda-zone zone.adit --crulanda-temp-save`): the four new frames
+  - `dead-line`;
+  - `black-cove` (from the beach);
+  - `ore-barge` (from the quay);
+  - `stern-castle` (along the barge's deck);
+  - and front, back and side frames of the barge for Chris.
+- Then the Cove's own group run (`group_run.ps1`, the Adit, events on). Only when it passes does `adit-cove` merge into `adit-rework`
+  (the plan's "until the Cove's own group run passes": the branch is that gate; `COVE_FINALE = False` is the way back).
 
 ## 21. S7 as built: the polish (2026-10-15, branch `adit-polish` off `adit-rework`; MADE and compiled, not run in Unity, OPEN)
 Chris's answers of 2026-10-15 (verbatim): Q4 "Yes, add them"; Q1 "20 minute respawn" (done before this, 1200 s); Q2 "Keep ~75 min";

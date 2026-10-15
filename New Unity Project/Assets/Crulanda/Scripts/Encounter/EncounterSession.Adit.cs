@@ -35,6 +35,7 @@ namespace Crulanda.Encounter
             StartEvents();   // (the Adit rework) the Wake, started where its anchor is reached once its wing is open (EncounterSession.Release.cs)
             StartGreySeep();   // (S7) the Grey Spreads' lines across the Breach (EncounterSession.GreySpread.cs)
             StartSwingLoads();   // (S7) the Foundry's swing-loads and their rope teams (AditSwingLoad)
+            StartHaul();     // (S6) the barge aground in the Black Cove and the rope teams on her warps (EncounterSession.Haul.cs)
             // The pressed goblins in their cages, and the doors of those opened before standing open (playtest note 125).
             foreach (var i in Zone.Interactables)
             {
@@ -165,7 +166,8 @@ namespace Crulanda.Encounter
                 case "powder": return CarryingPowder ? "Powder on your shoulder" : null;
                 case "stone": return Progress.spiritStones.Contains(i.Key(Zone.Zone.id)) ? "The spirit stone hums" : i.prompt;
                 case "weaver": return Weaver != null && Weaver.Now == AditWeaver.Stage.Waiting ? "Talk to " + AditWeaver.Name + " (walk her to the carriage)" : i.prompt;
-                case "carriage": return Progress.keys.Contains(WeaverLock) ? i.prompt + " (one ride out)" : "The carriage is loading: its lock still sings";
+                case "carriage": return RideAllowed ? i.prompt + " (one ride out)" : "The carriage is loading: its lock still sings";
+                case "warps": return Haul == null || Haul.Now == AditHaul.Stage.Stopped || Haul.Now == AditHaul.Stage.Floated ? null : i.prompt;   // (S6)
                 default: return null;
             }
         }
@@ -188,6 +190,7 @@ namespace Crulanda.Encounter
                 case "stone": TouchStone(i); return true;
                 case "weaver": TalkToWeaver(); return true;
                 case "carriage": RideCarriage(); return true;
+                case "warps": CutWarps(i); return true;   // (S6) the barge's warps at the bollards (EncounterSession.Haul.cs)
                 case "cage":   // the lock is the Company's: without Pib's quest, the goblin only shrinks back (with it, the quest counts it and it opens)
                     if (Quests != null && Quests.State(PressedQuest) != null) return false;
                     Message("The goblin inside flinches back from the bars. The padlock is the Company's: Pib, in the Peaks, knows how these open."); return true;
@@ -276,10 +279,16 @@ namespace Crulanda.Encounter
         /// The ride out (dungeon step D8): with the lock matched, the goblins take the mules' heads and walk the carriage back up the line
         /// to a siding under the Adit yard. E at its step: a few seconds on the bar (moving or a blow stops it, as with any work), then you,
         /// Mira and the sims stand at the yard. Before the lock is matched the carriage is still the Company's. No machines (Chris, 2026-10-11).
+        /// (S6) With Danner's finale in the Black Cove (CoveFinale), his death frees it as well as the lock does (RideAllowed).
         /// </summary>
         void RideCarriage()
         {
-            if (!Progress.keys.Contains(WeaverLock)) { Message("The carriage is loading, its geodes glowing in their crates, and the lock on its side still sings the Company's note. Stop it first: the Weaver knows the way."); return; }
+            if (!RideAllowed)
+            {
+                Message("The carriage is loading, its geodes glowing in their crates, and the lock on its side still sings the Company's note. " +
+                    (CoveFinale ? "Stop it first: the Weaver knows the way, or bring down Danner on his barge in the Black Cove, down the line." : "Stop it first: the Weaver knows the way."));
+                return;
+            }
             if (InCombat) { Message(FightingLine); return; }
             Message("You climb up onto the carriage. Two goblins take the mules' heads, cluck at them, and the wagons creak off up the line.");
             StartWork("Riding the line", RideSeconds, RideOut);

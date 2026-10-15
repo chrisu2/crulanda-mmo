@@ -34,6 +34,16 @@ namespace Crulanda.World
         /// <summary>Where the carriage's two pit mules stand in their traces, up the line from it, and the way they face (the session puts
         /// them there: EncounterSession.Adit). Unset outside the Adit.</summary>
         public Vector3[] RailTeam; public Quaternion RailTeamFacing;
+        /// <summary>(S6, the Black Cove; GAME-ONLY) The barge's warps, rope from the timber bollards on the quay to her bow and her stern castle,
+        /// which the rope teams haul on (EncounterSession.Haul): cut, they go slack and are gone. Null outside the Cove.</summary>
+        public GameObject[] CoveWarps;
+        /// <summary>(S6) The name of the warps' interactable (kind "warps", at the north bollards): "Cut the warps".</summary>
+        public const string AditWarps = "The barge's warps";
+        /// <summary>(S6) The spare ore wagon at the Dead Line's end (kind "carriage", as the Rail Hall's): once the lock is matched or Danner is
+        /// dead the goblins walk you up the line from here too, so the way home from the Cove is not the walk back (lesson L2).</summary>
+        public const string AditSpareWagon = "The spare wagon at the line's end";
+        /// <summary>(S6) The black water's surface in the Cove (its flood), or NaN outside it.</summary>
+        public float CoveWaterLevel = float.NaN;
         /// <summary>The lock matched (D4): the carriage's geodes go dull and their light goes out.</summary>
         public void QuietCarriage()
         {
@@ -60,6 +70,7 @@ namespace Crulanda.World
                 case "vent": case "ashgarden": case "scriptorium": case "musteryard": case "chapel": return new Color(.44f, .34f, .28f);
                 case "breach": return new Color(.55f, .55f, .56f);
                 case "river": return new Color(.47f, .49f, .48f);
+                case "deadline": case "cove": return new Color(.36f, .36f, .38f);   // (S6) the deep rock, nearly black by the water
                 default: return new Color(.54f, .49f, .43f);
             }
         }
@@ -91,6 +102,8 @@ namespace Crulanda.World
                 case "workings": return "workings";
                 case "gallery": return "gallery";
                 case "deep": return "deep";
+                case "deadline": return "deadline";   // (S6) the Dead Line, on from the Rail Hall
+                case "cove": return "cove";           // (S6) the Black Cove
                 default: return "plain";
             }
         }
@@ -101,7 +114,7 @@ namespace Crulanda.World
             {
                 case "geode": case "foundry": return GeodeViolet;
                 case "vent": case "ashgarden": case "scriptorium": case "musteryard": case "chapel": return EmberRed;
-                case "deep": return RailBlue;
+                case "deep": case "deadline": case "cove": return RailBlue;
                 default: return GreyLight;
             }
         }
@@ -617,6 +630,8 @@ namespace Crulanda.World
                 case "workings": MainAdit(true, false, false); break;
                 case "gallery": MainAdit(false, true, false); break;
                 case "deep": MainAdit(false, false, true); break;
+                case "deadline": DeadLine(); break;   // (S6)
+                case "cove": BlackCove(); break;      // (S6)
                 default: MainAdit(true, true, true); break;
             }
             DataGates();   // (the Adit rework) the gates the zone's data puts in this cave: before the floors are filled, which keep clear of gates
@@ -677,7 +692,7 @@ namespace Crulanda.World
                 int lake = part == "vent" ? Named("lake", 26 * X, h.Length - 8 * X) : part == "chapel" ? AnchorRing("lake") : -1;
                 float lakeS = lake >= 0 ? h.Along[lake] : -999, lakeR = lake >= 0 ? LakeRz(lake) + 4 : 0;
                 var rock = Tint(art.stone, AditLining(part) * .55f); var rubbleRock = Tint(art.stone, AditLining(part) * .45f);   // (at .8 they read near white in the cave's light)
-                bool geodes = part == "geode" || part == "foundry", drips = part == "main" || part == "breach" || part == "plain" || part == "workings" || part == "gallery" || part == "deep" || part == "river";
+                bool geodes = part == "geode" || part == "foundry", drips = part == "main" || part == "breach" || part == "plain" || part == "workings" || part == "gallery" || part == "deep" || part == "river" || part == "deadline" || part == "cove";
                 for (float s = 6; s < h.Length - 4; s += 2.2f)
                 {
                     int i = RingAt(s); float half = h.Half[i];
@@ -1423,7 +1438,10 @@ namespace Crulanda.World
                 // The carriage stands where Rail-Captain Danner keeps, 14 m short of his camp as in the first Adit (to - 16 there): drawn
                 // out, "to - 16 * X" put it 38 m from him, past the reach of a mob's leash, and he never came for the Weaver at the lock.
                 var danner = Zone.camps == null ? null : System.Array.Find(Zone.camps, cp => cp != null && cp.cave == h.Name && cp.tag == "railcaptain");
-                float sc = danner != null ? Mathf.Min(danner.along - 14, to - 12) : to - 16 * X; var qc = Along(sc); var car = On(sc, line);
+                // (S6) With Danner on his barge in the Black Cove the layout names the carriage's place ("carriage": where it stood 14 m short of
+                // his old camp), so the lock, the waves and the mules stand where they did.
+                var carAnchor = AnchorIn(h, "carriage");
+                float sc = danner != null ? Mathf.Min(danner.along - 14, to - 12) : carAnchor != null ? Mathf.Min(carAnchor.along, to - 12) : to - 16 * X; var qc = Along(sc); var car = On(sc, line);
                 var boards = Tint(art.timber, new Color(.46f, .33f, .21f));
                 void Wagon(float wz0, float wz1)
                 {
@@ -1478,6 +1496,141 @@ namespace Crulanda.World
                     Crate(On(s, -line * (.5f + A() * .4f)), Along(s), 1 + (int)(A() * 2), A() < .4f);
                 }
                 for (int k = 0; k < 5; k++) { A(); A(); A(); }   // (the steam is gone: it read as white blobs; its draws are kept)
+            }
+
+            // ---------- (S6) the Deadmines end-piece (Docs/ADIT_REWORK.md section 20; Chris 2026-10-15, Q3 "Build the Cove"; GAME-ONLY; the
+            // Deadmines' ship in its cove is a lesson in shape only, nothing of it copied; no machine of any kind: rails, timber, rope, hands) ----------
+            // The Dead Line: the old line on down the tunnel's middle under cold blue lamps; at each siding (where the tunnel widens) a spur of
+            // rail with a spare ore wagon on it and sleepers stacked against the rock; buffers where the line gives out on the Cove's beach.
+            void DeadLine()
+            {
+                int no = 0;
+                for (float s = 8; s < h.Length - 4; s += 16, no++) WallLamp(RingAt(s), no % 2 == 0 ? 1 : -1, RailBlue, 9, .7f);
+                Rails(2, h.Length - 8, 0, .7f);
+                for (int i = 1; i < n - 1; i++)
+                {
+                    if (h.Half[i] < 8.5f || h.Half[i - 1] >= 8.5f) continue;   // the first ring of each wide stretch
+                    int j = i; while (j + 1 < n && h.Half[j + 1] >= 8.5f) j++;
+                    float s = (h.Along[i] + h.Along[j]) / 2, side = -5.2f;
+                    Rails(s - 7, s + 7, side, .55f);
+                    Cart(s + 1.5f, side, false);
+                    var q = Along(s);
+                    for (int k = 0; k < 3; k++)   // sleepers stacked on the far side, three courses
+                    {
+                        var at = On(s - 2, -side) + Vector3.up * (.12f + k * .22f); if (!Free(at)) break;
+                        for (int m = -1; m <= 1; m++) Part(PrimitiveType.Cube, t, at + q * new Vector3(m * .3f, 0, 0), new Vector3(.24f, .2f, 2.4f), dark, q * Quaternion.Euler(0, 90, 0));
+                    }
+                    if (Free(On(s - 2, -side))) Block(On(s - 2, -side), new Vector3(2.6f, .8f, 1.2f), q);
+                    Glow(t, On(s, 0) + Vector3.up * 5, 16, .6f, RailBlue, .6f);
+                }
+                var qe = Along(h.Length - 8); var stop = On(h.Length - 8.5f, 0);   // the buffer-stop at the line's end
+                if (Free(stop))
+                {
+                    Part(PrimitiveType.Cube, t, stop + Vector3.up * .5f, new Vector3(2.2f, 1, .5f), dark, qe);
+                    foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, stop + qe * new Vector3(side * .7f, .6f, -.35f), new Vector3(.3f, .2f, .3f), iron, qe * Quaternion.Euler(90, 0, 0));
+                    Block(stop, new Vector3(2.2f, 1, .5f), qe);
+                }
+                // The spare wagon on the line short of the buffers: the way out from the Cove (EncounterSession.RideCarriage, kind "carriage").
+                Cart(h.Length - 12, 0, false);
+                Interactables.Add(new ZoneInteractable { name = AditSpareWagon, prompt = "Ride the spare wagon up the line", kind = "carriage", position = t.TransformPoint(On(h.Length - 12, 1.9f)) });
+            }
+            // The Black Cove: still black water from wall to wall under a beach of black scree; the quay along the west wall with lantern posts at
+            // its water's edge; the timber bollards and the warps the rope teams haul on (CoveWarps; EncounterSession.Haul); the ore barge, her
+            // plank hull iron-banded, oars racked, the hold's hatch, geode crates lashed along her west side, a long steering sweep over the stern,
+            // a lantern on the stern castle; the drain's dark mouth at the south end, where the water goes out under the range. The decks are the
+            // data's (ZoneBuilder.AditDecks); this is what stands on them, placed from their built middle lines (in the world's frame, under a root
+            // that keeps the world's frame).
+            void BlackCove()
+            {
+                var coveLight = new Color(.42f, .62f, .7f);
+                PlainCave(coveLight);
+                var cw = new GameObject("The Black Cove's works").transform; cw.SetPositionAndRotation(Vector3.zero, Quaternion.identity); cw.SetParent(t, true);
+                foreach (var w in caveWaters) if (w.cave == h && w.kind == 2) CoveWaterLevel = w.level;
+                float level = float.IsNaN(CoveWaterLevel) ? h.At(h.Length * .6f).y + 2.6f : CoveWaterLevel;
+                var tar = Tint(art.timber, new Color(.15f, .11f, .08f)); var ropeMat = Tint(art.hay, new Color(.55f, .47f, .32f));
+                var lanternLight = new Color(1, .7f, .4f);
+                ZoneDeckSpot Deck(string name) { return DeckSpots.Find(d => d.cave == h && d.def != null && d.def.name == name); }
+                Vector3 Fwd(ZoneDeckSpot d, int k) { var f = d.mid[Mathf.Min(d.mid.Length - 1, k + 1)] - d.mid[Mathf.Max(0, k - 1)]; f.y = 0; return f.sqrMagnitude > 1e-6f ? f.normalized : Vector3.forward; }
+                void Lantern(Vector3 foot, float tall)
+                {
+                    Part(PrimitiveType.Cube, cw, foot + Vector3.up * tall / 2, new Vector3(.18f, tall, .18f), tar);
+                    Part(PrimitiveType.Cube, cw, foot + Vector3.up * (tall + .2f), new Vector3(.3f, .38f, .3f), Glowing(lanternLight, 2));
+                    Glow(cw, foot + Vector3.up * (tall + .3f), 12, 1, lanternLight, 1).gameObject.AddComponent<Flicker>();
+                    DeckBlock(cw, foot, new Vector3(.3f, tall, .3f), Quaternion.identity, "lantern post");
+                }
+                // The quay's lantern posts, at its water's edge every 14 m.
+                var quay = Deck("The quay");
+                if (quay != null)
+                    for (int k = 2; k < quay.mid.Length - 2; k += 9)
+                        Lantern(quay.mid[k] - quay.across[k] * (quay.half - .35f), 2.4f);
+                // The bollards (three to a group, along the quay's inner edge) and the warps from them to the barge.
+                var warps = new System.Collections.Generic.List<GameObject>();
+                var barge = Deck("The ore barge"); var castle = Deck("The stern castle");
+                void Bollards(string anchor, Vector3 to)
+                {
+                    if (!Anchors.TryGetValue(anchor, out var at) || quay == null) return;
+                    var f = Fwd(quay, quay.mid.Length / 2);
+                    for (int k = -1; k <= 1; k++)
+                    {
+                        var b = at + f * (k * 1.6f);
+                        Part(PrimitiveType.Cylinder, cw, b + Vector3.up * .45f, new Vector3(.5f, .45f, .5f), tar);
+                        Part(PrimitiveType.Cylinder, cw, b + Vector3.up * .95f, new Vector3(.62f, .06f, .62f), tar);
+                        DeckBlock(cw, b, new Vector3(.55f, .9f, .55f), Quaternion.identity, "bollard");
+                        var from = b + Vector3.up * .75f; var cleat = to + f * (k * .9f); var d = cleat - from; if (d.sqrMagnitude < .5f) continue;
+                        warps.Add(Part(PrimitiveType.Cylinder, cw, (from + cleat) / 2, new Vector3(.08f, d.magnitude / 2, .08f), ropeMat, Quaternion.FromToRotation(Vector3.up, d)));
+                    }
+                }
+                if (barge != null) Bollards("bollards north", barge.mid[0] + barge.across[0] * (barge.half - .6f) + Vector3.up * .6f);
+                if (castle != null) Bollards("bollards south", castle.mid[castle.mid.Length - 1] + castle.across[0] * (castle.half - .6f) + Vector3.up * .6f);
+                CoveWarps = warps.ToArray();
+                if (Anchors.TryGetValue("bollards north", out var cutAt))
+                    Interactables.Add(new ZoneInteractable { name = AditWarps, prompt = "Cut the warps", kind = "warps", position = cutAt });
+                // The barge: iron bands down her hull from the gunwale into the water, the hold's hatch, the geode crates lashed along her west
+                // side under a violet glow, the oars racked along her east rail, her stem post at the bow.
+                if (barge != null)
+                {
+                    int N = barge.mid.Length - 1;
+                    for (int k = 0; k <= N; k += 2)
+                        foreach (int side in new[] { -1, 1 })
+                        {
+                            var edge = barge.mid[k] + barge.across[k] * side * (barge.half + .04f); float bottom = level - .6f, top = barge.mid[k].y - .05f;
+                            Part(PrimitiveType.Cube, cw, new Vector3(edge.x, (top + bottom) / 2, edge.z), new Vector3(.08f, top - bottom, .16f), iron, Quaternion.LookRotation(Fwd(barge, k)));
+                        }
+                    int hatch = Mathf.Min(N, Mathf.RoundToInt(N * .35f));
+                    Part(PrimitiveType.Cube, cw, barge.mid[hatch] + Vector3.up * .03f, new Vector3(2.6f, .06f, 2.6f), tar, Quaternion.LookRotation(Fwd(barge, hatch)));
+                    var geodeLit = Glowing(GeodeViolet, 1.5f);
+                    for (int k = 2; k <= N - 4; k += 3)
+                    {
+                        var q = Quaternion.LookRotation(Fwd(barge, k)); var at = barge.mid[k] + barge.across[k] * (barge.half - .9f);
+                        int high = 1 + k % 2;
+                        for (int m = 0; m < high; m++) Part(PrimitiveType.Cube, cw, at + Vector3.up * (.4f + m * .8f), Vector3.one * .8f, timber, q * Quaternion.Euler(0, m * 9, 0));
+                        for (int g = 0; g < 3; g++) Part(PrimitiveType.Sphere, cw, at + Vector3.up * (high * .8f + .03f) + q * new Vector3((g - 1) * .22f, 0, (g % 2) * .15f), new Vector3(.2f, .15f, .2f), geodeLit);
+                        DeckBlock(cw, at, new Vector3(.9f, .8f * high, .9f), q, "geode crates on the barge");
+                    }
+                    Glow(cw, barge.mid[N / 2] + barge.across[N / 2] * (barge.half - 1) + Vector3.up * 2, 12, .8f, GeodeViolet, .8f);
+                    for (int r = 0; r < 4; r++)   // oars racked along the east rail, inboard
+                    {
+                        var a = barge.mid[2] - barge.across[2] * (barge.half - .35f) + Vector3.up * (.12f + r * .09f); var b = barge.mid[Mathf.Min(N, 2 + 5)] - barge.across[2] * (barge.half - .35f) + Vector3.up * (.12f + r * .09f);
+                        var d = b - a; Part(PrimitiveType.Cylinder, cw, (a + b) / 2, new Vector3(.09f, d.magnitude / 2, .09f), timber, Quaternion.FromToRotation(Vector3.up, d));
+                    }
+                    var bow = barge.mid[0] - Fwd(barge, 0) * .4f;
+                    Part(PrimitiveType.Cube, cw, bow + Vector3.up * .9f - Fwd(barge, 0) * .5f, new Vector3(.45f, 3.4f, .45f), tar, Quaternion.LookRotation(Fwd(barge, 0)) * Quaternion.Euler(-24, 0, 0));
+                }
+                // The stern castle: a lantern at its back rail and the long steering sweep out over the stern into the water.
+                if (castle != null)
+                {
+                    int N = castle.mid.Length - 1; var back = castle.mid[N]; var f = Fwd(castle, N);
+                    Lantern(back - f * .8f + castle.across[N] * (castle.half - .8f), 1.8f);
+                    var a = back - f * 1.5f + Vector3.up * 1.2f; var b = back + f * 6 + Vector3.up * (level - back.y - .2f); var d = b - a;
+                    Part(PrimitiveType.Cylinder, cw, (a + b) / 2, new Vector3(.18f, d.magnitude / 2, .18f), timber, Quaternion.FromToRotation(Vector3.up, d));
+                    Part(PrimitiveType.Cube, cw, b - d.normalized * .8f, new Vector3(.12f, 1.6f, .7f), timber, Quaternion.LookRotation(f));
+                }
+                // The drain: a dark mouth in the cave's south end where the water goes out.
+                if (Anchors.ContainsKey("drain"))
+                {
+                    var qd = Along(h.Length - 3); var mw = t.TransformPoint(On(h.Length - 3, 0)); mw.y = level; var mouth = t.InverseTransformPoint(mw);
+                    Part(PrimitiveType.Sphere, t, mouth + Vector3.up * 2.5f, new Vector3(9, 6, .6f), Tint(art.stone, new Color(.02f, .02f, .025f)), qd);
+                }
             }
 
             void GeodeFloor()

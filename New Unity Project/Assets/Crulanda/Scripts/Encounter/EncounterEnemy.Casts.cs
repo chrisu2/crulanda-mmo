@@ -8,8 +8,11 @@ namespace Crulanda.Encounter
     /// <summary>A mob's spell (Docs/CC_DESIGN.md section 5, step C5, 2026-10-08; GAME-ONLY): something worth interrupting.</summary>
     public sealed class MobCast
     {
-        public string mob, name, kind;   // kind: "heal" (an ally under 70%), "bolt" (its foe), "drain" (its foe, healing itself), "blast" (all near it)
+        public string mob, name, kind;   // kind: "heal" (an ally under 70%), "bolt" (its foe), "drain" (its foe, healing itself), "blast" (all near it), "net" (a hold on the party round its foe)
         public float cast = 2.5f, every = 10, first = 4, power = 2.5f, reach = 25;
+        /// <summary>(S6) A "net": the hold it lands (EliteMove.cc's kinds: "root", "stun", "disorient", "fear"), for how long, on everyone of the
+        /// party within <see cref="area"/> metres of the foe it is thrown at.</summary>
+        public string cc; public float seconds, area;
     }
     /// <summary>The casters, by camp mob name (the Sealed Adit's first; more as dungeons come).</summary>
     public static class MobCasts
@@ -22,6 +25,9 @@ namespace Crulanda.Encounter
             // The Adit's shooters (D5, DUNGEON_DESIGN.md section 5): the yard's pickets open at range, the carriage gunners fire from the platform.
             new MobCast { mob = "Sandthrone picket", name = "Crossbow Bolt", kind = "bolt", cast = 1.5f, every = 9, first = 1, power = 2f, reach = 20 },
             new MobCast { mob = "Sandthrone carriage gunner", name = "Rail-shot", kind = "bolt", cast = 1.6f, every = 7, first = 2, power = 2.4f, reach = 25 },
+            // (S6, the Black Cove; GAME-ONLY) The harbour netters on the scaffold throw a weighted net: rooted, everyone within 4 m of whom it is
+            // thrown at, for 3 s. Interrupt the throw (it is a cast) and nobody is held.
+            new MobCast { mob = "Sandthrone harbour netter", name = "Weighted Net", kind = "net", cc = "root", seconds = 3, area = 4, cast = 1.8f, every = 14, first = 3, power = 0, reach = 18 },
         };
         public static MobCast For(string mob) { return string.IsNullOrEmpty(mob) ? null : All.FirstOrDefault(c => c.mob == mob); }
     }
@@ -91,6 +97,18 @@ namespace Crulanda.Encounter
                         session.FloatText(Victim.transform.position, Cast.name + " " + dealt, new Color(1, .5f, .3f));
                         if (Cast.kind == "drain" && dealt > 0) actor.Health.ApplyHealing(dealt);
                     }
+                    break;
+                case "net":   // (S6) a hold on everyone of the party round its foe (EncounterSession.HoldPlayer, SimCompanion.HoldUntil, as a boss's hold)
+                    if (Victim == null || !Victim.IsAlive || Vector3.Distance(Victim.transform.position, transform.position) > Cast.reach + 2) break;
+                    var netAt = Victim.transform.position; int held = 0;
+                    foreach (var who in new[] { session.Player }.Concat(session.PartySims.Where(c => c != null).Select(c => c.actor)))
+                    {
+                        if (who == null || !who.IsAlive || Vector3.Distance(who.transform.position, netAt) > Mathf.Max(.5f, Cast.area)) continue;
+                        if (who == session.Player) session.HoldPlayer(Cast.cc, Cast.seconds, transform.position, Name + "'s " + Cast.name);
+                        else { var sim = who.GetComponent<SimCompanion>(); if (sim == null) continue; sim.HoldUntil(Cast.cc, Cast.seconds, transform.position); }
+                        held++;
+                    }
+                    session.FloatText(netAt + Vector3.up * .6f, Cast.name + (held > 0 ? "!" : " misses"), new Color(1, .75f, .35f));
                     break;
                 case "blast":
                     var hit = new HashSet<Actor>();

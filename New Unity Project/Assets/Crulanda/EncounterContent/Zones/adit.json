@@ -89,7 +89,8 @@
   "objectives": [
     "Find out what the Sandthrone are cutting under the pass",
     "Win the three rail sigils off the Gallery's wings",
-    "Stop the carriage on the dead line"
+    "Stop the carriage on the dead line",
+    "Bring down Danner on his barge in the Black Cove"
   ],
   "exits": [
     {
@@ -271,6 +272,24 @@
       },
       "radius": 18,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Dead Line",
+      "at": {
+        "x": -170,
+        "y": 297
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Black Cove",
+      "at": {
+        "x": -304,
+        "y": 185
+      },
+      "radius": 18,
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "secrets": [
@@ -445,6 +464,42 @@
       "at": {
         "x": 91.59,
         "y": 119.8
+      },
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.adit.scaffold_a",
+      "name": "A Rigger's Tin",
+      "kind": "cache",
+      "prompt": "Search under the scaffold planks",
+      "text": "Wedged under a loose plank of the scaffold's first tier, a rigger's tin: twine, a marlinspike and a twist of coins against a wet week.",
+      "xp": 60,
+      "gold": 20,
+      "cave": "The Black Cove",
+      "along": 112.94,
+      "aside": 22.5,
+      "rise": 5.6,
+      "at": {
+        "x": -326.65,
+        "y": 180.93
+      },
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.adit.scaffold_b",
+      "name": "The Gangway Purse",
+      "kind": "cache",
+      "prompt": "Feel along the beam under the top tier",
+      "text": "Hung on a nail under the top tier, where the bargemen go aboard, a purse nobody has come back for.",
+      "xp": 60,
+      "gold": 30,
+      "cave": "The Black Cove",
+      "along": 131.94,
+      "aside": 22.5,
+      "rise": 6.8,
+      "at": {
+        "x": -326.51,
+        "y": 162.18
       },
       "canonStatus": "GAME-ONLY"
     },
@@ -2076,6 +2131,184 @@
       ],
       "style": "pitch",
       "within": "The Deep Way"
+    },
+    {
+      "kind": "cavern",
+      "name": "The Dead Line",
+      "at": {
+        "x": -88,
+        "y": 302
+      },
+      "rotation": -90.0,
+      "variant": 2,
+      "plan": [
+        0.0,
+        -1.0,
+        4.5,
+        5.5,
+        0.0,
+        0.0,
+        0.0,
+        4.5,
+        5.5,
+        0.0,
+        -0.0,
+        8.0,
+        4.5,
+        5.5,
+        0.0,
+        -0.0,
+        16.0,
+        4.5,
+        5.5,
+        -0.5,
+        -1.0,
+        30.0,
+        4.5,
+        5.5,
+        -2.0,
+        -2.0,
+        46.0,
+        9,
+        7,
+        -3.5,
+        -3.0,
+        58.0,
+        9,
+        7,
+        -4.5,
+        -4.0,
+        70.0,
+        4.5,
+        5.5,
+        -5.5,
+        -6.0,
+        90.0,
+        4.5,
+        5.5,
+        -7.5,
+        -9.0,
+        110.0,
+        4.5,
+        5.5,
+        -9.0,
+        -12.0,
+        126.0,
+        9,
+        7,
+        -10.5,
+        -15.0,
+        138.0,
+        9,
+        7,
+        -11.5,
+        -19.0,
+        150.0,
+        4.5,
+        5.5,
+        -12.5,
+        -26.0,
+        162.0,
+        4.5,
+        5.5,
+        -13.5,
+        -34.0,
+        170.0,
+        4.5,
+        5.5,
+        -14.0,
+        -36.828,
+        172.828,
+        0.3,
+        0.4,
+        -14.0
+      ],
+      "style": "deadline",
+      "within": "The Deep Way"
+    },
+    {
+      "kind": "cavern",
+      "name": "The Black Cove",
+      "at": {
+        "x": -252,
+        "y": 274.5
+      },
+      "rotation": -141.34,
+      "variant": 2,
+      "plan": [
+        0.0,
+        -1.0,
+        4.5,
+        5.5,
+        0.0,
+        0.0,
+        -0.0,
+        4.5,
+        5.5,
+        0.0,
+        0.0,
+        16.008,
+        5,
+        6,
+        -0.401,
+        0.312,
+        31.625,
+        9,
+        9,
+        -0.701,
+        2.186,
+        48.492,
+        22,
+        20,
+        -1.401,
+        1.249,
+        65.671,
+        36,
+        28,
+        -3.401,
+        -2.499,
+        83.163,
+        42,
+        34,
+        -5.901,
+        -12.182,
+        98.468,
+        44,
+        36,
+        -7.401,
+        -27.799,
+        117.989,
+        44,
+        36,
+        -7.401,
+        -43.416,
+        137.511,
+        42,
+        34,
+        -7.401,
+        -57.472,
+        151.879,
+        30,
+        26,
+        -7.401,
+        -68.56,
+        160.937,
+        14,
+        14,
+        -7.401,
+        -74.339,
+        166.559,
+        6,
+        8,
+        -7.401,
+        -77.206,
+        169.348,
+        0.3,
+        0.4,
+        -7.401
+      ],
+      "style": "cove",
+      "within": "The Dead Line"
     }
   ],
   "decks": [
@@ -2391,6 +2624,150 @@
       "rise2": 0,
       "width": 3,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The quay",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 74.0,
+      "to": 147.94,
+      "aside": 28.5,
+      "aside2": 28.5,
+      "rise": 0.26,
+      "rise2": 3.4,
+      "width": 8,
+      "canonStatus": "GAME-ONLY",
+      "rails": "left"
+    },
+    {
+      "name": "The scaffold ramp (north)",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 86.28,
+      "to": 93.97,
+      "aside": 24.5,
+      "aside2": 22.5,
+      "rise": 1.94,
+      "rise2": 4.82,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The scaffold, tier 1",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 93.97,
+      "to": 117.94,
+      "aside": 22.5,
+      "aside2": 22.5,
+      "rise": 4.82,
+      "rise2": 5.6,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The scaffold ramp (south)",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 117.94,
+      "to": 123.94,
+      "aside": 22.5,
+      "aside2": 22.5,
+      "rise": 5.6,
+      "rise2": 6.8,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The scaffold, tier 2",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 123.94,
+      "to": 133.94,
+      "aside": 22.5,
+      "aside2": 22.5,
+      "rise": 6.8,
+      "rise2": 6.8,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The gangway",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 127.94,
+      "to": 127.94,
+      "aside": 22.5,
+      "aside2": 16.5,
+      "rise": 6.8,
+      "rise2": 6.8,
+      "width": 2.6,
+      "canonStatus": "GAME-ONLY",
+      "rails": "both"
+    },
+    {
+      "name": "The ore barge",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 93.97,
+      "to": 128.94,
+      "aside": 14.5,
+      "aside2": 14.5,
+      "rise": 6.02,
+      "rise2": 6.8,
+      "width": 10,
+      "canonStatus": "GAME-ONLY",
+      "solid": true
+    },
+    {
+      "name": "The stern castle's stair",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 116.94,
+      "to": 128.94,
+      "aside": 11.0,
+      "aside2": 11.0,
+      "rise": 6.8,
+      "rise2": 10.1,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The stern castle",
+      "cave": "The Black Cove",
+      "style": "timber",
+      "wall": 0,
+      "from": 128.94,
+      "to": 138.94,
+      "aside": 14.5,
+      "aside2": 14.5,
+      "rise": 10.1,
+      "rise2": 10.1,
+      "width": 10,
+      "canonStatus": "GAME-ONLY",
+      "solid": true
+    },
+    {
+      "name": "The landing stage",
+      "cave": "The Black Cove",
+      "style": "scree",
+      "wall": 0,
+      "from": 147.94,
+      "to": 157.93,
+      "aside": 28.5,
+      "aside2": 28.5,
+      "rise": 3.4,
+      "rise2": 0,
+      "width": 5,
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "drops": [
@@ -2501,6 +2878,14 @@
       "aside": 0.12,
       "radius": 8,
       "depth": 0.5
+    },
+    {
+      "name": "The black water",
+      "cave": "The Black Cove",
+      "from": 97.94,
+      "to": 185.29,
+      "depth": 2.6,
+      "flood": true
     }
   ],
   "gates": [
@@ -2781,6 +3166,59 @@
       "cave": "The Deep Way",
       "along": 172.46,
       "aside": 7
+    },
+    {
+      "name": "carriage",
+      "cave": "The Deep Way",
+      "along": 273.53,
+      "aside": 0
+    },
+    {
+      "name": "cove",
+      "cave": "The Black Cove",
+      "along": 103.93,
+      "aside": 0
+    },
+    {
+      "name": "haul",
+      "cave": "The Black Cove",
+      "along": 86.28,
+      "aside": 28.5,
+      "rise": 1.94
+    },
+    {
+      "name": "bollards north",
+      "cave": "The Black Cove",
+      "along": 90.06,
+      "aside": 25.5,
+      "rise": 2.27
+    },
+    {
+      "name": "bollards south",
+      "cave": "The Black Cove",
+      "along": 137.94,
+      "aside": 25.5,
+      "rise": 3.4
+    },
+    {
+      "name": "barge bow",
+      "cave": "The Black Cove",
+      "along": 95.95,
+      "aside": 14.5,
+      "rise": 6.19
+    },
+    {
+      "name": "stern castle",
+      "cave": "The Black Cove",
+      "along": 133.94,
+      "aside": 14.5,
+      "rise": 10.1
+    },
+    {
+      "name": "drain",
+      "cave": "The Black Cove",
+      "along": 181.37,
+      "aside": 0
     }
   ],
   "wings": [
@@ -2882,6 +3320,12 @@
       "name": "The Pitch Pit",
       "after": "deep",
       "optional": true
+    },
+    {
+      "id": "cove",
+      "name": "The Black Cove",
+      "after": "deep",
+      "exit": "walk"
     }
   ],
   "events": [
@@ -3213,7 +3657,8 @@
       "aside": 10,
       "wing": "deep",
       "step": 4,
-      "gate": "The platform gate"
+      "gate": "The platform gate",
+      "optional": true
     },
     {
       "name": "Quartermaster's guards",
@@ -3289,20 +3734,21 @@
       "tag": "platformguard",
       "look": "outrider",
       "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
-      "radius": 1.5,
+      "radius": 1.2,
       "count": 2,
       "levelMin": 12,
       "levelMax": 12,
       "respawn": 1200,
       "center": {
-        "x": -62.04,
-        "y": 297.14
+        "x": -316.05,
+        "y": 158.15
       },
-      "cave": "The Deep Way",
-      "along": 283.53,
-      "aside": -5,
-      "wing": "deep",
-      "step": 8,
+      "cave": "The Black Cove",
+      "along": 135.94,
+      "aside": 12.0,
+      "wing": "cove",
+      "step": 5,
+      "rise": 10.1,
       "gate": "The platform gate"
     },
     {
@@ -3320,14 +3766,15 @@
       "harder": true,
       "guards": "Rail-Captain's guard",
       "center": {
-        "x": -66.0,
-        "y": 302.14
+        "x": -320.02,
+        "y": 160.66
       },
-      "cave": "The Deep Way",
-      "along": 287.53,
-      "aside": 0,
-      "wing": "deep",
-      "step": 8,
+      "cave": "The Black Cove",
+      "along": 133.44,
+      "aside": 16.0,
+      "wing": "cove",
+      "step": 5,
+      "rise": 10.1,
       "gate": "The platform gate"
     },
     {
@@ -4932,6 +5379,143 @@
       ],
       "wing": "river",
       "gate": "Lusk's door"
+    },
+    {
+      "name": "Siding rearguard",
+      "mob": "Sandthrone docker",
+      "tag": "docker",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band; CANON company (Sandthrone)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 1200,
+      "center": {
+        "x": -140.17,
+        "y": 301.51
+      },
+      "cave": "The Dead Line",
+      "along": 53.09,
+      "aside": 2,
+      "wing": "cove",
+      "step": 1,
+      "gate": "The platform gate"
+    },
+    {
+      "name": "Rope team (north)",
+      "mob": "Sandthrone bargeman",
+      "tag": "bargeman",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band (the barge's crew); CANON company (Sandthrone)",
+      "radius": 1.6,
+      "count": 3,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 1200,
+      "center": {
+        "x": -325.61,
+        "y": 223.33
+      },
+      "cave": "The Black Cove",
+      "along": 81.05,
+      "aside": 27.5,
+      "wing": "cove",
+      "step": 2,
+      "rise": 1.24,
+      "gate": "The platform gate"
+    },
+    {
+      "name": "Harbour netters",
+      "mob": "Sandthrone harbour netter",
+      "tag": "netter",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band (the barge's crew); CANON company (Sandthrone)",
+      "radius": 1.1,
+      "count": 3,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 1200,
+      "center": {
+        "x": -326.57,
+        "y": 188.64
+      },
+      "cave": "The Black Cove",
+      "along": 105.93,
+      "aside": 22.5,
+      "wing": "cove",
+      "step": 3,
+      "rise": 5.6,
+      "gate": "The platform gate"
+    },
+    {
+      "name": "Rope team (south)",
+      "mob": "Sandthrone bargeman",
+      "tag": "bargeman",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band (the barge's crew); CANON company (Sandthrone)",
+      "radius": 1.6,
+      "count": 3,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 1200,
+      "center": {
+        "x": -331.63,
+        "y": 152.25
+      },
+      "cave": "The Black Cove",
+      "along": 141.94,
+      "aside": 27.5,
+      "wing": "cove",
+      "step": 4,
+      "rise": 3.4,
+      "gate": "The platform gate"
+    },
+    {
+      "name": "Up from the hold (first)",
+      "mob": "Sandthrone bargeman",
+      "tag": "bargeman",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band (the barge's crew); CANON company (Sandthrone)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 1200,
+      "center": {
+        "x": -318.62,
+        "y": 186.24
+      },
+      "cave": "The Black Cove",
+      "along": 107.93,
+      "aside": 14.5,
+      "wing": "cove",
+      "rise": 6.8,
+      "gate": "none",
+      "after": "event:haul1"
+    },
+    {
+      "name": "Up from the hold (second)",
+      "mob": "Sandthrone bargeman",
+      "tag": "bargeman",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band (the barge's crew); CANON company (Sandthrone)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 12,
+      "levelMax": 12,
+      "respawn": 1200,
+      "center": {
+        "x": -318.64,
+        "y": 179.9
+      },
+      "cave": "The Black Cove",
+      "along": 113.94,
+      "aside": 14.5,
+      "wing": "cove",
+      "rise": 6.8,
+      "gate": "none",
+      "after": "event:haul2"
     },
     {
       "name": "Drift patrol",

@@ -41,6 +41,7 @@ namespace Crulanda.Tests
             { "pithound", SocialKind.Pack }, { "bristle", SocialKind.Solitary }, { "burrower", SocialKind.Solitary },
             { "bailer", SocialKind.Call }, { "vosk", SocialKind.Call }, { "urnkeeper", SocialKind.Call }, { "loremaster", SocialKind.Call }, { "armsmaster", SocialKind.Call },
             { "varrow", SocialKind.Call }, { "greywhisperer", SocialKind.Call }, { "hollowsong", SocialKind.Call }, { "hobb", SocialKind.Call }, { "kettle", SocialKind.Call },
+            { "bargeman", SocialKind.Call }, { "netter", SocialKind.Call },   // (S6) the Black Cove's rope teams, the barge's crew and the harbour netters: people, they call
             { "warden", SocialKind.Call },   // the grey picket (2026-10-15): Concord wardens, people: they call
             { "forager", SocialKind.Call }   // the foragers' camp (2026-10-15): deserters living rough; its data says call
         };

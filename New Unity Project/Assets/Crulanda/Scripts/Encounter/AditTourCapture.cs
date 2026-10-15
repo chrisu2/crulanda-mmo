@@ -92,6 +92,8 @@ namespace Crulanda.Encounter
             }
             IEnumerator Run(IEnumerator m) { while (m.MoveNext()) yield return m.Current; }
             yield return Run(Measure("all"));
+            var cull = FindFirstObjectByType<PropCull>(); int asleep = 0; foreach (var e in session.Enemies) if (e != null && e.Dormant) asleep++;
+            lines.Add("COUNT props not drawn " + (cull != null ? cull.Off + " of " + cull.Count : "(no culler)") + "; mobs asleep " + asleep + " of " + session.Enemies.Count);
             var sh = QualitySettings.shadows; QualitySettings.shadows = ShadowQuality.Disable; yield return Run(Measure("no-shadows")); QualitySettings.shadows = sh;
             var lights = Array.FindAll(FindObjectsByType<Light>(FindObjectsSortMode.None), l => l.enabled && l.type != LightType.Directional);
             int shadowed = 0; foreach (var l in lights) if (l.shadows != LightShadows.None) shadowed++;

@@ -70,8 +70,7 @@ namespace Crulanda.Tests
             foreach (var g in got) Mark(g, new Color32(80, 220, 80, 255));
             foreach (var l in lost) Mark(l, new Color32(240, 70, 70, 255));
             tex.Apply();
-            try { File.WriteAllBytes(@"D:\crulanda-work\encounter-validation
-avmesh-" + name + ".png", tex.EncodeToPNG()); } catch (Exception) { }
+            try { File.WriteAllBytes("D:/crulanda-work/encounter-validation/navmesh-" + name + ".png" tex.EncodeToPNG()); } catch (Exception) { }
             UnityEngine.Object.Destroy(tex);
         }
 

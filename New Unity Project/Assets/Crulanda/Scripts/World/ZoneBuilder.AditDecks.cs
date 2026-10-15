@@ -511,18 +511,39 @@ namespace Crulanda.World
                 float s = Mathf.Lerp(d.from, d.to, N > 0 ? k / (float)N : 0); var cr = spot.cave.At(s, 1) - spot.cave.At(s, 0); cr.y = 0;
                 return Vector3.Dot(spot.across[k] * side, cr * d.wall) <= 0;   // not along the wall it hugs
             }
+            // Something to stand on at a ground point within tol of the height top: another deck's planks or a cave's floor.
+            bool Footing(Vector2 p, float top, float tol)
+            {
+                foreach (var o in DeckSpots) if (o != spot && o.Top(p, out float y) && Mathf.Abs(y - top) < tol) return true;
+                foreach (var c in Hollow.All) if (c.FloorAt(p, out float f) && Mathf.Abs(f - BasinDip(c, p) - top) < tol) return true;
+                return false;
+            }
+            // (S7, chainR129 and the adit-final2 run) The way carries on past an edge only where there is footing both just past it (0.15 m out,
+            // within 0.7 m of its height) and on beyond (0.8 m out, within 1.2 m: the Foundry's north ramp falls a third from the cross-walk's
+            // edge, 0.77 m down at 0.8 m). The 0.8 m probe alone stood a rail across the north ramp's head; the 0.15 m probe alone (R129) opened
+            // the rope bridge's sides beside the bridge tower, whose round top reaches 0.15 m past the bridge's edge but not 0.8 m, over a 12 m
+            // drop ("someone fell off the path", Chris, 2026-10-15). Rails are now decided a half metre at a time (below).
             bool CarriesOn(Vector3 edge, Vector3 outward, float top)
             {
-                var probe = new Vector2(edge.x + outward.x * .8f, edge.z + outward.z * .8f);
-                // (S7, chainR129) And at the edge itself: the north ramp leaves the cross-walk's end falling a third, so 0.8 m out its planks
-                // were 0.77 m down and the cross-walk's rail stood across its head (the whole Geode Foundry cut off from the drift); the
-                // overlook balcony's rail stood on the trestle head's planks.
-                var at = new Vector2(edge.x + outward.x * .15f, edge.z + outward.z * .15f);
-                foreach (var o in DeckSpots) if (o != spot && ((o.Top(probe, out float y) && Mathf.Abs(y - top) < .7f) || (o.Top(at, out float y2) && Mathf.Abs(y2 - top) < .7f))) return true;
-                foreach (var c in Hollow.All) if (c.FloorAt(probe, out float f) && Mathf.Abs(f - BasinDip(c, probe) - top) < .7f) return true;
+                var near = new Vector2(edge.x + outward.x * .15f, edge.z + outward.z * .15f);
+                var far = new Vector2(edge.x + outward.x * .8f, edge.z + outward.z * .8f);
+                if (Footing(near, top, .7f) && Footing(far, top, 1.2f)) return true;
                 foreach (var dl in dropLooks)
                     if (!dl.def.scenery && Mathf.Abs(dl.from.y - top) < 1.5f && Vector2.Distance(new Vector2(dl.from.x, dl.from.z), new Vector2(edge.x, edge.z)) < (dl.def.width > 0 ? dl.def.width : 2) / 2 + 1.2f) return true;
                 return false;
+            }
+            // A rail along an edge from a to b, left open only over the half-metre pieces where the way carries on (CarriesOn): the open stretch
+            // is exactly the junction, not a whole 1.5 m segment because its middle happened to be on another deck.
+            void RailWhereOpen(Vector3 a, Vector3 b, Vector3 outward, bool postAtA)
+            {
+                float len = Vector3.Distance(a, b); int m = Mathf.Max(1, Mathf.CeilToInt(len / .5f));
+                int runFrom = -1;
+                for (int j = 0; j <= m; j++)
+                {
+                    bool railed = j < m && !CarriesOn(Vector3.Lerp(a, b, (j + .5f) / m), outward, Mathf.Lerp(a.y, b.y, (j + .5f) / m));
+                    if (railed && runFrom < 0) runFrom = j;
+                    if (!railed && runFrom >= 0) { Rail(Vector3.Lerp(a, b, runFrom / (float)m), Vector3.Lerp(a, b, j / (float)m), outward, postAtA && runFrom == 0); runFrom = -1; }
+                }
             }
             void Rail(Vector3 a, Vector3 b, Vector3 outward, bool postAtA)
             {
@@ -547,7 +568,7 @@ namespace Crulanda.World
                     float a0 = k * Mathf.PI * 2 / RSeg, a1 = (k + 1) * Mathf.PI * 2 / RSeg;
                     var p0 = spot.mid[0] + new Vector3(Mathf.Cos(a0), 0, Mathf.Sin(a0)) * spot.half; var p1 = spot.mid[0] + new Vector3(Mathf.Cos(a1), 0, Mathf.Sin(a1)) * spot.half;
                     var outward = (p0 + p1) / 2 - spot.mid[0]; outward.y = 0; outward.Normalize();
-                    if (Wanted(1, 0) && !CarriesOn((p0 + p1) / 2, outward, spot.mid[0].y)) Rail(p0, p1, outward, true);
+                    if (Wanted(1, 0)) RailWhereOpen(p0, p1, outward, true);
                 }
             }
             else
@@ -557,8 +578,7 @@ namespace Crulanda.World
                         if (!Wanted(side, k)) continue;
                         var a = spot.mid[k] + spot.across[k] * side * spot.half; var b = spot.mid[k + 1] + spot.across[k + 1] * side * spot.half;
                         var outward = (spot.across[k] + spot.across[k + 1]).normalized * side;
-                        if (CarriesOn((a + b) / 2, outward, (a.y + b.y) / 2)) continue;
-                        Rail(a, b, outward, k % 2 == 0);
+                        RailWhereOpen(a, b, outward, k % 2 == 0);
                     }
         }
 

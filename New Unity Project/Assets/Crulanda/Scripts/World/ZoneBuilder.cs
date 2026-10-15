@@ -1742,8 +1742,9 @@ namespace Crulanda.World
             float sill = Mathf.Clamp(DoorGround(t, 0, -L / 2 - .3f, doorW) + .03f, -1, .6f);
             foreach (int s in new[] { -1, 1 }) Piece(new Vector3(s * (doorW / 2 + .15f), (sill + doorH + .25f) / 2, -L / 2 - .02f), new Vector3(.3f, doorH + .25f - sill, wall + .14f), frame, false);
             Piece(new Vector3(0, doorH + .12f, -L / 2 - .02f), new Vector3(doorW + .6f, .26f, wall + .14f), frame, false);
-            // The sliding doors, slid open, hung in front of the gable either side of the doorway.
-            float floor = Mathf.Max(0, sill), leafW = doorW / 2 + .1f, leafH = doorH - floor - .05f, leafY = floor + .03f + leafH / 2, front = -L / 2 - wall / 2 - .12f, railY = doorH + .45f;
+            // The sliding doors, slid open, hung in front of the gable either side of the doorway, 6 cm clear of the sill's face (at .12 their
+            // stiles lay 1.5 cm off it: the building test's flush check, 2026-10-15).
+            float floor = Mathf.Max(0, sill), leafW = doorW / 2 + .1f, leafH = doorH - floor - .05f, leafY = floor + .03f + leafH / 2, front = -L / 2 - wall / 2 - .18f, railY = doorH + .45f;
             Piece(new Vector3(0, railY, front - .03f), new Vector3(2 * (doorW / 2 + leafW + .15f), .08f, .05f), iron, false);   // the rail, long enough for both leaves
             foreach (int s in new[] { -1, 1 })
             {

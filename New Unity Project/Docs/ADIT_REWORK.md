@@ -1196,6 +1196,12 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   a "Solid" at (7, -24, -183) in the way), the Cutting Drift past its first metres (204 of 213: the Gallery's knoll at about x 107,
   "by the first") and so the whole Geode Foundry (458), and the Chapel's west half (109 of 263, x 109-119, z 137-140). Four blocks,
   then, not forty; the tests' reach (NavReach) wants the hop search so they say the same.
+- **Where to start (21:45):** the "Solid" at (7, -24, -183) is a camp dressing block (ZoneBuilder.Adit.cs ~509-513: a brazier's or a
+  crate's, of the "Spoil heaps" camp at (9, -190)); the hall beside the stage is 8 m wide there (the stage to x 6, the wall at x 14) and
+  the Pen's mouth sits in that wall at z -181..-175, so the block alone should not close it: run the diagnostics with the camp's
+  dressing skipped (or Block() told to keep out of a child's mouth) and read the Pen's row. For the Cutting Drift, the Gallery's knoll
+  is about 13 m thick at the crown where the drift's mouth sits 12 m up (Thick(): 2 + swells + sin(th) * Height * .35), so its faces
+  are wide there: try `Cut` with the corner rule at shrink .9 for knolls, or cut any knoll face within a tube's Half of its centreline.
 - **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),
   the centreline walk at the tally stage, the fixture trestle's rail (a raycast; new in R83, not looked at), the fixture knoll ray,

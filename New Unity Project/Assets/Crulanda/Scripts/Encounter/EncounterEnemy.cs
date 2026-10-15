@@ -88,6 +88,7 @@ namespace Crulanda.Encounter
                 Inside = null; Shown(true);
                 var look = GetComponent<ActorVisual>(); if (look != null) { look.Riding = false; if (look.Pose == ActorPose.Sit) look.Pose = ActorPose.None; }
                 if (agent != null && !agent.enabled) { agent.enabled = true; if (NavMesh.SamplePosition(transform.position, out var hit, 4, NavMesh.AllAreas)) agent.Warp(hit.position); }
+                home = transform.position;   // his ground is where he climbs down (2026-10-15: his home stayed at the camp, so a lull after Shriek walked him back there, reset)
             }
             if (Hidden) Unhide();
             if (at != null && !Engaged) threat.Add(at.EntityId.Value, JoinThreat);

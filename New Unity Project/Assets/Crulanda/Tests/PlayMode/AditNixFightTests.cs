@@ -23,7 +23,7 @@ namespace Crulanda.Tests
     /// </summary>
     public class AditNixFightTests
     {
-        const float Speed = 3, Limit = 240, LogEvery = 5, Off = 15;
+        const float Speed = 3, Limit = 420, LogEvery = 5, Off = 15;   // 420: room for a death, the get-up and the re-pull (2026-10-15 18:10)
         string root; EncounterSession session;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (s != null) s.SaveDirectoryOverride = root; }
         [UnitySetUp] public IEnumerator Setup()
@@ -151,7 +151,7 @@ namespace Crulanda.Tests
                 var engagedAt = new Dictionary<EncounterEnemy, float>();
                 string Who(Crulanda.Gameplay.Actor a) { if (a == null) return "nobody"; var m = members.Find(x => x.actor == a); return m.actor != null ? m.name : a.DisplayName; }
                 string Hp(Crulanda.Gameplay.Actor a) { return a == null ? "-" : !a.IsAlive ? "dead" : a.Health.Pool.Current + "/" + a.Health.Pool.Max; }
-                float t = 0, nextLog = 0, nextSwing = 0, pathAt = 0, stuckAt = 0, pulledAt = -1, beastDiedAt = -1, nixDiedAt = -1; Vector3 stuckFrom = s.Player.transform.position, pathGoal = Vector3.zero; NavMeshPath path = null; bool pulledByYou = false;
+                float deadSince = -1, upAt = -1; int getUps = 0; bool repull = false; float t = 0, nextLog = 0, nextSwing = 0, pathAt = 0, stuckAt = 0, pulledAt = -1, beastDiedAt = -1, nixDiedAt = -1; Vector3 stuckFrom = s.Player.transform.position, pathGoal = Vector3.zero; NavMeshPath path = null; bool pulledByYou = false;
                 AdventurerMotor.Running = true; Time.timeScale = Speed;
                 void Line() { Log(t.ToString("0") + "s: " + string.Join(", ", members.Select(m => m.name + " " + Hp(m.actor))) + " | beast " + Hp(beast.actor) + " on " + (beast.actor.IsAlive ? Who(beast.Victim) : "-") + ", Nix " + Hp(nix.actor) + (nix.Inside != null ? " (in the saddle)" : " on " + (nix.actor.IsAlive ? Who(nix.Victim) : "-")) + " | " + (s.DuoState ?? "no duo") + " | healer " + (healer == null ? "none" : healer.actor.IsAlive ? (healer.Activity ?? "-") : "dead") + " | guards up " + s.Enemies.Count(e => e != null && e.Camp && e.CampIndex == nixCamp && e != beast && e != nix && e.actor.IsAlive) + " | leader " + (leader.Activity ?? "-") + " (" + leader.LeadingName + ")" + " | you on " + (s.Target != null ? s.Target.Name : "nothing")); }
                 while (t < Limit)
@@ -164,7 +164,25 @@ namespace Crulanda.Tests
                     if (!beast.actor.IsAlive && !nix.actor.IsAlive) break;
                     if (!s.Player.IsAlive && s.PartySims.All(c => c == null || !c.actor.IsAlive)) { Log(t.ToString("0") + "s: the party is all down"); break; }
                     var me = s.Player.transform.position;
-                    if (!s.Player.IsAlive) { EncounterInput.Scripted = Vector2.zero; t += Time.deltaTime; yield return null; continue; }   // down: you stay down (the run would get up at the stone, out of this fight)
+                    // Down: as the run does, you get up 4 s later (Recover, at the stone) and, for the walk back the run makes, are set beside the
+                    // leader; the fight goes on, and if the duo has reset with nobody on it you pull again 8 s on (Chris, 2026-10-15: "fix the
+                    // reset then run the fight a few times": the test had left you down and the duo reset with the sims standing by).
+                    if (!s.Player.IsAlive)
+                    {
+                        EncounterInput.Scripted = Vector2.zero;
+                        if (deadSince < 0) deadSince = t;
+                        else if (t - deadSince > 4)
+                        {
+                            s.Recover(); deadSince = -1; getUps++;
+                            var back = leader != null ? leader.transform.position - leader.transform.forward * 2.5f : campHit.position;
+                            if (NavMesh.SamplePosition(back, out var bh, 6, NavMesh.AllAreas)) s.Player.GetComponent<AdventurerMotor>().Teleport(bh.position + Vector3.up * 1.05f);
+                            s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max);
+                            upAt = t; Log(t.ToString("0") + "s: you get up (" + getUps + ") and are back beside " + leader.sim.name);
+                        }
+                        t += Time.deltaTime; yield return null; continue;
+                    }
+                    if (upAt >= 0 && t - upAt > 8 && !s.Enemies.Exists(e => e != null && e.actor.IsAlive && e.FightingParty))
+                    { upAt = -1; repull = true; Log(t.ToString("0") + "s: the duo reset and nobody is on it: you pull again"); s.Select(beast.actor.IsAlive ? beast : nix); }
                     // Nobody pulled in 30 s: you do (the run's leader should have).
                     if (pulledAt < 0 && t > 30 && !pulledByYou) { pulledByYou = true; Log(t.ToString("0") + "s: nobody pulled in 30 s (leader: " + leader.Activity + ", " + Vector3.Distance(leader.transform.position, campHit.position).ToString("0") + " m off): you pull"); s.Select(beast); }
                     // RunCapture's foe: what fights the party near you, a mob yours 2.5 s after the party engages it (at once when it is on you).
@@ -177,6 +195,7 @@ namespace Crulanda.Tests
                         float d = Vector3.Distance(e.transform.position, me); if (d < best) { best = d; foe = e; }
                     }
                     if (foe == null && pulledByYou && pulledAt < 0) foe = beast;
+                    if (repull) { if (foe != null) repull = false; else foe = beast.actor.IsAlive ? beast : nix; }
                     Vector3 goal = foe != null ? foe.transform.position : leader.actor.IsAlive ? leader.transform.position : campHit.position; float reach = foe != null ? 2.6f : 4.5f;
                     if (foe != null)
                     {

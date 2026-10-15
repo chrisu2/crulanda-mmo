@@ -1410,6 +1410,7 @@ namespace Crulanda.Encounter
             if (Zone != null && Zone.Zone.life != null) new GameObject("Village life").AddComponent<VillageLife>().Init(this);
             // The other adventurers (Phase 5.2): the roster from the world slot, figures for those here and online.
             if (Zone != null) new GameObject("Sims").AddComponent<SimPopulation>().Init(this, SaveRoot);
+            if (Zone != null) Crulanda.World.ZoneMusic.Begin(Zone.Zone, () => InCombat, () => Player != null ? Player.transform.position : Vector3.zero);   // the zone's music (2026-10-15, Chris's three packs: ZoneMusic; /music in the chat)
             StartQuests(); StartDiscoveries(); StartArmoury(); StartAdit();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [" + KeyBindings.InteractLabel + "], then follow the path to the sentries.");
             ReconcileQuests();

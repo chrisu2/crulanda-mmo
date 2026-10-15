@@ -282,7 +282,9 @@ namespace Crulanda.Encounter
                 return;
             }
             if (agent != null) agent.speed = Rooted ? 0 : baseSpeed * (Slowed ? slowFactor : 1) * (Time.time < lungeUntil ? 2.2f : 1);
-            if (!session.Player.IsAlive) { ResetFight(); return; }
+            // You down: a mob with a living party member within 40 m fights on and turns from you to them (2026-10-15: every mob reset the
+            // moment you fell, the party's fight with it gone; the run's parties wiped at Nix again and again); alone, it resets as before.
+            if (!session.Player.IsAlive) { if (!session.PartyNear(this)) { ResetFight(); return; } threat.Remove(session.Player.EntityId.Value); }
             // The leash. A mob fighting alone is held by its own home. A linked group (EncounterEnemy.Social) is held by where its
             // pull began, by its target only: those who came from across the camp are not sent back for having come.
             // Chris 13:05, "leash is too short on fighting boards. they keep reseting even while fighting": a mob in a fight (struck or striking

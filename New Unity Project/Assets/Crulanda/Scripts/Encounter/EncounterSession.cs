@@ -2259,6 +2259,13 @@ namespace Crulanda.Encounter
             int i = Progress.bag.FindIndex(s => s.item == content.itemId);
             if (i >= 0) EquipFromBag(i);
         }
+        /// <summary>A living member of your party (a sim, or Mira when recruited) within 40 m of the mob: its fight goes on while you are down.</summary>
+        public bool PartyNear(EncounterEnemy e)
+        {
+            if (e == null) return false;
+            foreach (var c in PartySims) if (c != null && c.actor.IsAlive && Vector3.Distance(c.transform.position, e.transform.position) < 40) return true;
+            return Progress.recruited && Companion != null && Companion.actor.IsAlive && Vector3.Distance(Companion.transform.position, e.transform.position) < 40;
+        }
         public void Recover()
         {
             if (Player.IsAlive) return;
@@ -2267,8 +2274,7 @@ namespace Crulanda.Encounter
             // the stone with you, and only a fight with nobody left alive in it resets. A whole party down is as it always was.
             // In a fight: a mob alive and in it (on someone, or with threat on its list) with a living party member within 40 m of it. Not
             // "a mob on a living member": at your death Nix was on you, and the three sims beside him at 7% were pulled out (R150).
-            bool InIt(EncounterEnemy e) { return e != null && e.actor.IsAlive && (e.Victim != null || e.threat.Any) && (PartySims.Exists(c => c != null && c.actor.IsAlive && Vector3.Distance(c.transform.position, e.transform.position) < 40)
-                || (Companion != null && Companion.actor.IsAlive && Vector3.Distance(Companion.transform.position, e.transform.position) < 40)); }
+            bool InIt(EncounterEnemy e) { return e != null && e.actor.IsAlive && (e.Victim != null || e.threat.Any) && PartyNear(e); }
             bool fighting = Enemies.Exists(InIt);
             Player.Health.Revive(Player.Health.Pool.Max);
             Player.GetComponent<AdventurerMotor>().Teleport(RecoveryPoint);

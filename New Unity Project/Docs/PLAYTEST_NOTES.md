@@ -760,3 +760,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   she was full again 15 s after a fight. Now her pool grows with your level as her heal does, a heal costs that much more and a quarter
   again, she says when she runs low and when she is out, and she drinks between fights at the old rate: about 40 s from empty at level
   11. Whether "the progress" also means levelling more slowly is asked. OPEN.)
+- 220 (03:20, the Flooded Working's pool: black water streaked with fine white lines) "looks bad with these white ripples" (the water
+  lit its painted highlights, the sun's glints and tonight's caustics by the sun, in a cave. With the camera inside a cave they are off now
+  (UndergroundShading, the shader's _CrulandaUnderground). OPEN until the tour frame and Chris's look.)

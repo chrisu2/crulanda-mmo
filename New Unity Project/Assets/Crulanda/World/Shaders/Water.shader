@@ -65,6 +65,7 @@ Shader "Crulanda/Water"
         fixed4 _DeepColor, _MidColor, _ShallowColor, _BedTint, _FoamColor;
         float4 _Drift;
         float _MidDepth, _DeepDepth, _Murk, _Glow, _FoamWidth, _FoamWaves, _Sparkle, _SkyTint, _Bump, _FlowSpeed, _Wave, _Refract, _Glare, _Caustics;
+        float _CrulandaUnderground;   // 1 with the camera in a cave (UndergroundShading): no sun to light highlights, glints or caustics
         // The weather (WorldWeather, global): x cloud dimness by day, y rain. Zero without weather.
         float4 _WeatherTone;
         // Only the foam is lit here (it is the one thing on the water with a body of its own), softly so it never goes flat on
@@ -172,7 +173,7 @@ Shader "Crulanda/Water"
             // surface), by the sun or moon, strongest a hand's depth down, gone by the deep and under cloud; seen with the bed.
             float2 bedAt = (IN.worldPos - V * thick).xz;
             float focus = smoothstep(0, 0.2, d) * (1 - smoothstep(_MidDepth, _DeepDepth, d)) * (1 - _WeatherTone.x) * saturate(_WorldSpaceLightPos0.y * 2);
-            lifted += _LightColor0.rgb * (Caustic(bedAt, t) * _Caustics * focus * wet * show);
+            lifted += _LightColor0.rgb * (Caustic(bedAt, t) * _Caustics * focus * wet * show) * (1 - _CrulandaUnderground);
             float clear = exp2(-_Murk * lerp(d, thick, 0.3)) * show;
             float3 water = lerp(body, lifted, clear);
 
@@ -196,11 +197,11 @@ Shader "Crulanda/Water"
             float lobe = pow(saturate(dot(R, _WorldSpaceLightPos0.xyz)), 10);
             float cut = lerp(0.7, 0.56, lobe), aa = fwidth(h);
             float spark = smoothstep(cut - aa, cut + 0.06 + aa, h) * saturate(1 - aa * 4) * show * wet;
-            float3 glint = _LightColor0.rgb * spark * lerp(0.14, 0.75, lobe) * _Sparkle;
+            float3 glint = _LightColor0.rgb * spark * lerp(0.14, 0.75, lobe) * _Sparkle * (1 - _CrulandaUnderground);
             // The sun's path itself (playtest note 9: glints on water): along the narrow reflection the brightest blobs go past
             // the paint's cap, so the bloom catches them as glints, a few and soft (the bloom's prefilter keeps one pixel from flaring).
             float path = pow(saturate(dot(R, _WorldSpaceLightPos0.xyz)), 120) * spark * _Sparkle;
-            float3 sunGlint = _LightColor0.rgb * path * 2.2;
+            float3 sunGlint = _LightColor0.rgb * path * 2.2 * (1 - _CrulandaUnderground);
 
             // Foam: a soft band hugging whatever the water touches (banks, rocks, posts, legs; from the depth texture), its width
             // wobbling slowly, and on still water a thinner line washing in toward the shore every few seconds (half as much on

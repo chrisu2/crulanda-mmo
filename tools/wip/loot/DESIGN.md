@@ -374,6 +374,11 @@ Rules for named items:
 Cut from v1: random-roll treasure chests, rare spawns, salvage (section 4).
 
 ### 3.6 Sets and unique effects
+**Chris, 2026-10-15 (~13:00, verbatim): "loot: we need set pieces like 6 pieces. 2/6 give 1 special, 4/6 another special ability 6/6
+full set 3 special abilities and these are class specific."** So: class sets of six pieces (one class each); at 2 worn the first
+special, at 4 the second, at 6 the third (three in all with the whole set). Specials are class abilities changed or added, not plain
+stats. Section 3.8 (below) is the plan; the four-piece Crowsfoot set and the zone sets stay as they are.
+
 
 Two sets, both four pieces including the existing boss crown (`ITEMS_V1.md`): The Deserter King's Due (Crowsfoot Hollow) and Vigil of the Root-Mother (the Root-Mother's Deep). Bonuses switch on by pieces worn and are recomputed whenever equipment changes; nothing is saved.
 

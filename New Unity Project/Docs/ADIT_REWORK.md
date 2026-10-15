@@ -1249,6 +1249,12 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   cloister stair is whole; the altar's way home of 236 m is a detour that starts somewhere at the chapel's west door (the table flags
   a complete step four times its straight length now). The fixture test's two (its knoll ray; a rail check that stopped passing
   when the deck bodies changed) are the test cave's, not the Adit's.
+- **01:41: the Adit nav, camps, gate and release tests 26/26.** The cloister stair's foot sat 1.5 m below the Gallery's floor (the
+  step walk found it: a 321 m detour three steps from the end); its last rows raised. The releases (a helper's: `EncounterSession.Release.cs`)
+  pass their three: Lusk's relief shift three seconds after his death, the Wake's four waves in order with Hollowsong's choir at half,
+  the keg's release of Hobb. The camera tour (28 frames, `world-captures/adit-tour`) shows the chapel as a nave now; the kit's
+  entrance-top module placed by height came out a 20 m slab across the chapel's west end and the Scriptorium (a thin up-axis): the
+  packs helper sizes every piece by an explicit box. The fixture test's two (its knoll ray, its rail check) are the reds left.
 - **Left (2026-10-15):**
   the web test's shut-door line (`home`, the stair way with the door open, came out 236 m: NavReach.Length pads a way with legs that
   wander into pockets, so the shut way is not 50 m longer; NavReach wants the hop search, and an honest length with it); the fixture

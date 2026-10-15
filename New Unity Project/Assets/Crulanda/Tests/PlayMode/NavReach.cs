@@ -20,7 +20,7 @@ namespace Crulanda.Tests
         public static bool Walkable(Vector3 from, Vector3 to, List<Vector3> corners = null)
         {
             var path = new NavMeshPath(); corners?.Clear(); var start = from;
-            for (int leg = 0; leg < 16; leg++)
+            for (int leg = 0; leg < 64; leg++)   // sixty-four legs: the way from the yard to the Pitch Pit is some 1,200 m of winding passage
             {
                 if (!NavMesh.CalculatePath(from, to, NavMesh.AllAreas, path) || path.corners.Length == 0) break;
                 corners?.AddRange(path.corners);
@@ -37,7 +37,7 @@ namespace Crulanda.Tests
         public static float Length(Vector3 from, Vector3 to, int mask = NavMesh.AllAreas)
         {
             var path = new NavMeshPath(); float total = 0;
-            for (int leg = 0; leg < 16; leg++)
+            for (int leg = 0; leg < 64; leg++)   // sixty-four legs: the way from the yard to the Pitch Pit is some 1,200 m of winding passage
             {
                 if (!NavMesh.CalculatePath(from, to, mask, path) || path.corners.Length == 0) return float.PositiveInfinity;
                 for (int i = 1; i < path.corners.Length; i++) total += Vector3.Distance(path.corners[i - 1], path.corners[i]);

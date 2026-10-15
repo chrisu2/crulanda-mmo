@@ -1177,7 +1177,15 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
   cave's passage (shrink .7): R86 reached the Sunless River 59/341 (was 9) and the Dry Ledge 54/189 (was 0), the rest unchanged, so
   the corner rule is not the whole of it. R87's map names, for each hall, the path status from the nearest reached sample to the
   first unreached one and what the straight line between them meets: read `adit-nav-diagnostics-R87.txt` first.
-- **Still red after R86 (PlayMode 19/29):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
+- **The finding of 21:12 (R87):** for most halls the first "unreached" sample is PathComplete from a reached sample 3-30 m away (the
+  Muster Yard: 3.4 m). One `NavMesh.CalculatePath` from the yard gives up part way through the drawn-out dungeon (its search budget),
+  so the floor map, the camps test (AditNavTests "Every camp can be walked to"), the breadcrumbs and the run order were measuring the
+  budget, not the caves. `NavReach.Length` already searched leg by leg but gave up when a leg ended farther off as the crow flies (a leg
+  round the Gallery does); now a leg only has to get somewhere. The map and the camps test use it. The real short blocks the map
+  names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183): PathPartial over 11 m) and the Cutting
+  Drift's floor from the Gallery below it (the drift is entered by the bridge; its own floor from the Company door needs the walk
+  from the bridge, not the floor). R88 (the map and AditNavTests, AditTests, AditGateTests with the new search): R88 RESULT.
+- **Still red after R86 (PlayMode 19/29; see R88 above for the change):** the camps nobody can walk to (the Pen's, the Cutting Drift's and everything past them),
   the breadcrumbs (56 of 480), the sim's run order (the Foundry unreachable), the web's joins (the cloister stair from the altar),
   the centreline walk at the tally stage, the fixture trestle's rail (a raycast; new in R83, not looked at), the fixture knoll ray,
   the solid tops. The first of these is the one to fix: every branch floor reachable, and most of the rest follows.

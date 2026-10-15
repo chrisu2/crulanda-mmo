@@ -26,7 +26,7 @@ namespace Crulanda.World
         /// <summary>Ring centres on the floor (world), half-widths, heights, the distance in from the mouth along the floor, and the land's height over each.</summary>
         public readonly List<Vector3> Centre = new List<Vector3>();
         public readonly List<float> Half = new List<float>(), Height = new List<float>(), Along = new List<float>(), Land = new List<float>();
-        Rect box, surfaceBox; float low = float.MaxValue, high = float.MinValue;
+        Rect box, surfaceBox; float low = float.MaxValue, high = float.MinValue, widest;
         Vector2 mouthAt, mouthOut;   // the mouth ring's centre, and the level way out of the mouth: nothing in front of it is inside
         readonly List<int> surface = new List<int>();   // the rings near the surface: only they can cover the land
 
@@ -52,7 +52,7 @@ namespace Crulanda.World
                     var c = new Vector3(x, mouth + Mathf.Lerp(D(seg), D(seg + 1), u), z);   // linear: an eased drop steepens mid-row past what feet and agents climb
                     if (!first) along += new Vector2(c.x - last.x, c.z - last.z).magnitude;
                     Centre.Add(c); Half.Add(Mathf.Max(.2f, q.z)); Height.Add(Mathf.Max(.3f, q.w)); Along.Add(along); Land.Add(ground(x, z));
-                    low = Mathf.Min(low, c.y - 2); high = Mathf.Max(high, c.y + Mathf.Max(.3f, q.w) * 1.2f + 1);
+                    low = Mathf.Min(low, c.y - 2); high = Mathf.Max(high, c.y + Mathf.Max(.3f, q.w) * 1.2f + 1); widest = Mathf.Max(widest, Mathf.Max(.2f, q.z));
                     last = c; first = false;
                 }
             }
@@ -315,6 +315,27 @@ namespace Crulanda.World
             float u = Mathf.Abs(d.x * fwd.y - d.y * fwd.x) / Half[i]; if (u >= shrink) return false;
             float up = p.y - Centre[i].y; if (up < -.6f) return false;
             return up < Height[i] * Mathf.Pow(Mathf.Max(0, 1 - Mathf.Pow(u, 8f / 3)), .425f) * shrink;
+        }
+        /// <summary>
+        /// Whether any of a triangle is in the passage's open air (<see cref="Open"/> at <paramref name="shrink"/>), sampled about every half
+        /// metre over it (2026-10-15, S7): a wall's or a knoll's face metres across can straddle a narrow passage that runs through it, its
+        /// corners above and below the passage and its middle to one side, so no corner or middle is in the air and the face stood across
+        /// the passage by its wall (the fixture's loop, where it comes through the hall's knoll to its lip: AditCaveBuildTests "the loop
+        /// opens over the hall"). Only a face near the passage is sampled.
+        /// </summary>
+        public bool OpenOnFace(Vector3 a, Vector3 b, Vector3 d, float shrink = .86f)
+        {
+            if (Centre.Count < 2) return false;
+            float reach = Mathf.Max(Vector3.Distance(a, b), Mathf.Max(Vector3.Distance(b, d), Vector3.Distance(d, a)));
+            var m = (a + b + d) / 3; var q = new Vector2(m.x, m.z);
+            if (q.x < box.xMin - reach || q.x > box.xMax + reach || q.y < box.yMin - reach || q.y > box.yMax + reach) return false;
+            if (m.y < low - reach || m.y > high + reach) return false;
+            Nearest(q, out float flat); if (flat > widest + reach + .5f) return false;
+            int steps = Mathf.Clamp(Mathf.CeilToInt(reach / .5f), 2, 48);
+            for (int u = 0; u <= steps; u++)
+                for (int v = 0; u + v <= steps; v++)
+                    if (Open(a + (b - a) * (u / (float)steps) + (d - a) * (v / (float)steps), shrink)) return true;
+            return false;
         }
         /// <summary>Whether a point is open air in any cave but <paramref name="not"/>.</summary>
         public static bool OpenInOther(Hollow not, Vector3 p, float shrink = .86f) { foreach (var h in All) if (h != not && h.Open(p, shrink)) return true; return false; }

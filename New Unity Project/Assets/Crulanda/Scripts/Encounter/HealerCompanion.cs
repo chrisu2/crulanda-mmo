@@ -22,7 +22,16 @@ namespace Crulanda.Encounter
         /// </summary>
         public const float HealPerLevel = .15f; public const int HealthPerLevel = 22;
         public static int HealFor(int power, int playerLevel, float perLevel = HealPerLevel) { return Mathf.RoundToInt(power * (1 + perLevel * (Mathf.Max(1, playerLevel) - 1))); }
-        int baseHealth;
+        /// <summary>
+        /// Her mana is a limit (Chris, 2026-10-15: "mira never runs out of mana healing. need to slow the progress down"): her pool grows
+        /// with your level as her heal does, but each heal costs its mana grown by the same and a quarter more, so a long fight empties
+        /// her, and she drinks between fights at 8 a second (some 40 s from empty at level 11) rather than being full in 15.
+        /// </summary>
+        public const float HealCostMore = 1.25f;
+        public static int HealCost(int cost, int playerLevel) { return Mathf.RoundToInt(cost * (1 + HealPerLevel * (Mathf.Max(1, playerLevel) - 1)) * HealCostMore); }
+        public static int ManaFor(int baseMana, int playerLevel) { return Mathf.RoundToInt(baseMana * (1 + HealPerLevel * (Mathf.Max(1, playerLevel) - 1))); }
+        int baseHealth, baseMana; bool warnedLow, warnedOut;
+        bool SpendHeal(int cost) { bool ok = Spend(HealCost(cost, session.Player.Level)); if (!ok && session.InCombat && !warnedOut) { warnedOut = true; session.Message("Mira: I'm out of mana!"); } return ok; }
         /// <summary>Her health at level 1 (what every save held for a whole Mira before she grew with your level).</summary>
         public int BaseHealth { get { return baseHealth; } }
         /// <summary>Sets her health for the player's level (her own level stays 1: nothing reads it).</summary>
@@ -30,6 +39,8 @@ namespace Crulanda.Encounter
         {
             if (baseHealth <= 0) baseHealth = actor.Health.Pool.Max;
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, baseHealth + HealthPerLevel * (Mathf.Max(1, playerLevel) - 1));
+            if (baseMana <= 0) baseMana = actor.Resource.Pool.Max;
+            if (baseMana > 0) actor.Stats.SetBase(Crulanda.Core.StatType.MaxPower, ManaFor(baseMana, playerLevel));
         }
         void Awake() { agent = GetComponent<NavMeshAgent>(); }
         float nextHush;
@@ -71,6 +82,8 @@ namespace Crulanda.Encounter
             }
             if (!session.Progress.recruited) return;
             if (Time.time >= nextRegen) { nextRegen = Time.time + 1; actor.Resource.Pool.Change(session.InCombat ? 1 : 8); }
+            if (!session.InCombat) { warnedLow = warnedOut = false; }
+            else if (!warnedLow && actor.Resource.Pool.Ratio < .2f) { warnedLow = true; session.Message("Mira: I'm running low on mana!"); }
             if (Time.time >= nextHush) Hush();
             var heal = Hasted(session.content.healingAbility);
             if (abilities.IsCasting)
@@ -105,7 +118,7 @@ namespace Crulanda.Encounter
             if (session.Weaver != null) Consider(session.Weaver.actor);
             if (recipient.Health.Pool.Ratio < .78f && Vector3.Distance(recipient.transform.position, transform.position) <= heal.range)
             {
-                var result = abilities.TryStart(heal, Time.time, Spend, () => {
+                var result = abilities.TryStart(heal, Time.time, SpendHeal, () => {
                     if (!recipient.IsAlive) return;
                     int healed = recipient.GetComponent<Combatant>().Heal(HealFor(heal.power, session.Player.Level), actor); if (healed > 0) HealFx.Show(recipient.transform);
                     session.FloatText(recipient.transform.position, "+" + healed, new Color(.3f,1,.7f));
@@ -118,7 +131,7 @@ namespace Crulanda.Encounter
                     return;
                 }
             }
-            Activity = actor.Resource.Pool.Current < heal.cost ? "Recovering mana" : distance > 3 ? "Following you" : "Watching your flank";
+            Activity = actor.Resource.Pool.Current < HealCost(heal.cost, session.Player.Level) ? "Out of mana" : !session.InCombat && actor.Resource.Pool.Ratio < .95f ? "Drinking: mana " + Mathf.RoundToInt(actor.Resource.Pool.Ratio * 100) + "%" : distance > 3 ? "Following you" : "Watching your flank";
             var target = session.Target;
             var bolt = Hasted(session.content.boltAbility);
             if (target != null && target.FightingParty && target.actor.IsAlive && !target.LeaveAlone && recipient.Health.Pool.Ratio > .8f &&

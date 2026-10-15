@@ -224,5 +224,13 @@ namespace Crulanda.Tests
             // Mira keeps pace: her heal at the cap is well over twice her heal at level 1.
             Assert.AreEqual(42, HealerCompanion.HealFor(42, 1)); Assert.Greater(HealerCompanion.HealFor(42, EncounterProgress.LevelCap), 2 * 42);
         }
+        [Test] public void Miras_mana_runs_out_in_a_long_fight()
+        {
+            // Chris 2026-10-15: "mira never runs out of mana healing". At level 11 her pool holds fewer heals than at level 1 (the cost
+            // grows a quarter faster than the pool), and a 35 s fight of a heal every 3.5 s (her cooldown) empties it.
+            int pool1 = HealerCompanion.ManaFor(120, 1), pool11 = HealerCompanion.ManaFor(120, 11), cost1 = HealerCompanion.HealCost(18, 1), cost11 = HealerCompanion.HealCost(18, 11);
+            Assert.Less(pool11 / (float)cost11, pool1 / (float)cost1, "fewer heals in her pool at 11 than at 1");
+            Assert.Less(pool11 + 35, 10 * cost11, "ten heals in 35 s cost more than her pool and her in-fight regeneration");
+        }
     }
 }

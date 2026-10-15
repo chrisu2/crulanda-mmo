@@ -756,3 +756,7 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   (not yet known why. The Adit camera tour now times the yard's view with each suspect off in turn: shadows, the point lights, the grass,
   each big group of the zone's scenery (the caves behind the hill among them), and Unity's counters: adit-perf.txt beside the frames.
   OPEN.)
+- 219 (03:10) "mira never runs out of mana healing. need to slow the progress down" (her heal grew 15% a level and its cost did not, and
+  she was full again 15 s after a fight. Now her pool grows with your level as her heal does, a heal costs that much more and a quarter
+  again, she says when she runs low and when she is out, and she drinks between fights at the old rate: about 40 s from empty at level
+  11. Whether "the progress" also means levelling more slowly is asked. OPEN.)

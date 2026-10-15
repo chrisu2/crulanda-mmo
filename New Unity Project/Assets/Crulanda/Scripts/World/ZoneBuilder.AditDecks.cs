@@ -338,9 +338,9 @@ namespace Crulanda.World
             }
         }
         /// <summary>A solid box (a post, a rail) standing on <paramref name="foot"/>: in the way of you and every agent (NavBlocker).</summary>
-        static void DeckBlock(Transform parent, Vector3 foot, Vector3 size, Quaternion rot)
+        static void DeckBlock(Transform parent, Vector3 foot, Vector3 size, Quaternion rot, string what = null)
         {
-            var o = new GameObject("Solid"); o.transform.SetParent(parent, false); o.transform.localPosition = foot + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;
+            var o = new GameObject(what == null ? "Solid" : "Solid: " + what); o.transform.SetParent(parent, false);   // named for AditNavDiagnostics (what stands in a deck's way) o.transform.localPosition = foot + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;
             o.AddComponent<BoxCollider>().size = size; o.AddComponent<NavBlocker>();
         }
 
@@ -421,7 +421,7 @@ namespace Crulanda.World
                 }
                 float tall = under - foot, w = style == "stone" ? .7f : .26f; var at = new Vector3(top.x, foot, top.z);
                 Part(PrimitiveType.Cube, look, at + Vector3.up * tall / 2, new Vector3(w, tall, w), style == "stone" ? cut : post);
-                DeckBlock(solidRoot, at, new Vector3(w + .05f, Mathf.Max(.1f, tall - .15f), w + .05f), Quaternion.identity);
+                DeckBlock(solidRoot, at, new Vector3(w + .05f, Mathf.Max(.1f, tall - .15f), w + .05f), Quaternion.identity, "post of " + d.name);
             }
             if (style == "timber" || style == "stone")
             {
@@ -451,7 +451,7 @@ namespace Crulanda.World
                     {
                         var at = spot.mid[k] + spot.across[k] * side * (spot.half + .12f);
                         Part(PrimitiveType.Cube, look, at + Vector3.up * .5f, new Vector3(.24f, 2.2f, .24f), post);
-                        DeckBlock(solidRoot, at + Vector3.down * .6f, new Vector3(.28f, 2.2f, .28f), Quaternion.identity);
+                        DeckBlock(solidRoot, at + Vector3.down * .6f, new Vector3(.28f, 2.2f, .28f), Quaternion.identity, "rope post of " + d.name);
                     }
             if (style == "scree")   // rubble along its flanks (round its rim)
             {
@@ -492,7 +492,7 @@ namespace Crulanda.World
             {
                 var along = b - a; float len = along.magnitude; if (len < .05f) return; var rot = Quaternion.LookRotation(along, Vector3.up);
                 var inset = -outward * .08f;
-                DeckBlock(solidRoot, (a + b) / 2 + inset, new Vector3(.15f, 1.6f, len + .05f), rot);
+                DeckBlock(solidRoot, (a + b) / 2 + inset, new Vector3(.15f, 1.6f, len + .05f), rot, "rail of " + d.name);
                 if (style == "stone") { Part(PrimitiveType.Cube, look, (a + b) / 2 + inset + Vector3.up * .48f, new Vector3(.3f, .95f, len + .02f), cut, rot); return; }
                 if (style == "rope")
                 {

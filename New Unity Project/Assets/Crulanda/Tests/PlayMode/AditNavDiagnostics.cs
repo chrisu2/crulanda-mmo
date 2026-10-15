@@ -113,7 +113,7 @@ namespace Crulanda.Tests
                         {
                             first = p;
                             var hits = Physics.OverlapBox(p + Vector3.up * 1.1f, new Vector3(.5f, 1, .5f), Quaternion.identity, ~0, QueryTriggerInteraction.Ignore);
-                            what = string.Join("; ", hits.Where(h => h != null && (d.root == null || !h.transform.IsChildOf(d.root))).Select(h => h.transform.root.name + "/" + h.name).Distinct().Take(6));
+                            what = string.Join("; ", hits.Where(h => h != null && (d.root == null || !h.transform.IsChildOf(d.root))).Select(h => h.transform.root.name + "/" + h.name + " " + h.bounds.size.ToString("0.0") + " at " + h.bounds.center.ToString("0.0")).Distinct().Take(6));
                         }
                     }
                 }

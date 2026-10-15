@@ -1400,6 +1400,22 @@ copied. **No machine of any kind** (memory rule, "i told you NO Machines!"): rai
 - Then the Cove's own group run (`group_run.ps1`, the Adit, events on). Only when it passes does `adit-cove` merge into `adit-rework`
   (the plan's "until the Cove's own group run passes": the branch is that gate; `COVE_FINALE = False` is the way back).
 
+**R129 (the first Unity run of the merged branch, lane A) and what was changed:**
+- **The Dead Line was cut off 5 m in.** It left the Rail Hall through the hall's closing end, and the Deep Way's end shell stood across it
+  (`adit-nav-diagnostics.txt`: the first unreached samples at x -103, "the line meets the Deep Way shell at (-99, -98, 298)"). So
+  nothing past it was reached: the siding, the quay, the scaffold, the barge, the stern castle (AditCoveTests, AditNavTests).
+  - Now it leaves through the hall's south-west side wall, where the line runs, as the Pitch Pit leaves by a side wall.
+  - The Black Cove's mouth is now in the Dead Line's south wall; the line runs on past it to the buffers and the spare wagon.
+- **The gangway did not join the barge** ("The gangway <-> The ore barge: path none"): the barge's own rails and the gangway's rails
+  walled it off. The barge, the stern castle and the gangway have no rails now (a gunwale for the eye only); the gangway ends on the
+  deck's middle.
+- **The quay's water-side rail stood across the scaffold ramp's foot:** the quay has no rail now.
+- **The quay's north end met the beach's wall:** the quay, scaffold and barge stand 2 m further in (asides 26.5, 20.5, 12.5).
+- **One netter spawned on the quay under tier 1:** the camp's radius is 0.6 m now.
+- **The haul was null on a second load:** it is now made once the rope teams stand, and the test waits for it.
+- **AditTests' run order:** the quick run ends in the Black Cove, with the Deep Way just before it, and its last fight is Danner.
+- Not mine and not touched: the Foundry overseers and smelter "in a pocket" (AditNavTests, the polish's side).
+
 ## 21. S7 as built: the polish (2026-10-15, branch `adit-polish` off `adit-rework`; MADE and compiled, not run in Unity, OPEN)
 Chris's answers of 2026-10-15 (verbatim): Q4 "Yes, add them"; Q1 "20 minute respawn" (done before this, 1200 s); Q2 "Keep ~75 min";
 Q3 "Build the Cove" (S6, another helper's: nothing here touches the Rail Hall, the Dead Line, the Black Cove, Danner or RideCarriage).

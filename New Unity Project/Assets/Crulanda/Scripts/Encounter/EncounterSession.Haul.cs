@@ -68,7 +68,21 @@ namespace Crulanda.Encounter
             if (Zone == null || !Zone.Anchors.TryGetValue(HaulAnchor, out var at)) return;
             var teams = RopeTeamCamps(); if (teams.Count == 0) return;
             var haulers = Enemies.FindAll(e => e != null && e.Camp && teams.Contains(e.CampIndex));
-            if (haulers.Count == 0) return;
+            if (haulers.Count == 0) { StartCoroutine(HaulWhenTheTeamsStand(at, teams)); return; }   // (R129: their camps not spawned yet on this load)
+            MakeHaul(at, haulers);
+        }
+        System.Collections.IEnumerator HaulWhenTheTeamsStand(Vector3 at, List<int> teams)
+        {
+            for (float until = Time.time + 30; Time.time < until; )
+            {
+                yield return null;
+                if (Haul != null || Zone == null) yield break;
+                var haulers = Enemies.FindAll(e => e != null && e.Camp && teams.Contains(e.CampIndex));
+                if (haulers.Count > 0) { MakeHaul(at, haulers); yield break; }
+            }
+        }
+        void MakeHaul(Vector3 at, List<EncounterEnemy> haulers)
+        {
             if (Zone.CoveWarps != null) foreach (var w in Zone.CoveWarps) if (w != null) w.SetActive(true);
             foreach (var i in Zone.Interactables) if (i.kind == "warps") i.hiddenUntil = 0;
             var go = new GameObject("The Haul"); go.transform.SetParent(transform, false);

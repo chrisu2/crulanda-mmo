@@ -278,15 +278,18 @@ CAVES = [
     # (S6, the Deadmines end-piece; Chris 2026-10-15, Q3 "Build the Cove") DL The Dead Line: the old line runs on west out of the Rail
     # Hall's far end, a rail tunnel falling gently, with two sidings where the rearguard and the spare wagons stand.
     Cave('DL', 'The Dead Line', 'deadline', [
-        (-88, 302, 4.5, 5.5, None), (-96, 302, 4.5, 5.5, -100), (-104, 302, 4.5, 5.5, -100.5), (-118, 301, 4.5, 5.5, -102), (-134, 300, 9, 7, -103.5),
-        (-146, 299, 9, 7, -104.5), (-158, 298, 4.5, 5.5, -105.5), (-178, 296, 4.5, 5.5, -107.5), (-198, 293, 4.5, 5.5, -109), (-214, 290, 9, 7, -110.5),
-        (-226, 287, 9, 7, -111.5), (-238, 283, 4.5, 5.5, -112.5), (-250, 276, 4.5, 5.5, -113.5), (-258, 268, 4.5, 5.5, -114)],
+        # (R129: out through the Rail Hall's south-west side wall where the line runs, not its far end: a branch leaving through its
+        # parent's closing end met the parent's end shell, and the whole line was cut off 5 m in. The Pitch Pit leaves by a side wall too.)
+        (-72, 282, 4.5, 5.5, None), (-80, 274, 4.5, 5.5, -100), (-90, 267, 4.5, 5.5, -100.5), (-104, 263, 4.5, 5.5, -101.5), (-120, 262, 9, 7, -103),
+        (-134, 262, 9, 7, -104), (-148, 263, 4.5, 5.5, -105), (-170, 266, 4.5, 5.5, -107), (-192, 270, 4.5, 5.5, -108.5), (-210, 273, 9, 7, -110),
+        (-222, 274, 9, 7, -111), (-234, 275, 4.5, 5.5, -112.5), (-246, 275, 4.5, 5.5, -113.5), (-258, 275, 4.5, 5.5, -114), (-270, 275, 4.5, 5.5, -114)],
         within='D', canon='CANON-EXPANDED: the mag-rail line south under the range (book2 ch.19); GAME-ONLY: this stretch, its sidings and all in it'),
     # BC The Black Cove: off the Dead Line's end, a beach of black scree down into a great natural cave of still black water, 88 m across
     # and 36 high; the quay along its west wall, the scaffold, the moored ore barge and its stern castle; the drain at its south end,
     # where the water goes out under the range. Swim water (the flood), 2.6 m deep over a floor 121 m under the yard.
     Cave('BC', 'The Black Cove', 'cove', [
-        (-252, 274.5, 4.5, 5.5, None), (-262, 262, 5, 6, -114), (-272, 250, 9, 9, -114.3), (-284, 238, 22, 20, -115), (-294, 224, 36, 28, -117),
+        # (R129: its mouth in the Dead Line's south wall, the line running on past it to the buffers, not out of the line's closing end.)
+        (-247, 273.5, 4.5, 5.5, None), (-256, 262, 5, 6, -114), (-268, 250, 9, 9, -114.3), (-282, 238, 22, 20, -115), (-294, 224, 36, 28, -117),
         (-302, 208, 42, 34, -119.5), (-304, 190, 44, 36, -121), (-304, 165, 44, 36, -121), (-304, 140, 42, 34, -121), (-302, 120, 30, 26, -121),
         (-299, 106, 14, 14, -121), (-298, 98, 6, 8, -121)],
         within='DL', canon='GAME-ONLY (the Black Cove, its quay, the barge and all in it; the Sandthrone are CANON)'),
@@ -378,7 +381,7 @@ def make_decks():
 WATER_Y = -121 + 2.6      # the cove's floor and the flood's depth (make_works)
 QUAY_Y, TIER1_Y, TIER2_Y = WATER_Y + .8, WATER_Y + .8 + 2.2, WATER_Y + .8 + 3.4
 BARGE_Y, CASTLE_Y = WATER_Y + 4.2, WATER_Y + 7.5
-QUAY_A, SCAFF_A, BARGE_A, STAIR_A = 28.5, 22.5, 14.5, 11.0
+QUAY_A, SCAFF_A, BARGE_A, STAIR_A = 26.5, 20.5, 12.5, 9.0   # (R129: two metres further in; the quay's outer edge at 28.5 met the beach's wall)
 def cz(z):
     """The Black Cove's along where its line crosses z (it runs south down x about -304)."""
     return along('BC', -304, z)
@@ -393,7 +396,7 @@ def cove_decks():
     landing stage at the quay's south end, where a swimmer climbs out. Timber, rope and rubble, hand-worked: no machine (0.05)."""
     B = 'BC'; shore = 74.0   # where the beach's floor comes up to the quay's height
     q0, q1 = shore, cz(146)
-    deck('The quay', B, q0, q1, aside=QUAY_A, rise=rise_to(B, q0, QUAY_Y), rise2=rise_to(B, q1, QUAY_Y), width=8, rails='left')
+    deck('The quay', B, q0, q1, aside=QUAY_A, rise=rise_to(B, q0, QUAY_Y), rise2=rise_to(B, q1, QUAY_Y), width=8, rails='none')   # (R129: its rail stood across the scaffold ramp's foot)
     r0, r1 = cz(208), cz(200)
     deck('The scaffold ramp (north)', B, r0, r1, aside=QUAY_A - 4, aside2=SCAFF_A, rise=rise_to(B, r0, QUAY_Y), rise2=rise_to(B, r1, TIER1_Y), width=3)
     t0, t1 = r1, cz(176)
@@ -403,13 +406,13 @@ def cove_decks():
     v0, v1 = u1, cz(160)
     deck('The scaffold, tier 2', B, v0, v1, aside=SCAFF_A, rise=rise_to(B, v0, TIER2_Y), rise2=rise_to(B, v1, TIER2_Y), width=3, free=('end',))
     g = cz(166)
-    deck('The gangway', B, g, aside=SCAFF_A, aside2=BARGE_A + 2, rise=rise_to(B, g, TIER2_Y), width=2.6, rails='both')
+    deck('The gangway', B, g, aside=SCAFF_A, aside2=BARGE_A, rise=rise_to(B, g, TIER2_Y), width=2.6, rails='none')   # (R129: onto the deck's middle; no rails to wall it off from the deck)
     b0, b1 = cz(200), cz(165)
-    deck('The ore barge', B, b0, b1, aside=BARGE_A, rise=rise_to(B, b0, BARGE_Y), rise2=rise_to(B, b1, BARGE_Y), width=10, solid=True, free=('start', 'end'))
+    deck('The ore barge', B, b0, b1, aside=BARGE_A, rise=rise_to(B, b0, BARGE_Y), rise2=rise_to(B, b1, BARGE_Y), width=10, solid=True, free=('start', 'end'), rails='none')   # (R129: her rails walled the gangway off; a gunwale for the eye: ZoneBuilder.BlackCove)
     s0, s1 = cz(177), cz(165)
     deck("The stern castle's stair", B, s0, s1, aside=STAIR_A, rise=rise_to(B, s0, BARGE_Y), rise2=rise_to(B, s1, CASTLE_Y), width=3)
     c0, c1 = cz(165), cz(155)
-    deck('The stern castle', B, c0, c1, aside=BARGE_A, rise=rise_to(B, c0, CASTLE_Y), rise2=rise_to(B, c1, CASTLE_Y), width=10, solid=True, free=('start', 'end'))   # (its stair comes up its east side: check 6 holds the stair's end to it)
+    deck('The stern castle', B, c0, c1, aside=BARGE_A, rise=rise_to(B, c0, CASTLE_Y), rise2=rise_to(B, c1, CASTLE_Y), width=10, solid=True, free=('start', 'end'), rails='none')   # (its stair comes up its east side: check 6 holds the stair's end to it)
     l0, l1 = q1, cz(136)
     deck('The landing stage', B, l0, l1, aside=QUAY_A, rise=rise_to(B, l0, QUAY_Y), rise2=0, width=5, style='scree')
 
@@ -579,9 +582,9 @@ def cove_camps():
     off the bar (released by EncounterSession.Haul: event:haul1, event:haul2). No machine: ropes, timber bollards, hands."""
     B = 'BC'
     return [
-        camp('DL', (-140, 299.5), mob('Siding rearguard', 'Sandthrone docker', 'deserter', 3, 12, 12, 'docker', 2.5), 'cove', 1, aside=2, gate=PGATE),
+        camp('DL', (-127, 262), mob('Siding rearguard', 'Sandthrone docker', 'deserter', 3, 12, 12, 'docker', 2.5), 'cove', 1, aside=2, gate=PGATE),
         deck_camp(B, cz(214), QUAY_Y, mob('Rope team (north)', 'Sandthrone bargeman', 'deserter', 3, 12, 12, 'bargeman', 1.6, canon=BG), 'cove', 2, aside=QUAY_A - 1, gate=PGATE),
-        deck_camp(B, cz(188), TIER1_Y, mob('Harbour netters', 'Sandthrone harbour netter', 'deserter', 3, 12, 12, 'netter', 1.1, canon=BG), 'cove', 3, aside=SCAFF_A, gate=PGATE),
+        deck_camp(B, cz(188), TIER1_Y, mob('Harbour netters', 'Sandthrone harbour netter', 'deserter', 3, 12, 12, 'netter', .6, canon=BG), 'cove', 3, aside=SCAFF_A, gate=PGATE),
         deck_camp(B, cz(152), QUAY_Y, mob('Rope team (south)', 'Sandthrone bargeman', 'deserter', 3, 12, 12, 'bargeman', 1.6, canon=BG), 'cove', 4, aside=QUAY_A - 1, gate=PGATE),
         deck_camp(B, cz(186), BARGE_Y, mob('Up from the hold (first)', 'Sandthrone bargeman', 'deserter', 2, 12, 12, 'bargeman', 1.5, canon=BG), 'cove', after='event:haul1', aside=BARGE_A, gate='none'),
         deck_camp(B, cz(180), BARGE_Y, mob('Up from the hold (second)', 'Sandthrone bargeman', 'deserter', 2, 12, 12, 'bargeman', 1.5, canon=BG), 'cove', after='event:haul2', aside=BARGE_A, gate='none'),

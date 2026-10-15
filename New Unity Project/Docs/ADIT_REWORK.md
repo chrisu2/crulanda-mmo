@@ -1267,3 +1267,18 @@ was done, in order. TESTED where a run shows it; the rework stays on `adit-rewor
 - The fixture test's "loop opens over the hall" ray meets the Hub's own knoll (the knoll is not cut by a joining cave's air); the two
   solids with walkable tops (the bowl at (11, -6, -303), the Muster Yard) and the Scriptorium's; the breadcrumbs (56 of 480) and the
   run order follow the floor map.
+
+## 19. The chapter-house on KayKit's grid, and its doors (2026-10-15, 01:30-02:20; chainR116 the tour, R118 the proving build; lane B)
+Chris on the 02:00 tour frames of the chapel ("still not sure what this is and looks bad", "just the shape and design is bad", "use some of
+the dungeon assedt not just plain walls and arch") and of the Scriptorium's door ("now this looks blocked??", "does the door open?").
+- The four rooms rebuilt on the KayKit Dungeon Pack's 4 m grid (`ZoneBuilder.Adit.cs` KitHall/KitEndWall/Kit): floor tiles, walls in bays
+  with pillars, arched windows in the chapel's third row, torches, banners, the altar's dais and stair, the apse's window.
+- **The door that looked blocked was blocked.** KayKit's `wall_arched` is a blind arch: 124 vertices of stone brick inside the arch's
+  opening (|x| < 0.85, y 0.15..2.2). The swap to `wall_doorway` (d74570a2) put a shut red door leaf with a ring there instead (24 vertices
+  of planks and knocker). The one wall piece with nothing in its slot is `wall_doorway_sides` (0 vertices in |x| < 0.95 below y 2.5): a
+  2 m slot with 4 m returns, boxed (10, 8, KitThick): a 4 m clear, 5 m tall opening on both faces, the returns flattened into the wall's
+  metre (their inner faces are the reveals). The side runs start at |a| 5 so no wall module lands in the bay; corners at the ends; the
+  jamb Blocks (3, 8, 1) at a = +-3.5, so the navmesh gap stays 4 m. A flat lintel: the kit has no open arch (`wall_archedwindow_open`
+  boxed over the slot would fake one but shows its sill; not done). Commit e7f5f6a1; proven by R118's tour frame, not yet by Chris.
+- The chapel's tour shot (R116's frame 19 was a pink close-up: the camera at 4.5 m up stood in a wall) now from 9 m up by the east door.
+

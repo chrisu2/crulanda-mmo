@@ -30,7 +30,7 @@ ROOT = os.path.abspath(os.path.join(HERE, '..', '..', '..'))
 ZONES = os.path.join(ROOT, 'New Unity Project', 'Assets', 'Crulanda', 'EncounterContent', 'Zones')
 DOCS = os.path.join(ROOT, 'New Unity Project', 'Docs')
 SIZE = 800
-RESPAWN = 900          # ADIT_REWORK Q1 (no respawns while you are inside: 7200) is Chris's to answer; until then, as the Adit was
+RESPAWN = 1200         # ADIT_REWORK Q1: Chris, 2026-10-15, "20 minute respawn"
 RARE_RESPAWN = 1200
 
 # ---------------------------------------------------------------- the trace (Hollow's constructor)

@@ -77,6 +77,10 @@ the scorecard.
 | G10 | **The maps show the land.** | The minimap and the zone map draw `ZoneBuilder.MapTexture` (HudMaps.cs:176, :243), which says nothing about floors at different heights. | L9 | the cave map (S3) |
 
 ## 1. Decisions to ask Chris at S0 (the question prompt; recommended answer first)
+**Answered 2026-10-15 ~12:45 (the question prompt; Chris's picks verbatim): Q1 "20 minute respawn"; Q2 "Keep ~75 min (Recommended)";
+Q3 "Build the Cove"; Q4 "Yes, add them".** So: every camp respawns at 1200 s (adit_layout.py RESPAWN, adit.json); the length stays;
+S6 is built; the SwingLoad buckets go in (S7), hand-hauled, nothing that reads as a machine. Asked that morning after Chris's "i told
+you to finish adit before shutting down" (the night's end had gone to the lag, the published build and a shutdown).
 **Q1. No respawns while you are inside?** Recommended: yes.
 - Data only: every Adit camp gets respawn 7200 (today 900, two at 1200).
 - Leaving and coming back builds a fresh Adit anyway.

@@ -229,9 +229,6 @@ namespace Crulanda.Tests
         {
             foreach (var (camp, move, beast) in elites)
             {
-                // The duo's Nix is its second half, fought after the Rock-Eater (2026-10-15: at .8 of an elite on foot the run's party could not
-                // finish him before his enrage, AditNixFightTests); his health counts with the beast's, so he is not an elite alone here.
-                if (move != null && move.mob == "Nix, the turncoat") continue;
                 var alone = Fight(EliteBalance.Kit.Warrior, camp.levelMax, camp, move, beast, false, true);
                 Assert.IsFalse(alone.won, camp.mob + ": it wants Mira (" + EliteBalance.Cell(alone) + ").");
                 Assert.Less(alone.mobsLeft, .6f, camp.mob + ": but it is a fight, not a wall (" + EliteBalance.Cell(alone) + ").");

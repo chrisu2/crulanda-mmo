@@ -35,7 +35,14 @@ store cache; a picture of fly-out hotbar buttons: "keep this in mind when design
   proven only by a build's shader-error count.
 - **Zone music** (ZoneMusic: thirteen tracks of Chris's three ithappy packs by zone, night, the grey's edge, the caves and the fight;
   long quiet gaps; `/music`; the WAVs on disk and in the backup, not in git: 593 MB) and **the Fantasy pack's market pieces** (sixteen
-  round Oakhaven's stalls and the inn's yard). A proving build of all of it: PROVING_BUILD.
+  round Oakhaven's stalls and the inn's yard). A proving build of all of it, published 02:27 (shader errors 0; Oakhaven 96 fps at noon; the save backed up to
+  `save-backups/20261015-0227-before-music-publish`). The Scriptorium's door in its tour frame is an open archway, the party walking
+  through it.
+- **Worked nodes vanish whole** (note 214): the seam's rock and the fallen trunk go too, not only the ore; gone for the node's own
+  respawn with nobody about, shorter the more people are in the zone (the sims there and your party): half with ten, two fifths at most.
+- **The Sound panel** (note 215; the pause menu's "Sound"): Master, Music, Combat music, Sound effects, Ambient sounds, each a slider
+  and a Mute, kept between runs (`AudioMix`). The only sound in the game so far is the zone music; effects and ambient wait for sounds.
+  Published 02:35 (EditMode 6/6 on the sound and node tests, shader errors 0).
 
 ## 2026-10-15, 01:05 on: clues to every secret, stories from everyone, the book of lore (a helper's pass; OPEN until Chris's build)
 Chris (2026-10-14 23:40, verbatim): "find recipes/ book of lore/still havent found many secrets. all this for ALL Zones"; (2026-10-15 01:05):

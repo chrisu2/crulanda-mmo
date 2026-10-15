@@ -4470,6 +4470,9 @@ namespace Crulanda.World
                 // floor could be reached from the yard (AditNavDiagnostics 2026-10-14 20:55: the Pen, the Cutting Drift, the Foundry, the
                 // Muster Yard, the River, the Breach...).
                 if (Hollow.OpenInOther(h, t.TransformPoint(a), .7f) || Hollow.OpenInOther(h, t.TransformPoint(b2), .7f) || Hollow.OpenInOther(h, t.TransformPoint(d), .7f)) return true;
+                // And its edges' middles: the Gallery's knoll is some 13 m thick where the Cutting Drift's mouth sits 12 m up its wall, and a
+                // face there is wider than the drift's tube, spanning it with every corner and its middle in the rock (R91's picture, 21:45).
+                if (Hollow.OpenInOther(h, t.TransformPoint((a + b2) / 2), .7f) || Hollow.OpenInOther(h, t.TransformPoint((b2 + d) / 2), .7f) || Hollow.OpenInOther(h, t.TransformPoint((d + a) / 2), .7f)) return true;
                 return sharp.Count > 0 && (SharpOpen(t.TransformPoint(a)) || SharpOpen(t.TransformPoint(b2)) || SharpOpen(t.TransformPoint(d)));
             }
             for (int i = 0; i + 1 < n; i++)

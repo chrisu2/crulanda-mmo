@@ -6318,7 +6318,7 @@
       },
       "rotation": 60,
       "text": "Col Pennock's bundle, wedged in the sallow roots where he dropped it: a pot of lard, a knife, and his boots, which he says the webs took. He went in after the pigs at the first frost and came out barefoot, and would not go back for them.",
-      "item": "item.boar_tallow",
+      "item": "food.salt_flank",
       "xp": 30,
       "gold": 5,
       "canonStatus": "GAME-ONLY"

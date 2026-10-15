@@ -86,6 +86,11 @@ namespace Crulanda.Encounter
             s.Player.Stats.SetBase(StatType.MaxHealth, 100000); s.Player.Health.ApplyHealing(100000);
             zone.OpenGates(); yield return new WaitForSeconds(1);   // every door, bar and grille up, for the tour's eye
             var motor = s.Player.GetComponent<AdventurerMotor>(); motor.enabled = false;   // the camera is ours until the end
+            // A lamp on the camera for the frames' sake: the caves' own lamps do not carry at the tour's eye, and the first run's frames
+            // came out near black (2026-10-15 00:55). The frames are for looking at the dungeon, not at its lighting. (The ambient is the
+            // clock's, set again every frame: a lamp, not a lifted ambient.)
+            var lamp = new GameObject("Tour lamp").AddComponent<Light>(); lamp.transform.SetParent(s.View.transform, false);
+            lamp.type = LightType.Point; lamp.range = 80; lamp.intensity = 3.2f; lamp.color = new Color(1, .93f, .8f); lamp.shadows = LightShadows.None;
             var body = Array.FindAll(s.Player.GetComponentsInChildren<Renderer>(), r => r.enabled); foreach (var r in body) r.enabled = false;
             report.AppendLine("The Sealed Adit, camera tour (" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + "): zone " + zone.Zone.id + ", " + Hollow.All.Count + " caves, " + zone.Gates.Count + " gates opened.");
 

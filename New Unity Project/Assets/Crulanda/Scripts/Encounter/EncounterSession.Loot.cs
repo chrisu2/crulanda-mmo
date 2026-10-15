@@ -67,6 +67,54 @@ namespace Crulanda.Encounter
         }
         /// <summary>Health back each second out of combat: 7, and what worn gear adds (capped at +20).</summary>
         int RestRegen { get { return 7 + GearFx.restRegen; } }
+
+        // ---------- class set bonuses (loot DESIGN.md 3.8) ----------
+        /// <summary>The scale on the player's hits (DamageScaleFor) and heals (PlayerHealScale) while an ability resolves: the worn
+        /// sets' abilityPower on it, and an echo's share. 1 at any other time, so later ticks and swings are untouched.</summary>
+        public float GearPowerNow { get; private set; } = 1;
+        readonly System.Random gearRng = new System.Random();
+        /// <summary>
+        /// An ability's effect as it resolves, with the worn class set bonuses (StartAbility): stronger by its abilityPower while it
+        /// runs, then its procs (resource back, another ability's cooldown cut, or an echo: the effect once more, free, at the echo's
+        /// power; an echo fires no procs of its own).
+        /// </summary>
+        void ResolveWithGear(Crulanda.Abilities.AbilityDefinition a, System.Action effect)
+        {
+            float was = GearPowerNow, scale = GearEffects.PowerScale(GearFx, a != null ? a.id : null);
+            GearPowerNow = was * scale;
+            try { effect(); } finally { GearPowerNow = was; }
+            if (a == null || GearFx.abilities.Count == 0) return;
+            var procs = GearEffects.Proc(GearFx, a.id, gearRng.NextDouble);
+            ApplyGearProcs(procs);
+            if (procs.echo > 0 && Player != null && Player.IsAlive)
+            {
+                GearPowerNow = was * scale * procs.echo;
+                try { effect(); } finally { GearPowerNow = was; }
+            }
+        }
+        /// <summary>A landed weapon swing or auto-shot: the worn sets' procs on "auto" (no echo: a swing is not an ability).</summary>
+        void GearSwingProcs()
+        {
+            if (GearFx.abilities.Count == 0) return;
+            var procs = GearEffects.Proc(GearFx, LootDatabase.AutoTrigger, gearRng.NextDouble); procs.echo = 0;
+            ApplyGearProcs(procs);
+        }
+        void ApplyGearProcs(GearProcs procs)
+        {
+            if (procs == null || !procs.Any || Player == null || !Player.IsAlive) return;
+            if (procs.resource > 0 && Player.Resource != null) Player.Resource.Pool.Change(procs.resource);
+            foreach (var (id, seconds) in procs.resets) abilities.Shorten(id, seconds, Time.time);
+            FloatText(Player.transform.position + Vector3.up * .4f, string.Join(" ", procs.fired.ConvertAll(ShortProc)), new Color(1f, .82f, .3f));
+        }
+        /// <summary>A fired proc's float: its text up to the colon ("Echo: ..." shows "Echo").</summary>
+        static string ShortProc(string text) { int c = text.IndexOf(':'); return c > 0 ? text.Substring(0, c) : text; }
+        /// <summary>The party's classes for a class set group (LootDatabase.Roll): yours first, then each sim's.</summary>
+        public List<string> PartyClasses()
+        {
+            var l = new List<string> { Progress != null ? Progress.classId : null };
+            foreach (var c in PartySims) if (c != null && c.sim != null) l.Add(c.sim.classId);
+            return l;
+        }
         /// <summary>
         /// A new character in the zones starts with the Tempered Trailblade in hand (loot step L2, the owner's call), so the empty
         /// hands of the gear looks are never the first thing seen. Saved characters are never changed; the old Quiet Trail keeps
@@ -119,7 +167,7 @@ namespace Crulanda.Encounter
                 {
                     var context = LootContext.From(corpse.persistentId, Zone != null ? Zone.Zone.camps : null, corpse.actor.Level, corpse.Elite);
                     if (Armoury != null) { Armoury.Killed(context); armouryTallies = null; }
-                    drops = Loot.Roll(context, Items, owned, GearFx.luck, Progress.lootLuck, rng, has);
+                    drops = Loot.Roll(context, Items, owned, GearFx.luck, Progress.lootLuck, rng, has, PartyClasses());
                 }
                 else
                 {

@@ -30,6 +30,8 @@ namespace Crulanda.Encounter
     {
         public string id, name, kind = "gear", slot, description, canonStatus;
         public string trade, teaches, pouch, holds;
+        /// <summary>A class set's piece (loot DESIGN.md 3.8): only this class may wear it ("class.mage"); empty for anyone.</summary>
+        public string classOnly;
         public int quality = 1, level = 1, value = 1, stack = 1, slots;
         public int armor, stamina, strength, agility, intellect, spirit, weaponDamage, heal;
         public bool food;
@@ -367,19 +369,25 @@ namespace Crulanda.Encounter
             p.bag[a] = to; p.bag[b] = from;
             return true;
         }
-        public static bool CanEquip(ItemDef d, int level, out string why)
+        public static bool CanEquip(ItemDef d, int level, out string why) { return CanEquip(d, level, null, out why); }
+        /// <summary>Whether gear can be worn at this level by this class: a class set's piece only by its class (loot DESIGN.md 3.8;
+        /// a null <paramref name="classId"/> skips the class check).</summary>
+        public static bool CanEquip(ItemDef d, int level, string classId, out string why)
         {
             why = null;
             if (d == null || d.kind != "gear") { why = "That can't be worn."; return false; }
             if (d.level > level) { why = "Requires level " + d.level + "."; return false; }
+            if (!ClassMayWear(d, classId)) { string n = SimRoster.ClassName(d.classOnly); why = "Only " + ("AEIOU".IndexOf(n[0]) >= 0 ? "an " : "a ") + n + " can wear that."; return false; }
             return true;
         }
+        /// <summary>True unless the item is a class piece for another class (a null class is anyone's).</summary>
+        public static bool ClassMayWear(ItemDef d, string classId) { return d == null || string.IsNullOrEmpty(d.classOnly) || classId == null || d.classOnly == classId; }
         /// <summary>Equips the item in a bag slot; whatever was in that equipment slot goes back to the same bag slot (to the first free
-        /// ordinary slot when that one would not take it).</summary>
+        /// ordinary slot when that one would not take it). A class set's piece goes on only for its class (p.classId).</summary>
         public static bool Equip(EncounterProgress p, ItemDatabase db, int bagIndex, int level, out string why)
         {
             why = null; if (bagIndex < 0 || bagIndex >= p.bag.Count || p.bag[bagIndex].Empty) return false;
-            var d = db.Get(p.bag[bagIndex].item); if (!CanEquip(d, level, out why)) return false;
+            var d = db.Get(p.bag[bagIndex].item); if (!CanEquip(d, level, p.classId, out why)) return false;
             int slot = ItemDatabase.SlotIndex(d.slot);
             var old = p.equipment[slot]; int back = bagIndex;
             if (!old.Empty && bagIndex >= BagSize && !Accepts(p, db, bagIndex, db.Get(old.item))) { back = FirstFree(p); if (back < 0) { why = "Your bags are full."; return false; } }

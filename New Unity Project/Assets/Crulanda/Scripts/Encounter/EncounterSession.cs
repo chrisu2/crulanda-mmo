@@ -1276,13 +1276,16 @@ namespace Crulanda.Encounter
         public string PlayerCastName { get { return abilities.IsCasting ? abilities.Casting.name : workName; } }
 
         // ---------- helpers for class kits ----------
-        /// <summary>Spends the player's class resource and starts the ability (casts complete later via Update).</summary>
+        /// <summary>Spends the player's class resource and starts the ability (casts complete later via Update). Every kit's abilities
+        /// pass through here, so this is where worn class set bonuses work (loot DESIGN.md 3.8): the cost, cooldown and cast time are
+        /// the set's (GearEffects.Adjust), and the effect resolves through ResolveWithGear (power and procs).</summary>
         public AbilityStartResult StartAbility(AbilityDefinition a, Action effect)
         {
-            var result = abilities.TryStart(a, Time.time, cost => {
+            var use = GearEffects.Adjust(a, GearFx);
+            var result = abilities.TryStart(use, Time.time, cost => {
                 if (Player.Resource.Pool.Current < cost) return false;
                 Player.Resource.Pool.Change(-cost); return true;
-            }, effect == null ? null : (Action)(() => SpellFx.Run(a, this, effect)));   // shown as it resolves (SpellFx: every ability's effect)
+            }, effect == null ? null : (Action)(() => SpellFx.Run(a, this, () => ResolveWithGear(a, effect))));   // shown as it resolves (SpellFx: every ability's effect)
             if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + (string.IsNullOrEmpty(ClassDef.resourceName) ? ClassDef.resource.ToString() : ClassDef.resourceName) + ".");
             // An instant blow or spell on a target shows (playtest note 25): a swing in melee, a release at range. Casts are TickCastPose's.
             if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive && !Kit.OwnBlow(a))
@@ -1889,7 +1892,7 @@ namespace Crulanda.Encounter
             {
                 nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
                 if (Kit.MeleeAutoAttacks) { PlayerFigure?.Strike(); SpellFx.Slash(Player.transform, Target.transform, false, .6f); } else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
-                Target.Receive(WeaponDamage, Player); Kit.OnAutoHit();
+                Target.Receive(WeaponDamage, Player); Kit.OnAutoHit(); GearSwingProcs();   // a class set's procs on a landed swing (loot DESIGN.md 3.8)
             }
             if (Time.time >= nextRegen)
             {

@@ -48,7 +48,7 @@ namespace Crulanda.Encounter
         public float DamageScaleFor(Actor source)
         {
             if (source == null) return 1;
-            if (source == Player) return PlayerDamageScale;
+            if (source == Player) return PlayerDamageScale * GearPowerNow;   // a class set's abilityPower or echo while an ability resolves (loot DESIGN.md 3.8)
             if (Pet != null && source == Pet.actor) return PetDamageScale;
             return 1;
         }
@@ -60,7 +60,7 @@ namespace Crulanda.Encounter
             { "class.paladin/sanctuary", 0.83f },   // 2026-10-13 fixed-dummy retune
             { "class.shaman/rainspeaker", 1.15f },   // 2026-10-13 fixed-dummy retune
         };
-        public float PlayerHealScale { get { var lead = LeadBuild; return lead != null && BuildHealScale.TryGetValue(lead, out var v) ? v : 1; } }
+        public float PlayerHealScale { get { var lead = LeadBuild; return (lead != null && BuildHealScale.TryGetValue(lead, out var v) ? v : 1) * GearPowerNow; } }   // GearPowerNow: a class set's abilityPower or echo (loot DESIGN.md 3.8)
         public const float HealerDpsCap = .50f, ControlDpsCap = .75f, SupportDpsCap = .75f;
         int scaleCount = -1; List<TalentRank> scaleList; float scale = 1;
         /// <summary>The build the player has spent most in (class/branch id), or null with no ranks.</summary>

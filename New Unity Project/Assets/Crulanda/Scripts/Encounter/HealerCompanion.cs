@@ -134,6 +134,21 @@ namespace Crulanda.Encounter
             Activity = actor.Resource.Pool.Current < HealCost(heal.cost, session.Player.Level) ? "Out of mana" : !session.InCombat && actor.Resource.Pool.Ratio < .95f ? "Drinking: mana " + Mathf.RoundToInt(actor.Resource.Pool.Ratio * 100) + "%" : distance > 3 ? "Following you" : "Watching your flank";
             var target = session.Target;
             var bolt = Hasted(session.content.boltAbility);
+            // Her own spells while nobody needs mending (Chris, 2026-10-15: "mira/druid should have some damage spells when not healing";
+            // GAME-ONLY names): Briar Lash, instant, every 8 s, and Kindled Seed, a 2 s cast. Both cost mana grown with your level as her
+            // heal's does and hit harder with it; she casts them only above half mana, so a heal is always left.
+            if (target != null && target.FightingParty && target.actor.IsAlive && !target.LeaveAlone && recipient.Health.Pool.Ratio > .8f &&
+                actor.Resource.Pool.Ratio > .5f && Vector3.Distance(target.transform.position, transform.position) < bolt.range)
+            {
+                var foe = target;
+                foreach (var spell in new[] { Hasted(Lash(bolt)), Hasted(Seed(bolt)) })
+                {
+                    var r = abilities.TryStart(spell, Time.time, c => Spend(HealCost(c, session.Player.Level)), () => {
+                        if (foe != null && foe.actor.IsAlive) foe.Receive(HealFor(spell.power, session.Player.Level), actor);
+                    });
+                    if (r == AbilityStartResult.Started) { Activity = "Casting " + spell.name.ToLowerInvariant(); if (spell.castTime > 0) { castingTarget = foe.actor; if (agent.isOnNavMesh) agent.isStopped = true; } return; }
+                }
+            }
             if (target != null && target.FightingParty && target.actor.IsAlive && !target.LeaveAlone && recipient.Health.Pool.Ratio > .8f &&
                 Vector3.Distance(target.transform.position, transform.position) < bolt.range)
             {
@@ -142,6 +157,10 @@ namespace Crulanda.Encounter
                 }) == AbilityStartResult.Started) Activity = "Casting " + bolt.name.ToLowerInvariant();
             }
         }
+        /// <summary>Briar Lash: thorns whipped at your target, instant, every 8 s (GAME-ONLY).</summary>
+        public static AbilitySpec Lash(AbilitySpec bolt) { return new AbilitySpec { id = "mira.briar_lash", name = "Briar Lash", description = "Thorns whipped at the foe.", effect = bolt.effect, power = 16, cost = 8, cooldown = 8, range = bolt.range, castTime = 0, globalCooldown = 1.5f }; }
+        /// <summary>Kindled Seed: a seed of fire cast at your target over 2 s (GAME-ONLY).</summary>
+        public static AbilitySpec Seed(AbilitySpec bolt) { return new AbilitySpec { id = "mira.kindled_seed", name = "Kindled Seed", description = "A seed of fire flung at the foe.", effect = bolt.effect, power = 30, cost = 12, cooldown = 0, range = bolt.range, castTime = 2, globalCooldown = 1.5f }; }
         /// <summary>Called Cadence: shorter cast, cooldown and global cooldown while the Warrior's rally lasts.</summary>
         AbilitySpec Hasted(AbilitySpec a)
         {

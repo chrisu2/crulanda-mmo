@@ -238,6 +238,15 @@ namespace Crulanda.Tests
             // Mira keeps pace: her heal at the cap is well over twice her heal at level 1.
             Assert.AreEqual(42, HealerCompanion.HealFor(42, 1)); Assert.Greater(HealerCompanion.HealFor(42, EncounterProgress.LevelCap), 2 * 42);
         }
+        [Test] public void Mira_has_damage_spells_between_heals()
+        {
+            // Chris 2026-10-15: "mira/druid should have some damage spells when not healing".
+            var bolt = new AbilitySpec { power = 7, range = 30 };
+            var lash = HealerCompanion.Lash(bolt); var seed = HealerCompanion.Seed(bolt);
+            Assert.AreEqual(0, lash.castTime); Assert.Greater(lash.cooldown, 0); Assert.Greater(seed.castTime, 0);
+            Assert.Greater(lash.power, bolt.power); Assert.Greater(seed.power, lash.power); Assert.Greater(lash.cost, 0); Assert.Greater(seed.cost, 0);
+            Assert.AreEqual(bolt.range, seed.range);
+        }
         [Test] public void Miras_mana_runs_out_in_a_long_fight()
         {
             // Chris 2026-10-15: "mira never runs out of mana healing". At level 11 her pool holds fewer heals than at level 1 (the cost

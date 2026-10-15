@@ -769,3 +769,6 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 222 (03:30, two pictures of a cave floor under a pale sheet, thin jagged white lines across it) "weird on the floor. i move and it
   changes" (a flood's water lies a few centimetres over a rough floor and its foam traced every ridge near the surface, moving with the
   eye's depth. With the camera in a cave the foam all but goes, and none where the water is under 3 cm. OPEN.)
+- 223 (03:35) "mira/druid should have some damage spells when not healing" (she had only a free 7-power bolt. Now, while everyone is
+  above 80% and she is above half mana: Briar Lash, instant every 8 s, and Kindled Seed, a 2 s cast; both cost mana and grow with your
+  level as her heal does; the bolt stays as her free filler. GAME-ONLY names. OPEN.)

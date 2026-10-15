@@ -208,7 +208,9 @@ namespace Crulanda.Encounter
                 // Stuck all the same (a prop the paths run through): a warp to beside what you are after, in a fight or out of one.
                 if (Time.time - stuckAt > 4)
                 {
-                    if (dist > reach + 1 && Vector3.Distance(stuckFrom, me) < 1)
+                    // Swimming counts as stuck too: the paths never run through swim-deep water, so the bot has no way out of a pool it has
+                    // fallen or been knocked into, and it bobs about more than a metre (adit-final2, 2026-10-15: "just standing in water").
+                    if (dist > reach + 1 && (Vector3.Distance(stuckFrom, me) < 1 || motor.Swimming))
                     {
                         var at = goal - to.normalized * Mathf.Min(2.5f, dist * .5f);
                         if (NavMesh.SamplePosition(at, out var hit, 4, NavMesh.AllAreas)) { motor.Teleport(hit.position + Vector3.up * 1.05f); warps++; Log(Clock(t) + "  stuck; warped " + (foe != null ? "to the fight" : corpse != null ? "to the body" : "to the leader") + " (" + warps + ")"); }

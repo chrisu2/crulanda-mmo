@@ -4575,7 +4575,11 @@ namespace Crulanda.World
             if (ov.Count > 65000) mound.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
             mound.SetVertices(ov); mound.SetUVs(0, ouv); mound.SetTriangles(ot, 0); mound.RecalculateNormals(); mound.RecalculateBounds();
             var hill = MeshPart(mound, t, Vector3.zero, knoll);
-            hill.AddComponent<MeshCollider>().sharedMesh = mound; hill.AddComponent<NavWalkable>();
+            hill.AddComponent<MeshCollider>().sharedMesh = mound;
+            // A walk-in cave's knoll is a hill to climb (the navmesh reads it); a branch cave's, inside another cave, is buried rock, and
+            // its crown pokes into the parent's hall near the wall as a floating floor (the Censored Room's over the Scriptorium at
+            // y -59.7, the Kennel's in the Muster Yard: "walkable triangles on solids", AditNavTests 2026-10-15).
+            if (h.Parent == null) hill.AddComponent<NavWalkable>();
 
             // Crests sunk into the mound's top and buttresses into its flanks (kept clear of the passage's walls); loose rock round the foot.
             bool Clear(Vector3 at, float radius)

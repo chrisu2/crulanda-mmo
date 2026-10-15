@@ -605,8 +605,14 @@ namespace Crulanda.World
                 Rod(t, from, new Vector3(0, LocalGround(t, 0, 0) + .2f, 0) + q * new Vector3(0, 0, .06f), .11f, art.bark);
             }
             var tongue = PropMesh("Flame", () => ZoneMeshes.Cone(.1f, .34f, 6));
+            var fire = Glow(t, new Vector3(0, LocalGround(t, 0, 0) + .45f, 0), 5, 1.1f, new Color(1, .55f, .25f), 1.9f);
             if (!RealFire(t, new Vector3(0, LocalGround(t, 0, 0) + .05f, 0), .36f))   // real flames between the logs (2026-10-14), the painted tongues without the pack
-            for (int k = 0; k < 3; k++) MeshPart(tongue, t, new Vector3((k - 1) * .07f, LocalGround(t, 0, 0) + .06f, (k % 2) * .06f - .03f), flame, Quaternion.Euler((k - 1) * 8, k * 50, (k - 1) * -10)).transform.localScale = new Vector3(1, .8f + k % 2 * .45f, 1);
+            for (int k = 0; k < 3; k++)
+            {
+                var lick = MeshPart(tongue, t, new Vector3((k - 1) * .07f, LocalGround(t, 0, 0) + .06f, (k % 2) * .06f - .03f), flame, Quaternion.Euler((k - 1) * 8, k * 50, (k - 1) * -10));
+                lick.transform.localScale = new Vector3(1, .8f + k % 2 * .45f, 1);
+                CandleFlame.Attach(lick, fire);   // wavering with the fire's light (the candle pack, 2026-10-15)
+            }
             // The tripod and the pot on its chain.
             var apex = new Vector3(0, g + 1.45f, 0);
             for (int k = 0; k < 3; k++) { float a = k * 2.094f + .3f; var fp = new Vector3(Mathf.Cos(a) * .82f, 0, Mathf.Sin(a) * .82f); fp.y = LocalGround(t, fp.x, fp.z) - .03f; Rod(t, fp, apex + (fp - apex).normalized * -.05f, .045f, iron); }
@@ -617,7 +623,6 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, new Vector3(0, potY + .285f, 0), new Vector3(.34f, .006f, .34f), Tint(art.cloth, new Color(.46f, .3f, .16f)));   // the stew
             foreach (int s in new[] { -1, 1 }) Rod(t, new Vector3(0, apex.y - .62f, 0), new Vector3(s * .2f, potY + .3f, 0), .015f, iron);   // its bail
             if (art.particle != null) Smoke(t, new Vector3(0, apex.y + .1f, 0));
-            Glow(t, new Vector3(0, LocalGround(t, 0, 0) + .45f, 0), 5, 1.1f, new Color(1, .55f, .25f), 1.9f);
             // A log to sit on, and a few split logs stacked by it.
             float lx = 1.45f, lz = .35f;
             Part(PrimitiveType.Cylinder, t, new Vector3(lx, LocalGround(t, lx, lz) + .17f, lz), new Vector3(.34f, .55f, .34f), art.bark, Quaternion.Euler(90, 20 + R() * 20, 0));

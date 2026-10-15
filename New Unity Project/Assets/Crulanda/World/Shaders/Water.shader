@@ -11,6 +11,9 @@
 //   and fades into the depth colour at _Murk per metre (sooner at a slant).
 // - Painted highlights (_Sparkle): two soft noise layers sliding past each other; faint and sparse away from the sun, crowded
 //   and bright along the sun's (or moon's) reflection.
+// - Caustics (_Caustics): the ripples' light focused on the bed, cast where the view ray meets it, strongest in the shallows and
+//   gone by the deep: the crossing-threads trick of the stylized water pack Chris downloaded (2026-10-15 01:20, "use these
+//   where appropriate"; the rest of that pack this water already did), on our own noise, no texture.
 // - Foam: a soft band wherever the water touches something (from the depth texture), its width wobbling slowly, plus on still
 //   water a thinner line washing in toward the shore (_FoamWaves). Only the foam is lit (LightingWater); the rest is emission.
 // - The composite is written opaquely (finalcolor sets alpha 1 over premultiplied blending).
@@ -31,6 +34,7 @@ Shader "Crulanda/Water"
         _DeepDepth ("Deep by (m deep)", Float) = 2.2
         _Murk ("Murk (bed fades, per metre)", Float) = 1.1
         _Glow ("Light in the shallows", Range(0, 1)) = 0.75
+        _Caustics ("Caustics on the bed", Range(0, 1)) = 0.4
         _BedTint ("Bed seen through the water", Color) = (0.82, 1, 1, 1)
         _FoamColor ("Foam (alpha = opacity)", Color) = (0.84, 0.92, 0.91, 0.85)
         _FoamWidth ("Foam band (m)", Float) = 0.14
@@ -60,7 +64,7 @@ Shader "Crulanda/Water"
         float4 _CameraDepthTexture_TexelSize;
         fixed4 _DeepColor, _MidColor, _ShallowColor, _BedTint, _FoamColor;
         float4 _Drift;
-        float _MidDepth, _DeepDepth, _Murk, _Glow, _FoamWidth, _FoamWaves, _Sparkle, _SkyTint, _Bump, _FlowSpeed, _Wave, _Refract, _Glare;
+        float _MidDepth, _DeepDepth, _Murk, _Glow, _FoamWidth, _FoamWaves, _Sparkle, _SkyTint, _Bump, _FlowSpeed, _Wave, _Refract, _Glare, _Caustics;
         // The weather (WorldWeather, global): x cloud dimness by day, y rain. Zero without weather.
         float4 _WeatherTone;
         // Only the foam is lit here (it is the one thing on the water with a body of its own), softly so it never goes flat on
@@ -81,6 +85,15 @@ Shader "Crulanda/Water"
         {
             float2 i = floor(p), f = frac(p); f = f * f * (3 - 2 * f);
             return lerp(lerp(WaterHash(i), WaterHash(i + float2(1, 0)), f.x), lerp(WaterHash(i + float2(0, 1)), WaterHash(i + 1), f.x), f.y);
+        }
+        // Caustics: the pack's trick (two copies of one light pattern sliding opposite ways, the darker of the two kept, so the
+        // bright threads cross and knot) on a ridge of the value noise, in metres on the bed; cubed, so only the threads show.
+        float Caustic(float2 p, float t)
+        {
+            float a = 1 - abs(WaterNoise(p * 1.7 + float2(t * 0.09, t * 0.05)) * 2 - 1);
+            float b = 1 - abs(WaterNoise(p * 1.9 - float2(t * 0.07, t * 0.08) + 4.1) * 2 - 1);
+            float c = min(a, b);
+            return c * c * c;
         }
         struct Input { float2 uv_Normal; float2 flowFlag; float3 worldPos; float4 screenPos; float4 color : COLOR; float3 worldNormal; INTERNAL_DATA };
         // The surface composites itself over the grabbed scene, so it replaces what is behind it.
@@ -155,6 +168,11 @@ Shader "Crulanda/Water"
             // bed reads pale and bright), and fades into the depth colour at _Murk per metre (sooner at a slant).
             float3 bedSeen = saturate(bed * lerp(1, _BedTint.rgb, wet));
             float3 lifted = 1 - (1 - bedSeen) * (1 - saturate(body * _Glow * wet));
+            // Caustics on the bed (the stylized water pack, 2026-10-15): cast where the view ray meets the bed (carried on under the
+            // surface), by the sun or moon, strongest a hand's depth down, gone by the deep and under cloud; seen with the bed.
+            float2 bedAt = (IN.worldPos - V * thick).xz;
+            float focus = smoothstep(0, 0.2, d) * (1 - smoothstep(_MidDepth, _DeepDepth, d)) * (1 - _WeatherTone.x) * saturate(_WorldSpaceLightPos0.y * 2);
+            lifted += _LightColor0.rgb * (Caustic(bedAt, t) * _Caustics * focus * wet * show);
             float clear = exp2(-_Murk * lerp(d, thick, 0.3)) * show;
             float3 water = lerp(body, lifted, clear);
 

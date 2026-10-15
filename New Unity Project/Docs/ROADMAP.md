@@ -62,6 +62,14 @@ a Kevin Iglesias archery set (the same maker as the locomotion) would give a rea
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every
 class's figure, and Chris has looked at it.
 
+## Phase 8.6 plan: the living world's second pass (Chris, 2026-10-14 23:30-23:35, verbatim; queued, its place to be decided)
+Chris: "so what is the phases look like? the villagers and npcs need better ai" and "more things to do. more incentives for
+gathering/professions. make better gear. have gear change the way your character looks when equipping" (PLAYTEST_NOTES 203-204).
+- **Villager and NPC AI** (what he saw is still to be asked: idling, walking into things, repeated lines, mobs that do not react).
+- **More to do; gathering and the professions worth doing** (incentives: what the gathered and the made are for).
+- **Better gear, and gear that changes the character's look when equipped** (with Phase 8.5's fit overhaul: the one phase if Chris
+  wants them together).
+
 ## Phase 9 plan: the wider world (after Phase 8; PROVISIONAL until each item is checked against the books)
 Everything here is drawn from the lore folder (D:\code\crulanda: world_bible.md, the three books) and labelled as the game labels lore:
 CANON where the books name it, CANON-EXPANDED where the game fills in round a canon place, GAME-ONLY for the rest.

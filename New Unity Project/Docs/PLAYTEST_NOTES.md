@@ -727,3 +727,5 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 200 (23:15, back after the shutdown) "birds still hopping" (the Living Birds are a Biped: the hop's travel sits on "Bip01", a child of the file's root, so the clips' root locks of 192 did nothing; Bip01 is the motion node now, creature import version 7; OPEN until the next build and Chris's eyes)
 - 201 (23:15) "scoundrel nerve should start at 0. you shouldnt be able to use a finished at start of fight" (the pool was bound full; now emptied when the kit wakes, on a respawn or a load, and six seconds after the last blow it drains at ten a second, never while auto-attacking a dummy; OPEN)
 - 202 (23:20) "shouldn't get nerve on auto attack" (the swing's 3 Nerve gone; the cuts and the verses build it; OPEN)
+- 203 (23:30) "so what is the phases look like? the villagers and npcs need better ai" (a brief: the villagers' and NPCs' AI; OPEN, to be planned)
+- 204 (23:35) "more things to do. more incentives for gathering/professions. make better gear. have gear change the way your character looks when equipping" (a brief; queued in ROADMAP.md with 203; OPEN)

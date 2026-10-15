@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-10-15, 00:40-01:45: the small hours with three helpers (Chris: "you can run 3 bots at most")
+Chris (verbatim, PLAYTEST_NOTES 203-212): "the villagers and npcs need better ai"; "more things to do. more incentives for
+gathering/professions. make better gear. have gear change the way your character looks when equipping"; "running into each other and
+sometimes get stuck or delayed at door of inn.."; "work on phase 8"; "launch a bot that fills in some open areas in oakhaven. work on new
+dungeons. improve polish, secrets, lore, clues, stories from npcs, etc"; of the chapel's frame "just the shape and design is bad", "use some
+of the dungeon assedt not just plain walls and arch"; the dungeon packs, the shaders, the music and the fantasy props in Downloads and the
+store cache; a picture of fly-out hotbar buttons: "keep this in mind when designing hotbar and ui."
+- **The Adit (branch `adit-rework`):** every floor reachable from the yard and the nav, camps, gate and release tests 26/26 at 01:41
+  (ADIT_REWORK.md section 18: the altar in the cloister doorway, the island under Lusk's stage, the stair's foot 1.5 m low, a parent's
+  knoll crossing each branch, the reach tests measuring a search budget). New: `AditDataTests` (every reference in the zone file
+  resolves), the Adit camera tour (`--crulanda-adit-tour`, 28 frames), the release of `after` camps (a boss's relief shift, the Wake's
+  waves, the keg), the chapter-house's end walls from the kit (then the packs: in progress).
+- **Oakhaven's open ground:** eleven places on the empty meadows (the Hollin skeps, the grey picket, the Silent Watcher, Wick's cot, the
+  Farrows' stand, the Old Delf, the Harrow knoll and Wren's cairn, Hesper Crane's hut, the foragers' camp, the webbed sallows, the wolf
+  pit): ten secrets, four camps, a resident; a `skep` prop. Not yet run in Unity.
+- **Secrets, clues, lore, stories:** a riddle for each of 63 secrets in the Discoveries tab and a villager's spoken hint for the unfound;
+  two or three stories for 58 named people; a Lore tab with eight lore pages found at new note secrets; all labelled. Not yet run in Unity.
+- **Plans written:** `PHASE8_6_LIVING_WORLD.md` (the villagers' way-finding and the inn's door — a 1.6 m door and a navmesh at radius .5
+  leave a 0.6 m strip — crafting loot, recipes, the book of lore, secrets, gear looks; fourteen decisions), `DUNGEON2_DESIGN.md`
+  (Hallow's Creek, levels 16-18; thirteen decisions), `DUNGEONS_3_AND_4.md`; ACTION_BAR.md's fly-out slots.
+- **In flight at 01:45:** the dungeon packs (KayKit, the Modular Pack) into the builder; the water, grass and candle shaders as built-in
+  shaders; zone music from the three packs and the Fantasy pack's market props.
+
 ## 2026-10-15, 01:05 on: clues to every secret, stories from everyone, the book of lore (a helper's pass; OPEN until Chris's build)
 Chris (2026-10-14 23:40, verbatim): "find recipes/ book of lore/still havent found many secrets. all this for ALL Zones"; (2026-10-15 01:05):
 "improve polish, secrets, lore, clues, stories from npcs, etc". Phase 8.6 3c-3e, the secrets and the book first (recipes to find not yet).

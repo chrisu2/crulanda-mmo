@@ -57,6 +57,11 @@ Nothing is VERIFIED until Chris has seen it in his build.
   Cutting Drift's own floor past its Company door. Start the next Adit session from `adit-nav-diagnostics-R88.txt`. The diagnostics (`AditNavDiagnostics`, lane A) write
   `D:/crulanda-work/encounter-validation/adit-nav-diagnostics.txt`: the deck tables, a floor map of every hall (reached from the yard
   or not, what stands by the first unreached sample), each gate's crossing. Run the Adit set with a copy of `D:\crulanda-work\chainR86.ps1`.
+- **The small hours (00:40-01:45; CHANGELOG's top entry):** three helpers at a time (Chris: "you can run 3 bots at most"): Oakhaven's open
+  ground filled (eleven places, ten secrets), secrets' clues and villagers' stories in every zone with a Lore tab, the Phase 8.6 and
+  Hallow's Creek plans (decisions for Chris at their ends), the Adit's releases, camera tour and data check. In flight when this was
+  written: the dungeon packs into the builder (worktree), the water/grass/candle shaders, zone music and the Fantasy props (main).
+  Their files land uncommitted in each repo: compile with the scratch Roslyn check, commit by path, run the touched tests.
 - **Next, in order:** Chris's reactions to the above; the Adit (section 18's "still red"); the Stylized Newbie Weapons Pack (skinned
   meshes: a bake before they can be held); the fixture test's knoll ray; the older list below.
 

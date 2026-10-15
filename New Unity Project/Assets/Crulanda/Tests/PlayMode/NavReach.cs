@@ -36,7 +36,7 @@ namespace Crulanda.Tests
         /// search gives up part way; +infinity where a leg gets no nearer (the way is cut, or winds back on itself too far to follow).</summary>
         public static float Length(Vector3 from, Vector3 to, int mask = NavMesh.AllAreas)
         {
-            var path = new NavMeshPath(); float total = 0;
+            var path = new NavMeshPath(); float total = 0; var start = from;
             for (int leg = 0; leg < 64; leg++)   // sixty-four legs: the way from the yard to the Pitch Pit is some 1,200 m of winding passage
             {
                 if (!NavMesh.CalculatePath(from, to, mask, path) || path.corners.Length == 0) return float.PositiveInfinity;
@@ -45,11 +45,26 @@ namespace Crulanda.Tests
                 var end = path.corners[path.corners.Length - 1];
                 // Each leg must get somewhere (not: nearer as the crow flies; a leg round the Gallery or down a winding drift ends farther
                 // off than it began, and the search gave up on the whole reworked Adit for that: the floor map of 2026-10-14 21:12).
-                if ((end - from).sqrMagnitude < 1) return float.PositiveInfinity;
+                if ((end - from).sqrMagnitude < 1) break;
                 from = end;
             }
-            return float.PositiveInfinity;
+            // The search gave up: the way may still be there (a leg that ends in a pocket the straight-line heuristic prefers; the floor
+            // map of 2026-10-14 reached every floor of the Adit by hops where this search did not). Breadcrumb to breadcrumb, then,
+            // each hop a complete short path, the hops' lengths summed: +infinity only when no chain of hops arrives.
+            return Hollow.All != null && Hollow.All.Count > 0 && mask == NavMesh.AllAreas ? HopLength(start, to) : float.PositiveInfinity;
         }
+        /// <summary>The way's length by hops over the caves' breadcrumbs (see <see cref="CaveCrumbs"/>): from <paramref name="from"/> to the
+        /// crumbs it reaches, crumb to crumb by complete short paths (the shortest chain found first), and from the nearest reached crumb
+        /// to <paramref name="to"/>; +infinity when no chain arrives.</summary>
+        static float HopLength(Vector3 from, Vector3 to)
+        {
+            var crumbs = CaveCrumbs(from, out var reach, out var dist); if (crumbs.Count == 0) return float.PositiveInfinity;
+            var path = new NavMeshPath(); float best = float.PositiveInfinity;
+            foreach (var i in Enumerable.Range(0, crumbs.Count).Where(i => reach.Contains(i)).OrderBy(i => (crumbs[i] - to).sqrMagnitude).Take(8))
+                if (Complete(crumbs[i], to, path)) best = Mathf.Min(best, dist[i] + PathLength(path));
+            return best;
+        }
+        static float PathLength(NavMeshPath path) { float l = 0; for (int i = 1; i < path.corners.Length; i++) l += Vector3.Distance(path.corners[i - 1], path.corners[i]); return l; }
 
         static bool Complete(Vector3 a, Vector3 b, NavMeshPath path)
         { return NavMesh.CalculatePath(a, b, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete; }
@@ -66,9 +81,11 @@ namespace Crulanda.Tests
 
         /// <summary>Breadcrumbs every six metres down every cave on the navmesh, and in <paramref name="reach"/> those a chain of
         /// complete short paths joins to <paramref name="from"/>.</summary>
-        public static List<Vector3> CaveCrumbs(Vector3 from, out HashSet<int> reach)
+        public static List<Vector3> CaveCrumbs(Vector3 from, out HashSet<int> reach) { return CaveCrumbs(from, out reach, out _); }
+        /// <summary>As above, with each reached crumb's way length from <paramref name="from"/> (the hops' complete paths summed).</summary>
+        public static List<Vector3> CaveCrumbs(Vector3 from, out HashSet<int> reach, out Dictionary<int, float> dist)
         {
-            var crumbs = new List<Vector3>(); var cave = new List<int>(); var caves = Hollow.All; reach = new HashSet<int>();
+            var crumbs = new List<Vector3>(); var cave = new List<int>(); var caves = Hollow.All; reach = new HashSet<int>(); dist = new Dictionary<int, float>();
             for (int c = 0; c < caves.Count; c++)
             {
                 var h = caves[c];
@@ -91,11 +108,11 @@ namespace Crulanda.Tests
             }
             var queue = new Queue<int>();
             foreach (var i in Enumerable.Range(0, crumbs.Count).OrderBy(i => (crumbs[i] - from).sqrMagnitude).Take(6))
-                if (Complete(from, crumbs[i], path)) { reach.Add(i); queue.Enqueue(i); }
+                if (Complete(from, crumbs[i], path)) { reach.Add(i); dist[i] = PathLength(path); queue.Enqueue(i); }
             while (queue.Count > 0)
             {
                 int i = queue.Dequeue();
-                foreach (int j in Near(i)) if (!reach.Contains(j) && Complete(crumbs[i], crumbs[j], path)) { reach.Add(j); queue.Enqueue(j); }
+                foreach (int j in Near(i)) if (!reach.Contains(j) && Complete(crumbs[i], crumbs[j], path)) { reach.Add(j); dist[j] = dist[i] + PathLength(path); queue.Enqueue(j); }
             }
             return crumbs;
         }

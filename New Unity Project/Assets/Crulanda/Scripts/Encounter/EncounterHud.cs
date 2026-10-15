@@ -643,6 +643,7 @@ namespace Crulanda.Encounter
             GUI.Label(new Rect(525, 398, 400, 35), "Progress autosaves out of combat.", text);
             if (controlsOpen) { DrawControls(); return; }
             if (displayOpen) { DrawDisplay(); return; }
+            if (soundOpen) { DrawSound(); return; }
             if (GUI.Button(new Rect(525, 448, 126, 44), "Resume [Esc]", button)) session.Resume();
             if (GUI.Button(new Rect(657, 448, 126, 44), "Controls", button)) controlsOpen = true;
             if (GUI.Button(new Rect(789, 448, 126, 44), "Display", button)) displayOpen = true;   // resolution, mode, UI scale (playtest note 94)   // key bindings (playtest note 75)
@@ -653,6 +654,7 @@ namespace Crulanda.Encounter
             GUI.enabled = true;
             // Chris 2026-10-14: "all need an exit command to close the .exe" (also /exit and /quit in the chat): saved first, out of combat.
             if (GUI.Button(new Rect(525, 540 + 48 * rows + 8, 126, 44), "Quit game", button)) session.Quit();
+            if (GUI.Button(new Rect(657, 540 + 48 * rows + 8, 126, 44), "Sound", button)) soundOpen = true;   // Chris 2026-10-15: sliders and mutes
         }
         public static string ResourceName(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Shift Breath" : kind.ToString(); }
         static string ResourceShort(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Breath" : kind.ToString(); }

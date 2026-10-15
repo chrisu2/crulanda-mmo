@@ -738,3 +738,10 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - 211 (01:20, a picture of the Downloads folder) "i have downloaded some shaders: stylized water, interactive grass, and candle flicker. use these where appropriate.  I have some music: dark realm, eastern life, last zone. Some Unity 6 and FBX fantasy assets you may want to use. They are in the downloads folder." (OPEN: to be brought in by helpers as slots free)
 - 212 (01:25, a picture captioned "Fly Out buttons are amazing QoL": a hotbar slot with a small arrow that opens sideways into a row of three related abilities, each with its charge count, the last used on the slot's face) "keep this in mind when designing hotbar and ui." (recorded in ACTION_BAR.md as a design note; OPEN, for the next hotbar pass)
 - 213 (02:05, the Scriptorium frame from the Adit tour: a KayKit stone wall whose arch is filled with stone) "now this looks blocked??" "does the door open?" (walkable, 4 m clear on the navmesh; the pack's blind arch was placed where its open doorway belongs; swapped; OPEN until a frame shows it)
+- 214 (02:25) "when a node is harvest it needs to disappear for a certain amount of time. i guess it depends on population" (a worked node
+  had only its ore hidden, the seam's rock standing: now the whole node goes, the seam's rock and the fallen trunk too; it is gone for its
+  own respawn with nobody about, shorter the more people are in the zone (the sims there and your party): half with ten, two fifths at
+  most. OPEN until Chris sees it.)
+- 215 (02:30) "need to be able to mute/adjust sliders for music, sounds, enviromental sounds, combat music, etc." (a Sound panel in the
+  pause menu: Master, Music, Combat music, Sound effects, Ambient sounds, each a slider and a Mute; kept between runs. The game's only
+  sound so far is the zone music: the effects and ambient sliders are ready for sounds still to come. OPEN.)

@@ -63,7 +63,7 @@ namespace Crulanda.World
         public static float Volume
         {
             get { return Mathf.Clamp01(PlayerPrefs.GetFloat(VolumeKey, DefaultVolume)); }
-            set { PlayerPrefs.SetFloat(VolumeKey, Mathf.Clamp01(value)); PlayerPrefs.Save(); }
+            set { PlayerPrefs.SetFloat(VolumeKey, Mathf.Clamp01(value)); if (value > 0) PlayerPrefs.SetInt(VolumeKey + ".mute", 0); PlayerPrefs.Save(); }   // /music on unmutes too
         }
         public static ZoneMusic Active { get; private set; }
         /// <summary>One for the zone just loaded, in place of any older one: the zone, whether the party is fighting, and where the
@@ -123,7 +123,7 @@ namespace Crulanda.World
         void Update()
         {
             if (AudioListener.pause) return;   // the application paused: nothing moves on
-            float dt = Time.unscaledDeltaTime, now = Time.unscaledTime, level = Volume, dark = WorldClock.Darkness;
+            float dt = Time.unscaledDeltaTime, now = Time.unscaledTime, level = AudioMix.Effective(AudioMix.Channel.Music), fightSet = AudioMix.Effective(AudioMix.Channel.CombatMusic), dark = WorldClock.Darkness;
             var want = TracksFor(zone, playerAt != null ? playerAt() : Vector3.zero, dark, out string fightPath);
             a.Tick(now); b.Tick(now); fight.Tick(now);
             if (a.Ended(now)) { a.Stop(); nextAt = now + UnityEngine.Random.Range(GapMin, GapMax); }
@@ -143,12 +143,12 @@ namespace Crulanda.World
             else a.Level = Mathf.MoveTowards(a.Level, 1, dt / Crossfade);   // a fresh track rises from nothing
             // The fight track: up in a second and a half, down over eight; gone when down. A fight that starts again inside those
             // eight seconds keeps the track it had.
-            bool fightingNow = fighting != null && fighting() && level > 0;
+            bool fightingNow = fighting != null && fighting() && fightSet > 0;
             if (fightingNow && !fightWanted) { fight.Cue(fightPath, now); fightWanted = true; }
             fightLevel = Mathf.MoveTowards(fightLevel, fightingNow ? 1 : 0, dt / (fightingNow ? FightIn : FightOut));
             if (!fightingNow && fightLevel <= 0 && fightWanted) { fight.Stop(); fightWanted = false; }
             float night = Mathf.Lerp(1, NightLevel, dark), duck = Mathf.Lerp(1, Duck, fightLevel);
-            a.Src.volume = level * night * duck * a.Level; b.Src.volume = level * night * duck * b.Level; fight.Src.volume = level * Mathf.Lerp(1, .85f, dark) * fightLevel;
+            a.Src.volume = level * night * duck * a.Level; b.Src.volume = level * night * duck * b.Level; fight.Src.volume = fightSet * Mathf.Lerp(1, .85f, dark) * fightLevel;
         }
         /// <summary>One of the set, not the last played when there is a choice; the zone's own folder's tracks count with its day set.</summary>
         string Pick(string[] set)

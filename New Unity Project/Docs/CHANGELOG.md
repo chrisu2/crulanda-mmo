@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-15, 18:00-20:00: the party fights on when you fall (three solo-era bugs; Chris: "ugh more wasted time for dumb bugs that should have already been caught")
+Why the sim parties wiped at the Nix duo all afternoon was not the duo's numbers: three rules from before parties existed.
+- **A mob reset the moment you fell** (`EncounterEnemy`: `if (!Player.IsAlive) ResetFight()`), whoever else was fighting it. Now a mob with a
+  living party member within 40 m fights on and turns from you to them (`EncounterSession.PartyNear`).
+- **Getting up pulled the whole party to the stone and reset every mob** (`Recover`). Now while the party is still in a fight only the
+  fallen come with you, and only fights with nobody alive in them reset. (In one test Nix was at 7% with three sims on him when this
+  reset him to full.)
+- **Mira stood idle while you were down**: she now heals and fights on while the party is still in a fight.
+- **A rider's home stayed at its camp:** Nix, off the dead beast, walked back there and reset after the lull his own Shriek made. His home is
+  now where he climbs down.
+- **The fight test** (`AditNixFightTests`): you get up as the run does and a reset duo is pulled again.
+- **Silent test runs:** batch-mode tests, tours, captures and group runs mute every sound (`QuietRuns`; Chris: "please turn the music off in
+  future testing").
+- **The duo's moves 11% further apart** (Chris: "move timer to 11%" after a 12% win with the tank never low).
+
 ## 2026-10-15, 12:40-18:00: the Adit finished (Chris: "i told you to finish adit before shutting down"; deadline 18:00)
 Chris answered the rework's four questions (ADIT_REWORK section 1): Q1 "20 minute respawn", Q2 "Keep ~75 min", Q3 "Build the Cove",
 Q4 "Yes, add them". Three helpers built on their own worktrees, merged into `adit-rework`; then merged into this branch.

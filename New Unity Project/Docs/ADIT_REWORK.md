@@ -1146,3 +1146,33 @@ order to fix:
   generated curve at their levels. LootDataTests' boss count 63 to 82; LootIdBaseline has the ids.
 - SocialRulesTests lets a designed pair (Ysolt and Varrow, each the other's guard) call each other.
 
+## 18. The decks walked: the evening's runs (2026-10-14, 19:24-21:00; chainR74f, R80, R82-R85; lane A)
+What the navmesh diagnostics (AditNavDiagnostics, `D:/crulanda-work/encounter-validation/adit-nav-diagnostics-R85.txt`) found and what
+was done, in order. TESTED where a run shows it; the rework stays on `adit-rework`, not live.
+- **The overseers' walk** ran level 8.4 m over the Cage Bowl's falling floor at aside 12.5, where the wall (Half 20, Height 12,
+  bumps to 19 %) leans in to about 8 m: its planks were in the shell from z -298 on, and its stair after it. Now the walk comes down
+  to 5 m over the floor at its north end and runs at aside 11.5 (`adit_layout.py`); the rim camp rides it. Then a 3 m rock block at
+  the bowl's floor rose through its first metre (the block guard tried the block's foot alone): `ZoneBuilder.Block` tries the whole
+  height (DeckOverlaps). R83: every deck whole, every junction complete, the walk reachable.
+- **The decks' blocks named** (post, rope post, rail, body, of which deck) and the diagnostics print what stands in a deck's way with
+  its bounds; a floor map of every hall (samples every 3 m, reached from the yard or not, the first unreached sample's neighbours),
+  a crossing check for each gate.
+- **Lusk's tally stage** (solid, 3.5 m up): the navmesh read the body's faces under the floor and left the floor under the stage a
+  walkable island, walled in; the centreline walk, the Pen's mouth and the Flooded Working's join all targeted it. A first fix (the
+  body stopping half a metre over the floor, a skirt below) made the body's own underside the island (R83); now a block that is not
+  walkable fills a solid body from under the floor to a hand under the planks (R84: still the point at -24.52 under the stage is
+  sampled: R85 RESULT).
+- **A camp's mobs** drawn again when the navmesh puts two on one footing (the rim's overseers 1.2 m apart on a 3 m deck).
+- **The EditMode set** after the elites' moves and loot: Ysolt's guard pair (the data names Sister Ashe Varrow), fifteen answered
+  calls, 94 rares, the Old Burrower's Earth-Heave (a second Rock-Crush), Brother Hollowsong among the end bosses, the planner test's
+  camps planned once (three calls stacked three copies of the room's camps: six in one fight). R83: EditMode 44/44.
+- **The floor map (R84, gates opened and three frames waited):** the Sealed Adit 511/544 reached, the Flooded Working all, the
+  Singing Gallery 1025/1029, the Ash Garden 186/188, the Scriptorium 58/115, the Deep Way 458/1142; the Pen, the Cutting Drift
+  (9/213), the Geode Foundry, the Muster Yard, the Chapel (2/263), the Sunless River (9/340), the Dry Ledge, the Grey Breach, the Quiet
+  Miner's Drift and the Pitch Pit not at all. Each branch is reached only for its first metres past its mouth. The tests waited three
+  frames after `OpenGates()`; a gate's carve (NavMeshObstacle) is lifted by the navmesh's own update, so they wait a second now, and
+  R85 says per gate whether the way crosses it and what stands by each hall's first unreached sample: R85 RESULT.
+- **Still red after R85:** R85 RED.
+- The fixture test's "loop opens over the hall" ray meets the Hub's own knoll (the knoll is not cut by a joining cave's air); the two
+  solids with walkable tops (the bowl at (11, -6, -303), the Muster Yard) and the Scriptorium's; the breadcrumbs (56 of 480) and the
+  run order follow the floor map.

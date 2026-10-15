@@ -4465,6 +4465,11 @@ namespace Crulanda.World
             {
                 if (!linked) return false;
                 if (Hollow.OpenInOther(h, t.TransformPoint((a + b2 + d) / 3))) return true;
+                // (The Adit rework) A face with a corner well inside another cave's passage goes too: the parent's knoll and shell, their
+                // faces metres wide, crossed each branch a few metres past its mouth with their middles in the rock, and no branch's
+                // floor could be reached from the yard (AditNavDiagnostics 2026-10-14 20:55: the Pen, the Cutting Drift, the Foundry, the
+                // Muster Yard, the River, the Breach...).
+                if (Hollow.OpenInOther(h, t.TransformPoint(a), .7f) || Hollow.OpenInOther(h, t.TransformPoint(b2), .7f) || Hollow.OpenInOther(h, t.TransformPoint(d), .7f)) return true;
                 return sharp.Count > 0 && (SharpOpen(t.TransformPoint(a)) || SharpOpen(t.TransformPoint(b2)) || SharpOpen(t.TransformPoint(d)));
             }
             for (int i = 0; i + 1 < n; i++)

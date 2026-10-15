@@ -37,10 +37,11 @@ Nothing is VERIFIED until Chris has seen it in his build.
   camps test, the breadcrumbs and the run order were measuring the search budget, not the caves. `NavReach.Length` now searches
   leg by leg without giving up on a leg that ends farther off as the crow flies, and the camps test and the map use it (R88: Adit classes 16/23, AditGateTests green); still a leg-by-leg search ends in pockets,
   so the map now also floods by hops (R90, the measure of the mesh itself): the River, the Dry Ledge, the Breach, the Quiet Miner's
-  Drift, the Pitch Pit and the Scriptorium are wholly reachable; **really cut off are four places:** the Pen (a "Solid" at
-  (7, -24, -183) between it and the hall beside Lusk's stage), the Cutting Drift past its first metres (the Gallery's knoll at about
-  x 107) and with it the whole Geode Foundry, and the Chapel's west half (x 109-119, z 137-140). Fix those four, give NavReach the
-  hop search, and most of the Adit's red tests should follow (ADIT_REWORK.md section 18).
+  Drift, the Pitch Pit and the Scriptorium are wholly reachable; **really cut off were four places;** the Pen was opened at
+  21:48 (the Spoil heaps camp's dressing blocks had walled the strip beside Lusk's stage: the camp is on the west side now, R92).
+  Left: the Cutting Drift past its first metres (and with it the whole Geode Foundry) and the Chapel's west half (one straight wall at
+  x about 110). The diagnostics draw the navmesh from above round each (`encounter-validation/navmesh-*.png`). Fix those two, give
+  NavReach the hop search, and most of the Adit's red tests should follow (ADIT_REWORK.md section 18).
   The real short blocks the map names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183)), and the
   Cutting Drift's own floor past its Company door. Start the next Adit session from `adit-nav-diagnostics-R88.txt`. The diagnostics (`AditNavDiagnostics`, lane A) write
   `D:/crulanda-work/encounter-validation/adit-nav-diagnostics.txt`: the deck tables, a floor map of every hall (reached from the yard

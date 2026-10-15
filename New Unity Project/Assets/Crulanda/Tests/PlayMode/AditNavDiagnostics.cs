@@ -40,6 +40,40 @@ namespace Crulanda.Tests
             if (Directory.Exists(root)) Directory.Delete(root, true);
         }
         static bool OnMesh(Vector3 p, float reach) { return NavMesh.SamplePosition(p, out var hit, reach, NavMesh.AllAreas) && Mathf.Abs(hit.position.y - p.y) < reach; }
+        /// <summary>A picture of the navmesh from above round a point (a tenth of a metre a pixel, north up; walkable blue, other areas
+        /// orange, the floor within 12 m of the point's height only) with the floor samples the yard reaches (green) and not (red):
+        /// `D:/crulanda-work/encounter-validation/navmesh-<name>.png`. The blocks are seen, not guessed (2026-10-14 21:45).</summary>
+        static void MeshPicture(string name, Vector3 centre, float half, List<Vector3> got, List<Vector3> lost)
+        {
+            const float Px = .1f; int size = Mathf.RoundToInt(half * 2 / Px); var tex = new Texture2D(size, size, TextureFormat.RGB24, false);
+            var fill = new Color32[size * size]; for (int i = 0; i < fill.Length; i++) fill[i] = new Color32(24, 24, 24, 255); tex.SetPixels32(fill);
+            void Dot(int x, int y, Color32 c) { if (x >= 0 && y >= 0 && x < size && y < size) tex.SetPixel(x, y, c); }
+            void Line(Vector3 a, Vector3 b, Color32 c)
+            {
+                int n = Mathf.CeilToInt(Vector3.Distance(a, b) / Px) + 1;
+                for (int i = 0; i <= n; i++) { var p = Vector3.Lerp(a, b, i / (float)n); Dot(Mathf.RoundToInt((p.x - centre.x + half) / Px), Mathf.RoundToInt((p.z - centre.z + half) / Px), c); }
+            }
+            void Mark(Vector3 p, Color32 c)
+            {
+                if (Mathf.Abs(p.x - centre.x) > half || Mathf.Abs(p.z - centre.z) > half || Mathf.Abs(p.y - centre.y) > 12) return;
+                int x = Mathf.RoundToInt((p.x - centre.x + half) / Px), y = Mathf.RoundToInt((p.z - centre.z + half) / Px);
+                for (int dx = -3; dx <= 3; dx++) for (int dy = -3; dy <= 3; dy++) Dot(x + dx, y + dy, c);
+            }
+            var tri = NavMesh.CalculateTriangulation();
+            for (int i = 0; i + 2 < tri.indices.Length; i += 3)
+            {
+                Vector3 a = tri.vertices[tri.indices[i]], b = tri.vertices[tri.indices[i + 1]], c = tri.vertices[tri.indices[i + 2]];
+                if (Mathf.Abs(a.x - centre.x) > half + 5 || Mathf.Abs(a.z - centre.z) > half + 5 || Mathf.Abs(a.y - centre.y) > 12) continue;
+                var col = tri.areas[i / 3] == 0 ? new Color32(90, 160, 255, 255) : new Color32(210, 130, 60, 255);
+                Line(a, b, col); Line(b, c, col); Line(c, a, col);
+            }
+            foreach (var g in got) Mark(g, new Color32(80, 220, 80, 255));
+            foreach (var l in lost) Mark(l, new Color32(240, 70, 70, 255));
+            tex.Apply();
+            try { File.WriteAllBytes(@"D:\crulanda-work\encounter-validation
+avmesh-" + name + ".png", tex.EncodeToPNG()); } catch (Exception) { }
+            UnityEngine.Object.Destroy(tex);
+        }
 
         [UnityTest] public IEnumerator Where_the_navmesh_is()
         {
@@ -235,6 +269,11 @@ namespace Crulanda.Tests
                     if (ok) { allReached.Add(u); pending.RemoveAt(i); hopped[hc] = hopped.TryGetValue(hc, out var c) ? c + 1 : 1; changed = true; }
                 }
             }
+            var stillLost = pending.Select(x => x.p).ToList();
+            MeshPicture("pen-and-stage", new Vector3(8, -24.5f, -180), 25, allReached, stillLost);
+            MeshPicture("cutting-drift-mouth", new Vector3(100, -45, -6), 25, allReached, stillLost);
+            MeshPicture("chapel-west", new Vector3(115, -69, 138), 25, allReached, stillLost);
+            MeshPicture("foundry-lip", new Vector3(206, -44, 4), 25, allReached, stillLost);
             sb.AppendLine(); sb.AppendLine("cave | reached by hops (added to the above) | still not reached (the first few)");
             foreach (var h in Hollow.All)
             {

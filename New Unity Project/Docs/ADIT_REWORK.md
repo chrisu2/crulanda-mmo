@@ -983,6 +983,7 @@ The work:
 - The /dungeon quick|full modes (ZoneChat.cs:160 passes arg; LeadDungeon(string mode)).
 - Optional-boss tuning, the secrets' rewards, the lichen crumbs.
 - Docs: DUNGEON_DESIGN 4-9, WORLD_ZONES, CHANGELOG, CLAUDE_HANDOFF.
+- **Built 2026-10-15 on `adit-polish` (section 21): all of the above but CHANGELOG and CLAUDE_HANDOFF (the main session's).**
 
 ## 12. What this merge fixes
 Two drafts (A and B) were merged: B's skeleton with A's grafts.
@@ -1286,3 +1287,83 @@ the dungeon assedt not just plain walls and arch") and of the Scriptorium's door
   boxed over the slot would fake one but shows its sill; not done). Commit e7f5f6a1; proven by R118's tour frame, not yet by Chris.
 - The chapel's tour shot (R116's frame 19 was a pink close-up: the camera at 4.5 m up stood in a wall) now from 9 m up by the east door.
 
+
+## 21. S7 as built: the polish (2026-10-15, branch `adit-polish` off `adit-rework`; MADE and compiled, not run in Unity, OPEN)
+Chris's answers of 2026-10-15 (verbatim): Q4 "Yes, add them"; Q1 "20 minute respawn" (done before this, 1200 s); Q2 "Keep ~75 min";
+Q3 "Build the Cove" (S6, another helper's: nothing here touches the Rail Hall, the Dead Line, the Black Cove, Danner or RideCarriage).
+Everything below is GAME-ONLY (the Wasting, the Sandthrone, the goblins and the old workings' lamps are CANON; these uses of them are not).
+Nothing here changes the save format: what it adds is per visit and not saved.
+
+**The fixture test's two reds (AditCaveBuildTests), both the builder's, not the test's:**
+- *"a rail along its open side"*: `ZoneBuilder.DeckBlock` lost the line that places its block in cbc484dc (chainR80, 2026-10-14): the new
+  name's comment ran on over `o.transform.localPosition = ...; o.transform.localRotation = rot;`, so every deck block (posts, rope posts,
+  rails, the solid bodies under the tally stage and the island) has stood at the decks' root's origin since. No trestle, catwalk or
+  bridge has had a solid rail since then: you and the agents could walk off an open side. The line is back. **This changes the navmesh**
+  (rails and posts are carved again, the bodies fill their decks): every Adit nav test must be read again (below).
+- *"the loop opens over the hall"*: the hall's knoll (and shell) faces are metres across; one straddled the fixture loop's tube where the
+  loop comes through the hall's rock to its lip, its corners above and below the passage and its middle to one side, so no point `Cut`
+  tested (corners, middle, edge middles) was in the loop's air and the face stood across the passage by its wall (the test's ray runs
+  2.5 m off the loop's middle). A port of Hollow and Cavern's rings to Python (a stand-in for Unity's Perlin) found it at one noise draw
+  in three, at x 273.7, the face spanning y -23.6 to -16.8 over a passage floored at -23. `Hollow.OpenOnFace` now samples a face every
+  half metre against a raised mouth's or lip's cave (`sharp`), only for faces near that cave; Cavern's `Cut` asks it last. The walk
+  through was never blocked (the middle of the passage is clear); the passage was narrowed by a slab at its side.
+
+**1. The Grey Spreads** (`EncounterSession.GreySpread.cs`, new; E6):
+- Three lines across the Grey Breach, anchors `grey line 1-3` at 45, 100 and 160 m (the plan's 45/125/185 were for a 230 m Breach; the
+  built one is 215 m, so the lines sit in the quiet between its fights: the mouth crawlers at 13, the Hollow drift at 79, the Grey den at
+  122, the Whisperer at 141, the Foreman at 178).
+- When you, a party sim or Mira first stands on the Breach's floor past the next line (checked four times a second): the Breach's lamps
+  short of the line drop to 40 % and go grey (`ZoneBuilder.GreyCaveLights`, through the clock's NightLight values); the static built
+  hidden over the 30 m behind the line shows (`ShowGreySeep`: unmade rock on the walls, a few faintly lit, grey stains on the floor);
+  its seep comes: "The grey seep (first|second|third)", two Greyed crawlers each (flee 0.25), 25 m back, `after` = `event:greylineN`
+  (raised by the code, listed in AditDataTests' CodeEvents), sent at whoever crossed. A line in chat each time.
+- The plan's three crawlers a line are two, to hold the run near 75 minutes (six crawlers, about a minute in all).
+- The Foreman Who Forgot's death stops it (no line after does anything) and brings the greyed lamps half way back. Once a visit.
+- Members are GreyLine*, GreySeep*, GreyLinesCrossed: `Spread` is the area-damage code's.
+
+**2. The swing-loads** (Q4; `AditSwingLoad.cs` and `ZoneBuilder.AditPolish.cs`, new):
+- Three ore buckets: over the catwalk at 108 and 82 m (+12; clear of the sorters at 95) and over the cross-walk at 69 m, aside 5.
+- Each hangs on a 6.5 m rope from a block lashed under a timber tie-beam across the hall, wall to wall, and swings across its walk
+  (the catwalk's buckets out over the hall and back; the cross-walk's along the hall) 50 degrees each way, a full swing in 5.6, 6.05
+  and 6.5 s, out of step. It is down at the walk (its middle 1.1 m over the planks) only as it passes the bottom, about 0.7 s each pass;
+  at the ends of its swing it is 5 m out and over head height. Cross as it swings away.
+- Its rope team stands on the hall floor 9 m out under the swing: two pressed goblins and a Sandthrone rope-hand on the tag line, one
+  behind another, leaning back as it comes their way (PROVISIONAL figures: the caged goblins' look, a deserter's). A cleat and a coil by them.
+- A bucket meeting you, a party sim or Mira (within 0.95 m on the level, 1.3 m up or down) knocks them 2.5 m along the walk, away from
+  it (`AditSwingLoad.KnockAlong`: traced on the navmesh, stopped by an edge or a rail, and only onto the level they stood on, within
+  0.6 m; else not at all). No damage. Mobs are not struck. A one-time line the first time it hits you.
+- Machines (memory "NO Machines"): rope, a lashed block, timber, people pulling. No wheel, pulley-wheel, winch, crane or counterweight.
+
+**3. `/dungeon quick|full`** were built in step 3 (section 15: `LeadDungeon(string mode)`, `DungeonPlan.ParseMode`); /help says so now.
+Quick is the required camps and bosses (about 68 minutes), the plain `/dungeon` adds the side bosses inside the wings it takes (about
+75), full takes every side room and both sides of the fork (about 90).
+
+**4. Optional bosses, secrets, lichen:**
+- Tuning (EliteMoves.cs): the Old Burrower (13, in an 11 wing) throws 4 m, not 6, and its Burrow reaches 5 m, not 6; Old Kettle's pitch
+  holds 2 s every 20, not 3 s every 18, so it seldom holds you inside his Hot Pitch ring. Nothing else changed: no fight was played.
+- Secrets (adit_layout.py `make_secrets`): Behind the Falls also gives the Adit-Runner's Hobnail Boots; the Foreman's Strongbox the
+  Adit-Runner's Scale Jerkin; the Lamp-Man's Niche 45 crowns (was 25) and **The Lamp-Men's Mixing Card** (new page, doc.adit.lamp_oil,
+  a page like a recipe: their lamp oil); the Censor's Box 60 (was 30); the Drowned Purse 60 (was 35); the Ember-Cap a Last-light (a rare
+  herb). The keys stay keys; the pages stay pages. Every secret now gives experience and coin, a piece, a page or a key (AditDataTests).
+- The lichen (`ZoneBuilder.BuildCrumbs`): the data had five crumb trails and nothing built them. Each is now faint glowing patches on
+  the floor every 1.3-2 m at its aside, drawn out along the way on, one mesh a trail, no light or collider: the dark drift (where no lamp
+  is), the falls stair, the Breach, the cloister stair home, the shaft stair. None over another cave's air, in a sunk pool or under a ramp;
+  it gives out for 2.6 m round a key by the way (the rusted key's "where the lichen gives out").
+
+**Data** (adit_layout.py, `--live`): 100 camps (3 released seeps added after the patrols and before the rare, which stays last; released
+camps draw nothing at the start, so no camp's draws move), 234 mobs (185 there from the start, as before), 6 more anchors (grey line 1-3,
+swing load 1-3); the six secrets above; Quests/adit.json one more page. The pinned head (camps 0-31) is unmoved; the Quiet Miner's
+index goes from 96 to 99, so his elitesSlain key ("mob.quietminer.adit.N") differs from a save made on an earlier rework build
+(the rework is not live, so no save of Chris's has one).
+
+**What Unity must run (lane A, one job at a time), in this order:**
+1. EditMode: AditDataTests (three new: the grey lines, the secrets pay, the swing anchors), QuestDataTests, SocialRulesTests,
+   EliteBalanceTests, LootDataTests, ArmouryTests, DiscoveryLogTests.
+2. PlayMode: AditCaveBuildTests (the two reds should be green), AditPolishTests (new: the grey lines and the Foreman, the swing-loads and
+   their knock, the lichen), then, because the deck blocks stand where they belong again, AditNavTests, AditTests, AditGateTests,
+   AditReleaseTests and AditNavDiagnostics (the floor map and the hop map: a post or a rail now carved where none was could cut a
+   junction the R83-R100 runs found whole).
+3. The Adit camera tour (`--crulanda-adit-tour`): frames of the Foundry (the buckets, the beams, the teams), the Breach before and after
+   a line, the dark drift's lichen. Front, back and side frames to Chris.
+4. A lane B group run (`group_run.ps1 -Mode` standard), timed against about 75 minutes, watching the catwalk crossing (how often the
+   sims are knocked back) and the Breach.

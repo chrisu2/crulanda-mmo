@@ -97,13 +97,17 @@ namespace Crulanda.Encounter
             Message(third == 1 ? "The barge groans on the bar. The warps creak round the bollards, and the bargemen haul in time, hand over hand."
                                : "Her bow lifts. The rope teams are singing the stroke now: one more good heave and she floats.");
         }
+        /// <summary>The haul over (cut, its haulers down, or her afloat): the bollards are no longer offered to E.</summary>
+        void HideWarps() { if (Zone != null) foreach (var i in Zone.Interactables) if (i.kind == "warps") i.hiddenUntil = float.MaxValue; }
         public void HaulStopped(AditHaul h, string why)
         {
+            HideWarps();
             Message(why == "cut" ? "The warps part under the blade and whip away into the black water. The barge settles back on the bar: she stays fast."
                                  : "The last of the rope teams is down. The warps go slack, and the barge stays fast on the bar.");
         }
         public void HaulFloated(AditHaul h)
         {
+            HideWarps();
             Message("With a long grinding lurch the barge comes off the bar and rides free on her warps. Below decks a hatch bangs open: her crew is up, and Danner has more to call on now.");
         }
         /// <summary>One of Danner's calls (EncounterSession.Rally) with the barge afloat: two of her crew up out of the hold, at most twice a visit

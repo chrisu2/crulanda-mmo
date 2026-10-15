@@ -167,7 +167,16 @@ namespace Crulanda.Encounter
                 case "stone": return Progress.spiritStones.Contains(i.Key(Zone.Zone.id)) ? "The spirit stone hums" : i.prompt;
                 case "weaver": return Weaver != null && Weaver.Now == AditWeaver.Stage.Waiting ? "Talk to " + AditWeaver.Name + " (walk her to the carriage)" : i.prompt;
                 case "carriage": return RideAllowed ? i.prompt + " (one ride out)" : "The carriage is loading: its lock still sings";
-                case "warps": return Haul == null || Haul.Now == AditHaul.Stage.Stopped || Haul.Now == AditHaul.Stage.Floated ? null : i.prompt;   // (S6)
+                // (S6) Nothing to cut once the haul is over: a line saying how she lies (a null here fell back to the prop's own "Cut the
+                // warps", R132), and the bollards are no longer offered (EncounterSession.Haul.HideWarps).
+                case "warps":
+                    if (Haul == null) return "The warps hang slack";
+                    switch (Haul.Now)
+                    {
+                        case AditHaul.Stage.Stopped: return Haul.Cut ? "The warps are cut" : "The warps hang slack: she is fast on the bar";
+                        case AditHaul.Stage.Floated: return "The warps are taut: she is afloat";
+                        default: return i.prompt;
+                    }
                 default: return null;
             }
         }

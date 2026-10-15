@@ -168,7 +168,9 @@ namespace Crulanda.Tests
             session.UseInteractable(warps); yield return Frames(2);
             Assert.AreEqual(AditHaul.Stage.Stopped, haul.Now, "the warps cut"); Assert.AreEqual("cut", haul.StoppedBy);
             Assert.IsTrue(session.Zone.CoveWarps.All(w => w == null || !w.activeSelf), "gone into the water");
-            Assert.IsNull(session.InteractPromptFor(warps), "nothing left to cut");
+            Assert.AreEqual("The warps are cut", session.InteractPromptFor(warps), "nothing left to cut");
+            Assert.Greater(warps.hiddenUntil, Time.time + 1e5f, "and the bollards are no longer offered");
+            Assert.AreNotSame(warps, session.NearbyInteractable, "E there does nothing now");
         }
 
         [UnityTest] public IEnumerator Danner_fights_on_his_stern_castle_and_drops_his_loot()

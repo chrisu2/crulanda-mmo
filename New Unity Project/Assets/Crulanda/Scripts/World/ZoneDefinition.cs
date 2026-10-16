@@ -38,6 +38,9 @@ namespace Crulanda.World
         public ZoneProp[] props = new ZoneProp[0];
         public ZoneWasting wasting;         // only when the JSON has a "wasting" block (ZoneBuilder.ParseZone)
         public ZoneLabel[] landmarks = new ZoneLabel[0];
+        /// <summary>Far places drawn on the skyline past the world's edge (DistantSkyline; Chris, 2026-10-16: "maybe see a castle off in
+        /// the distance when looking north"): Oakhaven's view of the Crown of Argentis up its North road. Empty: none.</summary>
+        public ZoneSkyline[] skyline = new ZoneSkyline[0];
         public string[] objectives = new string[0];
         public ZoneExit[] exits = new ZoneExit[0];
         public ZoneGrove[] groves = new ZoneGrove[0];
@@ -100,6 +103,24 @@ namespace Crulanda.World
         public ZoneHazard[] hazards = new ZoneHazard[0];
         /// <summary>The ride home (<see cref="ZoneRide"/>: Hallow's Creek's wagon), or one with no name: none.</summary>
         public ZoneRide ride;
+        // ---- a city (the Crown of Argentis, Docs/CAPITAL_HUB.md; all optional: a zone without them builds as it did) ----
+        /// <summary>A safe city (the Crown of Argentis): no camps and no gathering nodes; its people are the trades' trainers, the
+        /// clerks and the Council's wardens. Its levels show as "all" on the maps; the five wild zones' counts leave it out.</summary>
+        public bool city;
+        /// <summary>Level ground in rectangles over the land (<see cref="ZoneTerrace"/>; ZoneBuilder.Crown): a plateau on its wall, a
+        /// terrace above it, a ramp between them. Applied after the shapes, in order, a later one over an earlier.</summary>
+        public ZoneTerrace[] terraces = new ZoneTerrace[0];
+    }
+    /// <summary>
+    /// A terrace (ZoneBuilder.Crown; GAME-ONLY ground): a rectangle size (x across, y along) round center, turned rotation degrees,
+    /// levelled at height, easing back to whatever lies under it over blend metres outside its edge (a metre or two: a cliff the
+    /// walls stand on). ramp: its level runs from height at its -z end to heightTo at its +z end (a ramp up to a gate or a terrace).
+    /// paved: flagged in white stone where it is the ground (no grass grows there). A later terrace lies over an earlier one.
+    /// </summary>
+    [Serializable] public sealed class ZoneTerrace
+    {
+        public string name, canonStatus; public Vector2 center, size; public float rotation, height, heightTo, blend = 1.5f;
+        public bool ramp, paved;
     }
     /// <summary>
     /// A pit sunk in the land (GAME-ONLY; Hallow's Creek's chasm, DUNGEON2_DESIGN.md N3): a box of <see cref="size"/> round <see cref="center"/>
@@ -152,7 +173,11 @@ namespace Crulanda.World
     /// one who keeps a post day and night. stories: two or three lines of their own, memories, grudges and hopes tied to the
     /// canon (GAME-ONLY lines about CANON things), said one time in three when spoken to (ZoneLore.Story).
     /// </summary>
-    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; public bool works; public string[] stories = new string[0]; }
+    /// look: a resident's own body ("keeper", a Veridian Keeper; "concord", the Concord's warden look, friendly: the Council's wardens
+    /// in the Crown; "councilor", the High Councilor's white and gold robes of state; "scholar", a clerk's dark robe). canonStatus
+    /// (optional): the lore status of the person and their lines (High Councilor Aethelgard is CANON). seated: a post kept sitting, never
+    /// standing (the High Councilor on his throne), facing <c>facing</c> (a yaw in degrees: 0 north, +Z; 180 south), even when spoken to.
+    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look, canonStatus; public Vector2 at; public bool works, seated; public float facing; public string[] stories = new string[0]; }
     /// <summary>A named person's stories (<see cref="ZoneLife.stories"/>): name as the villager is named, and their lines.</summary>
     [Serializable] public sealed class ZoneStory { public string name; public string[] lines = new string[0]; }
     /// <summary>
@@ -337,6 +362,11 @@ namespace Crulanda.World
     /// rotation in degrees (0 = door faces south). variant picks colour/size variations; some are looks of their own:
     /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), inn 2 a waystation (one storey, a long table and bunks),
     /// crypt 1 a turfed barrow, grave 1 heaved over.
+    /// A city's (ZoneBuilder.Crown, the Crown of Argentis): council_keep, dome_hall, archive, mansion (variant 0 the Exchange, 1 the
+    /// Treasury, 2 the Hall of Arms, 3 the Armoury), guild_hall (variant: the guild, SimGuilds' order) walk in; gilt_house, colonnade,
+    /// fountain, statue, city_lamp, council_banner, parterre, stair (treads over a ramp terrace), city_wall (uses points; variant 0 the
+    /// curtain wall with its towers every size.x metres, 1 a parapet), city_gate (size.x the passage; variant 1 shut), spire (the
+    /// Spire, a backdrop), lowtowns (roofs and smoke over size), sea (a still sheet of water over size).
     /// </summary>
     [Serializable] public sealed class ZoneProp
     {
@@ -528,7 +558,15 @@ namespace Crulanda.World
     /// (unset: from its south-west); viewPitch and viewZoom set that shot's camera (0: 17 degrees, 11 m). ground (optional):
     /// "licked" paints the place's ground smooth and uncracked in an ash zone (the Unwoven Flats); paint only.
     /// </summary>
-    [Serializable] public sealed class ZoneLabel { public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; public string ground; }   // canonStatus: CANON / CANON-EXPANDED / GAME-ONLY / PROVISIONAL
+    /// viewHeight (optional, p9-cityinn): the shot is taken from a free camera that many metres over the ground at view, aimed at the
+    /// landmark viewAim metres over its ground (a city seen whole from high over its walls), not from the player's orbit camera.
+    [Serializable] public sealed class ZoneLabel { public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; public string ground; public float viewHeight, viewAim; }
+    /// <summary>
+    /// A far place on the skyline (DistantSkyline): kind ("crown": the Crown of Argentis on its mountain), bearing from the zone's middle
+    /// in degrees (0 north, 90 east), distance in reaches past the zone's middle (the zone's half plus its backdrop; 0: 1.75, past the
+    /// forest ring and in front of the far ranges), scale (0: 1), name and canonStatus for the record. Never reached; nothing solid.
+    /// </summary>
+    [Serializable] public sealed class ZoneSkyline { public string kind, name, canonStatus; public float bearing, distance, scale; }   // canonStatus: CANON / CANON-EXPANDED / GAME-ONLY / PROVISIONAL
 
     public static class ZoneColors
     {

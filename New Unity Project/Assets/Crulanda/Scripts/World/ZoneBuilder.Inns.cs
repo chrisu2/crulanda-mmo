@@ -19,6 +19,8 @@ namespace Crulanda.World
     {
         /// <summary>The inns' door, jamb to jamb (two leaves of 1.3 m), and its height in a tavern.</summary>
         public const float InnDoorW = 2.6f, InnDoorH = 2.4f;
+        /// <summary>The city inn's grand double door (variant 3, the Gilded Lantern): two leaves of 1.6 m, 3.4 m high.</summary>
+        public const float CityDoorW = 3.2f, CityDoorH = 3.4f;
         /// <summary>
         /// How the navmesh is cut round a door (EncounterNavigation): every blocker's box is padded by <see cref="NavPad"/> a side, and the
         /// walkable mesh stops the bake's agent radius (<see cref="NavAgentRadius"/>, NavMesh settings 0) short of that; the jambs'
@@ -60,7 +62,7 @@ namespace Crulanda.World
         /// </summary>
         public sealed class InnPlan
         {
-            public float w, d, doorW, doorH, wall = .3f; public bool waystation;
+            public float w, d, doorW, doorH, wall = .3f; public bool waystation, city;
             /// <summary>Tavern: the bar's middle and size (x along it, y its depth), the innkeeper's place, the rooms door's x.</summary>
             public Vector2 bar, barSize, stand; public float roomsX;
             /// <summary>The hearth's footprint (middle, size), its fire (the light, and a station), and the bench before it.</summary>
@@ -72,6 +74,13 @@ namespace Crulanda.World
             public readonly List<(Vector2 at, Vector2 face)> seats = new List<(Vector2, Vector2)>(), stools = new List<(Vector2, Vector2)>(), benchSeats = new List<(Vector2, Vector2)>();
             /// <summary>Waystation: the long table (middle, size), the bunks (middles; each <see cref="bunkSize"/>), and where a lodger goes to bed.</summary>
             public Vector2 longTable, longTableSize, bunkSize = new Vector2(2, .8f), sleep; public readonly List<Vector2> bunks = new List<Vector2>();
+            /// <summary>A city inn (variant 3, the Crown's Gilded Lantern): the gallery's floor height and depth round three walls, the
+            /// columns under its corners and ends, the stair up to it (middle, size; it rises toward +x along the front wall), the
+            /// kitchen's range in the back corner (middle, size) with the cook's place and the hatch where goods are handed in, and the
+            /// servers' places on the floor.</summary>
+            public float galleryY, galleryDepth; public readonly List<Vector2> columns = new List<Vector2>(), serve = new List<Vector2>();
+            public Vector2 stair, stairSize, range, rangeSize, cook, hatch;
+            public const float ColumnRadius = .35f;
             /// <summary>Half the room inside the walls.</summary>
             public Vector2 Inner { get { return new Vector2(w / 2 - wall / 2, d / 2 - wall / 2); } }
             /// <summary>The gap between the jambs' colliders, and the navmesh's walkable width through it.</summary>
@@ -83,6 +92,7 @@ namespace Crulanda.World
 
             public static InnPlan For(Vector2 size, int variant, float doorW = InnDoorW)
             {
+                if (variant == 3) return City(size);
                 var p = new InnPlan { w = size.x, d = size.y, doorW = doorW, waystation = variant == 2 };
                 float w = p.w, d = p.d;
                 if (p.waystation)
@@ -125,8 +135,52 @@ namespace Crulanda.World
                 }
                 return p;
             }
+            /// <summary>
+            /// The city inn (variant 3; GAME-ONLY, p9-cityinn; Chris, 2026-10-16: "dont need the same exact inn in the castle. needs a
+            /// redesign"): white stone walls half a metre thick round a taproom two storeys high, a gallery 2.6 m deep at 3.5 m round the
+            /// back and both ends on columns, a grand double door of <see cref="CityDoorW"/>. Under the back gallery the long bar from the
+            /// -x end with six stools before it and the innkeeper at its open end, the rooms door past him; the hearth with its carved
+            /// mantel on the +x end with the bench before it and the kitchen's range in the corner behind; three private booths along the
+            /// -x end (a table, a settle either side, two at each); five round tables of four on the open floor, none in the doorway; the
+            /// stair up to the +x gallery along the front wall. Laid out for 22 x 16.
+            /// </summary>
+            static InnPlan City(Vector2 size)
+            {
+                var p = new InnPlan { w = size.x, d = size.y, doorW = CityDoorW, doorH = CityDoorH, wall = .5f, city = true, galleryY = 3.5f, galleryDepth = 2.6f };
+                float hx = p.w / 2 - p.wall / 2, hz = p.d / 2 - p.wall / 2, g = p.galleryDepth;
+                // The bar under the back gallery, from 3.75 m in from the -x wall, twelve metres short of the room's width.
+                float len = Mathf.Max(6, p.w - 12), left = -hx + 3.75f;
+                p.bar = new Vector2(left + len / 2, hz - 1.45f); p.barSize = new Vector2(len, .8f);
+                p.stand = new Vector2(left + len + .7f, p.bar.y); p.roomsX = left + len + 2;
+                for (float x = left + .6f; x <= left + len - 1.4f + .01f; x += 1.4f) p.stools.Add((new Vector2(x, p.bar.y - .4f - 1), new Vector2(x, p.bar.y)));
+                // The hearth on the +x end, the bench before it; the range in the back corner, the cook before it, the hatch by it.
+                p.hearth = new Vector2(hx - .45f, -1); p.hearthSize = new Vector2(.9f, 2.8f); p.fire = new Vector2(hx - 1.3f, -1);
+                p.bench = new Vector2(hx - 2, -1); p.woodpile = new Vector2(hx - .5f, 1.2f);
+                foreach (float z in new[] { -1.6f, -.4f }) p.benchSeats.Add((new Vector2(hx - 2.15f, z), new Vector2(p.hearth.x, z)));
+                p.range = new Vector2(hx - .4f, hz - 2); p.rangeSize = new Vector2(.8f, 1.8f); p.cook = new Vector2(hx - 1.55f, hz - 2); p.hatch = new Vector2(hx - 3.55f, hz - 3.65f);
+                // The gallery's columns: at its inner corners and two down each end.
+                foreach (int s in new[] { -1, 1 }) foreach (float z in new[] { -4.2f, 2.4f, hz - g }) p.columns.Add(new Vector2(s * (hx - g), z));
+                // The stair up the front wall to the +x gallery, from 2.8 m right of the middle.
+                p.stair = new Vector2((2.8f + hx - g) / 2, -hz + p.wall / 2 + 1f); p.stairSize = new Vector2(hx - g - 2.8f, 2f);   // 2 m wide from the wall's inner face (1.4 m centred on the wall's middle left 0.15 m to walk past the rail: CrownLifeTests)
+                // The booths along the -x end: a table against the wall, a settle either side, two at each.
+                foreach (float z in new[] { -4.6f, -1.6f, 1.4f })
+                {
+                    var at = new Vector2(-hx + .95f, z); p.tables.Add(at); p.turns.Add(90);
+                    foreach (int sz in new[] { -1, 1 }) foreach (float dx in new[] { -.4f, .4f }) p.seats.Add((new Vector2(at.x + dx, z + sz), new Vector2(at.x + dx, z)));
+                }
+                // Five round tables of four on the open floor, seats at 45, 135, 225 and 315 degrees.
+                foreach (var at in new[] { new Vector2(-5, -5.2f), new Vector2(5.2f, -3.8f), new Vector2(-4.2f, .8f), new Vector2(3.6f, .6f), new Vector2(-.4f, -2.4f) })
+                {
+                    p.tables.Add(at); p.turns.Add(45);
+                    for (int k = 0; k < 4; k++) { float a = (45 + k * 90) * Mathf.Deg2Rad; p.seats.Add((at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * SeatRadius * 1.15f, at)); }   // on the diagonals: out past the table's corners (CrownZoneTests)
+                }
+                // Where the servers and the pot-boy wait between trays, in the aisles.
+                p.serve.Add(new Vector2(-1.6f, 3.4f)); p.serve.Add(new Vector2(1.4f, -.6f)); p.serve.Add(new Vector2(-2.6f, -4.4f));
+                return p;
+            }
             /// <summary>What stands on the floor, each as a box (middle, half size) in the room's frame: the bar, the hearth, the tables,
-            /// the long table and the bunks (the tests keep the seats and each other clear of them).</summary>
+            /// the long table and the bunks, and in a city inn its columns, its stair and its range (the tests keep the seats and each
+            /// other clear of them).</summary>
             public List<(string what, Vector2 at, Vector2 half)> Furniture()
             {
                 var list = new List<(string, Vector2, Vector2)>();
@@ -135,6 +189,9 @@ namespace Crulanda.World
                 for (int i = 0; i < tables.Count; i++) list.Add(("table " + (i + 1), tables[i], Vector2.one * TableRadius));
                 if (longTableSize.x > 0) list.Add(("the long table", longTable, longTableSize / 2));
                 for (int i = 0; i < bunks.Count; i++) list.Add(("bunk " + (i + 1), bunks[i], bunkSize / 2));
+                for (int i = 0; i < columns.Count; i++) list.Add(("column " + (i + 1), columns[i], Vector2.one * ColumnRadius));
+                if (stairSize.x > 0) list.Add(("the stair", stair, stairSize / 2));
+                if (rangeSize.x > 0) list.Add(("the range", range, rangeSize / 2));
                 return list;
             }
         }

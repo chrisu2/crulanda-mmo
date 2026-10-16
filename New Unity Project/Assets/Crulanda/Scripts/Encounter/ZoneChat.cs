@@ -168,11 +168,22 @@ namespace Crulanda.Encounter
                     case "/scorecard": ScorecardOpen = !ScorecardOpen; if (ScorecardOpen && ScorecardTitle == null) ScorecardTitle = (Meter.RunName ?? "The run") + " so far"; return;
                     case "/level": TesterLevel(arg); return;   // Chris, 2026-10-13: "i need a way to fast level for testing" / "and then reset to 1 when not testing"
                     case "/aa": TesterAa(arg); return;
+                    case "/archive": TesterArchive(); return;   // the Archive's reading room where you stand (the capital's halls, EncounterSession.Halls)
+                    case "/bank": TesterBank(); return;   // the Treasury Vault where you stand, before the castle's clerk (2026-10-15)
+                    case "/exchange": case "/ex": TesterExchange(); return;   // the Exchange where you stand
                     case "/meter": if (arg == "reset") { Meter.Reset(); Message("Meter reset."); } else { MeterOpen = !MeterOpen; Message(MeterOpen ? "Damage and healing meter shown (/meter reset clears it)." : "Meter hidden."); } return;
                     case "/guild": if (arg.Length == 0) { GuildRoster(); return; } break;
                     case "/groster": case "/ginfo": GuildRoster(); return;
                     case "/gquit": LeaveGuild(); return;
                     case "/invis": Unseen = !Unseen; Message(Unseen ? "Unseen: mobs will not notice you (until you hit one). /invis again to be seen." : "Seen again."); return;
+                    case "/crown":   // a tester's way to the capital (2026-10-16, Chris's castle preview: the bat took him to the Adit)
+                        {
+                            var crown = Zone != null ? Zone.FindZone("zone.crown") : null; if (crown == null) { Message("The Crown of Argentis is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            Message("To the Crown of Argentis...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.crown", name = "/crown", arrive = crown.spawns.player });
+                            return;
+                        }
                     case "/adit":   // a tester's way in (Chris, 2026-10-08): level 11 and straight to the Sealed Adit's yard
                         {
                             var adit = Zone != null ? Zone.FindZone("zone.adit") : null; if (adit == null) { Message("The Sealed Adit is not in this build."); return; }
@@ -202,7 +213,7 @@ namespace Crulanda.Encounter
                             }
                             Message("/music <0-1> sets the music's level; /music off silences it."); return;
                         }
-                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap, /lockouts clear ends every lockout."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick takes only what must be done, full every side room too), /queue [dungeon|any|leave] (the dungeon queue, J: a party of your level to a dungeon's door), /buff (eat, drink and lay your class's buff on the party: the leader stops to buff up before a boss); /lockouts (the bosses and elites locked for you); /g guild chat, /guild (who is in it), /gquit."); Message("Music: /music <0-1> sets its level, /music off silences it."); return;
+                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap, /lockouts clear ends every lockout, /archive opens the Archive's reading room, /bank the Treasury Vault and /exchange the Exchange where you stand."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick takes only what must be done, full every side room too), /queue [dungeon|any|leave] (the dungeon queue, J: a party of your level to a dungeon's door), /buff (eat, drink and lay your class's buff on the party: the leader stops to buff up before a boss); /lockouts (the bosses and elites locked for you); /g guild chat, /guild (who is in it), /gquit."); Message("Music: /music <0-1> sets its level, /music off silences it."); return;
                     case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": case "/gu": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;
                 }

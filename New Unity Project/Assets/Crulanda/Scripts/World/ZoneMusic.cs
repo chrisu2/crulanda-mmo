@@ -46,6 +46,7 @@ namespace Crulanda.World
             { "zone.adit", new Set { day = DungeonTracks, combat = DungeonFight } },
             { "zone.lowtowns", new Set { day = new[] { "Music/Last/RustAndSilence", "Music/Eastern/MysteriousCity" }, night = new[] { "Music/Dark/Cemetery", "Music/Eastern/RestlessNight" } } },   // the Lowtowns (Phase 9.1): rust and smog by day, the drains' night
             { "zone.hallows", new Set { day = DungeonTracks, combat = DungeonFight } },   // Hallow's Creek, the second dungeon
+            { "zone.crown", new Set { day = new[] { "Music/Eastern/MysteriousCity", "Music/Last/LastHope" }, night = new[] { "Music/Eastern/RestlessNight" } } },   // the Crown of Argentis (a city)
         };
         /// <summary>A zone's set; a zone not in <see cref="Sets"/> gets Oakhaven's.</summary>
         public static Set SetFor(string zoneId) { Set s; return zoneId != null && Sets.TryGetValue(zoneId, out s) ? s : Sets["zone.oakhaven"]; }

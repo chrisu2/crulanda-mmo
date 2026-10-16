@@ -45,7 +45,7 @@ namespace Crulanda.World
                 case "wellhouse": WellHouse(t); return true;
                 case "stone": SpiritStone(t); return true;
                 case "gatehouse": Gatehouse(t, p.size.x > 0 ? p.size : new Vector2(16, 14)); return true;
-                case "archive": Archive(t, p.size.x > 0 ? p.size : new Vector2(50, 24)); return true;
+                case "archive": HallowsArchive(t, p.size.x > 0 ? p.size : new Vector2(50, 24)); return true;
                 case "granary": Granary(t, p.size.x > 0 ? p.size : new Vector2(40, 18)); return true;
                 case "belfry": Belfry(t, p.size.x > 0 ? p.size.x : 12); return true;
                 case "copydesk": CopyDesk(t); return true;
@@ -237,7 +237,7 @@ namespace Crulanda.World
         /// deck), a doorless front on the west, the shelves standing three metres high as the walls of the maze, twisted columns along the walls,
         /// the Registrar's desk in the apse, and off the north wall three cells (the middle one the Warden's, behind its pen gate).
         /// </summary>
-        void Archive(Transform t, Vector2 size)
+        void HallowsArchive(Transform t, Vector2 size)
         {
             float w = size.x / 2, d = size.y / 2, h = 12, f = 2;
             var wall = Dressed(new Color(.6f, .58f, .55f)); var shelf = Tint(art.timber, new Color(.42f, .4f, .38f)); var book = Tint(art.stone, new Color(.5f, .46f, .42f));

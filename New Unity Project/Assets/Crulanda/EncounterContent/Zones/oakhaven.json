@@ -44,6 +44,14 @@
   "seed": 1771,
   "wildFrom": 160,
   "wildDensity": 0.45,
+  "skyline": [
+    {
+      "kind": "crown",
+      "name": "The Crown of Argentis",
+      "bearing": 355,
+      "canonStatus": "CANON place (Argentis, the Sky Bastion, up the North road from Oakhaven, the overworld map; the High City's white-and-gold towers, the city map); its far silhouette GAME-ONLY (Chris, 2026-10-16: \"maybe see a castle off in the distance when looking north\")"
+    }
+  ],
   "lighting": {
     "sunPitch": 27,
     "sunYaw": -38,
@@ -180,6 +188,19 @@
         "y": -377
       },
       "radius": 4
+    },
+    {
+      "to": "zone.crown",
+      "name": "North road to Argentis (the Crown)",
+      "at": {
+        "x": -6,
+        "y": 271
+      },
+      "arrive": {
+        "x": 146,
+        "y": 10
+      },
+      "radius": 5
     }
   ],
   "clearings": [
@@ -842,6 +863,36 @@
         {
           "x": 50,
           "y": -278
+        }
+      ]
+    },
+    {
+      "name": "Argentis road",
+      "width": 4,
+      "points": [
+        {
+          "x": -19,
+          "y": 168
+        },
+        {
+          "x": -14,
+          "y": 192
+        },
+        {
+          "x": -12,
+          "y": 214
+        },
+        {
+          "x": -13,
+          "y": 240
+        },
+        {
+          "x": -9,
+          "y": 262
+        },
+        {
+          "x": -6,
+          "y": 280
         }
       ]
     }

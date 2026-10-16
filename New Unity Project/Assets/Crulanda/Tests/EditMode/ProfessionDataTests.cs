@@ -190,9 +190,8 @@ namespace Crulanda.Tests
         /// nodes of that herb.</summary>
         [Test] public void EveryZone_HasTenOreEightTimberTenHerbNodes()
         {
-            var db = Db(Items()); var zones = Zones(); var problems = new List<string>();
-            CollectionAssert.IsSubsetOf(zones.Keys, Tiers.Keys, "Every zone has a tier.");
-            CollectionAssert.IsSubsetOf(Tiers.Keys.Where(k => k != "lowtowns"), zones.Keys, "The five zones are there (the Lowtowns' file comes with its zone, Phase 9.1).");
+            var db = Db(Items()); var zones = Zones().Where(kv => !kv.Value.city).ToDictionary(kv => kv.Key, kv => kv.Value); var problems = new List<string>();   // a city (the Crown) has no nodes: its trainers teach, the wild zones give
+            CollectionAssert.AreEquivalent(Tiers.Keys, zones.Keys, "The five zones and the Lowtowns (Phase 9.1), each with a tier.");
             foreach (var kv in zones)
             {
                 var z = kv.Value; var all = NodesOf(z); string p = kv.Key + ": ";
@@ -345,7 +344,8 @@ namespace Crulanda.Tests
         {
             var db = Db(Items()); var zones = Zones(); var problems = new List<string>(); var everywhere = new HashSet<string>();
             var want = new Dictionary<string, string[]> { { "oakhaven", new[] { "bench", "fire", "forge" } }, { "khaven", new[] { "bench", "fire" } }, { "peaks", new[] { "fire", "forge" } },
-                { "ashrim", new[] { "bench", "fire", "forge" } }, { "verdant", new[] { "bench", "fire", "forge" } } };
+                { "ashrim", new[] { "bench", "fire", "forge" } }, { "verdant", new[] { "bench", "fire", "forge" } }, { "crown", new[] { "bench", "fire", "forge" } },
+                { "lowtowns", new[] { "bench", "fire", "forge" } } };   // the Crown: the Crafters' Court and the inn's hearth (CAPITAL_HUB.md); the Lowtowns: the dyer's vats, the soup kettle and the Spoon, the market hearth (Phase 9.1)
             foreach (var kv in zones)
             {
                 var z = kv.Value; var kinds = new SortedSet<string>(StringComparer.Ordinal); var names = new HashSet<string>();

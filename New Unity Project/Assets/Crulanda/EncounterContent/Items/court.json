@@ -1,0 +1,65 @@
+{
+  "vendors": [
+    {
+      "npc": "Osric Penhale",
+      "items": [
+        "tool.pick",
+        "tool.hatchet",
+        "mat.charcoal",
+        "mat.copper_bar",
+        "mat.bogiron_bar"
+      ]
+    },
+    {
+      "npc": "Maudie Thorncroft",
+      "items": [
+        "mat.salt"
+      ]
+    },
+    {
+      "npc": "Prue Calvert",
+      "items": [
+        "mat.salt"
+      ]
+    },
+    {
+      "npc": "Tobiah Quarles",
+      "items": [
+        "mat.vial",
+        "mat.salt",
+        "potion.minor",
+        "potion.healing"
+      ]
+    },
+    {
+      "npc": "Margery Cobb",
+      "items": [
+        "mat.flour",
+        "mat.salt",
+        "food.brown_loaf",
+        "food.harrow_cheese"
+      ]
+    },
+    {
+      "npc": "Cuthbert Brenning",
+      "items": [
+        "tool.hatchet",
+        "mat.charcoal"
+      ]
+    },
+    {
+      "npc": "Grisel Hallam",
+      "items": [
+        "tool.pick",
+        "mat.charcoal"
+      ]
+    },
+    {
+      "npc": "Wilmot Pellow",
+      "items": [
+        "mat.vial",
+        "potion.minor"
+      ]
+    }
+  ]
+}

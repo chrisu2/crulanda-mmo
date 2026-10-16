@@ -385,6 +385,7 @@ MonoBehaviour:
   zones:
   - {fileID: 4900000, guid: 411a2554124736a41a10dabf4808834b, type: 3}
   - {fileID: 4900000, guid: f98f4c1881af452988ac6153ca05b43c, type: 3}
+  - {fileID: 4900000, guid: e8b8a4d41a524386b21e15c7d959b72b, type: 3}
   - {fileID: 4900000, guid: de246f0a92c544d8a2e88623d312b1cf, type: 3}
   - {fileID: 4900000, guid: d924e7ff1a5647029c378a7596dc1d40, type: 3}
   - {fileID: 4900000, guid: c24be396ee6c4f6b89eafbd784ba5728, type: 3}

@@ -28,7 +28,7 @@ namespace Crulanda.Encounter
         /// <summary>The bags window's line when no trade bag is worn (GAME-ONLY).</summary>
         public const string TradeBagNote = "Trade bags: Maud Tanner makes them, by the South road in Oakhaven.";
         static bool ItemUiBlocks(Vector2 p)
-        { return (bagsVisible && BagsRect.Contains(p)) || (charVisible && CharRect.Contains(p)) || (vendorVisible && VendorRect.Contains(p)) || confirmDestroy >= 0; }
+        { return (bagsVisible && BagsRect.Contains(p)) || (charVisible && CharRect.Contains(p)) || (vendorVisible && VendorRect.Contains(p)) || CapitalUiBlocks(p) || confirmDestroy >= 0; }
         const float Slot = 52, Gap = 6;
         // Drag state: from a bag slot (>= 0) or an equipment slot (dragEquip >= 0).
         int dragBag = -1, dragEquip = -1; static int confirmDestroy = -1;
@@ -170,10 +170,12 @@ namespace Crulanda.Encounter
                 }
             }
             y += extra;
-            GUI.Label(new Rect(w.x + 14, y, w.width - 28, 40), "Drag to move · right-click to " + (session.VendorNpc != null ? "sell" : "equip / use") + " · drag out of the window to destroy", tiny);
+            GUI.Label(new Rect(w.x + 14, y, w.width - 28, 40), "Drag to move · right-click to " + (session.BankOpen ? "store" : session.ExchangeOpen ? "sell on the Exchange" : session.VendorNpc != null ? "sell" : "equip / use") + " · drag out of the window to destroy", tiny);
             if (session.PotionCooldown > 0) Shadow(new Rect(w.x + 14, y + 36, 300, 20), "Potion ready in " + Mathf.CeilToInt(session.PotionCooldown) + "s", tiny, new Color(.9f, .7f, .5f));
             if (session.VendorNpc != null && GUI.Button(new Rect(w.x + 14, w.yMax - 44, 150, 32), "Sell junk", micro)) session.SellJunk();
-            if (GUI.Button(new Rect(w.xMax - 124, w.yMax - 44, 110, 32), "Close [I]", micro)) { session.InventoryOpen = false; session.CloseVendor(); }
+            // A vault item let go anywhere on the bags (not on a slot) comes out wherever it fits.
+            if (e.type == EventType.MouseUp && e.button == 0 && dragVault >= 0 && w.Contains(e.mousePosition)) { session.WithdrawVault(dragVault); dragVault = -1; e.Use(); }
+            if (GUI.Button(new Rect(w.xMax - 124, w.yMax - 44, 110, 32), "Close [I]", micro)) { session.InventoryOpen = false; session.CloseVendor(); session.CloseCapital(); }
         }
         /// <summary>
         /// One bag slot: its square, its tooltip (an empty trade-bag slot says what it takes), and the mouse on it: drag from it, drop
@@ -189,12 +191,19 @@ namespace Crulanda.Encounter
             else if (p.bag[i].Empty && pouch != null && dragBag < 0 && dragEquip < 0) { tooltip = "<b>" + pouch.name + "</b>\nTakes " + Inventory.HoldsWords(pouch.holds) + "."; tooltipAt = mouse; }
             if (e.type == EventType.MouseDown && e.button == 0 && !p.bag[i].Empty) { dragBag = i; e.Use(); }
             else if (e.type == EventType.MouseDown && e.button == 1 && !p.bag[i].Empty)
-            { var it = session.Items?.Get(p.bag[i].item); if (session.VendorNpc != null && it?.kind != "bag") session.SellBag(i); else session.EquipFromBag(i); e.Use(); }
+            {
+                var it = session.Items?.Get(p.bag[i].item);
+                if (session.BankOpen) session.DepositBag(i);   // into the Treasury Vault (EncounterSession.Capital.cs)
+                else if (session.ExchangeOpen) session.ExchangeChoose(i);   // the lot to list on the Exchange
+                else if (session.VendorNpc != null && it?.kind != "bag") session.SellBag(i); else session.EquipFromBag(i);
+                e.Use();
+            }
             else if (e.type == EventType.MouseUp && e.button == 0)
             {
                 if (dragBag >= 0) session.MoveBag(dragBag, i);
                 else if (dragEquip >= 0) session.UnequipSlot(dragEquip, i);
-                dragBag = dragEquip = -1; e.Use();
+                else if (dragVault >= 0) session.WithdrawVault(dragVault, i);   // out of the vault into this slot
+                dragBag = dragEquip = dragVault = -1; e.Use();
             }
         }
 
@@ -306,13 +315,23 @@ namespace Crulanda.Encounter
         void DrawDragAndConfirm()
         {
             var e = Event.current; var p = session.Progress;
+            if (dragVault >= 0)   // a vault item follows the pointer; let go away from the bags, it stays in the vault
+            {
+                var v = session.Vault;
+                if (v == null || dragVault >= v.slots.Count) dragVault = -1;
+                else
+                {
+                    ItemSquare(new Rect(e.mousePosition.x - Slot / 2, e.mousePosition.y - Slot / 2, Slot, Slot), v.slots[dragVault]);
+                    if (e.type == EventType.MouseUp) dragVault = -1;
+                }
+            }
             if (dragBag >= 0 || dragEquip >= 0)
             {
                 var s = dragBag >= 0 ? p.bag[dragBag] : p.equipment[dragEquip];
                 ItemSquare(new Rect(e.mousePosition.x - Slot / 2, e.mousePosition.y - Slot / 2, Slot, Slot), s);
                 if (e.type == EventType.MouseUp)
                 {
-                    bool overWindow = (bagsVisible && BagsRect.Contains(e.mousePosition)) || (charVisible && CharRect.Contains(e.mousePosition)) || (vendorVisible && VendorRect.Contains(e.mousePosition)) || TradesUiBlocks(e.mousePosition) || LootUiBlocks(e.mousePosition);
+                    bool overWindow = (bagsVisible && BagsRect.Contains(e.mousePosition)) || (charVisible && CharRect.Contains(e.mousePosition)) || (vendorVisible && VendorRect.Contains(e.mousePosition)) || CapitalUiBlocks(e.mousePosition) || TradesUiBlocks(e.mousePosition) || LootUiBlocks(e.mousePosition);
                     if (!overWindow && dragBag >= 0) confirmDestroy = dragBag;
                     dragBag = dragEquip = -1;
                 }

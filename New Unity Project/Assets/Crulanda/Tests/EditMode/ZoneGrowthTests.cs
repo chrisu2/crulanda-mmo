@@ -90,7 +90,7 @@ namespace Crulanda.Tests
         {
             var z = Zone("oakhaven"); float half = z.size / 2;
             Assert.AreEqual(560, z.size, "Oakhaven is 560 m across.");
-            Assert.AreEqual(4, z.exits.Length, "West to Khaven, south to the Ashland Rim, south-east to Argentis (the Lowtowns, Phase 9.1), and east at the Road's End into Hallow's Creek (2026-10-16).");
+            Assert.AreEqual(5, z.exits.Length, "West to Khaven, south to the Ashland Rim, south-east to Argentis (the Lowtowns, Phase 9.1), east at the Road's End into Hallow's Creek (2026-10-16) and north to Argentis (the Crown).");
             foreach (var e in z.exits)
             {
                 if (e.to == "zone.hallows") continue;   // a dungeon's door stands where it is dug: the Road's End, where the ruts run into the grey
@@ -109,7 +109,7 @@ namespace Crulanda.Tests
                     Assert.IsTrue(z.exits.Any(back => Vector2.Distance(back.at, e.arrive) < 15 && Vector2.Distance(back.at, e.arrive) > back.radius + 1), "The arrival from " + file + " at " + e.arrive + " is just inside an exit, and clear of it.");
                     Assert.IsTrue(z.roads.Any(r => ToPath(e.arrive, r.points) < r.width / 2), "The arrival from " + file + " is on a road.");
                 }
-            Assert.AreEqual(4, arrivals, "Khaven, the Ashland Rim, the Lowtowns and Hallow's Creek lead here.");
+            Assert.AreEqual(4, arrivals, "Khaven, the Ashland Rim, the Lowtowns and Hallow's Creek lead here (the Crown's road down is not in Files: a city of 320 m; CrownZoneTests has it).");
             Assert.AreEqual(half - 26, z.wasting.x, .01f, "The Wasting's curtain stands 26 m inside the east edge, as it did.");
             var creek = z.water.Single();
             Assert.AreEqual(-half, creek.points[0].x, .01f, "Oak creek comes in at the west edge"); Assert.AreEqual(half, creek.points[creek.points.Length - 1].x, .01f, "and runs out at the east.");

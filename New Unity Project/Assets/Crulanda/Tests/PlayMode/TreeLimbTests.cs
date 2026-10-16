@@ -57,7 +57,7 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(600000)] public IEnumerator Every_limb_grows_out_of_its_tree()
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
-            var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
+            var zones = first.Zone.AllZones().Where(z => !z.dungeon && !z.city).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own; a city (the Crown) only its garden trees
             Assert.AreEqual(6, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim, the Verdant Shore and the Lowtowns are registered (the Lowtowns have no painted trees).");
             var problems = new List<string>(); int trees = 0, limbs = 0, giants = 0;
             foreach (var id in zones)

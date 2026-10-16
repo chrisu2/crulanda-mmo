@@ -75,9 +75,20 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(600000)] public IEnumerator EveryNodeAndStation_IsReachable()
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
-            var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
+            var zones = first.Zone.AllZones().Where(z => !z.dungeon && !z.city).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own; a city (the Crown) no nodes
             Assert.AreEqual(6, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim, the Verdant Shore and the Lowtowns are registered.");
             var problems = new List<string>();
+            // A city's stations only (the Crown's Crafters' Court and its inn's hearth): every one walked to within reach from the start.
+            foreach (var id in first.Zone.AllZones().Where(z => z.city).Select(z => z.id).ToList())
+            {
+                ZoneBuilder.RequestedZoneId = id;
+                yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+                for (int f = 0; f < 4; f++) yield return null;
+                var cs = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+                if (cs.Zone.Zone.id != id) { problems.Add(id + ": built " + cs.Zone.Zone.id + " instead"); continue; }
+                if (!NavMesh.SamplePosition(cs.Zone.Ground(cs.Zone.Zone.spawns.player), out var cityStart, 2.5f, NavMesh.AllAreas)) { problems.Add(id + ": the player's start is not walkable"); continue; }
+                CheckStations(cs, new List<ZoneInteractable>(), cityStart.position, problems);
+            }
             foreach (var id in zones)
             {
                 ZoneBuilder.RequestedZoneId = id;
@@ -99,7 +110,7 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(600000)] public IEnumerator EveryHerb_LiesOnTheGround()
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
-            var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
+            var zones = first.Zone.AllZones().Where(z => !z.dungeon && !z.city).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own; nor a city
             var problems = new List<string>(); int herbs = 0; float steepest = 0; string steepestAt = "";
             foreach (var id in zones)
             {
@@ -227,7 +238,7 @@ namespace Crulanda.Tests
         /// <summary>Each zone's stations (DESIGN 6.1): which kinds it has (the workplaces' and the inn's, and its own).</summary>
         static readonly Dictionary<string, string[]> StationKinds = new Dictionary<string, string[]> {
             { "zone.oakhaven", new[] { "bench", "fire", "forge" } }, { "zone.khaven", new[] { "bench", "fire" } }, { "zone.peaks", new[] { "fire", "forge" } },
-            { "zone.ashrim", new[] { "bench", "fire", "forge" } }, { "zone.verdant", new[] { "bench", "fire", "forge" } }, { "zone.lowtowns", new[] { "bench", "fire", "forge" } } };   // the Lowtowns: the dyer's vats, the soup kettle and the Spoon, the market hearth
+            { "zone.ashrim", new[] { "bench", "fire", "forge" } }, { "zone.verdant", new[] { "bench", "fire", "forge" } }, { "zone.lowtowns", new[] { "bench", "fire", "forge" } }, { "zone.crown", new[] { "bench", "fire", "forge" } } };   // the Lowtowns: the dyer's vats, the soup kettle and the Spoon, the market hearth
         /// <summary>
         /// The zone's stations (BUILD_PLAN step 9): the kinds DESIGN 6.1 gives it; every one can be walked to from the start, to
         /// within reach of it (EncounterSession.StationRange) and on its side of its walls (ZoneStationSpot.Reaches); its own (field anvils, benches, cookfires, under "Zone stations") one

@@ -8,7 +8,7 @@ namespace Crulanda.Tests
     /// to four, and the set follows night, the grey's edge and the dungeon (ZoneMusic.TracksFor).</summary>
     public class ZoneMusicTests
     {
-        static readonly string[] ZoneIds = { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.adit", "zone.lowtowns", "zone.hallows" };   // Hallow's Creek plays the dungeon's set (2026-10-16)
+        static readonly string[] ZoneIds = { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.adit", "zone.lowtowns", "zone.hallows", "zone.crown" };   // Hallow's Creek plays the dungeon's set (2026-10-16); the Crown, a city
 
         [Test] public void Every_track_in_every_set_is_in_Resources()
         {

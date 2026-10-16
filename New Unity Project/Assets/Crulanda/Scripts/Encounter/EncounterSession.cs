@@ -229,6 +229,7 @@ namespace Crulanda.Encounter
             var list = Quests.For(npc, Zone.Zone.id, Progress.Level);
             // Merchants open on the list (so "Browse wares" is always one click away); others go straight to a single quest.
             bool shop = IsVendor(VillageLife.Active?.Find(npc));
+            CouncilErrands.Filter(list, Progress);   // an errand of the halls handed in today waits for tomorrow (EncounterSession.Halls)
             if (list.Count > 0) { Conversation = new QuestConversation { npc = npc, entries = list, selected = list.Count == 1 && !shop ? list[0].quest : null, where = where }; return true; }
             return handled;
         }
@@ -248,8 +249,9 @@ namespace Crulanda.Encounter
             var bagItems = q.rewards?.bagItems; int worth = 0;
             if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null && !(d.kind == "bag" && Inventory.Owns(Progress, id))) worth += Inventory.Price(d); }
             if (!Quests.TurnIn(q, out _, choice)) return;
-            if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
-            if (q.kind == "bounty") { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
+            if (HallQuest(q)) CouncilErrands.MarkDone(Progress, q.id);   // the Council's errands and the guilds' asks: once a day, not the board's (EncounterSession.Halls)
+            else if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
+            if (q.kind == "bounty" && !HallQuest(q)) { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
             if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             ReconcileQuests(); Save(false); ReopenConversation();
@@ -258,6 +260,7 @@ namespace Crulanda.Encounter
         {
             if (Conversation == null) return;
             var list = Conversation.npc == Bounties.BoardName && Boards != null ? Boards.Entries(ZoneId, Progress.Level) : Quests.For(Conversation.npc, ZoneId, Progress.Level);
+            CouncilErrands.Filter(list, Progress);
             if (list.Count == 0) { Conversation = null; return; }
             Conversation.entries = list; Conversation.selected = list.Count == 1 ? list[0].quest : null;
         }
@@ -393,6 +396,7 @@ namespace Crulanda.Encounter
                 if (whole > 0) { foodCarry -= whole; Player.Health.ApplyHealing(whole); }
             }
             if (VendorNpc != null && Vector3.Distance(Player.transform.position, vendorAt) > 6) CloseVendor();   // walked away
+            TickCapital();   // the vault's or the Exchange's counter, the same
         }
         public float PotionCooldown { get { return Mathf.Max(0, potionReadyAt - Time.time); } }
         // Merchants.
@@ -412,6 +416,7 @@ namespace Crulanda.Encounter
             VendorStock = stock;
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
+            CloseCapital();   // one counter at a time
             if (VendorNpc == null) bagsForShop = !InventoryOpen;
             VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
             if (Charm.Haggle(Progress, VendorNpc)) Message("You haggle with " + VendorNpc + ": a further twentieth off what you buy here today.");   // the Scoundrel (Charm.cs)
@@ -441,7 +446,7 @@ namespace Crulanda.Encounter
             if (s == null || Items == null) return false;
             if (Player != null && Vector3.Distance(Player.transform.position, at) > 6) { Message(s.name + " is too far away to trade with."); return false; }
             if (SimMemory.Refuses(s)) { Message(s.name + " won't trade with you."); return false; }
-            CloseVendor(); bagsForShop = !InventoryOpen; VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
+            CloseVendor(); CloseCapital(); bagsForShop = !InventoryOpen; VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
             VendorStock = new List<string>(); foreach (var id in s.goodIds) if (Items.Get(id) != null) VendorStock.Add(id);
             if (VendorStock.Count == 0) Message(s.name + " has nothing to sell just now, but will buy (" + s.coin + " crowns on them).");
             return true;
@@ -571,7 +576,7 @@ namespace Crulanda.Encounter
         {
             if (open && Professions == null) { Message("You have no trade to speak of yet."); return; }
             TradesOpen = open;
-            if (open) { CharacterOpen = false; CloseVendor(); InventoryOpen = true; }
+            if (open) { CharacterOpen = false; CloseVendor(); CloseCapital(); InventoryOpen = true; }
         }
         /// <summary>A trade bag used from the bags: worn for good, its slots added under the bags' 24, or refused and kept ("You already carry one.").</summary>
         bool WearBag(int bagIndex)
@@ -805,6 +810,9 @@ namespace Crulanda.Encounter
         /// The nearest villager of a trade (blacksmith, herbalist) within <paramref name="range"/> (ground distance, as E measures) who is
         /// awake and about: in sight, not abed or on the way there, not slumped over a table. Null when there is none, or no village.
         /// </summary>
+        /// <summary>A craft's trainer awake within TrainerRange: a villager of its trainer role (a blacksmith), or one of the Crown's trade
+        /// trainers ("profession-trainer:blacksmithing", the Crafters' Court, ZoneBuilder.Crown).</summary>
+        Villager CraftTrainerNear(ProfessionDef d) { return d == null ? null : TradeNpcNear(d.trainerRole, TrainerRange) ?? TradeNpcNear("profession-trainer:" + d.id, TrainerRange); }
         public Villager TradeNpcNear(string role, float range)
         {
             if (string.IsNullOrEmpty(role) || Player == null || VillageLife.Active == null) return null;
@@ -827,7 +835,7 @@ namespace Crulanda.Encounter
             if (!Professions.CanLearn(id, out why)) return false;
             var d = Professions.Db.Profession(id);
             foreach (var kind in ProfessionDatabase.Stations(d.station)) if (StationNear(kind) != null) return true;
-            if (TradeNpcNear(d.trainerRole, TrainerRange) != null) return true;
+            if (CraftTrainerNear(d) != null || TradeNpcNear(d.trainerRole, TrainerRange) != null || HallTradeTrainerNear(id) != null) return true;   // its trainer: in the village, or in the Crown (ZoneBuilder.Crown, EncounterSession.Halls)
             why = d.name + " is taken up at " + ProfessionLog.StationWords(d.station) + (string.IsNullOrEmpty(d.trainerRole) ? "." : ", or from a " + d.trainerRole + ".");
             return false;
         }
@@ -840,7 +848,7 @@ namespace Crulanda.Encounter
         public bool LearnCraft(string id)
         {
             if (!CanTakeUp(id, out var why)) { if (why != null) Message(why); return false; }
-            var d = Professions.Db.Profession(id); var trainer = TradeNpcNear(d.trainerRole, TrainerRange);
+            var d = Professions.Db.Profession(id); var trainer = CraftTrainerNear(d);
             if (!Professions.Learn(id, out why)) { Message(why); return false; }
             var line = trainer != null ? ProfessionDatabase.LineFor(d.trainerLines, trainer.Name) : null;
             if (line != null) { Message(trainer.Name + ": " + line); trainer.Say(line, 7); trainer.FacePlayer(); }
@@ -1396,6 +1404,8 @@ namespace Crulanda.Encounter
             if (SpellbookOpen && !Paused) { SpellbookOpen = false; BookPick = null; }
             else if (LootOpen && !Paused) CloseLoot();
             else if (Conversation != null && !Paused) Conversation = null;
+            else if (Hall != null && !Paused) Hall = null;
+            else if ((BankOpen || ExchangeOpen) && !Paused) CloseCapital();
             else if (VendorNpc != null && !Paused) CloseVendor();
             else if (TradesOpen && !Paused) TradesOpen = false;
             else if (WhoOpen && !Paused) WhoOpen = false;
@@ -1436,6 +1446,10 @@ namespace Crulanda.Encounter
             // in a test that forgets to point the session elsewhere: the real folder is the player's, shared by every build.
             bool testRun = Application.isEditor && (Application.isBatchMode || Array.IndexOf(Environment.GetCommandLineArgs(), "-runTests") >= 0);
             Exploring = !testRun && !UseTempSave && !EncounterCapture.Requested && SaveDirectoryOverride == null;
+            // A preview build's own save folder (2026-10-16, the castle preview: Chris plays a copy of his saves there, so a newer save
+            // format never reaches the real folder his published build reads): --crulanda-save-dir <folder>.
+            { var sa = Environment.GetCommandLineArgs(); int at = Array.IndexOf(sa, "--crulanda-save-dir");
+              if (at >= 0 && at + 1 < sa.Length && SaveDirectoryOverride == null && !testRun) { SaveDirectoryOverride = sa[at + 1]; Exploring = true; } }
             if ((UseTempSave || testRun || Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0) && SaveDirectoryOverride == null)
             {
                 // Test runs: a fresh throwaway character that never touches the real save folder. One folder for the whole
@@ -2190,6 +2204,8 @@ namespace Crulanda.Encounter
                 SelectFriendly(talkTo, false);
                 NoteMet(talkTo.Name);   // the book of lore's People
                 if (QuestTalk(talkTo.Name, talkTo.transform.position)) talkTo.FacePlayer();
+                else if (HallTalk(talkTo)) talkTo.FacePlayer();   // the capital's halls: the audience, the Archive, a guild, a trainer (EncounterSession.Halls)
+                else if (CapitalTalk(talkTo)) { }   // the Treasury's banker, the Exchange's auctioneer (EncounterSession.Capital.cs)
                 else if (IsVendor(talkTo)) { OpenVendor(talkTo); talkTo.FacePlayer(); }
                 else VillageLife.Active.Talk(talkTo);
                 return;

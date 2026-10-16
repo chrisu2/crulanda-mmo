@@ -55,11 +55,12 @@ namespace Crulanda.Encounter
         public bool IsOnlineAt(float hour) { float to = Mathf.Repeat(onlineFrom + onlineHours, 24); return onlineHours >= 24 || (onlineFrom <= to ? hour >= onlineFrom && hour < to : hour >= onlineFrom || hour < to); }
     }
 
-    /// <summary>The world's own save (slot "world", beside the characters' slots): the sims. Format 1.</summary>
+    /// <summary>The world's own save (slot "world", beside the characters' slots): the sims, and since format 2 (2026-10-15) the
+    /// Exchange's lots and what waits at its clerk (<see cref="exchange"/>; <see cref="AddExchangeMigration"/>).</summary>
     [Serializable]
     public sealed class WorldSave
     {
-        public const int FormatVersion = 1;
+        public const int FormatVersion = 2;
         public const string PayloadType = "CrulandaWorld";
         public int seed;
         public List<SimAdventurer> sims = new List<SimAdventurer>();
@@ -67,6 +68,28 @@ namespace Crulanda.Encounter
         public List<string> party = new List<string>();
         /// <summary>How many sims (in roster order) have had their guild chosen (round 27): an older world assigns them on load.</summary>
         public int guildedUpTo;
+        /// <summary>Format 2: the Exchange (the capital's market; Exchange.cs).</summary>
+        public ExchangeState exchange = new ExchangeState();
+    }
+
+    /// <summary>
+    /// World format 1 → 2 (2026-10-15, the Exchange): inserts <c>"exchange":{}</c> before the payload's closing brace and leaves every
+    /// other character of the format-1 payload as it was (the sims, the party, the guilds come through unchanged); an empty Exchange is
+    /// filled in on read (Exchange.Ensure). A payload that already has it is left alone; one that is not a JSON object is refused.
+    /// </summary>
+    public sealed class AddExchangeMigration : ISaveMigration
+    {
+        public int FromVersion { get { return 1; } }
+        public int ToVersion { get { return 2; } }
+        static readonly System.Text.RegularExpressions.Regex Has = new System.Text.RegularExpressions.Regex("\"exchange\"\\s*:");
+        public string Migrate(string payloadJson)
+        {
+            string json = (payloadJson ?? "").Trim();
+            if (json.Length < 2 || json[0] != '{' || json[json.Length - 1] != '}') throw new SaveMigrationException("The world save's payload is not a JSON object.");
+            if (Has.IsMatch(json)) return payloadJson;
+            string body = json.Substring(0, json.Length - 1).TrimEnd();
+            return body + (body.EndsWith("{") ? "" : ",") + "\"exchange\":{}}";
+        }
     }
 
     /// <summary>Makes, reads and writes the roster.</summary>
@@ -128,9 +151,11 @@ namespace Crulanda.Encounter
             if (env.payloadType != WorldSave.PayloadType || env.formatVersion < 1 || env.formatVersion > WorldSave.FormatVersion) { message = "Unsupported world save."; return null; }
             try
             {
-                var w = JsonUtility.FromJson<WorldSave>(env.payloadJson);
+                var steps = new SaveMigrator(); steps.Register(new AddExchangeMigration());   // 1 → 2: the Exchange
+                var w = JsonUtility.FromJson<WorldSave>(steps.MigrateToVersion(env, WorldSave.FormatVersion).payloadJson);
                 if (w == null || w.sims == null || w.sims.Count == 0) { message = "Empty world save."; return null; }
                 foreach (var s in w.sims) if (s == null || string.IsNullOrEmpty(s.id) || string.IsNullOrEmpty(s.name) || Array.IndexOf(ClassIds, s.classId) < 0 || s.level < 1 || s.level > EncounterProgress.LevelCap) { message = "Invalid sim in the world save."; return null; }
+                Exchange.Ensure(w);
                 return w;
             }
             catch (Exception e) { message = e.Message; return null; }

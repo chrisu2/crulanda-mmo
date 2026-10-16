@@ -60,7 +60,7 @@ namespace Crulanda.Tests
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()
         {
-            Assert.AreEqual(8, zones.Count, "Five zones, the Sealed Adit, the Lowtowns (Phase 9.1) and Hallow's Creek.");
+            Assert.AreEqual(8, zones.Count(z => !z.city), "Five zones, the Sealed Adit, the Lowtowns (Phase 9.1) and Hallow's Creek (and the Crown, a city with no camps).");
             int camps = 0;
             foreach (var (zone, camp, _) in Camps())
             {

@@ -208,3 +208,16 @@ Sandthrone, the Ash-Walkers: CANON where cited; lore entries labelled one by one
 12. **Taprooms for the Peaks, the Rim and the Shore** (Pilgrims' Rest, Wain's Rest, the Hearth-Tree): yes?
 13. **"Better ai" beyond the door:** which of 3a's small behaviours, or stop at way-finding and giving way?
 14. **The inns' new size:** the Cask 14x10 and the Hearth 13x9 with fifteen seats (the kitchen lean-to and the hitching rail move)?
+
+**Chris's answer (2026-10-15 ~22:00, the question prompt, verbatim): "Yes, your defaults (Recommended)"; with "keep going finish phase 8"
+and "them move to 9".** The defaults as asked: double doors and bigger inns, taprooms in every zone; three craft slots with Leatherworking
+and Weaving added; coin-only recipes called "a smith's leaf"; 30-minute food and elixir buffs; about 90 secrets with villager hints plus a
+count by region; the Lore tab in the quest book; villagers step aside and shelter from rain. So, one by one:
+1. 8.6 now, finishing Phase 8; then Phase 9. 2. The looks (3f, step 9) wait on 8.5's rig: Chris chose route (a), the hero pack's body
+   (ROADMAP Phase 8.5). 3. Three craft slots. 4. Leatherworking and Weaving are new crafts; bowyer work is Woodcutting recipes (as charcoal
+   is) and geode-cutting is recipes of an existing craft, no new slot (PROVISIONAL). 5. Alchemy's display name becomes "Simpling" (its id
+   stays, so saves keep their skill; PROVISIONAL, not asked by name). 6. Hints: villagers' lines and the Discoveries tab's count by region;
+   no chime, no glint. 7. About 90 secrets. 8. The Lore tab in the quest book (built 2026-10-15). 9. "a smith's leaf / a cook's leaf".
+   10. Well-fed and elixirs 30 minutes, one stat; a draught for each class's pool. 11. Coin only. 12. Taprooms for the Peaks, the Rim
+   and the Shore. 13. Stepping aside for you and the party, and shelter under a roof in rain. 14. The Cask 14x10, the Hearth 13x9,
+   fifteen seats.

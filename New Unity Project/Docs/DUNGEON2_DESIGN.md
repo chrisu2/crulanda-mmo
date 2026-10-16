@@ -250,3 +250,8 @@ the merged builder and not on a branch of a branch.
 11. **No respawns while inside** (as the Adit's Q1; recommended)?
 12. **Hollow children:** none placed (recommended), as canon has them?
 13. **The Preservationists' standing:** this dungeon raises it (the Warden freed); all right to give them a second quest line here?
+
+**Chris's answer (2026-10-15 ~22:00, the question prompt, verbatim): "Yes, recommended answers (Recommended)".** So: five dungeons;
+levels 16-18; the door at Oakhaven's Road's End by the milestone; a painted dial a minute short of noon; the cutters shown at work;
+Vala Solari named once on the Warden's papers; the red door seen, never reached; Gable on the baker's sign; time-squalls as dressing
+only; the wagon ride home; no respawns inside; no Hollow children placed; the Preservationists' second quest line here: yes.

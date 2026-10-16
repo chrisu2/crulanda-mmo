@@ -2,6 +2,16 @@
 
 ## Start here
 
+**Update 2026-10-16 ~11:40 (Chris on the castle preview, morning).** He played the preview: "inn does look better"; of the ivy "plants
+not even on the wall.only a few plants", then "still sparse looking". On `p9-capital`: the ivy follows each wall's real face (a ray back
+to the stone at every step), leaves lie flat, and it grows as wide sheets on almost every stretch up to the stone ledge. The castle preview
+was rebuilt three times (11:23, 11:31; frames `world-captures/crown-3`, `crown-4`); the frame rate at noon went 91 → 90 → 74 fps with the
+heavy ivy. Open: the upper walls above the ledge are bare (ask Chris: climb higher or hang from the top), and thin the far ivy if 74 fps
+feels heavy. The detail budget test (CrownZonePlayTests) now allows 3 M triangles. Then "save and backup and create handoff for next
+time" (this note). Everything below still holds.
+
+### The night of Oct 15-16
+
 **Stopping point: 2026-10-16 ~01:45.** Chris: "once complete find a stopping point. backup, publish all to git, and create a handoff for
 next time documenting everything done and what needs to be done." then "ok shutdown the computer when done". Everything below is pushed
 to GitHub (every branch), backed up to E:, and the PC shut down at his word. Nothing is VERIFIED until Chris sees it in his build.

@@ -224,7 +224,7 @@ namespace Crulanda.Tests
                 }
                 for (int j = i + 1; j < seats.Count; j++) if (Vector2.Distance(at, seats[j].at) < 2 * body - .02f) problems.Add(s + "is in the lap of the seat at " + seats[j].at);
             }
-            foreach (var (what, at) in new[] { ("the innkeeper's place", plan.stand), ("the cook's place", plan.cook), ("the hatch", plan.hatch) }.Concat(plan.serve.Select(s => ("a server's place", s))))
+            foreach (var (what, at) in new[] { ("the innkeeper's place", plan.stand), ("the cook's place", plan.cook), ("the hatch", plan.hatch) }.Concat(plan.serve.Select(s => ("a server's place", s))).Concat(plan.kitchen.Select(k => ("a kitchen place", k))))
             {
                 if (Mathf.Abs(at.x) > inner.x - body || Mathf.Abs(at.y) > inner.y - body) problems.Add(what + " is in the wall");
                 foreach (var (f, fat, half) in furniture) if (Outside(at, fat, half) < .5f) problems.Add(what + " is in " + f);
@@ -252,7 +252,9 @@ namespace Crulanda.Tests
         /// No pocket in the Lantern (CrownLifeTests, 2026-10-16: a server "stood stuck at (40.17, 9.08, 36.72)", the cook's place, three
         /// times a day): the kitchen's range stood in the back corner 1.45 m from the gallery's corner column, so the navmesh between
         /// them (each solid padded by NavPad, the walkable mesh the agent's radius short of that) was a strip 0.25 m wide, and whoever was
-        /// sent there could not get out. Over the plan's solids (the walls, the bar, the hearth, the range, the columns, the stair and its
+        /// sent there could not get out; moved beside the hearth, its one place sat in the neck between the hearth, the range and the +x
+        /// gallery's column, and drew the cook, the servers and the pot-boy round one point. The kitchen is now under the back gallery
+        /// with three places a metre apart. Over the plan's solids (the walls, the bar, the hearth, the range, the columns, the stair and its
         /// rail: the tables, settles, stools and bench are walked between), a grid flood from inside the door through every point whose
         /// middle keeps NavPad + the agent's radius + half a way of 0.9 m from every solid (a way 0.9 m wide on the navmesh, 2.1 m of clear
         /// floor between solids: a walker and room to pass); every seat, stool, bench seat, server's place, the innkeeper's, the
@@ -291,8 +293,12 @@ namespace Crulanda.Tests
                 return best;
             }
             var places = plan.seats.Select(s => ("a seat", s.at)).Concat(plan.stools.Select(s => ("a stool", s.at))).Concat(plan.benchSeats.Select(s => ("a bench seat", s.at)))
-                .Concat(plan.serve.Select(s => ("a server's place", s))).Concat(new[] { ("the innkeeper's place", plan.stand), ("the cook's place", plan.cook), ("the hatch", plan.hatch) });
+                .Concat(plan.serve.Select(s => ("a server's place", s))).Concat(new[] { ("the innkeeper's place", plan.stand), ("the cook's place", plan.cook), ("the hatch", plan.hatch) }).Concat(plan.kitchen.Select(k => ("a kitchen place", k)));
             var problems = new List<string>();
+            // More than one place in the kitchen, a metre apart: the cook, the servers and the pot-boy are all sent there.
+            Assert.GreaterOrEqual(plan.kitchen.Count, 3, "Places in the kitchen for the cook, a server and the pot-boy."); Assert.AreEqual(plan.cook, plan.kitchen[0]);
+            for (int i = 0; i < plan.kitchen.Count; i++) for (int j = i + 1; j < plan.kitchen.Count; j++)
+                if (Vector2.Distance(plan.kitchen[i], plan.kitchen[j]) < 1) problems.Add("the kitchen's places at " + plan.kitchen[i] + " and " + plan.kitchen[j] + " are under a metre apart");
             foreach (var (what, at) in places) { float d = ToWay(at); if (d > reach) problems.Add(what + " at " + at + " is " + (d > 2 ? "over 2" : d.ToString("0.00")) + " m from a way " + way + " m wide to the door"); }
             Assert.IsEmpty(problems, string.Join("\n", problems));
         }

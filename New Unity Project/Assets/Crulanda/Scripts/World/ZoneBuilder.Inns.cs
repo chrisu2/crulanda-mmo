@@ -76,10 +76,12 @@ namespace Crulanda.World
             public Vector2 longTable, longTableSize, bunkSize = new Vector2(2, .8f), sleep; public readonly List<Vector2> bunks = new List<Vector2>();
             /// <summary>A city inn (variant 3, the Crown's Gilded Lantern): the gallery's floor height and depth round three walls, the
             /// columns under its corners and ends, the stair up to it (middle, size; it rises toward +x along the front wall), the
-            /// kitchen's range in the back corner (middle, size) with the cook's place and the hatch where goods are handed in, and the
+            /// kitchen's range against the back wall (middle, size) with the cook's place and the hatch where goods are handed in, and the
             /// servers' places on the floor.</summary>
             public float galleryY, galleryDepth; public readonly List<Vector2> columns = new List<Vector2>(), serve = new List<Vector2>();
             public Vector2 stair, stairSize, range, rangeSize, cook, hatch;
+            /// <summary>The kitchen's places before the range (the cook's first), each a metre or more from the next.</summary>
+            public readonly List<Vector2> kitchen = new List<Vector2>();
             public const float ColumnRadius = .35f;
             /// <summary>Half the room inside the walls.</summary>
             public Vector2 Inner { get { return new Vector2(w / 2 - wall / 2, d / 2 - wall / 2); } }
@@ -140,7 +142,7 @@ namespace Crulanda.World
             /// redesign"): white stone walls half a metre thick round a taproom two storeys high, a gallery 2.6 m deep at 3.5 m round the
             /// back and both ends on columns, a grand double door of <see cref="CityDoorW"/>. Under the back gallery the long bar from the
             /// -x end with six stools before it and the innkeeper at its open end, the rooms door past him; the hearth with its carved
-            /// mantel on the +x end with the bench before it and the kitchen's range beside it; three private booths along the
+            /// mantel on the +x end with the bench before it, the kitchen's range against the back wall past the rooms door; three private booths along the
             /// -x end (a table, a settle either side, two at each); five round tables of four on the open floor, none in the doorway; the
             /// stair up to the +x gallery along the front wall. Laid out for 22 x 16.
             /// </summary>
@@ -153,14 +155,19 @@ namespace Crulanda.World
                 p.bar = new Vector2(left + len / 2, hz - 1.45f); p.barSize = new Vector2(len, .8f);
                 p.stand = new Vector2(left + len + .7f, p.bar.y); p.roomsX = left + len + 2;
                 for (float x = left + .6f; x <= left + len - 1.4f + .01f; x += 1.4f) p.stools.Add((new Vector2(x, p.bar.y - .4f - 1), new Vector2(x, p.bar.y)));
-                // The hearth on the +x end, the bench before it; the range against the same wall beside it, the cook before it, the hatch
-                // out on the floor by it, the woodpile in the back corner. The range stood in that corner (hz - 2), 1.45 m from the
-                // gallery's corner column: the navmesh between them was a strip 0.25 m wide, the cook's place in it, and the servers sent
-                // there stood stuck (CrownLifeTests, 2026-10-16); every place now has a way to the door a metre wide (CrownZoneTests).
+                // The hearth on the +x end, the bench before it, the woodpile in the back corner. The kitchen under the back gallery past
+                // the rooms door: the range against the back wall (its front -z), the cook's place before it and two more by it for
+                // whoever else is sent to the kitchen, a metre apart; the hatch out on the open floor before it. (The range stood in the
+                // +x back corner 1.45 m from the gallery's corner column, a strip of navmesh 0.25 m wide with the cook's place in it, and
+                // then by the hearth, where the one kitchen place drew the cook, the servers and the pot-boy into a corner of the range,
+                // the hearth and the column round one point: the servers sent there stood stuck, CrownLifeTests, 2026-10-16.)
                 p.hearth = new Vector2(hx - .45f, -1); p.hearthSize = new Vector2(.9f, 2.8f); p.fire = new Vector2(hx - 1.3f, -1);
                 p.bench = new Vector2(hx - 2, -1); p.woodpile = new Vector2(hx - .6f, hz - .7f);
                 foreach (float z in new[] { -1.6f, -.4f }) p.benchSeats.Add((new Vector2(hx - 2.15f, z), new Vector2(p.hearth.x, z)));
-                p.range = new Vector2(hx - .4f, 1.25f); p.rangeSize = new Vector2(.8f, 1.6f); p.cook = new Vector2(hx - 1.55f, 1.25f); p.hatch = new Vector2(hx - 3.35f, 1.5f);
+                p.range = new Vector2(left + len + 3.8f, hz - .4f); p.rangeSize = new Vector2(1.6f, .8f);
+                p.cook = new Vector2(p.range.x, hz - 1.55f);
+                p.kitchen.Add(p.cook); p.kitchen.Add(new Vector2(p.range.x - 1.1f, hz - 1.75f)); p.kitchen.Add(new Vector2(p.range.x, hz - 2.75f));
+                p.hatch = new Vector2(p.range.x - 1.4f, hz - 3.85f);
                 // The gallery's columns: at its inner corners and two down each end.
                 foreach (int s in new[] { -1, 1 }) foreach (float z in new[] { -4.2f, 2.4f, hz - g }) p.columns.Add(new Vector2(s * (hx - g), z));
                 // The stair up the front wall to the +x gallery, from 2.8 m right of the middle.

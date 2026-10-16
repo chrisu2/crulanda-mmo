@@ -12,7 +12,7 @@ namespace Crulanda.World
     /// tubs. Inside, a taproom two storeys high with a gallery round three walls on marble columns and stone corbels, reached by a stair
     /// along the front wall (walked: its ramp and the gallery's floor are in the navmesh, NavWalkable); the long polished bar under the
     /// back gallery with its stools, the barrels and bottles behind it; the hearth with a carved mantel and overmantel on the +x end, its
-    /// bench before it and the kitchen's range beside it; three high-backed booths along the -x end; five round tables on
+    /// bench before it; the kitchen's range against the back wall past the rooms door; three high-backed booths along the -x end; five round tables on
     /// the floor; chandeliers and sconces. The room is its plan's (<see cref="InnPlan"/>, variant 3): what the builder lays out, the
     /// tests measure and the village's life reads (its seats, the bar, the kitchen, the hatch and the servers' places; ZoneInn "city").
     /// Only the walls, the bar, the hearth, the range, the columns and the stair's ramp are solid; the doorway is step-free (the footing
@@ -81,9 +81,9 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, cupola + Vector3.up * 2.45f, new Vector3(2.5f, .1f, 2.5f), Gilt);
             GiltSpire(t, cupola + Vector3.up * 2.5f, 1.3f, 2.2f, 8);
             Glow(t, cupola + Vector3.up * 1.75f, 14, .2f, new Color(1, .78f, .42f), 2.4f).name = "The lantern";
-            foreach (int s in new[] { -1, 1 })   // chimney stacks over the hearth's end and the kitchen's corner
+            foreach (int s in new[] { -1, 1 })   // chimney stacks over the hearth's end and the kitchen's range
             {
-                var stack = new Vector3(w / 2 - 1.2f, wallH + roofH * .55f, s < 0 ? plan.hearth.y : plan.range.y);
+                var stack = s < 0 ? new Vector3(w / 2 - 1.2f, wallH + roofH * .55f, plan.hearth.y) : new Vector3(plan.range.x, wallH + roofH * .55f, d / 2 - 1.2f);
                 BoxPart(t, stack, new Vector3(.9f, roofH * 1.2f, .9f), white, null, 1); Part(PrimitiveType.Cube, t, stack + Vector3.up * (roofH * .6f + .06f), new Vector3(1.1f, .12f, 1.1f), Gilt);
                 if (art.particle != null) Smoke(t, stack + Vector3.up * (roofH * .65f));
             }
@@ -238,13 +238,13 @@ namespace Crulanda.World
             StationRoom(t, new Rect(-w / 2, -d / 2, w, d));
             CityBench(t, new Vector3(plan.bench.x, 0, plan.bench.y), 270, 2.2f);   // its back to the room, facing the fire
             ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(plan.woodpile.x, .045f, plan.woodpile.y), 0, .5f);
-            // ---------- the kitchen's end: the range with its pot, the cook's place, the hatch where goods are handed in ----------
+            // ---------- the kitchen under the back gallery: the range with its pot, the cook's place, the hatch where goods are handed in ----------
             var range = BoxPart(t, new Vector3(plan.range.x, .55f, plan.range.y), new Vector3(plan.rangeSize.x, 1.1f, plan.rangeSize.y), Masonry, null, 1);
             range.AddComponent<BoxCollider>(); range.AddComponent<NavBlocker>();
-            Part(PrimitiveType.Cube, t, new Vector3(plan.range.x - plan.rangeSize.x / 2 - .02f, .5f, plan.range.y), new Vector3(.05f, .4f, .8f), art.glass);
-            Part(PrimitiveType.Cylinder, t, new Vector3(plan.range.x, 1.3f, plan.range.y + .3f), new Vector3(.5f, .2f, .5f), Tint(art.metal, new Color(.2f, .2f, .22f)));   // the pot
-            Glow(t, new Vector3(plan.range.x - .6f, .8f, plan.range.y), 5, .9f, new Color(1, .55f, .25f), 1.2f);
-            Workplace(t, "kitchen", new Vector3(plan.cook.x, 0, plan.cook.y), new Vector3(plan.range.x, 1, plan.range.y));
+            Part(PrimitiveType.Cube, t, new Vector3(plan.range.x, .5f, plan.range.y - plan.rangeSize.y / 2 - .02f), new Vector3(.8f, .4f, .05f), art.glass);   // the fire's glow in its front
+            Part(PrimitiveType.Cylinder, t, new Vector3(plan.range.x + .4f, 1.3f, plan.range.y), new Vector3(.5f, .2f, .5f), Tint(art.metal, new Color(.2f, .2f, .22f)));   // the pot
+            Glow(t, new Vector3(plan.range.x, .8f, plan.range.y - .6f), 5, .9f, new Color(1, .55f, .25f), 1.2f);
+            foreach (var k in plan.kitchen) Workplace(t, "kitchen", new Vector3(k.x, 0, k.y), new Vector3(plan.range.x, 1, plan.range.y));   // the cook's first, two more for the servers and the pot-boy
             Workplace(t, "kitchendoor", new Vector3(plan.hatch.x, 0, plan.hatch.y), new Vector3(plan.cook.x, 1, plan.cook.y));
             foreach (var s in plan.serve) Workplace(t, "serve", new Vector3(s.x, 0, s.y), new Vector3(plan.bar.x, 1, plan.bar.y));
             // ---------- the booths and the tables ----------

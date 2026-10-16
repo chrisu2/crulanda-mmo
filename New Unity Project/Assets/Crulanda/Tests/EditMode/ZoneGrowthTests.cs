@@ -26,7 +26,7 @@ namespace Crulanda.Tests
     /// </summary>
     public class ZoneGrowthTests
     {
-        static readonly string[] Files = { "oakhaven", "khaven", "peaks", "ashrim", "verdant", "adit" };
+        static readonly string[] Files = { "oakhaven", "khaven", "peaks", "ashrim", "verdant", "adit", "hallows" };
         static string Read(string folder, string file) { return File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/" + folder + "/" + file + ".json")); }
         static ZoneDefinition Zone(string file) { return JsonUtility.FromJson<ZoneDefinition>(Read("Zones", file)); }
         static float Cheb(Vector2 p) { return Mathf.Max(Mathf.Abs(p.x), Mathf.Abs(p.y)); }
@@ -90,9 +90,10 @@ namespace Crulanda.Tests
         {
             var z = Zone("oakhaven"); float half = z.size / 2;
             Assert.AreEqual(560, z.size, "Oakhaven is 560 m across.");
-            Assert.AreEqual(2, z.exits.Length, "West to Khaven, south to the Ashland Rim.");
+            Assert.AreEqual(3, z.exits.Length, "West to Khaven, south to the Ashland Rim, and east at the Road's End into Hallow's Creek (2026-10-16).");
             foreach (var e in z.exits)
             {
+                if (e.to == "zone.hallows") continue;   // a dungeon's door stands where it is dug: the Road's End, where the ruts run into the grey
                 Assert.That(Cheb(e.at), Is.InRange(half - 12, half - 5), "The exit '" + e.name + "' stands at the edge.");
                 Assert.IsTrue(z.roads.Any(r => ToPath(e.at, r.points) < r.width / 2), "The exit '" + e.name + "' stands on its road.");
                 Assert.IsTrue(z.roads.Any(r => Cheb(r.points[r.points.Length - 1]) >= half - 3 && ToPath(e.at, r.points) < r.width / 2), "Its road runs off the edge past it.");
@@ -108,7 +109,7 @@ namespace Crulanda.Tests
                     Assert.IsTrue(z.exits.Any(back => Vector2.Distance(back.at, e.arrive) < 15 && Vector2.Distance(back.at, e.arrive) > back.radius + 1), "The arrival from " + file + " at " + e.arrive + " is just inside an exit, and clear of it.");
                     Assert.IsTrue(z.roads.Any(r => ToPath(e.arrive, r.points) < r.width / 2), "The arrival from " + file + " is on a road.");
                 }
-            Assert.AreEqual(2, arrivals, "Khaven and the Ashland Rim lead here.");
+            Assert.AreEqual(3, arrivals, "Khaven, the Ashland Rim and Hallow's Creek lead here.");
             Assert.AreEqual(half - 26, z.wasting.x, .01f, "The Wasting's curtain stands 26 m inside the east edge, as it did.");
             var creek = z.water.Single();
             Assert.AreEqual(-half, creek.points[0].x, .01f, "Oak creek comes in at the west edge"); Assert.AreEqual(half, creek.points[creek.points.Length - 1].x, .01f, "and runs out at the east.");

@@ -24,6 +24,8 @@ namespace Crulanda.Encounter
             Physics.SyncTransforms();
             var reach = new Bounds(Vector3.zero, new Vector3(size, 40, size));
             if (zone != null) reach = Crulanda.World.Hollow.Reach(reach);   // cave passages may run on under the hills past the edge
+            // (Hallow's Creek) Decks on open ground stand higher than the caves' reach: the belfry's floor 18 m over the yard, and the head-room over it.
+            if (zone != null) foreach (var d in zone.DeckSpots) if (d.cave == null && d.mid != null) foreach (var m in d.mid) reach.Encapsulate(m + Vector3.up * 3);
             data = NavMeshBuilder.BuildNavMeshData(NavMesh.GetSettingsByIndex(0), sources, reach, Vector3.zero, Quaternion.identity);
             if (data != null) instance = NavMesh.AddNavMeshData(data);
             else Debug.LogError("Could not build encounter navigation.");
@@ -99,12 +101,17 @@ namespace Crulanda.Encounter
             }
             // (The Adit rework) The caves' pools, streams and flooded stretches (ZoneCaveWater), as the land's water: wading costs, swim-deep is not walked.
             foreach (var (centre, rot, size, swim) in zone.CaveWaterAreas) sources.Add(Modifier(centre, rot, size, swim ? 1 : ShallowsArea));
+            // (Hallow's Creek, N4) The hungry shadows: walkable, but dear, so agents walk round them (they never cover a whole way).
+            NavMesh.SetAreaCost(HazardArea, Crulanda.World.ZoneHazard.EncounterNavigationCost);
+            foreach (var (centre, rot, size) in zone.HazardAreas) sources.Add(Modifier(centre, rot, size, HazardArea));
             return sources;
         }
         /// <summary>Navigation area for wadeable water: walkable, but agents avoid it when a dry way exists.</summary>
         public const int ShallowsArea = 3;
         /// <summary>Navigation area of the caves' one-way drops (the Adit rework): the party may take them down; a camp's mobs keep off them.</summary>
         public const int DropArea = 4;
+        /// <summary>Navigation area of hazard ground (Hallow's Creek's hungry shadows): walkable at a high cost.</summary>
+        public const int HazardArea = 5;
         static NavMeshBuildSource Modifier(Vector3 centre, Quaternion rot, Vector3 size, int area)
         { return new NavMeshBuildSource { shape = NavMeshBuildSourceShape.ModifierBox, size = size, transform = Matrix4x4.TRS(centre, rot, Vector3.one), area = area }; }
         static List<NavMeshBuildSource> LegacySources()

@@ -96,8 +96,8 @@ namespace Crulanda.World
             rng = new System.Random(Zone.seed);
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
-            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); Lap("prepare");
-            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
+            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); PrepareOpenGround(); Lap("prepare");
+            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildCaveWorks(); BuildOpenGround(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
             BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
@@ -188,6 +188,7 @@ namespace Crulanda.World
             float h = hills * Zone.hillHeight * n + (hills > 0 ? hills * Crag(x, z) : 0) + CliffLift(x, z);   // mountain crags off the kept ways; shelves behind cliffs
             if (Zone.wasting != null && x > Zone.wasting.x - 4) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 6);  // unmade ground is dead flat
             if (shapes != null) h = Shape(x, z, h);   // landmark ground: level pads, perches and basins (ZoneShape)
+            if (Zone.pits != null && Zone.pits.Length > 0) h = Pit(x, z, h);   // (Hallow's Creek) a chasm sunk in the land (ZonePit; ZoneBuilder.HallowsGround)
             if (carveWater && Water != null) h = Water.Carve(x, z, h);   // creeks and lakes (see ZoneWater)
             return h;
         }
@@ -1152,7 +1153,7 @@ namespace Crulanda.World
             {
                 if (p == null || string.IsNullOrEmpty(p.kind)) continue;
                 // Moving parts (doors, wheels) and things that can be picked or emptied can't be static-batched.
-                var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "inn" || p.kind == "mill" || p.kind == "windmill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
+                var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "crater" || p.kind == "inn" || p.kind == "mill" || p.kind == "windmill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
                 // Small things never stand in a road (playtest note 74): out to the verge, clear of the edge by their own reach.
                 float verge = Verge(p); if (verge > 0) p.at = OffRoad(p.at, verge);
                 var t = Root(p, parent);
@@ -1163,7 +1164,7 @@ namespace Crulanda.World
                 // every later prop, tree and rock keeps the layout it had. A ruined_house of variant 1 (Wick's cot, Oakhaven's fill,
                 // 2026-10-15: a ruin added after the zone was laid out) draws from its own stream too, so the groves after it keep
                 // their trees; variant 0 (the Hollins' and the other zones' ruins) draws from the zone's, as it always did.
-                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" || p.kind == "skep" || (p.kind == "ruined_house" && p.variant == 1) ? 0 : -1;
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" || p.kind == "skep" || (p.kind == "ruined_house" && p.variant == 1) || HallowsKinds.Contains(p.kind) ? 0 : -1;   // (Hallow's Creek's kinds too)
                 if (p.was == "ruined_house" && p.kind != "ruined_house") legacy = RuinDraws(p.size.x > 0 ? p.size : new Vector2(8, 6));   // raised over a fallen house (Wain's Rest, 2026-10-15): the ruin's draws
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
@@ -1258,8 +1259,9 @@ namespace Crulanda.World
                     case "wayshrine": Wayshrine(t); break;
                     case "cavern": Cavern(t, Hollow.All.Find(h => h.Name == t.name), p.variant); break;
                     case "chest": TreasureChest(t); break;
-                    default: Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;
+                    default: if (!HallowsProp(p, t)) Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;   // (Hallow's Creek's: ZoneBuilder.Hallows)
                 }
+                if (p.style == "stone" && t != null) Petrify(t);   // (Hallow's Creek) the paused town's houses, fences and carts: grey stone
                 rng = zoneRng;
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
                 if (t != null && Footprint(p).x > 0)   // see-through where it hides the player (playtest notes 26 and 120)
@@ -5488,6 +5490,7 @@ namespace Crulanda.World
                 // (The Adit rework) One placed in a cave by along and aside (its floor, or a deck over it at rise): exactly there.
                 var inCave = string.IsNullOrEmpty(s.cave) ? null : Hollow.All.Find(o => o.Name == s.cave);
                 if (inCave != null) { var w = inCave.At(s.along, s.aside); at = s.at = new Vector2(w.x, w.z); near = w.y + s.rise; }
+                else if (Mathf.Abs(s.rise) > .01f) near = Datum + s.rise;   // (Hallow's Creek) on open ground, up on a deck (the gallery) or down on one (the lower orbit)
                 else if (s.kind == "herb" || alone || (s.kind != "vista" && scene != null)) at = SecretClear(at, alone ? AloneClear(s.kind) : scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
                 var t = new GameObject("Secret: " + (string.IsNullOrEmpty(s.name) ? s.id : s.name)).transform; t.SetParent(all, false);
                 t.position = StandAt(at, near); t.rotation = Quaternion.Euler(0, s.rotation, 0);   // in a cave: on its floor (or the deck it names)

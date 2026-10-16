@@ -43,12 +43,20 @@ namespace Crulanda.Tests
             { "varrow", SocialKind.Call }, { "greywhisperer", SocialKind.Call }, { "hollowsong", SocialKind.Call }, { "hobb", SocialKind.Call }, { "kettle", SocialKind.Call },
             { "bargeman", SocialKind.Call }, { "netter", SocialKind.Call },   // (S6) the Black Cove's rope teams, the barge's crew and the harbour netters: people, they call
             { "warden", SocialKind.Call },   // the grey picket (2026-10-15): Concord wardens, people: they call
-            { "forager", SocialKind.Call }   // the foragers' camp (2026-10-15): deserters living rough; its data says call
+            { "forager", SocialKind.Call },   // the foragers' camp (2026-10-15): deserters living rough; its data says call
+            // Hallow's Creek (Docs/DUNGEON2_DESIGN.md, 2026-10-16): the Bureau's people, the Iron Pact, the Hollow and the ringers call; the Old
+            // Ram, the Grey Carter, the Fallen Mason, the Lamplighter, the Long Shadow and the Reader keep to themselves.
+            { "greypicker", SocialKind.Call }, { "pactsoldier", SocialKind.Call }, { "pactbow", SocialKind.Call }, { "bureaucutter", SocialKind.Call }, { "bureauclerk", SocialKind.Call },
+            { "teamster", SocialKind.Call }, { "creekhollow", SocialKind.Call }, { "ringer", SocialKind.Call },
+            { "roadcaptain", SocialKind.Call }, { "spansergeant", SocialKind.Call }, { "assessor", SocialKind.Call }, { "pickermaster", SocialKind.Call }, { "loftwatch", SocialKind.Call },
+            { "firstcut", SocialKind.Call }, { "registrar", SocialKind.Call }, { "pactcaptain", SocialKind.Call }, { "examiner", SocialKind.Call },
+            { "oldram", SocialKind.Solitary }, { "greycarter", SocialKind.Solitary }, { "fallenmason", SocialKind.Solitary }, { "lamplighter", SocialKind.Solitary },
+            { "longshadow", SocialKind.Solitary }, { "reader", SocialKind.Solitary }
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()
         {
-            Assert.AreEqual(6, zones.Count, "Five zones and the Sealed Adit.");
+            Assert.AreEqual(7, zones.Count, "Five zones, the Sealed Adit and Hallow's Creek.");
             int camps = 0;
             foreach (var (zone, camp, _) in Camps())
             {
@@ -130,7 +138,11 @@ namespace Crulanda.Tests
                 // The Adit rework: every wing's boss names its guards (Cinder-Warden Ysolt names Sister Ashe Varrow, an elite: the data names her, so she guards).
                 "Brack the Bailer <- Bailers' chain", "Overseer Grael Vosk <- Whip-hands", "Urn-Keeper Sabel <- Urn-tenders", "Loremaster Ivo Senn <- Lectors",
                 "Master-at-Arms Corvane <- Armourers", "The Grey Whisperer <- Whisperer's hollow", "The Foreman Who Forgot <- The Foreman's shift",
-                "Powder-Sergeant Hobb <- Hobb's sappers", "Old Kettle, the pitch-boiler <- Pitch-gangers", "Cinder-Warden Ysolt <- Sister Ashe Varrow" }, pairs,
+                "Powder-Sergeant Hobb <- Hobb's sappers", "Old Kettle, the pitch-boiler <- Pitch-gangers", "Cinder-Warden Ysolt <- Sister Ashe Varrow",
+                // Hallow's Creek (2026-10-16): every calling elite names its guards.
+                "Road-Captain Everard Hurst <- Hurst's carters", "Sergeant Wymond Tredway <- Tredway's shield-line", "Assessor Piers Upcott <- Upcott's chalk-men",
+                "Picker-Master Fulke Yelland <- The Picker-Master's sorters", "Gil Coldwell, the Loft Watch <- Coldwell's netters", "First-Cut <- First-Cut's kin",
+                "Registrar Dunstan Pardew <- Pardew's copyists", "Pact-Captain Rowena Kersey <- Kersey's line", "Bureau Examiner Thurstan Vowell <- The Examiner's clerks" }, pairs,
                 "If a camp moved, pair it in the data: \"guards\" on the elite's camp names its guard camps.");
         }
 
@@ -151,8 +163,8 @@ namespace Crulanda.Tests
         [Test] public void Each_of_the_twelve_elites_has_its_own_move()
         {
             var elites = Camps().Where(x => x.camp.elite).ToList();
-            Assert.AreEqual(32, elites.Count, "Twelve camp elites in the five zones and twenty in the Sealed Adit since its rework (the rare Quiet Miner among them).");
-            Assert.AreEqual(33, EliteMoves.All.Length, "Twenty camp elites, the Rock-Eater, which rides beside Nix in his camp (D5), and the reworked Adit's twelve (2026-10-14).");
+            Assert.AreEqual(47, elites.Count, "Twelve camp elites in the five zones, twenty in the Sealed Adit since its rework (the rare Quiet Miner among them) and fifteen in Hallow's Creek (2026-10-16).");
+            Assert.AreEqual(48, EliteMoves.All.Length, "Twenty camp elites, the Rock-Eater, which rides beside Nix in his camp (D5), the reworked Adit's twelve (2026-10-14) and Hallow's Creek's fifteen (2026-10-16).");
             var plain = EliteMoves.For("nobody at all", false);
             foreach (var (zone, camp, _) in elites)
             {
@@ -167,10 +179,10 @@ namespace Crulanda.Tests
                 Assert.That(m.enrageAt, Is.InRange(.2f, .4f)); Assert.Less(m.enrageHaste, .8f, "Enraged, it swings faster.");
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
-            Assert.AreEqual(33, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Thirty-three different moves (the reworked Adit's twelve among them, 2026-10-14; the Old Burrower's Earth-Heave, not a second Rock-Crush).");
+            Assert.AreEqual(48, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Forty-eight different moves (Hallow's Creek's fifteen, 2026-10-16; the reworked Adit's twelve among them, 2026-10-14; the Old Burrower's Earth-Heave, not a second Rock-Crush).");
             // Dungeon end bosses are a step harder than outdoor named elites: Caddock, the Hollow Root-Warden, the Rail-Captain and (the Adit
             // rework) Brother Hollowsong, the Wake's boss, and only they.
-            CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner", "Brother Hollowsong" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
+            CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner", "Brother Hollowsong", "Bureau Examiner Thurstan Vowell" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
             // Nix's two-part fight (D5): the engine and the goblin are each lighter than one elite and together a step above one.
             var rock = EliteMoves.For(EncounterSession.RockEaterName, false); var nix = EliteMoves.For(EncounterSession.NixName, false);
             Assert.That(rock.health, Is.InRange(.7f, 1.4f)); Assert.That(nix.health, Is.InRange(.7f, 1f)); Assert.That(rock.health + nix.health, Is.InRange(1.5f, 2.2f), "two parts, a step above one elite together (the beast 1.3 since the duo was eased, 2026-10-11 18:43)");

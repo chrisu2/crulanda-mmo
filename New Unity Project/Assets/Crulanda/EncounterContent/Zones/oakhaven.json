@@ -154,6 +154,19 @@
         "y": 199
       },
       "radius": 5
+    },
+    {
+      "to": "zone.hallows",
+      "name": "Hallow's Creek (dangerous, 15-20)",
+      "at": {
+        "x": 247,
+        "y": 126.5
+      },
+      "arrive": {
+        "x": 0,
+        "y": -377
+      },
+      "radius": 4
     }
   ],
   "clearings": [

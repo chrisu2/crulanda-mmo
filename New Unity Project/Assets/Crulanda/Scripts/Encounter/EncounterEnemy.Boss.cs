@@ -106,6 +106,9 @@ namespace Crulanda.Encounter
                 case "loose":   // (the Adit rework) a camp let loose at this mark: the urn-risen, the hound (EncounterSession.Release.cs)
                     session.Loose(this, p.camp, Victim);
                     break;
+                case "event":   // (Hallow's Creek) an event of the zone begins at this mark (the Examiner rings the bell: the Waking Hour); camp names it
+                    session.StartEvent(p.camp);
+                    break;
             }
         }
         /// <summary>A burst round it: everyone in its ring is hit.</summary>

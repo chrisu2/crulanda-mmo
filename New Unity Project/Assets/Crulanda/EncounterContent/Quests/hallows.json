@@ -1,0 +1,258 @@
+{
+  "items": [
+    {
+      "id": "item.hallows_pickers_tally",
+      "name": "The Picker-Master's Tally",
+      "description": "A Bureau tally book bound in black, the sunburst stamped on its cover, every page columns of figures in a neat, bored hand."
+    },
+    {
+      "id": "item.hallows_wardens_papers",
+      "name": "Warden Elvet's papers",
+      "description": "A bundle of Preservationist papers tied with grey tape: the Warden's commission, her notes on the Reach-Stones, and a letter she did not get to send."
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc.hallows.soldiers_letter",
+      "title": "A Pact Soldier's Letter",
+      "text": "Mam,\n\nThey have us on the Ash Road outside the old town, the one nobody names. It is quiet. That is the worst of it. The shadows lie the wrong way across the road at noon, long ones, and the sergeant says do not stand in them, and nobody asks him why, because Corran stood in one on the second day and came out an hour later by the sun, and he says it was a minute.\n\nThe Bureau men cut at the statues all day. The statues are people, Mam. You can see their eyes. I do not think the Pact should be guarding this.\n\nDo not tell Da I wrote that.\n\nYour Wil",
+      "canonStatus": "CANON-EXPANDED: the hungry shadows that take a minute or an hour are CANON (book1 ch.17); the letter, Wil and Corran are GAME-ONLY."
+    },
+    {
+      "id": "doc.hallows.archivist_page",
+      "title": "A Page from the High Archivist's Log",
+      "kind": "lore",
+      "text": "(Copied from a loose page in a careful First Era hand; the words are put into our own, as near as they go.)\n\nThe stacks are sealed against the damp and against the curious. The Council asks after the lower vault again; I have told them again that it holds records of tithe and boundary, which is true of the shelves they can see.\n\nThe town grows round us like moss round a stone. The children come to the steps to hear the readings. I have taught the baker's boy his letters. He writes them backward and laughs.\n\nIf this page is found by a stranger: what we kept, we kept for everyone. Do not let them tell you otherwise.",
+      "canonStatus": "CANON-EXPANDED: the Old Archive, its Archivists and High Archivist Malakor's log are CANON (book1 ch.18); this page is paraphrased and GAME-ONLY, and the vault, the riddle and the Prism are Book 1's and named nowhere here."
+    },
+    {
+      "id": "doc.hallows.pickers_tally",
+      "title": "The Picker-Master's Tally",
+      "text": "HALLOW'S CREEK. HIGH COUNCIL INVESTIGATION BUREAU. QUARTZ RECOVERY.\nkept by F. Yelland, Picker-Master\n\nMonth 4. Paused marked: 52. Paused cut: 40. Yield, sized and crated: twelve stone. Rejects (cloudy, cracked, or what the sorters call loud): 9.\nTo the coast station by the black wagon, under seal.\n\nMonth 5. The Assessor has marked the baker. I have told him the baker is on the main street where the Pact walk, and the men do not like it. He says the men are not paid to like it.\n\nNB. What walks after the cut is to be kept to the cellars. Do not record numbers.",
+      "canonStatus": "CANON-EXPANDED: aether-geodes as fossilised memory are CANON (book1 ch.3), the Bureau is CANON (book1 ch.3); the cutting of the paused, the coast station and the tally are GAME-ONLY."
+    },
+    {
+      "id": "doc.hallows.wardens_papers",
+      "title": "Warden Elvet's Papers",
+      "text": "COMMISSION. The bearer, Sigrid Elvet, Warden of the Preservationist Guild, is sent under the hand of the Matriarch, Vala Solari, to read the Reach-Stones at the Rim and the grey's edge at Hallow's Creek, and to report.\n\n(In the Warden's own hand, on the back.)\nThe Reach-Stones have moved a field this year, not a pace. The grey breathes when the bell rings. The Bureau knows it; they ring it anyway, because the waking square is the only hour they can cut the paused without the stone splitting wrong.\n\nIf I do not come back, tell Ivel the library is not ours to lose. It never was. We only kept it.",
+      "canonStatus": "CANON-EXPANDED: the Preservationists and their Matriarch are CANON (her name given once, in this text: decision 6); the Warden, the Reach-Stones' moving and the bell's use are GAME-ONLY."
+    }
+  ],
+  "quests": [
+    {
+      "id": "side.hallows.fourpence",
+      "title": "Fourpence",
+      "kind": "side",
+      "giver": "Tamsin Reed",
+      "turnIn": "Tamsin Reed",
+      "zone": "zone.oakhaven",
+      "level": 16,
+      "minLevel": 14,
+      "requires": ["side.oakhaven.tally"],
+      "canonStatus": "GAME-ONLY quest; Hallow's Creek and its paused townsfolk are CANON (book1 ch.17-21); Tamsin Reed and her mother's kettle are already in the game",
+      "summary": "Tamsin Reed's grandmother lived on Main Street in Hallow's Creek. Find the Reed house, past the broken bridge, and tell Tamsin what is there.",
+      "offer": "Tamsin has the copper kettle on her stall now, polished till it shows your face. She does not sell it. \"Fourpence,\" she says, as if you had asked. \"My mother carried it out of Hallow's Creek the week before. Her mother wouldn't come. Said she had the other kettle on the hob, and she'd follow when it boiled.\"\n\nShe turns the kettle a quarter turn. \"They say you can walk in now, if you can get past the Bureau. Main Street. White fence, blue door. It'll be grey now. Will you look? Just look. I don't want anything brought back.\"",
+      "progress": "\"White fence. Blue door. It'll be grey now.\"",
+      "complete": "Tamsin listens without looking up from the kettle. When you tell her about the woman in the doorway with the other kettle in her hands, she nods, once, as if a sum had come out.\n\n\"It boiled, then,\" she says. \"She'd have liked that.\" She pushes the coins across the stall before you can refuse them. \"Fourpence. It's the going rate.\"",
+      "steps": [
+        {
+          "text": "Find the Reed house on Main Street in Hallow's Creek, east of Oakhaven past the Road's End and over the broken bridge.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.hallows",
+              "at": { "x": 9.2, "y": -89.6 },
+              "radius": 5,
+              "text": "The Reed house",
+              "say": "The fence is white stone, the door grey stone with a ghost of blue in its grain. In the doorway an old woman stands with a kettle in her hands, looking down the street for someone. Her eyes move. They find you."
+            }
+          ]
+        },
+        {
+          "text": "Tell Tamsin Reed in Oakhaven what you saw.",
+          "objectives": [
+            { "type": "talk", "zone": "zone.oakhaven", "target": "Tamsin Reed", "text": "Tell Tamsin Reed" }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1400,
+        "gold": 4,
+        "reputation": [ { "faction": "oakhaven", "amount": 250 } ]
+      }
+    },
+    {
+      "id": "side.hallows.bureau_cuts",
+      "title": "What the Bureau Cuts",
+      "kind": "side",
+      "giver": "Quill",
+      "turnIn": "Quill",
+      "zone": "zone.oakhaven",
+      "level": 18,
+      "minLevel": 15,
+      "canonStatus": "CANON-EXPANDED: the Salt-Menders and the Bureau are CANON; the Bureau's quartz-cutting at Hallow's Creek, the Picker-Master and his tally are GAME-ONLY",
+      "summary": "Quill wants proof of what the Bureau takes out of Hallow's Creek in its black wagons. Bring down Picker-Master Fulke Yelland in the Granary and bring Quill his tally.",
+      "offer": "Quill does not look up from his ale. \"Black wagons on the east road at night. Bureau seals on the crates. They go west full and come back empty, and the Pact rides with them as if they carried the Council's own silver.\"\n\nHe turns the cup. \"There's a granary in Hallow's Creek, over the creek from the main street. The Bureau's picker-master keeps his books there. Men like that always keep books. Bring me his, and the Menders will know what's being carted out of a town that's meant to be a blight.\"",
+      "progress": "\"His books. Men like that always keep books.\"",
+      "complete": "Quill reads the tally standing, his lips moving on the figures. When he reaches the line about the cellars he stops and reads it again.\n\n\"'Do not record numbers.'\" He closes the book very gently. \"Forty of them. Cut like stone for a mantelpiece. And something walks after.\" He puts the tally inside his coat. \"The Menders will want to know where the coast station is. That can wait. You've done enough today.\"",
+      "steps": [
+        {
+          "text": "Bring down Picker-Master Fulke Yelland on the Granary's loft in Hallow's Creek, and take his tally.",
+          "objectives": [
+            { "type": "kill", "zone": "zone.hallows", "target": "mob.pickermaster.hallows.*", "count": 1, "text": "Picker-Master Fulke Yelland", "say": "Yelland goes down among his own crates." },
+            { "type": "collect", "zone": "zone.hallows", "target": "kill:mob.pickermaster.hallows.*", "item": "item.hallows_pickers_tally", "count": 1, "text": "The Picker-Master's Tally", "say": "The tally is in his apron, black-bound, the sunburst on its cover.", "document": "doc.hallows.pickers_tally" }
+          ]
+        },
+        {
+          "text": "Bring the Picker-Master's tally to Quill at the inn in Oakhaven.",
+          "objectives": [
+            { "type": "deliver", "zone": "zone.oakhaven", "target": "Quill", "item": "item.hallows_pickers_tally", "count": 1, "text": "Bring the tally to Quill", "say": "Quill holds out his hand for it without a word." }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1900,
+        "gold": 120,
+        "reputation": [ { "faction": "saltmenders", "amount": 350 }, { "faction": "concord", "amount": -150 } ]
+      }
+    },
+    {
+      "id": "side.hallows.reach_stone",
+      "title": "The Reach-Stone Moved",
+      "kind": "side",
+      "giver": "Sefa Brine",
+      "turnIn": "Sefa Brine",
+      "zone": "zone.ashrim",
+      "level": 19,
+      "minLevel": 15,
+      "canonStatus": "GAME-ONLY quest; the Wasting and Hallow's Creek are CANON; the Reach-Stones moving and the bell's part in it are GAME-ONLY",
+      "summary": "The Rim's Reach-Stones have moved a whole field this year. Sefa Brine has heard that the grey breathes when the bell in Hallow's Creek is rung. Silence it: bring down the Bureau Examiner in the Bell Tower.",
+      "offer": "Sefa Brine walks you to the line of Reach-Stones and makes you stand at the last one. \"My grandmother set this. It stood a pace from the grey her whole life.\" She points. The grey is a field away. \"This year.\"\n\n\"There's talk on the salt road. A bell, in Hallow's Creek, in the town the grey took first. The Bureau rings it, and every time they do, the grey breathes out a little further.\" She spits into the ash. \"Somebody should take the rope off it. And the man who pulls it.\"",
+      "progress": "\"A field. In one year.\"",
+      "complete": "Sefa listens with her hand flat on the Reach-Stone, as if she could feel the bell through it. \"Silent,\" she says. \"Good.\"\n\nShe takes a lump of salt from her pouch and sets it on top of the stone. \"That's for the town. They'll not get it, but they should have it. The rest is for you.\"",
+      "steps": [
+        {
+          "text": "Climb the Bell Tower in Hallow's Creek and bring down Bureau Examiner Thurstan Vowell.",
+          "objectives": [
+            { "type": "kill", "zone": "zone.hallows", "target": "mob.examiner.hallows.*", "count": 1, "text": "Bureau Examiner Thurstan Vowell", "say": "The Examiner falls against the bell, and it gives one last low note and is still." }
+          ]
+        },
+        {
+          "text": "Tell Sefa Brine at the Reach-Stones on the Ashland Rim.",
+          "objectives": [
+            { "type": "talk", "zone": "zone.ashrim", "target": "Sefa Brine", "text": "Tell Sefa Brine" }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 2400,
+        "gold": 150,
+        "reputation": [ { "faction": "ashwalkers", "amount": 350 } ]
+      }
+    },
+    {
+      "id": "side.hallows.archive_warden",
+      "title": "The Archive's Warden",
+      "kind": "side",
+      "giver": "Warden Ivel",
+      "turnIn": "Warden Ivel",
+      "zone": "zone.oakhaven",
+      "level": 18,
+      "minLevel": 15,
+      "canonStatus": "CANON-EXPANDED: the Preservationists kept the Old Archive at Hallow's Creek (CANON, book1 ch.18); Warden Elvet, her capture and the ward-lock are GAME-ONLY",
+      "summary": "A Preservationist Warden went to Hallow's Creek to read the grey and has not come back. Warden Ivel thinks the Bureau holds her in the Guild's old library. Free her.",
+      "offer": "Warden Ivel has a letter open on her knee and is not reading it. \"Sigrid Elvet. A Warden, like me. She went east to read the Reach-Stones and the grey's edge, and then on into Hallow's Creek, because the stones told her something there was wrong.\"\n\n\"The Guild kept a library there once. The Old Archive. Before the town stopped.\" She folds the letter. \"The Bureau is in it now. If they have her, that's where. Bring her out, and the Guild will remember it.\"",
+      "progress": "\"The Old Archive. The Bureau has no business with books.\"",
+      "complete": "Ivel closes her eyes when you tell her the Warden walked to the tower door on her own feet and unbound the Bureau's ward. \"Of course she did,\" she says. \"Of course.\"\n\n\"The Guild will remember you. I will see to it.\"",
+      "steps": [
+        {
+          "text": "Free Warden Sigrid Elvet from her cell in the Old Archive in Hallow's Creek, and see her to the Bell Tower's door.",
+          "objectives": [
+            { "type": "flag", "zone": "zone.hallows", "target": "key:hallows.ward", "count": 1, "text": "Warden Elvet unbinds the ward-lock", "say": "The ward-lock lets go under the Warden's hands." }
+          ]
+        },
+        {
+          "text": "Tell Warden Ivel in Oakhaven.",
+          "objectives": [
+            { "type": "talk", "zone": "zone.oakhaven", "target": "Warden Ivel", "text": "Tell Warden Ivel" }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1900,
+        "gold": 90,
+        "reputation": [ { "faction": "preservationists", "amount": 500 }, { "faction": "concord", "amount": -150 } ]
+      }
+    },
+    {
+      "id": "side.hallows.wardens_papers",
+      "title": "The Warden's Papers",
+      "kind": "side",
+      "giver": "Warden Ivel",
+      "turnIn": "Warden Ivel",
+      "zone": "zone.oakhaven",
+      "level": 19,
+      "minLevel": 15,
+      "requires": ["side.hallows.archive_warden"],
+      "canonStatus": "CANON-EXPANDED: the Preservationists and their Matriarch are CANON; the Warden's papers are GAME-ONLY",
+      "summary": "Warden Elvet kept the Bell Tower's door. Her papers, her notes on the Reach-Stones and the grey, are for the Guild; she left them in her cell in the Old Archive. Bring them to Warden Ivel.",
+      "offer": "\"She would not leave,\" Ivel says. \"Of course she would not. She says the paused keep her and she keeps the door.\" A thin smile. \"But her notes are the Guild's, and the Matriarch will want them read. She says she left her satchel in the cell: the Bureau never thought to look in it. Bring me what she wrote.\"",
+      "progress": "\"Her notes. The Matriarch will want them.\"",
+      "complete": "Ivel reads the commission first, then turns it over and reads the back twice. \"'We only kept it,'\" she says. \"Yes.\"\n\nShe ties the papers up again with their grey tape. \"These go to the Matriarch. She will want to know who brought them.\"",
+      "steps": [
+        {
+          "text": "Take Warden Elvet's papers from her satchel in her cell in the Old Archive at Hallow's Creek (the Registrar keeps it shut).",
+          "objectives": [
+            { "type": "collect", "zone": "zone.hallows", "target": "Warden Elvet's satchel", "item": "item.hallows_wardens_papers", "count": 1, "text": "Warden Elvet's papers", "say": "In the satchel, under a spare shirt: a bundle of papers tied with grey tape.", "document": "doc.hallows.wardens_papers" }
+          ]
+        },
+        {
+          "text": "Bring Warden Elvet's papers to Warden Ivel in Oakhaven.",
+          "objectives": [
+            { "type": "deliver", "zone": "zone.oakhaven", "target": "Warden Ivel", "item": "item.hallows_wardens_papers", "count": 1, "text": "Bring the papers to Warden Ivel", "say": "Ivel takes the bundle in both hands." }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1600,
+        "gold": 60,
+        "reputation": [ { "faction": "preservationists", "amount": 400 } ]
+      }
+    },
+    {
+      "id": "side.hallows.copying_cells",
+      "title": "The Bureau's Copies",
+      "kind": "side",
+      "giver": "Warden Ivel",
+      "turnIn": "Warden Ivel",
+      "zone": "zone.oakhaven",
+      "level": 19,
+      "minLevel": 15,
+      "requires": ["side.hallows.archive_warden"],
+      "canonStatus": "CANON-EXPANDED: the Old Archive and the Bureau are CANON; the copying cells and the Bureau's copies are GAME-ONLY",
+      "summary": "The Bureau's clerks are copying out the Old Archive's books for the Council. Spoil the copies on three of their copying desks in the Archive at Hallow's Creek.",
+      "offer": "\"Elvet says the Bureau has clerks in the Archive's cells, copying. Not the books, mind: they copy what the Council wants the books to have said.\" Ivel's mouth thins. \"The originals are stone now, and safe as stone. The copies will go west and be believed.\"\n\n\"Spill their ink. Three desks at least. It's petty, and it will cost them a season's work.\"",
+      "progress": "\"Three desks. Spill the ink.\"",
+      "complete": "Ivel laughs, which you have not heard her do. \"A season's work,\" she says. \"Maybe two. Let them copy that.\"",
+      "steps": [
+        {
+          "text": "Spoil the copies on three Bureau copying desks in the Old Archive in Hallow's Creek.",
+          "objectives": [
+            { "type": "interact", "zone": "zone.hallows", "target": "A Bureau copying desk", "count": 3, "text": "Bureau copying desks spoiled", "say": "You tip the ink across the pages and watch the Council's history run into the grain." }
+          ]
+        },
+        {
+          "text": "Tell Warden Ivel in Oakhaven.",
+          "objectives": [
+            { "type": "talk", "zone": "zone.oakhaven", "target": "Warden Ivel", "text": "Tell Warden Ivel" }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1600,
+        "gold": 70,
+        "reputation": [ { "faction": "preservationists", "amount": 350 }, { "faction": "concord", "amount": -100 } ]
+      }
+    }
+  ]
+}

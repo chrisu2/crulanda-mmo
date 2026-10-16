@@ -90,7 +90,7 @@ namespace Crulanda.Tests
         {
             var quests = QuestDatabase.Parse(Texts("Quests")); var zones = Zones();
             var lore = quests.Documents.Values.Where(d => d.IsLore).Select(d => d.id).ToList();
-            Assert.AreEqual(14, lore.Count, "Fourteen pages of the book of lore: two each in Khaven, the Peaks, the Rim and the Shore (2026-10-15), and six at the books, shelves and dead of Phase 8.6.");
+            Assert.AreEqual(15, lore.Count, "Fifteen pages of the book of lore: two each in Khaven, the Peaks, the Rim and the Shore (2026-10-15), six at the books, shelves and dead of Phase 8.6, and the High Archivist's page in Hallow's Creek's stacks (2026-10-16).");
             var held = new Dictionary<string, ZoneSecret>();
             foreach (var z in zones) foreach (var s in z.secrets ?? new ZoneSecret[0]) if (s != null && !string.IsNullOrEmpty(s.document)) held[s.document] = s;
             foreach (var id in lore)

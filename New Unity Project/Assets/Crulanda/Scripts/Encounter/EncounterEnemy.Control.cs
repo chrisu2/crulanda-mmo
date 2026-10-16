@@ -104,6 +104,14 @@ namespace Crulanda.Encounter
             seconds *= .5f; return true;
         }
         public void ForgetHolds() { heldOnce.Clear(); }
+        /// <summary>(Hallow's Creek, E3) Stone for <paramref name="seconds"/>: the Waking Hour's loop snapping holds the Examiner whatever his
+        /// holds this fight (it is the town's, not the party's), and he can be hit all the while.</summary>
+        public void StandStone(float seconds)
+        {
+            if (!actor.IsAlive || seconds <= 0) return;
+            stunUntil = Mathf.Max(stunUntil, Time.time + seconds); CancelBlow(); CancelCast(true); wasHeld = true;
+            session.FloatText(transform.position, "Stone", new Color(.8f, .8f, .85f));
+        }
         /// <summary>Its raid mark (Ctrl+1 skull, Ctrl+2 moon, Ctrl+3 cross, Ctrl+4 clears; one mob a mark).</summary>
         public RaidMark RaidMarked { get; set; }
         /// <summary>What the party's helpers (sims, Mira, the Ranger's companion) don't hit: a held mob, or one marked moon or cross.</summary>

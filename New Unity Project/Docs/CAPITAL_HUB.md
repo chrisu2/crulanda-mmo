@@ -122,3 +122,6 @@ working population as Oakhaven has (VillageWork: carriers, servants, guards' rou
 messengers, merchants' errands), many more than the first pass's six walkers.
 **Chris, 2026-10-16 ~01:05 (verbatim): "maybe see a castle off in the distance when looking north".** From Oakhaven (whose North road
 leads to the Crown) the Crown of Argentis shows on the northern skyline: the walled plateau, the keep's spire, the dome, faint in the haze.
+**Chris, 2026-10-16 ~01:15 (verbatim, with a screenshot of the Gilt Gate's stair): "will need to add more detail. search online for
+vines/ivy or something so it is not so white . maybe add some iron or something".** Searched (CC0 sources: Quaternius, Kenney, Poly
+Pizza); chosen: ivy grown by the builder (painted style, any wall), weathering, and ironwork; a CC0 ivy pack only if the grown ivy reads badly.

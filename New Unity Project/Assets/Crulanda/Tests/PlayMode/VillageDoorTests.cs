@@ -43,9 +43,19 @@ namespace Crulanda.Tests
             if (root != null && Directory.Exists(root)) Directory.Delete(root, true);
         }
         static float Flat(Vector3 a, Vector3 b) { a.y = 0; b.y = 0; return Vector3.Distance(a, b); }
-        /// <summary>A spot on the navmesh out in the inn's yard: <paramref name="out"/> metres in front of the door, <paramref name="aside"/> along it.</summary>
+        /// <summary>A spot on the navmesh out in the inn's yard: <paramref name="out"/> metres in front of the door, <paramref name="aside"/> along it,
+        /// or the nearest in toward the door from which the doorway can be walked to. (2026-10-15: 12 m out the yard reaches into the Great
+        /// Oak's bench ring, solid all round, and two of the twelve were stood on the ground inside it, which nobody walks out of: Garet
+        /// Moss and Osk Farrow, never in.)</summary>
         static Vector3 Yard(ZoneDoorway way, float @out, float aside)
         {
+            var path = new NavMeshPath(); var door = way.Entry(true);
+            if (NavMesh.SamplePosition(door, out var dh, 1.5f, NavMesh.AllAreas)) door = dh.position;
+            for (float o = @out; o >= 2; o -= .5f)
+            {
+                var q = way.middle - way.inward * o + way.across * aside;
+                if (NavMesh.SamplePosition(q, out var h, 3, NavMesh.AllAreas) && NavMesh.CalculatePath(h.position, door, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete) return h.position;
+            }
             var p = way.middle - way.inward * @out + way.across * aside;
             return NavMesh.SamplePosition(p, out var hit, 3, NavMesh.AllAreas) ? hit.position : p;
         }

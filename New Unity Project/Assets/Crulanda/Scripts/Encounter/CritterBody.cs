@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         /// <summary>How far the body's root sits above (negative: below) the animal's transform: 0 for a critter, whose transform is
         /// at its feet; -1 for a game animal, whose transform rides 1 m up like every actor's (its agent's base offset).</summary>
         public float Lift { get; private set; }
-        Transform wingL, wingR; float phase, seed;
+        Transform wingL, wingR; float phase, seed, nextHop = -1, hopAt = -1;
         ModelBeast model;
         /// <summary>The animal's model (game deer: the pack's stag or deer; <see cref="ModelBeast"/>), or null for a body of primitives.</summary>
         public ModelBeast Model { get { return model; } }
@@ -337,7 +337,20 @@ namespace Crulanda.Encounter
         /// </summary>
         public void Stride(float v)
         {
-            if (model != null) { model.Drive(v, "idle"); return; }
+            if (model != null && !model.Has("walk") && model.Has("hop") && v < 3)
+            {
+                // A bird on foot (the Living Birds): small quick steps on the standing clip, the body rocking from foot to foot with a
+                // little bob, and now and then a single hop (every 3-8 s), not a hop for every stride.
+                model.Drive(0, "idle");
+                phase += Time.deltaTime * Mathf.Clamp(v, .2f, 1.5f) * 22;
+                if (nextHop < 0) nextHop = Time.time + 3 + seed * 37 % 5;
+                if (Time.time >= nextHop) { nextHop = Time.time + 3 + (seed * 37 + Time.time) % 5; hopAt = Time.time; model.Play("hop"); }
+                float h = hopAt >= 0 && Time.time - hopAt < .35f ? Mathf.Sin((Time.time - hopAt) / .35f * Mathf.PI) * .06f : 0;
+                Root.localPosition = new Vector3(0, Lift + Mathf.Abs(Mathf.Sin(phase)) * .012f + h, 0);
+                Root.localRotation = Quaternion.Euler(0, 0, Mathf.Sin(phase) * 7);
+                return;
+            }
+            if (model != null) { Root.localRotation = Quaternion.identity; model.Drive(v, "idle"); return; }
             phase += Time.deltaTime * (Kind == "rabbit" ? Mathf.Min(v, 2.2f) * 5.5f : Mathf.Min(v * stepRate, 24));
             if (Kind == "rabbit") Root.localPosition = new Vector3(0, Lift + Mathf.Abs(Mathf.Sin(phase)) * Mathf.Lerp(.16f, .28f, (v - 1) / 5), 0);
             Legs(1);
@@ -365,6 +378,7 @@ namespace Crulanda.Encounter
             // A modelled deer grazes eight seconds or so, then lifts its head and looks about; farm animals graze two thirds of the time.
             if (model != null)
             {
+                Root.localRotation = Quaternion.identity; Root.localPosition = new Vector3(0, Lift, 0);   // a bird's step undone (Stride)
                 float tm = Time.time + seed; bool farm = Kind == "horse" || Kind == "donkey" || Kind == "cow";
                 model.Drive(0, Mathf.Sin(tm * (farm ? .23f : .4f)) > (farm ? -.45f : 0) ? "eat" : Mathf.Sin(tm * .13f) > .3f ? "idle2" : "idle"); return;
             }
@@ -381,7 +395,7 @@ namespace Crulanda.Encounter
         /// <summary>Head up and still: an animal that has noticed something and is watching it.</summary>
         public void Alert()
         {
-            if (model != null) { model.Drive(0, "idle"); return; }
+            if (model != null) { Root.localRotation = Quaternion.identity; Root.localPosition = new Vector3(0, Lift, 0); model.Drive(0, "idle"); return; }
             Root.localPosition = new Vector3(0, Lift, 0); Legs(0);
             if (Kind == "sheep") Nod(0, 4); else if (Head != null) Head.localEulerAngles = Vector3.zero;
             Tail(0, 0, 0);
@@ -389,7 +403,7 @@ namespace Crulanda.Encounter
         /// <summary>Wings out and beating at <paramref name="flap"/> degrees (a crow in flight; others have no wings).</summary>
         public void Flap(float flap)
         {
-            if (model != null) { WingsSpread = true; model.Drive(model.RunPace, "idle"); return; }   // the raven's wingbeat
+            if (model != null) { Root.localRotation = Quaternion.identity; Root.localPosition = new Vector3(0, Lift, 0); WingsSpread = true; model.Drive(model.RunPace, "idle"); return; }   // the raven's wingbeat
             if (wingL == null) return;
             WingsSpread = true; wingL.localEulerAngles = new Vector3(0, 0, flap); wingR.localEulerAngles = new Vector3(0, 0, -flap);
         }

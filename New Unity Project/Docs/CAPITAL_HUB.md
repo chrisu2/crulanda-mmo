@@ -203,3 +203,27 @@ Prue Calvert, and leaves to the keepers (e.g. the smith's, tanner's, weaver's, b
 To run: EditMode `CrownCourtTests`, `CrownZoneTests`, `ProfessionDataTests`, `ItemTests`; PlayMode `CrownCourtPlayTests`, `CrownZonePlayTests`,
 `NodePlacementTests`, `CrownLifeTests`; the Crown tour's frames "The Crafters' Court", "The Court Smithy", "The Court Loom-house" and the
 station frames.
+**Chris, 2026-10-16 ~00:30 (verbatim): "dont need the same exact inn in the castle. needs a redesign".** The Gilded Lantern gets its own
+design: a city inn of the High City (white stone and gilt, not the village's timber inn), its own shape and rooms.
+**Chris, 2026-10-16 ~00:35 (verbatim): "will need lots more npcs in the castle with real jobs like in oakhaven".** The Crown gets a
+working population as Oakhaven has (VillageWork: carriers, servants, guards' rounds, lamplighters, gardeners, clerks, cooks, grooms,
+messengers, merchants' errands), many more than the first pass's six walkers.
+**Chris, 2026-10-16 ~01:05 (verbatim): "maybe see a castle off in the distance when looking north".** From Oakhaven (whose North road
+leads to the Crown) the Crown of Argentis shows on the northern skyline: the walled plateau, the keep's spire, the dome, faint in the haze.
+**Chris, 2026-10-16 ~01:15 (verbatim, with a screenshot of the Gilt Gate's stair): "will need to add more detail. search online for
+vines/ivy or something so it is not so white . maybe add some iron or something".** Searched (CC0 sources: Quaternius, Kenney, Poly
+Pizza); chosen: ivy grown by the builder (painted style, any wall), weathering, and ironwork; a CC0 ivy pack only if the grown ivy reads badly.
+**Chris, 2026-10-16 ~01:30 (verbatim, with a screenshot of the parterres' red and yellow balls in plain boxes): "we need a real garden.
+need to use some of our texture packs".** And of the inn (screenshot): "table and mug still not meeting. hovering over tables" (fixed in
+the inn code: the dressing sits on the table's own top), "all trainers standing backwards" (fixed: a post in a city faces the room),
+"floor is blocked in armory" (fixed: no plinth across a hall's door).
+**Chris, 2026-10-16 ~01:40 (verbatim, a screenshot of the audience hall): "falling through the floor. he needs more regal attire and
+sitting on a throne".**
+**Chris, 2026-10-16 ~01:55 (verbatim): "need a limited shared space. maybe 3 slots and maybe they can buy more in the future. the
+remainder is character only".** So the Treasury Vault is two parts: a shared shelf of 3 slots for all your characters (more bought
+later), kept in the profile; and the character's own vault (48 slots, rows bought with coin), kept on the character.
+**Chris, 2026-10-16 ~02:05 (verbatim, a screenshot of the Crafters' Court: trainers on bare paving, one stall and a cookfire): "need more
+profession tools/small huts/vendored items".** The Crafters' Court gets a workshop for every trade: small open-fronted huts or stalls
+with each craft's tools and stock (a smith's forge, anvil, quench tub and racks; the leatherworker's stretching frames and hides; the
+weaver's loom, spindles and bolts; the herbalist's drying racks and jars; the cook's hearth and pots; the miner's and woodcutter's tool
+racks), and vendors selling each trade's tools and materials.

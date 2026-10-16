@@ -423,6 +423,9 @@
             "faction": "ashwalkers",
             "amount": 250
           }
+        ],
+        "bagItems": [
+          "leaf.tempered_ashsteel_bow"
         ]
       }
     },
@@ -1164,6 +1167,9 @@
             "faction": "ashwalkers",
             "amount": 250
           }
+        ],
+        "bagItems": [
+          "leaf.passfire_feast"
         ]
       }
     },

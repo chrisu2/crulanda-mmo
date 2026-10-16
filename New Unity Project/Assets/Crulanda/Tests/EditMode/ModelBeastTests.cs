@@ -45,7 +45,7 @@ namespace Crulanda.Tests
         [Test] public void The_new_creatures_are_in_with_their_motions()
         {
             var want = new (string kind, string[] slots)[] { ("WildBoar", new[] { "idle", "walk", "run", "attack", "attack2", "hitL", "death" }), ("UndeadUnit", new[] { "idle", "walk", "attack" }),
-                ("Squirrel", new[] { "idle", "walk", "run", "death" }), ("BirdCrow", new[] { "idle", "walk", "run", "eat", "death" }), ("BirdRobin", new[] { "idle", "run" }),
+                ("Squirrel", new[] { "idle", "walk", "run", "death" }), ("BirdCrow", new[] { "idle", "hop", "run", "eat", "death" }), ("BirdRobin", new[] { "idle", "run" }),
                 ("BirdBlueJay", new[] { "idle", "run" }), ("BirdCardinal", new[] { "idle", "run" }), ("BirdLittleBird", new[] { "idle", "run" }) };
             foreach (var (kind, slots) in want)
             {

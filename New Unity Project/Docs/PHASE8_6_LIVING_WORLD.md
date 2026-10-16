@@ -193,6 +193,15 @@ world; 9 waits on 8.5. Each step: fix, targeted tests, build, capture, commit, p
 Labels: the metals, herbs, dishes, recipes, inns, villagers: GAME-ONLY; aether-geodes, Veridian sap, salt, the Silent Pilgrims, the
 Sandthrone, the Ash-Walkers: CANON where cited; lore entries labelled one by one; this whole plan PROVISIONAL.
 
+**Status (p86-craft, 2026-10-15): steps 4-6 written, compiled, not yet run (no Unity on that branch).** Step 4: `Consumables.cs`
+(`buff` on ItemDef: well fed from the seven dishes of Cooking 20+, three found dishes and three party feasts; five tinctures and five
+cordials, two salves, a draught for each pool (mana, vigor, focus, nerve, breath, salt), the Clean-blood cure; the buff row names
+them). Step 5: the `recipe` item kind (37 leaves: "a smith's / tanner's / weaver's / bowyer's / herbalist's / cook's leaf: ..."),
+`Progress.recipes`, save format 11 (`AddRecipesMigration`), the grey "?" rows, sources in `Items/trades.json` (vendors, boss-only
+tables) and six quests. Step 6: three craft slots, Leatherworking and Weaving, Alchemy shown as Simpling, 57 plain pieces (nine slots
+a tier), 20 found rares, five found epics, the plain pieces re-cut a step over the generated uncommon, the sims' new crafts. Tests:
+`ConsumableBuffTests`, `ProfessionLogTests`, `SaveMigratorTests`, `LootDataTests`, `ProfessionDataTests`, `SimEconomyTests`. Open:
+the rare-herb flasks (wait on 8's regrowing herbs), leaves in secrets (`LootDataTests.SecretLeaves`), the inn kitchens' own dish.
 **Status (p86-lore), 2026-10-15, steps 7 and 8, a helper's pass on branch `p86-lore`: written and compile-checked (Roslyn), not yet run in Unity; OPEN.**
 - Step 7, the book of lore: `LoreBook.cs` (data `EncounterContent/Lore/<zone>.json`, one a zone, 160 entries, each labelled; registered as
   `EncounterContent.loreFiles` in Encounter.asset and by Build Oakhaven). The Lore tab (`EncounterHud.Lore.cs`) has its seven chapters: Places
@@ -261,3 +270,12 @@ buffed. Bosses are then tuned for a buffed party (the buffs worth about 10-15% o
 is harder, not impossible. Lands on top of step 4 (the consumables, branch p86-craft) once its tests pass.
 - Wain's Rest's roof of salt-cart canvas (the inns helper's PROVISIONAL choice, the Deacon's Tally saying its rafters were burnt): Chris,
   2026-10-15 ~23:30, verbatim: "canvas roof is fine. i really want the castle done asap so double down on it".
+## Status (p86-buffs, 2026-10-15): buffs to beat the bosses, written, not yet run in Unity
+Chris's brief (verbatim): "we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses" (the plan is on main). Built on p86-craft:
+the party's leader stops 25-30 m short of a boss or an elite camp (not trash), says "buff up" in Party and waits until every living member has
+buffed or 12 s pass, then pulls. Each sim eats (a party feast when a sim near carries one, else its dish), drinks its part's elixir (tank: salve,
+else Bear's-wort; healer: Hearth-ease; damage: its main stat's tincture), its draught under 60% of its pool, and lays its class's standing buff
+on the party. Every class has one in its kit (half an hour, +3% of one stat, GAME-ONLY names, icons from tools/art/make_icons.py). Sims keep
+a pack (made or bought at twice the value; a feast only when rich) that the stall never takes. /buff does yours; the run bot buffs from its
+bags (given a few of its tier) and logs "buffed:" lines. On a sim, the buffs' stat points become a share of its blow, mend and health (at
+most 15% a stat). Mira has no buff of her own yet. Code: BossBuffs.cs, EncounterSession.Buffs.cs. Tests: BuffUpRulesTests, BossBuffTests.

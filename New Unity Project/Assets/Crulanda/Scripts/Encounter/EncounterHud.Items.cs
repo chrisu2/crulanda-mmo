@@ -53,6 +53,7 @@ namespace Crulanda.Encounter
             if (d.kind == "material") return "Mt";
             if (d.kind == "tool") return "Tl";
             if (d.kind == "bag") return "Bg";
+            if (d.kind == "recipe") return "Lf";
             switch (d.slot) { case "head": return "Hd"; case "neck": return "Nk"; case "shoulders": return "Sh"; case "chest": return "Ch"; case "hands": return "Gl"; case "legs": return "Lg"; case "feet": return "Ft"; case "mainhand": return "Wp"; case "offhand": return "Of"; }
             return "?";
         }
@@ -79,8 +80,9 @@ namespace Crulanda.Encounter
             if (d == null) return;
             var lines = new List<string>();
             if (d.kind == "gear") lines.Add(ItemDatabase.SlotNames[ItemDatabase.SlotIndex(d.slot)] + "  ·  " + ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)]);
-            else lines.Add(d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.kind == "bag" ? "Trade bag" : d.food ? "Food" : "Potion");
+            else lines.Add(d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.kind == "bag" ? "Trade bag" : d.kind == "recipe" ? "Recipe leaf" : Consumables.KindWord(d));
             var stats = ItemDatabase.StatLines(d); if (stats.Length > 0) lines.Add(stats);
+            if (d.kind == "recipe") lines.Add(LeafLine(d));
             if (d.kind == "bag")
                 lines.Add(Inventory.Wears(session.Progress, d.id) ? "<color=#8f8>Worn: " + d.slots + " slots for " + Inventory.HoldsWords(d.holds) + ".</color>"
                     : "Trade bag: " + d.slots + " slots for " + Inventory.HoldsWords(d.holds) + ". Use it to wear it.");
@@ -101,6 +103,14 @@ namespace Crulanda.Encounter
             }
             tooltip = "<b><color=#" + ColorUtility.ToHtmlStringRGB(ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)]) + ">" + d.name + "</color></b>\n" + string.Join("\n", lines);
             tooltipAt = Event.current.mousePosition;
+        }
+        /// <summary>What a leaf teaches, on its tooltip (Phase 8.6 step 5): "Teaches Bog-iron coif (Blacksmithing 28). Use it to learn it.",
+        /// green once known.</summary>
+        string LeafLine(ItemDef d)
+        {
+            var log = session.Professions; var r = log?.Db.Recipe(d.teaches); if (r == null) return "Teaches a recipe this world does not know.";
+            var trade = log.Db.Profession(r.profession); string what = "Teaches " + r.name + " (" + (trade != null ? trade.name : r.profession) + " " + r.skill + ").";
+            return log.Knows(r) ? "<color=#8f8>" + what + " Already known.</color>" : what + " Use it to learn it.";
         }
         /// <summary>"a" or "an" before a word (by its first letter).</summary>
         static string Article(string word) { return !string.IsNullOrEmpty(word) && "aeiouAEIOU".IndexOf(word[0]) >= 0 ? "an" : "a"; }

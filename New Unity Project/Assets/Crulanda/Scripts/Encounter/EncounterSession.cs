@@ -45,7 +45,7 @@ namespace Crulanda.Encounter
         /// <summary>The run's scorecard (CombatMeter.Scorecard): shown when a sim-led run is called cleared or the dungeon's last boss falls, and
         /// by /scorecard (Chris, 2026-10-11).</summary>
         public bool ScorecardOpen; public string ScorecardTitle;
-        public void ShowScorecard(string title) { ScorecardTitle = title; ScorecardOpen = true; Message("The scorecard: " + title + " (/scorecard shows it again)."); }
+        public void ShowScorecard(string title) { ScorecardTitle = title; ScorecardOpen = true; Message("The scorecard: " + title + " (/scorecard shows it again)."); QueueRunDone(); }
         void OnHealed(Actor by, Actor who, int amount) { meter?.Heal(by, amount); }
         public ClassKit Kit { get; private set; }
         public WarriorKit Warrior { get { return Kit as WarriorKit; } }
@@ -311,6 +311,7 @@ namespace Crulanda.Encounter
             if (d != null && d.kind == "consumable") return UseItem(bagIndex);
             if (d != null && d.kind == "tool") return UseTool(bagIndex);
             if (d != null && d.kind == "bag") return WearBag(bagIndex);
+            if (d != null && d.kind == "recipe") return UseLeaf(bagIndex);
             if (d != null && d.kind == "material") { Message(Inventory.IsHide(d) ? HideLine : MaterialLine); return false; }
             string why;
             bool ok = Items != null ? Inventory.Equip(Progress, Items, bagIndex, Progress.Level, out why) : LegacyEquip(bagIndex, out why);
@@ -336,21 +337,53 @@ namespace Crulanda.Encounter
             if (i < 0 || i >= Progress.bag.Count || Progress.bag[i].Empty) return;
             Message("Destroyed " + ItemName(Progress.bag[i].item) + "."); Inventory.Destroy(Progress, i); Save(false);
         }
-        /// <summary>Potions heal at once (30 s cooldown); food heals over 10 s and only out of combat.</summary>
+        /// <summary>
+        /// Potions heal at once (30 s cooldown); food heals over 10 s and only out of combat. Phase 8.6 step 4 (Consumables): a dish from
+        /// Cooking 20 leaves you well fed too, and a feast the party with you (Mira and the party sims within Consumables.FeastRange, five
+        /// in all); a tincture or cordial raises one stat and a salve armour for half an hour (the buff row shows them; never saved); a
+        /// draught fills its class's pool and a cure lifts poisons, bleeds and the grey, both on the potion's cooldown. A draught for
+        /// another class's pool, or food in a fight, is refused and kept (Consumables.Refusal).
+        /// </summary>
         public bool UseItem(int i)
         {
             var d = Items?.Get(Progress.bag[i].item); if (d == null || d.kind != "consumable") return false;
-            if (d.food)
+            string why = Consumables.Refusal(d, InCombat, ClassDef);
+            if (why != null) { Message(why); return false; }
+            bool potion = Consumables.OnPotionCooldown(d);
+            if (potion && Time.time < potionReadyAt) { Message("Potion not ready (" + Mathf.CeilToInt(potionReadyAt - Time.time) + "s)."); return false; }
+            if (d.food) { if (d.heal > 0) { foodUntil = Time.time + 10; foodPerSecond = d.heal / 10f; } }
+            else if (d.heal > 0) Player.Health.ApplyHealing(d.heal);
+            if (potion) potionReadyAt = Time.time + 30;
+            if (d.restore > 0 && Player.Resource != null) Player.Resource.Pool.Change(d.restore);
+            var mine = Player.GetComponent<Combatant>();
+            int lifted = d.cure && mine != null && mine.Statuses != null ? mine.Statuses.RemoveHarmful() : 0;
+            Message("Used " + d.name + "."); Inventory.Remove(Progress, d.id, 1);
+            if (Consumables.HasBuff(d))
             {
-                if (InCombat) { Message("You can't eat while fighting."); return false; }
-                foodUntil = Time.time + 10; foodPerSecond = d.heal / 10f;
+                if (d.buff.party)
+                {
+                    int fed = Consumables.Feed(d, FeastParty(), Time.time);
+                    Message(fed > 1 ? "The party eats with you: " + fed + " of you are well fed." : "Nobody near to share it with. You are well fed.");
+                }
+                else if (mine != null && mine.Statuses != null) Consumables.Apply(d, mine.Statuses, Time.time);
             }
-            else
+            if (d.cure) Message(lifted > 0 ? "It burns going down, and whatever was on you is gone." : "Nothing on you to lift.");
+            return true;
+        }
+        /// <summary>Who shares a feast: you first, then Mira (recruited) and the party sims within Consumables.FeastRange, alive (the first
+        /// five are fed).</summary>
+        List<Crulanda.Combat.StatusEffectRuntime> FeastParty()
+        {
+            var list = new List<Crulanda.Combat.StatusEffectRuntime>();
+            void Add(Actor a)
             {
-                if (Time.time < potionReadyAt) { Message("Potion not ready (" + Mathf.CeilToInt(potionReadyAt - Time.time) + "s)."); return false; }
-                potionReadyAt = Time.time + 30; Player.Health.ApplyHealing(d.heal);
+                if (a == null || !a.IsAlive || (a != Player && Vector3.Distance(a.transform.position, Player.transform.position) > Consumables.FeastRange)) return;
+                var c = a.GetComponent<Combatant>(); if (c != null && c.Statuses != null) list.Add(c.Statuses);
             }
-            Message("Used " + d.name + "."); Inventory.Remove(Progress, d.id, 1); return true;
+            Add(Player);
+            if (Companion != null && Progress.recruited) Add(Companion.actor);
+            foreach (var s in PartySims) if (s != null) Add(s.actor);
+            return list;
         }
         float foodCarry;
         void TickItems()
@@ -376,6 +409,8 @@ namespace Crulanda.Encounter
             var stock = Items.StockFor(v.Name, v.Role, band); if (stock.Count == 0) return;
             // A trade bag you wear or carry is off the list: one of each is all anyone makes you. Another merchant's open window keeps its list.
             stock.RemoveAll(id => Items.Get(id)?.kind == "bag" && Inventory.Owns(Progress, id));
+            // A leaf whose recipe you have learned is off the list too (Phase 8.6 step 5).
+            if (Professions != null) stock.RemoveAll(id => { var d = Items.Get(id); return d != null && d.kind == "recipe" && Professions.Knows(Professions.Db.Recipe(d.teaches)); });
             if (stock.Count == 0) { Message(v.Name + ": " + AllBagsLine); v.Say(AllBagsLine, 6); return; }
             VendorStock = stock;
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
@@ -444,6 +479,9 @@ namespace Crulanda.Encounter
             // A material sold in a village is that day's delivery to its trade (ore to the forge, herbs to the stall), and the trades
             // notice; "sold." + the trade marks it as the player's (the herbalist brings the stall herbs herself every day).
             if (d != null && !string.IsNullOrEmpty(d.trade) && VillageLife.Active != null) { VillageLife.Active.Deliver(d.trade, count); VillageLife.Active.Deliver("sold." + d.trade, count); }
+            // The village stall buys surplus ore and timber too (Phase 8.6): sold at the merchant's, it is on the stall today, and she says so.
+            if (d != null && (d.pouch == "ore" || d.pouch == "timber") && d.kind == "material" && VillageLife.Active != null && VillageLife.Active.Find(VendorNpc)?.Role == "merchant")
+            { VillageLife.Active.Deliver("stall." + d.pouch, count); VillageLife.Active.Deliver("sold.stall." + d.pouch, count); }
             Message("Sold " + n + (count > 1 ? " x" + count : "") + " for " + gold + " crowns."); Save(false);
         }
         public void SellJunk()
@@ -509,6 +547,7 @@ namespace Crulanda.Encounter
                 var tier = skill > 1 ? db.NodesFor(id).Find(n => n.skill == skill) : null;
                 if (tier != null) ShowToast(trade.name.ToUpperInvariant(), "You can work " + tier.name.ToLowerInvariant() + "s now");
             };
+            Professions.Learned = r => ShowToast((db.Profession(r.profession)?.name ?? "A LEAF").ToUpperInvariant(), "Learned: " + r.name);
         }
         /// <summary>The zone builder asks what a kind of node is (IZoneNodeKinds): from the trades' content, before the session starts.</summary>
         public Crulanda.World.ZoneNodeKind NodeKind(string id)
@@ -552,6 +591,14 @@ namespace Crulanda.Encounter
         {
             if (Professions == null) { Message("You have no use for that yet."); return false; }
             if (!Professions.UseTool(bagIndex, out var why)) { if (why != null) Message(why); return false; }
+            Save(false); return true;
+        }
+        /// <summary>A leaf used from the bags (Phase 8.6 step 5): its found recipe is learned and the leaf is used up, or it is refused and
+        /// kept ("You know that one already.", or the trade it wants).</summary>
+        bool UseLeaf(int bagIndex)
+        {
+            if (Professions == null) { Message("You have no use for that yet."); return false; }
+            if (!Professions.UseLeaf(bagIndex, out var why)) { if (why != null) Message(why); return false; }
             Save(false); return true;
         }
 
@@ -1269,7 +1316,12 @@ namespace Crulanda.Encounter
         /// <summary>A cast in progress, or work (gathering) on the same bar.</summary>
         public bool PlayerCasting { get { return abilities.IsCasting || Working; } }
         /// <summary>A status effect's name for the HUD's buff row (its id when the content has no name for it).</summary>
-        public string StatusName(string id) { var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id == DiscoveryLog.BlessingId ? DiscoveryLog.BlessingName : id; }
+        public string StatusName(string id)
+        {
+            var food = Consumables.StatusName(id); if (food != null) return food;   // a dish's, a tincture's or a salve's (Phase 8.6)
+            var standing = ClassBuffs.StatusName(id); if (standing != null) return standing;   // a class's standing buff (the buff-up before a boss)
+            var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id == DiscoveryLog.BlessingId ? DiscoveryLog.BlessingName : id;   // a shrine's blessing (the lore pass)
+        }
         /// <summary>The player's figure (blows, flinches and casts on it: playtest note 25).</summary>
         public ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
         ActorVisual playerFigure; bool castPosed; string castMotion; ActorPose workPose; (GameObject hand, GameObject circle) castFx;
@@ -1355,6 +1407,7 @@ namespace Crulanda.Encounter
             else if (VendorNpc != null && !Paused) CloseVendor();
             else if (TradesOpen && !Paused) TradesOpen = false;
             else if (WhoOpen && !Paused) WhoOpen = false;
+            else if (QueueOpen && !Paused) QueueOpen = false;
             else if (ScorecardOpen && !Paused) ScorecardOpen = false;
             else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
             else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
@@ -1446,6 +1499,8 @@ namespace Crulanda.Encounter
             StartQuests(); StartDiscoveries(); StartArmoury(); StartAdit();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [" + KeyBindings.InteractLabel + "], then follow the path to the sentries.");
             ReconcileQuests();
+            SweepLockouts();   // the bosses and elites locked for you are not there (EncounterSession.Lockout; after the quests, for their exception)
+            ArriveQueued();   // a queued run arriving at its dungeon's door (EncounterSession.Queue)
             nextSave = Time.time + 30;
         }
         public static EncounterProgress FreshProgress(string classId = "class.warrior", string raceId = null)
@@ -1855,6 +1910,7 @@ namespace Crulanda.Encounter
             if (!Paused && EncounterInput.Press(KeyCode.M)) MapOpen = !MapOpen;
             if (!Paused && Quests != null && EncounterInput.Press(KeyCode.L)) { QuestBookOpen = !QuestBookOpen; if (!QuestBookOpen) ReadingDocument = null; }
             if (!Paused && SimPopulation.Active != null && EncounterInput.Press(KeyCode.O)) WhoOpen = !WhoOpen;
+            if (!Paused && Zone != null && EncounterInput.Press(KeyCode.J)) QueueOpen = !QueueOpen;   // the dungeon queue (Gather a Party)
             if (Paused) return;
             if (EncounterInput.Press(KeyCode.B)) BuildOpen = !BuildOpen;
             // Moving interrupts the player's own cast-time abilities (instant abilities are unaffected).
@@ -1893,6 +1949,7 @@ namespace Crulanda.Encounter
             if (!BuildOpen && EncounterInput.Press(KeyCode.E)) Interact();
             if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
             TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
+            TickLockouts(); TickQueue();   // lockouts run out; the dungeon queue gathers its party, leads it and breaks it up (EncounterSession.Lockout, .Queue)
 
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             if (!BuildOpen && EncounterInput.Press(KeyCode.P)) { SpellbookOpen = !SpellbookOpen; BookPick = null; }   // the spellbook (Docs/ACTION_BAR.md)
@@ -2191,6 +2248,11 @@ namespace Crulanda.Encounter
             GreySeepOnDeath(enemy);   // (S7) the Foreman's death stops the Grey Spreads (EncounterSession.GreySpread.cs)
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
+            // Lockouts (EncounterSession.Lockout): a boss or elite locked for you already (a queued run's fresh dungeon, a quest's kill) gives
+            // no loot; one that was not is locked from now.
+            bool lockedKill = LockedFor(enemy); enemy.NoLoot = lockedKill;
+            if (lockedKill) Message("No loot: " + enemy.Name + " is locked for you for another " + Lockouts.Words(Lockouts.Left(Progress, Lockouts.KeyOf(enemy.persistentId), Lockouts.UtcNow())) + ".");
+            else LockOnKill(enemy);
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
             NoteSlain(enemy);   // its kind in the book of lore's Creatures
             if (NamedElite(enemy)) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }   // the camp's own elite, not a machine it rides
@@ -2342,6 +2404,7 @@ namespace Crulanda.Encounter
             if (Professions != null) Professions.Bind(Progress);
             if (Armoury != null) Armoury.Bind(Progress);
             if (Feats != null) { Feats.Bind(Progress); featsPrimed = false; }
+            SweepLockouts();   // the loaded character's lockouts (EncounterSession.Lockout)
             if (lore != null) lore.Bind(Progress);   // the book of lore reads the loaded character (its Achievements too)
         }
         public void RepeatTrail()

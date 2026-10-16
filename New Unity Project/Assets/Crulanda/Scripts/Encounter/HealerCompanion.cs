@@ -43,6 +43,10 @@ namespace Crulanda.Encounter
             if (baseMana > 0) actor.Stats.SetBase(Crulanda.Core.StatType.MaxPower, ManaFor(baseMana, playerLevel));
         }
         void Awake() { agent = GetComponent<NavMeshAgent>(); }
+        /// <summary>Her own standing buff for the buff-up before a boss (BossBuffs; Chris, 2026-10-15), laid on the party at a stop and with
+        /// your /buff when she has one. She has none yet: she eats and drinks nothing of her own, and takes a feast's share and the
+        /// classes' buffs with the party.</summary>
+        public ClassBuff PartyBuff { get { return null; } }
         float nextHush;
         public const float HushCooldown = 15, HushSeconds = 4;
         /// <summary>Her longest wait in seconds (Hush, or a spell's own cooldown), for a Scoundrel's favour (ScoundrelKit, 2026-10-14).</summary>

@@ -59,6 +59,10 @@ namespace Crulanda.Encounter
                 if (!abilities.ContainsKey(id) || !unlocks.ContainsKey(id)) throw new ArgumentException("Mage ability '" + id + "' is missing from content or unlocks.");
         }
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
+        /// <summary>Its standing party buff at a buff-up before a boss (Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"; GAME-ONLY):
+        /// a spark of the Mage's Heat lent to every mind. Half an hour, +3% Intellect on everyone (BossBuffs).</summary>
+        public static readonly ClassBuff Standing = new ClassBuff("class.mage", "Kindled Wits", Crulanda.Core.StatType.Intellect);
+        public override ClassBuff PartyBuff { get { return Standing; } }
         public override bool MeleeAutoAttacks { get { return false; } }   // a caster: no swings, a release at range
         int R(string id) { return s.TalentRank(id); }
         float Now { get { return Time.time; } }

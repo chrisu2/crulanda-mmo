@@ -1003,7 +1003,10 @@
       ],
       "rewards": {
         "xp": 200,
-        "gold": 40
+        "gold": 40,
+        "bagItems": [
+          "leaf.tempered_ridgesteel_cloth"
+        ]
       }
     },
     {

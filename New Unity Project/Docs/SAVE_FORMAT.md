@@ -25,7 +25,7 @@ clears threat, casts, personal cooldowns, global cooldowns and temporary Guard s
 The shared ability runtime does not change the persistent schema, so no version bump is required.
 Unsupported format/type or invalid payloads are rejected. An unreadable startup save blocks overwrite.
 
-## Format history (current EncounterSave.FormatVersion = 10; formats 4-10 are described at the end)
+## Format history (current EncounterSave.FormatVersion = 11; formats 4-11 are described at the end)
 - 1: no class/talents. Read migrates to classId class.warrior with an empty talent list.
 - 2: classId + talents using the 9-node prototype ids (tank.armor, dps.power, ...). Read maps them through
   EncounterSave.LegacyTalentIds to the data-driven ids; if the mapped allocation is illegal under the new tier
@@ -38,9 +38,9 @@ Transient talent state (weapon pressure, Exposed, barriers, intercept, standard)
 ## Generic infrastructure
 SaveFileStore handles envelope I/O/backups. SaveMigrator chains ISaveMigration steps on the payload text.
 EncounterSave uses it from format 6 on: it registers one step per format (6 → 7: `AddDiscoveriesMigration`,
-7 → 8: `AddProfessionsMigration`, 8 → 9: `AddArmouryMigration`) and runs the chain in memory before reading the payload. Formats 1-5 are older than the chain and are still upgraded in memory in
+7 → 8: `AddProfessionsMigration`, 8 → 9: `AddArmouryMigration`, 9 → 10: `SteeperCurveMigration`, 10 → 11: `AddRecipesMigration`) and runs the chain in memory before reading the payload. Formats 1-5 are older than the chain and are still upgraded in memory in
 `EncounterSave.Read`. Versions above the current one are rejected.
-To change saved fields, add the next step (9 → 10) and bump `FormatVersion`. No migration is needed for combat tuning.
+To change saved fields, add the next step (11 → 12) and bump `FormatVersion`. No migration is needed for combat tuning.
 
 ## The world slot (2026-10-06, Phase 5.2)
 File: the same root, slot "world" (world.save.json, .bak kept), payloadType CrulandaWorld, formatVersion 1, DTO WorldSave:
@@ -128,7 +128,8 @@ Two new lists at the end of the payload, for the whole professions feature (one 
     2026-10-01): all 26 fields came through byte-identical, and only `discoveries`, `professions` and `pouches` were added, empty.
     Back the save folder up to `work\save-backups\<date>-pre-format-8` before the first run of this build.
 - Formats 1-5 load with both lists empty.
-- Not saved: which nodes have been worked (they regrow in memory), known recipes (they follow from skill).
+- Not saved: which nodes have been worked (they regrow in memory), known recipes (they follow from skill; from format 11 the found
+  recipes learned from leaves are saved, see below).
 - As before, migration happens in memory on read. The file is written as format 8 on the next save.
 
 ## Format 9 (2026-10-01): the Armoury (loot step L3)
@@ -234,3 +235,55 @@ File: the same root, slot "profile" (profile.save.json, .bak kept), payloadType 
   new one and writes it (the format-2 world survives one save as world.save.json.bak). Do not run an older build after this one.
 - Back up the whole `CrulandaEncounter` folder (every character save, `profile.save.json`, `world.save.json` and their `.bak` files)
   to `work\save-backups\<date>-pre-p9-exchange` before the first run of this build. The character format (10) is unchanged.
+## Format 11 (2026-10-15, Phase 8.6 step 5): found recipes
+One new list, for the found recipes (Docs/PHASE8_6_LIVING_WORLD.md 3c; one format bump, one migration):
+- `recipes`: `List<string>`, the found recipes learned from a leaf (an item of kind `recipe` whose `teaches` names the recipe;
+  `ProfessionLog.UseLeaf`), by recipe id, in the order learned. A taught recipe (bars, charcoal, the plain pieces) is never listed: it
+  follows from the skill, as before. A found recipe not listed shows in the Trades window as a grey "?" with its trade and skill.
+  - A leaf is used up when it teaches. A second leaf for a recipe already listed is refused and kept ("You know that one already.").
+  - Forgetting a craft keeps its leaves learned: the list is not touched by `ProfessionLog.Forget`.
+  - On load (`EncounterSave.Read` and `ProfessionLog.Bind`): blank ids are dropped, and so is a later entry for an id already listed.
+    An id this build's content doesn't know is kept in the save and ignored, so content can change.
+  - Where it sits: `EncounterProgress` declares it before `discoveries` (with `usedInteractables` before it), not at the end, so a
+    written payload still ends `...,"lootLuck":[...]}` as formats 9 and 10 did. The order of a JSON object's fields means nothing
+    to the read.
+- Migration 10 → 11 is `AddRecipesMigration`, a SaveMigrator step of the same kind as 6 → 7.
+  - It inserts `"recipes":[]` before the payload's closing brace and leaves every other character of the v10 payload as it was. A
+    payload that already has the list is left alone. One that isn't a JSON object is refused: the save isn't loaded or changed.
+  - A format-6 save runs all five steps (6 → 7 → 8 → 9 → 10 → 11) in one read. `SaveMigratorTests.V10Payload_MigratesTo11_...` takes
+    the owner's format-8 fixture (`OwnerSaveFixtures`) to format 10 and through the step and the save: every other field comes through
+    as it was and the list is empty.
+  - What to expect on Chris's save: `recipes` appears, empty; nothing else changes. Back up the whole `CrulandaEncounter` folder
+    (every character slot, the `.bak` files and `profile.save.json`) to `D:\crulanda-work\save-backups\<date>-pre-format-11` before the
+    first run of this build (CLAUDE.md: back up Chris's save before any save-format change). Not yet done on 2026-10-15: the p86-craft
+    helper does not run the game.
+- Formats 1-10 load with the list empty.
+- Not saved: the consumables' buffs (well fed, a tincture, a salve; Phase 8.6 step 4). They ride the status effects, so a load, a
+  fall or a zone change starts the character without them.
+- An older build refuses a format-11 save (its version is above theirs) and leaves the file alone.
+- As before, migration happens in memory on read. The file is written as format 11 on the next save.
+
+### Also format 11 (2026-10-15, branch p86-lockout): lockouts
+Chris, 2026-10-15: "bosses/elites will not respawn so no one is trying to exploit the gear/loot drops" ("Until a lockout resets",
+"Everywhere"; "every 2 days for loot"; "open world boss is once per week"; "raids once per week"). One more list, in the same format
+and the same step as the recipes (no format 12):
+- `lockouts`: `List<Lockout>` (`id`, `until`): each boss or elite this character's party has killed and may not loot again yet.
+  - `id` is the camp's key, the mob's id without its last part (`mob.captain.peaks.3` from `mob.captain.peaks.3.0`; the Rock-Eater's
+    own `mob.rockeater.adit.m21`), as the deeds' `elitesSlain` keys are. `until` is when the lockout ends, as UTC ticks
+    (`DateTime.Ticks`).
+  - How long (`Lockouts.Kinds`): a raid zone's (`ZoneDefinition.raid`, none built yet) and an open-world boss's (an elite with a boss's
+    move) a week, a dungeon's bosses and elites two days, any other open-world elite a day; each ends at 06:00 local time (the first
+    six o'clock after the kill, then a day for each further day). A kill inside a lockout does not push it back.
+  - On load (`EncounterSave.Read`, `Lockouts.Normalize`): a blank id, an `until` of zero or less, and a later entry for an id already
+    listed are dropped (the first is kept). A lockout that has run out is kept until the session prunes it (on each zone's load and
+    every few seconds while playing). An id this build's content doesn't know is kept.
+  - Where it sits: `EncounterProgress` declares it after `usedInteractables` and before `recipes`, so a written payload still has
+    `"recipes":[...],"discoveries":[...]` together and still ends `...,"lootLuck":[...]}`.
+- Migration 10 → 11 (`AddRecipesMigration`) now inserts `"recipes":[]` and then `"lockouts":[]` before the payload's closing brace, each
+  only when it is missing (as `AddArmouryMigration` does for its three), and leaves every other character as it was. A payload with both
+  is left alone. `SaveMigratorTests.V10Payload_MigratesTo11_...` and `LockoutTests` check it.
+- What to expect on Chris's save: `lockouts` appears, empty, next to `recipes`; nothing else changes. The same backup as for the recipes
+  (`<date>-pre-format-11`) covers it.
+- Formats 1-10 load with the list empty. A format-11 save written by the p86-craft build (recipes, no lockouts) also loads with it empty.
+- Not saved: the dungeon queue's run (which dungeon, which sims it brought: kept in memory across the dungeon's load only) and which
+  bosses are put away this visit (that follows from the list).

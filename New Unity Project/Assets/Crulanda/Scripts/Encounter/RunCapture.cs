@@ -19,6 +19,9 @@ namespace Crulanda.Encounter
     /// wing, each regroup and each wait at a gate. --crulanda-run-mode quick|full picks the run (the standard run without it). The gates the
     /// run's quests or hands open stand open; the bosses' doors are left to the bosses (a door still shut after a minute's wait is opened for
     /// the run, and the log says so: a boss's death should have opened it).
+    /// (Buffs to beat the bosses, 2026-10-15; BossBuffs) Before a boss or an elite camp the leader stops short to buff up: the bot buffs
+    /// from its bags as /buff does (the run gives it a feast, a dish, its part's elixir and its draught of its level's tier at the start;
+    /// the sims carry packs bought with their coin), and the log has a "buffed:" line for each member at each stop.
     /// </summary>
     public sealed class RunCapture : MonoBehaviour
     {
@@ -57,8 +60,19 @@ namespace Crulanda.Encounter
             }
             var p0 = s.Player.transform.position; int k = 0;
             foreach (var x in chosen) { x.zone = s.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = 11; x.bold = x.classId == "class.warrior" ? .95f : .3f; x.gearBonus = 2; x.x = p0.x + 2 + k; x.z = p0.z + (k % 2 == 0 ? 1.5f : -1.5f); k++; }   // gearBonus: bought upgrades, the better pieces of its level (Chris: "give the warrior some better gear")
+            // Their packs for the bosses (BossBuffs; Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"): bought with their own coin at
+            // the level-11 tier, a purse of 120 at the least (as gearBonus above: what a sim of eleven would have put by), so a richer one carries a feast.
+            foreach (var x in chosen) { x.coin = Mathf.Max(x.coin, 120); SimEconomy.Stock(x, s.Items); }
             pop.Refresh(); yield return new WaitForSeconds(.5f);
             foreach (var x in chosen) if (!s.Invite(x.id, true)) Log("could not invite " + x.name);
+            Log("Packs for the bosses: " + string.Join("; ", chosen.Select(x => x.name.Split(' ')[0] + ": " + Pack(s, x.goodIds, x.goodCounts))) + ".");
+            // Yours (the run gives the bot a few of its level's tier): a feast, a dish, the elixir for your part and your class's draught.
+            var mine = new List<string>();
+            void Give(ItemDef d, int n) { if (d != null && Inventory.Add(s.Progress, s.Items, d.id, n) < n) mine.Add(d.name + " x" + n); }
+            var all = s.Items.Items.Values; int lvl = s.Progress.Level;
+            Give(BossBuffs.FeastFor(lvl, s.Items), 2); Give(BossBuffs.PickDish(all, lvl), 2);
+            Give(BossBuffs.PickElixir(s.PlayerRole, BossBuffs.MainStat(s.ClassDef.id), all, lvl), 3); Give(BossBuffs.PickDraught(Consumables.PoolOf(s.ClassDef), all, lvl), 2);
+            Log("Your bags for the bosses: " + (mine.Count > 0 ? string.Join(", ", mine) : "nothing of your tier") + ".");
             // You in your class's kit at this level too (the temp save has only the starter gear): the armour of a sim's pieces.
             s.Player.Stats.SetBase(Crulanda.Core.StatType.Armor, SimCompanion.ArmourFor(new SimAdventurer { classId = s.ClassDef.id, level = s.Progress.Level, gearSeed = 7, gearBonus = 2 }, s.Items));
             yield return new WaitForSeconds(.5f);
@@ -74,6 +88,7 @@ namespace Crulanda.Encounter
             int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0, pathAt = 0; Vector3 pathGoal = Vector3.zero; NavMeshPath path = null; int holds = 0; string lastHold = null; var simHeld = new Dictionary<SimCompanion, bool>();
             float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1, atCorpseSince = -1, headBest = 0, headAt = Time.time; UnityEngine.Object headFor = null; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
+            int botBuffed = -1, buffStops = 0; var simBuffed = new Dictionary<SimCompanion, int>();
             Time.timeScale = Speed;
             Shot(s, directory, "00-" + Clock(0) + "-setting-out", ref shots, leader);
             while (leader != null && leader.Dungeon != null && Time.realtimeSinceStartup - realStart < RealLimitSeconds)
@@ -93,6 +108,17 @@ namespace Crulanda.Encounter
                     var shut = s.Zone.Gates.Find(g => g != null && !g.Open && g.Title == leader.StoppedBy);
                     if (shut != null) { shut.SetOpen(true); Log(Clock(t) + "  " + shut.Title + " still shut after a minute (it opens " + (string.IsNullOrEmpty(shut.OpensOn) ? "by hand" : "when " + shut.OpensOn + " falls") + "): opened for the run"); }
                     gateSince = -1;
+                }
+                // A buff-up before a boss (BossBuffs): the bot buffs from its bags as you would (/buff), and every member's buffing is on the record.
+                if (s.BuffingUp && botBuffed != s.BuffStop)
+                {
+                    botBuffed = s.BuffStop; buffStops++; Log(Clock(t) + "  buff up before " + leader.LeadingName + " (" + Vector3.Distance(leader.transform.position, leader.Leading ?? leader.transform.position).ToString("0") + " m short)");
+                    var used = s.BuffUp(); Log(Clock(t) + "  buffed: you: " + (used.Count > 0 ? string.Join(", ", used) : "nothing needed"));
+                }
+                foreach (var c in s.PartySims)
+                {
+                    if (c == null || c.BuffedStop < 0) continue; simBuffed.TryGetValue(c, out var was);
+                    if (c.BuffedStop != was) { simBuffed[c] = c.BuffedStop; Log(Clock(t) + "  buffed: " + c.sim.name + ": " + c.BuffNote); }
                 }
                 if (leader.LeadingName != leadingName)
                 {
@@ -241,10 +267,17 @@ namespace Crulanda.Encounter
             if (!s.ScorecardOpen) s.ShowScorecard((s.Zone.Zone.displayName ?? s.ZoneId) + (done ? " cleared" : " so far"));
             yield return null; yield return null;
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "99-scorecard.png")); yield return new WaitForSeconds(.6f);
-            Log(Clock(total) + "  " + (done ? "the run is done: every camp on it cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + "; holds the bosses put on the party: " + holds + ".");
+            Log(Clock(total) + "  " + (done ? "the run is done: every camp on it cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + "; holds the bosses put on the party: " + holds + "; buff-ups before bosses: " + buffStops + ".");
             Log("Loot taken: " + (lootTally.Count == 0 ? "nothing" : string.Join(", ", lootTally.Select(kv => kv.Key + (kv.Value > 1 ? " x" + kv.Value : "")))) + "; coin " + s.Progress.gold + ".");
             foreach (var line in s.Meter.Scorecard()) Log(line);
             Finish(s, directory, log, total, camps, camps - left, deaths, warps, done);
+        }
+        /// <summary>A sim's goods that are consumables, by name and count ("Shore feast x1, Scree salve x2").</summary>
+        static string Pack(EncounterSession s, List<string> ids, List<int> counts)
+        {
+            var l = new List<string>();
+            for (int i = 0; i < ids.Count; i++) { var d = s.Items.Get(ids[i]); if (d != null && d.kind == "consumable") l.Add(d.name + " x" + counts[i]); }
+            return l.Count > 0 ? string.Join(", ", l) : "nothing";
         }
         static int Worth(ItemDef d) { return d == null ? 0 : d.armor + 2 * (d.stamina + d.strength + d.agility + d.intellect + d.spirit) + 3 * d.weaponDamage + d.heal; }
         static string Slug(string name) { return (name ?? "camp").ToLowerInvariant().Replace(' ', '-').Replace("'", "").Replace(",", ""); }

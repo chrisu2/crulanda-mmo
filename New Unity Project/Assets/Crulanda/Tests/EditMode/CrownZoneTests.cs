@@ -218,7 +218,8 @@ namespace Crulanda.Tests
                 if (door.Contains(at)) problems.Add(s + "is in the doorway");
                 foreach (var (what, fat, half) in furniture)
                 {
-                    bool own = Vector2.Distance(face, fat) < .05f || what == "the bar" && Mathf.Abs(face.y - fat.y) < .05f; float clear = Outside(at, fat, half);
+                    // A booth's seat faces across its own table, not at its middle.
+                    bool own = Vector2.Distance(face, fat) < .05f || Outside(face, fat, half) <= 0 || what == "the bar" && Mathf.Abs(face.y - fat.y) < .05f; float clear = Outside(at, fat, half);
                     if (clear <= 0) problems.Add(s + "is in " + what); else if (!own && clear < body) problems.Add(s + "is " + clear.ToString("0.00") + " m from " + what);
                 }
                 for (int j = i + 1; j < seats.Count; j++) if (Vector2.Distance(at, seats[j].at) < 2 * body - .02f) problems.Add(s + "is in the lap of the seat at " + seats[j].at);

@@ -341,7 +341,7 @@ namespace Crulanda.Encounter
             var s = guild.Trim().ToLowerInvariant(); if (s.StartsWith("the ", StringComparison.Ordinal)) s = s.Substring(4);
             var sb = new System.Text.StringBuilder(); bool dash = false;
             foreach (char ch in s) { if (char.IsLetterOrDigit(ch)) { if (dash && sb.Length > 0) sb.Append('-'); sb.Append(ch); dash = false; } else dash = true; }
-            return sb.ToString();
+            var slug = sb.ToString(); return slug.StartsWith("the-", StringComparison.Ordinal) ? slug.Substring(4) : slug;   // "the-lantern-watch" is the Lantern Watch too
         }
         /// <summary>The guild of a slug ("lantern-watch", "the-lantern-watch" or the name itself), or null.</summary>
         public static string FromSlug(string slug)

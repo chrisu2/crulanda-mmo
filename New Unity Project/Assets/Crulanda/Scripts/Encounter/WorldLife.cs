@@ -623,7 +623,10 @@ namespace Crulanda.Encounter
                 if (prop.kind == "well") for (int i = 0; i < 3; i++) { float a = i * 2.1f; AddPlace("well", prop.at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 2.3f); }
                 if (prop.kind == "mill") AddPlace("mill", prop.at + new Vector2(0, -(prop.size.y > 0 ? prop.size.y : 6) / 2 - 2));
                 // A city's fountain is its well: four places round the basin's rim (ZoneBuilder.Fountain: 4.6 m for the Crown Square's, else 3).
-                if (prop.kind == "fountain") for (int i = 0; i < 4; i++) { float a = (i + .5f) * Mathf.PI / 2; AddPlace("well", prop.at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * ((prop.variant == 1 ? 4.6f : 3) + 1.3f)); }
+                if (prop.kind == "fountain") { Physics.SyncTransforms(); for (int i = 0; i < 4; i++) { float a = (i + .5f) * Mathf.PI / 2; var spot = prop.at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * ((prop.variant == 1 ? 4.6f : 3) + 1.3f);
+                    // Only where a body can stand (2026-10-16, CrownZonePlayTests: a water-carrier sent to a rim spot inside the Lantern Cross's
+                    // garden hedge could not be walked to).
+                    if (Physics.CheckSphere(Zone.Ground(spot) + Vector3.up * .9f, .35f, ~0, QueryTriggerInteraction.Ignore)) continue; AddPlace("well", spot); } }
             }
             if (z.city) Streets(z);
             if (z.clearings.Length > 0)

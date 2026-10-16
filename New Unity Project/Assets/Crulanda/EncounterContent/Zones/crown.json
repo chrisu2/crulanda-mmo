@@ -1774,8 +1774,8 @@
       },
       "rotation": 30,
       "text": "A purse of soft leather pushed in among the roots of the old garden tree behind the spired hall, and a note in a careful clerk's hand: 'For the day they come for me.'",
-      "clue": "Behind the many-spired hall, in a garden by the north-west corner, an old tree keeps something for a clerk who expected visitors.",
-      "hint": "Widow Penn says a clerk of the Treasury used to sit under the garden tree behind the spired hall every evening, and dig. She never asked what for.",
+      "clue": "Behind the hall of many towers, in a garden by the north-west corner, an old tree keeps something for a clerk who expected visitors.",
+      "hint": "Widow Penn says a clerk of the Treasury used to sit under the garden tree behind the towered hall every evening, and dig. She never asked what for.",
       "xp": 50,
       "gold": 25,
       "canonStatus": "GAME-ONLY."
@@ -2355,7 +2355,7 @@
         "title": "Warden of the Council",
         "at": {
           "x": 101,
-          "y": 16.5
+          "y": 11.5
         },
         "look": "concord",
         "canonStatus": "GAME-ONLY",

@@ -217,7 +217,7 @@ namespace Crulanda.Encounter
                     if (dist > reach + 1 && (Vector3.Distance(stuckFrom, me) < 1 || motor.Swimming))
                     {
                         var at = goal - to.normalized * Mathf.Min(2.5f, dist * .5f);
-                        if (NavMesh.SamplePosition(at, out var hit, 4, NavMesh.AllAreas)) { motor.Teleport(hit.position + Vector3.up * 1.05f); warps++; Log(Clock(t) + "  stuck; warped " + (foe != null ? "to the fight" : corpse != null ? "to the body" : "to the leader") + " (" + warps + ")"); }
+                        if (NavMesh.SamplePosition(at, out var hit, 4, NavMesh.AllAreas) && Mathf.Abs(hit.position.y - at.y) < 1.6f) { motor.Teleport(hit.position + Vector3.up * 1.05f); warps++; Log(Clock(t) + "  stuck; warped " + (foe != null ? "to the fight" : corpse != null ? "to the body" : "to the leader") + " (" + warps + ")"); }
                     }
                     stuckAt = Time.time; stuckFrom = me;
                 }

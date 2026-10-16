@@ -103,7 +103,7 @@ namespace Crulanda.Encounter
             {
                 nextCatchUp = Time.time + 1;
                 bool stuck = !agent.isOnNavMesh || (distance > 25 && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete);
-                if (stuck && NavMesh.SamplePosition(session.Player.transform.position - session.Player.transform.forward * 2, out var near, 12, NavMesh.AllAreas)) agent.Warp(near.position);
+                if (stuck && NavMesh.SamplePosition(session.Player.transform.position - session.Player.transform.forward * 2, out var near, 12, NavMesh.AllAreas) && Mathf.Abs(near.position.y - (session.Player.transform.position.y - 1.05f)) < 2f) agent.Warp(near.position);   // your level only
             }
             if (agent.isOnNavMesh)
             {

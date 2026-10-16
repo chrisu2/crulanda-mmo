@@ -247,6 +247,10 @@ loot.hal.pact_captains_breastplate
 loot.hal.pact_captains_sabatons
 loot.hal.the_examiners_sunburst
 loot.hal.the_examiners_seal
+# Hallow's Creek's secrets' rings (2026-10-16, the second pass)
+loot.hal.the_hollins_ring
+loot.hal.the_mortar_ring
+loot.hal.the_kingfisher_ring
 # the Lowtowns' elites (loot.lowtowns.json, Phase 9.1)
 loot.low.outfall_waders_boots
 loot.low.drain_pearl

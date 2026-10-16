@@ -382,12 +382,19 @@ namespace Crulanda.Encounter
             var g = route[0].gate;
             if (g != null && !g.Open)
             {
-                if (waitingAt == g) { if (route[0].optional && Time.time - waitingSince > 45) LeaveCamp(); return; }
+                if (waitingAt == g)
+                {
+                    // (Hallow's Creek, section 6) A bar it stands on the lifting side of, it lifts itself after a breath (the Cellars' far trapdoor).
+                    if (Time.time - waitingSince > 2.5f && Vector3.Distance(transform.position, Leading.Value) < 2 && session.LiftBar(g, this)) return;
+                    if (route[0].optional && Time.time - waitingSince > 45) LeaveCamp();
+                    return;
+                }
                 waitingAt = g; waitingSince = Time.time; StoppedBy = g.Title; Leading = GateSide(g); LeadingName = g.Title.StartsWith("The ") ? g.Title.Substring(4) : g.Title;   // "Waiting at the singing door"
                 var thing = session.Zone.Interactables.Find(i => i.gate == g); var prompt = thing != null ? session.InteractPromptFor(thing) : null;
                 // A boss's door (the Adit rework) says whose death opens it: the run comes to one shut only when he was left standing.
                 bool door = prompt == null && !string.IsNullOrEmpty(g.OpensOn);
-                session.ChatSay(ChatChannel.Party, sim.name, door
+                if (Lifts(g)) session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? g.Title.ToLower() + ". i'll get the bar" : g.Title + ". Hold on, I will lift the bar.");
+                else session.ChatSay(ChatChannel.Party, sim.name, door
                     ? (sim.chatty > .65f ? g.Title.ToLower() + " is shut till " + g.OpensOn.ToLower() + " drops" : g.Title + " is shut against us. It opens when " + g.OpensOn + " falls.")
                     : (sim.chatty > .65f ? g.Title.ToLower() + " is shut. " + (prompt ?? "open it").ToLower() + "?" : g.Title + " is shut against us. " + (prompt ?? "It wants opening") + "."));
             }
@@ -397,6 +404,8 @@ namespace Crulanda.Encounter
                 session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "open! on we go" : "It's open. On we go.");
             }
         }
+        /// <summary>(Hallow's Creek) A gate the leader lifts itself when it comes to it from the side it is worked from: a bar nobody holds shut.</summary>
+        static bool Lifts(Crulanda.World.ZoneGate g) { return g != null && g.Kind == "bar" && string.IsNullOrEmpty(g.OpensOn); }
         /// <summary>Where to wait at a shut gate: a step from it on the side the leader is on (a door the run comes to from its far end, as the
         /// Geode Foundry's chute door from the hall, is waited at from the hall).</summary>
         Vector3 GateSide(Crulanda.World.ZoneGate g)
@@ -432,7 +441,7 @@ namespace Crulanda.Encounter
                 // The first shut gate the run will wait at: not a boss's door it opens on its way (his death opens it).
                 for (int k = 0; k < route.Count && StoppedBy == null; k++)
                 {
-                    var g = route[k].gate; if (g == null || g.Open) continue;
+                    var g = route[k].gate; if (g == null || g.Open || Lifts(g)) continue;   // (a bar the leader lifts itself is no stop)
                     bool opensOnTheWay = false;
                     if (!string.IsNullOrEmpty(g.OpensOn)) for (int j = 0; j < k && !opensOnTheWay; j++) foreach (int c in route[j].camps) if (zone.camps[c].mob == g.OpensOn) opensOnTheWay = true;
                     if (!opensOnTheWay) StoppedBy = g.Title;
@@ -479,6 +488,9 @@ namespace Crulanda.Encounter
         Crulanda.World.ZoneGate ExitGate(RouteStep regroup, List<RouteStep> steps)
         {
             var camps = session.Zone.Zone.camps;
+            // (Hallow's Creek) A wing that names the gate on its way out (ZoneWing.gate: the Cellars' far trapdoor, barred from below).
+            var wing = session.Zone.Zone.wings != null ? System.Array.Find(session.Zone.Zone.wings, w => w != null && w.id == regroup.wing) : null;
+            if (wing != null && !string.IsNullOrEmpty(wing.gate)) { var named = session.Zone.Gates.Find(g => g != null && g.Title == wing.gate); if (named != null) return named; }
             foreach (var g in session.Zone.Gates)
             {
                 if (g == null || string.IsNullOrEmpty(g.OpensOn)) continue;
@@ -782,6 +794,18 @@ namespace Crulanda.Encounter
                 if (!agent.isStopped) { agent.speed = toHer > 8 ? 5.6f : 3.4f; agent.SetDestination(post); }
                 return;
             }
+            // (Hallow's Creek, E2; DUNGEON2_DESIGN section 6) Every party sim guards Warden Elvet on her walk as they guard Mother Quillet: the
+            // party keeps to her (the leader at her pace), and the waves come to her.
+            var elvet = session.Warden;
+            if (elvet != null && elvet.actor.IsAlive && elvet.Now == HallowsWarden.Stage.Walking && Vector3.Distance(transform.position, elvet.transform.position) < 45)
+            {
+                Activity = "Guarding " + EncounterSession.WardenName;
+                var post = elvet.transform.position + Quaternion.Euler(0, 90 + slot * 120, 0) * Vector3.forward * 2.2f;
+                float toHer = Vector3.Distance(transform.position, elvet.transform.position);
+                agent.isStopped = toHer < 3.2f;
+                if (!agent.isStopped) { agent.speed = toHer > 8 ? 5.6f : 3.4f; agent.SetDestination(post); }
+                return;
+            }
             // Leading a run (5.6): on to the camp while you keep up; waits when you fall behind. At a shut gate it waits for you to open it (D7).
             // No headway for 45 s out of a fight (2026-10-13, the evening group run: the leader stood "leading you to the lava ledge" for
             // eleven minutes, the camp up where no path reaches and never within the 18 m of the rule above): that camp is left behind.
@@ -993,6 +1017,7 @@ namespace Crulanda.Encounter
             if (session.Progress.recruited && session.Companion != null) Consider(session.Companion.actor);
             foreach (var p in session.PartySims) if (p != null) Consider(p.actor);
             if (session.Weaver != null) Consider(session.Weaver.actor);   // Mother Quillet (D4)
+            if (session.Warden != null) Consider(session.Warden.actor);   // (Hallow's Creek, E2) Warden Elvet
             return best;
         }
     }

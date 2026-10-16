@@ -45,8 +45,10 @@ CAVES = [
         (-39, 21, 3.5, 3.5, -6.8), (-38.4, 29, 3.5, 3.5, -6.8)],
         joins='WS', canon='GAME-ONLY (the cellars of the paused town, the Cut-Store)'),
     # The dark cellar: one cellar with no lamp, off the Cellars' west side (behind a door you find by feel).
+    # (2026-10-16, the second pass) Its crawl was 3.2 m wide and 2.6 high with the hidden door's frame in it: too low and narrow for the navmesh
+    # (the Long Shadow had "no way there"); now a doorway's size, as the Adit's side passages are.
     AL.Cave('DK', "The dark cellar", 'darkcellar', [
-        (-43.4, 6, 1.6, 2.6, None), (-47, 6.5, 1.8, 2.8, -6.7), (-51, 7, 4.5, 3.4, -6.7), (-57, 7.5, 5, 3.5, -6.7), (-61, 8, 4, 3.3, -6.7)],
+        (-43.4, 6, 2.6, 3.5, None), (-47, 6.5, 2.6, 3.5, -6.7), (-51, 7, 4.5, 3.6, -6.7), (-57, 7.5, 5, 3.6, -6.7), (-61, 8, 4, 3.4, -6.7)],
         within='CE', canon='GAME-ONLY'),
     # The overhang off the Ash Road's east side (a secret).
     AL.Cave('OV', "The overhang", 'overhang', [
@@ -128,6 +130,7 @@ DROPS = []
 
 # ---------------------------------------------------------------- the built places (their walls are props; their floors are decks)
 GH = {}   # the gatehouse
+SALLY = -5.6   # the sally-port's middle, west of the gatehouse's middle (west of the gate: the wall-walk's stair stands in the east corner)
 def make_gatehouse(far_lip):
     cz = far_lip + 7 + 1   # its south wall a metre past the lip
     GH.update(at=(0, cz), w=16, d=14)
@@ -139,25 +142,46 @@ def make_gatehouse(far_lip):
 
 TOWER = (0, 118)
 def make_tower():
-    cx, cz = TOWER; o = 3.9; corners = [(o, -o), (o, o), (-o, o), (-o, -o)]   # SE, NE, NW, SW (x, z offsets)
-    h = 0.0; names = {2: 'The first landing', 4: 'The second landing', 6: 'The third landing'}
-    for k in range(8):
-        a = corners[k % 4]; b = corners[(k + 1) % 4]; h2 = h + 2.25
-        # each flight from a corner to the next, its ends in the corner squares
+    """The Bell Tower's inside (DUNGEON2_DESIGN section 2.7): four landings at +4.5, +9, +13.5 and +18 by stairs round the walls. Eight flights
+    of 2.25 m along the walls (each 5.6 m, 22 degrees), their ends in the corner squares: the first four go round east, north, west and south
+    from the door's corner (SE) to +9; the second landing is a floor at +9 over the middle and the east side, where the Pact-Captain holds
+    (the fight's floor: solid stone, 7.8 x 5.6 m and its two corner squares); the last four go round north, west, south and east over the
+    first four (and over the landing's east side only where the eighth flight is 6.75 m above it) to the belfry at +18. No flight passes
+    under a floor with less than 2.2 m over it."""
+    cx, cz = TOWER; o = 3.9; SE, NE, NW, SW = (o, -o), (o, o), (-o, o), (-o, -o)
+    def flight(n, a, b, h):
         ax, az = cx + a[0], cz + a[1]; bx, bz = cx + b[0], cz + b[1]
         dx, dz = (bx - ax), (bz - az); m = math.hypot(dx, dz); ux, uz = dx / m, dz / m
-        deck('Tower flight %d' % (k + 1), (ax + ux * 1.1, az + uz * 1.1), (bx - ux * 1.1, bz - uz * 1.1), h, h2, 2.2, 'stone')
-        if k < 7: deck(names.get(k + 1, 'Tower corner %d' % (k + 1)), (bx - ux * 1.1, bz - uz * 1.1), (bx + ux * 1.1, bz + uz * 1.1), h2, h2, 2.2, 'stone')
-        h = h2
-    # The belfry floor at +18: the tower less the west strip (over the seventh flight) and the south strip (the eighth comes up there).
-    deck('The belfry floor', (cx + 1.1, cz - 2.8), (cx + 1.1, cz + 5), 18, 18, 7.8, 'timber')
-    deck('The belfry stair-head', (cx + o, cz - o - 1.1), (cx + o, cz - o + 1.1), 18, 18, 2.2, 'timber')
+        deck('Tower flight %d' % n, (ax + ux * 1.1, az + uz * 1.1), (bx - ux * 1.1, bz - uz * 1.1), h, h + 2.25, 2.2, 'stone')
+        return (bx - ux * 1.1, bz - uz * 1.1), (bx + ux * 1.1, bz + uz * 1.1)
+    def corner(name, ends, h): deck(name, ends[0], ends[1], h, h, 2.2, 'stone')
+    # Up to the second landing: east, north (the first landing at the NW corner, +4.5), west, south.
+    corner('Tower corner 1', flight(1, SE, NE, 0), 2.25)
+    corner('The first landing', flight(2, NE, NW, 2.25), 4.5)
+    corner('Tower corner 3', flight(3, NW, SW, 4.5), 6.75)
+    corner('The second landing (stair-head)', flight(4, SW, SE, 6.75), 9)
+    # The second landing: a solid floor at +9 over the tower's middle and its east side, joined to the stair-head (SE) and to the NE corner,
+    # where the stair goes on up.
+    deck('The second landing', (cx + 1.1, cz - 2.8), (cx + 1.1, cz + 2.8), 9, 9, 7.8, 'floor')
+    deck('The second landing (north corner)', (cx + o, cz + o - 1.1), (cx + o, cz + o + 1.1), 9, 9, 2.2, 'floor')
+    # On up: north (over the second flight), west (the third landing at the SW corner, +13.5), south, east (over the landing) to the belfry.
+    corner('Tower corner 5', flight(5, NE, NW, 9), 11.25)
+    corner('The third landing', flight(6, NW, SW, 11.25), 13.5)
+    corner('Tower corner 7', flight(7, SW, SE, 13.5), 15.75)
+    flight(8, SE, NE, 15.75)
+    # The belfry floor at +18: the tower less the east strip (the eighth flight climbs there) and the south strip (over the seventh); the
+    # stair-head is the NE corner square, where the eighth flight comes up.
+    deck('The belfry floor', (cx - 1.1, cz - 2.8), (cx - 1.1, cz + 5), 18, 18, 7.8, 'timber')
+    deck('The belfry stair-head', (cx + o, cz + o - 1.1), (cx + o, cz + o + 1.1), 18, 18, 2.2, 'timber')
 
 ARCHIVE = (72, 70)
 def make_archive():
     x, z = ARCHIVE
     deck('The Archive floor', (x - 24, z), (x + 24, z), 2, 2, 23, 'stone', solid=True)
-    deck('The copying cells', (x - 13, z + 14.5), (x + 13, z + 14.5), 2, 2, 5, 'stone', solid=True)
+    # (2026-10-16, the second pass) The cells' floor runs 0.2 m under the hall's floor through the north wall's doorways: it began at the wall's
+    # middle and the hall's at its south face, and the half-metre slot between them under each doorway cut the cells (and the Warden in hers)
+    # off from the navmesh ("into the Archive and to the Warden's cell: Infinity").
+    deck('The copying cells', (x - 13, z + 14.2), (x + 13, z + 14.2), 2, 2, 5.8, 'stone', solid=True)
     ramp('The Archive steps', (x - 33, z), 0, (x - 24, z), 2, 7)
     deck('The north gallery', (x - 22, z + 10.2), (x + 22.5, z + 10.2), 5, 5, 2.8, 'timber')
     deck('The south gallery', (x - 22, z - 10.2), (x + 22.5, z - 10.2), 5, 5, 2.8, 'timber')
@@ -269,8 +293,9 @@ def make_camps(gate_z, l2):
     # ---- the Bell Tower (19-20)
     tx, tz = TOWER
     camp('The tower door watch', *PACT, 3, 19, 19, (tx + 2, tz - 12), 'tower', 1, radius=2.5, gate='The ward-lock')
-    camp("Kersey's line", *PACT, 2, 19, 19, (tx - 1.5, tz + 1.5), 'tower', 2, radius=1.5, gate='The ward-lock')
-    camp('Pact-Captain Rowena Kersey', 'Pact-Captain Rowena Kersey', 'pactcaptain', 'outrider', 1, 20, 20, (tx + 1, tz - 1), 'tower', 2, radius=1, elite=True,
+    # The Pact-Captain holds the second landing (+9), her line with her (DUNGEON2_DESIGN 2.7).
+    camp("Kersey's line", *PACT, 2, 19, 19, (tx - 1.2, tz + 1.2), 'tower', 2, radius=1.2, rise=9, gate='The ward-lock')
+    camp('Pact-Captain Rowena Kersey', 'Pact-Captain Rowena Kersey', 'pactcaptain', 'outrider', 1, 20, 20, (tx + 1.6, tz - .6), 'tower', 2, radius=1, rise=9, elite=True,
          guards="Kersey's line", gate='The ward-lock')
     camp("The Examiner's clerks", *CLERK, 2, 19, 19, (tx + 2.5, tz + 3), 'tower', 3, radius=1.2, rise=18, gate='The ward-lock')
     camp('Bureau Examiner Thurstan Vowell', 'Bureau Examiner Thurstan Vowell', 'examiner', 'collector', 1, 20, 20, (tx + 1, tz + 1), 'tower', 3, radius=1, rise=18,
@@ -290,7 +315,7 @@ def make_camps(gate_z, l2):
 
 # ---------------------------------------------------------------- gates, anchors, events, wings
 GATES, ANCHORS = [], []
-def gate(title, at, kind, rotation=0.0, width=6.0, prompt=None, opensOn=None, look=None, side=None, rise=0.0, cave=None, along=None):
+def gate(title, at, kind, rotation=0.0, width=6.0, prompt=None, opensOn=None, look=None, side=None, rise=0.0, cave=None, along=None, behind=False):
     g = {'title': title, 'kind': kind}
     if cave: g['cave'] = CAVE[cave].name; g['along'] = along
     else: g['at'] = {'x': round(at[0], 2), 'y': round(at[1], 2)}; g['rotation'] = rotation; g['width'] = width
@@ -299,6 +324,7 @@ def gate(title, at, kind, rotation=0.0, width=6.0, prompt=None, opensOn=None, lo
     if opensOn: g['opensOn'] = opensOn
     if look: g['look'] = look
     if side: g['side'] = side
+    if behind: g['behind'] = True   # it bars again behind the party once all are through (the Cellars' far trapdoor: never walked back)
     GATES.append(g)
 def anchor(name, at, rise=0.0, cave=None):
     a = {'name': name}
@@ -310,6 +336,9 @@ def anchor(name, at, rise=0.0, cave=None):
 def make_works():
     gx, gz = GH['at']
     gate("Tredway's gate", (gx, gz + 7), 'bossdoor', 0, 6, opensOn='Sergeant Wymond Tredway', look='door')
+    # The gatehouse's town-side bar (DUNGEON2_DESIGN sections 3 and 5): a sally-port beside the gate, barred from the town side; lifted from
+    # Main Street it is the way back over the slabs for a group that leaves early from the Square, and shut it keeps the Pact behind it.
+    gate('The sally-port bar', (gx + SALLY, gz + 7), 'bar', 0, 1.8, prompt='Lift the sally-port bar', look='bar', side='far')
     ax, az = ARCHIVE
     gate("The Warden's cell", (ax, az + 12), 'pen', 0, 2.4, prompt='Lift the bar', opensOn='Registrar Dunstan Pardew', look='stockade', rise=2)
     tx, tz = TOWER
@@ -317,9 +346,13 @@ def make_works():
     x, z = GRANARY
     gate('The yard bar', (x, z - 43), 'bar', 0, 5, prompt='Lift the yard bar', look='bar', side='far')
     gate('The dark cellar door', None, 'hiddendoor', prompt='Feel along the wall', look='door', cave='DK', along=3.5)
+    # The Cellars' far trapdoor (sections 2.5 and 5): at the head of the well-house stair, barred from below (lifted from the cellar side only)
+    # and barring again behind the party once all are up on the Square: the Cellars are never walked back, nor come into from the Square.
+    gate('The well-house trapdoor', None, 'bar', prompt='Lift the trapdoor bar', look='door', side='far', cave='WS', along=13, behind=True)
     anchor('the milestone', (0, -366)); anchor('the gatehouse', (gx, gz)); anchor('the bakery counter', (-14, -70))
     anchor('the well-house', (-31, 51)); anchor("the Archive's steps", (ax - 30, az)); anchor("the Warden's cell", (ax, az + 14.5), 2)
-    anchor('the tower door', (tx, tz - 9)); anchor('the belfry stair-head', (tx + 3.9, tz - 3.9), 18); anchor('the wagon', (x - 6, z - 30))
+    anchor('the tower door', (tx, tz - 9)); anchor('the belfry stair-head', (tx + 3.9, tz + 3.9), 18); anchor('the wagon', (x - 6, z - 30))
+    anchor('the second landing', (tx + 1.1, tz), 9)
     anchor('the Cut-Store', (-41, -18), cave='CE')
 
 WINGS = [
@@ -328,21 +361,25 @@ WINGS = [
     {'id': 'street', 'name': 'Main Street', 'after': 'bridge'},
     # The Granary: a wing of the standard run (its two elites, DUNGEON2_DESIGN section 3) but not the quick one: every camp in it optional.
     {'id': 'granary', 'name': 'The Granary on the race', 'after': 'street', 'exit': 'walk', 'home': 'the wagon'},
-    {'id': 'cellars', 'name': 'The Cellars', 'after': 'street', 'exit': 'walk', 'home': 'the well-house', 'optional': True},
+    # The Cellars come out at the well-house through its trapdoor (the run waits at it from below and lifts its bar: ZoneWing.gate).
+    {'id': 'cellars', 'name': 'The Cellars', 'after': 'street', 'exit': 'walk', 'home': 'the well-house', 'optional': True, 'gate': 'The well-house trapdoor'},
     {'id': 'archive', 'name': 'The Old Archive', 'after': 'street', 'exit': 'walk', 'home': "the Archive's steps"},
     {'id': 'walk', 'name': "The Warden's walk", 'after': 'archive'},
     {'id': 'tower', 'name': 'The Bell Tower', 'after': 'walk'},
 ]
+# An event's hold (seconds; DUNGEON2_DESIGN section 4.2): the town is awake that long (the colour back, the paused moving) and then the loop
+# snaps, warned three seconds before by a ring round every townsperson awake; an escort's waves come at the share of her walk ("at", in
+# hundredths: a third and two thirds, section 5's E2), not at seconds.
 EVENTS = [
-    {'id': 'glitch', 'kind': 'hold', 'wing': 'street', 'anchor': 'the bakery counter', 'step': 0, 'waves': [
+    {'id': 'glitch', 'kind': 'hold', 'wing': 'street', 'anchor': 'the bakery counter', 'step': 0, 'hold': 60, 'waves': [
         {'at': 4, 'camp': 'Hollow up the bakery trapdoor', 'text': 'The bakery\'s bell gives one note. For a breath the room is warm and smells of bread; then the trapdoor lifts and the Hollow come up out of the cellar.'},
         {'at': 30, 'camp': 'More Hollow up the trapdoor', 'text': 'The bell rings again, a minute that will not end. More of them come up the cellar stair.'}]},
     {'id': 'walk', 'kind': 'escort', 'wing': 'walk', 'anchor': "the Warden's cell", 'step': 0, 'waves': [
-        {'at': 20, 'camp': 'Pact relief on the walk', 'unless': 'Picker-Master Fulke Yelland', 'text': 'Boots on the Granary road: the Pact\'s relief comes up from the yard to take the Warden back.'},
-        {'at': 45, 'camp': 'Hollow up out of the well', 'unless': 'First-Cut', 'text': 'Something climbs out of the well-house: the Hollow, come up from the Cellars after the Warden.'}]},
-    {'id': 'waking', 'kind': 'phase', 'wing': 'tower', 'anchor': 'the belfry stair-head', 'step': 0, 'waves': [
+        {'at': 33, 'camp': 'Pact relief on the walk', 'unless': 'Picker-Master Fulke Yelland', 'text': 'Boots on the Granary road: the Pact\'s relief comes up from the yard to take the Warden back.'},
+        {'at': 67, 'camp': 'Hollow up out of the well', 'unless': 'First-Cut', 'text': 'Something climbs out of the well-house: the Hollow, come up from the Cellars after the Warden.'}]},
+    {'id': 'waking', 'kind': 'phase', 'wing': 'tower', 'anchor': 'the belfry stair-head', 'step': 0, 'hold': 90, 'waves': [
         {'at': 3, 'camp': 'Ringers on the stair (first)', 'text': 'Colour runs back into the town like water into a print. Below, the square moves; on the stair, two of the paused ringers wake and climb.'},
-        {'at': 30, 'camp': 'Ringers on the stair (second)', 'text': 'Two more of the ringers come up the stair, their faces still stone, their hands already on the rope that is not there.'}]},
+        {'at': 40, 'camp': 'Ringers on the stair (second)', 'text': 'Two more of the ringers come up the stair, their faces still stone, their hands already on the rope that is not there.'}]},
 ]
 
 # ---------------------------------------------------------------- props: the town (ZoneBuilder.Hallows), the caves
@@ -430,20 +467,20 @@ def make_secrets(l2):
     a, s = CA('OV', 25, -246.3)
     secret('satchel', "A Soldier's Satchel", 'cache', (25, -246.3), 'Pull the satchel out from under the rock',
            "Wedged under the overhang's lip where the ash cannot reach it: a Pact-issue satchel, the strap cut, and a letter folded small inside.", 220,
-           'GAME-ONLY (the Iron Pact is CANON, book1 ch.2)', document='doc.hallows.soldiers_letter', gold=28, cave="The overhang", along=a, aside=s)
+           'GAME-ONLY (the Iron Pact is CANON, book1 ch.2)', document='doc.hallows.soldiers_letter', cave="The overhang", along=a, aside=s)
     secret('bets-cart', "Bet's Packed Cart", 'cache', (-23.5, -101.5), 'Look under the stone tarpaulin',
-           "The cart is packed for the road west and turned to stone with it: a chair lashed on top, a quilt, a tin box under the seat that the stone did not take.", 260,
-           "GAME-ONLY (Bet's letter is already in the game)", gold=40)
+           "The cart is packed for the road west and turned to stone with it: a chair lashed on top, a quilt, a tin box under the seat that the stone did not take, and in it a ring on a cord.", 260,
+           "GAME-ONLY (Bet's letter is already in the game)", item='loot.hal.the_hollins_ring')
     secret('masons-cache', "The Mason's Cache", 'cache', (l2[0] - 3, l2[1] + 3), 'Open the mortar-tub',
            "A mason's tub on the lowest slab, the mortar in it grey and set, and under it, wrapped in a leather apron, the man's own ring.", 280,
-           'GAME-ONLY', rise=-13, gold=45)
+           'GAME-ONLY', rise=-13, item='loot.hal.the_mortar_ring')
     secret('two-coppers', 'Two Coppers on the Sill', 'cache', (-9.4, -73.8), 'Pick up the two coppers',
            "Two copper pennies on the bakery's window sill, left for a loaf fifty years ago and never taken in. They are warm.", 160, 'CANON-EXPANDED (the baker and his shop, book1 ch.21; the coppers GAME-ONLY)', gold=12)
     secret('reed-key', "Old Mother Reed's Key", 'key', (-34.5, 51.5), 'Take the key from the well-house hook',
            "On a hook inside the well-house door, where a careful woman would hang a spare: a small brass key with REED scratched on its bow.", 120, 'GAME-ONLY')
     secret('reed-chest', 'The Reed Chest', 'chest', (7.4, -93.2), 'Unlock the chest by the fence',
-           "A blanket chest set out by the Reed house's fence for a cart that never came, the lid stone but the lock still brass. Inside: linen, a kettle-holder worked with a kingfisher, and a purse.", 300,
-           'GAME-ONLY (Tamsin Reed and her mother are already in the game)', needs='secret.hallows.reed-key', gold=55)
+           "A blanket chest set out by the Reed house's fence for a cart that never came, the lid stone but the lock still brass. Inside: linen, a kettle-holder worked with a kingfisher, and Old Mother Reed's ring with the same bird cut in its stone.", 300,
+           'GAME-ONLY (Tamsin Reed and her mother are already in the game)', needs='secret.hallows.reed-key', item='loot.hal.the_kingfisher_ring')
     secret('archivists-page', 'A Page in the Stacks', 'read', (ARCHIVE[0] - 20, ARCHIVE[1] + 10.2), 'Take the page from the gallery shelf',
            "Pushed behind a row of stone books on the north gallery, where no Bureau clerk has thought to look: one loose page in a careful First Era hand.", 320,
            'CANON-EXPANDED (High Archivist Malakor and the Archivists are CANON, book1 ch.18; this page paraphrased, GAME-ONLY)', rise=5, document='doc.hallows.archivist_page')
@@ -477,6 +514,8 @@ def zone_json(far_lip):
                      "Docs/DUNGEON2_DESIGN.md.",
         'size': SIZE, 'levelMin': 15, 'levelMax': 20, 'roadsNote': 'the Ash Road, Main Street and the wagon track', 'biome': 'ash',
         'weather': [{'kind': 'overcast', 'weight': 3}, {'kind': 'ashsquall', 'weight': 2}, {'kind': 'mist', 'weight': 1}],
+        # The time-squalls (decision 9: dressing only): the ash squall's dust here is silver, and the chat says so.
+        'squallTint': '#C9CDDA', 'squallText': 'A time-squall blows in over the town: the ash in it glitters silver, and for a breath your shadow is a step behind you.',
         'worldMapPosition': {'x': 0.66, 'y': 0.47}, 'worldMapNote': "East of Oakhaven, past the Road's End, in the grey.",
         'flatRadius': 400, 'hillHeight': 0, 'seed': 9161,
         'shapes': [{'name': 'The crater', 'center': {'x': 0, 'y': 70}, 'radius': 20, 'height': -16, 'blend': 4, 'paint': 'unmade'}],
@@ -531,6 +570,9 @@ def check():
     anames = {a['name'] for a in ANCHORS}
     for w in WINGS:
         if w.get('home') and w['home'] not in anames: fail('home ' + w['home'])
+        if w.get('gate') and w['gate'] not in {g['title'] for g in GATES}: fail('wing gate ' + w['gate'])
+    for g in GATES:
+        if g.get('behind') and (g['kind'] != 'bar' or g.get('side') != 'far'): fail(g['title'] + ': only a bar lifted from its far side bars again behind')
     for e in EVENTS:
         if e['anchor'] not in anames: fail('anchor ' + e['anchor'])
     if len(SECRETS) > 9: fail('too many secrets for DiscoveryLogTests (85-100 in all)')

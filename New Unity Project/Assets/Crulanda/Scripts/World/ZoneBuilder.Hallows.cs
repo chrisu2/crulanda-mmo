@@ -225,7 +225,18 @@ namespace Crulanda.World
         {
             var wall = Dressed(PausedStone * .95f); float w = size.x / 2, d = size.y / 2, h = 8;
             HWallDoors(t, new Vector2(-w, -d), new Vector2(w, -d), 0, h, 1.2f, wall, (w, 6, 4.4f));   // the south face: open to the bridge
-            HWallDoors(t, new Vector2(-w, d), new Vector2(w, d), 0, h, 1.2f, wall, (w, 7, 4.4f));     // the north face: Tredway's gate stands in it
+            // The north face: a doorway for each of the zone's gates that stands in it (Tredway's gate; the sally-port beside it, barred from the
+            // town side: DUNGEON2_DESIGN section 3), or the gate's doorway alone where the data has none.
+            var doors = new List<(float at, float width, float high)>();
+            if (Zone.gates != null)
+                foreach (var gd in Zone.gates)
+                {
+                    if (gd == null || !string.IsNullOrEmpty(gd.cave) || gd.at == Vector2.zero) continue;
+                    var local = t.InverseTransformPoint(new Vector3(gd.at.x, t.position.y, gd.at.y));
+                    if (Mathf.Abs(local.z - d) < 1.5f && Mathf.Abs(local.x) < w - .5f) doors.Add((local.x + w, (gd.width > 0 ? gd.width : 6) + 1, 4.4f));
+                }
+            if (doors.Count == 0) doors.Add((w, 7, 4.4f));
+            HWallDoors(t, new Vector2(-w, d), new Vector2(w, d), 0, h, 1.2f, wall, doors.ToArray());
             HWall(t, new Vector2(-w, -d), new Vector2(-w, d), 0, h, 1.2f, wall); HWall(t, new Vector2(w, -d), new Vector2(w, d), 0, h, 1.2f, wall);
             for (float x = -w; x <= w; x += 2) foreach (float z in new[] { -d, d }) Part(PrimitiveType.Cube, t, new Vector3(x, h + .4f, z), new Vector3(1, .8f, 1.2f), wall);
             Glow(t, new Vector3(0, 6.5f, 0), 14, .6f, new Color(.85f, .82f, .9f), .9f);

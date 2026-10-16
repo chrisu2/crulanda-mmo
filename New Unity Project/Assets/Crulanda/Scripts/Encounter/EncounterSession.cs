@@ -1527,7 +1527,7 @@ namespace Crulanda.Encounter
             UnityEngine.SceneManagement.SceneManager.LoadScene(gameObject.scene.name);
             return true;
         }
-        Actor SpawnActor(string label, Crulanda.Data.ActorArchetypeDefinition definition, Vector3 point, Color color, string id, ActorLook look, int level = 1, int variant = -1, bool orc = false)
+        Actor SpawnActor(string label, Crulanda.Data.ActorArchetypeDefinition definition, Vector3 point, Color color, string id, ActorLook look, int level = 1, int variant = -1, bool orc = false, string role = null)
         {
             var go = new GameObject(label);
             go.SetActive(false); go.transform.SetParent(actorsRoot.transform); go.transform.position = point;
@@ -1539,7 +1539,7 @@ namespace Crulanda.Encounter
             var actor = go.AddComponent<Actor>();
             actor.Initialize(definition, label, label == "You" ? Progress.Level : level, new EntityId(id));
             go.AddComponent<Combatant>();
-            ActorVisual.Attach(go, look, variant >= 0 ? variant : LookVariant(label), false, null, orc);
+            ActorVisual.Attach(go, look, variant >= 0 ? variant : LookVariant(label), false, role, orc);   // role: a villager's dress (Hallow's Creek's Warden, "warden")
             return actor;
         }
         void SpawnParty()
@@ -1850,6 +1850,7 @@ namespace Crulanda.Encounter
             foreach (var p in SimPets) if (p != null && p.actor != null && p.actor.EntityId.Value == id) return p.actor;   // the sim Rangers' wolves
             foreach (var c in PartySims) if (c != null && c.actor != null && c.actor.EntityId.Value == id) return c.actor;   // invited sims (Phase 5.2b)
             if (Weaver != null && Weaver.actor != null && Weaver.actor.EntityId.Value == id) return Weaver.actor;   // Mother Quillet on her way to the lock (D4)
+            if (Warden != null && Warden.actor != null && Warden.actor.EntityId.Value == id) return Warden.actor;   // (Hallow's Creek, E2) Warden Elvet: the walk's waves come at her
             return null;
         }
         public bool IsLivingPartyMember(string id) { var a = PartyActor(id); return a != null && a.IsAlive; }
@@ -2431,6 +2432,8 @@ namespace Crulanda.Encounter
         void OnWeatherTurned(Crulanda.World.WeatherKind from, Crulanda.World.WeatherKind to)
         {
             var line = Crulanda.World.WeatherSchedule.Herald(from, to);
+            // (Hallow's Creek's time-squalls, decision 9) a zone's own words for its squall blowing in.
+            if (to == Crulanda.World.WeatherKind.AshSquall && Zone != null && !string.IsNullOrEmpty(Zone.Zone.squallText)) line = Zone.Zone.squallText;
             if (line != null) Message(line);
         }
         void OnApplicationQuit() { if (Player != null) Save(false); }

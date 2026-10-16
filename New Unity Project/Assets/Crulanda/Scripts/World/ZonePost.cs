@@ -19,6 +19,12 @@ namespace Crulanda.World
     public sealed class ZonePost : MonoBehaviour
     {
         Material mat; ZoneDefinition zone; Camera cam; Light sun;
+        /// <summary>
+        /// (Hallow's Creek, DUNGEON2_DESIGN 4.2: "colour returns (a post-process swing)") How far the grade has swung back to the colour of a
+        /// living day, 0 to 1: the paused town's drained grey at 0; at 1 full colour, warm light and a lifted exposure. The session moves it
+        /// (EncounterSession.Hallows: a Glitch, the Waking Hour); 0 everywhere else.
+        /// </summary>
+        public static float Swing;
         const int Levels = 5;
         readonly RenderTexture[] down = new RenderTexture[Levels];
         public void Init(Material post, ZoneDefinition definition, Light sunLight)
@@ -53,6 +59,14 @@ namespace Crulanda.World
             g.threshold += .35f * weather.dim; g.bloom *= 1 - .25f * weather.dim;
             g.tint = Color.Lerp(Color.Lerp(g.tint, new Color(.98f, 1, 1.02f), .6f * weather.dim * lit), new Color(.95f, 1, 1.06f), .5f * weather.rain * lit);   // no warm sun under cloud
             g.exposure *= 1 - .12f * weather.rain * lit;   // rain is a dull day, a storm a dark one (the skylight falls with it: WorldClock)
+            // A time-squall (Hallow's Creek, decision 9: dressing only) casts the light silver as it drains it.
+            if (WorldWeather.Active != null && WorldWeather.Active.SquallTinted) g.tint = Color.Lerp(g.tint, new Color(.97f, 1, 1.07f), .6f * weather.ash);
+            // The Waking Hour's swing: the colour of a living noon comes back into the grey (Swing), and goes again when the loop snaps.
+            if (Swing > 0)
+            {
+                float s = Mathf.Clamp01(Swing);
+                g.saturation = Mathf.Lerp(g.saturation, 1.45f, s); g.tint = Color.Lerp(g.tint, new Color(1.06f, 1.01f, .92f), s); g.exposure *= 1 + .08f * s; g.vignette = Mathf.Lerp(g.vignette, .5f, s);
+            }
             // In a cave: the eye adjusts a little and firelight blooms.
             float under = Hollow.CameraDepth;
             g.exposure *= 1 + .3f * under; g.threshold = Mathf.Lerp(g.threshold, .6f, under); g.bloom += .3f * under; g.vignette += .25f * under;

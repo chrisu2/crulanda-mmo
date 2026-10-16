@@ -145,6 +145,16 @@ namespace Crulanda.Encounter
                 if (extras.TryGetValue(w.id, out var extra))
                     foreach (var fight in Fights(camps, extra, campAt))
                         Insert(mine, Step(camps, WingOf(camps[fight[0]].wing) ?? w, fight, campAt, true), entry, home, distance);
+                // (Hallow's Creek) An optional wing fitted in here whose way out is a gate of its own (ZoneWing.gate: the Cellars come up through
+                // the well-house trapdoor, barred from below): after its last fight the party regroups at its home, through that gate, and is
+                // never walked back through it.
+                foreach (var ow in wings)
+                {
+                    if (!ow.optional || string.IsNullOrEmpty(ow.gate) || string.IsNullOrEmpty(ow.home) || anchorAt == null) continue;
+                    int last = mine.FindLastIndex(s => s.wing == ow.id && !s.regroup); if (last < 0) continue;
+                    var at = anchorAt(ow.home); if (!at.HasValue) continue;
+                    mine.Insert(last + 1, new RouteStep { at = at.Value, name = ow.home, wing = ow.id, wingName = ow.name, regroup = true });
+                }
                 if (mine.Count == 0) return entry;
                 if (wingOrder != null) wingOrder.Add(w.name);
                 route.AddRange(mine);

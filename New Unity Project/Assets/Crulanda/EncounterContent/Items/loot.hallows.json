@@ -197,7 +197,7 @@
     },
     {
       "id": "loot.hal.grey_quartz_pendant",
-      "name": "Grey Quartz Pendant",
+      "name": "Grey Quartz Ring",
       "kind": "gear",
       "slot": "neck",
       "quality": 3,
@@ -205,7 +205,7 @@
       "value": 80,
       "intellect": 31,
       "spirit": 20,
-      "description": "A chip of memory-quartz on a cord. Hold it and you remember a kitchen you have never stood in.",
+      "description": "A ring cut from one chip of memory-quartz, worn on a cord. Hold it and you remember a kitchen you have never stood in.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -316,6 +316,45 @@
       "stamina": 20,
       "intellect": 31,
       "description": "The Examiner's seal on a fob: the High Council's word, pressed into wax a thousand times, into stone once.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.hal.the_hollins_ring",
+      "name": "The Hollins' Ring",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 17,
+      "value": 72,
+      "stamina": 23,
+      "spirit": 15,
+      "description": "A plain gold ring on a bootlace, out of the tin box under the seat of Bet's cart. Somebody meant to come back for it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.hal.the_mortar_ring",
+      "name": "The Mortar Ring",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 17,
+      "value": 72,
+      "stamina": 15,
+      "strength": 23,
+      "description": "The Fallen Mason's own ring, grey with fifty years of mortar that never set until he did. Whatever it strikes, it holds.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.hal.the_kingfisher_ring",
+      "name": "The Kingfisher Ring",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 18,
+      "value": 76,
+      "intellect": 24,
+      "spirit": 16,
+      "description": "Old Mother Reed's ring, a kingfisher cut in its blue stone, kept in the blanket chest for the day the cart came. Tamsin's mother wore one like it.",
       "canonStatus": "GAME-ONLY"
     }
   ],
@@ -480,6 +519,33 @@
       "look": "offhand.hung:scale/concord",
       "source": "boss:Bureau Examiner Thurstan Vowell",
       "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.hal.the_hollins_ring",
+      "look": "neck.pendant:signet/oakhaven",
+      "source": "secret:secret.hallows.bets-cart",
+      "unique": true
+    },
+    {
+      "id": "loot.hal.the_mortar_ring",
+      "look": "neck.cord:knot/pale",
+      "source": "secret:secret.hallows.masons-cache",
+      "unique": true,
+      "effects": [
+        {
+          "kind": "procRoot",
+          "ability": "auto",
+          "chance": 8,
+          "amount": 3,
+          "text": "Mortar: a landed blow has an 8% chance to set the target in the mortar, rooted for 3 seconds."
+        }
+      ]
+    },
+    {
+      "id": "loot.hal.the_kingfisher_ring",
+      "look": "neck.pendant:drop/pilgrim",
+      "source": "secret:secret.hallows.reed-chest",
       "unique": true
     }
   ],

@@ -123,6 +123,7 @@ namespace Crulanda.Encounter
             Consider(actor);
             foreach (var c in session.PartySims) if (c != null) Consider(c.actor);
             if (session.Weaver != null) Consider(session.Weaver.actor);
+            if (session.Warden != null) Consider(session.Warden.actor);   // (Hallow's Creek, E2) Warden Elvet on her walk
             if (recipient.Health.Pool.Ratio < .78f && Vector3.Distance(recipient.transform.position, transform.position) <= heal.range)
             {
                 var result = abilities.TryStart(heal, Time.time, SpendHeal, () => {

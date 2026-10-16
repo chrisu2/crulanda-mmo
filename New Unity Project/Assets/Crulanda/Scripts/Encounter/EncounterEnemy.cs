@@ -317,7 +317,7 @@ namespace Crulanda.Encounter
             else unreachableSince = -1;
             if (inReach && Time.time >= swing && MarkSwing())
             {
-                if (Move != null && Time.time >= nextBlowAt) { BeginBlow(); return; }
+                if (Move != null && Time.time >= nextBlowAt && !HoldsOff) { BeginBlow(); return; }
                 swing = Time.time + SwingInterval;
                 if (Figure != null) Figure.Strike();
                 int damage = session.Kit.ResolveEnemyHit(this, Victim, CappedBlow(Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale * BlowScale)));

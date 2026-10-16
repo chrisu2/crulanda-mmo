@@ -53,6 +53,9 @@ namespace Crulanda.World
         /// storm). Empty: the biome's default. Spells of weather follow each other one step of severity at a time (WorldWeather).
         /// </summary>
         public ZoneWeather[] weather = new ZoneWeather[0];
+        /// <summary>(Hallow's Creek's time-squalls, DUNGEON2_DESIGN decision 9: dressing only) The colour of an ash squall's dust here (hex; empty:
+        /// the squall's own dun), and the chat's line when one blows in (empty: the plain one). WorldWeather, EncounterSession.</summary>
+        public string squallTint, squallText;
         /// <summary>Hidden finds (ZoneSecret): on no map; found by walking onto a lookout or searching a hidden spot.</summary>
         public ZoneSecret[] secrets = new ZoneSecret[0];
         /// <summary>Things to gather that are not props (ore seams, windfalls, herbs; see <see cref="ZoneNode"/>). Herb props carry their own <see cref="ZoneProp.node"/>.</summary>
@@ -476,6 +479,9 @@ namespace Crulanda.World
         /// <summary>(Hallow's Creek, N1) A gate on open ground (no cave): its middle at <see cref="at"/>, its face turned <see cref="rotation"/>
         /// degrees (0: across a way running north), <see cref="width"/> across, its foot <see cref="rise"/> metres over the yard (0: on the land).</summary>
         public Vector2 at; public float rotation, width = 6, rise;
+        /// <summary>(Hallow's Creek) A bar lifted from its far side that bars again behind the party once everyone is through to its near side
+        /// (the Cellars' far trapdoor: never walked back). EncounterSession.Hallows.</summary>
+        public bool behind;
     }
     /// <summary>A named place in a cave (GAME-ONLY): along, aside and rise over its floor (a deck). ZoneBuilder.Anchors holds where each stands.
     /// (Hallow's Creek, N1) With no cave: at <see cref="at"/> on open ground, rise metres over the yard (on a deck there) or on the land at 0.</summary>
@@ -485,10 +491,14 @@ namespace Crulanda.World
     /// group: wings of which one is enough (the Scriptorium or the Muster Yard); exit: "drop" or "walk", the way home from its end; home:
     /// the anchor the run regroups at after it; optional: the run leaves it to you.
     /// </summary>
-    [Serializable] public sealed class ZoneWing { public string id, name, after, group, exit, home; public bool optional; }
+    /// <remarks>(Hallow's Creek) gate: a gate on the wing's way out that the run waits at before its regroup at home, and lifts when it stands
+    /// on the side the gate is worked from (the Cellars' far trapdoor, barred from below); empty: only a door its own boss's death opens.</remarks>
+    [Serializable] public sealed class ZoneWing { public string id, name, after, group, exit, home, gate; public bool optional; }
     /// <summary>An event of a dungeon (GAME-ONLY: the Wake): its id and kind, the wing it belongs to and its place in that wing's run, the anchor
-    /// it centres on, and its waves.</summary>
-    [Serializable] public sealed class ZoneEvent { public string id, kind, wing, anchor; public int step; public ZoneWave[] waves = new ZoneWave[0]; }
+    /// it centres on, and its waves. (Hallow's Creek) hold: seconds the event lasts at the least (a Glitch, the Waking Hour: the town awake that
+    /// long, then the loop snaps; 0: over when its last wave is down). An "escort" event's waves come at the share of the walk in hundredths
+    /// (ZoneWave.at 33: a third of the way), not at seconds.</summary>
+    [Serializable] public sealed class ZoneEvent { public string id, kind, wing, anchor; public int step; public float hold; public ZoneWave[] waves = new ZoneWave[0]; }
     /// <summary>A wave of an event: at seconds in, the camp (by name) it brings, and the line said as it comes (empty: the code's own line for that
     /// camp, else a plain one; EncounterSession.Release.cs, 2026-10-15).</summary>
     [Serializable] public sealed class ZoneWave

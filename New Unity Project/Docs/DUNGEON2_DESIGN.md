@@ -323,6 +323,10 @@ p9-lowtowns), 2026-10-16. Chris: "no thanks i dont want a half assed version. co
   the hidden door's frame in it) was too low and narrow for the navmesh (the Long Shadow "no way there"; now 5.2 m and 3.5 m); the wagon
   test rode with the yard's teamsters standing at the wagon (the ride is refused in a fight); the navmesh's "Combined Mesh" read error is
   the shared static batching (another helper's fix), not Hallows' decks (they are never batched).
+- **Fixed after the second run (2026-10-16):** the Long Shadow still had "no way there". The Cellars lie under the flat town less than
+  3 m below the land, so their knoll gets solid rock buttresses down both flanks (in the navmesh); those were kept clear of the Cellars'
+  own passage only, and one on the west flank stood across the dark cellar's crawl. A cave's buttresses now keep clear of every cave's
+  passage (Hollow.Crowds, in ZoneBuilder.Cavern's Clear). Untested in Unity: run HallowsNavTests and ZoneContentTests.
 - **Still not built, and why:** the Archive's door shutting behind the Warden (the Archive is doorless: its doors were blown in, CANON);
   N9's shared rules (the party held to five, the deepest stone) are the shared dungeon code's, not changed here.
 - **To run (lane A):** EditMode HallowsDataTests, LootDataTests, ClassSetTests, SocialRulesTests, EliteBalanceTests, DiscoveryLogTests;

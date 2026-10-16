@@ -352,6 +352,19 @@ namespace Crulanda.World
                     if (Open(a + (b - a) * (u / (float)steps) + (d - a) * (v / (float)steps), shrink)) return true;
             return false;
         }
+        /// <summary>
+        /// Whether a heap of rock <paramref name="radius"/> across round <paramref name="p"/> and <paramref name="height"/> tall would stand in
+        /// this passage (within its walls, as the knoll's own heaps keep clear of their own: ZoneBuilder.Cavern), floor to roof.
+        /// </summary>
+        public bool Crowds(Vector3 p, float radius, float height)
+        {
+            var q = new Vector2(p.x, p.z);
+            if (Centre.Count == 0 || q.x < box.xMin - radius || q.x > box.xMax + radius || q.y < box.yMin - radius || q.y > box.yMax + radius) return false;
+            if (p.y > high + 1 || p.y + height < low - 1) return false;
+            for (int i = 0; i < Centre.Count; i++)
+                if (Vector2.Distance(q, new Vector2(Centre[i].x, Centre[i].z)) < Half[i] * 1.2f + .3f + radius && p.y < Roof(i) + .5f && p.y + height > Centre[i].y - .5f) return true;
+            return false;
+        }
         /// <summary>Whether a point is open air in any cave but <paramref name="not"/>.</summary>
         public static bool OpenInOther(Hollow not, Vector3 p, float shrink = .86f) { foreach (var h in All) if (h != not && h.Open(p, shrink)) return true; return false; }
         /// <summary>The passage's deepest floor.</summary>

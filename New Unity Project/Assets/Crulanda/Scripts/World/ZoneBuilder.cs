@@ -4631,6 +4631,10 @@ namespace Crulanda.World
             bool Clear(Vector3 at, float radius)
             {
                 for (int j = 0; j < n; j++) if (new Vector2(at.x - c[j].x, at.z - c[j].z).magnitude < h.Half[j] * 1.2f + .3f + radius) return false;
+                // (Hallow's Creek, 2026-10-16) Nor in another cave's passage: the Cellars run under the flat town near the surface, and a
+                // buttress on their west flank (solid, in the navmesh) stood across the dark cellar's crawl ("The Long Shadow: no way there").
+                var heapAt = t.TransformPoint(at);
+                foreach (var o in Hollow.All) if (o != h && o.Crowds(heapAt, radius, 6)) return false;
                 return true;
             }
             void Heap(Vector3 bottom, Vector3 scale, float yaw, bool solid)

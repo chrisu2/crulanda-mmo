@@ -245,22 +245,27 @@ namespace Crulanda.World
         {
             if (!IvyArt || tall < 1.2f) return;
             float R() { return (float)r.NextDouble(); }
-            var leafM = IvyLeaf; var stem = d[IvyStem]; int strands = 3 + (int)(spread * 1.4f + R() * 2);
+            // A mat, not a few strands (2026-10-16, Chris on the preview: "plants not even on the wall. only a few plants"): twice the
+            // spread and more strands, each point set on the wall's real face (a ray back along -n: the curtain's battered foot leans, and a
+            // stem 3 cm off the foot's line hung in the air above it), leaves lying flat on the stone, three or four a node low down.
+            spread *= 1.8f;
+            var leafM = IvyLeaf; var stem = d[IvyStem]; int strands = 6 + (int)(spread * 2.5f + R() * 3);
+            Vector3 OnWall(Vector3 q) { return Physics.Raycast(q + n * 1.5f, -n, out var hit, 3f) ? hit.point + n * .035f : q; }
             for (int s = 0; s < strands; s++)
             {
                 float x = (R() - .5f) * spread, h = tall * (.45f + .55f * R()), y = 0, drift = (R() - .5f) * .5f;
-                var prev = foot + u * x + n * .03f;
+                var prev = OnWall(foot + u * x + n * .03f);
                 while (y < h)
                 {
                     y += .3f; float f = y / h; x += drift * .3f + (R() - .5f) * .18f; x = Mathf.Clamp(x, -spread * (.5f + f), spread * (.5f + f));
-                    var p = foot + u * x + Vector3.up * y + n * (.03f + .015f * R());
+                    var p = OnWall(foot + u * x + Vector3.up * y + n * .03f);
                     var side = Vector3.Cross(n, (p - prev).normalized) * Mathf.Lerp(.035f, .014f, f);
                     stem.Quad(prev - side, p - side, p + side, prev + side, n);
-                    int leaves = f < .3f ? 2 : f < .7f ? 1 : (R() < .55f ? 1 : 0);
+                    int leaves = f < .3f ? 4 : f < .7f ? 3 : (R() < .7f ? 2 : 1);
                     for (int k = 0; k < leaves; k++)
                     {
-                        float size = Mathf.Lerp(.52f, .24f, f) * (.8f + .4f * R());
-                        var along = (Vector3.up * .8f + n * .42f + u * (R() - .5f) * 1.1f).normalized; var at = p + u * (R() - .5f) * .26f - along * size * .3f;
+                        float size = Mathf.Lerp(.55f, .3f, f) * (.8f + .4f * R());
+                        var along = (Vector3.up * .9f + n * .08f + u * (R() - .5f) * 1.3f).normalized; var at = p + u * (R() - .5f) * .45f - along * size * .3f;
                         d.Leaf(leafM, at, along, Vector3.Cross(along, n).normalized, size, size, at - n, .2f, IvyGreens[r.Next(IvyGreens.Length)] * (.85f + .25f * R()));
                     }
                     if (flowering && f > .15f && R() < .22f) Blossom(d, p + n * .12f + u * (R() - .5f) * .3f, n, u, .07f + R() * .04f, r.Next(3));
@@ -406,6 +411,7 @@ namespace Crulanda.World
         /// </summary>
         void BuildCrownDetail()
         {
+            Physics.SyncTransforms();   // the walls' colliders this frame, for the ivy to find their real faces (IvyClump)
             if (!Zone.city || Zone.props == null) return;   // (the gardens' counts are in already: they are built with the props)
             Vector2? giltGate = null; foreach (var p in Zone.props) if (p != null && p.kind == "city_gate" && p.variant == 0) giltGate = p.at;
             foreach (var p in Zone.props)
@@ -440,9 +446,9 @@ namespace Crulanda.World
         /// north (in shade), by a garden and round the Gilt Gate (Chris's frame).</summary>
         float IvyChance(float basis, Vector3 n, Vector3 at, Vector2? gate)
         {
-            float c = basis + .3f * Mathf.Max(0, n.z) + .35f * NearGarden(at);
+            float c = basis * 1.8f + .35f * Mathf.Max(0, n.z) + .35f * NearGarden(at);   // more of it (Chris, 2026-10-16: "only a few plants")
             if (gate.HasValue && Vector2.Distance(new Vector2(at.x, at.z), gate.Value) < 30) c += .3f;
-            return Mathf.Min(.75f, c);
+            return Mathf.Min(.85f, c);
         }
 
         /// <summary>

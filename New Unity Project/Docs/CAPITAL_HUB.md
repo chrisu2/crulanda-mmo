@@ -186,3 +186,5 @@ brackets and posts, handrails up the Grand Stair and the Gilt Ramp, a cresting o
 chains; a string course on corbels and slate caps. The gardens: leaf-carded box hedges, gravel walks, the packs' flowers in beds, lawns
 of the zone's grass, topiary, small trees, rose arches, stone benches, urns. No colliders on any of it. To run: CrownZoneTests,
 CrownZonePlayTests (the new detail test), then the Crown tour's gate, stair and garden frames for Chris.
+
+**Chris, 2026-10-16 (verbatim, screenshots of a street and the Gilt Gate's north wall): "plants not even on the wall.only a few plants. inn does look better".** The ivy remade as dense mats set on the wall's real face, leaves flat on the stone, about twice as many clumps.

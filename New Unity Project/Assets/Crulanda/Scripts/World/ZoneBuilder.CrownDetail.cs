@@ -248,12 +248,12 @@ namespace Crulanda.World
             // A mat, not a few strands (2026-10-16, Chris on the preview: "plants not even on the wall. only a few plants"): twice the
             // spread and more strands, each point set on the wall's real face (a ray back along -n: the curtain's battered foot leans, and a
             // stem 3 cm off the foot's line hung in the air above it), leaves lying flat on the stone, three or four a node low down.
-            spread *= 1.8f;
-            var leafM = IvyLeaf; var stem = d[IvyStem]; int strands = 6 + (int)(spread * 2.5f + R() * 3);
+            spread *= 3.2f; tall = Mathf.Max(tall, 2.5f);   // sheets, not patches (Chris, 2026-10-16: "still sparse looking")
+            var leafM = IvyLeaf; var stem = d[IvyStem]; int strands = 8 + (int)(spread * 3.5f + R() * 3);
             Vector3 OnWall(Vector3 q) { return Physics.Raycast(q + n * 1.5f, -n, out var hit, 3f) ? hit.point + n * .035f : q; }
             for (int s = 0; s < strands; s++)
             {
-                float x = (R() - .5f) * spread, h = tall * (.45f + .55f * R()), y = 0, drift = (R() - .5f) * .5f;
+                float x = (R() - .5f) * spread, h = tall * (.7f + .3f * R()), y = 0, drift = (R() - .5f) * .5f;
                 var prev = OnWall(foot + u * x + n * .03f);
                 while (y < h)
                 {
@@ -446,9 +446,9 @@ namespace Crulanda.World
         /// north (in shade), by a garden and round the Gilt Gate (Chris's frame).</summary>
         float IvyChance(float basis, Vector3 n, Vector3 at, Vector2? gate)
         {
-            float c = basis * 1.8f + .35f * Mathf.Max(0, n.z) + .35f * NearGarden(at);   // more of it (Chris, 2026-10-16: "only a few plants")
+            float c = basis * 4f + .4f * Mathf.Max(0, n.z) + .35f * NearGarden(at);   // more of it (Chris, 2026-10-16: "only a few plants", then "still sparse looking")
             if (gate.HasValue && Vector2.Distance(new Vector2(at.x, at.z), gate.Value) < 30) c += .3f;
-            return Mathf.Min(.85f, c);
+            return Mathf.Min(.95f, c);
         }
 
         /// <summary>
@@ -490,8 +490,8 @@ namespace Crulanda.World
                 if (curtain) for (int k = 0, n = r.Next(3); k < n; k++) Streak(d, StreakStone, new Vector3(fIn.x, bodyTop - .3f, fIn.z) + dir * (R() - .5f) * L * .8f, nIn, dir, .25f + R() * .35f, 1 + R() * 2.5f, uvIn);
                 if (Paved(new Vector2(fIn.x + nIn.x, fIn.z + nIn.z))) GroundStrip(d, Dirt, fIn - dir * L / 2, fIn + dir * L / 2, nIn, .55f, .06f);
                 var footIn = fIn + dir * (R() - .5f) * L * .6f; footIn.y = HeightAt(footIn.x + nIn.x * .3f, footIn.z + nIn.z * .3f);
-                if (!NearTower(footIn) && i - lastIn > 1 && R() < IvyChance(curtain ? .1f : .05f, nIn, footIn, gate))
-                { IvyClump(d, footIn, nIn, dir, Mathf.Min(curtain ? 8 : 2.6f, (bodyTop - footIn.y) * .8f), 1 + R(), r, NearGarden(footIn) > .5f); lastIn = i; }
+                if (!NearTower(footIn) && i - lastIn > 0 && R() < IvyChance(curtain ? .1f : .05f, nIn, footIn, gate))
+                { IvyClump(d, footIn, nIn, dir, Mathf.Min(curtain ? 12 : 3.2f, (bodyTop - footIn.y) * .95f), 1 + R(), r, NearGarden(footIn) > .5f); lastIn = i; }
 
                 // The face on the low side: the curtain's battered foot down to the ground, the wall above it; a parapet's outer face.
                 if (foot)
@@ -503,8 +503,8 @@ namespace Crulanda.World
                     d[DarkSlate].Box(new Vector3(ff.x, footTop + .03f, ff.z) - outward * .25f, new Vector3(L + .02f, .06f, .62f), q);   // the slate cap on its edge
                     for (int k = 0, n = 1 + r.Next(2); k < n; k++) Streak(d, DampFoot, new Vector3(ff.x, footTop - .02f, ff.z) + dir * (R() - .5f) * L * .8f, outward, dir, .3f + R() * .4f, 1.5f + R() * 3, uvFoot);
                     var footOut = ff + dir * (R() - .5f) * L * .6f; footOut.y = gF;
-                    if (!NearTower(footOut) && i - lastOut > 1 && footTop - gF > 1.5f && R() < IvyChance(.12f, outward, footOut, gate))
-                    { IvyClump(d, footOut, outward, dir, Mathf.Min(9, (footTop - gF) * .85f), 1.1f + R() * 1.2f, r, NearGarden(footOut) > .5f); lastOut = i; }
+                    if (!NearTower(footOut) && i - lastOut > 0 && footTop - gF > 1.5f && R() < IvyChance(.12f, outward, footOut, gate))
+                    { IvyClump(d, footOut, outward, dir, Mathf.Min(14, (footTop - gF) * .95f), 1.1f + R() * 1.2f, r, NearGarden(footOut) > .5f); lastOut = i; }
                     var fw = C + outward * (T / 2); fw.y = 0; var uvOut = BoxUv(t, local, lq, outward, 1.75f);
                     if (R() < .5f) Panel(d, StoneTint(r.Next(3)), fw, outward, dir, L / 2, footTop + .3f, bodyTop - .4f - R() * 2, uvOut);
                 }
@@ -514,8 +514,8 @@ namespace Crulanda.World
                     Band(d, curtain ? DampFoot : Damp, fo - dir * L / 2, fo + dir * L / 2, outward, .45f, 1.4f, bodyTop, uvOut);
                     if (R() < .5f) Panel(d, StoneTint(r.Next(3)), fo, outward, dir, L / 2, gO + .6f + R(), Mathf.Min(bodyTop - .05f, gO + 2.5f + R() * 4), uvOut);
                     var footOut = fo + dir * (R() - .5f) * L * .6f; footOut.y = gO;
-                    if (!NearTower(footOut) && i - lastOut > 1 && R() < IvyChance(curtain ? .12f : .08f, outward, footOut, gate))
-                    { IvyClump(d, footOut, outward, dir, Mathf.Min(curtain ? 8 : 6, (bodyTop - gO) * .8f), 1 + R(), r, NearGarden(footOut) > .5f); lastOut = i; }
+                    if (!NearTower(footOut) && i - lastOut > 0 && R() < IvyChance(curtain ? .12f : .08f, outward, footOut, gate))
+                    { IvyClump(d, footOut, outward, dir, Mathf.Min(curtain ? 12 : 8, (bodyTop - gO) * .95f), 1 + R(), r, NearGarden(footOut) > .5f); lastOut = i; }
                 }
 
                 if (curtain)

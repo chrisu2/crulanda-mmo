@@ -21,7 +21,7 @@ namespace Crulanda.Encounter
         /// <summary>Time and kills with you this grouping (5.5: SimMemory on leaving).</summary>
         public float joinedAt; public int killsTogether;
         NavMeshAgent agent; ActorVisual visual;
-        float nextAct, nextHeal, nextRegen, nextCatchUp, downSince = -1, healAt; Actor healing;
+        float nextAct, nextHeal, nextRegen, nextCatchUp, downSince = -1, healAt, pendingSince = -1, leadDestAt = -10; Vector3 leadDest; Actor healing;
         public string Activity { get; private set; } = "Following you";
         public enum PartyRole { Tank, Healer, Damage }
         /// <summary>Its part in the party (5.6): Warriors and Paladins tank (a Paladin heals when no Druid is along), Druids heal, Rangers and Mages deal damage.</summary>
@@ -616,7 +616,8 @@ namespace Crulanda.Encounter
                 bool stuck = !agent.isOnNavMesh || (toPlayer > 25 && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete) || toPlayer > 60;
                 // Never out of a fight to you (2026-10-15, the full run: you fell at the duo, got up at the stone, and every sim was warped to your
                 // side, the beast back to full): while a mob is on the party within 15 m of it (it is in that fight), a sim fights on and catches up after.
-                if (stuck && agent.isOnNavMesh && session.Enemies.Exists(e => e != null && e.actor.IsAlive && e.FightingParty && Vector3.Distance(e.transform.position, transform.position) < 15)) stuck = false;
+                if (stuck && agent.isOnNavMesh && ((Quarry != null && Quarry.actor.IsAlive && Quarry.FightingParty)
+                    || session.Enemies.Exists(e => e != null && e.actor.IsAlive && e.FightingParty && Vector3.Distance(e.transform.position, transform.position) < 30))) stuck = false;   // its own target, or a fight within 30 m (a healer or an archer stands 15-25 m off: at 15 they were pulled out)
                 if (stuck && NavMesh.SamplePosition(player.transform.position - player.transform.forward * 2.5f, out var near, 12, NavMesh.AllAreas) && Mathf.Abs(near.position.y - (player.transform.position.y - 1.05f)) < 2f) agent.Warp(near.position);   // your level only (the party stood on the land over the Sunless River, 2026-10-15)
             }
             if (!agent.isOnNavMesh) return;
@@ -770,6 +771,9 @@ namespace Crulanda.Encounter
                 if (leadLegFor != Leading.Value) { leadLegFor = Leading.Value; legging = false; nextLeg = 0; }
                 if (toCamp <= 30) legging = false;
                 else if (!legging && agent.hasPath && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete) legging = true;
+                // A path still being worked out after 3 s is a long way too: leg it (2026-10-15, adit-final6/7: from the yard after a wipe the
+                // leader stood "leading you" for minutes: its path was asked for afresh every frame and never finished).
+                if (agent.pathPending) { if (pendingSince < 0) pendingSince = Time.time; else if (!legging && toCamp > 30 && Time.time - pendingSince > 3) { legging = true; nextLeg = 0; } } else pendingSince = -1;
                 if (legging && Time.time >= nextLeg)
                 {
                     nextLeg = Time.time + 1.5f;
@@ -792,7 +796,14 @@ namespace Crulanda.Encounter
                     else if (!session.InCombat && Time.time - leadBestAt > 45) { leadSeen = 0; LeaveCamp(); return; }
                     leadSeen = Time.time;
                 }
-                if (toCamp > 6) { Activity = (waitingAt != null ? "Going to " : "Leading you to ") + ThePlace; agent.isStopped = false; agent.speed = 4.2f; agent.SetDestination(legging ? legTo : Leading.Value); return; }
+                if (toCamp > 6)
+                {
+                    Activity = (waitingAt != null ? "Going to " : "Leading you to ") + ThePlace; agent.isStopped = false; agent.speed = 4.2f;
+                    // Asked for again only when it moves or every 2 s: asked every frame, a long path never finished (pathPending for good).
+                    var dest = legging ? legTo : Leading.Value;
+                    if ((dest - leadDest).sqrMagnitude > 1 || (!agent.pathPending && !agent.hasPath) || Time.time - leadDestAt > 2) { leadDest = dest; leadDestAt = Time.time; agent.SetDestination(dest); }
+                    return;
+                }
                 Activity = (waitingAt != null ? "Waiting at " : "At ") + ThePlace; agent.isStopped = true; return;
             }
             // At your side: a pace behind, each in its own place so they do not stack.

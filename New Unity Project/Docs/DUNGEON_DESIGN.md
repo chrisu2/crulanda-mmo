@@ -679,7 +679,7 @@ mine with the ship at the bottom, the cave of the four lords, the zealots' house
 
 **Three things for Chris to decide first (short):**
 1. **The Spent.** These are dead Indentured whose collars still walk them. They are canon (b1 ch.12:37-39), but the novels call the collar "a rudimentary locomotive engine", which is a machine (0.05). The game would make it the tether's spell holding the body up. Keep them, or swap them for living gaolers? They are in this dungeon only: the Deep Veins and the Hub have none (shared rules).
-2. **Gorm Rock-Wall as a giver.** He is CANON: Valen's orc partner, alive before Book 1 (b1 ch.1:21). He would give The Soul Tax on the Outfall. Yes, or a GAME-ONLY orc docker? (Until you answer: the docker.) Gorm gives quests in this dungeon only.
+2. **Gorm Rock-Wall as a giver.** He is CANON: Valen's orc partner, alive before Book 1 (b1 ch.1:21). He would give The Soul Tax on the Outfall. Yes, or a GAME-ONLY orc docker? (Until you answer: the docker.) Gorm gives quests in this dungeon only. **Answered (Chris, 2026-10-15 ~22:40, the Lowtowns question prompt): "Yes, Gorm himself (Recommended)".**
 3. **Orcs among the freed and the lightermen?** Canon says the Council sees orcs, goblins and ogres as "disposable manual labor" (b1 ch.16:353). Some freed and some lightermen would use the orc figures. That needs a line of code for orc non-player figures.
 
 ## 1. Where it is and what it is (lore)

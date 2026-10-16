@@ -13,6 +13,7 @@ character; queued again inside the lockout the run goes but the bosses drop no l
 resets). Open-world elites: once a real day.
 **Chris, 2026-10-15 ~23:55 (verbatim): "open world boss is once per week".** So an open-world boss (a world boss; a named boss camp out
 of a dungeon) is once a real week per character; open-world elites stay once a real day; dungeons two days.
+**Chris, 2026-10-16 ~00:00 (verbatim): "raids once per week".** Raids (the Spire of Agony at 30, twenty players) once a real week.
 
 ## Chris's words (2026-10-14, verbatim)
 "what are the three new dungeons? you should have the build guide on levels. i think adit dungeon need to be more complex like wow's

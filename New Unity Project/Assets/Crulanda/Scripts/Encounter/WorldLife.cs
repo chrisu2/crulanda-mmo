@@ -1103,7 +1103,7 @@ namespace Crulanda.Encounter
             var look = life.LookFor(transform.position);
             // Someone at a fixed post (a trainer at the racks, a clerk at a desk against the wall) faces the room, away from the prop at
             // their back (2026-10-16, Chris in the Crown's Hall of Arms: "all trainers standing backwards").
-            if (look.HasValue && fixedPlace != null) { var back = transform.position - look.Value; back.y = 0; if (back.sqrMagnitude > .01f) Face(transform.position + back); }
+            if (look.HasValue && fixedPlace != null && life.Zone != null && life.Zone.Zone != null && life.Zone.Zone.city) { var back = transform.position - look.Value; back.y = 0; if (back.sqrMagnitude > .01f) Face(transform.position + back); }
             else if (look.HasValue) Face(look.Value);
             if (activity == "field") FaceRow();
             if (Coop != null) KeeperStart();

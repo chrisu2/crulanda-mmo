@@ -1,0 +1,169 @@
+{
+  "zone": "zone.ashrim",
+  "canonStatus": "GAME-ONLY: the Ashland Rim's chapter of the book of lore, its lines the game's; the Ash-Walkers, the Weave-Eaters and their salt (book1 ch.20) and the Cult of Ash (book1 ch.10) are CANON, as each line says.",
+  "entries": [
+    {
+      "id": "lore.ashrim.places.ash-walker-enclave",
+      "chapter": "places",
+      "subject": "Ash-Walker enclave",
+      "more": "The Walkers chalk their war on slates by the harpoon rack: every Eater bound, every line of salt laid, every name lost. The line holds, the last slate says, because they walk it.",
+      "page": "doc.ashrim.salt_slates",
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers and their salt against the Weave-Eaters are CANON (book1 ch.20); the slates are GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.places.tear-marked-shrine",
+      "chapter": "places",
+      "subject": "Tear-marked shrine",
+      "more": "The bone-masks' litany says the grey is the truth coming home and the Weave was a lie told by the Makers. They kneel in the ash because the ash is honest.",
+      "page": "doc.ashrim.litany",
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash and its cry are CANON (book1 ch.10); this litany is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.places.cinderfold",
+      "chapter": "places",
+      "subject": "Cinderfold",
+      "more": "Somebody stood a doorstone on end with a child's heights cut up its edge, a tick a year. The ticks stop the year the grey came through. The houses stayed.",
+      "secret": "secret.ashrim.heights-stone",
+      "canonStatus": "GAME-ONLY: the hamlet and its doorstone. The Wasting unmaking rather than destroying is CANON (book1 ch.20)."
+    },
+    {
+      "id": "lore.ashrim.places.wain-s-rest",
+      "chapter": "places",
+      "subject": "Wain's Rest",
+      "more": "The waybook lists the wains as they came: six west with salt, then four, then two, then a page of nothing. The carters said the pans were crusting grey at the far edge.",
+      "page": "doc.ashrim.waybook",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.ashrim.places.the-ash-pit",
+      "chapter": "places",
+      "subject": "The Ash Pit",
+      "more": "The Deacon's tally of what was given to the fire: ridge salt that would not burn, an old wain-horse, the last rafters of the waystation.",
+      "page": "doc.ashrim.tally",
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash is CANON (book1 ch.10); the Deacon and his tally are GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.places.the-silent-statue",
+      "chapter": "places",
+      "subject": "The Silent Statue",
+      "more": "Grohl has stood three watches at the stone and says it does not move. The ash at its feet is further from it every dawn.",
+      "page": "doc.ashrim.faceless",
+      "canonStatus": "CANON-EXPANDED: the Silent Statues, faceless monoliths in the Wasting, are CANON (world_bible.md); Grohl's watch is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.places.the-last-orchard",
+      "chapter": "places",
+      "subject": "The Last Orchard",
+      "more": "The orchard-keeper buried his wife under the last tree that bore and cut her stone himself, the letters going deeper as he went. Then he walked into the grey.",
+      "secret": "secret.ashrim.orchard-grave",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.ashrim.places.the-wasting",
+      "chapter": "places",
+      "subject": "The Wasting",
+      "more": "The Walkers do not throw their salt. They walk it, one hand low, the grains falling in a thread, singing as they go, and the grey stops where they stop.",
+      "page": "doc.ashrim.salt_line",
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers binding with Salt of the First Sea and its chant are CANON (book1 ch.20); how it is walked is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.people.mother-vane",
+      "chapter": "people",
+      "subject": "Mother Vane",
+      "more": "The Salt-Speaker taught you the chant over the salt, and to say it loud: the salt doesn't hear you, she says. You hear you.",
+      "page": "doc.ashrim.salt_rite",
+      "canonStatus": "CANON-EXPANDED: the chant is CANON (book1 ch.20); Mother Vane's teaching is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.creatures.weave-eater",
+      "chapter": "creatures",
+      "subject": "Weave-Eater",
+      "line": "Things that feed on the Weave at the grey's edge, soft and many-mouthed. Salt binds them; steel only annoys them.",
+      "canonStatus": "CANON-EXPANDED: the Weave-Eaters and the Ash-Walkers' salt are CANON (book1 ch.20); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.creatures.ash-hound",
+      "chapter": "creatures",
+      "subject": "Ash hound",
+      "line": "Hounds gone grey to the bone, hunting the plain in packs. They don't bark. They don't need to.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.ashrim.creatures.old-cinder-jaw",
+      "chapter": "creatures",
+      "subject": "Old Cinder-Jaw",
+      "line": "The oldest of the ash hounds, with a jaw like a coal-shovel. He hunts the old west road alone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.ashrim.creatures.bone-masked-cultist",
+      "chapter": "creatures",
+      "subject": "Bone-masked cultist",
+      "line": "The Cult of Ash: they wear the bone, mark the tear, and kneel in the grey because it is honest.",
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash and its bone masks are CANON (book1 ch.10); these are GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.creatures.brood-weave-eater",
+      "chapter": "creatures",
+      "subject": "Brood Weave-Eater",
+      "line": "A brood-mother at the grey's edge, where the Eaters grow fat. Bind her and the brood goes hungry.",
+      "canonStatus": "CANON-EXPANDED: the Weave-Eaters are CANON (book1 ch.20); the brood is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.creatures.hollow-man",
+      "chapter": "creatures",
+      "subject": "Hollow Man",
+      "line": "The emptied dead of the hamlet the grey went through. They still walk its lanes as if they had somewhere to be.",
+      "canonStatus": "CANON-EXPANDED: the Hollow Men are a CANON creature (book1 ch.4); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.creatures.the-ash-deacon",
+      "chapter": "creatures",
+      "subject": "The Ash-Deacon",
+      "line": "The cult's deacon at the pit, who keeps the tally of what is given to the fire.",
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash is CANON (book1 ch.10); the Deacon is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.creatures.sandthrone-salt-raider",
+      "chapter": "creatures",
+      "subject": "Sandthrone salt-raider",
+      "line": "Sandthrone riders who raid the salt road west, because this close to the grey salt is worth more than silver.",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone mercenary company is CANON (world_bible.md); these men are GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.creatures.pale-shadow",
+      "chapter": "creatures",
+      "subject": "Pale shadow",
+      "line": "A shadow by the standing stones where nothing casts it. Cold, and counting.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Pale Things as cosmic auditors are CANON (world_bible.md); this one is GAME-ONLY."
+    },
+    {
+      "id": "lore.ashrim.herbs.cinder",
+      "chapter": "herbs",
+      "subject": "node.cinder",
+      "line": "Cinder ore: black, glassy seams the grey has baked into the Ridge's flank. It rings like a bell under the pick, which the Walkers take for a good sign.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.ashrim.herbs.snag",
+      "chapter": "herbs",
+      "subject": "node.snag",
+      "line": "Ash-snags: dead trunks gone half to stone, still good timber inside. The Walkers burn them; the cult will not.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.ashrim.herbs.cinder-thistle",
+      "chapter": "herbs",
+      "subject": "node.cinder_thistle",
+      "line": "A grey thistle that grows only on ground the grey has touched and left. Its sting is dull and lasts a day.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.ashrim.herbs.last-light",
+      "chapter": "herbs",
+      "subject": "herb.last_light",
+      "line": "A pale flower that pushes up through the ash where nothing else will. The Walkers say it grows where something refused to be unmade.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    }
+  ]
+}

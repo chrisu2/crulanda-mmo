@@ -22,6 +22,8 @@ namespace Crulanda.Encounter
     /// finish every quest (bounties aside) and kill every camp elite; across the world, all of each, notice-board bounties, a rare
     /// posting and a trade's skill. Each pays points once (EncounterProgress.achievements); some give a title the player can wear
     /// (EncounterProgress.title, shown in the player frame). Pure logic over the progress, like DiscoveryLog: tested without a scene.
+    /// With the book of lore (Phase 8.6 step 7): a zone's chapter of the book filled (every place, person, creature, herb and ore,
+    /// and every page that tells more) gives "The Book of &lt;zone&gt;" and the title "Chronicler of &lt;zone&gt;"; all of them, "the Rememberer".
     /// GAME-ONLY (names and titles).
     /// </summary>
     public sealed class Achievements
@@ -30,14 +32,14 @@ namespace Crulanda.Encounter
         public EncounterProgress Progress { get; private set; }
         public readonly List<AchievementDef> All = new List<AchievementDef>();
         public readonly List<ZoneDefinition> Zones;
-        readonly QuestDatabase quests;
+        readonly QuestDatabase quests; readonly LoreBook lore;
         /// <summary>An achievement was just earned (the session raises its toast).</summary>
         public Action<AchievementDef> Earned = a => { };
 
-        public Achievements(EncounterProgress progress, IEnumerable<ZoneDefinition> zones, QuestDatabase questDb)
+        public Achievements(EncounterProgress progress, IEnumerable<ZoneDefinition> zones, QuestDatabase questDb, LoreBook loreBook = null)
         {
             /* a dungeon gets its deeds with its quests (the Sealed Adit, D6) */ Zones = (zones ?? new ZoneDefinition[0]).Where(z => z != null && !z.dungeon).OrderBy(z => z.levelMin).ThenBy(z => z.id, StringComparer.Ordinal).ToList();
-            quests = questDb; Bind(progress); Build();
+            quests = questDb; lore = loreBook; Bind(progress); Build();
         }
         public void Bind(EncounterProgress progress)
         {
@@ -113,6 +115,17 @@ namespace Crulanda.Encounter
             Add("bounty.10", "Paid in Crowns", "Hand in ten notice-board bounties.", 10, W, 10, () => Progress.bounties);
             Add("bounty.50", "Bounty Hunter", "Hand in fifty notice-board bounties.", 25, W, 50, () => Progress.bounties, "Bounty Hunter");
             Add("rare.1", "The Courier's Bane", "See a rare posting through: the Bureau courier and the shard he carries.", 10, W, 1, () => Progress.rares, "the Courier's Bane");
+            if (lore != null)
+            {
+                // The book of lore (Phase 8.6 step 7): a zone's chapter filled, and the whole book.
+                foreach (var z in Zones)
+                {
+                    var zone = z; string g = z.displayName, of = g.StartsWith("The ") ? "the " + g.Substring(4) : g;
+                    Add("lore." + Short(z), "The Book of " + of, "Fill " + of + "'s chapter of the book of lore: every place, person, creature, herb and ore, and every page that tells more.", 15, g,
+                        lore.Count(zone).total, () => lore.Count(zone).full, "Chronicler of " + of);
+                }
+                Add("lore.all", "The Whole Book", "Fill every zone's chapter of the book of lore.", 25, W, Zones.Sum(z => lore.Count(z).total), () => Zones.Sum(z => lore.Count(z).full), "the Rememberer");
+            }
             Add("trade.75", "Journeyman", "Raise a trade to 75 skill.", 10, W, 75, TopSkill);
             Add("trade.100", "Master of a Trade", "Raise a trade to 100 skill.", 20, W, 100, TopSkill, "Master of a Trade");
         }

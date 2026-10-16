@@ -6,7 +6,8 @@ namespace Crulanda.Encounter
     /// <summary>
     /// Quest interface: tracker (under the minimap), ! and ? over quest givers, the parchment conversation window, and the
     /// quest book (L) with Quests, Chronicle, Lore (the book of lore, 2026-10-15), Standing, Discoveries, Achievements and Armoury
-    /// tabs (the last three in EncounterHud.Discoveries.cs, EncounterHud.Achievements.cs and EncounterHud.Armoury.cs).
+    /// tabs (the Lore tab in EncounterHud.Lore.cs, the last three in EncounterHud.Discoveries.cs, EncounterHud.Achievements.cs and
+    /// EncounterHud.Armoury.cs).
     /// </summary>
     public sealed partial class EncounterHud
     {
@@ -31,7 +32,7 @@ namespace Crulanda.Encounter
             qList = new GUIStyle(GUI.skin.button) { fontSize = 14, alignment = TextAnchor.MiddleLeft, wordWrap = true, padding = new RectOffset(10, 6, 4, 4) };
         }
         void Ink(Rect r, string s, GUIStyle style, Color c) { GUI.contentColor = c; GUI.Label(r, s, style); GUI.contentColor = Color.white; }
-        static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : q.kind == "bounty" ? (q.rare ? "Rare posting" : q.poster == "sandthrone" ? "Sandthrone contract" : "Bounty") : "Side quest"; }
+        static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : q.kind == "bounty" ? (q.rare ? "Rare posting" : q.poster == "sandthrone" ? "Sandthrone contract" : CouncilErrands.IsErrand(q) ? "Council errand" : GuildHalls.IsAsk(q) ? "Guild ask" : "Bounty") : "Side quest"; }
 
         /// <summary>The ! or ? over someone's head, or ' ' (no quests here, or too far away).</summary>
         // Each person's marker is worked out again every 0.4 s, not every frame (playtest note 23: the quest log was asked for every
@@ -239,7 +240,7 @@ namespace Crulanda.Encounter
             if (status == QuestStatus.Available)
             {
                 if (GUI.Button(new Rect(w.x + 24, w.yMax - 52, 150, 36), "Accept", button)) session.AcceptQuest(quest);
-                if (GUI.Button(new Rect(w.xMax - 174, w.yMax - 52, 150, 36), "Decline", button)) { if (c.entries.Count > 1) c.selected = null; else session.Conversation = null; }
+                if (GUI.Button(new Rect(w.xMax - 174, w.yMax - 52, 150, 36), "Decline", button)) { session.DeclineQuest(quest); if (c.entries.Count > 1) c.selected = null; else session.Conversation = null; }
             }
             else if (status == QuestStatus.ReadyToTurnIn)
             {
@@ -406,39 +407,7 @@ namespace Crulanda.Encounter
             GUI.EndScrollView();
             if (!string.IsNullOrEmpty(reading.canonStatus)) Ink(new Rect(page.x + 30, page.yMax - 56, page.width - 60, 48), "Lore status: " + reading.canonStatus, qSmall, new Color(.45f, .38f, .28f));
         }
-        /// <summary>
-        /// The book of lore (2026-10-15, Chris: "find recipes/ book of lore"): the pages of kind "lore" found at the zones' hidden
-        /// finds (EncounterSession.LorePages), the found ones to read and, zone by zone, how many more lie unread; then every other
-        /// page found (the Chronicle's letters and ledgers), so one tab holds all there is to read.
-        /// </summary>
-        void BookLore(QuestLog log, Rect list, Rect page)
-        {
-            var pages = session.LorePages(); int found = 0; foreach (var p in pages) if (p.found) found++;
-            float y = list.y + 8;
-            Shadow(new Rect(list.x + 10, y, list.width, 20), "THE BOOK OF LORE  (" + found + " / " + pages.Count + ")", qHead, gold); y += 26;
-            foreach (var p in pages)
-            {
-                if (!p.found) continue;
-                GUI.enabled = session.ReadingDocument != p.doc.id;
-                if (GUI.Button(new Rect(list.x + 8, y, list.width - 16, 34), p.doc.title, qList)) { session.ReadingDocument = p.doc.id; textScroll = Vector2.zero; }
-                GUI.enabled = true; y += 38;
-            }
-            if (found == 0) { Shadow(new Rect(list.x + 10, y, list.width - 20, 40), "Pages of the old lore lie at the zones' hidden places. Find them and they are kept here.", tiny, new Color(.8f, .8f, .8f)); y += 44; }
-            // Unread pages, by zone, in the pages' order (this zone first, then by level).
-            var zones = new List<string>(); var unread = new Dictionary<string, int>();
-            foreach (var p in pages) { if (p.found) continue; string z = string.IsNullOrEmpty(p.zoneName) ? "elsewhere" : p.zoneName; if (!unread.ContainsKey(z)) { zones.Add(z); unread[z] = 0; } unread[z]++; }
-            foreach (var z in zones) { Shadow(new Rect(list.x + 16, y, list.width - 24, 20), unread[z] + (unread[z] == 1 ? " page lies unread " : " pages lie unread ") + (z == "elsewhere" ? "elsewhere" : "in " + z) + ".", tiny, new Color(.72f, .7f, .65f)); y += 20; }
-            int others = 0; foreach (var id in log.Progress.documents) if (log.Db.Documents.TryGetValue(id, out var d) && !d.IsLore) others++;
-            y += 10; Shadow(new Rect(list.x + 10, y, list.width, 20), "LETTERS AND LEDGERS  (" + others + ")", qHead, new Color(.7f, .7f, .7f)); y += 24;
-            foreach (var id in log.Progress.documents)
-            {
-                if (y > list.yMax - 40 || !log.Db.Documents.TryGetValue(id, out var doc) || doc.IsLore) continue;
-                GUI.enabled = session.ReadingDocument != id;
-                if (GUI.Button(new Rect(list.x + 8, y, list.width - 16, 30), doc.title, qList)) { session.ReadingDocument = id; textScroll = Vector2.zero; }
-                GUI.enabled = true; y += 34;
-            }
-            ReadPage(log, page, found + others == 0 ? "What the world remembers, as you find it written: the old lore at the hidden places, and the letters, ledgers and songs." : "Choose a page to read.");
-        }
+        // The Lore tab (BookLore) is EncounterHud.Lore.cs since Phase 8.6: the book of lore's chapters, its Pages the book of 2026-10-15.
         void BookStanding(QuestLog log, Rect area)
         {
             float y = area.y + 10;

@@ -67,6 +67,20 @@
   ],
   "documents": [
     {
+      "id": "doc.verdant.tale_book",
+      "kind": "lore",
+      "title": "A Tale from the Bower's Book",
+      "text": "From the book on the root-stand by the glade path, which the Keepers read aloud at dusk to whoever sits. One tale, set down in a careful flesh-folk hand under the Keepers' spiral-script:\n\nOnce a Keeper found a seed that shone, and was afraid it would be lost, and kept it in her hand. She kept it a hundred years. The seed did not grow, because it was in her hand, and the Keeper did not grow, because her hand was full.\n\nWhen she opened her hand at last, the seed was only a seed. It had shone because she was holding it.\n\nSo we do not keep things, the tale ends. We plant them, or we give them, or we let the river have them. A full hand cannot be held.\n\nUnder it, in another hand: Read to the flesh-folk on the ninth night. They laughed at the end. That is allowed.",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers and their rule against hoarding are CANON (book3 ch.2, 7; world_bible.md); the book and this tale are GAME-ONLY."
+    },
+    {
+      "id": "doc.verdant.ore_hunter",
+      "kind": "lore",
+      "title": "An Ore-Hunter's Reckoning",
+      "text": "A page from the sack of the man against the root wall, in a hand that started neat:\n\nDown the root-stair with a lamp, a pick and a sack. The Keepers said the green ore is the Mother's and not for selling. The Keepers say a lot.\n\nA vein as thick as my arm in the hall of root columns. I filled the sack by the second lamp.\n\nThe sack is too heavy to climb with. I'll rest first.\n\nIt is cold here, and it should not be. The root is warm everywhere else. The cold is further down, at the bottom, and it is coming up the way I came down.\n\nI'll rest a little longer. The root has my boots. It's kind about it.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother (book3) and the cold in the root (book3 ch.6-7), shown before their time; the ore-hunter and his page are GAME-ONLY."
+    },
+    {
       "id": "doc.verdant.first_cycle",
       "title": "The Song of the First Cycle",
       "text": "What the Keepers sing to a sapling on its first night, as Willow-Whisper sang it to you:\n\nBefore the first leaf, the Mother.\nBefore the Mother, the sea,\nand the sea was salt, and the salt was song,\nand the song went up the roots.\n\nGrow slow, little one. Grow green.\nThe wood remembers all it is given.\nTake, and the wood remembers.\nHoard, and the wood remembers.\n\nWhen the cold comes over the ridge\n(and the cold comes, little one,\nit came before, it comes again)\nstand still. Hold fast. Be wood.\n\n'There is more of it,' she said, 'but the rest is for when you are older.'",

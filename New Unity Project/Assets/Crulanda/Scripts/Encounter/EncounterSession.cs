@@ -229,6 +229,7 @@ namespace Crulanda.Encounter
             var list = Quests.For(npc, Zone.Zone.id, Progress.Level);
             // Merchants open on the list (so "Browse wares" is always one click away); others go straight to a single quest.
             bool shop = IsVendor(VillageLife.Active?.Find(npc));
+            CouncilErrands.Filter(list, Progress);   // an errand of the halls handed in today waits for tomorrow (EncounterSession.Halls)
             if (list.Count > 0) { Conversation = new QuestConversation { npc = npc, entries = list, selected = list.Count == 1 && !shop ? list[0].quest : null, where = where }; return true; }
             return handled;
         }
@@ -248,8 +249,9 @@ namespace Crulanda.Encounter
             var bagItems = q.rewards?.bagItems; int worth = 0;
             if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null && !(d.kind == "bag" && Inventory.Owns(Progress, id))) worth += Inventory.Price(d); }
             if (!Quests.TurnIn(q, out _, choice)) return;
-            if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
-            if (q.kind == "bounty") { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
+            if (HallQuest(q)) CouncilErrands.MarkDone(Progress, q.id);   // the Council's errands and the guilds' asks: once a day, not the board's (EncounterSession.Halls)
+            else if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
+            if (q.kind == "bounty" && !HallQuest(q)) { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
             if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             ReconcileQuests(); Save(false); ReopenConversation();
@@ -258,6 +260,7 @@ namespace Crulanda.Encounter
         {
             if (Conversation == null) return;
             var list = Conversation.npc == Bounties.BoardName && Boards != null ? Boards.Entries(ZoneId, Progress.Level) : Quests.For(Conversation.npc, ZoneId, Progress.Level);
+            CouncilErrands.Filter(list, Progress);
             if (list.Count == 0) { Conversation = null; return; }
             Conversation.entries = list; Conversation.selected = list.Count == 1 ? list[0].quest : null;
         }
@@ -596,7 +599,7 @@ namespace Crulanda.Encounter
             if (i == null || i.node == null || Professions == null || Zone == null) return false;
             var def = Professions.Db.Node(i.node); if (def == null) return false;
             int got = Professions.Gather(def, gatherRng, out string why);
-            if (got > 0) FloatText(i.position, "+" + got + " " + ItemName(def.item), new Color(.86f, .95f, .66f));
+            if (got > 0) { FloatText(i.position, "+" + got + " " + ItemName(def.item), new Color(.86f, .95f, .66f)); NoteWorked(def.id, def.name); }   // the book of lore's Herbs and Ores
             bool quest = QuestUse(i);
             if (got == 0 && !quest) { if (why != null) Message(why); return false; }   // nothing went in and no quest took it: the node stays
             RestNode(i, NodeRespawn(def));
@@ -782,7 +785,7 @@ namespace Crulanda.Encounter
             if (!Professions.CanLearn(id, out why)) return false;
             var d = Professions.Db.Profession(id);
             foreach (var kind in ProfessionDatabase.Stations(d.station)) if (StationNear(kind) != null) return true;
-            if (CraftTrainerNear(d) != null) return true;
+            if (CraftTrainerNear(d) != null || TradeNpcNear(d.trainerRole, TrainerRange) != null || HallTradeTrainerNear(id) != null) return true;   // its trainer: in the village, or in the Crown (ZoneBuilder.Crown, EncounterSession.Halls)
             why = d.name + " is taken up at " + ProfessionLog.StationWords(d.station) + (string.IsNullOrEmpty(d.trainerRole) ? "." : ", or from a " + d.trainerRole + ".");
             return false;
         }
@@ -1003,7 +1006,7 @@ namespace Crulanda.Encounter
         void TickFeats()
         {
             if (Zone == null || Progress == null || Player == null) return;
-            if (Feats == null) { Feats = new Achievements(Progress, Zone.AllZones(), Quests != null ? Quests.Db : null); Feats.Earned = OnEarned; featsPrimed = false; }
+            if (Feats == null) { Feats = new Achievements(Progress, Zone.AllZones(), Quests != null ? Quests.Db : null, Lore); Feats.Earned = OnEarned; featsPrimed = false; }   // with the book of lore's chapters
             if (!Exploring || Paused || !Player.IsAlive) return;
             if (!featsPrimed)
             {
@@ -1093,7 +1096,7 @@ namespace Crulanda.Encounter
                 Crulanda.World.ZoneSecretSpot best = null; float bestD = UseRange;
                 foreach (var spot in SecretSpots)
                 {
-                    if (DiscoveryLog.IsVista(spot.def) || Discoveries.IsFound(spot.def)) continue;
+                    if (DiscoveryLog.IsVista(spot.def) || (Discoveries.IsFound(spot.def) && !UsableAgain(spot))) continue;   // a herb grown back, a wayshrine: E again
                     float d = GroundDistance(spot.position); if (d < bestD) { best = spot; bestD = d; }
                 }
                 return best;
@@ -1114,6 +1117,7 @@ namespace Crulanda.Encounter
         public DiscoveryLog.Result Search(Crulanda.World.ZoneSecretSpot spot)
         {
             if (spot == null || spot.def == null || Discoveries == null) return DiscoveryLog.Result.AlreadyFound;
+            if (UsableAgain(spot)) { UseAgain(spot); return DiscoveryLog.Result.AlreadyFound; }   // a herb picked again, a crown left (EncounterSession.Lore.cs)
             var r = Find(spot);
             if (r == DiscoveryLog.Result.Locked) Message(DiscoveryLog.ShutLine(spot.def));
             else if (r == DiscoveryLog.Result.BagsFull) Message(DiscoveryLog.BagsFullLine);
@@ -1127,6 +1131,7 @@ namespace Crulanda.Encounter
             if (r != DiscoveryLog.Result.Found) return r;
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             if (DiscoveryLog.Pocketed(spot.def)) Pocket(spot);
+            if (spot.def.kind == "shrine") Bless(spot);   // found, a wayshrine blesses you at once; after that, for a crown
             Save(false);
             return r;
         }
@@ -1136,6 +1141,7 @@ namespace Crulanda.Encounter
             if (Discoveries == null || Zone == null || Time.time < nextSecretCheck) return;
             nextSecretCheck = Time.time + .5f;
             if (!pocketedSynced) { pocketedSynced = true; SyncPocketed(); }
+            TickRegrowth();   // a rare herb picked yesterday shows again
             string waiting = null;
             foreach (var spot in SecretSpots)
             {
@@ -1176,10 +1182,10 @@ namespace Crulanda.Encounter
             if (Discoveries == null || Zone == null) return list;
             ZoneLore.Apply(Zone.Zone);
             var here = new List<Crulanda.World.ZoneSecret>(); foreach (var spot in SecretSpots) here.Add(spot.def);
-            list.Add(Discoveries.TallyOf(Zone.Zone.id, Zone.Zone.displayName, here, true));
+            list.Add(Discoveries.TallyOf(Zone.Zone.id, Zone.Zone.displayName, here, true, Zone.Zone.landmarks));   // with the count by region (decision 6)
             var others = Zone.AllZones().FindAll(z => z != null && z.id != Zone.Zone.id);
             others.Sort((a, b) => a.levelMin != b.levelMin ? a.levelMin.CompareTo(b.levelMin) : string.CompareOrdinal(a.id, b.id));
-            foreach (var z in others) { ZoneLore.Apply(z); list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false)); }
+            foreach (var z in others) { ZoneLore.Apply(z); list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false, z.landmarks)); }
             return list;
         }
         /// <summary>A page of the book of lore (<see cref="LorePages"/>): the page, the zone whose hidden find holds it, whether it is found.</summary>
@@ -1261,7 +1267,7 @@ namespace Crulanda.Encounter
         /// <summary>A cast in progress, or work (gathering) on the same bar.</summary>
         public bool PlayerCasting { get { return abilities.IsCasting || Working; } }
         /// <summary>A status effect's name for the HUD's buff row (its id when the content has no name for it).</summary>
-        public string StatusName(string id) { var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id; }
+        public string StatusName(string id) { var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id == DiscoveryLog.BlessingId ? DiscoveryLog.BlessingName : id; }
         /// <summary>The player's figure (blows, flinches and casts on it: playtest note 25).</summary>
         public ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
         ActorVisual playerFigure; bool castPosed; string castMotion; ActorPose workPose; (GameObject hand, GameObject circle) castFx;
@@ -1342,6 +1348,7 @@ namespace Crulanda.Encounter
             if (SpellbookOpen && !Paused) { SpellbookOpen = false; BookPick = null; }
             else if (LootOpen && !Paused) CloseLoot();
             else if (Conversation != null && !Paused) Conversation = null;
+            else if (Hall != null && !Paused) Hall = null;
             else if (VendorNpc != null && !Paused) CloseVendor();
             else if (TradesOpen && !Paused) TradesOpen = false;
             else if (WhoOpen && !Paused) WhoOpen = false;
@@ -2081,7 +2088,7 @@ namespace Crulanda.Encounter
                 if (mira) return !Progress.recruited ? "Recruit Mira" : !Companion.actor.IsAlive ? "Revive Mira" : "Talk to Mira";
                 if (villager != null) return "Talk to " + villager.Name;
                 var (usable, secret) = NearestUse();
-                if (secret != null) return SearchPrompt(secret.def);
+                if (secret != null) return SecretPrompt(secret);
                 if (usable != null) return InteractPromptFor(usable);
                 var door = NearbyDoor;
                 if (door != null) return door.openable ? (door.Open ? "Close the door" : "Open the door") + " · " + door.name : (door.kind == "rooms" ? "Try the door · " : "Knock · ") + door.name;
@@ -2124,7 +2131,9 @@ namespace Crulanda.Encounter
             if (talkTo != null)
             {
                 SelectFriendly(talkTo, false);
+                NoteMet(talkTo.Name);   // the book of lore's People
                 if (QuestTalk(talkTo.Name, talkTo.transform.position)) talkTo.FacePlayer();
+                else if (HallTalk(talkTo)) talkTo.FacePlayer();   // the capital's halls: the audience, the Archive, a guild, a trainer (EncounterSession.Halls)
                 else if (IsVendor(talkTo)) { OpenVendor(talkTo); talkTo.FacePlayer(); }
                 else VillageLife.Active.Talk(talkTo);
                 return;
@@ -2174,6 +2183,7 @@ namespace Crulanda.Encounter
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
+            NoteSlain(enemy);   // its kind in the book of lore's Creatures
             if (NamedElite(enemy)) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }   // the camp's own elite, not a machine it rides
             if (enemy.Camp) TakeKey(enemy);   // a sigil boss's key (EncounterSession.Adit.cs)
             // The dungeon's last boss down: the run's scorecard (Chris, 2026-10-11: "final boss kill can also call the scorecard").
@@ -2323,6 +2333,7 @@ namespace Crulanda.Encounter
             if (Professions != null) Professions.Bind(Progress);
             if (Armoury != null) Armoury.Bind(Progress);
             if (Feats != null) { Feats.Bind(Progress); featsPrimed = false; }
+            if (lore != null) lore.Bind(Progress);   // the book of lore reads the loaded character (its Achievements too)
         }
         public void RepeatTrail()
         {

@@ -193,6 +193,22 @@ world; 9 waits on 8.5. Each step: fix, targeted tests, build, capture, commit, p
 Labels: the metals, herbs, dishes, recipes, inns, villagers: GAME-ONLY; aether-geodes, Veridian sap, salt, the Silent Pilgrims, the
 Sandthrone, the Ash-Walkers: CANON where cited; lore entries labelled one by one; this whole plan PROVISIONAL.
 
+**Status (p86-lore), 2026-10-15, steps 7 and 8, a helper's pass on branch `p86-lore`: written and compile-checked (Roslyn), not yet run in Unity; OPEN.**
+- Step 7, the book of lore: `LoreBook.cs` (data `EncounterContent/Lore/<zone>.json`, one a zone, 160 entries, each labelled; registered as
+  `EncounterContent.loreFiles` in Encounter.asset and by Build Oakhaven). The Lore tab (`EncounterHud.Lore.cs`) has its seven chapters: Places
+  (every landmark, its line and the zone's canonNote), People (named folk spoken to, with their stories; adventurers hailed), Creatures (kinds
+  killed: camps, levels, drops), Herbs and Ores (nodes worked, rare herbs found: trade, ground, makings), Factions, Pages (the 2026-10-15 book)
+  and Leaves (a hook for step 5: `EncounterSession.LoreLeaves`). A better half unlocks with its page or its find: 6 to 15 a zone. A zone's
+  chapter filled gives "The Book of <zone>" and the title "Chronicler of <zone>"; all of them "the Rememberer". What doing records is kept in
+  `EncounterProgress.explored` under keys of its own (`lore|met|...`, `lore|slain|...`, `lore|worked|...`, `lore|sim|...`): no new field, the
+  save format stays 10. The `read` kind is a hidden find (a lectern, a cairn's book, slates); shelves inside the inns wait for step 1's `ZoneInn`.
+- Step 8, secrets: 76 to 91 (Khaven 10 to 13, the Peaks 10 to 13, the Rim 10 to 13, the Shore 8 to 14 with three in the Root-Mother's Deep;
+  Oakhaven 25 and the Adit 13 kept, Crowsfoot Hollow's two kept). New kinds carving, read, grave, remains, shrine (`ZoneBuilder.SecretLooks.cs`);
+  the Adit's 13 got their clues and hints (`Resources/Lore/adit.json`); six new lore pages. The Discoveries tab counts the hidden by the zone's
+  great places ("3 hidden about the Mastwood"). A found rare herb grows back a game day after it is picked (Herbalism 10-75 by the herb); a
+  wayshrine blesses (3% less taken, 10 minutes) when found, then for a crown. Tests: `LoreBookTests` (new), `DiscoveryLogTests`,
+  `ZoneLoreTests` (EditMode); `SecretPlacementTests`, `DiscoveryTests` (PlayMode).
+
 ## 5. Open decisions for Chris (one line each)
 1. **Place:** 8.6 straight after Phase 8 (his 23:25 "work on phase 8"), before or after the talents' fourth paths and 8.5?
 2. **8.5 and 8.6 together** as one gear phase, or 8.6's looks (3f, step 9) alone waiting on 8.5's rig choice?
@@ -221,3 +237,15 @@ count by region; the Lore tab in the quest book; villagers step aside and shelte
    10. Well-fed and elixirs 30 minutes, one stat; a draught for each class's pool. 11. Coin only. 12. Taprooms for the Peaks, the Rim
    and the Shore. 13. Stepping aside for you and the party, and shelter under a roof in rain. 14. The Cask 14x10, the Hearth 13x9,
    fifteen seats.
+
+## Buffs to beat the bosses (Chris, 2026-10-15 ~23:25, verbatim)
+"we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses"
+**The plan (PROVISIONAL):** before a boss or an elite camp the leader stops short of the pull ("buff up"): every sim eats (a party feast
+when one is carried, else its own well-fed dish), drinks the elixir for its role (a tank's armour salve or stamina, a healer's cordial,
+damage-dealers' tinctures) and its class draught when low; each class casts its party buff on everyone (the Paladin's oath/standard, the
+Druid's, the Archivist's songs, the Shaman's and the Cleric's blessings, whichever exists; a class with none gets one, small); the run bot
+(you) does the same from the bags; then the pull. Sims carry what they craft and buy (SimEconomy), so a richer sim party is better
+buffed. Bosses are then tuned for a buffed party (the buffs worth about 10-15% of the party's damage and survival), so going in unbuffed
+is harder, not impossible. Lands on top of step 4 (the consumables, branch p86-craft) once its tests pass.
+- Wain's Rest's roof of salt-cart canvas (the inns helper's PROVISIONAL choice, the Deacon's Tally saying its rafters were burnt): Chris,
+  2026-10-15 ~23:30, verbatim: "canvas roof is fine. i really want the castle done asap so double down on it".

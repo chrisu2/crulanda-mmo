@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         {
             var p = ScreenToCanvas(point.x, point.y);
             Vector2 fr = p - PanelOffset("frames"), mm = p - PanelOffset("minimap"), tr = p - PanelOffset("tracker"), br = p - PanelOffset("bar");   // each panel where it was put
-            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
+            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || HallUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(fr)) || new Rect(1215, 0, 225, 240).Contains(mm) ||
                 (partySims > 0 && new Rect(10, 196, 400, 46 * partySims).Contains(fr)) || chatRect.Contains(p) ||   // the chat
                 new Rect(1110, 236, 330, 200).Contains(tr) || false;
@@ -83,7 +83,7 @@ namespace Crulanda.Encounter
             if (Hidden || session == null || session.Player == null) return;
             Styles();
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
-            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
+            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null; hallVisible = session.Hall != null;
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
             GUI.matrix = CanvasMatrix;   // even and centred (playtest note 94; EncounterHud.Display)
             GUI.color = Color.white;
@@ -104,6 +104,7 @@ namespace Crulanda.Encounter
             if (session.MeterOpen && !BigWindowOpen) { At("meter"); DrawMeter(); At(null); }   // not over a big window (Chris, 2026-10-13: it lay over the talents)
             if (session.ScorecardOpen) DrawScorecard();
             if (session.Conversation != null) DrawConversation();
+            if (session.Hall != null) DrawHall();   // the capital's halls (EncounterHud.Halls)
             DrawLoot();
             if (uiUnlocked) DrawPanelHandles();
             DrawDiscoveryToast();   // over the windows: it lasts a few seconds

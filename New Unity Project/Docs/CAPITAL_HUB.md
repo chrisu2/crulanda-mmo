@@ -118,3 +118,25 @@ towers, tall wall and wall entrance, the Spire and the Lowtowns below), the Nort
 roles the halls, bank and Exchange branches hook, every trade's trainer and station in the Crafters' Court. Tests: CrownZoneTests
 (EditMode), CrownZonePlayTests (PlayMode); the general zone tests take the Crown in. Captures: `--crulanda-world-capture` with
 `--crulanda-zone zone.crown` (a view per place; "The Crown of Argentis" from the south-east, as the map).
+**Chris, 2026-10-15 ~23:30 (verbatim): "i really want the castle done asap so double down on it".** Three helpers on it from 23:35: the
+zone and buildings (p9-crown), the bank and the Exchange (p9-exchange), the halls' people and systems (p9-halls: Aethelgard's audience,
+the Archive's reading room, the guild halls, the trainers, the dresser); the talent tiers for 19 paused.
+
+## Status (p9-halls, 2026-10-15; code and data written and compile-checked, NOT yet run in Unity)
+The halls' people, hooked by the resident's role (CapitalHalls.cs, EncounterSession.Halls.cs, EncounterHud.Halls.cs; data in
+Quests/halls.json). E on a hall person with no quest business opens their window; Esc or walking away shuts it.
+- **Aethelgard** (role `councilor`): an audience, a line for each topic picked by your level, your deeds (quests done, provinces
+  reached, the Bureau's ledger read) and your standing with **The High Council** (a new faction, `council`, start 200, apart from the
+  Concord's fixed -4000); "Has the Council work for me?" opens his clerk's errands. No body to strike (HallRoles.Untouchable).
+- **His clerk** (`council-clerk`, named exactly "Clerk Odo Vantry"): three repeatable Council errands (levels 2, 6, 8), once a game day
+  each; handing one in raises the Council's standing, refusing one lowers it by 50 (once a day each).
+- **The Archive** (`archivist`; `/archive` opens it anywhere): a shelf a zone, the pages found to read, pages still lost, finds still
+  hidden and one clue; a found page lent to be copied (once each) buys a word of a find not found and not shut.
+- **Guild halls** (`guildmaster:<slug>`: lantern-watch, oak-and-ember, long-road, scree-hounds): motto, roster (about now first),
+  Join for one in no guild, the notice board of two asks a guild (halls.json); members idle at the zone's `hall.<slug>` props, else
+  round the master's post.
+- **Trainers** (`trainer` or `trainer:<class id>`): the talent reset for coin, (10 + 5 a level) times the resets bought plus one, at
+  most eight times; the class's abilities by level. **Dresser** (`dresser`): the Armoury tab. **Trades** (`profession-trainer:<id>`
+  for mining, woodcutting, herbalism, cooking, blacksmithing, alchemy): take up or put aside a craft beside them, buy a gathering tool.
+- Open: the talent window's free "Refund all" is still there (Chris to say whether resets become trainer-only); the residents
+  themselves are the zone's (p9-crown).

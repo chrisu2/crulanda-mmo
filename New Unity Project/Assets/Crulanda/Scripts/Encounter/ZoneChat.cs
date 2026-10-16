@@ -162,6 +162,7 @@ namespace Crulanda.Encounter
                     case "/scorecard": ScorecardOpen = !ScorecardOpen; if (ScorecardOpen && ScorecardTitle == null) ScorecardTitle = (Meter.RunName ?? "The run") + " so far"; return;
                     case "/level": TesterLevel(arg); return;   // Chris, 2026-10-13: "i need a way to fast level for testing" / "and then reset to 1 when not testing"
                     case "/aa": TesterAa(arg); return;
+                    case "/archive": TesterArchive(); return;   // the Archive's reading room where you stand (the capital's halls, EncounterSession.Halls)
                     case "/meter": if (arg == "reset") { Meter.Reset(); Message("Meter reset."); } else { MeterOpen = !MeterOpen; Message(MeterOpen ? "Damage and healing meter shown (/meter reset clears it)." : "Meter hidden."); } return;
                     case "/guild": if (arg.Length == 0) { GuildRoster(); return; } break;
                     case "/groster": case "/ginfo": GuildRoster(); return;
@@ -196,7 +197,7 @@ namespace Crulanda.Encounter
                             }
                             Message("/music <0-1> sets the music's level; /music off silences it."); return;
                         }
-                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick takes only what must be done, full every side room too); /g guild chat, /guild (who is in it), /gquit."); Message("Music: /music <0-1> sets its level, /music off silences it."); return;
+                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap, /archive opens the Archive's reading room."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick takes only what must be done, full every side room too); /g guild chat, /guild (who is in it), /gquit."); Message("Music: /music <0-1> sets its level, /music off silences it."); return;
                     case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": case "/gu": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;
                 }

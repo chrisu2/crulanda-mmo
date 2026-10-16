@@ -165,10 +165,11 @@ namespace Crulanda.Encounter
             SimGear.Dress(GetComponent<ActorVisual>(), sim, session.Items);
         }
         /// <summary>Its choice in a roll (Round 25, note 72): Need for gear of its weight and slot that beats what it wears, Greed for
-        /// anything it could sell, Pass for what is no use to it (a potion it cannot use goes to Greed too: coin is coin).</summary>
+        /// anything it could sell, Pass for what is no use to it (a potion it cannot use goes to Greed too: coin is coin). A leaf (a found
+        /// recipe, Phase 8.6) is passed: the sims make only what their skill teaches, and the leaves are yours.</summary>
         public RollChoice RollFor(ItemDef d)
         {
-            if (d == null) return RollChoice.Pass;
+            if (d == null || d.kind == "recipe") return RollChoice.Pass;
             if (d.kind == "gear" && !string.IsNullOrEmpty(d.classOnly))   // a class set's piece (loot DESIGN.md 3.8): Need it for its own class (unless worn already), never for another's
                 return d.classOnly == sim.classId && d.level <= sim.level && SimEconomy.Worn(sim, d.slot) != d.id ? RollChoice.Need : RollChoice.Greed;
             if (d.kind == "gear")

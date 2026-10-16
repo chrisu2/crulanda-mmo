@@ -100,8 +100,8 @@ namespace Crulanda.Encounter
         /// <summary>
         /// The unseen living on (5.4, 2026-10-07): each world-clock hour a sim in another zone and online hunts, gathers and trades
         /// in the rough, by its personality: the bold take experience as from a few kills of their level (a level when it adds
-        /// up: no ding is heard from another zone), the careful gather their trade's first material and sell it now and then,
-        /// coin buys the gear upgrades (SimEconomy), and the smiths forge what they can. Nothing happens while offline, and a
+        /// up: no ding is heard from another zone; a leatherworker brings home a hide or two), the careful gather their trade's first
+        /// material and sell it now and then, coin buys the gear upgrades (SimEconomy), and the crafters make what they can. Nothing happens while offline, and a
         /// sim here, seen, lives for real instead. Called from <see cref="Refresh"/>.
         /// </summary>
         public static void LiveAway(SimAdventurer s, float hour, ItemDatabase items, ProfessionDatabase db)
@@ -121,6 +121,7 @@ namespace Crulanda.Encounter
                         s.experience = Mathf.Max(s.experience, EncounterProgress.XpForLevel(s.level)) + kills * EncounterProgress.KillXp(s.level, s.level, false) / 2;
                         while (s.level < EncounterProgress.LevelCap && s.experience >= EncounterProgress.XpForLevel(s.level + 1)) s.level++;
                     }
+                    if (SimEconomy.CraftTrade(s.classId) == "leatherworking") SimEconomy.Add(s, SimEconomy.HideFor(s.level), 1 + r.NextInt(0, 2));   // skinned (Phase 8.6)
                 }
                 else
                 {

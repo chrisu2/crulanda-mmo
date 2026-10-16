@@ -7,7 +7,8 @@ namespace Crulanda.Encounter
     // ============================================================================================
     // Trades: gathering skills (mining, woodcutting, herbalism), Cooking for everyone, and the crafts a character takes up.
     // The content lives in EncounterContent/Professions/*.json: the trades themselves, the kinds of node that can be worked
-    // in the world, and the recipes. What a character has learned is saved as EncounterProgress.professions (save format 8).
+    // in the world, and the recipes. What a character has learned is saved as EncounterProgress.professions (save format 8), and the
+    // found recipes learned from leaves as EncounterProgress.recipes (save format 11, Phase 8.6).
     // ============================================================================================
     [Serializable] public sealed class ProfessionFile
     {
@@ -46,11 +47,14 @@ namespace Crulanda.Encounter
         public int skill = 1, min = 1, max = 1, variant;
         public float respawn = 180, seconds = 2;
     }
-    /// <summary>Something made at a station: inputs from the bags become count of output. skill: the trade skill it needs.</summary>
+    /// <summary>Something made at a station: inputs from the bags become count of output. skill: the trade skill it needs. found: a found
+    /// recipe (Phase 8.6 step 5), known only once its leaf (an item of kind recipe that teaches it) has been used; otherwise it is taught,
+    /// known the moment the skill reaches it.</summary>
     [Serializable] public sealed class RecipeDef
     {
         public string id, name, profession, station, output;
         public int skill = 1, count = 1;
+        public bool found;
         public RecipeInput[] inputs = new RecipeInput[0];
     }
     [Serializable] public sealed class RecipeInput { public string item; public int count = 1; }
@@ -78,7 +82,8 @@ namespace Crulanda.Encounter
         /// - a station that is not forge, bench or fire; a craft with no station; a trainer or help line with no text;
         /// - a node whose trade is not a gathering skill, whose item is unknown, whose skill is outside 1-100, whose yield is
         ///   below 1 or has min over max, or whose respawn or working time is not above zero;
-        /// - a recipe with an unknown trade, output or input, no inputs, a count below 1, a skill outside 1-100 or no station.
+        /// - a recipe with an unknown trade, output or input, no inputs, a count below 1, a skill outside 1-100 or no station;
+        /// - a leaf (an item of kind recipe) that teaches no known recipe, or a taught one; a found recipe that no leaf teaches.
         /// </summary>
         public static ProfessionDatabase Parse(IEnumerable<string> jsonFiles, ItemDatabase items)
         {
@@ -116,7 +121,7 @@ namespace Crulanda.Encounter
                 }
             }
             foreach (var i in items.Items.Values)
-                if (!string.IsNullOrEmpty(i.teaches) && !db.professions.ContainsKey(i.teaches)) errors.Add("Item '" + i.id + "' teaches unknown profession '" + i.teaches + "'.");
+                if (i.kind != "recipe" && !string.IsNullOrEmpty(i.teaches) && !db.professions.ContainsKey(i.teaches)) errors.Add("Item '" + i.id + "' teaches unknown profession '" + i.teaches + "'.");
             foreach (var f in files)
             {
                 foreach (var n in f.nodes ?? new NodeDef[0])
@@ -153,8 +158,31 @@ namespace Crulanda.Encounter
                     db.recipes[r.id] = r; db.Recipes.Add(r);
                 }
             }
+            // Leaves and the found recipes they teach (Phase 8.6 step 5): every leaf teaches a found recipe, and every found recipe has a leaf.
+            // Checked only once the trades have recipes at all, so an items-only file set (a trades file missing) is not refused for them.
+            if (db.Recipes.Count > 0)
+            {
+                var taughtByLeaf = new HashSet<string>(StringComparer.Ordinal);
+                foreach (var i in items.Items.Values)
+                {
+                    if (i.kind != "recipe") continue;
+                    var r = db.Recipe(i.teaches);
+                    if (r == null) errors.Add("Leaf '" + i.id + "' teaches unknown recipe '" + i.teaches + "'.");
+                    else if (!r.found) errors.Add("Leaf '" + i.id + "' teaches '" + r.id + "', which is taught by the skill, not found.");
+                    else taughtByLeaf.Add(r.id);
+                }
+                foreach (var r in db.Recipes) if (r.found && !taughtByLeaf.Contains(r.id)) errors.Add("Recipe '" + r.id + "': found, but no leaf teaches it.");
+            }
             if (errors.Count > 0) throw new ArgumentException(string.Join("\n", errors));
             return db;
+        }
+        /// <summary>The leaf (an item of kind recipe) that teaches a found recipe, or null.</summary>
+        public static ItemDef LeafFor(ItemDatabase items, RecipeDef r)
+        {
+            if (items == null || r == null || !r.found) return null;
+            ItemDef best = null;
+            foreach (var d in items.Items.Values) if (d.kind == "recipe" && d.teaches == r.id && (best == null || string.CompareOrdinal(d.id, best.id) < 0)) best = d;
+            return best;
         }
         /// <summary>The station kinds in a station field ("forge|fire" is either); none for an empty field.</summary>
         public static string[] Stations(string station) { return string.IsNullOrEmpty(station) ? new string[0] : station.Split('|'); }
@@ -224,6 +252,10 @@ namespace Crulanda.Encounter
             Progress.professions.RemoveAll(s => s == null || string.IsNullOrEmpty(s.id));
             foreach (var s in Progress.professions) if (Db.Profession(s.id) != null) s.skill = Math.Max(1, Math.Min(ProfessionDatabase.MaxSkill, s.skill));
             foreach (var d in Db.Order) if (ProfessionDatabase.FromTheStart(d) && Entry(d.id) == null) Progress.professions.Add(new ProfessionSkill { id = d.id, skill = 1 });
+            // The found recipes learned (save format 11): blanks and repeats dropped; an id this content does not have is kept and ignored.
+            if (Progress.recipes == null) Progress.recipes = new List<string>();
+            Progress.recipes.RemoveAll(string.IsNullOrEmpty);
+            var once = new HashSet<string>(StringComparer.Ordinal); Progress.recipes.RemoveAll(id => !once.Add(id));
         }
         ProfessionSkill Entry(string id) { return Progress.professions.Find(s => s.id == id); }
 
@@ -234,6 +266,46 @@ namespace Crulanda.Encounter
         public int Skill(string id) { return Has(id) ? Entry(id).skill : 0; }
         /// <summary>How many crafts the character holds, of Db.CraftSlots.</summary>
         public int CraftSlotsUsed { get { int n = 0; foreach (var d in Db.Order) if (d.kind == "craft" && Has(d.id)) n++; return n; } }
+        /// <summary>Whether a recipe is known: a taught one always (its skill decides whether it can be made), a found one once its leaf has
+        /// been used (Progress.recipes). Forgetting a craft keeps the leaves learned for it: they are the page, not the hand.</summary>
+        public bool Knows(RecipeDef r) { return r != null && (!r.found || Progress.recipes.Contains(r.id)); }
+
+        // ---------- leaves: found recipes (Phase 8.6 step 5) ----------
+        public const string AlreadyKnownLine = "You know that one already.";
+        public const string NotALeafLine = "That can't be read.";
+        /// <summary>A found recipe was just learned (the session raises a toast and saves).</summary>
+        public Action<RecipeDef> Learned = r => { };
+        /// <summary>
+        /// Learns the found recipe a leaf teaches and says so ("You learn Bog-iron coif."). False, with why, when it is not a leaf of a known
+        /// found recipe (NotALeafLine), the recipe is known already (AlreadyKnownLine), or its trade is not had ("That is Blacksmithing's
+        /// work. Take up Blacksmithing to learn it."; for a gathering trade its tool: "You need a woodcutter's hatchet. Merchants sell
+        /// them."). The skill is not asked: a leaf learned early shows in the recipes, red, until the skill reaches it. The caller removes
+        /// the leaf on success.
+        /// </summary>
+        public bool UseLeaf(ItemDef leaf, out string why)
+        {
+            why = null;
+            var r = leaf != null && leaf.kind == "recipe" ? Db.Recipe(leaf.teaches) : null;
+            if (r == null || !r.found) { why = NotALeafLine; return false; }
+            if (Knows(r)) { why = AlreadyKnownLine; return false; }
+            var trade = Db.Profession(r.profession);
+            if (trade == null) { why = NotALeafLine; return false; }
+            if (!Has(trade.id)) { why = NotKnownLine(trade, "That is " + trade.name + "'s work. Take up " + trade.name + " to learn it."); return false; }
+            Progress.recipes.Add(r.id);
+            Say("You learn " + r.name + ".");
+            Learned(r);
+            return true;
+        }
+        /// <summary>Uses the leaf in a bag slot: on success one is taken from that slot. A refused leaf stays where it is.</summary>
+        public bool UseLeaf(int bagIndex, out string why)
+        {
+            why = NotALeafLine;
+            if (Items == null || Progress.bag == null || bagIndex < 0 || bagIndex >= Progress.bag.Count || Progress.bag[bagIndex].Empty) return false;
+            var s = Progress.bag[bagIndex];
+            if (!UseLeaf(Items.Get(s.item), out why)) return false;
+            s.count--; if (s.count <= 0) { s.item = ""; s.count = 0; }
+            return true;
+        }
 
         // ---------- tools ----------
         /// <summary>
@@ -378,15 +450,16 @@ namespace Crulanda.Encounter
         }
 
         // ---------- making things at a station (DESIGN 4, 5, 6.1) ----------
-        /// <summary>How a recipe stands for the character, the recipe list's colour: Locked (the trade not had, or its skill under the
-        /// recipe's), Orange (every one made teaches), Yellow (half do), Green (one in ten), Grey (nothing left to teach).</summary>
+        /// <summary>How a recipe stands for the character, the recipe list's colour: Locked (the trade not had, its skill under the
+        /// recipe's, or a found recipe whose leaf is not yet learned), Orange (every one made teaches), Yellow (half do), Green (one in
+        /// ten), Grey (nothing left to teach).</summary>
         public enum Difficulty { Locked, Orange, Yellow, Green, Grey }
         /// <summary>The chance that making a recipe of skill <paramref name="recipeSkill"/> raises the skill: certain under 10 points over
         /// it, even under 20, one in ten under 30, never from 30 over.</summary>
         public static float UpChance(int skill, int recipeSkill) { return skill < recipeSkill + 10 ? 1 : skill < recipeSkill + 20 ? .5f : skill < recipeSkill + 30 ? .1f : 0; }
         public Difficulty DifficultyOf(RecipeDef r)
         {
-            if (r == null || !Has(r.profession) || Skill(r.profession) < r.skill) return Difficulty.Locked;
+            if (r == null || !Has(r.profession) || Skill(r.profession) < r.skill || !Knows(r)) return Difficulty.Locked;
             float up = UpChance(Skill(r.profession), r.skill);
             return up >= 1 ? Difficulty.Orange : up >= .5f ? Difficulty.Yellow : up > 0 ? Difficulty.Green : Difficulty.Grey;
         }
@@ -413,11 +486,13 @@ namespace Crulanda.Encounter
             foreach (var s in ProfessionDatabase.Stations(station)) words.Add(s == "bench" ? "a herbalist's bench" : s == "forge" ? "a forge" : s == "fire" ? "a fire" : "a " + s);
             return string.Join(" or ", words);
         }
+        /// <summary>Why a found recipe can't be made before its leaf is learned.</summary>
+        public const string UnknownLine = "You have not learned that. A leaf teaches it.";
         /// <summary>Why a recipe can't be made away from its station: "You need a forge or a fire nearby."</summary>
         public static string StationWanted(string station) { return "You need " + StationWords(station) + " nearby."; }
         /// <summary>
         /// Whether a recipe can be made now, and why not, in this order: the trade not had (a gathering skill's tool, or "You have not
-        /// taken up Blacksmithing."); the skill under the recipe's ("That wants Woodcutting 20."); no station of its kind near
+        /// taken up Blacksmithing."); a found recipe not learned (UnknownLine); the skill under the recipe's ("That wants Woodcutting 20."); no station of its kind near
         /// (<paramref name="stationNear"/> is asked for each kind it may be made at; null: none is near); an input short ("You need
         /// Harrow oak log.", "... x2." for two); no room in the bags for what it makes (BagsFullLine). Nothing changes.
         /// </summary>
@@ -427,6 +502,7 @@ namespace Crulanda.Encounter
             var trade = r == null ? null : Db.Profession(r.profession);
             if (trade == null) { why = "You can't make that."; return false; }
             if (!Has(trade.id)) { why = NotKnownLine(trade, "You have not taken up " + trade.name + "."); return false; }
+            if (!Knows(r)) { why = UnknownLine; return false; }
             if (Skill(trade.id) < r.skill) { why = "That wants " + trade.name + " " + r.skill + "."; return false; }
             if (stationNear == null || !Array.Exists(ProfessionDatabase.Stations(r.station), k => stationNear(k))) { why = StationWanted(r.station); return false; }
             foreach (var kv in Needs(r))

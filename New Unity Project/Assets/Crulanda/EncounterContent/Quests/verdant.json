@@ -523,6 +523,9 @@
             "faction": "keepers",
             "amount": 250
           }
+        ],
+        "bagItems": [
+          "leaf.tempered_veridian_cloth"
         ]
       }
     },

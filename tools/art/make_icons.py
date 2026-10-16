@@ -2395,6 +2395,7 @@ def build_all(C):
             look = parse_look(lk) if lk else (fallbacks.get(it.get('slot'), 'sword.arming'), FAMILIES[fallbacks.get(it.get('slot'), 'sword.arming')][0], 'oakhaven', False)
             out.append(('item/' + safe(id_), gear_icon(id_, looks, look, id_), it['name'], q, False))
         elif id_ in ITEMS: out.append(('item/' + safe(id_), plain_icon(id_, ITEMS[id_]), it['name'], q, False))
+        elif kind == 'recipe': out.append(('item/' + safe(id_), plain_icon(id_, leaf_spec(it)), it['name'], q, False))   # a leaf (Phase 8.6)
         else: missing.append('item ' + id_)
     for r in C['prof'].get('recipes') or []:
         if not any(i['id'] == r['output'] for i in C['items']): missing.append('recipe output ' + r['output'])
@@ -2740,6 +2741,39 @@ ABILITIES.update({'scoundrel.quick_cut': ('#3a1a20', a_sc_quick_cut), 'scoundrel
                   'scoundrel.rallying_verse': ('#1e3a2c', a_sc_rallying_verse), 'scoundrel.bribe': ('#3a3018', a_sc_bribe), 'scoundrel.favour': ('#1e3434', a_sc_favour)})
 BRANCH.update({'cutthroat': ('#3a1418', ['#c0303a', '#e8e0d0', '#9be05a', GOLD, '#ff9070']), 'silver-tongue': ('#2a2440', ['#e0d0ff', '#fff2c0', '#c8a0ff', '#9fc8ff', '#ffffff']),
                'fixer': ('#3a3018', [GOLD, '#c0303a', '#9fe8c0', '#fff2c0', '#d07050'])})
+
+# ---- Phase 8.6 (2026-10-15, p86-craft): the leaves (found recipes), the simples, the dishes and feasts, the fleece and the geode chip;
+# Leatherworking and Weaving's trade icons. GAME-ONLY imagery. The crafted gear itself is drawn from its look (gear_icon). ----
+def leaf_page(c, mark='#b23a30', ink='#6b4a2c'):
+    """A leaf torn from a trade's book: a parchment page with a ragged edge, ruled lines and the trade's mark."""
+    c.push(rot=-12)
+    b = c.poly([(22, 10), (78, 12), (82, 28), (76, 44), (82, 62), (76, 78), (80, 92), (24, 90), (20, 52)], smooth=False)
+    c.part(b, '#efe6cc', 'matte')
+    for y in (24, 32, 40, 48, 56, 64): c.flat(c.line([(28, y), (68, y)], 1.3), ink, .55, clip=b)
+    s = c.blob(60, 76, 8, 7, n=10, jit=.1, smooth=True); c.part(s, mark, 'gem')
+LEAF_MARK = {'smith': '#8d96a3', 'tanner': '#a8703a', 'weaver': '#4a7ab0', 'bowyer': '#6e8a3a', 'herbalist': '#3f8a4a', 'cook': '#c06a18'}
+ITEMS.update({
+    'mat.fleece': ('hide', pelt, ('#e8e2d4',), dict(belly='#f4f0e6', small=True)),
+    'mat.geode_chip': ('ore', shard, ('#a8b4c4',), dict(mat='gem', glowc='#cfe0ff', thin=True)),
+    'potion.tincture_ox': ('potion', flask, ('#b05030',), dict(shape='vial')), 'potion.tincture_hare': ('potion', flask, ('#c8a050',), dict(shape='vial')),
+    'potion.tincture_owl': ('potion', flask, ('#5a70c8',), dict(shape='vial')), 'potion.tincture_hearth': ('potion', flask, ('#d08840',), dict(shape='vial')),
+    'potion.tincture_bear': ('potion', flask, ('#6a4a2a',), dict(shape='vial')),
+    'potion.cordial_ox': ('potion', flask, ('#b05030',), dict(shape='tall', label='#c9b48a')), 'potion.cordial_hare': ('potion', flask, ('#c8a050',), dict(shape='tall', label='#c9b48a')),
+    'potion.cordial_owl': ('potion', flask, ('#5a70c8',), dict(shape='tall', label='#c9b48a')), 'potion.cordial_hearth': ('potion', flask, ('#d08840',), dict(shape='tall', label='#c9b48a')),
+    'potion.cordial_bear': ('potion', flask, ('#6a4a2a',), dict(shape='tall', label='#c9b48a')),
+    'potion.draught_mana': ('potion', flask, ('#3a6ae0',)), 'potion.draught_vigor': ('potion', flask, ('#d04a2a',)), 'potion.draught_focus': ('potion', flask, ('#4ac0a0',)),
+    'potion.draught_nerve': ('potion', flask, ('#a03a8a',)), 'potion.draught_breath': ('potion', flask, ('#70b0d0',)), 'potion.draught_salt': ('potion', flask, ('#e8eef2',)),
+    'potion.clean_blood': ('potion', flask, ('#7a1a2a',), dict(shape='tri')),
+    'salve.tallow': ('potion', tallow), 'salve.scree': ('potion', salt, ('#8a8a88',), dict(crust=True)),
+    'food.cask_stew': ('food', bowl_stew, ('#8a4a20',)), 'food.harvest_feast': ('food', pie, ('#d9a04a', '#c8a050')),
+    'food.bear_broth': ('food', bowl_stew, ('#6a3a20', '#5a3a24')), 'food.passfire_feast': ('food', roast, ('#5a2a18', '#c86a4a')),
+    'food.sap_venison': ('food', meat_chop, ('#8a3a2a', '#d8b070'), dict(glaze='#40e080')), 'food.shore_feast': ('food', pie, ('#b8d070', '#6a3a30')),
+})
+def leaf_spec(item):
+    """A leaf's picture: its trade's mark, read off its name ("a smith's leaf: ...")."""
+    word = item.get('name', '').split("'")[0].replace('a ', '', 1).strip()
+    return ('quest', leaf_page, (LEAF_MARK.get(word, '#b23a30'),))
+PROF_ICONS.update({'leatherworking': ('hide', pelt, ('#a8703a',)), 'weaving': ('herb', skein)})
 
 def main():
     here = os.path.dirname(os.path.abspath(__file__))

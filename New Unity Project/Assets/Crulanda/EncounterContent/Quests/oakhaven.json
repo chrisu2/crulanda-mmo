@@ -1383,6 +1383,9 @@
             "faction": "oakhaven",
             "amount": 150
           }
+        ],
+        "bagItems": [
+          "leaf.tempered_copper_bow"
         ]
       }
     },

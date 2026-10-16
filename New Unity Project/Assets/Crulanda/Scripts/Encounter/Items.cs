@@ -17,7 +17,7 @@ namespace Crulanda.Encounter
         public LootTableDef[] loot = new LootTableDef[0];
     }
     /// <summary>
-    /// kind: gear | junk | consumable | material | tool | bag. slot: head, neck, shoulders, chest, hands, legs, feet, mainhand, offhand (gear only).
+    /// kind: gear | junk | consumable | material | tool | bag | recipe. slot: head, neck, shoulders, chest, hands, legs, feet, mainhand, offhand (gear only).
     /// quality: 0 poor (grey), 1 common (white), 2 uncommon (green), 3 rare (blue), 4 epic (purple).
     /// value: sell price in gold (merchants charge 4x). heal: consumables restore this much health (potions) or over 10 s out of combat (food).
     /// material: something gathered or refined that recipes use (quality 1, so "Sell junk" leaves it). trade: the village stock a sale of
@@ -25,6 +25,8 @@ namespace Crulanda.Encounter
     /// tool: used once from the bags, it teaches the trade named in teaches and takes no bag slot after that (ProfessionLog.UseTool).
     /// bag: a trade bag (the leatherworker's). Used once from the bags it is worn for good (Inventory.Wear) and adds slots more
     /// bag slots that take only items whose pouch is its holds class.
+    /// recipe: a leaf (Phase 8.6 step 5): used once from the bags it teaches the found recipe named in teaches (ProfessionLog.UseLeaf).
+    /// A consumable's buff, pool and restore, and cure: see Consumables.
     /// </summary>
     [Serializable] public sealed class ItemDef
     {
@@ -35,11 +37,18 @@ namespace Crulanda.Encounter
         public int quality = 1, level = 1, value = 1, stack = 1, slots;
         public int armor, stamina, strength, agility, intellect, spirit, weaponDamage, heal;
         public bool food;
+        /// <summary>What a consumable gives for a while (Phase 8.6 step 4): well fed, a tincture's stat, a salve's armour. Not saved.</summary>
+        public ItemBuff buff;
+        /// <summary>A draught for a class's pool: the pool it fills (Consumables.Pools: "mana", "vigor", "focus", "nerve", "breath", "salt") and how much.</summary>
+        public string pool; public int restore;
+        /// <summary>A cure: it lifts the harmful workings on the drinker (poisons, bleeds, the grey; StatusEffectRuntime.RemoveHarmful).</summary>
+        public bool cure;
     }
     /// <summary>What a merchant sells: by NPC name, or by role (merchant, blacksmith, baker, herbalist...) for anyone of that trade.</summary>
     [Serializable] public sealed class VendorDef { public string npc, role; public string[] items = new string[0]; public bool gearForZone; }
-    /// <summary>Drops for mobs whose id tag matches (wolf, boar, collector... or "any"), within a level band.</summary>
-    [Serializable] public sealed class LootTableDef { public string tag = "any"; public int levelMin = 1, levelMax = 10; public LootEntry[] entries = new LootEntry[0]; public float gearChance = .12f; }
+    /// <summary>Drops for mobs whose id tag matches (wolf, boar, collector... or "any"), within a level band. elite: only the camp's elite
+    /// (its boss) rolls it, not the rest of its camp (a boss's leaves, Phase 8.6 step 5).</summary>
+    [Serializable] public sealed class LootTableDef { public string tag = "any"; public int levelMin = 1, levelMax = 10; public LootEntry[] entries = new LootEntry[0]; public float gearChance = .12f; public bool elite; }
     [Serializable] public sealed class LootEntry { public string item; public float chance = .5f; public int min = 1, max = 1; }
 
     /// <summary>One bag slot or equipment slot in the save ("" = empty).</summary>
@@ -72,6 +81,8 @@ namespace Crulanda.Encounter
                     if (db.Items.ContainsKey(i.id)) { errors.Add("Duplicate item '" + i.id + "'."); continue; }
                     if (i.kind == "gear" && SlotIndex(i.slot) < 0) errors.Add("Item '" + i.id + "' has no valid slot.");
                     if (i.kind == "bag" && (string.IsNullOrEmpty(i.holds) || i.slots < 1 || i.slots > Inventory.BagSize)) errors.Add("Bag '" + i.id + "' needs holds and 1-" + Inventory.BagSize + " slots.");
+                    if (i.kind == "recipe" && string.IsNullOrEmpty(i.teaches)) errors.Add("Leaf '" + i.id + "' teaches no recipe.");
+                    Consumables.Check(i, errors);
                     if (i.stack < 1) i.stack = 1;
                     db.Items[i.id] = i;
                 }
@@ -149,7 +160,7 @@ namespace Crulanda.Encounter
             var drops = new List<(string, int)>(); float gearChance = .1f;
             foreach (var t in Loot)
             {
-                if ((t.tag != "any" && t.tag != tag) || level < t.levelMin || level > t.levelMax) continue;
+                if ((t.tag != "any" && t.tag != tag) || level < t.levelMin || level > t.levelMax || (t.elite && !elite)) continue;
                 gearChance = Mathf.Max(gearChance, t.gearChance);
                 foreach (var e in t.entries) if (rng.NextDouble() < e.chance) drops.Add((e.item, e.min + rng.Next(Mathf.Max(1, e.max - e.min + 1))));
             }
@@ -182,6 +193,7 @@ namespace Crulanda.Encounter
             if (d.stamina > 0) l.Add("+" + d.stamina + " Stamina"); if (d.strength > 0) l.Add("+" + d.strength + " Strength");
             if (d.agility > 0) l.Add("+" + d.agility + " Agility"); if (d.intellect > 0) l.Add("+" + d.intellect + " Intellect"); if (d.spirit > 0) l.Add("+" + d.spirit + " Spirit");
             if (d.heal > 0) l.Add(d.food ? "Restores " + d.heal + " health over 10 s (out of combat)" : "Restores " + d.heal + " health");
+            l.AddRange(Consumables.Lines(d));
             return string.Join("\n", l);
         }
     }

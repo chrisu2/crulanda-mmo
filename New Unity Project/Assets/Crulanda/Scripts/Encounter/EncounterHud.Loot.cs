@@ -118,7 +118,7 @@ namespace Crulanda.Encounter
         static string LootKind(ItemDef d, int count)
         {
             string kind = d.kind == "gear" ? ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)] + "  ·  " + ItemDatabase.SlotNames[Mathf.Max(0, ItemDatabase.SlotIndex(d.slot))]
-                : d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "consumable" ? (d.food ? "Food" : "Potion") : ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)];
+                : d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "consumable" ? Consumables.KindWord(d) : d.kind == "recipe" ? "Recipe leaf" : ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)];
             return count > 1 ? kind + "  ·  " + count : kind;
         }
 

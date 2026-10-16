@@ -64,7 +64,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(4, crown.props.Count(p => p != null && p.kind == "guild_hall"));
             Assert.AreEqual(1, crown.props.Count(p => p != null && p.kind == "city_gate" && p.variant == 1), "One gate shut: the Low Stair.");
             Assert.AreEqual(1, Prop("The Low Stair").variant, "The Low Stair is shut until the Lowtowns open.");
-            Assert.IsTrue(crown.props.Any(p => p != null && p.kind == "signpost" && p.name.Contains("16-19")), "Its sign says what is below: dangerous, 16-19.");
+            Assert.IsTrue(crown.props.Any(p => p != null && p.kind == "signpost" && p.name.Contains("15-20")), "Its sign says what is below: dangerous, 16-19.");
             Assert.IsNotNull(Prop("The Gilt Gate")); Assert.AreEqual(0, Prop("The Gilt Gate").variant, "The Gilt Gate stands open.");
             Assert.GreaterOrEqual(crown.props.Count(p => p != null && p.kind == "city_wall" && p.variant == 0), 2, "The curtain wall.");
             // The map: the keep at the north-centre, the domed hall east of it, the many-spired Archive west of it, the Spire below the south wall's middle.

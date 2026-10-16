@@ -93,7 +93,8 @@ namespace Crulanda.Tests
             session.Kit.ApplyStats();
             Assert.IsNull(session.Kit.ActionLockLabel(net), "the Net learnt");
             var jailer = (WarriorKit)session.Kit; var motor = session.Player.GetComponent<AdventurerMotor>();
-            var e = Mob(); motor.Teleport(e.transform.position + Vector3.back * 2); session.Select(e); yield return null;
+            var e = Mob(); e.Cast = null;   // the Jailer's own numbers: the mob's signature move (2026-10-15) would land a hit and its Vigor
+            motor.Teleport(e.transform.position + Vector3.back * 2); session.Select(e); yield return null;
             Assert.AreEqual(1f, session.Kit.PartyDamageMultiplier(e), 1e-4f, "nothing held yet");
             Assert.IsTrue(session.UseAbility(cut), "Hock Cut"); yield return null;
             Assert.IsTrue(e.Slowed, "slowed"); Assert.IsTrue(jailer.Holds(e)); Assert.IsFalse(jailer.Binds(e), "a slow is a hold, not a binding");

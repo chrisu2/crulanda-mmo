@@ -757,6 +757,9 @@ namespace Crulanda.Encounter
         /// The nearest villager of a trade (blacksmith, herbalist) within <paramref name="range"/> (ground distance, as E measures) who is
         /// awake and about: in sight, not abed or on the way there, not slumped over a table. Null when there is none, or no village.
         /// </summary>
+        /// <summary>A craft's trainer awake within TrainerRange: a villager of its trainer role (a blacksmith), or one of the Crown's trade
+        /// trainers ("profession-trainer:blacksmithing", the Crafters' Court, ZoneBuilder.Crown).</summary>
+        Villager CraftTrainerNear(ProfessionDef d) { return d == null ? null : TradeNpcNear(d.trainerRole, TrainerRange) ?? TradeNpcNear("profession-trainer:" + d.id, TrainerRange); }
         public Villager TradeNpcNear(string role, float range)
         {
             if (string.IsNullOrEmpty(role) || Player == null || VillageLife.Active == null) return null;
@@ -779,7 +782,7 @@ namespace Crulanda.Encounter
             if (!Professions.CanLearn(id, out why)) return false;
             var d = Professions.Db.Profession(id);
             foreach (var kind in ProfessionDatabase.Stations(d.station)) if (StationNear(kind) != null) return true;
-            if (TradeNpcNear(d.trainerRole, TrainerRange) != null) return true;
+            if (CraftTrainerNear(d) != null) return true;
             why = d.name + " is taken up at " + ProfessionLog.StationWords(d.station) + (string.IsNullOrEmpty(d.trainerRole) ? "." : ", or from a " + d.trainerRole + ".");
             return false;
         }
@@ -792,7 +795,7 @@ namespace Crulanda.Encounter
         public bool LearnCraft(string id)
         {
             if (!CanTakeUp(id, out var why)) { if (why != null) Message(why); return false; }
-            var d = Professions.Db.Profession(id); var trainer = TradeNpcNear(d.trainerRole, TrainerRange);
+            var d = Professions.Db.Profession(id); var trainer = CraftTrainerNear(d);
             if (!Professions.Learn(id, out why)) { Message(why); return false; }
             var line = trainer != null ? ProfessionDatabase.LineFor(d.trainerLines, trainer.Name) : null;
             if (line != null) { Message(trainer.Name + ": " + line); trainer.Say(line, 7); trainer.FacePlayer(); }

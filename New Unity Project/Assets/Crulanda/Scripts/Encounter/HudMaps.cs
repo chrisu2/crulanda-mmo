@@ -151,7 +151,7 @@ namespace Crulanda.Encounter
             }
         }
 
-        public static string Band(ZoneDefinition z) { return z.levelMin == z.levelMax ? "(" + z.levelMin + ")" : "(" + z.levelMin + "-" + z.levelMax + ")"; }
+        public static string Band(ZoneDefinition z) { return z.city ? "(all)" : z.levelMin == z.levelMax ? "(" + z.levelMin + ")" : "(" + z.levelMin + "-" + z.levelMax + ")"; }
         /// <summary>Colour of a level band for you: grey = beneath you, green = right for you, yellow = a stretch, red = too dangerous.</summary>
         public static Color BandColor(ZoneDefinition z, int level)
         {

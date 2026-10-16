@@ -89,6 +89,24 @@ namespace Crulanda.World
         public ZoneEvent[] events = new ZoneEvent[0];
         /// <summary>Trails of living lichen along the run's way (<see cref="ZoneCrumb"/>).</summary>
         public ZoneCrumb[] crumbs = new ZoneCrumb[0];
+        // ---- a city (the Crown of Argentis, Docs/CAPITAL_HUB.md; all optional: a zone without them builds as it did) ----
+        /// <summary>A safe city (the Crown of Argentis): no camps and no gathering nodes; its people are the trades' trainers, the
+        /// clerks and the Council's wardens. Its levels show as "all" on the maps; the five wild zones' counts leave it out.</summary>
+        public bool city;
+        /// <summary>Level ground in rectangles over the land (<see cref="ZoneTerrace"/>; ZoneBuilder.Crown): a plateau on its wall, a
+        /// terrace above it, a ramp between them. Applied after the shapes, in order, a later one over an earlier.</summary>
+        public ZoneTerrace[] terraces = new ZoneTerrace[0];
+    }
+    /// <summary>
+    /// A terrace (ZoneBuilder.Crown; GAME-ONLY ground): a rectangle size (x across, y along) round center, turned rotation degrees,
+    /// levelled at height, easing back to whatever lies under it over blend metres outside its edge (a metre or two: a cliff the
+    /// walls stand on). ramp: its level runs from height at its -z end to heightTo at its +z end (a ramp up to a gate or a terrace).
+    /// paved: flagged in white stone where it is the ground (no grass grows there). A later terrace lies over an earlier one.
+    /// </summary>
+    [Serializable] public sealed class ZoneTerrace
+    {
+        public string name, canonStatus; public Vector2 center, size; public float rotation, height, heightTo, blend = 1.5f;
+        public bool ramp, paved;
     }
     /// <summary>
     /// Ambient life. villagers: how many named villagers live here (homes are the zone's barred houses, given by households).
@@ -117,7 +135,9 @@ namespace Crulanda.World
     /// one who keeps a post day and night. stories: two or three lines of their own, memories, grudges and hopes tied to the
     /// canon (GAME-ONLY lines about CANON things), said one time in three when spoken to (ZoneLore.Story).
     /// </summary>
-    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look; public Vector2 at; public bool works; public string[] stories = new string[0]; }
+    /// look: a resident's own body ("keeper", a Veridian Keeper; "concord", the Concord's warden look, friendly: the Council's wardens
+    /// in the Crown). canonStatus (optional): the lore status of the person and their lines (High Councilor Aethelgard is CANON).
+    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look, canonStatus; public Vector2 at; public bool works; public string[] stories = new string[0]; }
     /// <summary>A named person's stories (<see cref="ZoneLife.stories"/>): name as the villager is named, and their lines.</summary>
     [Serializable] public sealed class ZoneStory { public string name; public string[] lines = new string[0]; }
     /// <summary>
@@ -292,6 +312,11 @@ namespace Crulanda.World
     /// the prop facing -Z; variant 0 is Crowsfoot Hollow's plan; give it a level ZoneShape pad under its floor, see Hollow).
     /// rotation in degrees (0 = door faces south). variant picks colour/size variations; some are looks of their own:
     /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), crypt 1 a turfed barrow, grave 1 heaved over.
+    /// A city's (ZoneBuilder.Crown, the Crown of Argentis): council_keep, dome_hall, archive, mansion (variant 0 the Exchange, 1 the
+    /// Treasury, 2 the Hall of Arms, 3 the Armoury), guild_hall (variant: the guild, SimGuilds' order) walk in; gilt_house, colonnade,
+    /// fountain, statue, city_lamp, council_banner, parterre, stair (treads over a ramp terrace), city_wall (uses points; variant 0 the
+    /// curtain wall with its towers every size.x metres, 1 a parapet), city_gate (size.x the passage; variant 1 shut), spire (the
+    /// Spire, a backdrop), lowtowns (roofs and smoke over size), sea (a still sheet of water over size).
     /// </summary>
     [Serializable] public sealed class ZoneProp
     {

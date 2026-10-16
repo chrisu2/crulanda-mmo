@@ -110,3 +110,11 @@ a bank; "etc more as we come up with it".
 **Decisions answered (2026-10-15 ~22:45, the question prompt, verbatim):** the bank "Shared by all (Recommended)": the vault lives in
 the profile save (profile.save.json, beside the characters), not on a character, so the character format is untouched by it (the
 profile's format goes up one, Chris's saves backed up first); the Exchange "Sims list and buy (Recommended)".
+
+## Status (p9-crown, 2026-10-15): step 1 written, not yet run
+Written and compile-checked on branch p9-crown; **not built, toured or looked at** (no Unity run). `zone.crown` (EncounterContent/Zones/crown.json),
+its kinds in `Scripts/World/ZoneBuilder.Crown.cs` (terraces, paving, the walk-in halls, the walls and gates with the Modular Castle Kit's
+towers, tall wall and wall entrance, the Spire and the Lowtowns below), the North road from Oakhaven, the people at their posts with the
+roles the halls, bank and Exchange branches hook, every trade's trainer and station in the Crafters' Court. Tests: CrownZoneTests
+(EditMode), CrownZonePlayTests (PlayMode); the general zone tests take the Crown in. Captures: `--crulanda-world-capture` with
+`--crulanda-zone zone.crown` (a view per place; "The Crown of Argentis" from the south-east, as the map).

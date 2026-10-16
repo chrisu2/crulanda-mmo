@@ -1640,6 +1640,34 @@
   ],
   "vendors": [
     {
+      "role": "profession-trainer:mining",
+      "items": [
+        "tool.pick"
+      ]
+    },
+    {
+      "role": "profession-trainer:woodcutting",
+      "items": [
+        "tool.hatchet"
+      ]
+    },
+    {
+      "role": "profession-trainer:blacksmithing",
+      "items": [
+        "tool.pick",
+        "tool.hatchet",
+        "mat.charcoal"
+      ]
+    },
+    {
+      "role": "profession-trainer:alchemy",
+      "items": [
+        "potion.minor",
+        "potion.healing",
+        "mat.vial"
+      ]
+    },
+    {
       "role": "merchant",
       "items": [
         "potion.minor",

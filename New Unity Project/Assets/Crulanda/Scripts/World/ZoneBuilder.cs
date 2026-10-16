@@ -97,7 +97,7 @@ namespace Crulanda.World
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); Lap("prepare");
-            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
+            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildPaving(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
             BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
@@ -188,6 +188,7 @@ namespace Crulanda.World
             float h = hills * Zone.hillHeight * n + (hills > 0 ? hills * Crag(x, z) : 0) + CliffLift(x, z);   // mountain crags off the kept ways; shelves behind cliffs
             if (Zone.wasting != null && x > Zone.wasting.x - 4) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 6);  // unmade ground is dead flat
             if (shapes != null) h = Shape(x, z, h);   // landmark ground: level pads, perches and basins (ZoneShape)
+            if (Zone.terraces != null && Zone.terraces.Length > 0) h = Terraces(x, z, h);   // a city's plateau, terraces and ramps (ZoneBuilder.Crown)
             if (carveWater && Water != null) h = Water.Carve(x, z, h);   // creeks and lakes (see ZoneWater)
             return h;
         }
@@ -1152,7 +1153,7 @@ namespace Crulanda.World
             {
                 if (p == null || string.IsNullOrEmpty(p.kind)) continue;
                 // Moving parts (doors, wheels) and things that can be picked or emptied can't be static-batched.
-                var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "inn" || p.kind == "mill" || p.kind == "windmill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
+                var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "inn" || WalksInCity(p.kind) || p.kind == "mill" || p.kind == "windmill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
                 // Small things never stand in a road (playtest note 74): out to the verge, clear of the edge by their own reach.
                 float verge = Verge(p); if (verge > 0) p.at = OffRoad(p.at, verge);
                 var t = Root(p, parent);
@@ -1257,7 +1258,7 @@ namespace Crulanda.World
                     case "wayshrine": Wayshrine(t); break;
                     case "cavern": Cavern(t, Hollow.All.Find(h => h.Name == t.name), p.variant); break;
                     case "chest": TreasureChest(t); break;
-                    default: Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;
+                    default: if (!CityProp(t, p)) Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;   // a city's kinds (ZoneBuilder.Crown)
                 }
                 rng = zoneRng;
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
@@ -1319,7 +1320,7 @@ namespace Crulanda.World
                 case "leathershop": return LeatherShopSize / 2 + Vector2.one * .8f;
                 case "dryhut": return DryingHutSize / 2 + Vector2.one * .8f;
                 case "kitchen": return KitchenSize / 2 + new Vector2(.3f, .4f);
-                default: return Vector2.zero;
+                default: return CityFootprint(p);   // a city's halls and houses (ZoneBuilder.Crown); zero for anything else
             }
         }
         /// <summary>Whether a point stands under a building's roof (its footprint, eaves included), under an inn's porch or in a cave: no rain or snow falls there.</summary>
@@ -3684,6 +3685,7 @@ namespace Crulanda.World
             }
             float living = 1 - Unmade(p.x, p.y) / .55f; if (living <= 0) return 0;   // grass thins out along the grey's ragged front
             if (Hollow.CoverAt(p, 1.2f) > 0) return 0;   // a cave's bare floor
+            if (Paved(p)) return 0;   // a city's flagged streets and squares (ZoneBuilder.Crown)
             float verge = 0;   // 1 at a road's edge, 0 from 2.5 m out
             for (int k = 0; k < Zone.roads.Length; k++)
             {

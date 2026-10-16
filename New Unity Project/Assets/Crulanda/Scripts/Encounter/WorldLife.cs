@@ -745,6 +745,49 @@ namespace Crulanda.Encounter
             { "Sister Iselle", new[] { "I am listening. You may listen too, if you are quiet.", "The Archive has words for this glade. None of them are right." } },
             { "Ondine Varro", new[] { "Charts, salt, and anything that glows. That's what House Glass pays for.", "There's a cove under that ridge with deep water close in. Somebody ought to be using it." } },
         };
+        // ---- the Crown of Argentis (a city: ZoneDefinition.city; GAME-ONLY lines about CANON things: the High Council, the Lowtowns) ----
+        static readonly string[] CityChatter = {
+            "...and the Exchange took his whole cargo before noon.", "The Council sits again tomorrow.", "Gilt on the gate again. Somebody's paying.",
+            "Mind the wardens. They're counting today.", "Smoke's thick over the Lowtowns.", "Aye.", "Mm. Could be." };
+        static readonly string[] CityLines = {
+            "Welcome to the Crown. Keep to the white stone and the wardens won't trouble you.",
+            "Everything worth having passes through the Exchange sooner or later.",
+            "Don't look over the south wall too long. The Lowtowns look back.",
+            "The Council's edicts go up in the domed hall. Read them before you break them.",
+            "Gold on the roofs, and the bread's the same price as anywhere. Dearer." };
+        static readonly string[] CityChild = { "Are you here to see the High Councilor? Nobody sees the High Councilor.", "My uncle's a warden. He says I'm not to go near the Low Stair.", "Is it true there are sea serpents off the west cliffs?" };
+        /// <summary>The key of a Crown role's lines: every class's trainer ("trainer:class.warrior") is "trainer", every guild's master
+        /// ("guildmaster:lantern-watch") "guildmaster"; a trade's trainer keeps its own ("profession-trainer:mining").</summary>
+        static string CityRole(string role)
+        {
+            if (role == null) return null;
+            if (role.StartsWith("trainer:") || role.StartsWith("trainer.")) return "trainer";
+            if (role.StartsWith("guildmaster:")) return "guildmaster";
+            return role;
+        }
+        /// <summary>What the Crown's clerks, trainers and wardens say of their work (GAME-ONLY), by role (<see cref="CityRole"/>).</summary>
+        static readonly Dictionary<string, string[]> CityTrade = new Dictionary<string, string[]> {
+            // High Councilor Aethelgard (CANON, world_bible.md; his "Greater Good", his dry calculation: b1 ch.12): lines of the game's own (GAME-ONLY).
+            { "councilor", new[] { "The Council serves the Greater Good. In time, so will you.", "Order is a kindness. The disorderly never thank us for it.", "A variable. How interesting. Most people are merely sums." } },
+            { "warden", new[] { "Order in the Crown, traveller. Move along.", "The Council's peace holds here. See that it holds round you.", "The Low Stair's shut. Council's word." } },
+            { "auctioneer", new[] { "Lots listed, lots sold. The Exchange never sleeps.", "Fair price, fair fee. The Council takes its tenth either way." } },
+            { "factor", new[] { "Port Caelum buys what the Crown won't admit it wants.", "Glass, salt and rumour. I deal in all three." } },
+            { "banker", new[] { "What the Treasury holds, the Treasury keeps.", "Sign here. And here. The Council likes its ledgers full." } },
+            { "archivist", new[] { "Quietly, please. The shelves remember every voice.", "Bring me what you find out there. Every page has a place." } },
+            { "council-clerk", new[] { "The High Councilor's time is the Council's. Mine, regrettably, is yours.", "Errands for the Council are posted through me. Refuse them if you like. It is noted." } },
+            { "profession-trainer:herbalism", new[] { "Yarrow by the path, tarnwort by the water. Learn where a thing grows and it will find you.", "Cut clean and leave the root. The hill gives again." } },
+            { "profession-trainer:leatherworking", new[] { "A good hide is half the work. Curing it right is the other half.", "Bags, belts, a jerkin that turns a blade. All from what you skin." } },
+            { "profession-trainer:weaving", new[] { "Warp first, then weft. Patience is the shuttle.", "Wool from the folds, flax from the Shore. The loom takes everything." } },
+            { "herald", new[] { "Hear the edicts of the High Council.", "New notices on the board at noon." } },
+            { "guildmaster", new[] { "A guild is only as good as its worst run. Remember that.", "Our hall's open to members. The rest of you may admire the banner." } },
+            { "trainer", new[] { "Discipline first. Everything else follows.", "Come back when you've bled a little more. Then we'll talk." } },
+            { "dresser", new[] { "Stand still. No, stiller. There.", "Mail under silk. That's the Crown's fashion this year." } },
+            { "profession-trainer:mining", new[] { "Every pick in the Crown came through my hands.", "Swing from the hips. Let the stone do the arguing." } },
+            { "profession-trainer:woodcutting", new[] { "A hatchet, a good eye, and the patience to look for the windfall.", "Never cut what's still living. The deadfall's yours for the taking." } },
+            { "profession-trainer:cooking", new[] { "Any fire will do for a stew. A good fire does it better.", "Meat, salt, and patience. Mostly patience." } },
+            { "profession-trainer:blacksmithing", new[] { "Bring me ore and I'll teach you what to do with it.", "Anvil, hammer, heat. The rest is practice." } },
+            { "profession-trainer:alchemy", new[] { "The bench is yours, if you've herbs to bring.", "Simpling is listening. The herb tells you what it wants to be." } },
+            { "innkeeper", new[] { "Gilded by name. The ale's honest, though.", "A room, a meal, a quiet corner. The Lantern has all three." } } };
         static readonly string[] ChildLines = { "Are you a real adventurer?", "Mum says not to go near the grey.", "I saw a crow as big as a dog!" };
         static readonly string[] Chatter = {
             "...and the miller swore it was a wolf.", "Two coppers for a loaf now!", "Did you see the sky over the east fields?",
@@ -786,6 +829,18 @@ namespace Crulanda.Encounter
                 if (rng.Next(4) == 0) { var hint = ZoneLore.SecretHint(Zone.Zone, Session.Discoveries, rng); if (hint != null) return hint; }
                 if (OwnLines.TryGetValue(v.Name, out var own) && rng.Next(2) == 0) return own[rng.Next(own.Length)];
                 return v.Keeper ? Keepers[rng.Next(Keepers.Length)] : OwnLines.TryGetValue(v.Name, out var mine) ? mine[rng.Next(mine.Length)] : Keepers[rng.Next(Keepers.Length)];
+            }
+            if (Zone.Zone.city)
+            {
+                // The Crown of Argentis: its own talk (CityChatter, CityLines; GAME-ONLY), none of the villages' grey and collectors. Stories and
+                // hints as anywhere; the clerks, trainers and wardens their own trade's lines.
+                if (!toPlayer) return CityChatter[rng.Next(CityChatter.Length)];
+                if (rng.Next(3) == 0) { var tale = ZoneLore.Story(Zone.Zone, v.Name, rng); if (tale != null) return tale; }
+                if (rng.Next(4) == 0) { var hint = ZoneLore.SecretHint(Zone.Zone, Session.Discoveries, rng); if (hint != null) return hint; }
+                var role = CityRole(v.Role);
+                if (role != null && CityTrade.TryGetValue(role, out var cityTrade) && rng.Next(3) > 0) return cityTrade[rng.Next(cityTrade.Length)];
+                if (v.Role == "child") return CityChild[rng.Next(CityChild.Length)];
+                return CityLines[rng.Next(CityLines.Length)];
             }
             if (v.PassedOut) return "Zzz...";
             if (!toPlayer) return Chatter[rng.Next(Chatter.Length)];
@@ -960,7 +1015,9 @@ namespace Crulanda.Encounter
             v.agent.baseOffset = role == "child" ? .66f : 1; v.agent.avoidancePriority = 60;
             // A resident's own look (a Veridian Keeper): the body of the look, calm (an even variant), and no villager's outfit.
             v.Keeper = look == "keeper";
-            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper ? null : role);
+            // A Council warden of the Crown (look "concord"): the Concord's warden in its white tabard, friendly (ZoneBuilder.Crown; GAME-ONLY).
+            bool concord = look == "concord";
+            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper || concord ? null : role);
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop; v.Fold = fold;

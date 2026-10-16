@@ -1,0 +1,2531 @@
+{
+  "id": "zone.crown",
+  "displayName": "The Crown of Argentis",
+  "subtitle": "The High City, seat of the High Council",
+  "canonStatus": "CANON",
+  "canonNote": "CANON: Argentis, the Sky Bastion, at the centre of the land (the overworld map); the Crown, the highest tier, 'built of white stone and gold, housing the Council and the wealthy' (world_bible.md); the walled High City on its raised wall with the Spire below its south wall, the Lowtowns spreading south-west and the Warrens south-east (maps\\argentis_city_map.png); the High Council and High Councilor Aethelgard, its face (world_bible.md; b1 ch.12). CANON-EXPANDED: the Archive (the High City's archives, world_bible.md); the factor of Port Caelum. GAME-ONLY: every building's name, look and plan (the Council Keep, the Council Hall, the Gilt Gate, the Low Stair, the Processional Way, the Grand Stair, the Crown Square, the Exchange, the Treasury Vault, Guild Row and its halls, the Gilded Lantern, the Hall of Arms, the Armoury, the Crafters' Court), the Council's device (a gold crown on a white field), every person but Aethelgard, and every line. A safe city: no camps, no hostile mobs; the Lowtowns below (16-19) are reached by the Low Stair when that zone is built (ZONE_LOWTOWNS.md). Docs/CAPITAL_HUB.md.",
+  "size": 320,
+  "levelMin": 1,
+  "levelMax": 15,
+  "city": true,
+  "biome": "meadow",
+  "weather": [
+    {
+      "kind": "clear",
+      "weight": 3
+    },
+    {
+      "kind": "fair",
+      "weight": 3
+    },
+    {
+      "kind": "windy",
+      "weight": 1.5
+    },
+    {
+      "kind": "overcast",
+      "weight": 2
+    },
+    {
+      "kind": "mist",
+      "weight": 1
+    },
+    {
+      "kind": "rain",
+      "weight": 1.5
+    }
+  ],
+  "worldMapPosition": {
+    "x": 0.49,
+    "y": 0.37
+  },
+  "worldMapNote": "Argentis, the Sky Bastion, where the game map draws it at the centre of the land; the Crown is its High City. A road climbs to it from Oakhaven.",
+  "flatRadius": 400,
+  "hillHeight": 0,
+  "seed": 4127,
+  "lighting": {
+    "sunPitch": 34,
+    "sunYaw": -36,
+    "sunIntensity": 1.2,
+    "sunColor": "#FFE6BE",
+    "ambientSky": "#93A8C8",
+    "ambientEquator": "#8E8C7C",
+    "ambientGround": "#454238",
+    "fogColor": "#A6C0DC",
+    "fogStart": 160,
+    "fogEnd": 520,
+    "skyTint": "#6A90CC",
+    "skyExposure": 1.08,
+    "skyHaze": 1.0
+  },
+  "spawns": {
+    "player": {
+      "x": 146,
+      "y": 10
+    },
+    "playerFacing": 270,
+    "companion": {
+      "x": 144,
+      "y": 13
+    },
+    "recovery": {
+      "x": 40,
+      "y": 10
+    },
+    "leash": 17,
+    "enemies": []
+  },
+  "objectives": [
+    "Climb the Processional Way to the Crown Square",
+    "Seek an audience with High Councilor Aethelgard in the Council Keep"
+  ],
+  "exits": [
+    {
+      "to": "zone.oakhaven",
+      "name": "Road down to Oakhaven",
+      "at": {
+        "x": 156,
+        "y": 10
+      },
+      "arrive": {
+        "x": -8,
+        "y": 262
+      },
+      "radius": 5
+    }
+  ],
+  "terraces": [
+    {
+      "name": "The fall below the High City",
+      "center": {
+        "x": 0,
+        "y": 0
+      },
+      "size": {
+        "x": 400,
+        "y": 400
+      },
+      "height": -24,
+      "blend": 1,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Gilt Approach",
+      "center": {
+        "x": 138,
+        "y": 8
+      },
+      "size": {
+        "x": 52,
+        "y": 64
+      },
+      "height": 0,
+      "blend": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The High City",
+      "center": {
+        "x": 0,
+        "y": 56
+      },
+      "size": {
+        "x": 224,
+        "y": 172
+      },
+      "height": 8,
+      "blend": 3,
+      "paved": true,
+      "canonStatus": "CANON place (the walled High City on its raised wall, the city map); its plan GAME-ONLY"
+    },
+    {
+      "name": "The Gilt Ramp",
+      "center": {
+        "x": 126,
+        "y": 10
+      },
+      "size": {
+        "x": 12,
+        "y": 28
+      },
+      "rotation": 270,
+      "height": 0,
+      "heightTo": 8,
+      "ramp": true,
+      "blend": 1.5,
+      "paved": true,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Crown terrace",
+      "center": {
+        "x": 0,
+        "y": 99
+      },
+      "size": {
+        "x": 224,
+        "y": 86
+      },
+      "height": 14,
+      "blend": 1.2,
+      "paved": true,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Grand Stair",
+      "center": {
+        "x": 0,
+        "y": 45
+      },
+      "size": {
+        "x": 14,
+        "y": 22
+      },
+      "height": 8,
+      "heightTo": 14,
+      "ramp": true,
+      "blend": 1,
+      "paved": true,
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "roads": [
+    {
+      "name": "The Gilt Approach",
+      "width": 7,
+      "points": [
+        {
+          "x": 159,
+          "y": 10
+        },
+        {
+          "x": 150,
+          "y": 10
+        },
+        {
+          "x": 113,
+          "y": 10
+        }
+      ]
+    },
+    {
+      "name": "The Processional Way",
+      "width": 7,
+      "points": [
+        {
+          "x": 113,
+          "y": 10
+        },
+        {
+          "x": 104,
+          "y": 10
+        },
+        {
+          "x": 14,
+          "y": 10
+        },
+        {
+          "x": 4,
+          "y": 16
+        },
+        {
+          "x": 0,
+          "y": 26
+        },
+        {
+          "x": 0,
+          "y": 40
+        },
+        {
+          "x": 0,
+          "y": 56
+        },
+        {
+          "x": 0,
+          "y": 64
+        }
+      ]
+    }
+  ],
+  "clearings": [
+    {
+      "name": "Crown Square",
+      "center": {
+        "x": 0,
+        "y": 80
+      },
+      "radius": 14
+    }
+  ],
+  "landmarks": [
+    {
+      "name": "The Gilt Gate",
+      "text": "Gilt over white stone, the Council's crown above the arch.",
+      "at": {
+        "x": 110.5,
+        "y": 10
+      },
+      "radius": 9,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 146,
+        "y": 13
+      },
+      "viewPitch": 12,
+      "viewZoom": 18
+    },
+    {
+      "name": "The Processional Way",
+      "text": "From the Gilt Gate to the Crown Square, white stone all the way.",
+      "at": {
+        "x": 60,
+        "y": 10
+      },
+      "radius": 12,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 92,
+        "y": 4
+      },
+      "viewPitch": 14,
+      "viewZoom": 12
+    },
+    {
+      "name": "The Grand Stair",
+      "text": "Two hundred steps, and the Founders at the top.",
+      "at": {
+        "x": 0,
+        "y": 45
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 0,
+        "y": 20
+      },
+      "viewPitch": 20,
+      "viewZoom": 16
+    },
+    {
+      "name": "The Crown Square",
+      "text": "The heart of the High City: the fountain, the keep, the domed hall, the spires.",
+      "at": {
+        "x": 0,
+        "y": 80
+      },
+      "radius": 16,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 0,
+        "y": 63
+      },
+      "viewPitch": 22,
+      "viewZoom": 22
+    },
+    {
+      "name": "The Council Keep",
+      "text": "The castle of the High Council, its gilt spire the highest point in Argentis.",
+      "at": {
+        "x": 0,
+        "y": 120
+      },
+      "radius": 16,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 8,
+        "y": 95
+      },
+      "viewPitch": 20,
+      "viewZoom": 34
+    },
+    {
+      "name": "The Audience Hall",
+      "text": "Where the High Councilor receives those the Council has a use for.",
+      "at": {
+        "x": 0,
+        "y": 126
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 0,
+        "y": 113
+      },
+      "viewPitch": 8,
+      "viewZoom": 6
+    },
+    {
+      "name": "The Council Hall",
+      "text": "The domed hall where the Council sits and its edicts are posted.",
+      "at": {
+        "x": 46,
+        "y": 120
+      },
+      "radius": 12,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 38,
+        "y": 98
+      },
+      "viewPitch": 16,
+      "viewZoom": 24
+    },
+    {
+      "name": "The Archive",
+      "text": "The High City's archives under their many spires.",
+      "at": {
+        "x": -46,
+        "y": 120
+      },
+      "radius": 12,
+      "canonStatus": "CANON-EXPANDED",
+      "view": {
+        "x": -38,
+        "y": 98
+      },
+      "viewPitch": 16,
+      "viewZoom": 26
+    },
+    {
+      "name": "The Exchange",
+      "text": "Everything worth having passes through it sooner or later.",
+      "at": {
+        "x": -54,
+        "y": 80
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": -26,
+        "y": 76
+      },
+      "viewPitch": 15,
+      "viewZoom": 14
+    },
+    {
+      "name": "The Treasury Vault",
+      "text": "What the Treasury holds, the Treasury keeps.",
+      "at": {
+        "x": 54,
+        "y": 80
+      },
+      "radius": 9,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 26,
+        "y": 84
+      },
+      "viewPitch": 15,
+      "viewZoom": 14
+    },
+    {
+      "name": "The Crafters' Court",
+      "text": "Every trade's trainer and its anvil, still-table and hearth.",
+      "at": {
+        "x": 88,
+        "y": 80
+      },
+      "radius": 14,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 74,
+        "y": 68
+      },
+      "viewPitch": 30,
+      "viewZoom": 16
+    },
+    {
+      "name": "Guild Row",
+      "text": "The four guilds' halls, banners at their doors.",
+      "at": {
+        "x": -60,
+        "y": 35
+      },
+      "radius": 14,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": -60,
+        "y": 14
+      },
+      "viewPitch": 22,
+      "viewZoom": 18
+    },
+    {
+      "name": "The Gilded Lantern",
+      "text": "The Crown's inn, where the guilds drink after a run.",
+      "at": {
+        "x": 30,
+        "y": 24
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 24,
+        "y": 12
+      },
+      "viewPitch": 12,
+      "viewZoom": 12
+    },
+    {
+      "name": "The Hall of Arms",
+      "text": "Where every class's trainer keeps their hours.",
+      "at": {
+        "x": 62,
+        "y": 40
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 56,
+        "y": 24
+      },
+      "viewPitch": 14,
+      "viewZoom": 14
+    },
+    {
+      "name": "The Armoury",
+      "text": "The dresser's: looks for whatever you wear.",
+      "at": {
+        "x": 92,
+        "y": 40
+      },
+      "radius": 7,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 88,
+        "y": 28
+      },
+      "viewPitch": 12,
+      "viewZoom": 12
+    },
+    {
+      "name": "The Low Stair",
+      "text": "Shut by the Council's word. Below it, the Lowtowns.",
+      "at": {
+        "x": -36,
+        "y": -28.5
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": -36,
+        "y": -8
+      },
+      "viewPitch": 15,
+      "viewZoom": 14
+    },
+    {
+      "name": "The Spire",
+      "text": "Below the south wall, wreathed in cloud.",
+      "at": {
+        "x": 0,
+        "y": -78
+      },
+      "radius": 10,
+      "canonStatus": "CANON",
+      "view": {
+        "x": 0,
+        "y": 62
+      },
+      "viewPitch": 6,
+      "viewZoom": 10
+    },
+    {
+      "name": "The Crown of Argentis",
+      "text": "The High City from the south-east, as the old maps draw it.",
+      "at": {
+        "x": 0,
+        "y": 60
+      },
+      "radius": 18,
+      "canonStatus": "CANON",
+      "view": {
+        "x": 150,
+        "y": -20
+      },
+      "viewPitch": 22,
+      "viewZoom": 60
+    }
+  ],
+  "props": [
+    {
+      "kind": "city_wall",
+      "name": "The curtain wall, north and west",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": 110.5,
+          "y": 18
+        },
+        {
+          "x": 110.5,
+          "y": 140.5
+        },
+        {
+          "x": -110.5,
+          "y": 140.5
+        },
+        {
+          "x": -110.5,
+          "y": -28.5
+        },
+        {
+          "x": -44,
+          "y": -28.5
+        }
+      ],
+      "size": {
+        "x": 40,
+        "y": 0
+      }
+    },
+    {
+      "kind": "city_wall",
+      "name": "The curtain wall, south and east",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": -28,
+          "y": -28.5
+        },
+        {
+          "x": 110.5,
+          "y": -28.5
+        },
+        {
+          "x": 110.5,
+          "y": 2
+        }
+      ],
+      "size": {
+        "x": 40,
+        "y": 0
+      }
+    },
+    {
+      "kind": "city_gate",
+      "name": "The Gilt Gate",
+      "at": {
+        "x": 110.5,
+        "y": 10
+      },
+      "rotation": 270,
+      "size": {
+        "x": 6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "city_gate",
+      "name": "The Low Stair",
+      "at": {
+        "x": -36,
+        "y": -28.5
+      },
+      "size": {
+        "x": 6,
+        "y": 0
+      },
+      "variant": 1
+    },
+    {
+      "kind": "signpost",
+      "name": "The Lowtowns (dangerous, 16-19)",
+      "at": {
+        "x": -27.5,
+        "y": -23
+      }
+    },
+    {
+      "kind": "city_wall",
+      "name": "The Crown terrace's wall, west",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": -109,
+          "y": 55.4
+        },
+        {
+          "x": -7.7,
+          "y": 55.4
+        }
+      ],
+      "variant": 1
+    },
+    {
+      "kind": "city_wall",
+      "name": "The Crown terrace's wall, east",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": 7.7,
+          "y": 55.4
+        },
+        {
+          "x": 109,
+          "y": 55.4
+        }
+      ],
+      "variant": 1
+    },
+    {
+      "kind": "city_wall",
+      "name": "The Grand Stair's west side",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": -7.35,
+          "y": 33.6
+        },
+        {
+          "x": -7.35,
+          "y": 55.4
+        }
+      ],
+      "variant": 1
+    },
+    {
+      "kind": "city_wall",
+      "name": "The Grand Stair's east side",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": 7.35,
+          "y": 33.6
+        },
+        {
+          "x": 7.35,
+          "y": 55.4
+        }
+      ],
+      "variant": 1
+    },
+    {
+      "kind": "city_wall",
+      "name": "The Gilt Ramp's south side",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": 113,
+          "y": 3.7
+        },
+        {
+          "x": 140,
+          "y": 3.7
+        }
+      ],
+      "variant": 1
+    },
+    {
+      "kind": "city_wall",
+      "name": "The Gilt Ramp's north side",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": 113,
+          "y": 16.3
+        },
+        {
+          "x": 140,
+          "y": 16.3
+        }
+      ],
+      "variant": 1
+    },
+    {
+      "kind": "stair",
+      "name": "The Grand Stair",
+      "at": {
+        "x": 0,
+        "y": 45
+      },
+      "size": {
+        "x": 13.2,
+        "y": 22
+      }
+    },
+    {
+      "kind": "stair",
+      "name": "The Gilt Ramp's steps",
+      "at": {
+        "x": 126,
+        "y": 10
+      },
+      "rotation": 270,
+      "size": {
+        "x": 11.4,
+        "y": 28
+      }
+    },
+    {
+      "kind": "council_keep",
+      "name": "The Council Keep",
+      "at": {
+        "x": 0,
+        "y": 120
+      },
+      "size": {
+        "x": 30,
+        "y": 24
+      }
+    },
+    {
+      "kind": "dome_hall",
+      "name": "The Council Hall",
+      "at": {
+        "x": 46,
+        "y": 120
+      },
+      "size": {
+        "x": 24,
+        "y": 24
+      }
+    },
+    {
+      "kind": "archive",
+      "name": "The Archive",
+      "at": {
+        "x": -46,
+        "y": 120
+      },
+      "size": {
+        "x": 26,
+        "y": 20
+      }
+    },
+    {
+      "kind": "mansion",
+      "name": "The Exchange",
+      "at": {
+        "x": -54,
+        "y": 80
+      },
+      "rotation": 270,
+      "size": {
+        "x": 20,
+        "y": 16
+      },
+      "variant": 0
+    },
+    {
+      "kind": "mansion",
+      "name": "The Treasury Vault",
+      "at": {
+        "x": 54,
+        "y": 80
+      },
+      "rotation": 90,
+      "size": {
+        "x": 16,
+        "y": 16
+      },
+      "variant": 1
+    },
+    {
+      "kind": "fountain",
+      "name": "The Crown fountain",
+      "at": {
+        "x": 0,
+        "y": 80
+      },
+      "variant": 1
+    },
+    {
+      "kind": "statue",
+      "name": "Statue of the Founders, west",
+      "at": {
+        "x": -13,
+        "y": 62
+      },
+      "rotation": 180,
+      "variant": 1
+    },
+    {
+      "kind": "colonnade",
+      "name": "The west colonnade",
+      "at": {
+        "x": -36,
+        "y": 80
+      },
+      "rotation": 90,
+      "size": {
+        "x": 30,
+        "y": 4
+      }
+    },
+    {
+      "kind": "council_banner",
+      "name": "Council banner, keep west",
+      "at": {
+        "x": -10,
+        "y": 102
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, square south west",
+      "at": {
+        "x": -20,
+        "y": 66
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, square north west",
+      "at": {
+        "x": -20,
+        "y": 96
+      }
+    },
+    {
+      "kind": "statue",
+      "name": "Statue of the Founders, east",
+      "at": {
+        "x": 13,
+        "y": 62
+      },
+      "rotation": 180,
+      "variant": 1
+    },
+    {
+      "kind": "colonnade",
+      "name": "The east colonnade",
+      "at": {
+        "x": 36,
+        "y": 80
+      },
+      "rotation": 90,
+      "size": {
+        "x": 30,
+        "y": 4
+      }
+    },
+    {
+      "kind": "council_banner",
+      "name": "Council banner, keep east",
+      "at": {
+        "x": 10,
+        "y": 102
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, square south east",
+      "at": {
+        "x": 20,
+        "y": 66
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, square north east",
+      "at": {
+        "x": 20,
+        "y": 96
+      }
+    },
+    {
+      "kind": "colonnade",
+      "name": "The Crafters' Court colonnade, east",
+      "at": {
+        "x": 104,
+        "y": 80
+      },
+      "rotation": 90,
+      "size": {
+        "x": 36,
+        "y": 4
+      }
+    },
+    {
+      "kind": "colonnade",
+      "name": "The Crafters' Court colonnade, north",
+      "at": {
+        "x": 88,
+        "y": 98
+      },
+      "size": {
+        "x": 30,
+        "y": 4
+      }
+    },
+    {
+      "kind": "council_banner",
+      "name": "Council banner, the Crafters' Court",
+      "at": {
+        "x": 72,
+        "y": 62
+      }
+    },
+    {
+      "kind": "parterre",
+      "name": "The Councillors' garden",
+      "at": {
+        "x": -88,
+        "y": 80
+      },
+      "size": {
+        "x": 16,
+        "y": 22
+      }
+    },
+    {
+      "kind": "parterre",
+      "name": "The Archive garden",
+      "at": {
+        "x": -88,
+        "y": 120
+      },
+      "size": {
+        "x": 18,
+        "y": 20
+      }
+    },
+    {
+      "kind": "parterre",
+      "name": "The Hall garden",
+      "at": {
+        "x": 84,
+        "y": 120
+      },
+      "size": {
+        "x": 18,
+        "y": 20
+      }
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -102,
+        "y": 64
+      }
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -102,
+        "y": 98
+      }
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -100,
+        "y": 106
+      }
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": -76,
+        "y": 134
+      }
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": 100,
+        "y": 106
+      }
+    },
+    {
+      "kind": "tree",
+      "at": {
+        "x": 70,
+        "y": 134
+      }
+    },
+    {
+      "kind": "inn",
+      "name": "The Gilded Lantern",
+      "at": {
+        "x": 30,
+        "y": 24
+      },
+      "size": {
+        "x": 14,
+        "y": 9
+      },
+      "variant": 3
+    },
+    {
+      "kind": "mansion",
+      "name": "The Hall of Arms",
+      "at": {
+        "x": 62,
+        "y": 40
+      },
+      "size": {
+        "x": 26,
+        "y": 12
+      },
+      "variant": 2
+    },
+    {
+      "kind": "mansion",
+      "name": "The Armoury",
+      "at": {
+        "x": 92,
+        "y": 40
+      },
+      "size": {
+        "x": 12,
+        "y": 10
+      },
+      "variant": 3
+    },
+    {
+      "kind": "guild_hall",
+      "name": "Hall of the Lantern Watch",
+      "at": {
+        "x": -80,
+        "y": 44
+      },
+      "rotation": 270,
+      "size": {
+        "x": 14,
+        "y": 11
+      },
+      "variant": 0
+    },
+    {
+      "kind": "spot",
+      "name": "hall.lantern-watch",
+      "at": {
+        "x": -77.2,
+        "y": 44.0
+      }
+    },
+    {
+      "kind": "guild_hall",
+      "name": "Hall of Oak and Ember",
+      "at": {
+        "x": -80,
+        "y": 26
+      },
+      "rotation": 270,
+      "size": {
+        "x": 14,
+        "y": 11
+      },
+      "variant": 1
+    },
+    {
+      "kind": "spot",
+      "name": "hall.oak-and-ember",
+      "at": {
+        "x": -77.2,
+        "y": 26.0
+      }
+    },
+    {
+      "kind": "guild_hall",
+      "name": "Hall of the Long Road",
+      "at": {
+        "x": -40,
+        "y": 44
+      },
+      "rotation": 90,
+      "size": {
+        "x": 14,
+        "y": 11
+      },
+      "variant": 2
+    },
+    {
+      "kind": "spot",
+      "name": "hall.long-road",
+      "at": {
+        "x": -42.8,
+        "y": 44.0
+      }
+    },
+    {
+      "kind": "guild_hall",
+      "name": "Hall of the Scree Hounds",
+      "at": {
+        "x": -40,
+        "y": 26
+      },
+      "rotation": 90,
+      "size": {
+        "x": 14,
+        "y": 11
+      },
+      "variant": 3
+    },
+    {
+      "kind": "spot",
+      "name": "hall.scree-hounds",
+      "at": {
+        "x": -42.8,
+        "y": 26.0
+      }
+    },
+    {
+      "kind": "parterre",
+      "name": "The Guild Row garden",
+      "at": {
+        "x": -60,
+        "y": 36
+      },
+      "size": {
+        "x": 10,
+        "y": 24
+      }
+    },
+    {
+      "kind": "fountain",
+      "name": "The Lantern Cross fountain",
+      "at": {
+        "x": -16,
+        "y": 21
+      }
+    },
+    {
+      "kind": "statue",
+      "name": "Statue of the Scholar, west",
+      "at": {
+        "x": -12,
+        "y": 31
+      },
+      "variant": 0
+    },
+    {
+      "kind": "statue",
+      "name": "Statue of the Scholar, east",
+      "at": {
+        "x": 12,
+        "y": 31
+      },
+      "variant": 0
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Way 100",
+      "at": {
+        "x": 100,
+        "y": 15
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Way 84",
+      "at": {
+        "x": 84,
+        "y": 5
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Way 68",
+      "at": {
+        "x": 68,
+        "y": 15
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Way 52",
+      "at": {
+        "x": 52,
+        "y": 5
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Way 36",
+      "at": {
+        "x": 36,
+        "y": 15
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Way 20",
+      "at": {
+        "x": 20,
+        "y": 5
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, Guild Row",
+      "at": {
+        "x": -66,
+        "y": 15
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Stair Yard",
+      "at": {
+        "x": -42,
+        "y": -14
+      }
+    },
+    {
+      "kind": "council_banner",
+      "name": "Council banner, the Way 76",
+      "at": {
+        "x": 76,
+        "y": 16
+      }
+    },
+    {
+      "kind": "council_banner",
+      "name": "Council banner, the Way 44",
+      "at": {
+        "x": 44,
+        "y": 4
+      }
+    },
+    {
+      "kind": "council_banner",
+      "name": "Council banner, the Way -30",
+      "at": {
+        "x": -30,
+        "y": 15
+      }
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Aurel",
+      "at": {
+        "x": -96,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 0
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Brightwater",
+      "at": {
+        "x": -82,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Calloway",
+      "at": {
+        "x": -68,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Delane",
+      "at": {
+        "x": -54,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Eversley",
+      "at": {
+        "x": -18,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 0
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Fairchild",
+      "at": {
+        "x": -4,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Goldhawk",
+      "at": {
+        "x": 10,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Harcourt",
+      "at": {
+        "x": 24,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Ivory",
+      "at": {
+        "x": 38,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 0
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Juniper",
+      "at": {
+        "x": 70,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Kestrell",
+      "at": {
+        "x": 84,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Larkspur",
+      "at": {
+        "x": 98,
+        "y": -3
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Merriweather",
+      "at": {
+        "x": -96,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 0
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Northgate",
+      "at": {
+        "x": -82,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Oriel",
+      "at": {
+        "x": -68,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Pennington",
+      "at": {
+        "x": -54,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Quillfeather",
+      "at": {
+        "x": -18,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 0
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Rosamund",
+      "at": {
+        "x": -4,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Silverthorn",
+      "at": {
+        "x": 10,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Thornbury",
+      "at": {
+        "x": 24,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Underwood",
+      "at": {
+        "x": 38,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 0
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Valemont",
+      "at": {
+        "x": 70,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Whitlock",
+      "at": {
+        "x": 84,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "gilt_house",
+      "name": "House Yardley",
+      "at": {
+        "x": 98,
+        "y": -18
+      },
+      "rotation": 180,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "parterre",
+      "name": "The Gilt Garden",
+      "at": {
+        "x": 54,
+        "y": -10
+      },
+      "size": {
+        "x": 13,
+        "y": 18
+      }
+    },
+    {
+      "kind": "spire",
+      "name": "The Spire",
+      "at": {
+        "x": 0,
+        "y": -78
+      },
+      "size": {
+        "x": 0,
+        "y": 100
+      }
+    },
+    {
+      "kind": "lowtowns",
+      "name": "The Lowtowns",
+      "at": {
+        "x": -42.5,
+        "y": -120
+      },
+      "size": {
+        "x": 225,
+        "y": 70
+      }
+    },
+    {
+      "kind": "lowtowns",
+      "name": "The Warrens",
+      "at": {
+        "x": 115,
+        "y": -105
+      },
+      "size": {
+        "x": 80,
+        "y": 80
+      }
+    },
+    {
+      "kind": "sea",
+      "name": "The western sea",
+      "at": {
+        "x": -140,
+        "y": 40
+      },
+      "size": {
+        "x": 40,
+        "y": 240
+      }
+    }
+  ],
+  "stations": [
+    {
+      "kind": "forge",
+      "name": "Forge: the Crafters' Court anvil",
+      "at": {
+        "x": 84,
+        "y": 90
+      },
+      "rotation": 0,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "bench",
+      "name": "Bench: the Crafters' Court still-table",
+      "at": {
+        "x": 98,
+        "y": 80
+      },
+      "rotation": 90,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "fire",
+      "name": "Fire: the Crafters' Court cook-hearth",
+      "at": {
+        "x": 82,
+        "y": 66
+      },
+      "rotation": 180,
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "secrets": [
+    {
+      "id": "secret.crown.over-the-lowtowns",
+      "name": "Over the Lowtowns",
+      "kind": "vista",
+      "at": {
+        "x": 54,
+        "y": -24.6
+      },
+      "radius": 4,
+      "text": "Behind the gilt garden a gap in the wall's merlons looks straight down onto the roofs below: smoke, slate, and the dark needle rising out of them into its collar of cloud.",
+      "clue": "Behind a walled garden of clipped hedges, the south wall's battlements leave a gap where the smoke of the roofs below comes up to meet you.",
+      "hint": "Wynn says there's a gap in the south battlements behind the hedged garden where you can see right down onto the smoke. Her mother says not to look.",
+      "xp": 60,
+      "canonStatus": "GAME-ONLY: the gap in the wall. The Lowtowns and the Spire below the High City are CANON (the city map)."
+    },
+    {
+      "id": "secret.crown.clerks-purse",
+      "name": "A Clerk's Hidden Purse",
+      "kind": "cache",
+      "prompt": "Feel under the roots of the garden tree",
+      "at": {
+        "x": -98.5,
+        "y": 107.5
+      },
+      "rotation": 30,
+      "text": "A purse of soft leather pushed in among the roots of the old garden tree behind the spired hall, and a note in a careful clerk's hand: 'For the day they come for me.'",
+      "clue": "Behind the many-spired hall, in a garden by the north-west corner, an old tree keeps something for a clerk who expected visitors.",
+      "hint": "Widow Penn says a clerk of the Treasury used to sit under the garden tree behind the spired hall every evening, and dig. She never asked what for.",
+      "xp": 50,
+      "gold": 25,
+      "canonStatus": "GAME-ONLY."
+    },
+    {
+      "id": "secret.crown.spoiled-copy",
+      "name": "A Spoiled Copy",
+      "kind": "note",
+      "prompt": "Pull out the paper wedged behind the bench",
+      "at": {
+        "x": -74,
+        "y": 100
+      },
+      "rotation": 200,
+      "text": "A copy of a Council register, spoiled by a blot and thrown away: a list of names under the heading 'Resonance: candidates', each with a village beside it. Several are from the east.",
+      "clue": "Between two clipped gardens on the high terrace's west side, a spoiled paper was wedged out of sight by someone who should have burned it.",
+      "hint": "Rollo Tamsworth swears a clerk stuffed a paper behind something at the west end of the terrace gardens and ran. He'd have looked, but a warden was watching.",
+      "xp": 45,
+      "canonStatus": "GAME-ONLY page; the Council's resonance candidates are CANON (Oakhaven's canon: the Council's abduction of resonance candidates)."
+    }
+  ],
+  "life": {
+    "villagers": 0,
+    "mood": "city",
+    "critters": [
+      {
+        "kind": "cat",
+        "center": {
+          "x": -60,
+          "y": 30
+        },
+        "radius": 8,
+        "count": 2
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 0,
+          "y": -10
+        },
+        "radius": 30,
+        "count": 4
+      }
+    ],
+    "residents": [
+      {
+        "name": "High Councilor Aethelgard",
+        "role": "councilor",
+        "title": "High Councilor",
+        "at": {
+          "x": 0,
+          "y": 127.6
+        },
+        "canonStatus": "CANON: High Councilor Aethelgard, the face of the Council (world_bible.md; b1 ch.12). His lines are GAME-ONLY; he is visited, never fought.",
+        "stories": [
+          "The Greater Good is not a slogan, traveller. It is arithmetic. Some sums are simply larger than others.",
+          "The east greys a little more each season. The Council has the matter in hand. The Council always has the matter in hand.",
+          "You ask questions. Ask them of the archives; it is quieter there, and so much safer."
+        ]
+      },
+      {
+        "name": "Clerk Odo Vantry",
+        "role": "council-clerk",
+        "title": "Clerk of the Council",
+        "at": {
+          "x": 2.2,
+          "y": 126.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Fourteen years I have kept the High Councilor's ledgers. He has never once asked my name. It is in the ledgers, of course.",
+          "Petitions on the left, errands on the right. The brazier takes the rest."
+        ]
+      },
+      {
+        "name": "Warden Coll Ambry",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": -4.6,
+          "y": 126.4
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I stand here from bell to bell. In six years he has spoken to me twice. Both times about the draught.",
+          "The Concord trains us at the Iron Citadel's gate and sends us here to stand still. I was better at the training."
+        ]
+      },
+      {
+        "name": "Warden Isa Ferrant",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": 4.6,
+          "y": 126.4
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Keep your hands where I can see them in the audience hall. It's not personal. Nothing in here is.",
+          "My brother collects the tithe out east. He doesn't write about it. I don't ask."
+        ]
+      },
+      {
+        "name": "Warden Aubrey Stane",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": -4,
+          "y": 104.5
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Petitioners queue from the fountain at dawn. Most go home by noon without seeing anyone.",
+          "Gilt on the doors was renewed this spring. The Lowtowns paid for it. They don't know that."
+        ]
+      },
+      {
+        "name": "Warden Lucan Merrow",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": 4,
+          "y": 104.5
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The keep's spire is the first thing the sun touches in all Argentis. We're told to find that inspiring.",
+          "Swords sheathed past this door. The Council's peace, not mine."
+        ]
+      },
+      {
+        "name": "Herald Pell Corvane",
+        "role": "herald",
+        "title": "Herald of the Council",
+        "at": {
+          "x": 42.5,
+          "y": 113.5
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I read the edicts aloud at noon. Half the square listens. The other half pretends not to.",
+          "Resonance registers, tithe schedules, the hours of the Low Stair. The board fills faster than I can read it."
+        ]
+      },
+      {
+        "name": "Archivist Mirelle Dow",
+        "role": "archivist",
+        "title": "Keeper of the Archive",
+        "at": {
+          "x": -48.6,
+          "y": 113.5
+        },
+        "canonStatus": "GAME-ONLY person; the High City's archives are CANON-EXPANDED (world_bible.md), the goblins as the High City's record-keepers CANON (world_bible.md).",
+        "stories": [
+          "Before the Council's clerks, the goblins catalogued every light in the High City. Their shelf-marks are still on the oldest stacks.",
+          "The Silent Pilgrims keep an archive of their own, far south. They write to ask for copies. The Council never answers.",
+          "Bring me any page you find out there. Every page has a place, even the ones that would rather not."
+        ]
+      },
+      {
+        "name": "Tallis Grend",
+        "role": "auctioneer",
+        "title": "Clerk of the Exchange",
+        "at": {
+          "x": -56.6,
+          "y": 77.5
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "A lot listed at dawn is gone by dusk if the price is honest. If it isn't, it gathers dust and I gather the fee.",
+          "Copper from the east, salt from the Rim, glass from the coast. Everything passes through these doors in the end."
+        ]
+      },
+      {
+        "name": "Serafine Vael",
+        "role": "factor",
+        "title": "Factor of Port Caelum",
+        "at": {
+          "x": -56.6,
+          "y": 83
+        },
+        "canonStatus": "CANON-EXPANDED: Port Caelum, its glass ships and the Trade Princes are CANON (world_bible.md, the Glittering Coast); the factor is invented.",
+        "stories": [
+          "The Trade Princes keep their barges in the Gilded Bay and their factors in every Exchange that matters. This is one of them.",
+          "Port Caelum builds ships of glass. I build ledgers. Both break if you are careless."
+        ]
+      },
+      {
+        "name": "Ennis Harrowgate",
+        "role": "banker",
+        "title": "Clerk of the Treasury",
+        "at": {
+          "x": 56.2,
+          "y": 80
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The vault is older than the Council's charter. The door weighs as much as a cart and swings with one finger. Good hinges.",
+          "Whatever you leave with the Treasury stays exactly as you left it. That is the whole of our promise, and we keep it."
+        ]
+      },
+      {
+        "name": "Bertram Lisle",
+        "role": "guildmaster:lantern-watch",
+        "title": "Master of the Lantern Watch",
+        "at": {
+          "x": -83.0,
+          "y": 44.0
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The Watch takes anyone who'll come back for the next one. Levels don't matter. Showing up does.",
+          "We light a lantern in the hall window for every member out on the road. Tonight there are eleven."
+        ]
+      },
+      {
+        "name": "Hazel Cotter",
+        "role": "guildmaster:oak-and-ember",
+        "title": "Master of Oak and Ember",
+        "at": {
+          "x": -83.0,
+          "y": 26.0
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Half our members have never drawn a blade in anger. The other half buy their potions from the first half.",
+          "Oak for the hand, ember for the forge. The hall smells of both, and of supper."
+        ]
+      },
+      {
+        "name": "Rafe Marrick",
+        "role": "guildmaster:long-road",
+        "title": "Master of the Long Road",
+        "at": {
+          "x": -37.0,
+          "y": 44.0
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The Long Road runs the deep caves every night. If you can't keep pace, the road is long for you too.",
+          "We keep a tally of every run on the back wall. The chalk goes faster than the ale."
+        ]
+      },
+      {
+        "name": "Jessa Kell",
+        "role": "guildmaster:scree-hounds",
+        "title": "Master of the Scree Hounds",
+        "at": {
+          "x": -37.0,
+          "y": 26.0
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The hard camps first. The elites first. The easy things will still be there when we've finished.",
+          "Every Hound carries a scar from the Peaks. Mine is the one you can't see."
+        ]
+      },
+      {
+        "name": "Corin Bellweather",
+        "role": "innkeeper",
+        "title": "Innkeeper",
+        "at": {
+          "x": 28.3,
+          "y": 27.1
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Gilded by name. The ale's honest, and so am I, mostly.",
+          "Every guild in the Row drinks here after a run. I keep the tables apart."
+        ]
+      },
+      {
+        "name": "Garrow Stent",
+        "role": "trainer:class.warrior",
+        "title": "Warrior Trainer",
+        "at": {
+          "x": 52,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Shield up, feet wide, and never step back unless you mean to. That's the whole of it. The rest is bruises.",
+          "The Concord asked me to train their wardens. I said I train fighters. We haven't spoken since."
+        ]
+      },
+      {
+        "name": "Dame Ysolde Amber",
+        "role": "trainer:class.paladin",
+        "title": "Paladin Trainer",
+        "at": {
+          "x": 54,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "A vow is only a word until something tests it. Then it is the only thing you have.",
+          "I hold the line so the healers behind me can do the real work."
+        ]
+      },
+      {
+        "name": "Teague Fennick",
+        "role": "trainer:class.ranger",
+        "title": "Ranger Trainer",
+        "at": {
+          "x": 56,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Read the ground before you read the enemy. The ground never lies.",
+          "My hound sleeps by the Hall's fire. He has opinions about the dummies."
+        ]
+      },
+      {
+        "name": "Marra Thistledown",
+        "role": "trainer:class.druid",
+        "title": "Druid Trainer",
+        "at": {
+          "x": 58,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The Verdant Shore still remembers what green means. The rest of us are learning it again.",
+          "A bear, a cat, a sapling. You are all of them, if you listen."
+        ]
+      },
+      {
+        "name": "Magister Orrin Sallis",
+        "role": "trainer:class.mage",
+        "title": "Mage Trainer",
+        "at": {
+          "x": 60,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Every spell is a sum. Get it wrong and the sum gets you.",
+          "The Council licenses every mage in the Crown. I have three licences. One of them is even real."
+        ]
+      },
+      {
+        "name": "Kit Ashdown",
+        "role": "trainer:class.rogue",
+        "title": "Rogue Trainer",
+        "at": {
+          "x": 62,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Quiet feet, quick hands, and a smile for the warden. In that order.",
+          "The best blade is the one nobody saw you carrying."
+        ]
+      },
+      {
+        "name": "Lector Benedek Hume",
+        "role": "trainer:class.archivist",
+        "title": "Archivist Trainer",
+        "at": {
+          "x": 64,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Knowledge is a weapon if you know where to cut. I teach where.",
+          "The Archive gave me a desk. I gave it twenty years. Fair trade, mostly."
+        ]
+      },
+      {
+        "name": "Ilse Marrow",
+        "role": "trainer:class.saltmender",
+        "title": "Salt-Mender Trainer",
+        "at": {
+          "x": 66,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Salt of the First Sea binds what the grey loosens. Use it sparingly; there is no more being made.",
+          "Mending is not healing. Healing closes a wound. Mending reminds the world how it was."
+        ]
+      },
+      {
+        "name": "Mother Agnet Ross",
+        "role": "trainer:class.cleric",
+        "title": "Cleric Trainer",
+        "at": {
+          "x": 68,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Prayer is a discipline, not a plea. Stand straight when you make it.",
+          "I have buried more adventurers than I've trained. Train harder than they did."
+        ]
+      },
+      {
+        "name": "Florian Dace",
+        "role": "trainer:class.scoundrel",
+        "title": "Scoundrel Trainer",
+        "at": {
+          "x": 70,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Charm opens more doors than any lockpick. Ask the Exchange clerks; they still owe me.",
+          "A song, a wink, a knife. Pick the right one for the room."
+        ]
+      },
+      {
+        "name": "Urga Stonehand",
+        "role": "trainer:class.shaman",
+        "title": "Shaman Trainer",
+        "at": {
+          "x": 72,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The spirits of the Rim walk with my people. They came a long way to stand in this cold white city.",
+          "Totems are not decoration. Plant them like you mean it."
+        ]
+      },
+      {
+        "name": "Perrin Gallow",
+        "role": "dresser",
+        "title": "Dresser of the Armoury",
+        "at": {
+          "x": 92,
+          "y": 41.4
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Mail under silk this season. Next season, silk under mail. The Crown changes its mind faster than its walls.",
+          "Bring me what you wear and I'll make it look like you meant to wear it."
+        ]
+      },
+      {
+        "name": "Abner Wilks",
+        "role": "merchant",
+        "title": "Provisioner",
+        "at": {
+          "x": -16,
+          "y": 66
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Potions, picks, and gear fit for anyone, from first blood to the Peaks. The Crown pays well and expects the best.",
+          "My stock comes up the Gilt Approach from Oakhaven every third day. Less of it lately."
+        ]
+      },
+      {
+        "name": "Master Hamund Brask",
+        "role": "profession-trainer:blacksmithing",
+        "title": "Blacksmithing Trainer",
+        "at": {
+          "x": 88.5,
+          "y": 88.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Copper first. It forgives you. Iron doesn't.",
+          "I shod the wardens' horses for thirty years before the Council found me a better anvil."
+        ]
+      },
+      {
+        "name": "Sister Wenlow Ayre",
+        "role": "profession-trainer:alchemy",
+        "title": "Alchemy Trainer",
+        "at": {
+          "x": 96.6,
+          "y": 84.5
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "A still-table is a patient thing. Rush it and it rushes back.",
+          "Every draught in the Crown's infirmary passed through my hands. Most of them came back out."
+        ]
+      },
+      {
+        "name": "Bettany Hale",
+        "role": "profession-trainer:cooking",
+        "title": "Cooking Trainer",
+        "at": {
+          "x": 86.5,
+          "y": 67.5
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Anyone can cook. Not everyone should. I teach the difference.",
+          "Boar from the east, salt from the Rim, bread from the Lantern's oven. Stew is a map of the world."
+        ]
+      },
+      {
+        "name": "Dunstan Rooke",
+        "role": "profession-trainer:mining",
+        "title": "Mining Trainer",
+        "at": {
+          "x": 92,
+          "y": 93.5
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Crowsfoot copper, bog-iron, cinder from the Rim. I've had all of it under my pick.",
+          "Find the stained shoulder of the rock. The ore's always just behind it."
+        ]
+      },
+      {
+        "name": "Orla Fenwright",
+        "role": "profession-trainer:woodcutting",
+        "title": "Woodcutting Trainer",
+        "at": {
+          "x": 78,
+          "y": 93.5
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Windfalls only. A living tree is the forest's; a fallen one is yours.",
+          "Oak from Harrow, pine from the Peaks, ghost-oak from the Shore. Each splits its own way."
+        ]
+      },
+      {
+        "name": "Liesel Moor",
+        "role": "profession-trainer:herbalism",
+        "title": "Herbalism Trainer",
+        "at": {
+          "x": 100,
+          "y": 73
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Yarrow, tarnwort, cinder-thistle, dewfern. Learn their names and they'll show you where they grow.",
+          "Bare hands are enough. A light touch is better."
+        ]
+      },
+      {
+        "name": "Joss Tanwick",
+        "role": "profession-trainer:leatherworking",
+        "title": "Leatherworking Trainer",
+        "at": {
+          "x": 74,
+          "y": 72
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Hides from the hunt, salt from the Rim, and a needle that doesn't quit.",
+          "A bag that holds is worth more than a sword that shines."
+        ]
+      },
+      {
+        "name": "Ada Lindley",
+        "role": "profession-trainer:weaving",
+        "title": "Weaving Trainer",
+        "at": {
+          "x": 74,
+          "y": 78
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Wool from Oakhaven's folds makes honest cloth. The Crown wants silk; it gets wool and calls it silk.",
+          "Warp, weft, patience. The loom forgives nothing."
+        ]
+      },
+      {
+        "name": "Warden Maeve Corbin",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": 101,
+          "y": 16.5
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Every cart through the Gilt Gate is counted, and so is every face. Yours is counted now.",
+          "The gilt on the gate is renewed every spring. The Lowtowns pay for it. Don't tell them."
+        ]
+      },
+      {
+        "name": "Warden Tobias Reede",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": 101,
+          "y": 3.5
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The road from Oakhaven's quieter than it was. Fewer carts, more collectors.",
+          "Morning's the busiest. By dusk only the wardens and the wind come through."
+        ]
+      },
+      {
+        "name": "Warden Garth Ollery",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": -40,
+          "y": -21
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The Low Stair's shut by Council word. What comes up it at night doesn't knock.",
+          "Smoke from below gets into everything. My cloak's never been white since I took this post."
+        ]
+      },
+      {
+        "name": "Warden Sela Brightwater",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": -32,
+          "y": -21
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "You can hear the Lowtowns from here if the wind's right. You learn not to listen.",
+          "When the stair opens again, I'll be the first one down it. My mother's still below."
+        ]
+      },
+      {
+        "name": "Warden Dorian Hask",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": -9,
+          "y": 59
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The stair's two hundred steps from the Way to the square. I've counted. Twice a day.",
+          "Petitioners rest at the top and look back down. Most of them never come up again."
+        ]
+      },
+      {
+        "name": "Warden Nell Varga",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": 9,
+          "y": 59
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Nobody runs on the Grand Stair. It isn't a rule. It's just that nobody does.",
+          "The statues at the top were here before the Council. Nobody knows who they were. We call them the Founders."
+        ]
+      },
+      {
+        "name": "Warden Cass Holloway",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": -63,
+          "y": 15.5
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The guilds keep to their halls, mostly. When they don't, I'm the one who sorts it.",
+          "The Scree Hounds and the Long Road drink at the same inn and never at the same table."
+        ]
+      },
+      {
+        "name": "Warden Rowan Tierce",
+        "role": "warden",
+        "title": "Warden of the Council",
+        "at": {
+          "x": -57,
+          "y": 15.5
+        },
+        "look": "concord",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The Lantern Watch brings new ones up the Row every week. Half come back for the next run.",
+          "A guild brawl is still a brawl. The Council's peace covers the Row too."
+        ]
+      },
+      {
+        "name": "Lady Celandine Ormsby",
+        "role": "gossip",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "My grandfather's house had the first gilt roof on the north row. It was a fashion then. Now it's a duty.",
+          "They say the Councilors never sleep. I've seen Aethelgard's window lit at every hour I've looked."
+        ]
+      },
+      {
+        "name": "Master Fulk Darrow",
+        "role": "elder",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I remember when the Low Stair stood open from dawn to dusk. You could buy a fish from the coast before breakfast.",
+          "Sixty years in the Crown and I've never once been below the walls. I'm told I'm not missing much."
+        ]
+      },
+      {
+        "name": "Widow Agathe Penn",
+        "role": "elder",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "My husband kept the Treasury's ledgers. They gave me his pen when he died, and a pension, and a warning.",
+          "The fountains were dry for a year when I was a girl. Nobody would say why."
+        ]
+      },
+      {
+        "name": "Rollo Tamsworth",
+        "role": "gossip",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The Exchange sold a whole crate of Shore lanterns this morning. Glowing ones. Whoever brought them is rich.",
+          "The Long Road came back from the deep caves short two. They didn't say which two."
+        ]
+      },
+      {
+        "name": "Bess Coombe",
+        "role": "gossip",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I sell ribbons at the fountain. Gold and white for the Council, whatever colour for the guilds.",
+          "A warden told me the keep's spire is hollow all the way up. He'd had a drink."
+        ]
+      },
+      {
+        "name": "Wynn",
+        "role": "child",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I climbed the wall by the Gilt Garden once. You can see the whole sea. And the smoke.",
+          "Mother says the sea serpents on the old maps are real. I've never seen one. I look every day."
+        ]
+      }
+    ]
+  },
+  "camps": []
+}

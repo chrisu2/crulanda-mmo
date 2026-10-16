@@ -22,10 +22,11 @@ namespace Crulanda.Encounter
             "rs-deep-rain", "rs-long-rain", "rs-tide", "rs-chain", "rs-springs", "rs-ancestor",
             "sc-gale", "sc-charge", "sc-hail", "sc-quick-squall", "sc-eye", "sc-thunderclap",
             "sb-earthskin", "sb-stamp", "sb-cairn", "sb-rooted", "sb-stone-blood", "sb-mountain",
-            "gw-moor-wind", "gw-mist", "gw-barrow", "gw-cold", "gw-long-dark", "gw-wailing" };
+            "gw-moor-wind", "gw-mist", "gw-barrow", "gw-cold", "gw-long-dark", "gw-wailing",
+            "rs-soft-rain", "rs-spring-tide", "sc-low-clouds", "sc-heavy-sky", "sb-bedrock", "sb-stone-call", "gw-far-wind", "gw-clinging-mist" };   // tier 3 (the cap of 20, 2026-10-16)
         public static readonly string[] BarIds = { "shaman.squall", "shaman.tide_mend", "shaman.rain_call", "shaman.chain_mend", "shaman.thunderhead", "shaman.hailfall",
             "shaman.earthskin", "shaman.rooting_stamp", "shaman.cairn", "shaman.moor_wind", "shaman.mist", "shaman.barrow_call" };
-        public const float MendReach = 30, RainRadius = 8, ChainReach = 12, HailRadius = 6, StampRadius = 8, WindRadius = 8, EarthskinCut = .1f;
+        public const float MendReach = 30, RainRadius = 8, ChainReach = 12, HailRadius = 6, StampRadius = 8, WindRadius = 8, EarthskinCut = .1f, LowMend = .35f, SpringTide = .05f, StoneCallSeconds = 3, MistSlow = .3f, MistSlowSeconds = 6;
 
         readonly Dictionary<string, AbilityDefinition> abilities = new Dictionary<string, AbilityDefinition>(StringComparer.Ordinal);
         readonly Dictionary<string, ClassAbilityUnlock> unlocks = new Dictionary<string, ClassAbilityUnlock>(StringComparer.Ordinal);
@@ -120,11 +121,13 @@ namespace Crulanda.Encounter
         bool TideMend(AbilityDefinition a)
         {
             var who = MostHurt(MendReach); if (!Need(who != null, "No one near enough to mend.")) return false;
-            return Start(a, () => { Mend(MostHurt(MendReach) ?? who, Dmg((a.power + 3 * Level) * (1 + .04f * R("rs-tide")))); if (R("rs-springs") > 0) Breath(2 * R("rs-springs")); });
+            return Start(a, () => { var on = MostHurt(MendReach) ?? who; Mend(on, Dmg((a.power + 3 * Level) * (1 + .04f * R("rs-tide")) * SpringTideOn(R("rs-spring-tide"), on.Health.Pool.Ratio))); if (R("rs-springs") > 0) Breath(2 * R("rs-springs")); });
         }
+        /// <summary>Spring Tide: a Tide Mend on someone under 35% health heals 5% more.</summary>
+        public static float SpringTideOn(int rank, float ratio) { return rank > 0 && ratio < LowMend ? 1 + SpringTide : 1; }
         bool RainCall(AbilityDefinition a)
         {
-            return Start(a, () => {
+            return Start(With(a, Mathf.Max(0, a.cost - 2 * R("rs-soft-rain")), a.castTime), () => {   // Soft Rain: cheaper
                 var at = s.Player.transform.position; int ticks = Mathf.RoundToInt(Mathf.Max(3, a.duration / 2)) + R("rs-long-rain");
                 periodic.Add("rain", s.Player, Now, 2, ticks, Dmg((a.power + Level) * (1 + .05f * R("rs-deep-rain"))), (e, i) => {
                     foreach (var who in Party().ToList()) if (who != null && Vector3.Distance(who.transform.position, at) <= RainRadius) Mend(who, e.value); return true; });
@@ -148,13 +151,15 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             var use = With(a, a.cost, Mathf.Max(0, a.castTime - .15f * R("sc-quick-squall")));
-            return Start(use, () => { if (!s.LandsOn(t, a.range)) return; s.Bolt(t, new Color(.7f, .8f, 1), .15f); t.Receive(Dmg((a.power + 2 * Level) * (1 + .04f * R("sc-gale"))), s.Player); charge = Mathf.Min(5, charge + 1); lastFight = Now; });
+            return Start(use, () => { if (!s.LandsOn(t, a.range)) return; s.Bolt(t, new Color(.7f, .8f, 1), .15f); t.Receive(Dmg((a.power + 2 * Level) * (1 + .04f * R("sc-gale"))), s.Player); charge = Mathf.Min(MostCharge, charge + 1); lastFight = Now; });
         }
+        /// <summary>The Squall's charge builds to 5 (Heavy Sky: 6).</summary>
+        int MostCharge { get { return R("sc-heavy-sky") > 0 ? 6 : 5; } }
         bool Thunderhead(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             if (!Need(charge > 0, "Thunderhead needs a Squall's charge.")) return false;
-            return Start(a, () => {
+            return Start(With(a, Mathf.Max(0, a.cost - R("sc-low-clouds")), a.castTime), () => {   // Low Clouds: cheaper
                 if (!s.LandsOn(t, a.range)) return; int k = charge; charge = 0;
                 float d = (a.power + 2 * Level) * k * (1 + .1f * R("sc-charge")); if (R("sc-eye") > 0 && t.actor.Health.Pool.Ratio < .3f) d *= 1.25f;
                 s.Bolt(t, new Color(.85f, .9f, 1), .3f); t.Receive(Dmg(d), s.Player);
@@ -171,12 +176,12 @@ namespace Crulanda.Encounter
         }
 
         // ---------- Stonebound ----------
-        bool Earthskin(AbilityDefinition a) { return Start(a, () => { earthskinUntil = Now + Mathf.Max(10, a.duration); PlayerCombat.AddBarrier(Dmg((a.power + 2 * Level) * (1 + .05f * R("sb-earthskin"))), 10); }); }
+        bool Earthskin(AbilityDefinition a) { return Start(a, () => { int more = R("sb-bedrock"); earthskinUntil = Now + Mathf.Max(10, a.duration) + more; PlayerCombat.AddBarrier(Dmg((a.power + 2 * Level) * (1 + .05f * R("sb-earthskin"))), 10 + more); }); }   // Bedrock: 1 s longer a rank
         bool RootingStamp(AbilityDefinition a)
         {
             return Start(a, () => {
                 foreach (var e in FoesNear(s.Player.transform.position, StampRadius))
-                { e.Receive(Dmg((a.power + Level) * (1 + .04f * R("sb-stamp")) * 1.5f), s.Player); e.Slow(.3f + .05f * R("sb-rooted"), 4); }   // the heavy blow draws them to you
+                { e.Receive(Dmg((a.power + Level) * (1 + .04f * R("sb-stamp")) * 1.5f), s.Player); e.Slow(.3f + .05f * R("sb-rooted"), 4); if (R("sb-stone-call") > 0) e.threat.Taunt(s.Player.EntityId.Value, Now, StoneCallSeconds); }   // the heavy blow draws them to you (Stone-Call: they must come, 3 s)
             });
         }
         bool Cairn(AbilityDefinition a)
@@ -189,13 +194,14 @@ namespace Crulanda.Encounter
         bool MoorWind(AbilityDefinition a)
         {
             return Start(a, () => {
-                foreach (var e in FoesNear(s.Player.transform.position, WindRadius)) { e.Receive(Dmg(a.power + Level), s.Player); e.Slow(.4f + .05f * R("gw-moor-wind") + .05f * R("gw-cold"), 5); }
+                foreach (var e in FoesNear(s.Player.transform.position, WindRadius + R("gw-far-wind"))) {   // Far Wind: 1 m further a rank
+                    e.Receive(Dmg(a.power + Level), s.Player); e.Slow(.4f + .05f * R("gw-moor-wind") + .05f * R("gw-cold"), 5); }
             });
         }
         bool Mist(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
-            return Start(a, () => { foreach (var e in FoesNear(t.transform.position, 4 + R("gw-mist"))) e.Root(3 + .5f * R("gw-long-dark")); });
+            return Start(a, () => { foreach (var e in FoesNear(t.transform.position, 4 + R("gw-mist"))) { e.Root(3 + .5f * R("gw-long-dark")); if (R("gw-clinging-mist") > 0) e.Slow(MistSlow, MistSlowSeconds); } });   // Clinging Mist: slowed 30% for 6 s too
         }
         bool BarrowCall(AbilityDefinition a)
         {

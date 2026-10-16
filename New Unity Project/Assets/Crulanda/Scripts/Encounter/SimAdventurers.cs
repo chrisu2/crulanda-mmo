@@ -82,9 +82,10 @@ namespace Crulanda.Encounter
         /// <summary>The eight Scoundrels of 2026-10-14 (sims 81-88), spread over the bands.</summary>
         static readonly int[] ScoundrelBands = { 0, 1, 2, 3, 4, 1, 2, 3 };
         static readonly string[] FirstFive = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage" };
-        /// <summary>Home zones by level band (WORLD_ZONES.md): the village for the low levels, the Shore for the cap.</summary>
+        /// <summary>Home zones by level band (WORLD_ZONES.md): the village for the low levels, the Lowtowns for the cap of 20.</summary>
         public static readonly (string zone, string folk, int lo, int hi)[] Homes = {
-            ("zone.oakhaven", "Oakhaven folk", 1, 5), ("zone.khaven", "Khaven folk", 5, 9), ("zone.peaks", "Peaks folk", 9, 12), ("zone.ashrim", "Rim folk", 12, 15), ("zone.verdant", "Shore folk", 13, 15) };   // round 29 bands
+            ("zone.oakhaven", "Oakhaven folk", 1, 5), ("zone.khaven", "Khaven folk", 5, 9), ("zone.peaks", "Peaks folk", 9, 12), ("zone.ashrim", "Rim folk", 12, 15), ("zone.verdant", "Shore folk", 13, 15),
+            ("zone.lowtowns", "Lowtown folk", 15, 20) };   // round 29 bands; the Lowtowns for the cap of 20 (2026-10-16: no sim is made there yet, it is the home of those who level past the Shore)
         // GAME-ONLY names, plain and of the Trail: none from the books.
         static readonly string[] First = { "Ansel", "Bryn", "Cato", "Della", "Edric", "Fenna", "Garrick", "Hollis", "Isolde", "Jory", "Kestrel", "Lowen", "Maren", "Nolan", "Orla", "Piran", "Quill", "Rhosyn", "Sedge", "Tamsin", "Ulric", "Vesna", "Wren", "Yorath" };
         static readonly string[] Bynames = { "Ashby", "Brook", "Coombe", "Dray", "Fallow", "Greave", "Hale", "Kettle", "Larkin", "Marl", "Nettle", "Oxley", "Pike", "Rooke", "Sallow", "Thatch", "Underhill", "Wick" };

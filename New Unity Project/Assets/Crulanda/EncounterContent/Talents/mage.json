@@ -116,6 +116,36 @@
       "sustain": 2
      },
      "impl": true
+    },
+    {
+     "id": "cb-even-flame",
+     "name": "Even Flame",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "flame",
+     "desc": "Ember Bolt builds 1 less Heat per rank.",
+     "emphasis": {
+      "tempo": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cb-kept-coals",
+     "name": "Kept Coals",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "fire",
+     "desc": "A Flare of 70 Heat or more leaves 20 Heat behind.",
+     "emphasis": {
+      "tempo": 1.5
+     },
+     "impl": true
     }
    ]
   },
@@ -230,6 +260,21 @@
       "control": 2
      },
      "impl": true
+    },
+    {
+     "id": "hw-thick-smoke",
+     "name": "Thick Smoke",
+     "tier": 3,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "cloud",
+     "desc": "Enemies in your Cinder Field are slowed 3% per rank, on top of Embers Underfoot.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
     }
    ]
   },
@@ -342,6 +387,21 @@
      "desc": "Unbind makes the party hit 25% harder instead of 15%.",
      "emphasis": {
       "support": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "sb-open-hands",
+     "name": "Open Hands",
+     "tier": 3,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "Unbind gives you and Mira back 4 Mana per rank.",
+     "emphasis": {
+      "support": 1
      },
      "impl": true
     }
@@ -498,8 +558,8 @@
     {
      "id": "bc-ossuary-coat",
      "name": "Ossuary Coat",
-     "tier": 4,
-     "col": 2,
+     "tier": 3,
+     "col": 0,
      "max": 3,
      "req": null,
      "kind": "passive",
@@ -508,7 +568,7 @@
      "emphasis": {
       "mitigation": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "bc-rise-again",

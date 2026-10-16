@@ -18,7 +18,8 @@
     {"id": "ss-calcify", "name": "Calcify", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "chain", "desc": "New action: Calcify: the target crusted into salt and stunned for 3s; the Wasting's things 2s more.", "emphasis": {"control": 3}, "impl": true},
     {"id": "ss-white-crust", "name": "White Crust", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "target", "desc": "A foe your salt holds (bound, sealed or calcified) takes 3% more from the party per rank.", "emphasis": {"damage": 1, "support": 1}, "impl": true},
     {"id": "ss-deep-crystal", "name": "Deep Crystal", "tier": 2, "col": 1, "max": 3, "req": "ss-calcify", "kind": "passive", "icon": "clock", "desc": "Calcify holds half a second longer per rank.", "emphasis": {"control": 1.5}, "impl": true},
-    {"id": "ss-sealed", "name": "I Seal the Wound", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Seal the Wound silences twice as long.", "emphasis": {"control": 2}, "impl": true}
+    {"id": "ss-sealed", "name": "I Seal the Wound", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Seal the Wound silences twice as long.", "emphasis": {"control": 2}, "impl": true},
+    {"id": "ss-ready-salt", "name": "Ready Salt", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "crystal", "desc": "Calcify comes back 2s sooner per rank.", "emphasis": {"control": 1}, "impl": true}
    ]
   },
   {

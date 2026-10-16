@@ -20,12 +20,18 @@ namespace Crulanda.Tests
         {
             var t = TalentTree.Parse("class.scoundrel", Json, 15, ScoundrelKit.ImplementedIds);
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
-            Assert.AreEqual(25, count); Assert.AreEqual(ScoundrelKit.ImplementedIds.Length, count);
+            Assert.AreEqual(31, count, "25, and two a path at tier 3 for the cap of 20"); Assert.AreEqual(ScoundrelKit.ImplementedIds.Length, count);
             CollectionAssert.AreEqual(new[] { "cutthroat", "silver-tongue", "fixer" }, t.Branches.Select(b => b.id).ToArray(), "three paths for now (Chris, 2026-10-13)");
             CollectionAssert.AreEqual(new[] { "dps", "control", "support" }, t.Branches.Select(b => b.role).ToArray());
-            foreach (var b in t.Branches) Assert.AreEqual(17, b.nodes.Sum(n => n.max), b.id + ": 17 ranks");
+            foreach (var b in t.Branches) Assert.AreEqual(21, b.nodes.Sum(n => n.max), b.id + ": 21 ranks (17, and tier 3's 4)");
             var only = new List<string>(ScoundrelKit.ImplementedIds); only.Remove("st-glimmer");
             Assert.Throws<ArgumentException>(() => TalentTree.Parse("class.scoundrel", Json, 15, only));
+        }
+        /// <summary>Greased Palms (tier 3, 2026-10-16): a bribe for half the crowns, rounded up, never free.</summary>
+        [Test] public void Greased_Palms_halves_the_bribe()
+        {
+            Assert.AreEqual(7, ScoundrelKit.BribeCrowns(7, false)); Assert.AreEqual(4, ScoundrelKit.BribeCrowns(7, true));
+            Assert.AreEqual(9, ScoundrelKit.BribeCrowns(18, true)); Assert.AreEqual(1, ScoundrelKit.BribeCrowns(1, true)); Assert.AreEqual(1, ScoundrelKit.BribeCrowns(0, true));
         }
         [Test] public void Every_path_ability_is_learnt_by_its_own_paths_talent()
         {

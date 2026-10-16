@@ -41,14 +41,15 @@ namespace Crulanda.Tests
             Assert.AreEqual("Simpling", db.Profession("alchemy").name, "Decision 5: shown as Simpling, its id kept so saves keep the skill.");
             Assert.IsTrue(ProfessionDatabase.FromTheStart(db.Profession("herbalism"))); Assert.IsTrue(ProfessionDatabase.FromTheStart(db.Profession("cooking")));
             Assert.IsFalse(ProfessionDatabase.FromTheStart(db.Profession("mining"))); Assert.IsFalse(ProfessionDatabase.FromTheStart(db.Profession("alchemy")));
-            // Node kinds: one tier per zone for each gathering skill (1, 20, 40, 60, 80), each giving a material that stacks to 20.
-            Assert.AreEqual(17, db.Nodes.Count);
+            // Node kinds: one tier per zone for each gathering skill (1, 20, 40, 60, 80, and the Lowtowns' 90 for the cap of 20), each
+            // giving a material that stacks to 20; the Lowtowns have two herbs (soot-wort and lamp-lichen, ZONE_LOWTOWNS.md 6).
+            Assert.AreEqual(21, db.Nodes.Count);
             foreach (var skill in new[] { "mining", "woodcutting", "herbalism" })
             {
                 var tiers = new SortedSet<int>(); var gives = new HashSet<string>();
                 foreach (var n in db.NodesFor(skill)) { tiers.Add(n.skill); gives.Add(n.item); }
-                CollectionAssert.AreEqual(new[] { 1, 20, 40, 60, 80 }, tiers, skill);
-                Assert.AreEqual(5, gives.Count, skill + ": five materials, one per tier.");
+                CollectionAssert.AreEqual(new[] { 1, 20, 40, 60, 80, 90 }, tiers, skill);
+                Assert.AreEqual(skill == "herbalism" ? 7 : 6, gives.Count, skill + ": six materials, one per tier (the Lowtowns' herbs two).");
             }
             foreach (var n in db.Nodes)
             {
@@ -180,7 +181,7 @@ namespace Crulanda.Tests
         }
 
         /// <summary>Each zone's tier: the skill every one of its nodes asks (DESIGN 2.4).</summary>
-        static readonly Dictionary<string, int> Tiers = new Dictionary<string, int> { { "oakhaven", 1 }, { "khaven", 20 }, { "peaks", 40 }, { "ashrim", 60 }, { "verdant", 80 } };
+        static readonly Dictionary<string, int> Tiers = new Dictionary<string, int> { { "oakhaven", 1 }, { "khaven", 20 }, { "peaks", 40 }, { "ashrim", 60 }, { "verdant", 80 }, { "lowtowns", 90 } };
 
         /// <summary>Every zone (DESIGN 2.4, BUILD_PLAN step 8): ten ore, eight windfalls and ten herbs, counting the herb props worked
         /// as nodes, every one a kind the trades know at the zone's tier, no two sharing a respawn (name and metre). Rich seams are
@@ -190,7 +191,8 @@ namespace Crulanda.Tests
         [Test] public void EveryZone_HasTenOreEightTimberTenHerbNodes()
         {
             var db = Db(Items()); var zones = Zones(); var problems = new List<string>();
-            CollectionAssert.AreEquivalent(Tiers.Keys, zones.Keys, "The five zones, each with a tier.");
+            CollectionAssert.IsSubsetOf(zones.Keys, Tiers.Keys, "Every zone has a tier.");
+            CollectionAssert.IsSubsetOf(Tiers.Keys.Where(k => k != "lowtowns"), zones.Keys, "The five zones are there (the Lowtowns' file comes with its zone, Phase 9.1).");
             foreach (var kv in zones)
             {
                 var z = kv.Value; var all = NodesOf(z); string p = kv.Key + ": ";
@@ -240,7 +242,7 @@ namespace Crulanda.Tests
         {
             var items = Items(); var db = Db(items);
             var expect = new[] { ("recipe.charcoal_oak", "mat.oak_log", 1, 1), ("recipe.charcoal_blackpine", "mat.blackpine_log", 20, 2), ("recipe.charcoal_stonepine", "mat.stonepine_log", 40, 3),
-                ("recipe.charcoal_snag", "mat.snag_wood", 60, 4), ("recipe.charcoal_ghostoak", "mat.ghostoak_log", 80, 5) };
+                ("recipe.charcoal_snag", "mat.snag_wood", 60, 4), ("recipe.charcoal_ghostoak", "mat.ghostoak_log", 80, 5), ("recipe.charcoal_cinderbeam", "mat.cinderbeam", 90, 6) };
             CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("woodcutting").Where(r => r.output == "mat.charcoal").Select(r => r.id), "Woodcutting's charcoal, easiest first (its bows and staves since Phase 8.6 are the bowyer's).");
             foreach (var (id, log, skill, count) in expect)
             {
@@ -251,7 +253,7 @@ namespace Crulanda.Tests
                 Assert.IsTrue(r.name.StartsWith("Charcoal from "), id + ": " + r.name);
                 Assert.IsTrue(db.NodesFor("woodcutting").Exists(n => n.item == log && n.skill == skill), id + ": its wood is the windfall of its tier.");
             }
-            Assert.AreEqual(5, db.Recipes.Count(r => r.output == "mat.charcoal"), "Five charcoal recipes, one per tier (other trades' recipes may follow).");
+            Assert.AreEqual(6, db.Recipes.Count(r => r.output == "mat.charcoal"), "Six charcoal recipes, one per tier (other trades' recipes may follow).");
         }
 
         /// <summary>
@@ -388,7 +390,9 @@ namespace Crulanda.Tests
             (72, "craft.ashsteel_sabatons", "mat.ashsteel_bar 3"), (76, "craft.ashsteel_hauberk", "mat.ashsteel_bar 4"),
             (84, "craft.veridian_warblade", "mat.veridian_bar 4, mat.ghostoak_log 1"), (88, "craft.veridian_shield", "mat.veridian_bar 3, mat.ghostoak_log 2"),
             (92, "craft.veridian_legplates", "mat.veridian_bar 4"), (96, "craft.veridian_breastplate", "mat.veridian_bar 5"),
-            (100, "craft.heartwood_greatblade", "mat.veridian_bar 8, mat.ghostoak_log 2, mat.charcoal 4") };
+            (100, "craft.heartwood_greatblade", "mat.veridian_bar 8, mat.ghostoak_log 2, mat.charcoal 4"),
+            (92, "craft.slagiron_maul", "mat.slagiron_bar 4, mat.cinderbeam 1"), (94, "craft.slagiron_shield", "mat.slagiron_bar 3, mat.cinderbeam 2"),   // tier 6, the Lowtowns' (the cap of 20)
+            (96, "craft.slagiron_helm", "mat.slagiron_bar 3"), (98, "craft.slagiron_cuirass", "mat.slagiron_bar 5") };
 
         /// <summary>
         /// Blacksmithing (DESIGN 5.2): five smelts at a forge, each two of its tier's ore and a charcoal for one bar, at skill 1, 20, 40,
@@ -399,9 +403,10 @@ namespace Crulanda.Tests
         {
             var items = Items(); var db = Db(items);
             var smelts = new[] { ("recipe.copper_bar", "mat.copper_ore", "mat.copper_bar", 1, 4), ("recipe.bogiron_bar", "mat.bogiron_ore", "mat.bogiron_bar", 20, 9),
-                ("recipe.ridgesteel_bar", "mat.adit_ore", "mat.ridgesteel_bar", 40, 11), ("recipe.ashsteel_bar", "mat.cinder_ore", "mat.ashsteel_bar", 60, 13), ("recipe.veridian_bar", "mat.veridian_ore", "mat.veridian_bar", 80, 19) };
+                ("recipe.ridgesteel_bar", "mat.adit_ore", "mat.ridgesteel_bar", 40, 11), ("recipe.ashsteel_bar", "mat.cinder_ore", "mat.ashsteel_bar", 60, 13), ("recipe.veridian_bar", "mat.veridian_ore", "mat.veridian_bar", 80, 19),
+                ("recipe.slagiron_bar", "mat.slagiron_ore", "mat.slagiron_bar", 90, 22) };
             var all = db.RecipesFor("blacksmithing");
-            Assert.AreEqual(45, all.Count, "Five smelts, 21 pieces and the five resonance-tempered weapons (the notice boards' shard); since Phase 8.6 the geode chips, five geode-set necks, two shields, the five tempered armour pieces and the ash-steel epic (the last six from leaves).");
+            Assert.AreEqual(54, all.Count, "Five smelts, 21 pieces and the five resonance-tempered weapons (the notice boards' shard); since Phase 8.6 the geode chips, five geode-set necks, two shields, the five tempered armour pieces and the ash-steel epic (the last six from leaves); and slag-iron's nine (the cap of 20): its smelt, four pieces, a tempered weapon, a torc, tempered sabatons and the epic hammer.");
             Assert.IsTrue(all.All(r => r.station == "forge"), "Everything a smith makes is made at a forge.");
             foreach (var (id, ore, bar, skill, value) in smelts)
             {
@@ -425,7 +430,7 @@ namespace Crulanda.Tests
                 Assert.IsTrue(r.inputs.Any(i => i.item == "mat." + tier + "_bar"), item + " is made of " + tier + " bars.");
             }
             var tempered = all.Where(r => r.id.StartsWith("recipe.tempered_") && !r.found).Select(r => r.id).ToList();
-            Assert.AreEqual(5, tempered.Count, "The five resonance-tempered weapons (the notice boards' Aether-Geode shard; 2026-10-03).");
+            Assert.AreEqual(6, tempered.Count, "The five resonance-tempered weapons (the notice boards' Aether-Geode shard; 2026-10-03) and slag-iron's maul.");
             Assert.IsTrue(tempered.All(id => db.Recipe(id).inputs.Any(i => i.item == "mat.geode_shard")), "Each needs the shard.");
             CollectionAssert.IsSubsetOf(smelts.Select(x => x.Item1).Concat(Pieces.Select(p => "recipe." + p.item.Substring(6))).Concat(tempered), all.Select(r => r.id));
             CollectionAssert.AreEqual(all.OrderBy(x => x.skill).ThenBy(x => x.id, StringComparer.Ordinal).Select(x => x.id), all.Select(r => r.id), "Easiest first.");
@@ -444,11 +449,11 @@ namespace Crulanda.Tests
             var items = Items(); var looks = GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text);
             var crafted = items.Items.Values.Where(d => d.id.StartsWith("craft.", StringComparison.Ordinal)).ToList();
             CollectionAssert.IsSubsetOf(Pieces.Select(p => p.item), crafted.Select(d => d.id), "The Blacksmith's 21 pieces are still there.");
-            Assert.AreEqual(Pieces.Length + 57, crafted.Count, "And the 57 of Phase 8.6: four leather, four cloth, a bow, a staff and a geode-set neck a tier, and two shields.");
+            Assert.AreEqual(Pieces.Length + 68, crafted.Count, "And the 57 of Phase 8.6: four leather, four cloth, a bow, a staff and a geode-set neck a tier, and two shields; and slag-iron's eleven of those (the cap of 20).");
             foreach (var d in crafted)
             {
                 Assert.AreEqual("gear", d.kind, d.id); Assert.GreaterOrEqual(ItemDatabase.SlotIndex(d.slot), 0, d.id);
-                Assert.IsTrue(new[] { 1, 4, 8, 11, 14 }.Contains(d.level), d.id + " is required at a tier's level (" + d.level + ").");
+                Assert.IsTrue(new[] { 1, 4, 8, 11, 14, 19 }.Contains(d.level), d.id + " is required at a tier's level (" + d.level + ").");
                 var l = looks.Resolve(d); Assert.IsFalse(l.fallback, d.id + " has its own look."); Assert.AreEqual(d.slot, GearLooks.Family(l.family).slot, d.id);
                 Assert.IsFalse(string.IsNullOrEmpty(d.description), d.id); Assert.IsTrue(d.canonStatus != null && d.canonStatus.StartsWith("GAME-ONLY"), d.id);
                 int stats = d.stamina + d.strength + d.agility + d.intellect + d.spirit;
@@ -477,7 +482,7 @@ namespace Crulanda.Tests
         }
 
         /// <summary>The five tiers of Phase 8.6 step 6, by the word in their pieces' ids (the heartwood capstone is veridian's).</summary>
-        static readonly string[] TierIds = { "copper", "bogiron", "ridgesteel", "ashsteel", "veridian" };
+        static readonly string[] TierIds = { "copper", "bogiron", "ridgesteel", "ashsteel", "veridian", "slagiron" };   // and the sixth, the Lowtowns' (the cap of 20)
         static string TierOf(string itemId) { var t = itemId.Substring(itemId.IndexOf('.') + 1); int u = t.IndexOf('_'); t = u < 0 ? t : t.Substring(0, u); return t == "heartwood" ? "veridian" : t; }
 
         /// <summary>
@@ -515,7 +520,7 @@ namespace Crulanda.Tests
         {
             var items = Items(); var db = Db(items); var looks = GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text);
             var rares = db.Recipes.FindAll(r => items.Get(r.output).kind == "gear" && items.Get(r.output).quality == 3 && r.output != "craft.heartwood_greatblade");
-            Assert.AreEqual(25, rares.Count, "Five tempered weapons, and a mastered jerkin, a fine-woven robe, a seasoned bow and a tempered armour piece a tier.");
+            Assert.AreEqual(30, rares.Count, "Six tempered weapons, and a mastered jerkin, a fine-woven robe, a seasoned bow and a tempered armour piece a tier.");
             foreach (var r in rares)
             {
                 var d = items.Get(r.output); var gen = items.Get(ItemDatabase.GearId(d.slot, d.level + 1, 3, 0));

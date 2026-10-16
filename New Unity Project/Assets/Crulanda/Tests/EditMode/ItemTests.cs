@@ -245,6 +245,33 @@ namespace Crulanda.Tests
  new[] { db.Get(raw[0]).value, db.Get(raw[1]).value, db.Get(raw[2]).value, db.Get(raw[3]).value, db.Get(raw[4]).value }, "Raw value by tier.");
         }
 
+        /// <summary>The cap of 20 (Chris, 2026-10-16): generated gear at 16-20 wears the Lowtowns' material words (ZONE_LOWTOWNS.md 8's
+        /// palette: soot, tar, lamp-light) and climbs on past 15's; the beasts' and the camps' tables reach the cap; the gutter-hounds drop
+        /// their hide and the dock-rats their sacking (tier 6's makings).</summary>
+        [Test] public void Generated_gear_and_the_tables_reach_the_cap_of_twenty()
+        {
+            var db = Db(); var words = new[] { "Soot-stained ", "Tar-sealed ", "Lamp-lit " };
+            Assert.AreEqual(20, EncounterProgress.LevelCap);
+            for (int level = 16; level <= EncounterProgress.LevelCap; level++)
+                for (int seed = 0; seed < 12; seed++)
+                {
+                    var d = db.Get(ItemDatabase.GearId("chest", level, 2, seed)); Assert.NotNull(d, level + "/" + seed);
+                    Assert.AreEqual(level - 1, d.level); Assert.IsTrue(words.Any(w => d.name.StartsWith(w)), d.name + " (level " + level + ") is of the Lowtowns' band.");
+                }
+            Assert.IsFalse(words.Any(w => db.Get(ItemDatabase.GearId("chest", 15, 2, 3)).name.StartsWith(w)), "15 is still the Shore's.");
+            Assert.Greater(db.Get(ItemDatabase.GearId("chest", 20, 2, 3)).armor, db.Get(ItemDatabase.GearId("chest", 15, 2, 3)).armor);
+            Assert.Greater(db.Get(ItemDatabase.GearId("mainhand", 20, 3, 3)).weaponDamage, db.Get(ItemDatabase.GearId("mainhand", 15, 3, 3)).weaponDamage);
+            Assert.AreEqual(ItemDatabase.GearId("legs", 20, 2, 7), ItemDatabase.GearId("legs", 25, 2, 7), "Clamped to the cap.");
+            foreach (var tag in new[] { "wolf", "boar", "bear", "hound", "cultist", "weaveeater", "deserter", "rabbit", "deer" })
+                Assert.AreEqual(EncounterProgress.LevelCap, db.Loot.Find(t => t.tag == tag && t.levelMin == 1).levelMax, tag + "'s table reaches the cap.");
+            var hounds = db.Loot.Find(t => t.tag == "gutterhound"); Assert.NotNull(hounds);
+            Assert.AreEqual(.7f, System.Array.Find(hounds.entries, e => e.item == "junk.gutter_hide").chance, 1e-4f); Assert.IsTrue(Inventory.IsHide(db.Get("junk.gutter_hide")));
+            Assert.IsTrue(db.Loot.Find(t => t.tag == "dockrat").entries.Any(e => e.item == "mat.dock_sacking"));
+            var rng = new System.Random(3); int gear = 0;
+            for (int n = 0; n < 100; n++) foreach (var (item, _) in db.RollLoot("gutterhound", 18, true, rng)) if (item.StartsWith("gen.")) { gear++; StringAssert.Contains(".18.", item); }
+            Assert.Greater(gear, 50, "Elites at 18 drop gear of 18.");
+        }
+
         [Test] public void Loot_rolls_use_the_kind_and_elites_drop_gear()
         {
             var db = Db(); var rng = new System.Random(5); int gear = 0, pelts = 0;

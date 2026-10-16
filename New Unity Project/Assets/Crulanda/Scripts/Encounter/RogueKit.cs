@@ -23,7 +23,10 @@ namespace Crulanda.Encounter
             "tg-long-sap", "tg-quiet-hands", "tg-light-step", "tg-second-sap", "tg-shadow-shift", "tg-pickpocket", "tg-graces-end",
             "sw-keen-edge", "sw-ruthless", "sw-shard-poison", "sw-quick-blades", "sw-relentless", "sw-spent-shards", "sw-cut-deep",
             "lk-quick-kick", "lk-dust", "lk-feel-the-pins", "lk-ward-break", "lk-tumblers", "lk-hum", "lk-vibration",
-            "bk-showmanship", "bk-light-blade", "bk-from-behind", "bk-long-flourish", "bk-tumble", "bk-wide-open", "bk-encore", "bk-dashing" };   // the Swashbuckler, rows 0-3
+            "bk-showmanship", "bk-light-blade", "bk-from-behind", "bk-long-flourish", "bk-tumble", "bk-wide-open", "bk-encore", "bk-dashing",   // the Swashbuckler, rows 0-3
+            "tg-gone-clean", "tg-unremarked", "sw-spare-motion", "sw-close-work", "lk-practised-hands", "lk-pocket-dust", "bk-crowd-pleaser" };   // the level-20 rows (2026-10-16)
+        public const int GoneCleanFocus = 10, SpareMotionCost = 3, PractisedHandsCost = 4, CrowdPleaserFocus = 10;
+        public const float CloseWorkBelow = .3f, PocketDustSeconds = 10;
         public static readonly string[] BarIds = { "rogue.sinister_strike", "rogue.eviscerate", "rogue.sap", "rogue.gouge", "rogue.kick", "rogue.blind", "rogue.vanish",
             "rogue.opening_cut", "rogue.rallying_flourish", "rogue.tumble", "rogue.throw_knife" };
         public const int MaxCombo = 5;
@@ -117,7 +120,18 @@ namespace Crulanda.Encounter
         bool SinisterStrike(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
-            return Start(a, () => { s.BeginAutoAttack(); t.Receive(Dmg((a.power + s.WeaponDamage) * (1 + .04f * R("sw-keen-edge")) * Flank(t)), s.Player); AddCombo(t, 1); });
+            return Start(With(a, a.cost - SpareMotionCost * R("sw-spare-motion"), a.cooldown), () => {   // Spare Motion: cheaper
+                bool low = R("sw-close-work") > 0 && t.actor.Health.Pool.Ratio < CloseWorkBelow;   // Close Work: two points on a foe near its end
+                s.BeginAutoAttack(); t.Receive(Dmg((a.power + s.WeaponDamage) * (1 + .04f * R("sw-keen-edge")) * Flank(t)), s.Player); AddCombo(t, low ? 2 : 1);
+            });
+        }
+        /// <summary>Metres off the range at which mobs notice you (Unremarked: a metre a rank).</summary>
+        public override float NoticeShrink { get { return R("tg-unremarked"); } }
+        /// <summary>Crowd Pleaser: a foe that falls while Exposed gives back 10 Focus a rank.</summary>
+        public override void OnFoeDown(EncounterEnemy enemy)
+        {
+            int crowd = R("bk-crowd-pleaser");
+            if (crowd > 0 && Exposed(enemy) && s.Player != null && s.Player.IsAlive) GainFocus(CrowdPleaserFocus * crowd);
         }
         bool Eviscerate(AbilityDefinition a)
         {
@@ -154,7 +168,7 @@ namespace Crulanda.Encounter
         bool Kick(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
-            return Start(With(a, a.cost, a.cooldown - 2 * R("lk-quick-kick")), () => {
+            return Start(With(a, a.cost - PractisedHandsCost * R("lk-practised-hands"), a.cooldown - 2 * R("lk-quick-kick")), () => {   // Practised Hands: cheaper
                 t.Receive(Dmg(a.power * (1 + .5f * R("lk-ward-break"))), s.Player);
                 Held(t, t.Apply("silence", s.Player, KickSilence * (R("lk-vibration") > 0 ? 2 : 1)));
                 if (R("lk-hum") > 0 && t.actor.IsAlive) t.Apply("stun", s.Player, 1);   // The Hum
@@ -163,7 +177,7 @@ namespace Crulanda.Encounter
         bool Blind(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
-            return Start(a, () => Held(t, t.Apply("fear", s.Player, BlindSeconds + 2 * R("lk-dust"))));
+            return Start(With(a, a.cost, a.cooldown - PocketDustSeconds * R("lk-pocket-dust")), () => Held(t, t.Apply("fear", s.Player, BlindSeconds + 2 * R("lk-dust"))));   // Pocket of Dust: back sooner
         }
         /// <summary>Vanish: every mob after you loses sight of you; with nobody else to fight it goes home. Out of the fight you can Sap again.</summary>
         bool Vanish(AbilityDefinition a)
@@ -172,6 +186,7 @@ namespace Crulanda.Encounter
                 int n = 0;
                 foreach (var e in s.Enemies.ToArray()) if (e != null && e.actor.IsAlive && e.Engaged && e.Victim == s.Player) { e.LoseSight(s.Player, 6 + 4 * R("tg-quiet-hands")); n++; }
                 s.StopAutoAttack(); s.FloatText(s.Player.transform.position, "Vanished", new Color(.7f, .7f, .8f));
+                GainFocus(GoneCleanFocus * R("tg-gone-clean"));   // Gone Clean
                 s.Message(n > 0 ? "You slip away: " + n + (n == 1 ? " foe loses" : " foes lose") + " sight of you." : "You slip into the shadows.");
             });
         }

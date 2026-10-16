@@ -15,7 +15,7 @@ namespace Crulanda.Encounter
     /// Ward is a barrier. Bind makes the next Ember Bolt weaker and banks a Charge; Unbind spends it so the whole party hits
     /// harder for a while. Bar: 1 Ember Bolt, 2 Scorch, 3 Flare, 4 Cinder Field, 5 Smoulder, 6 Ember Ward, 7 Bind, 8 Unbind,
     /// 9 Quench (talent), 0 Ash Hex; the Bonecaller's (the necromancer, 2026-10-12) - Raise Bone Thrall, = Marrow Drain, [ Bone Spikes (talent). Base
-    /// abilities, rows 0-2 of Talents/mage.json and the Bonecaller's rows 0-3. Nothing here is saved.
+    /// abilities, rows 0-3 of Talents/mage.json (row 3 for the level-20 cap) and the Bonecaller's rows 0-3. Nothing here is saved.
     /// </summary>
     public sealed class MageKit : ClassKit, IPetMaster
     {
@@ -23,7 +23,8 @@ namespace Crulanda.Encounter
             "cb-kindling", "cb-hot-hands", "cb-stoked", "cb-flashpoint", "cb-backdraft", "cb-inferno", "cb-white-heat",
             "hw-cinders", "hw-slow-burn", "hw-wide-field", "hw-embers-underfoot", "hw-heat-haze", "hw-long-burn", "hw-firestorm",
             "sb-reservoir", "sb-ward-weave", "sb-quench", "sb-shared-flame", "sb-steady-mind", "sb-quickening", "sb-binding-oath",
-            "bc-hard-bone", "bc-sharp-marrow", "bc-grave-bond", "bc-long-drain", "bc-bone-spikes", "bc-death-echo", "bc-bone-armour", "bc-wide-spikes"   // the Bonecaller, rows 0-3
+            "bc-hard-bone", "bc-sharp-marrow", "bc-grave-bond", "bc-long-drain", "bc-bone-spikes", "bc-death-echo", "bc-bone-armour", "bc-wide-spikes",   // the Bonecaller, rows 0-3
+            "cb-even-flame", "cb-kept-coals", "hw-thick-smoke", "sb-open-hands", "bc-ossuary-coat"   // the level-20 rows (2026-10-16)
         };
         public static readonly string[] BarIds = { "mage.ember_bolt", "mage.scorch", "mage.flare", "mage.cinder_field", "mage.smoulder", "mage.ember_ward", "mage.bind", "mage.unbind", "mage.quench", "mage.ash_hex",
             "mage.raise_thrall", "mage.marrow_drain", "mage.bone_spikes" };
@@ -88,6 +89,12 @@ namespace Crulanda.Encounter
             }
             else s.Message("Overload: the heat is spent; nothing builds for " + OverloadSeconds + " seconds.");
         }
+        /// <summary>The Heat one Ember Bolt builds (Even Flame: a point less a rank).</summary>
+        public int EmberBoltHeat { get { return EmberHeat - R("cb-even-flame"); } }
+        /// <summary>The slow the burning ground lays on whoever stands in it each second: Embers Underfoot's 20%, Thick Smoke's 3% a rank.</summary>
+        public float FieldSlow { get { return (R("hw-embers-underfoot") > 0 ? .2f : 0) + ThickSmokePerRank * R("hw-thick-smoke"); } }
+        public const int KeptCoals = 20, OpenHandsMana = 4;
+        public const float ThickSmokePerRank = .03f, OssuaryCoatPerRank = .03f;
         bool InField(EncounterEnemy e) { return FieldBurning && e != null && Vector3.Distance(e.transform.position, fieldCentre) <= FieldRadius; }
 
         // ---------- action bar ----------
@@ -153,7 +160,7 @@ namespace Crulanda.Encounter
                 s.Bolt(t, new Color(1, .55f, .15f), .2f);
                 float d = (a.power + 2 * Level) * (1 + .03f * R("cb-kindling"));
                 if (bound) { d *= 1 - Mathf.Max(.1f, BoundLoss - .1f * R("sb-steady-mind")); Binding = false; Charges = 1; s.Message("Bound: a Charge is banked for Unbind."); }
-                Hit(t, Dmg(d)); GainHeat(EmberHeat); MendHound();
+                Hit(t, Dmg(d)); GainHeat(EmberBoltHeat); MendHound();
             });
         }
         bool Scorch(AbilityDefinition a)
@@ -181,6 +188,7 @@ namespace Crulanda.Encounter
                     foreach (var o in s.Enemies)
                         if (o != t && o.actor.IsAlive && Vector3.Distance(o.transform.position, t.transform.position) <= 4) { Hit(o, Mathf.Max(1, d / 2)); break; }
                 if (R("cb-backdraft") > 0) backdraft = true;
+                if (spent >= 70 && R("cb-kept-coals") > 0) { Heat = KeptCoals; heatKeptUntil = Now + HeatKept; }   // Kept Coals: some of the heat stays
                 s.Message("Flare: " + spent + " Heat released.");
             });
         }
@@ -192,10 +200,10 @@ namespace Crulanda.Encounter
             return Start(a, () => {
                 if (!t.actor.IsAlive) return;
                 fieldCentre = t.transform.position; int seconds = Mathf.RoundToInt(a.duration) + 2 * R("hw-long-burn"); fieldUntil = Now + seconds;
-                int per = Dmg((a.power + Level / 2f) * (1 + .1f * R("hw-cinders"))); int underfoot = R("hw-embers-underfoot");
+                int per = Dmg((a.power + Level / 2f) * (1 + .1f * R("hw-cinders"))); float slow = FieldSlow;   // Embers Underfoot, Thick Smoke
                 periodic.Add("cinder", s.Player, Now, 1, seconds, per, (e, i) => {
                     foreach (var o in s.Enemies)
-                        if (o.actor.IsAlive && InField(o)) { Hit(o, e.value); if (underfoot > 0) o.Slow(.2f, 1.2f); }
+                        if (o.actor.IsAlive && InField(o)) { Hit(o, e.value); if (slow > 0) o.Slow(slow, 1.2f); }
                     return true;
                 }, null, true);
                 s.Message("Cinder Field: the ground there burns for " + seconds + " seconds.");
@@ -259,6 +267,10 @@ namespace Crulanda.Encounter
                 if (shared > 0)
                     foreach (var who in new[] { s.Player, s.Progress.recruited && s.Companion != null ? s.Companion.actor : null })
                         if (who != null && who.IsAlive) HealActor(who, Mathf.RoundToInt(who.Health.Pool.Max * .03f * shared));
+                int hands = R("sb-open-hands");   // Open Hands: Mana back to you and Mira
+                if (hands > 0)
+                    foreach (var who in new[] { s.Player, s.Progress.recruited && s.Companion != null ? s.Companion.actor : null })
+                        if (who != null && who.IsAlive) who.Resource.Pool.Change(OpenHandsMana * hands);
                 s.Message("Unbind: the party hits " + Mathf.RoundToInt(Bonus * 100) + "% harder for " + seconds + " seconds.");
             });
         }
@@ -351,6 +363,7 @@ namespace Crulanda.Encounter
             int haze = R("hw-heat-haze");
             float mult = haze > 0 && InField(enemy) ? 1 - .04f * haze : 1;
             if (ThrallUp && victim == Thrall.actor && R("bc-bone-armour") > 0 && Draining) mult *= 1 - BoneArmourCut;   // Bone Armour
+            if (victim == s.Player && ThrallUp) mult *= 1 - OssuaryCoatPerRank * R("bc-ossuary-coat");   // Ossuary Coat: while the thrall stands
             return victim.GetComponent<Combatant>().Damage(Mathf.RoundToInt(raw * mult));
         }
 

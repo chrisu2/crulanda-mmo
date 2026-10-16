@@ -26,17 +26,21 @@ namespace Crulanda.Encounter
             "vw-stillness", "vw-thick-silence", "vw-grace", "vw-atonement", "vw-quiet-ward", "vw-hushed-pain", "vw-second-ward", "vw-steady-voice", "vw-vow-kept",   // the Still Vow
             "lu-deep-sleep", "lu-unsong", "lu-soft", "lu-wide", "lu-fourth", "lu-dreams", "lu-mesmer",
             "uw-unwrite", "uw-deep-unwriting", "uw-long-silence", "uw-erasure", "uw-hollow-echo", "uw-grey-note", "uw-void-hum", "uw-quick-erasure", "uw-spreading-grey", "uw-the-unwritten",   // the Unwriting
-            "ca-clear-voice", "ca-breath", "ca-held-note", "ca-chorus", "ca-long-song", "ca-echoing-mend", "ca-resonant-ward", "ca-quiet-mind", "ca-weave", "ca-symphony" };   // the Cantor, tiers 0-3
+            "ca-clear-voice", "ca-breath", "ca-held-note", "ca-chorus", "ca-long-song", "ca-echoing-mend", "ca-resonant-ward", "ca-quiet-mind", "ca-weave", "ca-symphony",   // the Cantor, tiers 0-3
+            "vw-long-stillness", "lu-long-echo", "lu-half-waking" };   // tier 3 (the cap of 20, 2026-10-16)
         public static readonly string[] BarIds = { "archivist.shard_note", "archivist.lull", "archivist.hush", "archivist.echo_bind", "archivist.cadence", "archivist.dirge", "archivist.echo_jar",
             "archivist.mending_phrase", "archivist.song_of_mending", "archivist.chorus", "archivist.unwrite", "archivist.erasure", "archivist.stillness", "archivist.mending_verse" };
         public const float MendingReach = 10, MendingShare = .017f, HeldNoteShare = .004f, HeldNoteSeconds = 5, LowMend = .35f, PhraseWeight = .4f;   // 2026-10-13: the Cantor heals a party by its song; its phrase and held note for one were overtuned (105 a second on the wounded dummy at full healing, 91 in a party)
         public const float LullSeconds = 20, LullReach = 6, BindSeconds = 30, HushSilence = 5, DirgeReach = 10, JarReach = 8, JarSeconds = 6, CadenceSpeed = .1f;
         public const int LullMost = 3, JarMost = 3;
+        public const float HalfWakingPerRank = .03f, HalfWakingSeconds = 6;
         public enum Song { None, Cadence, Dirge, Mending }
 
         readonly Dictionary<string, AbilityDefinition> abilities = new Dictionary<string, AbilityDefinition>(StringComparer.Ordinal);
         readonly Dictionary<string, ClassAbilityUnlock> unlocks = new Dictionary<string, ClassAbilityUnlock>(StringComparer.Ordinal);
         readonly List<(EncounterEnemy e, float until)> sleepers = new List<(EncounterEnemy, float)>();
+        /// <summary>Half-Waking: a sleeper woken early, and when its dulled blows end.</summary>
+        readonly Dictionary<EncounterEnemy, float> halfAwake = new Dictionary<EncounterEnemy, float>();
         float dirgeNext, mendNext; bool originalSung;
         readonly List<(Actor who, float until, int each)> heldNotes = new List<(Actor, float, int)>(); float heldNext;
         /// <summary>The song being sung (one at a time).</summary>
@@ -71,8 +75,20 @@ namespace Crulanda.Encounter
         }
         /// <summary>Quiet Step: mobs notice you a metre closer per rank.</summary>
         public override float NoticeShrink { get { return 0; } }   // Quiet Step went with the Silent Vow (2026-10-12)
-        public override void ResetState() { periodic.Clear(); Singing = Song.None; Bound = null; sleepers.Clear(); dirgeNext = mendNext = 0; originalSung = false; heldNotes.Clear(); }
-        public override void ClearTransient() { Bound = null; sleepers.Clear(); }
+        public override void ResetState() { periodic.Clear(); Singing = Song.None; Bound = null; sleepers.Clear(); halfAwake.Clear(); dirgeNext = mendNext = 0; originalSung = false; heldNotes.Clear(); }
+        public override void ClearTransient() { Bound = null; sleepers.Clear(); halfAwake.Clear(); }
+        /// <summary>Half-Waking: a mob woken early from your Lull or Echo Bind strikes 3% softer a rank for 6 s.</summary>
+        public override int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
+        {
+            if (victim == null || !victim.IsAlive) return 0;
+            if (enemy != null && halfAwake.TryGetValue(enemy, out var until) && Time.time < until) raw = Mathf.RoundToInt(raw * HalfWaking(R("lu-half-waking")));
+            return victim.GetComponent<Combatant>().Damage(raw);
+        }
+        public static float HalfWaking(int rank) { return 1 - HalfWakingPerRank * Mathf.Max(0, rank); }
+        /// <summary>How long Echo Bind holds (Long Echo: 2 s longer a rank).</summary>
+        public float BindHold { get { return BindSeconds + 2 * R("lu-long-echo"); } }
+        /// <summary>How long a Vow of Stillness's ward, and Hushed Pain with it, lasts (Long Stillness: 1 s longer a rank).</summary>
+        public float StillnessHold { get { return StillnessSeconds + R("vw-long-stillness"); } }
         public override string StatusLine { get { return Singing == Song.None ? null : "Singing " + SongName(Singing); } }
         static string SongName(Song song) { return song == Song.Mending ? "the Song of Mending" : song.ToString(); }
         public override string TargetStatus(EncounterEnemy enemy)
@@ -169,9 +185,9 @@ namespace Crulanda.Encounter
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (Bound != null && Bound != t && Bound.Incapacitated) Bound.Release();
-                string why = t.Apply("incap", s.Player, BindSeconds);
+                string why = t.Apply("incap", s.Player, BindHold);
                 if (why == "Immune" && R("lu-mesmer") > 0) { if (t.Apply("stun", s.Player, 4) == null) s.Message("Mesmer: " + t.actor.DisplayName + " is caught in its own echo for a moment."); return; }
-                if (Took(t, why)) { Bound = t; sleepers.Add((t, Time.time + BindSeconds)); }
+                if (Took(t, why)) { Bound = t; sleepers.Add((t, Time.time + BindHold)); }
             });
         }
         bool Sing(AbilityDefinition a, Song song)
@@ -287,8 +303,8 @@ namespace Crulanda.Encounter
         void Ward(Actor who, int size)
         {
             if (who == null || !who.IsAlive) return;
-            var c = who.GetComponent<Combatant>(); c.AddBarrier(size, StillnessSeconds); Aura(who.transform, "Stillness ward", StillWhite, StillnessSeconds, .6f, 1f, 12);
-            int pain = R("vw-hushed-pain"); if (pain > 0) c.Apply(new StatusEffectDefinition { id = "status.hushed_pain", name = "Hushed Pain", duration = StillnessSeconds, incomingDamageMultiplier = 1 - .03f * pain });
+            float hold = StillnessHold; var c = who.GetComponent<Combatant>(); c.AddBarrier(size, hold); Aura(who.transform, "Stillness ward", StillWhite, hold, .6f, 1f, 12);
+            int pain = R("vw-hushed-pain"); if (pain > 0) c.Apply(new StatusEffectDefinition { id = "status.hushed_pain", name = "Hushed Pain", duration = hold, incomingDamageMultiplier = 1 - .03f * pain });
             int grace = R("vw-grace"); if (grace > 0) HealActor(who, Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * .04f * grace)));
             s.FloatText(who.transform.position + Vector3.up * 1.6f, "Stillness " + size, StillWhite); HealFx.Show(who.transform);
         }
@@ -399,8 +415,9 @@ namespace Crulanda.Encounter
             {
                 var (e, until) = sleepers[i];
                 if (e == null || !e.actor.IsAlive || Time.time >= until) { sleepers.RemoveAt(i); if (e == Bound) Bound = null; continue; }
-                if (!e.Incapacitated) { sleepers.RemoveAt(i); if (e == Bound) Bound = null; if (R("lu-unsong") > 0) e.Slow(.5f, 6); }
+                if (!e.Incapacitated) { sleepers.RemoveAt(i); if (e == Bound) Bound = null; if (R("lu-unsong") > 0) e.Slow(.5f, 6); if (R("lu-half-waking") > 0) halfAwake[e] = Time.time + HalfWakingSeconds; }
             }
+            if (halfAwake.Count > 0) foreach (var e in halfAwake.Keys.ToList()) if (e == null || !e.actor.IsAlive || Time.time >= halfAwake[e]) halfAwake.Remove(e);
             if (Singing == Song.Dirge && Time.time >= dirgeNext)
             {
                 dirgeNext = Time.time + 1; float slow = .3f + .1f * R("ar-low-dirge");

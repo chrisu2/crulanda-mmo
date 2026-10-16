@@ -25,7 +25,7 @@ namespace Crulanda.Tests
             var t = Tree();
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
             Assert.AreEqual(4, t.Branches.Count, "Oathguard, Judicator, Sanctuary, Vanguard.");
-            Assert.AreEqual(PaladinKit.ImplementedIds.Length, count); Assert.AreEqual(30, count, "21 of the first three paths, 9 of the Vanguard's tiers 0-3; its tiers 4-6 are written, not built.");
+            Assert.AreEqual(PaladinKit.ImplementedIds.Length, count); Assert.AreEqual(33, count, "24 of the first three paths (a row-3 node each for the cap of 20, 2026-10-16), 9 of the Vanguard's tiers 0-3; its tiers 4-6 are written, not built.");
             foreach (var id in PaladinKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
             CollectionAssert.AreEqual(new[] { "oathguard", "judicator", "sanctuary", "vanguard" }, t.Branches.Select(b => b.id).ToArray());
             Assert.AreEqual("support", t.Branches[3].role);
@@ -46,6 +46,14 @@ namespace Crulanda.Tests
             Buy(t, p, "va-under-the-colours");                                                                            // 16
             Assert.AreEqual(0, t.Available(p), "Sixteen points: the Vanguard to its third tier, as far as the cap of 15 reaches.");
             Assert.IsNull(t.Find("va-oriflamme"), "Tier 4 is written, not built: not in the loaded tree.");
+        }
+        /// <summary>The level-20 row (2026-10-16): each new node's words carry the numbers its code uses.</summary>
+        [Test] public void The_level_twenty_nodes_say_what_the_code_does()
+        {
+            var t = TalentTree.Parse("class.paladin", Json, 20, PaladinKit.ImplementedIds);
+            StringAssert.Contains(Mathf.RoundToInt(PaladinKit.IronOathPerRank * 100) + "% less per rank", t.Find("og-iron-oath").desc);
+            StringAssert.Contains(Mathf.RoundToInt(PaladinKit.SentencePerRank * 100) + "% harder per rank", t.Find("ju-sentence-passed").desc);
+            StringAssert.Contains(PaladinKit.SharedMercyReach + "m for " + Mathf.RoundToInt(PaladinKit.SharedMercyPerRank * 100) + "%", t.Find("sa-shared-mercy").desc);
         }
         [Test] public void Implemented_flag_without_code_is_rejected()
         {

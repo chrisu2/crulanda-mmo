@@ -20,7 +20,7 @@ namespace Crulanda.Encounter
     public sealed class SaltMenderKit : ClassKit
     {
         public static readonly string[] ImplementedIds = {
-            "ss-long-binding", "ss-quick-chant", "ss-first-sea", "ss-calcify", "ss-white-crust", "ss-deep-crystal", "ss-sealed",
+            "ss-long-binding", "ss-quick-chant", "ss-first-sea", "ss-calcify", "ss-white-crust", "ss-deep-crystal", "ss-sealed", "ss-ready-salt",
             "ms-thick-salt", "ms-grounding", "ms-mortar", "ms-line-held", "ms-spiked-wall", "ms-wide-wall", "ms-mason-of-the-weave",
             "sf-sharp-salt", "sf-sifting-song", "sf-bane", "sf-light-hand", "sf-brine", "sf-crystal-rain", "sf-split-shard",
             "md-mender-craft", "md-long-verse", "md-steady-breath", "md-salt-circle", "md-wide-ring", "md-sealing-hands",
@@ -176,11 +176,12 @@ namespace Crulanda.Encounter
                 if (Held(t, t.Apply("silence", s.Player, seconds))) Hold(t, seconds);
             });
         }
-        /// <summary>Calcify (a talent): the target crusted into salt and stunned 3 s (Deep Crystal: longer); the Wasting's things 2 s more.</summary>
+        /// <summary>Calcify (a talent): the target crusted into salt and stunned 3 s (Deep Crystal: longer); the Wasting's things 2 s more.
+        /// Ready Salt: back 2 s sooner a rank.</summary>
         bool Calcify(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
-            return Start(a, () => {
+            return Start(With(a, a.cost, a.cooldown - 2 * R("ss-ready-salt")), () => {
                 if (!s.LandsOn(t, a.range)) return;
                 s.Bolt(t, SaltWhite, .22f); Hit(t, Dmg(a.power + Level));
                 float seconds = CalcifyStun + .5f * R("ss-deep-crystal") + (Unmade(t) ? 2 : 0);

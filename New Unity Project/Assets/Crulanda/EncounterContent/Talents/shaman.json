@@ -103,6 +103,36 @@
                                                             "healer":  1
                                                         },
                                            "impl":  true
+                                       },
+                                       {
+                                           "id":  "rs-soft-rain",
+                                           "name":  "Soft Rain",
+                                           "tier":  3,
+                                           "col":  0,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "cloud",
+                                           "desc":  "Rain Call costs 2 less Breath per rank.",
+                                           "emphasis":  {
+                                                            "healer":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "rs-spring-tide",
+                                           "name":  "Spring Tide",
+                                           "tier":  3,
+                                           "col":  2,
+                                           "max":  1,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "drop",
+                                           "desc":  "Tide Mend heals 5% more on someone under 35% health.",
+                                           "emphasis":  {
+                                                            "healer":  1
+                                                        },
+                                           "impl":  true
                                        }
                                    ]
                      },
@@ -198,6 +228,36 @@
                                            "kind":  "passive",
                                            "icon":  "bolt",
                                            "desc":  "Thunderhead splashes 30% to foes within 5 m.",
+                                           "emphasis":  {
+                                                            "dps":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sc-low-clouds",
+                                           "name":  "Low Clouds",
+                                           "tier":  3,
+                                           "col":  0,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "cloud",
+                                           "desc":  "Thunderhead costs 1 less Breath per rank.",
+                                           "emphasis":  {
+                                                            "dps":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sc-heavy-sky",
+                                           "name":  "Heavy Sky",
+                                           "tier":  3,
+                                           "col":  2,
+                                           "max":  1,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "bolt",
+                                           "desc":  "Squall's charge builds to 6, not 5.",
                                            "emphasis":  {
                                                             "dps":  1
                                                         },
@@ -301,6 +361,36 @@
                                                             "tank":  1
                                                         },
                                            "impl":  true
+                                       },
+                                       {
+                                           "id":  "sb-bedrock",
+                                           "name":  "Bedrock",
+                                           "tier":  3,
+                                           "col":  0,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "stone",
+                                           "desc":  "Earthskin lasts 1s longer per rank.",
+                                           "emphasis":  {
+                                                            "tank":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sb-stone-call",
+                                           "name":  "Stone-Call",
+                                           "tier":  3,
+                                           "col":  2,
+                                           "max":  1,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "fist",
+                                           "desc":  "Rooting Stamp turns every foe it strikes on you for 3 seconds.",
+                                           "emphasis":  {
+                                                            "tank":  1
+                                                        },
+                                           "impl":  true
                                        }
                                    ]
                      },
@@ -396,6 +486,36 @@
                                            "kind":  "passive",
                                            "icon":  "skull",
                                            "desc":  "Barrow-call also harms its foe over 6 s.",
+                                           "emphasis":  {
+                                                            "control":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "gw-far-wind",
+                                           "name":  "Far Wind",
+                                           "tier":  3,
+                                           "col":  0,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "wind",
+                                           "desc":  "Moor Wind reaches 1 m further per rank.",
+                                           "emphasis":  {
+                                                            "control":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "gw-clinging-mist",
+                                           "name":  "Clinging Mist",
+                                           "tier":  3,
+                                           "col":  2,
+                                           "max":  1,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "cloud",
+                                           "desc":  "Mist also slows the foes it holds by 30% for 6 seconds.",
                                            "emphasis":  {
                                                             "control":  1
                                                         },

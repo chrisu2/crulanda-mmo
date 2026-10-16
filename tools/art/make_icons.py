@@ -2110,6 +2110,12 @@ ITEMS = {
     'mat.yarrow': ('herb', herb_yarrow), 'mat.mourners_cap': ('herb', herb_cap), 'mat.tarnwort': ('herb', herb_tarnwort), 'mat.cinder_thistle': ('herb', herb_thistle), 'mat.dewfern': ('herb', herb_fern),
     'herb.moonbell': ('herb', herb_bell, ('#a8c8ff',), dict(glowc='#a8c8ff')), 'herb.widows_lamp': ('herb', herb_lamp), 'herb.frostbell': ('herb', herb_bell, ('#f0fbff',), dict(glowc='#9fe8ff', leaf='#8ab8b0', n=2)),
     'herb.last_light': ('herb', herb_lastlight), 'herb.lantern_moss': ('herb', herb_moss),
+    # tier 6, the Lowtowns' (the cap of 20, 2026-10-16; GAME-ONLY): slag-iron, cinder-beam, soot-wort, lamp-lichen, grey-bell, gutter-hound hide, dock sacking
+    'mat.slagiron_ore': ('ore', ore, ('#3a3430', '#b0603a')), 'mat.slagiron_bar': ('ore', bar, ('#5e4e46',)),
+    'mat.cinderbeam': ('wood', log, ('#2a2422', '#8a5a34'), dict(char=True)),
+    'mat.sootwort': ('herb', herb_yarrow, (), dict(flower='#8a8680', leaf='#4a5048')), 'mat.lamp_lichen': ('herb', herb_cap, (), dict(cap='#c8c8a0', gill='#8a8a60', stem='#b0aa90', glowc='#ffd890')),
+    'herb.grey_bell': ('herb', herb_bell, ('#b8b8b4',), dict(leaf='#5a6058', n=2)),
+    'junk.gutter_hide': ('hide', pelt, ('#5a504a',), dict(belly='#7a6e64', spots='#3a3430')), 'mat.dock_sacking': ('food', sack, ('#7a6440', '#9a8460')),
     'mat.charcoal': ('ore', charcoal), 'mat.flour': ('food', sack, (), dict(mark='wheat')), 'mat.salt': ('food', salt), 'mat.vial': ('potion', flask, (None,), dict(shape='vial')),
     # hides
     'junk.wolf_pelt': ('hide', pelt, ('#8d9096',)), 'junk.ash_hide': ('hide', pelt, ('#4a4648',), dict(belly='#6a6462')), 'junk.moss_hide': ('hide', pelt, ('#6a7a4a',), dict(belly='#8aa05a')),

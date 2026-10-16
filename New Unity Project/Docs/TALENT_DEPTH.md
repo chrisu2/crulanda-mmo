@@ -132,3 +132,23 @@ Druid (their deep rows are designed), Archivist, Ranger, Rogue, Mage. Each round
 - Option A changes balance now: a full branch at 15 makes the sims and the mobs read softer; the elite paper fights
   (EliteBalanceTests) and the group scaling need a look once the first class lands.
 - The sims use the talent trees too (SimAdventurers): they get the new paths as roles.
+## The tiers at 20 (the cap of 20, Chris 2026-10-16: "raise top level to 20")
+At 20 a character has 21 points (level + 1). A tier-t node needs 5t points already in its branch, so a single-branch build fills tiers
+0-3 (20 points) and its 21st point goes either in tier 3's spare ranks or in a tier-4 node. Every branch of every class now holds 21 or
+more ranks in tiers 0-3, so a level-20 character can spend all 21 in one branch (TalentDataTests.At_twenty_every_branch_can_spend_21_in_itself).
+The plan was tools/wip/talents19.py (written for 19, its extra ranks in tier 3's free columns); 47 nodes built 2026-10-16 (GAME-ONLY names,
+each about 3% a rank at most, 5% on a conditional one-rank node), every one with code in its kit:
+| Class | New nodes (tier 3 unless said) |
+|---|---|
+| Archivist | Long Stillness (the Vow's ward +1 s a rank), Long Echo (Echo Bind +2 s a rank), Half-Waking (a mob woken early hits 3% softer a rank, 6 s) |
+| Cleric | Trimmed Wick, Lamp Held Low, Even Breath, Answering Hills, Burning Word, Ashes Returned, Patient Ward, The Shrine Holds; Renewing Ward (tier 1, was written) |
+| Mage | Even Flame, Kept Coals, Thick Smoke, Open Hands; Ossuary Coat (was tier 4, written: 3% less a rank while the thrall stands) |
+| Paladin | Iron Oath (2% less under the Ward), Sentence Passed (Judgement 3%), Shared Mercy (Lay On mends the party 3% a rank) |
+| Ranger | Practised Draw, Scarred Hide, Shared Hunt, Lasting Mark; Catch Your Breath (was the written tier-4 Second Wind: 5 Focus a rank on a kill within 5 m) |
+| Rogue | Gone Clean, Unremarked, Spare Motion, Close Work, Practised Hands, Pocket of Dust; Crowd Pleaser (was tier 4, written: 10 Focus a rank when an Exposed foe falls) |
+| Salt-Mender | Ready Salt (Calcify 2 s sooner a rank) |
+| Scoundrel | Old Grudge, Collected, Honeyed Words, Rude Awakening, Second Chorus, Greased Palms |
+| Shaman | Soft Rain, Spring Tide, Low Clouds, Heavy Sky, Bedrock, Stone-Call, Far Wind, Clinging Mist |
+| Warrior, Druid | nothing new: 23-26 ranks a branch already |
+The written tiers 4-6 stay written for the cap of 30 (a tier-4 capstone of one rank would also take the 21st point; none is needed now).
+Status: written and compile-checked (Roslyn), not yet run in Unity; OPEN until Chris plays a level-20 build.

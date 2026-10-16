@@ -132,6 +132,36 @@
       "dps": 2
      },
      "impl": true
+    },
+    {
+     "id": "ct-old-grudge",
+     "name": "Old Grudge",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "dagger",
+     "desc": "Settle the Score cuts 3% harder per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ct-collected",
+     "name": "Collected",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "coin",
+     "desc": "A debt that comes due gives you back 10 Nerve.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
     }
    ]
   },
@@ -259,6 +289,36 @@
      "desc": "Glimmer takes a fifth foe, and reaches 2 metres further.",
      "emphasis": {
       "control": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "st-honeyed-words",
+     "name": "Honeyed Words",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "Stay costs 3 less Nerve per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "st-rude-awakening",
+     "name": "Rude Awakening",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "wind",
+     "desc": "A foe woken from your Glimmer by a blow is slowed by 30% for 4 seconds.",
+     "emphasis": {
+      "control": 1
      },
      "impl": true
     }
@@ -403,6 +463,36 @@
      "desc": "While you sing the War-Verse, Mira casts 10% faster.",
      "emphasis": {
       "support": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-second-chorus",
+     "name": "Second Chorus",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "The Rallying Verse lasts 1 second longer per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "fx-greased-palms",
+     "name": "Greased Palms",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "coin",
+     "desc": "A Bribe costs half the crowns and holds 3 seconds longer.",
+     "emphasis": {
+      "support": 1
      },
      "impl": true
     }

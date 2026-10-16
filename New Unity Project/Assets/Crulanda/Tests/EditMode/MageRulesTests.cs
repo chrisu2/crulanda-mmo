@@ -21,7 +21,7 @@ namespace Crulanda.Tests
         {
             var t = Tree();
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
-            Assert.AreEqual(4, t.Branches.Count); Assert.AreEqual(MageKit.ImplementedIds.Length, count); Assert.AreEqual(29, count);
+            Assert.AreEqual(4, t.Branches.Count); Assert.AreEqual(MageKit.ImplementedIds.Length, count); Assert.AreEqual(34, count, "29, and the level-20 row 3 (2026-10-16): Even Flame, Kept Coals, Thick Smoke, Open Hands, Ossuary Coat");
             Assert.IsNull(t.Find("cw-hot-jaws"), "the Cinderwright is gone");
             foreach (var id in MageKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
             CollectionAssert.AreEqual(new[] { "combustion", "heatweaver", "spellbinder", "bonecaller" }, t.Branches.Select(b => b.id).ToArray());
@@ -34,7 +34,7 @@ namespace Crulanda.Tests
             var t = TalentTree.Parse("class.mage", File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Talents/mage.json")), 15, MageKit.ImplementedIds);
             Assert.AreEqual("bonecaller", t.Branches[3].id); Assert.AreEqual("pet", t.Branches[3].role);
             Assert.GreaterOrEqual(t.Branches[3].nodes.Sum(n => n.max), 16, "at least sixteen ranks in rows 0-3");
-            foreach (var written in new[] { "bc-twin-thralls", "bc-ossuary-coat", "bc-rise-again", "bc-the-bone-lord" }) Assert.IsNull(t.Find(written), written + " is written, not built");
+            foreach (var written in new[] { "bc-twin-thralls", "bc-rise-again", "bc-the-bone-lord" }) Assert.IsNull(t.Find(written), written + " is written, not built");
             var p = EncounterSession.FreshProgress("class.mage"); p.experience = EncounterProgress.XpForLevel(15);
             Assert.IsFalse(t.Propose(p, "bc-bone-spikes", 1, out _, out _), "Bone Spikes is a row-2 talent");
             Buy(t, p, "bc-hard-bone", "bc-hard-bone", "bc-hard-bone", "bc-sharp-marrow", "bc-sharp-marrow", "bc-sharp-marrow", "bc-grave-bond", "bc-grave-bond", "bc-grave-bond",
@@ -42,6 +42,18 @@ namespace Crulanda.Tests
             Assert.AreEqual(0, t.Available(p));
             foreach (var line in File.ReadAllLines(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Talents/mage.json")))
                 if (line.Contains("\"bc-")) foreach (var word in new[] { "golem", "forge", "engine", "machine", "gear", "piston" }) StringAssert.DoesNotContain(word, line.ToLowerInvariant(), "no machines (Chris, 2026-10-11)");
+        }
+        /// <summary>The level-20 row (2026-10-16): each new node's words carry the numbers its code uses.</summary>
+        [Test] public void The_level_twenty_nodes_say_what_the_code_does()
+        {
+            var t = TalentTree.Parse("class.mage", Json, 20, MageKit.ImplementedIds);
+            StringAssert.Contains("1 less Heat", t.Find("cb-even-flame").desc);
+            StringAssert.Contains(MageKit.KeptCoals + " Heat", t.Find("cb-kept-coals").desc);
+            StringAssert.Contains(Mathf.RoundToInt(MageKit.ThickSmokePerRank * 100) + "% per rank", t.Find("hw-thick-smoke").desc);
+            StringAssert.Contains(MageKit.OpenHandsMana + " Mana per rank", t.Find("sb-open-hands").desc);
+            StringAssert.Contains(Mathf.RoundToInt(MageKit.OssuaryCoatPerRank * 100) + "% less per rank", t.Find("bc-ossuary-coat").desc);
+            Assert.AreEqual(3, t.Find("bc-ossuary-coat").tier, "moved up to row 3 for the cap of 20");
+            Assert.Greater(MageKit.EmberHeat - t.Find("cb-even-flame").max, 0, "Ember Bolt still builds Heat at Even Flame's top rank");
         }
         /// <summary>A save with points in a retired path (the Cinderwright, the Archive, the Silent Vow) loads with them refunded and every
         /// other pick kept (2026-10-12).</summary>

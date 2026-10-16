@@ -102,6 +102,36 @@
       "healer": 2
      },
      "impl": true
+    },
+    {
+     "id": "ln-trimmed-wick",
+     "name": "Trimmed Wick",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Mend and Long Mend cost 1 less Grace per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ln-lamp-held-low",
+     "name": "Lamp Held Low",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "flame",
+     "desc": "Mend and Long Mend heal 5% more on someone under 35% health.",
+     "emphasis": {
+      "healer": 2
+     },
+     "impl": true
     }
    ]
   },
@@ -197,6 +227,36 @@
      "kind": "signature",
      "icon": "star",
      "desc": "Litany also heals for 30% more over 6s.",
+     "emphasis": {
+      "healer": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "ch-even-breath",
+     "name": "Even Breath",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Litany costs 2 less Grace per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ch-answering-hills",
+     "name": "Answering Hills",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "note",
+     "desc": "Each tick of the Hymn mends the most hurt within its reach for 5% more.",
      "emphasis": {
       "healer": 2
      },
@@ -300,6 +360,36 @@
       "dps": 2
      },
      "impl": true
+    },
+    {
+     "id": "cn-burning-word",
+     "name": "Burning Word",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "fire",
+     "desc": "Brand burns 3% harder per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cn-ashes-returned",
+     "name": "Ashes Returned",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "drop",
+     "desc": "Sunburst gives back 2 Grace for each Brand it spends.",
+     "emphasis": {
+      "dps": 2
+     },
+     "impl": true
     }
    ]
   },
@@ -368,7 +458,7 @@
      "emphasis": {
       "support": 1
      },
-     "impl": false
+     "impl": true
     },
     {
      "id": "wd-shared",
@@ -395,6 +485,36 @@
      "kind": "signature",
      "icon": "star",
      "desc": "Once a fight, the party is warded for 20% of its health.",
+     "emphasis": {
+      "support": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "wd-patient-ward",
+     "name": "Patient Ward",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Ward lasts 2s longer per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "wd-shrine-holds",
+     "name": "The Shrine Holds",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "shield",
+     "desc": "While Steadfast stands, Ward absorbs 5% more.",
      "emphasis": {
       "support": 2
      },

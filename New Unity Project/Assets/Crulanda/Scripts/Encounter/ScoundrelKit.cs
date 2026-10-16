@@ -25,7 +25,8 @@ namespace Crulanda.Encounter
         public static readonly string[] ImplementedIds = {
             "ct-settle", "ct-keen-dirk", "ct-steady-nerve", "ct-poisoned-wine", "ct-strong-vintage", "ct-mark-debt", "ct-compounding", "ct-paid-in-full",
             "st-glimmer", "st-long-glimmer", "st-silver-voice", "st-jagged-verse", "st-sour-note", "st-stay", "st-held-word", "st-whole-room",
-            "fx-war-verse", "fx-rousing", "fx-good-company", "fx-rallying-verse", "fx-bribe", "fx-deep-pockets", "fx-favour", "fx-old-friends", "fx-everyones-friend" };
+            "fx-war-verse", "fx-rousing", "fx-good-company", "fx-rallying-verse", "fx-bribe", "fx-deep-pockets", "fx-favour", "fx-old-friends", "fx-everyones-friend",
+            "ct-old-grudge", "ct-collected", "st-honeyed-words", "st-rude-awakening", "fx-second-chorus", "fx-greased-palms" };   // tier 3 (the cap of 20, 2026-10-16)
         public static readonly string[] BarIds = { "scoundrel.quick_cut", "scoundrel.jeer", "scoundrel.settle_score", "scoundrel.poisoned_wine", "scoundrel.mark_debt",
             "scoundrel.glimmer", "scoundrel.jagged_verse", "scoundrel.stay", "scoundrel.war_verse", "scoundrel.rallying_verse", "scoundrel.bribe", "scoundrel.favour" };
         /// <summary>The path each gated ability belongs to (its talent is in that branch of Talents/scoundrel.json); Quick Cut and Jeer are every path's.</summary>
@@ -37,6 +38,8 @@ namespace Crulanda.Encounter
         public const float QuickCutWeapon = .2f, JeerWeapon = .4f, SettleWeapon = .5f, SettlePer = 30, JaggedWeapon = .3f, KeenPerRank = .04f, VintagePerRank = .1f;
         public const float DebtShare = .2f, CompoundingPerRank = .05f, PaidInFullBelow = .35f;
         public const float GlimmerReach = 8, JaggedReach = 6, JaggedSlow = .4f, JaggedSlowSeconds = 5, FavourSeconds = 10, OldFriendsPerRank = 3, DeepPocketsPerRank = 5;
+        public const int CollectedNerve = 10, HoneyedPerRank = 3;
+        public const float OldGrudgePerRank = .03f, RudeSlow = .3f, RudeSlowSeconds = 4, GreasedSeconds = 3;
         public const float WarLift = .06f, RousingPerRank = .01f, GoodCompanyPerRank = .02f, GoodCompanyReach = 15, FriendHaste = .1f;
         public enum Verses { None, War }
         static readonly Color VerseColour = new Color(.95f, .6f, .7f), DebtColour = new Color(1, .82f, .35f);
@@ -49,6 +52,8 @@ namespace Crulanda.Encounter
         /// <summary>The verse being sung (one at a time; the War-Verse is the only one kept up).</summary>
         public Verses Verse { get; private set; }
         float rallyUntil, fightAt, drain; Crulanda.Gameplay.VitalPool wokePool;
+        /// <summary>Rude Awakening: the foes your Glimmer dazed, and when it would have let them go.</summary>
+        readonly List<(EncounterEnemy e, float until)> dazed = new List<(EncounterEnemy, float)>();
 
         public ScoundrelKit(EncounterSession session, ClassDefinition definition, IEnumerable<AbilityDefinition> catalog) : base(session)
         {
@@ -140,7 +145,7 @@ namespace Crulanda.Encounter
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 var pool = s.Player.Resource.Pool; int extra = pool.Current; pool.Change(-extra); int spent = a.cost + extra;
-                Hit(t, (a.power + s.WeaponDamage * SettleWeapon) * spent / SettlePer * Keen);
+                Hit(t, (a.power + s.WeaponDamage * SettleWeapon) * spent / SettlePer * Keen * (1 + OldGrudgePerRank * R("ct-old-grudge")));   // Old Grudge: harder
                 s.FloatText(t.transform.position + Vector3.up * .4f, "Settled", new Color(.9f, .3f, .35f));
             });
         }
@@ -175,6 +180,7 @@ namespace Crulanda.Encounter
             if (R("ct-paid-in-full") > 0 && t.actor.Health.Pool.Ratio < PaidInFullBelow) blow *= 2;
             t.Receive(Dmg(blow), s.Player);   // not run up again
             s.FloatText(t.transform.position + Vector3.up * .6f, "The debt comes due", DebtColour);
+            if (R("ct-collected") > 0) Nerve(CollectedNerve);   // Collected
         }
 
         // ---------- the Silver Tongue (crowd control; CANON-EXPANDED) ----------
@@ -189,7 +195,7 @@ namespace Crulanda.Encounter
                 bool room = R("st-whole-room") > 0; float reach = GlimmerReach + (room ? 2 : 0), seconds = a.duration + R("st-long-glimmer"); int most = GlimmerMost + (room ? 1 : 0);
                 var near = FoesNear(t.transform.position, reach).Where(e => e != t).OrderBy(e => Vector3.Distance(e.transform.position, t.transform.position)).Take(most - 1).ToList();
                 near.Insert(0, t); int n = 0;
-                foreach (var e in near) if (e.Apply("incap", s.Player, seconds) == null) n++;
+                foreach (var e in near) if (e.Apply("incap", s.Player, seconds) == null) { n++; dazed.Add((e, Now + seconds)); }
                 s.Message(n == 0 ? "The Glimmer finds no one to take." : "Glimmer: " + n + (n == 1 ? " foe stands" : " foes stand") + " dazed.");
             });
         }
@@ -210,7 +216,7 @@ namespace Crulanda.Encounter
         bool Stay(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
-            return Start(a, () => {
+            return Start(With(a, a.cost - HoneyedPerRank * R("st-honeyed-words"), a.cooldown), () => {   // Honeyed Words: cheaper
                 if (!s.LandsOn(t, a.range)) return;
                 s.FloatText(t.transform.position + Vector3.up * .4f, "\"Stay.\"", VerseColour);
                 Held(t, t.Apply("stun", s.Player, a.duration + .5f * R("st-held-word")));
@@ -233,7 +239,7 @@ namespace Crulanda.Encounter
         bool RallyingVerse(AbilityDefinition a)
         {
             return Start(a, () => {
-                int ticks = Mathf.Max(1, Mathf.RoundToInt(a.duration)); rallyUntil = Now + ticks;
+                int ticks = Mathf.Max(1, Mathf.RoundToInt(a.duration)) + R("fx-second-chorus"); rallyUntil = Now + ticks;   // Second Chorus: a second longer a rank
                 periodic.Add("rally", s.Player, Now, 1, ticks, Mathf.Max(1, a.power), (e, i) => {
                     Nerve(e.value);
                     if (s.Progress.recruited && s.Companion != null && s.Companion.gameObject.activeInHierarchy && s.Companion.actor.IsAlive) s.Companion.actor.Resource.Pool.Change(e.value);
@@ -254,16 +260,18 @@ namespace Crulanda.Encounter
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             if (!Need(Bribable(t), t.actor.DisplayName + " can't be bought.")) return false;
-            int crowns = Mathf.Max(1, t.actor.Level);
+            int crowns = BribeCrowns(t.actor.Level, R("fx-greased-palms") > 0);
             if (!Need(s.Progress.gold >= crowns, "You haven't the coin: " + crowns + " crowns.")) return false;
             return Start(a, () => {
                 if (!t.actor.IsAlive || s.Progress.gold < crowns) return;
-                if (!Held(t, t.Apply("incap", s.Player, a.duration + DeepPocketsPerRank * R("fx-deep-pockets")))) return;
+                if (!Held(t, t.Apply("incap", s.Player, a.duration + DeepPocketsPerRank * R("fx-deep-pockets") + (R("fx-greased-palms") > 0 ? GreasedSeconds : 0)))) return;
                 s.Progress.gold -= crowns;
                 s.FloatText(t.transform.position + Vector3.up * .4f, "Bribed", DebtColour);
                 s.Message("Bribe: " + crowns + " crowns, and " + t.actor.DisplayName + " looks the other way.");
             });
         }
+        /// <summary>A bribe's price: the foe's level in crowns (Greased Palms: half, rounded up).</summary>
+        public static int BribeCrowns(int level, bool greased) { int c = Mathf.Max(1, level); return greased ? (c + 1) / 2 : c; }
         /// <summary>Call in a Favour: of your allies within reach (Mira, the sims in your party), the one with the longest wait has it cut
         /// (Old Friends: more). Needs an ally who is waiting on something.</summary>
         bool Favour(AbilityDefinition a)
@@ -321,6 +329,12 @@ namespace Crulanda.Encounter
                     if (d > 0) { pool.Change(-Mathf.Min(d, pool.Current)); drain -= d; }
                 }
             }
+            for (int i = dazed.Count - 1; i >= 0; i--)   // Rude Awakening: a dazed foe woken early by a blow is slowed 30% for 4 s
+            {
+                var (e, until) = dazed[i];
+                if (e == null || e.actor == null || !e.actor.IsAlive || Now >= until) { dazed.RemoveAt(i); continue; }
+                if (!e.Incapacitated) { dazed.RemoveAt(i); if (R("st-rude-awakening") > 0) e.Slow(RudeSlow, RudeSlowSeconds); }
+            }
             if (debts.Count == 0) return;
             foreach (var kv in debts.ToList())
             {
@@ -331,7 +345,7 @@ namespace Crulanda.Encounter
             }
         }
         public override bool RestingResourceRegen { get { return false; } }
-        public override void ResetState() { periodic.Clear(); debts.Clear(); Verse = Verses.None; rallyUntil = 0; wokePool = null; drain = 0; }
+        public override void ResetState() { periodic.Clear(); debts.Clear(); dazed.Clear(); Verse = Verses.None; rallyUntil = 0; wokePool = null; drain = 0; }
         public override string StatusLine
         {
             get

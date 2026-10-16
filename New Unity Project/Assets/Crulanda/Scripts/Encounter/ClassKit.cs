@@ -47,6 +47,8 @@ namespace Crulanda.Encounter
         public virtual float MoveSpeedMultiplier { get { return 1; } }
         public virtual float SwingInterval(float baseInterval) { return baseInterval; }
         public virtual void OnAutoHit() { }
+        /// <summary>A foe that counts as your kill (yours or your party's) has just fallen (Catch Your Breath, Crowd Pleaser).</summary>
+        public virtual void OnFoeDown(EncounterEnemy enemy) { }
         public virtual int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
         { return victim == null || !victim.IsAlive ? 0 : victim.GetComponent<Combatant>().Damage(raw); }
         public virtual float PartyDamageMultiplier(EncounterEnemy enemy) { return 1; }

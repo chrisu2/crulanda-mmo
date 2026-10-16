@@ -695,6 +695,27 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "junk.gutter_hide",
+      "name": "Gutter-hound hide",
+      "kind": "material",
+      "quality": 1,
+      "value": 8,
+      "stack": 10,
+      "trade": "tannery.hides",
+      "description": "A feral hound's hide, scarred and short-haired. It tans tough.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.dock_sacking",
+      "name": "Dock sacking",
+      "kind": "material",
+      "quality": 1,
+      "value": 3,
+      "stack": 20,
+      "description": "Tarred sacking from the barges, cut free of a bale. A weaver can line a coat with it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "junk.mossback_tusk",
       "name": "Moss-green tusk",
       "kind": "junk",
@@ -916,6 +937,18 @@
       "value": 20,
       "stack": 10,
       "description": "Moss that glows like a banked coal, even picked. Chew it, and for a moment you can hear the trees.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "herb.grey_bell",
+      "name": "Grey-bell",
+      "kind": "consumable",
+      "heal": 900,
+      "quality": 3,
+      "level": 17,
+      "value": 24,
+      "stack": 10,
+      "description": "A grey flower that grows only in the ash of the Shard-Burners' Yard. It rings, faintly, if you shake it. Nobody likes that.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -1158,6 +1191,30 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "mat.sootwort",
+      "name": "Soot-wort",
+      "kind": "material",
+      "quality": 1,
+      "value": 7,
+      "stack": 20,
+      "trade": "stall.herbs",
+      "pouch": "herb",
+      "description": "A grey weed that grows in the gutters where nothing else will. Steeped, it dyes cloth the colour of the Lowtowns.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.lamp_lichen",
+      "name": "Lamp-lichen",
+      "kind": "material",
+      "quality": 1,
+      "value": 7,
+      "stack": 20,
+      "trade": "stall.herbs",
+      "pouch": "herb",
+      "description": "A pale crust that grows round the drain mouths and gives back a little light at night. The dyers prize it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "mat.charcoal",
       "name": "Charcoal",
       "kind": "material",
@@ -1330,6 +1387,42 @@
       "trade": "forge.ore",
       "pouch": "ore",
       "description": "Blue-green, and lighter than it looks. It never quite loses the colour of the ridge.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.slagiron_ore",
+      "name": "Slag-iron",
+      "kind": "material",
+      "quality": 1,
+      "value": 7,
+      "stack": 20,
+      "trade": "forge.ore",
+      "pouch": "ore",
+      "description": "Lumps of iron picked from the slag the smelters tip over the Forge District's wall. Pitted, and still good under the crust.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.slagiron_bar",
+      "name": "Slag-iron bar",
+      "kind": "material",
+      "quality": 1,
+      "value": 22,
+      "stack": 20,
+      "trade": "forge.ore",
+      "pouch": "ore",
+      "description": "Grey iron, smelted twice over. It takes an edge it should not, for metal somebody threw away.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "mat.cinderbeam",
+      "name": "Cinder-beam",
+      "kind": "material",
+      "quality": 1,
+      "value": 7,
+      "stack": 20,
+      "trade": "forge.wood",
+      "pouch": "timber",
+      "description": "An old roof beam from a fallen tenement, black with a century of smoke. Saw it and the heart is still sound.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -1627,6 +1720,62 @@
       "canonStatus": "GAME-ONLY: Ghost-Oaks are CANON (book3 ch.4); the blade is invented."
     },
     {
+      "id": "craft.slagiron_maul",
+      "name": "Slag-iron maul",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 19,
+      "value": 84,
+      "weaponDamage": 48,
+      "stamina": 13,
+      "strength": 23,
+      "description": "A slag-iron head on a cinder-beam haft. It breaks brick.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_shield",
+      "name": "Slag-iron door-shield",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 2,
+      "level": 19,
+      "value": 60,
+      "armor": 74,
+      "stamina": 23,
+      "strength": 13,
+      "description": "Cut from a tenement door and faced with slag-iron. The keyhole is still in it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_helm",
+      "name": "Slag-iron sallet",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 2,
+      "level": 19,
+      "value": 60,
+      "armor": 40,
+      "stamina": 13,
+      "strength": 23,
+      "description": "Slag-iron, worked at the Rust Market hearth. Dark, pitted, and harder than it has any right to be.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_cuirass",
+      "name": "Slag-iron cuirass",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 19,
+      "value": 60,
+      "armor": 62,
+      "stamina": 23,
+      "strength": 13,
+      "description": "Slag-iron, worked at the Rust Market hearth. Dark, pitted, and harder than it has any right to be.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "mat.geode_shard",
       "name": "Aether-Geode shard",
       "kind": "material",
@@ -1705,6 +1854,20 @@
       "stamina": 15,
       "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
       "canonStatus": "CANON-EXPANDED"
+    },
+    {
+      "id": "temper.slagiron",
+      "name": "Shard-tempered maul",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 19,
+      "value": 112,
+      "weaponDamage": 57,
+      "stamina": 19,
+      "strength": 32,
+      "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
+      "canonStatus": "GAME-ONLY"
     },
     {
       "id": "mat.fleece",
@@ -1801,7 +1964,7 @@
     {
       "tag": "wolf",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.12,
       "entries": [
         {
@@ -1822,7 +1985,7 @@
     {
       "tag": "boar",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.12,
       "entries": [
         {
@@ -1842,7 +2005,7 @@
     {
       "tag": "bear",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.12,
       "entries": [
         {
@@ -1863,7 +2026,7 @@
     {
       "tag": "collector",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.18,
       "entries": [
         {
@@ -1879,7 +2042,7 @@
     {
       "tag": "outrider",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.18,
       "entries": [
         {
@@ -1899,7 +2062,7 @@
     {
       "tag": "hollow",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.1,
       "entries": [
         {
@@ -1911,7 +2074,7 @@
     {
       "tag": "cultist",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.2,
       "entries": [
         {
@@ -1927,7 +2090,7 @@
     {
       "tag": "weaveeater",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.14,
       "entries": [
         {
@@ -1939,7 +2102,7 @@
     {
       "tag": "pale",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.25,
       "entries": [
         {
@@ -1951,7 +2114,7 @@
     {
       "tag": "deserter",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.14,
       "entries": [
         {
@@ -1967,7 +2130,7 @@
     {
       "tag": "quartermaster",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.7,
       "entries": [
         {
@@ -1985,7 +2148,7 @@
     {
       "tag": "banditking",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.7,
       "entries": [
         {
@@ -1997,7 +2160,7 @@
     {
       "tag": "hound",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.12,
       "entries": [
         {
@@ -2013,7 +2176,7 @@
     {
       "tag": "brood",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.7,
       "entries": [
         {
@@ -2031,7 +2194,7 @@
     {
       "tag": "deacon",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.7,
       "entries": [
         {
@@ -2047,7 +2210,7 @@
     {
       "tag": "tollguard",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.18,
       "entries": [
         {
@@ -2068,7 +2231,7 @@
     {
       "tag": "captain",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.7,
       "entries": [
         {
@@ -2086,7 +2249,7 @@
     {
       "tag": "sexton",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.7,
       "entries": [
         {
@@ -2102,7 +2265,7 @@
     {
       "tag": "drowned",
       "levelMin": 1,
-      "levelMax": 14,
+      "levelMax": 20,
       "gearChance": 0.1,
       "entries": [
         {
@@ -2354,7 +2517,7 @@
     {
       "tag": "rabbit",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "gearChance": 0,
       "entries": [
         {
@@ -2366,7 +2529,7 @@
     {
       "tag": "deer",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "gearChance": 0,
       "entries": [
         {
@@ -2466,6 +2629,42 @@
         {
           "item": "mat.hound_flank",
           "chance": 0.45
+        }
+      ]
+    },
+    {
+      "tag": "gutterhound",
+      "levelMin": 15,
+      "levelMax": 20,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.gutter_hide",
+          "chance": 0.7
+        },
+        {
+          "item": "junk.wolf_fang",
+          "chance": 0.3
+        }
+      ]
+    },
+    {
+      "tag": "dockrat",
+      "levelMin": 15,
+      "levelMax": 20,
+      "gearChance": 0.18,
+      "entries": [
+        {
+          "item": "mat.dock_sacking",
+          "chance": 0.6
+        },
+        {
+          "item": "junk.toll_coin",
+          "chance": 0.3
+        },
+        {
+          "item": "potion.healing",
+          "chance": 0.1
         }
       ]
     }

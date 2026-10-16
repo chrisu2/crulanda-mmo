@@ -22,8 +22,11 @@ namespace Crulanda.Encounter
             "mk-steady-hand", "mk-quick-draw", "mk-piercing", "mk-bleeding-wounds", "mk-snap-shot", "mk-headshot", "mk-double-nock",
             "bb-thick-coat", "bb-sharp-teeth", "bb-mending-bond", "bb-sic-fury", "bb-pack-sense", "bb-howl", "bb-alpha",
             "pf-fleet", "pf-tangling-snare", "pf-pin", "pf-keen-eye", "pf-cover-of-leaves", "pf-trapper", "pf-pathfinder",
-            "sk-long-haft", "sk-light-step", "sk-bleeding-point", "sk-quick-recovery", "sk-feint", "sk-pack-tactics", "sk-whirl-edge", "sk-hit-and-run"   // the Skirmisher, tiers 0-3 (2026-10-11)
+            "sk-long-haft", "sk-light-step", "sk-bleeding-point", "sk-quick-recovery", "sk-feint", "sk-pack-tactics", "sk-whirl-edge", "sk-hit-and-run",   // the Skirmisher, tiers 0-3 (2026-10-11)
+            "mk-practised-draw", "bb-scarred-hide", "bb-shared-hunt", "pf-lasting-mark", "sk-second-wind"   // the level-20 rows (2026-10-16)
         };
+        public const float PractisedDrawPerRank = .1f, ScarredHidePerRank = .03f, LastingMarkPerRank = 3, BreathReach = 5;
+        public const int SharedHuntFocus = 2, BreathFocusPerRank = 5;
         public static readonly string[] BarIds = { "ranger.quick_shot", "ranger.aimed_shot", "ranger.barbed_arrow", "ranger.hunters_mark", "ranger.snare", "ranger.call_companion", "ranger.sic", "ranger.disengage", "ranger.pin", "ranger.snare_trap",
             "ranger.spear_lunge", "ranger.whirling_spear", "ranger.feint" };
         public const float BowRange = 25, MarkBonus = .1f, DisengageLeap = 6;
@@ -130,9 +133,11 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); s.BeginAutoAttack(); Hit(t, Sho
         bool AimedShot(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            int draw = R("mk-practised-draw");   // Practised Draw: drawn quicker
+            if (draw > 0) a = With(a, a.cost, Mathf.Max(.5f, a.castTime - PractisedDrawPerRank * draw));
             return Start(a, () => {
                 if (!s.LandsOn(t, a.range)) return;
-                s.BeginAutoAttack(); s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); 
+                s.BeginAutoAttack(); s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true);
                 float d = a.power + s.WeaponDamage;
                 float ratio = t.actor.Health.Pool.Ratio;
                 if (ratio > .7f) d *= 1 + .08f * R("mk-piercing");
@@ -161,11 +166,14 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); s.BeginAutoAttack(); Hit(t, Sho
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
             return Start(a, () => {
                 if (!t.actor.IsAlive) return;
-                markedUntil[t] = Now + a.duration;
-                if (R("pf-pathfinder") > 0) t.Slow(.15f, a.duration);
-                s.Message("Hunter's Mark: " + t.actor.DisplayName + " takes more from the party for " + a.duration + " seconds.");
+                float seconds = MarkSeconds(a);
+                markedUntil[t] = Now + seconds;
+                if (R("pf-pathfinder") > 0) t.Slow(.15f, seconds);
+                s.Message("Hunter's Mark: " + t.actor.DisplayName + " takes more from the party for " + seconds + " seconds.");
             });
         }
+        /// <summary>How long Hunter's Mark holds (Lasting Mark: 3 s longer a rank).</summary>
+        public float MarkSeconds(AbilityDefinition a) { return a.duration + LastingMarkPerRank * R("pf-lasting-mark"); }
         bool Snare(AbilityDefinition a)
         {
             if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
@@ -270,6 +278,8 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponD
             {
                 feintedUntil.Remove(enemy); s.FloatText(s.Player.transform.position, "Miss", new Color(.85f, .9f, 1)); return 0;
             }
+            int hide = R("bb-scarred-hide");   // Scarred Hide: the wolf takes less
+            if (hide > 0 && victim != null && Wolf != null && victim == Wolf.actor) raw = Mathf.RoundToInt(raw * (1 - ScarredHidePerRank * hide));
             return base.ResolveEnemyHit(enemy, victim, raw);
         }
 
@@ -280,7 +290,15 @@ s.Bolt(t, new Color(.9f, .88f, .8f), .1f, true); Hit(t, Shot(a.power + s.WeaponD
         public float PetHealthScale { get { return WolfHealthScale; } }
         public float PetBiteScale { get { return WolfBiteScale; } }
         public bool PetHolds { get { return WolfHowls; } }
-        public void OnPetBite(EncounterEnemy target, int bite) { }
+        /// <summary>Shared Hunt: each of the wolf's bites gives you back 2 Focus.</summary>
+        public void OnPetBite(EncounterEnemy target, int bite) { if (R("bb-shared-hunt") > 0 && s.Player != null) s.Player.Resource.Pool.Change(SharedHuntFocus); }
+        /// <summary>Catch Your Breath: a foe of yours falling within 5 m gives back 5 Focus a rank.</summary>
+        public override void OnFoeDown(EncounterEnemy enemy)
+        {
+            int breath = R("sk-second-wind");
+            if (breath > 0 && enemy != null && s.Player != null && s.Player.IsAlive && Vector3.Distance(enemy.transform.position, s.Player.transform.position) <= BreathReach)
+                s.Player.Resource.Pool.Change(BreathFocusPerRank * breath);
+        }
         bool CallCompanion(AbilityDefinition a)
         {
             if (Wolf != null && Wolf.actor.IsAlive)

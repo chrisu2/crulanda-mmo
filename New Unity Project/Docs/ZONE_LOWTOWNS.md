@@ -182,3 +182,14 @@ furnace); the Raid Bell (Book 1's rising).
 "after this work on next dungeon and raise top level to 20. make sure there is a zone for 15-20 and a dungeon for the same range";
 then "Lowtowns + Hallow's Creek (Recommended)". The zone is 15-20 (not 16-19): its camps spread 15 to 20, the two elites 20, the cap 20
 (talent points 21 at 20: a tier-4 node is reachable with the 21st point).
+## Status (p9-lowtowns, level 20)
+The systems for the cap of 20, done on `p9-lowtowns` 2026-10-16 (compile-checked, tests written, not yet run in Unity; OPEN):
+- **Talents:** every branch of every class has 21+ ranks in tiers 0-3 (47 new nodes with code; TALENT_DEPTH.md "The tiers at 20").
+- **Levels:** LevelCap 20, the XP formula as it was, SimRoster.Homes `("zone.lowtowns", "Lowtown folk", 15, 20)`, the beasts' and camps'
+  loot tables to 20, generated gear's band 16-20 (Items.cs, GearLooks.BandOf), BALANCE_REPORT.md "Levels 16-20".
+- **Tier 6 trades (GAME-ONLY), ready for the zone file:** nodes `node.slagiron` (Slag-iron heap, ore, skill 90), `node.cinderbeam`
+  (Fallen cinder-beam, windfall), `node.sootwort` and `node.lamp_lichen` (herbs); the zone needs ten ore, eight windfalls and ten herbs at
+  skill 90 and no rich seams (ProfessionDataTests). The rare grey-bell is `herb.grey_bell`, a herb secret (kind "herb", item
+  herb.grey_bell) in the Shard-Burners' Yard. Camp tags with tables: `gutterhound` (the hide), `dockrat` (dock sacking); elite tags
+  `drainmother` (Mother of Drains) and `brannoc` (Knuckle Brannoc) drop the slag-iron leaves; Ketta Rune and Old Wulf sell one leaf each
+  (residents of the zone, named so). A forge, a bench and a fire in the zone (section 6's stations).

@@ -21,7 +21,7 @@ namespace Crulanda.Tests
         {
             var t = Tree();
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
-            Assert.AreEqual(4, t.Branches.Count); Assert.AreEqual(RangerKit.ImplementedIds.Length, count); Assert.AreEqual(29, count);
+            Assert.AreEqual(4, t.Branches.Count); Assert.AreEqual(RangerKit.ImplementedIds.Length, count); Assert.AreEqual(34, count, "29, and the level-20 row 3 (2026-10-16): Practised Draw, Scarred Hide, Shared Hunt, Lasting Mark, Catch Your Breath");
             foreach (var id in RangerKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
             CollectionAssert.AreEqual(new[] { "marksman", "beastbond", "pathfinder", "skirmisher" }, t.Branches.Select(b => b.id).ToArray());
         }
@@ -31,12 +31,24 @@ namespace Crulanda.Tests
         {
             var t = TalentTree.Parse("class.ranger", Json, 15, RangerKit.ImplementedIds);
             Assert.AreEqual("skirmisher", t.Branches[3].id); Assert.AreEqual("dps", t.Branches[3].role);
-            foreach (var written in new[] { "sk-thrown-spear", "sk-second-wind", "sk-dancer", "sk-untouchable" }) Assert.IsNull(t.Find(written), written + " is written, not built");
+            foreach (var written in new[] { "sk-thrown-spear", "sk-dancer", "sk-untouchable" }) Assert.IsNull(t.Find(written), written + " is written, not built");
             var p = AtLevel(15);
             Assert.IsFalse(t.Propose(p, "sk-feint", 1, out _, out _), "Feint is a row-2 talent");
             Buy(t, p, "sk-long-haft", "sk-long-haft", "sk-long-haft", "sk-light-step", "sk-light-step", "sk-light-step", "sk-bleeding-point", "sk-bleeding-point", "sk-bleeding-point",
                 "sk-quick-recovery", "sk-quick-recovery", "sk-feint", "sk-pack-tactics", "sk-pack-tactics", "sk-pack-tactics", "sk-hit-and-run");
             Assert.AreEqual(0, t.Available(p));
+        }
+        /// <summary>The level-20 row (2026-10-16): each new node's words carry the numbers its code uses.</summary>
+        [Test] public void The_level_twenty_nodes_say_what_the_code_does()
+        {
+            var t = TalentTree.Parse("class.ranger", Json, 20, RangerKit.ImplementedIds);
+            StringAssert.Contains(RangerKit.PractisedDrawPerRank.ToString("0.0", System.Globalization.CultureInfo.InvariantCulture) + "s quicker per rank", t.Find("mk-practised-draw").desc);
+            StringAssert.Contains(Mathf.RoundToInt(RangerKit.ScarredHidePerRank * 100) + "% less per rank", t.Find("bb-scarred-hide").desc);
+            StringAssert.Contains(RangerKit.SharedHuntFocus + " Focus", t.Find("bb-shared-hunt").desc);
+            StringAssert.Contains(RangerKit.LastingMarkPerRank + "s longer per rank", t.Find("pf-lasting-mark").desc);
+            var breath = t.Find("sk-second-wind");
+            Assert.AreEqual("Catch Your Breath", breath.name); Assert.AreEqual(3, breath.tier, "moved up to row 3 for the cap of 20");
+            StringAssert.Contains(RangerKit.BreathReach + "m", breath.desc); StringAssert.Contains(RangerKit.BreathFocusPerRank + " Focus per rank", breath.desc);
         }
         [Test] public void Implemented_flag_without_code_is_rejected()
         {

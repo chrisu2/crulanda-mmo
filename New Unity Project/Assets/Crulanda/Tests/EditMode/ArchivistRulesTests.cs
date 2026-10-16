@@ -22,6 +22,13 @@ namespace Crulanda.Tests
             var only = new List<string>(ArchivistKit.ImplementedIds); only.Remove("uw-erasure");
             Assert.Throws<ArgumentException>(() => TalentTree.Parse("class.archivist", Json, 15, only));
         }
+        /// <summary>Tier 3 for the cap of 20 (2026-10-16): built, and Half-Waking's dulled blows 3% a rank.</summary>
+        [Test] public void Tier_three_nodes_are_built()
+        {
+            var t = TalentTree.Parse("class.archivist", Json, 20, ArchivistKit.ImplementedIds);
+            foreach (var id in new[] { "vw-long-stillness", "lu-long-echo", "lu-half-waking" }) Assert.NotNull(t.Find(id), id);
+            Assert.AreEqual(1f, ArchivistKit.HalfWaking(0), 1e-5f); Assert.AreEqual(.94f, ArchivistKit.HalfWaking(2), 1e-5f);
+        }
         /// <summary>The Cantor (TALENT_DEPTH.md, 2026-10-10): at the cap of 15 (16 points) an Archivist reaches its tier 3; the Chorus is its talent action.</summary>
         [Test] public void The_Cantor_reaches_tier_three_at_the_cap()
         {

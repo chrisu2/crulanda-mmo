@@ -2232,6 +2232,7 @@ namespace Crulanda.Encounter
             GreySeepOnDeath(enemy);   // (S7) the Foreman's death stops the Grey Spreads (EncounterSession.GreySpread.cs)
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
+            Kit?.OnFoeDown(enemy);   // the kit's own kill talents (Catch Your Breath, Crowd Pleaser)
             // Lockouts (EncounterSession.Lockout): a boss or elite locked for you already (a queued run's fresh dungeon, a quest's kill) gives
             // no loot; one that was not is locked from now.
             bool lockedKill = LockedFor(enemy); enemy.NoLoot = lockedKill;

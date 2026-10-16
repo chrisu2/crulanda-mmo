@@ -18,7 +18,7 @@ namespace Crulanda.Tests
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
             Assert.AreEqual(4, t.Branches.Count, "Thief's Grace, Shardwork, Locksmith, the Swashbuckler"); Assert.AreEqual(RogueKit.ImplementedIds.Length, count);
             Assert.AreEqual("support", t.Branches[3].role);
-            foreach (var written in new[] { "bk-panache", "bk-crowd-pleaser", "bk-riposte", "bk-grand-finale" }) Assert.IsNull(t.Find(written), written + " is written, not built");
+            foreach (var written in new[] { "bk-panache", "bk-riposte", "bk-grand-finale" }) Assert.IsNull(t.Find(written), written + " is written, not built");
             var p = EncounterSession.FreshProgress("class.rogue"); p.experience = EncounterProgress.XpForLevel(15);
             Assert.IsFalse(t.Propose(p, "bk-tumble", 1, out _, out _), "Tumble is a row-2 talent");
             foreach (var id in new[] { "bk-showmanship", "bk-showmanship", "bk-showmanship", "bk-light-blade", "bk-light-blade", "bk-light-blade", "bk-from-behind", "bk-from-behind", "bk-from-behind",
@@ -28,6 +28,21 @@ namespace Crulanda.Tests
             foreach (var id in RogueKit.ImplementedIds) Assert.NotNull(t.Find(id), id);
             var only = new List<string>(RogueKit.ImplementedIds); only.Remove("lk-dust");
             Assert.Throws<ArgumentException>(() => TalentTree.Parse("class.rogue", Json, 15, only));
+        }
+        /// <summary>The level-20 row (2026-10-16): seven more nodes, and each one's words carry the numbers its code uses.</summary>
+        [Test] public void The_level_twenty_nodes_say_what_the_code_does()
+        {
+            var t = TalentTree.Parse("class.rogue", Json, 20, RogueKit.ImplementedIds);
+            int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
+            Assert.AreEqual(36, count, "29, and Gone Clean, Unremarked, Spare Motion, Close Work, Practised Hands, Pocket of Dust, Crowd Pleaser");
+            StringAssert.Contains(RogueKit.GoneCleanFocus + " Focus per rank", t.Find("tg-gone-clean").desc);
+            StringAssert.Contains("1 metre closer per rank", t.Find("tg-unremarked").desc);
+            StringAssert.Contains(RogueKit.SpareMotionCost + " less Focus per rank", t.Find("sw-spare-motion").desc);
+            StringAssert.Contains(Mathf.RoundToInt(RogueKit.CloseWorkBelow * 100) + "% health", t.Find("sw-close-work").desc);
+            StringAssert.Contains(RogueKit.PractisedHandsCost + " less Focus per rank", t.Find("lk-practised-hands").desc);
+            StringAssert.Contains(RogueKit.PocketDustSeconds + " seconds sooner per rank", t.Find("lk-pocket-dust").desc);
+            StringAssert.Contains(RogueKit.CrowdPleaserFocus + " Focus per rank", t.Find("bk-crowd-pleaser").desc);
+            Assert.AreEqual(3, t.Find("bk-crowd-pleaser").tier, "moved up to row 3 for the cap of 20");
         }
         /// <summary>The Rogue's pair of dirks (Chris, 2026-10-11: "rogue should have daggers. and maybe a crossbow to pull but mainly melee"):
         /// a knife for each hand in the items, the second drawn in the left fist (knife.off), on every sim Rogue; and Throw Knife on the bar.</summary>

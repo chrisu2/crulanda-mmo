@@ -21,7 +21,7 @@ namespace Crulanda.Tests
         {
             var t = TalentTree.Parse("class.saltmender", Json, 15, SaltMenderKit.ImplementedIds);
             int count = 0; foreach (var b in t.Branches) count += b.nodes.Length;
-            Assert.AreEqual(32, count); Assert.AreEqual(SaltMenderKit.ImplementedIds.Length, count);
+            Assert.AreEqual(33, count, "32, and Ready Salt (tier 3, the cap of 20)"); Assert.AreEqual(SaltMenderKit.ImplementedIds.Length, count);
             CollectionAssert.AreEqual(new[] { "salt-speaker", "mason", "sifter", "mender" }, t.Branches.Select(b => b.id).ToArray());
             CollectionAssert.AreEqual(new[] { "control", "tank", "dps", "healer" }, t.Branches.Select(b => b.role).ToArray());
             var only = new List<string>(SaltMenderKit.ImplementedIds); only.Remove("ss-calcify");

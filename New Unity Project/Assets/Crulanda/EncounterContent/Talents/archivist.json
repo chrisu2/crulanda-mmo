@@ -149,6 +149,21 @@
       "healing": 3
      },
      "impl": true
+    },
+    {
+     "id": "vw-long-stillness",
+     "name": "Long Stillness",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Vow of Stillness's ward, and Hushed Pain with it, lasts 1s longer per rank.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": true
     }
    ]
   },
@@ -259,6 +274,36 @@
      "kind": "capstone",
      "icon": "eye",
      "desc": "Echo Bind on a boss stuns it for 4 seconds instead of failing.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-long-echo",
+     "name": "Long Echo",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "Echo Bind holds 2 seconds longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-half-waking",
+     "name": "Half-Waking",
+     "tier": 3,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "moon",
+     "desc": "A mob woken early from your Lull or Echo Bind strikes 3% softer per rank for 6 seconds.",
      "emphasis": {
       "control": 1
      },

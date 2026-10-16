@@ -778,6 +778,159 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "craft.slagiron_torc",
+      "name": "Slag-iron geode torc",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 2,
+      "level": 19,
+      "value": 60,
+      "stamina": 18,
+      "strength": 18,
+      "description": "A chip of Aether-Geode set in slag-iron. It warms against the throat. GAME-ONLY cutting; CANON stone (book1 ch.3).",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_hide_jerkin",
+      "name": "Gutter-hide jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 19,
+      "value": 48,
+      "armor": 62,
+      "stamina": 13,
+      "agility": 23,
+      "description": "Gutter-hound hide, tanned in the Rows' yards. It smells of the street for a month and turns any blade for a lifetime.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_hide_gloves",
+      "name": "Gutter-hide gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 2,
+      "level": 19,
+      "value": 25,
+      "armor": 40,
+      "stamina": 13,
+      "agility": 23,
+      "description": "Gutter-hound hide, tanned in the Rows' yards. It smells of the street for a month and turns any blade for a lifetime.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_hide_leggings",
+      "name": "Gutter-hide leggings",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 19,
+      "value": 48,
+      "armor": 62,
+      "stamina": 13,
+      "agility": 23,
+      "description": "Gutter-hound hide, tanned in the Rows' yards. It smells of the street for a month and turns any blade for a lifetime.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_hide_boots",
+      "name": "Cobble-worn boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 2,
+      "level": 19,
+      "value": 34,
+      "armor": 40,
+      "stamina": 13,
+      "agility": 23,
+      "description": "Gutter-hound hide, tanned in the Rows' yards. It smells of the street for a month and turns any blade for a lifetime.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_wool_hood",
+      "name": "Soot-dyed hood",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 2,
+      "level": 19,
+      "value": 13,
+      "armor": 40,
+      "intellect": 20,
+      "spirit": 16,
+      "description": "Wool dyed soot-grey with the gutters' own weed, the way the Lowtowns dress. Lamp-light goes soft on it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_wool_mantle",
+      "name": "Soot-dyed mantle",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 2,
+      "level": 19,
+      "value": 15,
+      "armor": 40,
+      "intellect": 20,
+      "spirit": 16,
+      "description": "Wool dyed soot-grey with the gutters' own weed, the way the Lowtowns dress. Lamp-light goes soft on it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_wool_robe",
+      "name": "Lamp-lichen robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 19,
+      "value": 37,
+      "armor": 62,
+      "intellect": 20,
+      "spirit": 16,
+      "description": "Dyed with lamp-lichen, so the hem glows a little in an unlit lane. The Lowtowns call that luck.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_wool_breeches",
+      "name": "Sacking-lined breeches",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 19,
+      "value": 24,
+      "armor": 62,
+      "intellect": 20,
+      "spirit": 16,
+      "description": "Wool dyed soot-grey with the gutters' own weed, the way the Lowtowns dress. Lamp-light goes soft on it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_bow",
+      "name": "Cinder-beam longbow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 19,
+      "value": 43,
+      "weaponDamage": 48,
+      "stamina": 13,
+      "agility": 23,
+      "description": "Sawn from a tenement beam a hundred years seasoned in smoke. It draws sweet and smells of chimneys.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.slagiron_staff",
+      "name": "Cinder-beam staff",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 19,
+      "value": 42,
+      "weaponDamage": 48,
+      "intellect": 23,
+      "spirit": 13,
+      "description": "A length of black roof beam, shaved round and wound at the grip with soot-dyed cord.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "craft.bogiron_targe",
       "name": "Bog-iron targe",
       "kind": "gear",
@@ -1086,6 +1239,62 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "temper.slagiron_sabatons",
+      "name": "Shard-tempered sabatons",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 3,
+      "level": 19,
+      "value": 80,
+      "armor": 48,
+      "stamina": 19,
+      "strength": 32,
+      "description": "Forged on the hum of an Aether-Geode shard. Every step on the cobbles rings. GAME-ONLY smithing; CANON stone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.slagiron_leather",
+      "name": "Mastered gutter-hide jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 19,
+      "value": 80,
+      "armor": 75,
+      "stamina": 19,
+      "agility": 32,
+      "description": "A tanner's best work, cut to the wearer and stitched with a geode-dust wax that never cracks. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.slagiron_cloth",
+      "name": "Fine-woven lamp-lichen robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 19,
+      "value": 80,
+      "armor": 75,
+      "intellect": 29,
+      "spirit": 22,
+      "description": "Woven so fine the light comes through it, and dyed twice in lamp-lichen. A thread of geode-dust runs in the hem. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.slagiron_bow",
+      "name": "Seasoned cinder-beam longbow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 19,
+      "value": 112,
+      "weaponDamage": 57,
+      "stamina": 19,
+      "agility": 32,
+      "description": "Three old beams laminated and backed with hide. The nocks are set with geode chips that hum when it is drawn. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "master.copper_mantle",
       "name": "Harrow festival mantle",
       "kind": "gear",
@@ -1153,6 +1362,20 @@
       "intellect": 26,
       "spirit": 21,
       "description": "Dyed in a pit of root-water under the Shore's oldest trees and worn at the vigils for the laid-down. It is warm in any weather. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "master.slagiron_hammer",
+      "name": "The Rows' last hammer",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 4,
+      "level": 19,
+      "value": 140,
+      "weaponDamage": 70,
+      "stamina": 25,
+      "strength": 38,
+      "description": "The pattern of the Lowtown militia's door-breakers, from before the militia was broken. A lamp-light glow sits in the slag of its head. GAME-ONLY.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -1805,6 +2028,50 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "leaf.tempered_slagiron_sabatons",
+      "name": "a smith's leaf: Shard-tempered sabatons",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_slagiron_sabatons",
+      "description": "A leaf torn from a smith's daybook, the margins black with thumbprints. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_slagiron_leather",
+      "name": "a tanner's leaf: Mastered gutter-hide jerkin",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_slagiron_leather",
+      "description": "A leaf torn from a tanner's book of cuts, pricked through with an awl. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_slagiron_cloth",
+      "name": "a weaver's leaf: Fine-woven lamp-lichen robe",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_slagiron_cloth",
+      "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_slagiron_bow",
+      "name": "a bowyer's leaf: Seasoned cinder-beam longbow",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_slagiron_bow",
+      "description": "A leaf torn from a bowyer's notebook, the measures cut into the cover. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "leaf.master_copper_mantle",
       "name": "a weaver's leaf: Harrow festival mantle",
       "kind": "recipe",
@@ -1857,6 +2124,17 @@
       "value": 15,
       "teaches": "recipe.master_veridian_robe",
       "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.master_slagiron_hammer",
+      "name": "a smith's leaf: The Rows' last hammer",
+      "kind": "recipe",
+      "quality": 4,
+      "level": 1,
+      "value": 15,
+      "teaches": "recipe.master_slagiron_hammer",
+      "description": "A leaf torn from a smith's daybook, the margins black with thumbprints. Read it and the making is yours.",
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2048,13 +2326,25 @@
         "leaf.tempered_veridian_helm",
         "leaf.tempered_veridian_bow"
       ]
+    },
+    {
+      "npc": "Ketta Rune",
+      "items": [
+        "leaf.tempered_slagiron_bow"
+      ]
+    },
+    {
+      "npc": "Old Wulf",
+      "items": [
+        "leaf.tempered_slagiron_sabatons"
+      ]
     }
   ],
   "loot": [
     {
       "tag": "quartermaster",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2071,7 +2361,7 @@
     {
       "tag": "banditking",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2092,7 +2382,7 @@
     {
       "tag": "sexton",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2109,7 +2399,7 @@
     {
       "tag": "pale",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2130,7 +2420,7 @@
     {
       "tag": "captain",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2147,7 +2437,7 @@
     {
       "tag": "railcaptain",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2164,7 +2454,7 @@
     {
       "tag": "gangboss",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2181,7 +2471,7 @@
     {
       "tag": "ysolt",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2198,7 +2488,7 @@
     {
       "tag": "brood",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2215,7 +2505,7 @@
     {
       "tag": "deacon",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2236,7 +2526,7 @@
     {
       "tag": "ninebranch",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2253,7 +2543,7 @@
     {
       "tag": "greyheart",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
@@ -2270,13 +2560,51 @@
     {
       "tag": "rootwarden",
       "levelMin": 1,
-      "levelMax": 15,
+      "levelMax": 20,
       "elite": true,
       "gearChance": 0,
       "entries": [
         {
           "item": "leaf.master_veridian_robe",
           "chance": 0.1
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "drainmother",
+      "levelMin": 15,
+      "levelMax": 20,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_slagiron_cloth",
+          "chance": 0.35
+        },
+        {
+          "item": "leaf.master_slagiron_hammer",
+          "chance": 0.1
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "brannoc",
+      "levelMin": 15,
+      "levelMax": 20,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_slagiron_leather",
+          "chance": 0.35
         },
         {
           "item": "mat.geode_shard",

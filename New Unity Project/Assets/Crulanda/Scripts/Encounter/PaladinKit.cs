@@ -24,8 +24,10 @@ namespace Crulanda.Encounter
             "og-steadfast", "og-bulwark-of-faith", "og-answering-light", "og-censure", "og-unbroken-oath", "og-vigil", "og-hallowed-ground",
             "ju-zeal", "ju-righteous-rhythm", "ju-weighted-judgement", "ju-burning-light", "ju-swift-verdict", "ju-executioner", "ju-crusade",
             "sa-devotion", "sa-light-of-dawn", "sa-grace", "sa-aegis-of-faith", "sa-beacon", "sa-mercy", "sa-sanctuary",
-            "va-colours-held", "va-press-harder", "va-rampart", "va-close-ranks", "va-press-longer", "va-steady-ranks", "va-comrades", "va-under-the-colours", "va-last-stand"
+            "va-colours-held", "va-press-harder", "va-rampart", "va-close-ranks", "va-press-longer", "va-steady-ranks", "va-comrades", "va-under-the-colours", "va-last-stand",
+            "og-iron-oath", "ju-sentence-passed", "sa-shared-mercy"   // the level-20 row (2026-10-16)
         };
+        public const float IronOathPerRank = .02f, SentencePerRank = .03f, SharedMercyPerRank = .03f, SharedMercyReach = 10;
         public static readonly string[] BarIds = { "paladin.smite", "paladin.oath", "paladin.mend", "paladin.ward", "paladin.judgement", "paladin.consecrate", "paladin.lay_on", "paladin.aegis", "paladin.censure", "paladin.rebuke",
             "paladin.colours", "paladin.close_ranks", "paladin.press_on", "paladin.mending_oath" };
         public const int MaxConviction = 3, HealRange = 25;
@@ -188,6 +190,7 @@ namespace Crulanda.Encounter
                 float per = a.power + 6 * R("ju-weighted-judgement");
                 float d = per * pips + s.WeaponDamage * .5f;
                 if (t.actor.Health.Pool.Ratio < .35f) d *= 1 + .1f * R("ju-executioner");
+                d *= 1 + SentencePerRank * R("ju-sentence-passed");   // Sentence Passed
                 s.Bolt(t, new Color(1, .9f, .5f), .22f); Hit(t, Dmg(d));
                 int burn = R("ju-burning-light");
                 if (burn > 0) periodic.Add("burn", t, Now, 2, 3, Dmg((2 + Level / 2f) * burn), (e, i) => { var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false; Hit(enemy, e.value); return true; });
@@ -287,6 +290,11 @@ namespace Crulanda.Encounter
                 if (Conviction < MaxConviction) return; Conviction = 0;
                 HealActor(target, Mathf.RoundToInt(target.Health.Pool.Max * (.25f + .08f * R("sa-mercy"))));
                 if (R("sa-beacon") > 0 && abilities.TryGetValue("paladin.aegis", out var aegis)) GrantAegis(target, aegis);
+                int mercy = R("sa-shared-mercy");   // Shared Mercy: the rest of the party within 10 m mended a little too
+                if (mercy > 0)
+                    foreach (var who in Party())
+                        if (who != null && who != target && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= SharedMercyReach)
+                            HealActor(who, Mathf.Max(1, Mathf.RoundToInt(who.Health.Pool.Max * SharedMercyPerRank * mercy)));
                 s.Message("Lay On: " + Who(target, s) + (target == s.Player ? " are" : " is") + " made whole.");
             });
         }
@@ -372,6 +380,7 @@ namespace Crulanda.Encounter
             if (victim == null || !victim.IsAlive) return 0;
             float mult = 1;
             if (Consecrating && R("og-hallowed-ground") > 0 && Vector3.Distance(enemy.transform.position, consecrateCentre) <= ConsecrateRadius) mult -= .1f;
+            if (victim == s.Player && Now < wardUntil) mult -= IronOathPerRank * R("og-iron-oath");   // Iron Oath: under the Ward
             int dealt = victim.GetComponent<Combatant>().Damage(Mathf.RoundToInt(raw * mult));
             if (victim != s.Player || Now >= wardUntil) return dealt;
             // Under the Ward every blow taken steadies the Paladin (a pip at most every 1.5 s) and, with Answering Light, heals.

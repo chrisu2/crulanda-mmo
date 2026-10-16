@@ -369,3 +369,18 @@ and the Archivist's Cantor heal one at a time and leave a party of five low)
 spells, the Unwriting, Thornsong, Bonecaller, Sifter, and the Shaman's kit is area-heavy). Applied: a damage build doing over x1.25 against
 three is held to the area band against one (62-67, moved to 64), as the splash builds are: the Unwriting 1.72 to 1.60, Thornsong 2.62 to
 2.42, Bonecaller 2.37 to 2.21 (its thrall's scale with it), Sifter 1.41 to 1.31. The table labels them "(area spells)".
+## Levels 16-20 (the cap of 20, 2026-10-16): targets, not yet measured
+Chris, 2026-10-16: "raise top level to 20". The numbers the harness sets its targets from, as they stand (no run yet at 16-20):
+- **XP:** XpToNext is unchanged (400 + 170 a level): 16 to 17 is 2,950, 19 to 20 is 3,460; 20 is 36,670 in all (15 was 21,070).
+- **Talents:** 21 points at 20; every branch can take all 21 in itself (TalentDataTests). The 47 new nodes are about 3% a rank at most.
+- **Mobs:** MobHealth and MobHit keep their curves: a normal mob at 20 has 690 health and hits for 50.8 (15: 540, 39.8). A camp elite
+  (x5.5 health, x3 hit growing 9% a level) at 20 has 3,795 health and hits for about 413 (15: 2,970 and 270): the elite rules hold to
+  the cap (SocialRulesTests loops 1-20), but the elite's hit grows faster than the player's health past 15. **To measure first**: the
+  Lowtowns' two elites (Mother of Drains, Knuckle Brannoc, 19-20) in a group run; if a level-20 tank cannot hold one, cap EliteHitPerLevel's
+  growth at 15 rather than retune the curve below it.
+- **Gear:** generated gear climbs on its curve to 20 (the 16-20 band's words Soot-stained, Tar-sealed, Lamp-lit; looks reuse the top
+  band's families). Crafted tier 6, slag-iron (required 19): plain pieces the uncommon curve one level up (a chest 62 armour, a weapon
+  48 damage, 36 stat points), tempered rares the named rares' (57 damage, 75 armour, 51 points), the epic hammer 70 damage and 63 points.
+- **Targets for the harness at 16-20 (to set when it runs):** the same shares as at 15 (each build's role band against the DPS median,
+  healer HPS against the 4%/s test), measured at level 18 with the band's uncommon kit and at 20 with tier 6; sims at 16-20 wear the
+  16-20 band (SimGear) and live in the Lowtowns' band (SimRoster.Homes, 15-20).

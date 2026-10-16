@@ -137,9 +137,13 @@ namespace Crulanda.Encounter
             // Bodies stand about a metre above the walkable mesh: trace along the mesh from under their feet, never through a wall or off an
             // edge. Short of walkable ground the full distance (a cliff, deep water, a cave wall), the throw stops at the edge.
             if (!NavMesh.SamplePosition(who.transform.position, out var from, 2.5f, NavMesh.AllAreas)) return;
+            // Only from the floor under their feet, and only onto the same floor: on a catwalk the nearest mesh could be the hall's floor below
+            // and the throw landed them down there (2026-10-15, Chris: "warrior fell off again. seems to happen every run").
+            float lift = who.transform.position.y - from.position.y; if (lift < -.5f || lift > 1.6f) return;
             NavMeshHit hit;
             if (NavMesh.Raycast(from.position, from.position + dir * metres, out var edge, NavMesh.AllAreas)) { if ((edge.position - from.position).magnitude < .5f) return; hit = edge; }
-            else if (!NavMesh.SamplePosition(from.position + dir * metres, out hit, 2.5f, NavMesh.AllAreas)) return;
+            else if (!NavMesh.SamplePosition(from.position + dir * metres, out hit, .8f, NavMesh.AllAreas)) return;
+            if (Mathf.Abs(hit.position.y - from.position.y) > 1f) return;
             var motor = who.GetComponent<AdventurerMotor>();
             if (motor != null) motor.Teleport(hit.position + Vector3.up * (who.transform.position.y - from.position.y));
             else { var a = who.GetComponent<NavMeshAgent>(); if (a != null && a.isOnNavMesh) a.Warp(hit.position); }

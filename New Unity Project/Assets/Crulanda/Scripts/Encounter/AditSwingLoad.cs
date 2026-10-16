@@ -97,6 +97,7 @@ namespace Crulanda.Encounter
         {
             dir.y = 0; if (who == null || metres <= 0 || dir.sqrMagnitude < 1e-4f) return false; dir.Normalize();
             if (!NavMesh.SamplePosition(who.transform.position, out var from, 2.5f, NavMesh.AllAreas)) return false;
+            float lift = who.transform.position.y - from.position.y; if (lift < -.5f || lift > 1.6f) return false;   // the floor under their feet, not the hall's below the catwalk
             NavMeshHit hit;
             if (NavMesh.Raycast(from.position, from.position + dir * metres, out var edge, NavMesh.AllAreas)) { if ((edge.position - from.position).magnitude < .4f) return false; hit = edge; }
             else if (!NavMesh.SamplePosition(from.position + dir * metres, out hit, .6f, NavMesh.AllAreas)) return false;

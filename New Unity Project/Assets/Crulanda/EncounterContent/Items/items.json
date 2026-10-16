@@ -27,6 +27,42 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "item.rogues_dirk",
+      "name": "Lowtown Dirk",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "weaponDamage": 6,
+      "description": "A thin, quick knife of the Lowtown kind, one of a pair. The Rogue's first (Chris, 2026-10-11: \"rogue should have daggers\").",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.rogues_second_dirk",
+      "name": "Lowtown Dirk (the pair)",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "weaponDamage": 3,
+      "description": "The other of the pair, for the left hand.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.scoundrels_dirk",
+      "name": "Tollroad Dirk",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "weaponDamage": 7,
+      "description": "A slim knife with a worn grip, quick to hand and quicker to hide. The Scoundrel's first; the other hand is for gesturing.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "item.training_blade",
       "name": "Tempered Trailblade",
       "kind": "gear",
@@ -295,6 +331,13 @@
       "level": 5,
       "value": 5,
       "stack": 20,
+      "buff": {
+        "kind": "food",
+        "stat": "Agility",
+        "amount": 4,
+        "stamina": 5,
+        "seconds": 1800
+      },
       "description": "Lean wolf cut small and charred on a green stick with mourner's cap. Better than it sounds.",
       "canonStatus": "GAME-ONLY"
     },
@@ -308,6 +351,13 @@
       "level": 6,
       "value": 5,
       "stack": 20,
+      "buff": {
+        "kind": "food",
+        "stat": "Spirit",
+        "amount": 4,
+        "stamina": 5,
+        "seconds": 1800
+      },
       "description": "Boar and Harrow cheese folded into a crust and crimped shut. Farm folk carry them to the fields in a coat pocket.",
       "canonStatus": "GAME-ONLY"
     },
@@ -321,6 +371,13 @@
       "level": 9,
       "value": 8,
       "stack": 20,
+      "buff": {
+        "kind": "food",
+        "stat": "Strength",
+        "amount": 6,
+        "stamina": 7,
+        "seconds": 1800
+      },
       "description": "Boar loin rubbed with salt and tarnwort and hung in the smoke until it keeps. A meal for the high road.",
       "canonStatus": "GAME-ONLY"
     },
@@ -334,6 +391,13 @@
       "level": 12,
       "value": 12,
       "stack": 20,
+      "buff": {
+        "kind": "food",
+        "stat": "Agility",
+        "amount": 7,
+        "stamina": 9,
+        "seconds": 1800
+      },
       "description": "Ash-hound flank packed in Rim salt and baked in the coals. Crack the crust and eat it hot.",
       "canonStatus": "GAME-ONLY"
     },
@@ -347,6 +411,13 @@
       "level": 12,
       "value": 8,
       "stack": 20,
+      "buff": {
+        "kind": "food",
+        "stat": "Intellect",
+        "amount": 7,
+        "stamina": 9,
+        "seconds": 1800
+      },
       "description": "A loaf baked straight on the charcoal, cinder-thistle in the dough. Black outside, sweet within.",
       "canonStatus": "GAME-ONLY"
     },
@@ -360,6 +431,13 @@
       "level": 14,
       "value": 18,
       "stack": 20,
+      "buff": {
+        "kind": "food",
+        "stat": "Strength",
+        "amount": 8,
+        "stamina": 11,
+        "seconds": 1800
+      },
       "description": "A thick mossback chop under a glaze of dewfern. Rich, green-smelling, and gone too quickly.",
       "canonStatus": "GAME-ONLY"
     },
@@ -373,6 +451,13 @@
       "level": 14,
       "value": 16,
       "stack": 20,
+      "buff": {
+        "kind": "food",
+        "stat": "Spirit",
+        "amount": 8,
+        "stamina": 11,
+        "seconds": 1800
+      },
       "description": "Shore venison under a flour crust, the kind of pie that is baked for a homecoming.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1255,8 +1340,9 @@
       "quality": 2,
       "level": 1,
       "value": 8,
-      "weaponDamage": 7,
-      "strength": 1,
+      "weaponDamage": 9,
+      "stamina": 2,
+      "strength": 4,
       "description": "Oak, with a copper shoe hammered on at the anvil. Yours.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1268,8 +1354,9 @@
       "quality": 2,
       "level": 1,
       "value": 6,
-      "armor": 7,
-      "stamina": 1,
+      "armor": 11,
+      "stamina": 4,
+      "strength": 2,
       "description": "A ring of copper round an oak board. It turns a blow, and then another.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1281,8 +1368,9 @@
       "quality": 2,
       "level": 1,
       "value": 6,
-      "armor": 4,
-      "strength": 1,
+      "armor": 6,
+      "stamina": 2,
+      "strength": 4,
       "description": "Copper scales riveted to the backs of old leather gloves. They clink when you make a fist.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1294,8 +1382,9 @@
       "quality": 2,
       "level": 1,
       "value": 6,
-      "armor": 6,
-      "stamina": 1,
+      "armor": 9,
+      "stamina": 4,
+      "strength": 2,
       "description": "Copper scales on a quilted jerkin, one row over the next like a fish's back.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1307,8 +1396,9 @@
       "quality": 2,
       "level": 8,
       "value": 38,
-      "weaponDamage": 22,
-      "strength": 3,
+      "weaponDamage": 25,
+      "stamina": 6,
+      "strength": 11,
       "description": "Bog-iron on a black pine haft. Heavy at the head, which is the point.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1320,8 +1410,9 @@
       "quality": 2,
       "level": 8,
       "value": 27,
-      "armor": 17,
-      "stamina": 3,
+      "armor": 19,
+      "stamina": 11,
+      "strength": 6,
       "description": "A plain bog-iron cap, beaten round over a stake. It rusts if you let it.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1333,8 +1424,9 @@
       "quality": 2,
       "level": 8,
       "value": 27,
-      "armor": 27,
-      "stamina": 3,
+      "armor": 30,
+      "stamina": 11,
+      "strength": 6,
       "description": "Bog-iron plates for the shins, strapped on with old harness leather.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1346,8 +1438,9 @@
       "quality": 2,
       "level": 8,
       "value": 27,
-      "armor": 27,
-      "strength": 3,
+      "armor": 30,
+      "stamina": 6,
+      "strength": 11,
       "description": "Rings of bog-iron, every one closed by hand. It weighs what it weighs.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1359,8 +1452,9 @@
       "quality": 2,
       "level": 11,
       "value": 50,
-      "weaponDamage": 29,
-      "strength": 4,
+      "weaponDamage": 31,
+      "stamina": 8,
+      "strength": 14,
       "description": "A straight ridge-steel blade on a stone-pine grip. It rings like a pass bell.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1372,8 +1466,9 @@
       "quality": 2,
       "level": 11,
       "value": 36,
-      "armor": 42,
-      "stamina": 4,
+      "armor": 46,
+      "stamina": 14,
+      "strength": 8,
       "description": "Ridge-steel faced on stone-pine boards, the way the toll-road guards carry them.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1385,8 +1480,9 @@
       "quality": 2,
       "level": 11,
       "value": 36,
-      "armor": 23,
-      "strength": 4,
+      "armor": 25,
+      "stamina": 8,
+      "strength": 14,
       "description": "Domed ridge-steel for the shoulders. The cold of the Peaks is in the metal yet.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1398,8 +1494,9 @@
       "quality": 2,
       "level": 11,
       "value": 36,
-      "armor": 36,
-      "stamina": 4,
+      "armor": 39,
+      "stamina": 14,
+      "strength": 8,
       "description": "A ridge-steel breast and back, buckled at the sides. Made to stand in a wind.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1411,8 +1508,9 @@
       "quality": 2,
       "level": 14,
       "value": 63,
-      "weaponDamage": 35,
-      "strength": 5,
+      "weaponDamage": 38,
+      "stamina": 10,
+      "strength": 17,
       "description": "A slab of ash-steel on an ash-snag handle. Dark, and warm in the hand.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1424,8 +1522,9 @@
       "quality": 2,
       "level": 14,
       "value": 45,
-      "armor": 28,
-      "stamina": 5,
+      "armor": 30,
+      "stamina": 17,
+      "strength": 10,
       "description": "An ash-steel helm with a narrow sight. The smoke stays out, and so does most else.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1437,8 +1536,9 @@
       "quality": 2,
       "level": 14,
       "value": 45,
-      "armor": 28,
-      "agility": 5,
+      "armor": 30,
+      "stamina": 10,
+      "agility": 17,
       "description": "Ash-steel for the feet, jointed at the toes. Ash does not cling to it.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1450,8 +1550,9 @@
       "quality": 2,
       "level": 14,
       "value": 45,
-      "armor": 45,
-      "stamina": 5,
+      "armor": 48,
+      "stamina": 17,
+      "strength": 10,
       "description": "Ash-steel mail, close-linked and dark. It does not shine, even by firelight.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1463,8 +1564,9 @@
       "quality": 2,
       "level": 14,
       "value": 63,
-      "weaponDamage": 35,
-      "strength": 5,
+      "weaponDamage": 38,
+      "stamina": 10,
+      "strength": 17,
       "description": "A long Veridian blade on a ghost-oak hilt. Green, in the right light.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1476,8 +1578,9 @@
       "quality": 2,
       "level": 14,
       "value": 45,
-      "armor": 53,
-      "stamina": 5,
+      "armor": 56,
+      "stamina": 17,
+      "strength": 10,
       "description": "A tall Veridian shield on ghost-oak boards. Rain runs off it as off a leaf.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1489,8 +1592,9 @@
       "quality": 2,
       "level": 14,
       "value": 45,
-      "armor": 45,
-      "strength": 5,
+      "armor": 48,
+      "stamina": 10,
+      "strength": 17,
       "description": "Veridian plate from hip to ankle. Lighter than iron, and quieter.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1502,8 +1606,9 @@
       "quality": 2,
       "level": 14,
       "value": 45,
-      "armor": 45,
-      "stamina": 5,
+      "armor": 48,
+      "stamina": 17,
+      "strength": 10,
       "description": "A Veridian breastplate, fitted close. The ridge gave the ore; the forge gave the rest.",
       "canonStatus": "GAME-ONLY"
     },
@@ -1515,9 +1620,9 @@
       "quality": 3,
       "level": 14,
       "value": 84,
-      "weaponDamage": 41,
-      "stamina": 5,
-      "strength": 5,
+      "weaponDamage": 42,
+      "stamina": 12,
+      "strength": 18,
       "description": "Veridian folded round a core of ghost-oak heartwood. The grain still shows along the flat, and it glows a little at dusk.",
       "canonStatus": "GAME-ONLY: Ghost-Oaks are CANON (book3 ch.4); the blade is invented."
     },
@@ -1537,11 +1642,11 @@
       "kind": "gear",
       "slot": "mainhand",
       "quality": 3,
-      "level": 1,
-      "value": 60,
-      "weaponDamage": 9,
-      "strength": 2,
-      "stamina": 2,
+      "level": 4,
+      "value": 28,
+      "weaponDamage": 17,
+      "strength": 8,
+      "stamina": 5,
       "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
       "canonStatus": "CANON-EXPANDED"
     },
@@ -1551,11 +1656,11 @@
       "kind": "gear",
       "slot": "mainhand",
       "quality": 3,
-      "level": 5,
-      "value": 74,
-      "weaponDamage": 15,
-      "strength": 3,
-      "stamina": 3,
+      "level": 8,
+      "value": 50,
+      "weaponDamage": 27,
+      "strength": 14,
+      "stamina": 9,
       "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
       "canonStatus": "CANON-EXPANDED"
     },
@@ -1565,11 +1670,11 @@
       "kind": "gear",
       "slot": "mainhand",
       "quality": 3,
-      "level": 9,
-      "value": 88,
-      "weaponDamage": 22,
-      "strength": 4,
-      "stamina": 4,
+      "level": 11,
+      "value": 67,
+      "weaponDamage": 36,
+      "strength": 19,
+      "stamina": 12,
       "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
       "canonStatus": "CANON-EXPANDED"
     },
@@ -1579,11 +1684,11 @@
       "kind": "gear",
       "slot": "mainhand",
       "quality": 3,
-      "level": 12,
-      "value": 102,
-      "weaponDamage": 29,
-      "strength": 5,
-      "stamina": 5,
+      "level": 14,
+      "value": 84,
+      "weaponDamage": 44,
+      "strength": 23,
+      "stamina": 15,
       "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
       "canonStatus": "CANON-EXPANDED"
     },
@@ -1594,15 +1699,54 @@
       "slot": "mainhand",
       "quality": 3,
       "level": 14,
-      "value": 130,
-      "weaponDamage": 40,
-      "strength": 6,
-      "stamina": 6,
+      "value": 84,
+      "weaponDamage": 44,
+      "strength": 23,
+      "stamina": 15,
       "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
       "canonStatus": "CANON-EXPANDED"
+    },
+    {
+      "id": "mat.fleece",
+      "name": "Fleece",
+      "kind": "material",
+      "quality": 1,
+      "value": 1,
+      "stack": 20,
+      "trade": "stall.wool",
+      "description": "Shorn off a fold's sheep and washed, mostly. The stall sells them on to anyone with a spindle.",
+      "canonStatus": "GAME-ONLY"
     }
   ],
   "vendors": [
+    {
+      "role": "profession-trainer:mining",
+      "items": [
+        "tool.pick"
+      ]
+    },
+    {
+      "role": "profession-trainer:woodcutting",
+      "items": [
+        "tool.hatchet"
+      ]
+    },
+    {
+      "role": "profession-trainer:blacksmithing",
+      "items": [
+        "tool.pick",
+        "tool.hatchet",
+        "mat.charcoal"
+      ]
+    },
+    {
+      "role": "profession-trainer:alchemy",
+      "items": [
+        "potion.minor",
+        "potion.healing",
+        "mat.vial"
+      ]
+    },
     {
       "role": "merchant",
       "items": [
@@ -1614,7 +1758,8 @@
         "tool.hatchet",
         "mat.flour",
         "mat.salt",
-        "mat.vial"
+        "mat.vial",
+        "mat.fleece"
       ],
       "gearForZone": true
     },
@@ -2039,6 +2184,26 @@
       ]
     },
     {
+      "tag": "stag",
+      "levelMin": 1,
+      "levelMax": 13,
+      "gearChance": 0.05,
+      "entries": [
+        {
+          "item": "hide.hill_deer",
+          "chance": 1
+        },
+        {
+          "item": "mat.venison",
+          "chance": 0.5
+        },
+        {
+          "item": "junk.velvet_tine",
+          "chance": 0.3
+        }
+      ]
+    },
+    {
       "tag": "spider",
       "levelMin": 14,
       "levelMax": 15,
@@ -2271,6 +2436,63 @@
         },
         {
           "item": "mat.bear_haunch",
+          "chance": 0.45
+        }
+      ]
+    },
+    {
+      "tag": "burrower",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "hide.bear",
+          "chance": 0.75
+        },
+        {
+          "item": "junk.bear_claw",
+          "chance": 0.4,
+          "max": 2
+        },
+        {
+          "item": "mat.bear_haunch",
+          "chance": 0.45
+        }
+      ]
+    },
+    {
+      "tag": "bristle",
+      "levelMin": 10,
+      "levelMax": 13,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.boar_tusk",
+          "chance": 0.6
+        },
+        {
+          "item": "junk.boar_meat",
+          "chance": 0.5
+        },
+        {
+          "item": "hide.boar",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
+      "tag": "pithound",
+      "levelMin": 10,
+      "levelMax": 12,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.ash_hide",
+          "chance": 0.7
+        },
+        {
+          "item": "mat.hound_flank",
           "chance": 0.45
         }
       ]

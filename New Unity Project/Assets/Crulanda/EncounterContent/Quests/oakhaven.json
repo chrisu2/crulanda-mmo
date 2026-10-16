@@ -29,6 +29,21 @@
       "id": "item.concord_iron",
       "name": "Confiscated iron",
       "description": "Bar iron taken from Oakhaven as 'tithe'."
+    },
+    {
+      "id": "item.brook_mark",
+      "name": "Brook tar-mark",
+      "description": "A hand's breadth of bristly hide from a wild sow's shoulder. The Brook farm's mark is still tarred on it."
+    },
+    {
+      "id": "item.wether_bell",
+      "name": "Tansy's bell",
+      "description": "A bell-wether's bell on a chewed leather collar, dented, the clapper bent. It still rings."
+    },
+    {
+      "id": "item.hesk_tally",
+      "name": "Hesk's tally book",
+      "description": "A cheap little book gone soft with handling. Every line is in the same careful, square hand."
     }
   ],
   "documents": [
@@ -67,6 +82,12 @@
       "title": "The Watch Book",
       "text": "THE WATCHTOWER ON THE EAST ROAD. Each watcher writes the weather, where the grey stands, and their name.\n\nFair. Grey at the far hedge past Hollin's. No change.  - W. Carder\nRain. Grey at the far hedge. The hedge is grey now too.  - Tobin\nFair. The grey has the hedge and two rows of Hollin's barley. You can't hear the wind in it.  - Edda P.\nOvercast. The crows won't fly over it. Counted them. They go round.  - Garet M.\nFair. Hollin's east field gone, all of it, in the one night. Ada Hollin came up and sat with me and didn't say anything.  - Sel H.\nWindy. No change. No change is good.  - W. Carder\nFair. It was nearer this morning than last night. I'd swear it. Nobody else will.  - Tobin\n\n(The rest of the page is torn out along the fold, carefully, as if someone meant to keep it.)",
       "canonStatus": "GAME-ONLY: the watchtower and its book. The Wasting creeping across the eastern farms, unmaking rather than burning, is CANON (book1 ch.4; world_bible.md)."
+    },
+    {
+      "id": "doc.oakhaven.hesks_tally",
+      "title": "The Quartermaster's Tally",
+      "text": "STORES. OAKHAVEN. FOR THE KING.\n(Kept by Hesk, who can write.)\n\nCarder field barn: seed-corn, 9 sacks. Hams, 1 string. Boots, 1 pair, good (the King's now).\nMarket: blue wool, 3 bolts. Pots, 6, one cracked. Kettle, copper, the good one: fourpence.\nBrook farm: hens, 4. (3 more got away. Not my fault.)\nHarrow fold: ewes, none. Not us. Something else is at them. Told the King. The King says it is wolves and to stop writing about sheep.\n\nValue of all the above at market: 2 crowns and some.\nOwed to me: nine months.\n\n(Below, smaller:) I said take the corn and leave the kettles. Nobody listens to the quartermaster.",
+      "canonStatus": "GAME-ONLY: Hesk and his tally. The Sandthrone company, whose deserters these are, is CANON."
     }
   ],
   "quests": [
@@ -890,6 +911,580 @@
           {
             "faction": "oakhaven",
             "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.ama.tallgrass",
+      "title": "Salt Off the Rim Road",
+      "kind": "npc",
+      "giver": "Ama Rusk",
+      "turnIn": "Ama Rusk",
+      "zone": "zone.oakhaven",
+      "level": 2,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Clear the wolves lying up in the tall grass beside the South road, and the Southwood boars that root up the South furlong, so Ama Rusk's turnips and the salt carter can get through.",
+      "offer": "\"Turnips off the South furlong and salt up from the Rim, that's my stall. This week it's neither.\" Ama Rusk sets one cabbage in the middle of an empty board, for show.\n\n\"The boars out of the Southwood have had the furlong up, row by row. And the salt carter won't bring his pony past the tall grass any more: something lay in it and took the pony by the hock. Go down the South road. Mind the long grass, and walk soft (Ctrl) if you'd rather see them before they see you.\"",
+      "progress": "\"Still nothing up the South road. The cabbage is lonely.\"",
+      "complete": "\"Then I'll send word down the road to the carter.\" Ama knocks twice on the empty board, for luck. \"Salt by Thursday, and turnips Friday, if the boars left me any. First pick's yours. Don't tell Hedda.\"",
+      "steps": [
+        {
+          "text": "Clear the wolves from the tall grass beside the South road, and the boars from the Southwood.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.3.*",
+              "count": 4,
+              "text": "Wolves in the tall grass"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.boar.oakhaven.1.*",
+              "count": 4,
+              "text": "Southwood boars"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 60,
+        "gold": 10,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 125
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.sel.grain",
+      "title": "Harrow Grain for the Mill",
+      "kind": "npc",
+      "giver": "Sel Harrow",
+      "turnIn": "Aldo Crisp",
+      "zone": "zone.oakhaven",
+      "level": 2,
+      "requires": [
+        "npc.hedda.flour"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "Take two sacks of clean grain from the Harrow barn down the Mill lane to Aldo Crisp, so Oakhaven has flour without grey in it.",
+      "offer": "Sel Harrow is mending a hen-house door that does not need mending. \"Hedda says you know where our grain is. Good. I'd sooner you than the collectors.\"\n\n\"We've stored early every year since Wren came. She was born in the middle of harvest, and I've not trusted a late harvest since.\" She drives a nail in, hard. \"It's no good to anybody in a bin. Take two sacks down to Aldo at the mill and let him grind it. The village can eat clean bread for a fortnight. She'd have liked that.\"",
+      "progress": "\"Two sacks. Aldo won't come and fetch them; he never leaves that mill.\"",
+      "complete": "Aldo tips the first sack in himself, slowly, as if the stones might refuse it. The flour comes down white.\n\n\"White.\" He holds up a dusty hand and looks at it. \"Tell Sel I'll not take my portion of this. Tell her... no. I'll tell her myself.\"",
+      "steps": [
+        {
+          "text": "Take two sacks of clean grain from the Harrow grain bin.",
+          "objectives": [
+            {
+              "type": "collect",
+              "target": "Harrow grain bin",
+              "item": "item.clean_grain",
+              "count": 2,
+              "text": "Sacks of Harrow grain"
+            }
+          ]
+        },
+        {
+          "text": "Carry the grain down the Mill lane to Aldo Crisp at Oak creek mill.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "target": "Aldo Crisp",
+              "item": "item.clean_grain",
+              "count": 2,
+              "text": "Bring the grain to Aldo Crisp",
+              "say": "Harrow grain? From Sel? Put it by the stones. No, not there. There."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 55,
+        "gold": 8,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.grete.marks",
+      "title": "Struck Off the Tithe",
+      "kind": "npc",
+      "giver": "Grete Lowe",
+      "turnIn": "Grete Lowe",
+      "zone": "zone.oakhaven",
+      "level": 2,
+      "canonStatus": "GAME-ONLY",
+      "summary": "The Concord still tithes the Brook farm for the pigs that went wild in Sallow Bottom two winters back. Bring Grete Lowe five tar-marks off them, so she can prove they are not hers to tithe.",
+      "offer": "Grete Lowe has the Concord's tithe paper nailed to her barn door, the better to glare at it. \"Five pigs. They tithe me five pigs a year, and I've not had a pig in this yard since the winter they broke the fence and went off into the sallows.\"\n\n\"The collector says show him the pigs or pay for them. So: Sallow Bottom, south-east past the Long acre. They're wild as anything now, but the old sows still carry my mark, tarred on the shoulder. Cut me the five marks. I'll nail them up beside his paper and see how he likes it.\"",
+      "progress": "\"Five marks. The collector can count to five; I've watched him do it.\"",
+      "complete": "Grete lays the five tarred squares out on the barn step in a row and looks at them a long moment.\n\n\"Struck off. Every one.\" She nails the first beside the tithe paper, square in the middle of the Concord's seal. \"Let him tithe that.\"",
+      "steps": [
+        {
+          "text": "Cut the Brook tar-mark from the wild pigs of Sallow Bottom, south-east of the Brook farm.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.oakhaven",
+              "target": "kill:mob.boar.oakhaven.19.*",
+              "item": "item.brook_mark",
+              "count": 5,
+              "text": "Brook tar-marks"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 55,
+        "gold": 9,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 125
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.pim.dares",
+      "title": "Pim's Three Dares",
+      "kind": "npc",
+      "giver": "Pim",
+      "turnIn": "Pim",
+      "zone": "zone.oakhaven",
+      "level": 3,
+      "canonStatus": "CANON-EXPANDED: the First Kin, sworn by in book1 ch.4, are CANON; Pim, his dares and the barrow's tale are GAME-ONLY.",
+      "summary": "Pim Farrow dares you to climb the Overlook rocks, to touch the Old Barrow's door-stone after dark, and to stand on Khaven's side of the Bound Stone at the end of the West road.",
+      "offer": "Pim looks you up and down the way boys look at a tall tree. \"You're a proper adventurer. Everybody says.\" A pause. \"I bet you daren't do my dares.\"\n\n\"One: climb the Overlook rocks, up the hill past Moss's lodge. Two: touch the door-stone of the Old Barrow, south of the fields, after dark. Nobody's done that after dark, not even Garet. Three: go right out the West road and stand on Khaven's side of the Bound Stone. Dad says if you do that the dusk follows you home.\" He holds out a grubby fist. \"I've got two crowns if you do all three.\"",
+      "progress": "\"You haven't done them all. I'd know. I'd have felt it.\"",
+      "complete": "Pim makes you tell each one twice, and the Barrow three times. At the end he presses two warm crowns into your hand with tremendous ceremony.\n\n\"Did the dusk follow you?\" He peers past you down the lane. \"It might be slow. I'll watch for it.\"",
+      "steps": [
+        {
+          "text": "Do Pim's three dares: the Overlook rocks, the Old Barrow's door-stone after dark, and Khaven's side of the Bound Stone.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": -50,
+                "y": 136.5
+              },
+              "radius": 5,
+              "text": "Climb the Overlook rocks",
+              "say": "From the top of the rocks the whole valley lies open: the Great Oak, the smoke from the Cask, the mill. On the Farrows' roof, very small, somebody is waving."
+            },
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": 20,
+                "y": -154
+              },
+              "radius": 6,
+              "night": true,
+              "text": "Touch the Old Barrow's door-stone after dark",
+              "say": "The door-stone lies where it was thrown down, cold as a well bucket. You lay your hand flat on it. Somewhere under the turf something settles, the way a house settles at night. It is probably nothing."
+            },
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": -257,
+                "y": 17
+              },
+              "radius": 4,
+              "text": "Stand on Khaven's side of the Bound Stone",
+              "say": "One step past the stone the light goes thin and brown, like tea left to stand. You stay long enough to say you did, and step back over the bound."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 65,
+        "gold": 2,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 100
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.oakhaven.stake",
+      "title": "Nearer Than Last Night",
+      "kind": "side",
+      "giver": "Old Tobin",
+      "turnIn": "Old Tobin",
+      "zone": "zone.oakhaven",
+      "level": 3,
+      "canonStatus": "CANON-EXPANDED: the Wasting creeping across Oakhaven's eastern farms is CANON (book1 ch.4; world_bible.md); Tobin, his stake and the watch are GAME-ONLY.",
+      "summary": "Old Tobin swears the grey came nearer in the night, and nobody believes him. Look east from the Watchtower, find the hazel stake he drove at the edge of Hollin's east field, and drive the wolves out of Hollin's empty yard.",
+      "offer": "Old Tobin's cup is empty and he is, for once, quite sober. \"I wrote it in the watch book. 'It was nearer this morning than last night.' And they laughed. Edda laughed.\"\n\n\"So the morning after, I took a hazel stake out to Hollin's east field and drove it in a foot short of the grey. A foot. I measured it with my boot.\" He jabs a finger east. \"Go up to the Watchtower first and look, so you know what you're looking at. Then find my stake. And mind Hollin's yard: there's wolves living in it, since Ada went west and left the gate on the latch.\"",
+      "progress": "\"Well? Is it there? Is my stake there?\"",
+      "complete": "Tobin hears you out with his eyes shut. When you tell him about the grey on the near side of the stake he nods, very slowly, as if you had told him the price of barley.\n\n\"A foot in a fortnight. Or a pace in a night, when it wants.\" He turns his cup upside down on the table. \"Write it in the watch book for me, would you? In your hand. They'll believe it in your hand.\"",
+      "steps": [
+        {
+          "text": "Climb the rise to the Watchtower on the east road and look east.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": 132,
+                "y": 98
+              },
+              "radius": 8,
+              "text": "Look east from the Watchtower",
+              "say": "From the rise the east road runs on between the fields as straight as a rule, and then simply stops. The grey stands along the far hedges like a bank of smoke that the wind does not move."
+            }
+          ]
+        },
+        {
+          "text": "Find Tobin's hazel stake at the edge of Hollin's east field, and drive the wolves out of Hollin's yard.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": 230,
+                "y": -64
+              },
+              "radius": 8,
+              "text": "Find Tobin's hazel stake",
+              "say": "The stake is where he said: a peeled hazel rod with a notch cut in it for every day. The grass is grey on this side of it now, a full pace of it, and the notches stop at nine."
+            },
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.17.*",
+              "count": 4,
+              "text": "Wolves in Hollin's yard"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 75,
+        "gold": 10,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.nan.wain",
+      "title": "The Wain at the Carter's Rest",
+      "kind": "npc",
+      "giver": "Nan Pennock",
+      "turnIn": "Nan Pennock",
+      "zone": "zone.oakhaven",
+      "level": 3,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Nan Pennock's son drives the wain to Khaven, and his horse came home without him. Find the wain at the Carter's Rest on the West road, then thin the wolves of the Bound wood.",
+      "offer": "Nan Pennock is shutting the Brook hens in early, and counting them twice. \"My Dunnock drives the wain to Khaven. Cider out, salt and nails back, twice a month since he was fifteen.\"\n\n\"His horse came home on market day with the traces cut, and no Dunnock.\" She latches the coop very carefully. \"The carters water at the Carter's Rest, half way to the bound. Go and see. And if it's the Bound wood wolves, and it will be, I'd take it kindly if there were fewer of them for the next poor soul.\"",
+      "progress": "\"Anything? No. Well. No news is news, my mother used to say. She was wrong about most things.\"",
+      "complete": "Nan makes you say the chalked words twice.\n\n\"'Gone on to Khaven on foot.' The great soft lump. He'll be sat in their inn with his boots off, telling everyone about the wolves.\" She wipes her eyes with the back of her wrist, briskly. \"He'll come back for his wain now the wood's quieter. And I'll box his ears when he does.\"",
+      "steps": [
+        {
+          "text": "Find Dunnock's wain at the Carter's Rest, half way along the West road to the bound.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": -216,
+                "y": 20
+              },
+              "radius": 7,
+              "text": "Find the wain at the Carter's Rest",
+              "say": "The wain stands by the shrine with its casks still roped down, not one of them broached, and wolf tracks all round it in the mud. Chalked on the tailboard in big careful letters: WOLVES. GONE ON TO KHAVEN ON FOOT. D."
+            }
+          ]
+        },
+        {
+          "text": "Thin the wolves of the Bound wood, south of the West road.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.20.*",
+              "count": 5,
+              "text": "Bound wood wolves"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 75,
+        "gold": 12,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.ilse.fold",
+      "title": "One a Week",
+      "kind": "npc",
+      "giver": "Ilse Brandt",
+      "turnIn": "Ilse Brandt",
+      "zone": "zone.oakhaven",
+      "level": 3,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Something takes a ewe from the Old Fold every week. Look over the fold, ask Garet Moss at his lodge what made the tracks, and thin the wolf pack on the north-west downs.",
+      "offer": "Ilse Brandt has the Harrows' tally-stick in her fist and keeps turning it, as if the notches might come out different. \"One a week. Five weeks now. Always a Tuesday night, always an old ewe from the back of the flock.\"\n\n\"Sel says it's the deserters. It isn't. Men take the fat ones and leave a mess. This leaves nothing.\" She points west, up the Downs track. \"Go and look at the Old Fold, then take what you see to Garet Moss at his lodge. He knows every track on the downs, and pretends he doesn't.\"",
+      "progress": "\"Another Tuesday coming. Don't dawdle.\"",
+      "complete": "Ilse listens with her arms folded. When you tell her what Garet said, she unfolds them.\n\n\"An old one behind them that does the thinking.\" She looks west, toward the downs. \"Four of his pack gone, and he'll still come Tuesday. He'll just come hungrier.\"",
+      "steps": [
+        {
+          "text": "Look over the Old Fold, west of the Harrow wood.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.oakhaven",
+              "at": {
+                "x": -156,
+                "y": 64
+              },
+              "radius": 8,
+              "text": "Look over the Old Fold",
+              "say": "Inside the fold the mud is trodden flat by sheep, and over it, pressed deep, a wolf's prints, bigger than any dog's. The near forefoot splays wider than the rest. They go out over the wall to the north-west, toward the downs."
+            }
+          ]
+        },
+        {
+          "text": "Ask Garet Moss at his lodge in the Mastwood what made the tracks.",
+          "objectives": [
+            {
+              "type": "talk",
+              "target": "Garet Moss",
+              "text": "Ask Garet Moss about the tracks",
+              "say": "Splayed on the near fore, and big as a calf? There's a pack lies up on the downs below Whitefoot's thicket. Three or four, and an old one behind them that does the thinking. Thin the pack first. Then we'll see who comes out to ask why."
+            }
+          ]
+        },
+        {
+          "text": "Thin the wolf pack lying up on the downs below Whitefoot's thicket.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.15.*",
+              "count": 4,
+              "text": "Wolves of the downs pack"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 75,
+        "gold": 10,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.hob.stew",
+      "title": "Stew for the Pickers",
+      "kind": "npc",
+      "giver": "Hob Linden",
+      "turnIn": "Hob Linden",
+      "zone": "zone.oakhaven",
+      "level": 4,
+      "canonStatus": "CANON-EXPANDED: Oakhaven's cider, the finest and sweetest in the Reach, is CANON (book1 ch.4); the pickers and their stew are GAME-ONLY.",
+      "summary": "The apple-pickers at the Cider Barn work for stew and a cup, and the Cask has no meat for the stew. Bring Hob Linden five cuts of tough boar meat.",
+      "offer": "Hob Linden is drying the same tankard he was drying when you came in. \"Pressing week at the Cider Barn. The finest cider in the Reach, and I'm not boasting, it's just so.\"\n\n\"The pickers work for stew and a cup, and they'll not climb a ladder for the cup alone. No meat, no stew. No stew, no pickers. No pickers, and Oakhaven's a lot of mud with a tree in it.\" He sets the tankard down. \"Boar. Five good cuts. The Brookside boars out past the Moonbell copse are fattest, but the ones that come up from the Withy wallow for the windfalls will do.\"",
+      "progress": "\"The pickers are asking after their stew. I keep telling them it's coming. Is it coming?\"",
+      "complete": "Hob weighs each cut in his hand like a man buying a horse. \"Tough. Good. Tough boar stews sweet, if you give it the day.\"\n\n\"There'll be a cup for you at the Cask when the first barrel's broached. Not the first cup. That one's mine. The second.\"",
+      "steps": [
+        {
+          "text": "Bring five cuts of tough boar meat to Hob Linden at the Golden Cask.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "Hob Linden",
+              "item": "junk.boar_meat",
+              "count": 5,
+              "text": "Boar meat for Hob Linden",
+              "say": "On the block, if you please. Not on the bar. Never on the bar."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 70,
+        "gold": 12,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 125
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.osk.felling",
+      "title": "Felling Weather",
+      "kind": "npc",
+      "giver": "Osk Farrow",
+      "turnIn": "Osk Farrow",
+      "zone": "zone.oakhaven",
+      "level": 5,
+      "canonStatus": "GAME-ONLY",
+      "summary": "Osk Farrow wants the winter's timber down before the weather turns, and the wolves of the Upper pines and Thornshaw won't let him work. Thin both packs, up the North road.",
+      "offer": "Osk Farrow sets down an armful of split logs and rubs the back of his neck. \"See that sky? Felling weather. Dry, and the sap down. A week of it, maybe, and then the rain.\"\n\n\"I want pine out of the Upper pines for roof-trees and thorn out of Thornshaw for hurdles, and I've wolves in both, sat watching me work like I'm their dinner coming.\" He spits on his palms. \"Thin them for me. Five out of each. And if Pim's been daring you to do anything, don't.\"",
+      "progress": "\"The sky's holding. So are the wolves. One of those wants to change.\"",
+      "complete": "Osk hears you out and picks up his axe in the same motion. \"Then I'm away up the North road while it's dry. Pim! Fetch the sling.\"\n\nHe stops at the gate. \"You'll not be short of a fire at the Cask this winter. I'll see to that.\"",
+      "steps": [
+        {
+          "text": "Thin the wolves of the Upper pines and of Thornshaw, up the North road past the last fields.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.0.*",
+              "count": 5,
+              "text": "Upper pines wolves"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.2.*",
+              "count": 5,
+              "text": "Thornshaw wolves"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 110,
+        "gold": 16,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 150
+          }
+        ],
+        "bagItems": [
+          "leaf.tempered_copper_bow"
+        ]
+      }
+    },
+    {
+      "id": "side.oakhaven.whitefoot",
+      "title": "The Bell-Wether's Bell",
+      "kind": "side",
+      "giver": "Ilse Brandt",
+      "turnIn": "Ilse Brandt",
+      "zone": "zone.oakhaven",
+      "level": 6,
+      "minLevel": 5,
+      "requires": [
+        "npc.ilse.fold"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "Old Whitefoot, the grizzled wolf of the north-west downs, has taken the Harrows' bell-wether. Thin the Hanger wolves that run with him, bring him down at his den under Whitefoot's rocks, and bring Ilse Brandt the bell.",
+      "offer": "Ilse Brandt meets you at the Harrow gate with the tally-stick. There is a new notch in it. \"Tuesday. Tansy, this time. The bell-wether. The whole flock follows her bell, and now they stand in the fold and bleat at nothing.\"\n\n\"Garet came and looked at the prints. 'Whitefoot,' he says. 'Old Whitefoot,' like he was naming a man. He lies up under the rocks at the head of Whitefoot's thicket, out on the north-west downs, and the Hanger wolves run with him in hard weather. Garet's had him in his sights twice in eleven years and let him go both times, because he was the finest thing on the downs.\" She snaps the stick in two. \"He isn't now. Bring me Tansy's bell, if there's anything left of it to bring.\"",
+      "progress": "\"He's still out there. I can hear the flock from here, calling for a bell that doesn't come.\"",
+      "complete": "Ilse takes the bell and shakes it once. It is dented, and the clapper is bent, and it rings. Somewhere behind the barn a ewe answers it.\n\n\"That's her note.\" She laughs, a short surprised sound. \"I'll hang it on the next old ewe and they'll follow her the same. Sheep.\" She turns the bell over in her hands. \"Thank you. Go and tell Garet yourself. He'll want to hear it, though he'll not say so.\"",
+      "steps": [
+        {
+          "text": "Thin the Hanger wolves north of the den, then bring down Old Whitefoot under Whitefoot's rocks, on the north-west downs.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.18.*",
+              "count": 4,
+              "text": "Hanger wolves"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.14.*",
+              "text": "Old Whitefoot",
+              "say": "The old wolf goes down on the rocks he lay on for eleven years, and the downs go very quiet."
+            },
+            {
+              "type": "collect",
+              "zone": "zone.oakhaven",
+              "target": "kill:mob.wolf.oakhaven.14.*",
+              "item": "item.wether_bell",
+              "count": 1,
+              "text": "Tansy's bell",
+              "say": "Pushed into the bedding at the back of the den: a sheep's bell on a chewed collar, dented and still whole."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 160,
+        "gold": 22,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 200
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.oakhaven.tally",
+      "title": "Fourpence for a Kettle",
+      "kind": "side",
+      "giver": "Tamsin Reed",
+      "turnIn": "Tamsin Reed",
+      "zone": "zone.oakhaven",
+      "level": 6,
+      "minLevel": 5,
+      "canonStatus": "GAME-ONLY quest; CANON faction (Sandthrone deserters); Hallow's Creek is CANON (world_bible.md)",
+      "summary": "Quartermaster Hesk keeps the deserters' stores in Crowsfoot Hollow, and wrote down everything they took from Oakhaven's market. Take his tally book from him in the Store Caves and bring it to Tamsin Reed.",
+      "offer": "Tamsin Reed's stall has two pots on it and a bolt of grey linen nobody wants. \"I had blue wool. Three bolts, dyed in the spring. Six pots. And my mother's copper kettle.\"\n\n\"One of them came down to market the day before, in a borrowed cloak, and bought nothing. Only looked, and wrote in a little book. The next night my stall was stripped.\" Her mouth goes thin. \"Their quartermaster, Garet says. Hesk. He keeps their stores in the caves under Crowsfoot Ridge, past the deserters' camp and down the Drop. I want that book. I want to see what he thought my mother's kettle was worth.\"",
+      "progress": "\"Not yet? He'll have written that down too, I expect.\"",
+      "complete": "Tamsin turns the pages with one finger, as though the book might bite. Half way down the second page she stops.\n\n\"'Kettle, copper, the good one: fourpence.'\" She reads it twice. \"Fourpence. My mother carried that kettle all the way from Hallow's Creek.\" She shuts the book and holds it against her chest. \"I'm keeping this. One day somebody will offer me fourpence for something, and I'm going to laugh in his face.\"",
+      "steps": [
+        {
+          "text": "Take Quartermaster Hesk's tally book from him in the Store Caves of Crowsfoot Hollow, down the Drop.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.oakhaven",
+              "target": "kill:mob.quartermaster.oakhaven.*",
+              "item": "item.hesk_tally",
+              "count": 1,
+              "text": "Hesk's tally book",
+              "say": "Inside the quartermaster's coat, buttoned in where he could feel it: a cheap little book, every line in a careful square hand.",
+              "document": "doc.oakhaven.hesks_tally"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 150,
+        "gold": 20,
+        "reputation": [
+          {
+            "faction": "oakhaven",
+            "amount": 200
           }
         ]
       }

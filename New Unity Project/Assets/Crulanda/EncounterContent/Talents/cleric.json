@@ -1,0 +1,406 @@
+{
+ "id": "cleric",
+ "name": "Cleric",
+ "resource": "Grace",
+ "resourceDesc": "Grace, a well of a hundred, pays for every prayer; it comes back steadily, faster for a heal that wastes nothing.",
+ "identity": "A lay-sister or lay-brother of a hill shrine, outside the Concord: mend, ward and censure by the lantern's light. GAME-ONLY (no priests or clerics in canon).",
+ "canonStatus": "GAME-ONLY",
+ "branches": [
+  {
+   "id": "lantern",
+   "name": "Lantern",
+   "role": "healer",
+   "loop": "Mend the one in danger, lay a Vigil on the tank, and let Long Mend land on the spike.",
+   "tradeoff": "Long Mend is slow; a spike that lands first is not undone.",
+   "nodes": [
+    {
+     "id": "ln-steady-hand",
+     "name": "Steady Hand",
+     "tier": 0,
+     "col": 0,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Mend heals 4% more per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ln-vigil",
+     "name": "Long Vigil",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Vigil lasts 2s longer per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ln-thrift",
+     "name": "Thrift of Grace",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "A heal that wastes nothing refunds 3 Grace per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ln-quick-prayer",
+     "name": "Quick Prayer",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Long Mend casts 0.2s faster per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ln-lantern-light",
+     "name": "Lantern Light",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "active",
+     "icon": "sun",
+     "desc": "Your next Mend after a Vigil is instant (rank 2: and heals 10% more).",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ln-keeper",
+     "name": "Keeper of the Flame",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Once a fight, a party member who would fall is held at 1 and healed 30%.",
+     "emphasis": {
+      "healer": 2
+     },
+     "impl": true
+    }
+   ]
+  },
+  {
+   "id": "choir",
+   "name": "Choir",
+   "role": "healer",
+   "loop": "Litany heals all near you; hold the Hymn while the party takes spread damage.",
+   "tradeoff": "Every heal is round you: the far ones wait.",
+   "nodes": [
+    {
+     "id": "ch-full-voice",
+     "name": "Full Voice",
+     "tier": 0,
+     "col": 0,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Litany heals 4% more per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ch-wide-ring",
+     "name": "Wide Ring",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "ring",
+     "desc": "Litany and Hymn reach 1 m further per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ch-held-note",
+     "name": "Held Note",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Hymn channels 1s longer per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ch-answer",
+     "name": "Answering Voice",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Hymn refunds 2 Grace a tick per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ch-sanctuary",
+     "name": "Sanctuary",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "active",
+     "icon": "shield",
+     "desc": "A circle where the party takes 5% less per rank.",
+     "emphasis": {
+      "healer": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ch-chorus",
+     "name": "The Whole Chorus",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Litany also heals for 30% more over 6s.",
+     "emphasis": {
+      "healer": 2
+     },
+     "impl": true
+    }
+   ]
+  },
+  {
+   "id": "censure",
+   "name": "Censure",
+   "role": "dps",
+   "loop": "Brand the foe, Rebuke it, and spend the Brands on Sunburst.",
+   "tradeoff": "A Brand let fall is Grace spent for nothing.",
+   "nodes": [
+    {
+     "id": "cn-hard-word",
+     "name": "Hard Word",
+     "tier": 0,
+     "col": 0,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Rebuke deals 4% more per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cn-deep-brand",
+     "name": "Deep Brand",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "fire",
+     "desc": "Brand burns 1 tick longer per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cn-stern",
+     "name": "Stern Voice",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Rebuke casts 0.15s faster per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cn-sunburst",
+     "name": "Sunburst",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "active",
+     "icon": "sun",
+     "desc": "Sunburst consumes Brands for 20% more per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cn-witness",
+     "name": "Witness",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Branded foes take 3% more from the party per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cn-judgement",
+     "name": "Last Judgement",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Sunburst on a foe under 25% deals double.",
+     "emphasis": {
+      "dps": 2
+     },
+     "impl": true
+    }
+   ]
+  },
+  {
+   "id": "warden",
+   "name": "Warden",
+   "role": "support",
+   "loop": "Ward the one who will be hit, Absolve the cursed, and stand in Steadfast.",
+   "tradeoff": "A ward on the wrong one is a heal wasted.",
+   "nodes": [
+    {
+     "id": "wd-thick-ward",
+     "name": "Thick Ward",
+     "tier": 0,
+     "col": 0,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Ward absorbs 5% more per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "wd-absolve",
+     "name": "Quick Absolution",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Absolve's cooldown is 2s shorter per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "wd-steadfast",
+     "name": "Steadfast",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "ring",
+     "desc": "Steadfast's aura cuts 1% more per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "wd-renew",
+     "name": "Renewing Ward",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "A broken Ward heals 4% of its strength per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "wd-shared",
+     "name": "Shared Ward",
+     "tier": 1,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "active",
+     "icon": "shield",
+     "desc": "Ward also lands on one more ally per rank, at half strength.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "wd-bulwark",
+     "name": "Bulwark of Faith",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Once a fight, the party is warded for 20% of its health.",
+     "emphasis": {
+      "support": 2
+     },
+     "impl": true
+    }
+   ]
+  }
+ ]
+}

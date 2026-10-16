@@ -4,7 +4,7 @@ using UnityEngine;
 namespace Crulanda.Encounter
 {
     /// <summary>Goods a villager carries between trades, built on the arm or the shoulder by <see cref="LoadProps"/>.</summary>
-    public enum Load { None, Eggs, Bucket, Grain, Flour, Bread, Logs, Hide, Herbs, Game, Goods }
+    public enum Load { None, Eggs, Bucket, Grain, Flour, Bread, Logs, Hide, Herbs, Game, Goods, Papers, Broom, Pole }
 
     /// <summary>
     /// An errand in a trade's day, run once a day from <see cref="at"/> (and dropped if not started by <see cref="until"/>):
@@ -114,13 +114,137 @@ namespace Crulanda.Encounter
                 new Errand("the afternoon feed", 14.6f, 17, "trough", null, Load.None, null, "Chook-chook-chook-chook!") { work = 16 },
                 new Errand("eggs to the stall", 15.4f, 17.2f, "nest", "stall", Load.Eggs, "eggs", "{n} eggs, fresh. And don't start about the Concord's tax.") { toRole = "merchant" },
                 new Errand("eggs for the pot", 17.2f, 18.6f, "nest", "home", Load.Eggs, "eggs", "{n} for the pot.")) },
+            // The shepherd (GAME-ONLY; Chris 2026-10-14): the flock counted at the gate at first light, sheared through the morning, the
+            // fleeces to the produce stall after the midday meal, fed in the afternoon, and the fold until dusk.
+            { "shepherd", new WorkDay(new[] { new Shift(5.8f, 12.2f, "fold", "fold", "foldgate", "well"), new Shift(12.2f, 13.5f, "home"), new Shift(13.5f, 18.5f, "fold", "fold", "foldgate", "green"), new Shift(18.5f, Night, "foldgate", "home") },
+                new Errand("the morning count", 5.8f, 8, "foldgate", null, Load.None, null, "Hup, hup. Thirty... thirty-one. All there.") { work = 14, pose = ActorPose.Talk },
+                new Errand("the shearing", 8.2f, 11.6f, "fold", null, Load.None, null, "Hold still, you great lump. There.") { work = 34, pose = ActorPose.Gather },
+                new Errand("fleeces to the stall", 13.5f, 16, "fold", "stall", Load.Goods, "wool", "{n} fleeces off the fold. Washed, mostly.") { toRole = "merchant", pose = ActorPose.Gather },
+                new Errand("the afternoon feed", 15.5f, 17.5f, "foldtrough", null, Load.None, null, "Hup! Hup! Come on, then, before the crows do.") { work = 14 }) },
             // The innkeeper (GAME-ONLY; Oakhaven's Hob Linden, who sleeps over the Golden Cask): the kitchen from first light, then the
             // bar and the kitchen turn about until the last table. Water for the pot, the pot on, and dinner out to the tables.
             { "innkeeper", new WorkDay(new[] { new Shift(InnkeeperUp, 7, "kitchen"), new Shift(7, 11.5f, "kitchen", "kitchen", "bar"), new Shift(11.5f, 14, "bar", "bar", "kitchen"), new Shift(14, 17, "kitchen", "bar", "well"), new Shift(17, InnkeeperBed, "bar", "bar", "bar", "kitchen") },
                 new Errand("water for the pot", 6, 7.5f, "well", "kitchen", Load.Bucket, "water", "Bitter or not, it boils."),
                 new Errand("the pot on", 10.5f, 12.5f, "kitchen", null, Load.None, null, "Pot's on. Hare if Garet's been by; barley if he hasn't.") { work = 14 },
                 new Errand("dinner to the tables", 12.2f, 14, "kitchen", "inn", Load.Bread, "dinner", "Dinner. Mind the bowl; it's hotter than it looks.")) },
+
+            // ---------- the Crown's trades (GAME-ONLY, p9-cityinn; Chris, 2026-10-16: "will need lots more npcs in the castle with real jobs
+            // like in oakhaven") ----------
+            // The places are the city's own (ZoneBuilder.Crown registers them): the Council Keep's desks ("keep"), the Council Hall
+            // ("councilhall"), the Archive's desks ("archive"), the Exchange's floor ("exchange"), the Treasury's door and counter
+            // ("treasury"), the guild halls ("guildhall"), the Gilt Gate's inner yard ("gate"), the street lamps ("lamp"), the parterres
+            // ("garden"), the streets ("street", along the roads), the fountains (as "well"), and the Gilded Lantern's kitchen, bar and
+            // floor ("kitchen", "kitchendoor", "bar", "serve", "inn"). Papers go between the Keep, the Hall and the Archive; crates
+            // between the gate, the Exchange, the Treasury and the Row; water from the fountains; the lamps are lit at dusk.
+            { "clerk", new WorkDay(new[] { new Shift(7.5f, 12, "keep", "keep", "councilhall", "archive"), new Shift(12, 13, "inn", "inn", "green"), new Shift(13, 17.5f, "keep", "councilhall", "councilhall", "archive"), new Shift(17.5f, Night, "inn", "green", "home") },
+                new Errand("the morning's edicts", 8, 10.5f, "keep", "councilhall", Load.Papers, "papers", "Today's edicts, for the board. Mind the seal; the Herald counts them."),
+                new Errand("copies for the Archive", 10.5f, 12, "councilhall", "archive", Load.Papers, "papers", "Copies for the shelves. Three of everything, as the charter says."),
+                new Errand("the Archive's answer", 14, 16, "archive", "keep", Load.Papers, "papers", "The Archive's answer. It says no, at some length."),
+                new Errand("petitions to the Keep", 15.8f, 17.4f, "councilhall", "keep", Load.Papers, "papers", "The day's petitions. Most of them will be read.")) },
+            { "scribe", new WorkDay(new[] { new Shift(7, 12, "archive", "archive", "archive", "keep"), new Shift(12, 13, "inn", "green"), new Shift(13, 18, "archive", "archive", "archive", "councilhall"), new Shift(18, Night, "inn", "inn", "home") },
+                new Errand("a register to the Keep", 9.5f, 11.5f, "archive", "keep", Load.Papers, "papers", "The register, copied fair. My hand aches in Council ink."),
+                new Errand("the day's copies", 16, 18, "archive", "councilhall", Load.Papers, "papers", "The day's copies, for the Hall's chest.")) },
+            { "page", new WorkDay(new[] { new Shift(7, 12, "keep", "green", "exchange", "treasury", "guildhall"), new Shift(12, 13, "inn", "green"), new Shift(13, 18, "keep", "green", "street", "exchange", "guildhall"), new Shift(18, 19.6f, "green", "home") },
+                new Errand("a letter to the Exchange", 7.6f, 9.5f, "keep", "exchange", Load.Papers, "papers", "From the Keep. Sealed, so don't ask me what it says."),
+                new Errand("a summons to the Row", 9.5f, 11.5f, "keep", "guildhall", Load.Papers, "papers", "The Council asks for your master. Asks. Nicely."),
+                new Errand("the Treasury's tally", 13.2f, 15, "treasury", "keep", Load.Papers, "papers", "The Treasury's tally, for the Clerk of the Council."),
+                new Errand("the Exchange's lists", 15, 17, "exchange", "archive", Load.Papers, "papers", "The day's sales, for the record. Everything's for the record.")) },
+            { "lamplighter", new WorkDay(new[] { new Shift(8.5f, 12, "street", "lamp", "green", "well"), new Shift(12, 14, "inn", "inn", "green"), new Shift(14, 17.6f, "lamp", "street", "green", "inn"), new Shift(17.6f, 18.5f, "inn"), new Shift(18.5f, 22, "lamp", "lamp", "lamp", "street"), new Shift(22, 23.4f, "inn", "inn", "home") },
+                new Errand("wicks trimmed", 9, 11.5f, "lamp", "lamp", Load.Pole, null, "Trimmed. A clean wick burns gold; a dirty one burns Lowtown."),
+                new Errand("the Way's lamps", 18.6f, 20, "lamp", "lamp", Load.Pole, null, "There. The Way's lit from the gate to the Stair."),
+                new Errand("the Square's lamps", 19.2f, 21, "lamp", "lamp", Load.Pole, null, "The Square's done. The Council likes it bright before the bells."),
+                new Errand("the Row's lamps", 19.8f, 21.6f, "lamp", "lamp", Load.Pole, null, "Last of them. The Row can drink by its own light now.")) },
+            { "gardener", new WorkDay(new[] { new Shift(6, 12, "garden", "garden", "garden", "well"), new Shift(12, 13, "inn", "green"), new Shift(13, 17.5f, "garden", "garden", "garden", "well"), new Shift(17.5f, Night, "inn", "home") },
+                new Errand("water for the beds", 6.6f, 9, "well", "garden", Load.Bucket, "fountain", "There. Nothing grows white and gold on its own."),
+                new Errand("lilies for the Hall", 9.5f, 11.5f, "garden", "councilhall", Load.Herbs, "flowers", "White lilies for the Council's table. White, as ordered."),
+                new Errand("the evening's water", 15.4f, 17.2f, "well", "garden", Load.Bucket, "fountain")) },
+            { "sweeper", new WorkDay(new[] { new Shift(5.8f, 11.5f, "street", "street", "street", "street", "green"), new Shift(11.5f, 12.5f, "inn", "well"), new Shift(12.5f, 17, "street", "street", "street", "green"), new Shift(17, Night, "inn", "green", "home") },
+                new Errand("the Way swept", 6, 9, "street", "street", Load.Broom, null, "The Way's clean. It'll be dust again by noon; the carts see to that."),
+                new Errand("the Square swept", 13, 15.5f, "street", "green", Load.Broom, null, "Petitioners, pigeons and petals. Same every day.")) },
+            { "watercarrier", new WorkDay(new[] { new Shift(6, 11.5f, "well", "well", "well", "green"), new Shift(11.5f, 12.5f, "inn"), new Shift(12.5f, 17, "well", "well", "green", "street"), new Shift(17, Night, "inn", "green", "home") },
+                new Errand("water for the Lantern", 6.2f, 8.4f, "well", "inn", Load.Bucket, "fountain", "Water for the kitchen. Fountain-sweet, not Lowtown grey.") { door = KitchenDoor },
+                new Errand("water for the Keep", 8.6f, 11, "well", "keep", Load.Bucket, "fountain", "Fresh for the Keep's ewers. The Councilor drinks it cold."),
+                new Errand("water for the Hall", 13, 15, "well", "councilhall", Load.Bucket, "fountain", "For the Hall's basins. They wash their hands a great deal, up here."),
+                new Errand("water home", 16.4f, 18.4f, "well", "home", Load.Bucket, "fountain")) },
+            // The Gilded Lantern's staff: the cook keeps the kitchen from first light, the servers carry to the tables, the pot-boy fetches
+            // and clears; Corin Bellweather keeps the bar (his post).
+            { "cook", new WorkDay(new[] { new Shift(5.6f, 11.5f, "kitchen", "kitchen", "kitchen", "serve"), new Shift(11.5f, 14, "kitchen", "kitchen", "serve"), new Shift(14, 17, "kitchen", "inn", "well"), new Shift(17, 22.4f, "kitchen", "kitchen", "kitchen", "serve") },
+                new Errand("the pot on", 10.2f, 12, "kitchen", null, Load.None, null, "Pot's on. Capon for the Councillors' clerks; barley for the rest.") { work = 14 },
+                new Errand("the noon dinners", 12.2f, 13.8f, "kitchen", "inn", Load.Bread, "dinner", "Dinner. Mind the dish; it's the good silver.")) },
+            { "server", new WorkDay(new[] { new Shift(7, 11.5f, "serve", "serve", "kitchen", "inn"), new Shift(11.5f, 15, "serve", "serve", "kitchen"), new Shift(15, 17, "inn", "serve", "green"), new Shift(17, 22.6f, "serve", "serve", "serve", "kitchen") },
+                new Errand("the noon trays", 12, 13.6f, "kitchen", "inn", Load.Bread, "dinner", "Your dinner. Bread's warm; the butter's from the Vale."),
+                new Errand("the supper trays", 18.4f, 20.2f, "kitchen", "inn", Load.Bread, "dinner", "Supper. Corin says the second jug's on the house. It isn't."),
+                new Errand("the late trays", 20.4f, 22, "kitchen", "inn", Load.Bread, "dinner", "Last of the kitchen. Cook's gone to sit down.")) },
+            { "potboy", new WorkDay(new[] { new Shift(6, 11.5f, "kitchen", "serve", "well"), new Shift(11.5f, 15, "serve", "kitchen", "inn"), new Shift(15, 17, "green", "well", "serve"), new Shift(17, 21.5f, "serve", "kitchen", "kitchen") },
+                new Errand("water for the kitchen", 6.4f, 8.4f, "well", "kitchen", Load.Bucket, "fountain", "Water, Cook. Two buckets, no spilling. Well. Hardly any."),
+                new Errand("pots from the tables", 14, 15.6f, "inn", "kitchen", Load.Goods, "pots", "Pots. Somebody's left a spoon in the gravy. A silver one."),
+                new Errand("the evening's water", 16, 17.8f, "well", "kitchen", Load.Bucket, "fountain")) },
+            { "porter", new WorkDay(new[] { new Shift(7, 12, "exchange", "exchange", "gate", "treasury"), new Shift(12, 13, "inn", "green"), new Shift(13, 18, "exchange", "gate", "treasury", "guildhall"), new Shift(18, Night, "inn", "inn", "home") },
+                new Errand("crates up from the gate", 7.6f, 10, "gate", "exchange", Load.Goods, "goods", "Up from the gate. Copper, by the weight of it. My back says copper."),
+                new Errand("the Exchange's coin", 10.6f, 12, "exchange", "treasury", Load.Goods, "coin", "The morning's coin, for the vault. Two wardens walked behind me the whole way."),
+                new Errand("lots to the Row", 13.6f, 15.6f, "exchange", "guildhall", Load.Goods, "goods", "Your hall's lot from the Exchange. Paid for. Sign here."),
+                new Errand("a crate from the gate", 15.6f, 17.6f, "gate", "exchange", Load.Goods, "goods", "Glass from the coast. Don't drop it, they said. As if I drop things.")) },
+            // The Treasury's guards change the watch at six and at six: the day guard at the vault from first light, the night guard
+            // through the dark (her bed is by day; VillageWork.HoursOf).
+            { "vaultguard", new WorkDay(new[] { new Shift(5.8f, 17.9f, "treasury", "treasury", "treasury", "treasury", "treasury", "gate"), new Shift(17.9f, Night, "inn", "inn", "home") },
+                new Errand("the watch taken", 5.8f, 6.6f, "treasury", null, Load.None, null, "The watch is mine. Go home and sleep, you look like the Lowtowns.") { work = 10, pose = ActorPose.Talk },
+                new Errand("the watch handed over", 17.6f, 18.6f, "treasury", null, Load.None, null, "Watch is yours. Vault's shut and the clerk's gone home.") { work = 10, pose = ActorPose.Talk }) },
+            { "nightguard", new WorkDay(new[] { new Shift(16.4f, 17.8f, "inn", "green"), new Shift(17.8f, 24, "treasury", "treasury", "treasury"), new Shift(0, 6.2f, "treasury"), new Shift(6.2f, 8.2f, "inn", "home") },
+                new Errand("the watch taken", 17.8f, 18.8f, "treasury", null, Load.None, null, "Mine till dawn, then. Go and eat; you've earned it.") { work = 10, pose = ActorPose.Talk },
+                new Errand("the watch handed over", 5.6f, 6.6f, "treasury", null, Load.None, null, "Quiet night. Nobody tried the door. Nobody ever tries the door.") { work = 10, pose = ActorPose.Talk }) },
+            { "steward", new WorkDay(new[] { new Shift(7.5f, 12, "guildhall", "guildhall", "guildhall", "exchange"), new Shift(12, 13, "inn"), new Shift(13, 18, "guildhall", "guildhall", "exchange", "treasury"), new Shift(18, Night, "guildhall", "inn", "home") },
+                new Errand("the hall's order", 9, 11, "guildhall", "exchange", Load.Papers, "papers", "The hall's order. Bandages, oil, and whatever the Hounds broke this week."),
+                new Errand("the hall's dues", 15, 17, "guildhall", "treasury", Load.Goods, "coin", "The hall's dues, counted twice. Count them again; I'll wait.")) },
+            { "trader", new WorkDay(new[] { new Shift(7.5f, 12, "exchange", "exchange", "exchange", "green"), new Shift(12, 13, "inn"), new Shift(13, 18, "exchange", "exchange", "treasury", "green"), new Shift(18, Night, "inn", "inn", "home") },
+                new Errand("samples to the Exchange", 8, 10, "home", "exchange", Load.Goods, "goods", "Samples, for the floor. The rest is still on the road from the coast."),
+                new Errand("the day's takings", 16.4f, 18, "exchange", "treasury", Load.Goods, "coin", "The day's takings. A good day; don't tell the tithe-clerk.")) },
+            { "patron", new WorkDay(new[] { new Shift(8.5f, 12, "exchange", "exchange", "green", "garden", "treasury"), new Shift(12, 13.6f, "inn", "inn", "green"), new Shift(13.6f, 17.5f, "exchange", "garden", "green", "guildhall"), new Shift(17.5f, 21.4f, "inn", "inn", "green", "home") },
+                new Errand("a parcel home", 15, 17, "exchange", "home", Load.Goods, null, "Bought it. Don't ask what it cost; I've stopped asking myself.")) },
+            { "noble", new WorkDay(new[] { new Shift(9, 12, "green", "garden", "garden", "councilhall", "street"), new Shift(12, 14, "inn", "inn", "garden"), new Shift(14, 18, "garden", "green", "exchange", "councilhall"), new Shift(18, 22, "inn", "inn", "green", "home") }) },
+            { "servant", new WorkDay(new[] { new Shift(6, 9, "well", "home", "street"), new Shift(9, 12, "exchange", "green", "garden"), new Shift(12, 13, "home"), new Shift(13, 18, "exchange", "garden", "green", "street"), new Shift(18, Night, "home", "inn") },
+                new Errand("the house's water", 6.3f, 8.5f, "well", "home", Load.Bucket, "fountain", "Water for the house. The fountain's, not the cistern's; the mistress can tell."),
+                new Errand("the master's letters", 9.2f, 11, "home", "keep", Load.Papers, "papers", "Letters for the Keep, from the house. Petitions, mostly, dressed as compliments."),
+                new Errand("a parcel from the Exchange", 14, 16.5f, "exchange", "home", Load.Goods, null, "Silk from the coast for the mistress. Third this month.")) },
         };
+        /// <summary>The Crown's trades (above), in order: each has a working day here and a place of its own in a city.</summary>
+        public static readonly string[] CityRoles = { "clerk", "scribe", "page", "lamplighter", "gardener", "sweeper", "watercarrier", "cook", "server", "potboy", "porter", "vaultguard", "nightguard", "steward", "trader", "patron", "noble", "servant" };
+        /// <summary>When a trade goes to bed and gets up, where it is not the villagers' own (VillageLife's Villager.Spawn): the lamplighter
+        /// is out till the last lamp, the inn's staff last to bed, the night guard abed by day. Null: the usual hours.</summary>
+        public static Vector2? HoursOf(string role)
+        {
+            switch (role)
+            {
+                case "lamplighter": return new Vector2(23.4f, 8.2f);
+                case "cook": return new Vector2(22.4f, 5.4f);
+                case "server": return new Vector2(22.6f, 6.8f);
+                case "potboy": return new Vector2(21.5f, 5.8f);
+                case "nightguard": return new Vector2(8.2f, 16.4f);
+                case "noble": return new Vector2(22.2f, 8.6f);
+                case "patron": return new Vector2(21.4f, 8.2f);
+                default: return null;
+            }
+        }
+        /// <summary>The outfit a city trade wears (ActorVisual's trades): the nobles, stewards, traders and their customers in a
+        /// merchant's coat and feathered hat, the inn's staff in the innkeeper's apron, the gardener in the herbalist's; the rest plain.</summary>
+        public static string OutfitOf(string role)
+        {
+            switch (role)
+            {
+                case "noble": case "steward": case "trader": case "patron": return "merchant";
+                case "cook": case "server": case "potboy": return "innkeeper";
+                case "gardener": return "herbalist";
+                default: return role;
+            }
+        }
+        /// <summary>Every place a trade's day sends it to (its shifts' places and its errands' ends), but home and the coop's and fold's.</summary>
+        public static List<string> PlacesOf(string role)
+        {
+            var list = new List<string>(); var d = DayFor(role); if (d == null) return list;
+            void Add(string p) { if (p != null && p != "home" && !list.Contains(p)) list.Add(p); }
+            foreach (var s in d.shifts) foreach (var p in s.places) Add(p);
+            foreach (var e in d.errands) { Add(e.from); Add(e.to); Add(e.door); }
+            return list;
+        }
         public static WorkDay DayFor(string role) { return Days.TryGetValue(role, out var d) ? d : null; }
         /// <summary>
         /// A household's shopping (GAME-ONLY; ADDENDUM C.2): bread from the baker's stall, a bundle from the woodyard, eggs from a
@@ -176,6 +300,12 @@ namespace Crulanda.Encounter
                 case "goods": return r < .5f ? "Leave it on the counter." : "I'll see what sells.";
                 case "ale": return r < .5f ? "About time. They're through the last one." : "Roll it behind the bar.";
                 case "dinner": return r < .5f ? "Stew again? ...Go on, then." : "Smells like hare. Bless you.";
+                // The Crown's (GAME-ONLY, p9-cityinn).
+                case "papers": return r < .5f ? "On the pile. Is it sealed? Then it waits its turn." : "Initial here. And here. And here.";
+                case "coin": return r < .5f ? "Counted and entered. The vault thanks you." : "Two wardens saw it in. Good.";
+                case "flowers": return r < .5f ? "Lilies. The Councillors won't notice, but they'd notice if they weren't there." : "Put them by the lectern.";
+                case "pots": return r < .5f ? "In the tub. Mind the good silver." : "About time. I'm down to the chipped ones.";
+                case "fountain": return r < .5f ? "Set it down. Fountain water?" : "Ta. By the basin.";
                 default: return null;
             }
         }
@@ -277,6 +407,27 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Cube, t, Vector3.zero, new Vector3(.42f, .3f, .3f), Timber);
                     Part(PrimitiveType.Cube, t, new Vector3(0, .16f, 0), new Vector3(.44f, .02f, .32f), new Color(.5f, .38f, .24f));
                     foreach (float x in new[] { -.14f, .14f }) Part(PrimitiveType.Cube, t, new Vector3(x, 0, -.16f), new Vector3(.03f, .32f, .01f), new Color(.5f, .38f, .24f));
+                    break;
+                // The Crown's loads (GAME-ONLY, p9-cityinn): a clerk's bundle of papers under a ledger, tied with the Council's white
+                // ribbon and sealed in red; a sweeper's besom; a lamplighter's long pole, its wick-hook lit at the top.
+                case Load.Papers:
+                    t.localPosition = new Vector3(0, .05f, .38f);
+                    Part(PrimitiveType.Cube, t, Vector3.zero, new Vector3(.34f, .05f, .26f), new Color(.36f, .2f, .12f));   // the ledger's boards
+                    for (int i = 0; i < 4; i++) Part(PrimitiveType.Cube, t, new Vector3((i % 2) * .02f - .01f, .04f + i * .022f, (i % 3) * .015f), new Vector3(.3f, .02f, .22f), new Color(.94f, .92f, .84f));
+                    Part(PrimitiveType.Cube, t, new Vector3(0, .07f, 0), new Vector3(.36f, .11f, .025f), new Color(.97f, .96f, .92f));   // the ribbon
+                    Part(PrimitiveType.Cylinder, t, new Vector3(.08f, .14f, 0), new Vector3(.05f, .008f, .05f), new Color(.62f, .1f, .08f));   // the seal
+                    break;
+                case Load.Broom:
+                    t.localPosition = new Vector3(.42f, -.1f, .15f);
+                    Part(PrimitiveType.Cylinder, t, new Vector3(0, .25f, 0), new Vector3(.035f, .62f, .035f), new Color(.5f, .38f, .22f));
+                    Part(PrimitiveType.Cube, t, new Vector3(0, -.45f, 0), new Vector3(.2f, .2f, .1f), new Color(.66f, .56f, .3f), new Vector3(0, 0, 0));   // the twigs
+                    Part(PrimitiveType.Cube, t, new Vector3(0, -.33f, 0), new Vector3(.12f, .05f, .08f), new Color(.3f, .22f, .14f));   // the binding
+                    break;
+                case Load.Pole:
+                    t.localPosition = new Vector3(.42f, -.1f, .15f);
+                    Part(PrimitiveType.Cylinder, t, new Vector3(0, .55f, 0), new Vector3(.03f, 1.15f, .03f), new Color(.34f, .24f, .14f));
+                    Part(PrimitiveType.Cube, t, new Vector3(.04f, 1.72f, 0), new Vector3(.03f, .12f, .03f), new Color(.8f, .64f, .3f));   // the brass hook
+                    Part(PrimitiveType.Sphere, t, new Vector3(0, 1.74f, 0), new Vector3(.05f, .07f, .05f), new Color(1f, .82f, .42f));   // the wick, alight
                     break;
             }
             return go;

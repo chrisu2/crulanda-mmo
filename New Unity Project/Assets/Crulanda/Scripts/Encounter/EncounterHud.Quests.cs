@@ -1,11 +1,12 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Crulanda.Encounter
 {
     /// <summary>
     /// Quest interface: tracker (under the minimap), ! and ? over quest givers, the parchment conversation window, and the
-    /// quest book (L) with Quests, Chronicle, Standing, Discoveries and Armoury tabs (the last two in EncounterHud.Discoveries.cs and
+    /// quest book (L) with Quests, Chronicle, Lore (the book of lore, 2026-10-15), Standing, Discoveries, Achievements and Armoury
+    /// tabs (the Lore tab in EncounterHud.Lore.cs, the last three in EncounterHud.Discoveries.cs, EncounterHud.Achievements.cs and
     /// EncounterHud.Armoury.cs).
     /// </summary>
     public sealed partial class EncounterHud
@@ -31,7 +32,7 @@ namespace Crulanda.Encounter
             qList = new GUIStyle(GUI.skin.button) { fontSize = 14, alignment = TextAnchor.MiddleLeft, wordWrap = true, padding = new RectOffset(10, 6, 4, 4) };
         }
         void Ink(Rect r, string s, GUIStyle style, Color c) { GUI.contentColor = c; GUI.Label(r, s, style); GUI.contentColor = Color.white; }
-        static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : q.kind == "bounty" ? (q.rare ? "Rare posting" : q.poster == "sandthrone" ? "Sandthrone contract" : "Bounty") : "Side quest"; }
+        static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : q.kind == "bounty" ? (q.rare ? "Rare posting" : q.poster == "sandthrone" ? "Sandthrone contract" : CouncilErrands.IsErrand(q) ? "Council errand" : GuildHalls.IsAsk(q) ? "Guild ask" : "Bounty") : "Side quest"; }
 
         /// <summary>The ! or ? over someone's head, or ' ' (no quests here, or too far away).</summary>
         // Each person's marker is worked out again every 0.4 s, not every frame (playtest note 23: the quest log was asked for every
@@ -57,6 +58,7 @@ namespace Crulanda.Encounter
         /// <summary>Target frame for a clicked villager or Mira: green ring, name, trade, and what E will do.</summary>
         void DrawFriendFrame()
         {
+            if (session.FocusMending && session.MendingDummy != null) { DrawMendingFrame(session.MendingDummy); return; }
             var sim = session.FocusSim;
             if (sim != null && session.FocusVillager == null && !session.FocusMira) { DrawSimFrame(sim); return; }
             var v = session.FocusVillager; string name = session.FocusName; if (name == null) return;
@@ -70,10 +72,10 @@ namespace Crulanda.Encounter
             string hint = !session.FocusInTalkReach ? "Friendly  ·  " + (dist >= EncounterSession.TalkRange ? Mathf.RoundToInt(dist) + " m away" : "out of earshot") :
                 "Friendly  ·  [" + KeyBindings.InteractLabel + "] " + (m == '!' ? "has work for you" : m == '?' ? "wants to hear from you" : "talk");
             // Mira not yet with you: Invite, as on a sim's frame (2026-10-10, Chris: "there should be an invite button for mira").
-            if (session.FocusMira && !session.Progress.recruited)
+            if ((session.FocusMira || session.FocusName == "Mira") && !session.Progress.recruited)
             {
                 Fill(new Rect(372, 86, 290, 6), new Color(0, 0, 0, .55f));
-                if (GUI.Button(new Rect(380, 63, 90, 26), "Invite", slim)) session.InviteMira();
+                if (GUI.Button(new Rect(380, 63, 90, 26), "Invite", slim)) session.InviteTarget();
                 Shadow(new Rect(478, 66, 190, 20), "Friendly  ·  not in your party", tiny, Color.white);
             }
             else Shadow(new Rect(380, 66, 280, 20), hint, tiny, Color.white);
@@ -81,13 +83,22 @@ namespace Crulanda.Encounter
         }
 
         /// <summary>A sim you clicked (Phase 5.2b): name in the class's colour, class, level and folk, and Invite (or Leave party).</summary>
+        /// <summary>The training field's mending dummy: its health, and what it is for.</summary>
+        void DrawMendingFrame(Crulanda.Gameplay.Actor a)
+        {
+            Fill(new Rect(372, 22, 290, 70), new Color(0, 0, 0, .55f));
+            Portrait(new Vector2(668, 54), 74, new Color(.35f, .8f, .4f), "M", a.Level.ToString());
+            Shadow(new Rect(380, 24, 240, 20), "Mending dummy", frameName, new Color(.55f, 1, .55f));
+            UnitBar(new Rect(378, 45, 244, 18), a.Health.Pool.Ratio, HealthGreen, a.Health.Pool.Current + " / " + a.Health.Pool.Max);
+            Shadow(new Rect(380, 66, 280, 20), "Heal it: loses 4% a second while you are near  ·  /meter", tiny, Color.white);
+        }
         void DrawSimFrame(SimAdventurer s)
         {
             var col = ClassColour(s.classId); bool member = session.InParty(s.id);
             Fill(new Rect(372, 22, 290, 70), new Color(0, 0, 0, .55f));
             Portrait(new Vector2(668, 54), 74, col, s.name.Substring(0, 1), s.level.ToString());
             Shadow(new Rect(380, 24, 240, 20), s.name, frameName, col);
-            Shadow(new Rect(380, 46, 260, 20), "<" + SimRoster.ClassName(s.classId) + " " + s.level + " · " + s.folk + ">", tiny, new Color(1, .84f, .45f));
+            Shadow(new Rect(380, 46, 260, 20), "<" + Races.Name(s.Race) + " " + SimRoster.ClassName(s.classId) + " " + s.level + " · " + s.folk + ">", tiny, new Color(1, .84f, .45f));
             var body = session.FocusSimBody;
             if (member)
             {
@@ -229,7 +240,7 @@ namespace Crulanda.Encounter
             if (status == QuestStatus.Available)
             {
                 if (GUI.Button(new Rect(w.x + 24, w.yMax - 52, 150, 36), "Accept", button)) session.AcceptQuest(quest);
-                if (GUI.Button(new Rect(w.xMax - 174, w.yMax - 52, 150, 36), "Decline", button)) { if (c.entries.Count > 1) c.selected = null; else session.Conversation = null; }
+                if (GUI.Button(new Rect(w.xMax - 174, w.yMax - 52, 150, 36), "Decline", button)) { session.DeclineQuest(quest); if (c.entries.Count > 1) c.selected = null; else session.Conversation = null; }
             }
             else if (status == QuestStatus.ReadyToTurnIn)
             {
@@ -298,15 +309,18 @@ namespace Crulanda.Encounter
             Fill(new Rect(w.x - 4, w.y - 4, w.width + 8, w.height + 8), new Color(.25f, .17f, .08f, .98f));
             Fill(w, new Color(.1f, .09f, .08f, .97f));
             Shadow(new Rect(w.x + 24, w.y + 14, 400, 32), "QUEST BOOK", heading, gold);
-            // A newly revealed page jumps to the Chronicle once; after that the reader can switch tabs freely.
-            if (!string.IsNullOrEmpty(session.ReadingDocument) && session.ReadingDocument != lastReading) BookTab = "chronicle";
+            // A newly revealed page jumps to the Chronicle once (a page of the book of lore to the Lore tab); after that the reader can
+            // switch tabs freely.
+            if (!string.IsNullOrEmpty(session.ReadingDocument) && session.ReadingDocument != lastReading)
+                BookTab = log.Db.Documents.TryGetValue(session.ReadingDocument, out var revealed) && revealed.IsLore ? "lore" : "chronicle";
             lastReading = session.ReadingDocument;
-            string[] tabs = { "quests", "chronicle", "standing", "discoveries", "achievements", "armoury" };
-            string[] names = { "Quests", "Chronicle", "Standing", "Discoveries", "Achievements", "Armoury" + (session.ArmouryUnseen > 0 ? "  +" + session.ArmouryUnseen : "") };
+            // Seven tabs since the Lore tab (2026-10-15): 100 apart and 96 wide, so the last ends before the Close button.
+            string[] tabs = { "quests", "chronicle", "lore", "standing", "discoveries", "achievements", "armoury" };
+            string[] names = { "Quests", "Chronicle", "Lore", "Standing", "Discoveries", "Achievements", "Armoury" + (session.ArmouryUnseen > 0 ? "  +" + session.ArmouryUnseen : "") };
             for (int i = 0; i < tabs.Length; i++)
             {
                 GUI.enabled = BookTab != tabs[i];
-                if (GUI.Button(new Rect(w.x + 236 + i * 111, w.y + 16, 106, 30), names[i], micro)) { BookTab = tabs[i]; if (tabs[i] != "chronicle") session.ReadingDocument = null; }
+                if (GUI.Button(new Rect(w.x + 212 + i * 100, w.y + 16, 96, 30), names[i], micro)) { BookTab = tabs[i]; if (tabs[i] != "chronicle" && tabs[i] != "lore") session.ReadingDocument = null; }
                 GUI.enabled = true;
             }
             if (GUI.Button(new Rect(w.xMax - 124, w.y + 16, 100, 30), "Close [L]", micro)) { session.QuestBookOpen = false; session.ReadingDocument = null; }
@@ -314,6 +328,7 @@ namespace Crulanda.Encounter
             Fill(list, new Color(1, 1, 1, .04f));
             if (BookTab == "quests") BookQuests(log, list, page);
             else if (BookTab == "chronicle") BookChronicle(log, list, page);
+            else if (BookTab == "lore") BookLore(log, list, page);
             else if (BookTab == "discoveries") BookDiscoveries(list, page);
             else if (BookTab == "achievements") BookAchievements(list, page);
             else if (BookTab == "armoury") BookArmoury(list, page);
@@ -375,8 +390,14 @@ namespace Crulanda.Encounter
             foreach (var id in log.Progress.questsDone)
             { var q = log.Def(id); if (q == null || !q.IsMain) continue; Shadow(new Rect(list.x + 16, y, list.width - 24, 20), "◆ " + q.title, tiny, new Color(1, .86f, .5f)); y += 20; }
             foreach (var (q, s) in log.Active()) if (q.IsMain) { Shadow(new Rect(list.x + 16, y, list.width - 24, 20), "◇ " + q.title + " (now)", tiny, new Color(.85f, .8f, .7f)); y += 20; }
+            ReadPage(log, page, log.Progress.documents.Count == 0 ? "Letters, ledgers and songs you find are kept here." : "Choose a page to read.");
+        }
+        /// <summary>The page being read (session.ReadingDocument) on parchment: its title, its text in a scroll view, its lore status; or a
+        /// word on what the pane is for when nothing is chosen. Shared by the Chronicle and the Lore tab.</summary>
+        void ReadPage(QuestLog log, Rect page, string empty)
+        {
             if (session.ReadingDocument == null || !log.Db.Documents.TryGetValue(session.ReadingDocument, out var reading))
-            { Shadow(new Rect(page.x, page.y + 10, page.width, 60), log.Progress.documents.Count == 0 ? "Letters, ledgers and songs you find are kept here." : "Choose a page to read.", text, new Color(.8f, .8f, .8f)); return; }
+            { Shadow(new Rect(page.x, page.y + 10, page.width, 60), empty, text, new Color(.8f, .8f, .8f)); return; }
             Fill(page, new Color(.93f, .88f, .76f, 1));
             Ink(new Rect(page.x + 30, page.y + 20, page.width - 60, 34), reading.title, qTitle, new Color(.3f, .16f, .05f));
             var view = new Rect(page.x + 30, page.y + 64, page.width - 50, page.height - 128);
@@ -386,6 +407,7 @@ namespace Crulanda.Encounter
             GUI.EndScrollView();
             if (!string.IsNullOrEmpty(reading.canonStatus)) Ink(new Rect(page.x + 30, page.yMax - 56, page.width - 60, 48), "Lore status: " + reading.canonStatus, qSmall, new Color(.45f, .38f, .28f));
         }
+        // The Lore tab (BookLore) is EncounterHud.Lore.cs since Phase 8.6: the book of lore's chapters, its Pages the book of 2026-10-15.
         void BookStanding(QuestLog log, Rect area)
         {
             float y = area.y + 10;

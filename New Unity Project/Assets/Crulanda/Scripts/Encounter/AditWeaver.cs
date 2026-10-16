@@ -8,7 +8,9 @@ namespace Crulanda.Encounter
     /// The Weaver's unlocking (Docs/DUNGEON_DESIGN.md section 4, the Rail Hall; dungeon step D4): Mother Quillet (GAME-ONLY), the eldest
     /// of the goblins pressed into the Adit, waits by the platform gate she hummed open. Spoken to, she walks down the hall to the
     /// carriage's resonance lock and matches it, a little over half a minute's work. On the way the Sandthrone come for her: a wave from
-    /// the carriage a third of the way down, the dockers from the far tunnel at two thirds; with the lock half matched Rail-Captain Danner
+    /// the carriage when she is 27 m from the lock, the dockers from the far tunnel at 13 m (a third and two thirds of the first Adit's
+    /// walk; drawn out, her walk is four times as long, and a wave fired by the fraction came out of reach: a mob lets go of anyone more
+    /// than its leash and 6 m from home, so the second wave stood idle; 2026-10-10); with the lock half matched Rail-Captain Danner
     /// stands up out of the dark. She counts as one of your party for every mob, for Mira and for the sims (EncounterSession.PartyActor),
     /// so they fight over her and defend her. She waits while you are far behind or something is on her, and stops matching while you
     /// are down. Matched, the geodes go dark and "adit.lock" is kept; if she falls she is back by the gate a little later. The session
@@ -21,6 +23,8 @@ namespace Crulanda.Encounter
         /// <summary>How long the lock takes to match, how far behind you may fall before she waits for you, and how long after a fall
         /// she is back by the gate. Tests shorten them.</summary>
         public static float MatchSeconds = 36, WaitFor = 16, BackAfter = 30;
+        /// <summary>How far from the lock she is when each wave comes out (metres).</summary>
+        public const float Wave1At = 27, Wave2At = 13;
         public Actor actor;
         /// <summary>Her "Talk to Mother Quillet" (kind "weaver"): it goes where she goes.</summary>
         public Crulanda.World.ZoneInteractable talk;
@@ -81,9 +85,10 @@ namespace Crulanda.Encounter
                         bool far = session.Player == null || !session.Player.IsAlive || Flat(session.Player.transform.position - transform.position) > WaitFor;
                         Holding = far || Beset();
                         if (agent.isOnNavMesh) agent.isStopped = Holding;
-                        Walked = Mathf.Clamp01(1 - Flat(lockAt - transform.position) / total);
-                        if (!wave1 && Walked >= 1 / 3f) { wave1 = true; session.WeaverWave(this, 1); }
-                        if (!wave2 && Walked >= 2 / 3f) { wave2 = true; session.WeaverWave(this, 2); }
+                        float left = Flat(lockAt - transform.position);
+                        Walked = Mathf.Clamp01(1 - left / total);
+                        if (!wave1 && left <= Wave1At) { wave1 = true; session.WeaverWave(this, 1); }
+                        if (!wave2 && left <= Wave2At) { wave2 = true; session.WeaverWave(this, 2); }
                         if (Flat(lockAt - transform.position) < 1.2f && !agent.pathPending)
                         {
                             Now = Stage.Matching; Walked = 1; if (agent.isOnNavMesh) agent.isStopped = true;

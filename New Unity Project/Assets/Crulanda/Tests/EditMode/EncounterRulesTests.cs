@@ -45,6 +45,43 @@ namespace Crulanda.Tests
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
         }
         [Test]
+        public void A_save_deep_in_the_adit_loads_and_one_off_the_world_does_not()
+        {
+            string root = Path.Combine(Path.GetTempPath(), "Crulanda-" + Guid.NewGuid().ToString("N"));
+            try
+            {
+                // The drawn-out Sealed Adit's Rail Hall lies 80-90 m down: a save there came back a new character (2026-10-11).
+                var p = EncounterSession.FreshProgress(); p.experience = 9720; p.keys.Add("adit.lock"); p.x = 117; p.y = -95; p.z = 284;
+                var save = new EncounterSave(root, TestTalents.Warrior()); save.Write(p);
+                Assert.IsTrue(save.Read(out var loaded, out var error), error);
+                Assert.AreEqual(-95, loaded.y, .01f); Assert.AreEqual(9720, loaded.experience); CollectionAssert.Contains(loaded.keys, "adit.lock");
+                foreach (var off in new[] { new[] { 0f, -EncounterSave.MaxDepth - 1, 0 }, new[] { 0f, EncounterSave.MaxHeight + 1, 0 }, new[] { EncounterSave.MaxAcross + 1, 0, 0 }, new[] { 0, 0, float.NaN } })
+                {
+                    p.x = off[0]; p.y = off[1]; p.z = off[2]; save.Write(p);
+                    Assert.IsFalse(save.Read(out _, out _), "a place off the world (" + off[0] + ", " + off[1] + ", " + off[2] + ") is not a save this game wrote");
+                }
+            }
+            finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+        }
+        /// <summary>Full screen is borderless at the monitor's own size, never the exclusive mode, and a start-up puts right anything else
+        /// that is full screen (playtest note 121, Chris, 2026-10-11: blurry at 3440x1440 and his desktop's text wrong after alt-tab).</summary>
+        [Test]
+        public void Full_screen_is_always_borderless_at_the_monitors_own_size()
+        {
+            CollectionAssert.DoesNotContain(EncounterHud.DisplayModes, UnityEngine.FullScreenMode.ExclusiveFullScreen, "no mode switches the monitor");
+            Assert.AreEqual((3440, 1440, UnityEngine.FullScreenMode.FullScreenWindow), EncounterHud.StartupDisplay(UnityEngine.FullScreenMode.ExclusiveFullScreen, 1920, 1080, 3440, 1440));
+            Assert.AreEqual((3440, 1440, UnityEngine.FullScreenMode.FullScreenWindow), EncounterHud.StartupDisplay(UnityEngine.FullScreenMode.FullScreenWindow, 1920, 1080, 3440, 1440));
+            Assert.IsNull(EncounterHud.StartupDisplay(UnityEngine.FullScreenMode.FullScreenWindow, 3440, 1440, 3440, 1440), "already right");
+            Assert.IsNull(EncounterHud.StartupDisplay(UnityEngine.FullScreenMode.Windowed, 1920, 1080, 3440, 1440), "a window is left as it is");
+        }
+        /// <summary>The chat's hold on the keys lapses when the chat is no longer drawn (the tester's note 115).</summary>
+        [Test]
+        public void Typing_holds_the_keys_only_while_the_chat_is_drawn()
+        {
+            EncounterInput.Typing = true; Assert.IsTrue(EncounterInput.Typing);
+            EncounterInput.Typing = false; Assert.IsFalse(EncounterInput.Typing);
+        }
+        [Test]
         public void Level_curve_kill_experience_and_old_save_migration()
         {
             Assert.AreEqual(0, EncounterProgress.XpForLevel(1)); Assert.AreEqual(400, EncounterProgress.XpForLevel(2)); Assert.AreEqual(9720, EncounterProgress.XpForLevel(10));   // round 29: 400 + 170 a level

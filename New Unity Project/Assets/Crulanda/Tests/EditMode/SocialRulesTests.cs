@@ -34,12 +34,21 @@ namespace Crulanda.Tests
             { "picket", SocialKind.Call }, { "digger", SocialKind.Call }, { "overseer", SocialKind.Call }, { "sapper", SocialKind.Call }, { "gangboss", SocialKind.Call }, { "carrier", SocialKind.Call }, { "watchman", SocialKind.Call },
             { "platformguard", SocialKind.Call }, { "docker", SocialKind.Call }, { "railquartermaster", SocialKind.Call }, { "gunner", SocialKind.Call }, { "railcaptain", SocialKind.Call }, { "cutter", SocialKind.Call }, { "sorter", SocialKind.Call },
             { "nix", SocialKind.Call }, { "ashinitiate", SocialKind.Call }, { "ashmender", SocialKind.Call }, { "ysolt", SocialKind.Call }, { "foreman", SocialKind.Call }, { "venthound", SocialKind.Solitary }, { "crawler", SocialKind.Pack }, { "greybear", SocialKind.Solitary },
-            { "quietminer", SocialKind.Solitary }   // D3: the rare keeps to himself
+            { "quietminer", SocialKind.Solitary },   // D3: the rare keeps to himself
+            // The Adit rework (Docs/ADIT_REWORK.md): the cult's zealots and scribes, the smelters, the grey whisperers, the ash-bound dead and
+            // the new elites call; the Company's pit-hounds pack; Old Bristle and the Old Burrower keep to themselves.
+            { "zealot", SocialKind.Call }, { "ashscribe", SocialKind.Call }, { "smelter", SocialKind.Call }, { "whisperer", SocialKind.Call }, { "ashbound", SocialKind.Call },
+            { "pithound", SocialKind.Pack }, { "bristle", SocialKind.Solitary }, { "burrower", SocialKind.Solitary },
+            { "bailer", SocialKind.Call }, { "vosk", SocialKind.Call }, { "urnkeeper", SocialKind.Call }, { "loremaster", SocialKind.Call }, { "armsmaster", SocialKind.Call },
+            { "varrow", SocialKind.Call }, { "greywhisperer", SocialKind.Call }, { "hollowsong", SocialKind.Call }, { "hobb", SocialKind.Call }, { "kettle", SocialKind.Call },
+            { "bargeman", SocialKind.Call }, { "netter", SocialKind.Call },   // (S6) the Black Cove's rope teams, the barge's crew and the harbour netters: people, they call
+            { "warden", SocialKind.Call },   // the grey picket (2026-10-15): Concord wardens, people: they call
+            { "forager", SocialKind.Call }   // the foragers' camp (2026-10-15): deserters living rough; its data says call
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()
         {
-            Assert.AreEqual(6, zones.Count, "Five zones and the Sealed Adit.");
+            Assert.AreEqual(6, zones.Count(z => !z.city), "Five zones and the Sealed Adit (and the Crown, a city with no camps).");
             int camps = 0;
             foreach (var (zone, camp, _) in Camps())
             {
@@ -108,7 +117,7 @@ namespace Crulanda.Tests
                 {
                     if (guards[e] == null) continue;
                     Assert.IsTrue(z.camps[e].elite, "Only an elite's camp has guards.");
-                    foreach (int c in guards[e]) { Assert.IsFalse(z.camps[c].elite, "An elite guards nobody."); pairs.Add(z.camps[e].name + " <- " + z.camps[c].name); }
+                    foreach (int c in guards[e]) { Assert.IsFalse(z.camps[c].elite && !(z.camps[e].guards ?? "").Split(',').Any(n => n.Trim() == z.camps[c].name), "An elite guards nobody unless the lord's camp names it (the reworked Adit's Varrow with Ysolt)."); pairs.Add(z.camps[e].name + " <- " + z.camps[c].name); }
                 }
             }
             // The king and the guard before his throne, the quartermaster and his store's men, the Deacon and his pit, Greyheart
@@ -117,7 +126,11 @@ namespace Crulanda.Tests
                 "Caddock's hall <- King's guard", "The Quartermaster's desk <- Store Caves", "The Ash-Deacon <- Ash-pit cultists",
                 "Greyheart <- The Greying", "The Root-Warden <- The Heart's withered",
                 // The Sealed Adit (dungeon D1): the gang-boss, the quartermaster, the rail-captain and Nix each name their guards.
-                "Gang-Boss Haddo Lusk <- Gang-boss's guards", "Quartermaster Brannigan Sorrel <- Quartermaster's guards", "Rail-Captain Orsk Danner <- Rail-Captain's guard", "Nix and the Rock-Eater <- Workshop guards" }, pairs,
+                "Gang-Boss Haddo Lusk <- Gang-boss's guards", "Quartermaster Brannigan Sorrel <- Quartermaster's guards", "Rail-Captain Orsk Danner <- Rail-Captain's guard", "Nix and the Rock-Eater <- Workshop guards",
+                // The Adit rework: every wing's boss names its guards (Cinder-Warden Ysolt names Sister Ashe Varrow, an elite: the data names her, so she guards).
+                "Brack the Bailer <- Bailers' chain", "Overseer Grael Vosk <- Whip-hands", "Urn-Keeper Sabel <- Urn-tenders", "Loremaster Ivo Senn <- Lectors",
+                "Master-at-Arms Corvane <- Armourers", "The Grey Whisperer <- Whisperer's hollow", "The Foreman Who Forgot <- The Foreman's shift",
+                "Powder-Sergeant Hobb <- Hobb's sappers", "Old Kettle, the pitch-boiler <- Pitch-gangers", "Cinder-Warden Ysolt <- Sister Ashe Varrow" }, pairs,
                 "If a camp moved, pair it in the data: \"guards\" on the elite's camp names its guard camps.");
         }
 
@@ -138,8 +151,8 @@ namespace Crulanda.Tests
         [Test] public void Each_of_the_twelve_elites_has_its_own_move()
         {
             var elites = Camps().Where(x => x.camp.elite).ToList();
-            Assert.AreEqual(20, elites.Count, "Twelve camp elites in the five zones and eight in the Sealed Adit (the rare Quiet Miner among them).");
-            Assert.AreEqual(21, EliteMoves.All.Length, "Twenty camp elites, and the Rock-Eater, which rides beside Nix in his camp (D5).");
+            Assert.AreEqual(32, elites.Count, "Twelve camp elites in the five zones and twenty in the Sealed Adit since its rework (the rare Quiet Miner among them).");
+            Assert.AreEqual(33, EliteMoves.All.Length, "Twenty camp elites, the Rock-Eater, which rides beside Nix in his camp (D5), and the reworked Adit's twelve (2026-10-14).");
             var plain = EliteMoves.For("nobody at all", false);
             foreach (var (zone, camp, _) in elites)
             {
@@ -154,12 +167,13 @@ namespace Crulanda.Tests
                 Assert.That(m.enrageAt, Is.InRange(.2f, .4f)); Assert.Less(m.enrageHaste, .8f, "Enraged, it swings faster.");
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
-            Assert.AreEqual(21, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Twenty-one different moves.");
-            // Dungeon end bosses are a step harder than outdoor named elites: Caddock and the Hollow Root-Warden, and only they.
-            CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
+            Assert.AreEqual(33, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Thirty-three different moves (the reworked Adit's twelve among them, 2026-10-14; the Old Burrower's Earth-Heave, not a second Rock-Crush).");
+            // Dungeon end bosses are a step harder than outdoor named elites: Caddock, the Hollow Root-Warden, the Rail-Captain and (the Adit
+            // rework) Brother Hollowsong, the Wake's boss, and only they.
+            CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner", "Brother Hollowsong" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());
             // Nix's two-part fight (D5): the engine and the goblin are each lighter than one elite and together a step above one.
             var rock = EliteMoves.For(EncounterSession.RockEaterName, false); var nix = EliteMoves.For(EncounterSession.NixName, false);
-            Assert.That(rock.health, Is.InRange(.7f, 1f)); Assert.That(nix.health, Is.InRange(.7f, 1f)); Assert.That(rock.health + nix.health, Is.InRange(1.5f, 2f), "two parts, a step above one elite together");
+            Assert.That(rock.health, Is.InRange(.7f, 1.4f)); Assert.That(nix.health, Is.InRange(.7f, 1f)); Assert.That(rock.health + nix.health, Is.InRange(1.5f, 2.2f), "two parts, a step above one elite together (the beast 1.3 since the duo was eased, 2026-10-11 18:43)");
             foreach (var m in EliteMoves.All) { if (m == rock || m == nix) continue; Assert.AreEqual(m.boss ? EliteMoves.BossHealth : 1, m.health, m.mob); Assert.AreEqual(m.boss ? EliteMoves.BossHit : 1, m.hit, m.mob); }
             Assert.Greater(EliteMoves.BossHealth, 1.1f); Assert.Greater(EliteMoves.BossHit, 1.05f);
             // Solitary beasts call nobody; the rest have a call to make.
@@ -188,12 +202,15 @@ namespace Crulanda.Tests
                         if (Vector2.Distance(kin.center, lord.center) - kin.radius > m.callReach) continue;
                         answered = true;
                         // The paper fight (EliteBalanceTests) counts those who answer as normal mobs: no second elite within a call.
-                        Assert.IsFalse(kin.elite, lord.mob + "'s call reaches " + kin.mob + ", another elite. Shorten the call or count it in the balance table.");
+                        // A pair the zone makes on purpose, each the other's guard (the reworked Adit's Ysolt and Varrow: they pull together).
+                        bool pair = (lord.guards ?? "").Split(',').Any(n => n.Trim() == kin.name) || (kin.guards ?? "").Split(',').Any(n => n.Trim() == lord.name);
+                        Assert.IsFalse(kin.elite && !pair, lord.mob + "'s call reaches " + kin.mob + ", another elite. Shorten the call or count it in the balance table.");
                     }
                     if (!answered) unanswered.Add(lord.mob);
                 }
             }
-            CollectionAssert.AreEquivalent(new[] { "The Pale Reckoner" }, unanswered, "When a pale camp stands within its call, take the Reckoner off this list and out of the docs' exception.");
+            // (Hollowsong's choir comes at his call once S4 looses it, ADIT_REWORK 5.)
+            CollectionAssert.AreEquivalent(new[] { "Brother Hollowsong", "The Pale Reckoner" }, unanswered, "When a pale camp stands within its call, take the Reckoner off this list and out of the docs' exception.");
             // A call across a hillside reaches a whole camp: the Sexton and the captain bring two, not all of them.
             Assert.AreEqual(2, EliteMoves.For("The Grey Sexton", false).callMost); Assert.AreEqual(2, EliteMoves.For("Sandthrone captain", false).callMost);
             Assert.AreEqual(0, EliteMoves.For("Old Whitefoot", true).callMost, "The howl brings the whole pack.");
@@ -223,6 +240,23 @@ namespace Crulanda.Tests
             }
             // Mira keeps pace: her heal at the cap is well over twice her heal at level 1.
             Assert.AreEqual(42, HealerCompanion.HealFor(42, 1)); Assert.Greater(HealerCompanion.HealFor(42, EncounterProgress.LevelCap), 2 * 42);
+        }
+        [Test] public void Mira_has_damage_spells_between_heals()
+        {
+            // Chris 2026-10-15: "mira/druid should have some damage spells when not healing".
+            var bolt = new AbilitySpec { power = 7, range = 30 };
+            var lash = HealerCompanion.Lash(bolt); var seed = HealerCompanion.Seed(bolt);
+            Assert.AreEqual(0, lash.castTime); Assert.Greater(lash.cooldown, 0); Assert.Greater(seed.castTime, 0);
+            Assert.Greater(lash.power, bolt.power); Assert.Greater(seed.power, lash.power); Assert.Greater(lash.cost, 0); Assert.Greater(seed.cost, 0);
+            Assert.AreEqual(bolt.range, seed.range);
+        }
+        [Test] public void Miras_mana_runs_out_in_a_long_fight()
+        {
+            // Chris 2026-10-15: "mira never runs out of mana healing". At level 11 her pool holds fewer heals than at level 1 (the cost
+            // grows a quarter faster than the pool), and a 35 s fight of a heal every 3.5 s (her cooldown) empties it.
+            int pool1 = HealerCompanion.ManaFor(120, 1), pool11 = HealerCompanion.ManaFor(120, 11), cost1 = HealerCompanion.HealCost(18, 1), cost11 = HealerCompanion.HealCost(18, 11);
+            Assert.Less(pool11 / (float)cost11, pool1 / (float)cost1, "fewer heals in her pool at 11 than at 1");
+            Assert.Less(pool11 + 35, 10 * cost11, "ten heals in 35 s cost more than her pool and her in-fight regeneration");
         }
     }
 }

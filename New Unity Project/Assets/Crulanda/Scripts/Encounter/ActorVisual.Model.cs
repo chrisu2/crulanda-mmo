@@ -23,6 +23,8 @@ namespace Crulanda.Encounter
         /// <summary>People are built as models when the kit is in the build; off, the smooth figure (read when a figure is built).</summary>
         public static bool Models = true;
         ModelFigure model;
+        /// <summary>The modelled figure, for captures and tests (null on a primitive figure).</summary>
+        public ModelFigure Figure { get { return model; } }
         /// <summary>The figure's model (null on a smooth, block or beast figure).</summary>
         public ModelFigure Model { get { return model; } }
         Transform headFrame, faceFrame, chestFrame, hipsFrame, handleR;
@@ -54,7 +56,7 @@ namespace Crulanda.Encounter
                 default: return false;
             }
             if (role == "henwife") return true;
-            if (role == "blacksmith" || role == "lumberjack" || role == "miller" || role == "elder" && variant % 2 == 0) return false;
+            if (role == "blacksmith" || role == "lumberjack" || role == "miller" || role == "councilor" || role == "elder" && variant % 2 == 0) return false;
             string n = name ?? "";
             foreach (var f in FemaleNames) if (n == f || n.StartsWith(f + " ")) return true;
             foreach (var m in MaleNames) if (n == m || n.StartsWith(m + " ")) return false;
@@ -85,6 +87,7 @@ namespace Crulanda.Encounter
                 case ActorLook.Druid: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 1; break;
                 case ActorLook.Paladin: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.hair = 3; s.beard = true; break;
                 case ActorLook.Ranger: s.kit = ModelFigure.Kit.Ranger; s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 2; break;
+                case ActorLook.SaltMender: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.shirt = ClothTint(clothC, .2f); s.hood = true; s.hoodColour = ClothTint(accentC, .75f); s.hair = 0; s.beard = true; break;   // an elder of the West, salt-white
                 case ActorLook.Mage: s.kit = ModelFigure.Kit.Peasant; s.hood = true; s.hoodColour = ClothTint(accentC, .75f); s.hair = 1; break;
                 case ActorLook.Healer: s.hood = true; s.hoodColour = ClothTint(clothC, .8f); s.hair = 2; break;
                 case ActorLook.Collector: case ActorLook.Warden: s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.shirt = ClothTint(new Color(.93f, .93f, .95f), .15f); break;   // Concord white, for the tabard
@@ -99,7 +102,83 @@ namespace Crulanda.Encounter
             // On a peasant's outfit only the hood is the ranger's: bleached, it takes its colour true (Mira's cream, a hen-wife's
             // red kerchief), not the ranger's green under a tint.
             if (s.kit == ModelFigure.Kit.Peasant) s.bleach = true;
+            if (orc) Orcish(ref s);
             return s;
+        }
+        /// <summary>Orc skin: the kit's pale skin times a green (moss, sage, olive, a darker fen green), by the variant.</summary>
+        static readonly Color[] OrcSkins = { new Color(.74f, 1.18f, .9f), new Color(.7f, 1.1f, .84f), new Color(.78f, 1.2f, .92f), new Color(.66f, 1.04f, .8f) };   // the kit's pale skin to the orc head's olive (OrcHead)
+        /// <summary>How much taller an orc is drawn than a man (a woman: <see cref="OrcWomanScale"/>). The canon's orcs stand about
+        /// seven feet (world_bible: Gorm); the kit's man is about six.</summary>
+        public const float OrcScale = 1.15f, OrcWomanScale = 1.1f;
+        /// <summary>
+        /// An orc (Chris, 2026-10-13: "shaman is not an orc"; Docs/RACES.md, step 3): CANON as a people (green, tusked, about seven feet:
+        /// Gorm, Krunk). Built on the same humanoid body and clips as everyone else, so it wears the same gear: green skin, taller, no
+        /// beard, the head shaved or cropped (a woman's tied back), dark hair; the tusks are hung on the head after (<see cref="Tusks"/>).
+        /// </summary>
+        void Orcish(ref ModelFigure.Spec s)
+        {
+            s.skin = OrcSkins[Mathf.Abs(variant) % OrcSkins.Length]; s.scale = (s.female ? OrcWomanScale : OrcScale) * (s.scale > 0 ? s.scale : 1);
+            s.beard = false; s.hair = s.female ? 2 : (Mathf.Abs(variant) % 2 == 0 ? 4 : 3); s.hairColour = new Color(.42f, .38f, .34f);
+            if (OrcKit) s.hood = false;   // the orc's own head and topknot (OrcHead): a man's hood does not go over it
+        }
+        static Mesh orcHead, orcHair; static Material orcSkin; static bool orcLoaded;
+        /// <summary>The orc's head from the pack, baked (Editor/OrcHeadBake.cs; Resources/Characters/Orc): head, eyes, teeth and tusks, and
+        /// its hair, in the frame of its Head bone; the skin recoloured green from the pack's pink.</summary>
+        public static bool OrcKit
+        {
+            get
+            {
+                if (!orcLoaded) { orcLoaded = true; orcHead = Resources.Load<Mesh>("Characters/Orc/OrcHead"); orcHair = Resources.Load<Mesh>("Characters/Orc/OrcHair"); orcSkin = Resources.Load<Material>("Characters/Orc/OrcSkin"); }
+                return orcHead != null && orcSkin != null;
+            }
+        }
+        /// <summary>The pack's head to a man's: its crown .257 above its Head bone, a man's about .215, so about the same height, but broader
+        /// and deeper, with the brow and jaw forward.</summary>
+        public const float OrcHeadFit = .7f, OrcHeadWide = 1.2f, OrcHeadLift = .045f;   // its jaw is long: smaller, and lifted so the chin clears the collar (22:20 frames)
+        /// <summary>
+        /// The orc's own head (2026-10-13, Chris chose "Orc face" after the first pass's tusks on a man's head): the pack's head, eyes, teeth,
+        /// tusks and topknot hung on the Head bone at its place, turned with the body, sized by <see cref="OrcHeadFit"/>; the man's head,
+        /// eyes, brows and hair are kept from drawing (forceRenderingOff, which nothing that shows or hides a figure touches). False without
+        /// the kit (the tusks then).
+        /// </summary>
+        bool OrcHead(ModelFigure m)
+        {
+            if (!OrcKit) return false;
+            float s = m.Model.localScale.y;
+            foreach (var (mesh, label) in new[] { (orcHead, "Orc head"), (orcHair, "Orc hair") })
+            {
+                if (mesh == null) continue;
+                var go = new GameObject(label); go.transform.SetParent(body, false);
+                go.transform.SetPositionAndRotation(m.HeadBone.position + body.up * OrcHeadLift * s, body.rotation); go.transform.localScale = Vector3.one * OrcHeadFit * s;
+                go.AddComponent<MeshFilter>().sharedMesh = mesh;
+                var r = go.AddComponent<MeshRenderer>(); var mats = new Material[mesh.subMeshCount]; for (int i = 0; i < mats.Length; i++) mats[i] = orcSkin; r.sharedMaterials = mats;
+                go.transform.SetParent(m.HeadBone, true);
+                m.Renderers.Add(r);
+            }
+            if (m.Head != null) m.Head.forceRenderingOff = true;
+            foreach (var h in m.Hair) if (h != null) h.forceRenderingOff = true;
+            foreach (var r in m.Renderers) if (r != null && r.name.Contains("Eye")) r.forceRenderingOff = true;
+            return true;
+        }
+        static Material tuskMat;
+        /// <summary>An orc's two tusks: ivory points standing up from the corners of the lower jaw, a little forward and out, hung on the
+        /// Head bone. Made in the bind pose, like the frames (the jaw about 3 cm above the Head bone, the face about 9 cm in front).</summary>
+        void Tusks(ModelFigure m)
+        {
+            if (tuskMat == null) { tuskMat = new Material(Shader.Find("Standard")) { color = new Color(.93f, .89f, .76f), name = "Orc tusk" }; tuskMat.SetFloat("_Glossiness", .35f); }
+            float s = m.Model.localScale.y; var jaw = body.InverseTransformPoint(m.HeadBone.position);
+            foreach (float side in new[] { -1f, 1f })
+            {
+                var t = GameObject.CreatePrimitive(PrimitiveType.Capsule); t.name = "Tusk " + (side < 0 ? "L" : "R");
+                var c = t.GetComponent<Collider>(); if (Application.isPlaying) Destroy(c); else DestroyImmediate(c);
+                t.transform.SetParent(body, false);
+                t.transform.localPosition = jaw + new Vector3(side * .03f, .035f, .088f) * s;
+                t.transform.localRotation = Quaternion.Euler(-18, 0, side * -12);
+                t.transform.localScale = new Vector3(.013f, .022f, .013f) * s;
+                t.transform.SetParent(m.HeadBone, true);
+                var r = t.GetComponent<MeshRenderer>(); r.sharedMaterial = tuskMat; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                m.Renderers.Add(r);
+            }
         }
         /// <summary>A trade's model: the outfit and its dyes (the old outfit's colours), a hood for the hooded trades, a beard,
         /// grey hair for an elder.</summary>
@@ -126,6 +205,9 @@ namespace Crulanda.Encounter
                 case "stranger": s.kit = ModelFigure.Kit.Ranger; s.bleach = true; Wear(C(.2f, .2f, .22f), C(.16f, .15f, .15f)); Hood(C(.17f, .17f, .19f)); break;
                 case "pilgrim": Wear(C(.86f, .58f, .16f), C(.7f, .56f, .34f)); Hood(C(.84f, .62f, .24f)); break;
                 case "warden": s.kit = ModelFigure.Kit.Ranger; Wear(C(.2f, .46f, .18f), C(.36f, .24f, .13f)); Hood(C(.16f, .38f, .14f)); break;
+                // The High Councilor (CANON look, book1 ch.12:365): white silk, the head bare, pale skin tight on the skull, no beard.
+                case "councilor": s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.shirt = ClothTint(C(.95f, .94f, .9f), .15f); s.breeches = ClothTint(C(.92f, .9f, .84f), .15f); s.hair = 4; s.beard = false; s.hairColour = Gain(C(.85f, .85f, .83f), 1.25f); break;
+                case "scholar": Wear(C(.13f, .12f, .17f), C(.1f, .09f, .12f)); break;   // a clerk's dark robe (GAME-ONLY)
                 case "innkeeper": Wear(C(.9f, .86f, .74f), C(.26f, .2f, .17f)); s.beard = !s.female; break;
                 case "drinker": if (v % 2 == 0) Hood(VillagerCloth[Mathf.Abs(v * 3 + 2) % VillagerCloth.Length]); break;
                 default: if (v % 4 == 2) Hood(VillagerCloth[Mathf.Abs(v * 3 + 2) % VillagerCloth.Length]); break;   // plain folk: a headscarf
@@ -143,6 +225,7 @@ namespace Crulanda.Encounter
             model = m; actorRef = GetComponent<Crulanda.Gameplay.Actor>();
             if (child) m.HeadBone.localScale = Vector3.one * ChildHead;   // a child's head is large for the body (the clips turn bones, they never scale them)
             Frames();
+            if (orc && !OrcHead(m)) Tusks(m);
             // What armour recolours (Cover): the shirt, the sleeves (and, for gloves, the bare hands), the breeches, the shoes.
             baseChest = new[] { m.Torso }; baseSleeves = new[] { m.Arms }; baseHands = new[] { m.Arms }; baseLegs = new[] { m.Legs }; baseBoots = new[] { m.Feet };
             baseBelt = null;   // the outfit's belts go under a chest piece (ModelFigure.ShowExtras)
@@ -169,6 +252,7 @@ namespace Crulanda.Encounter
             // across and .32 tall, the model's is about .17 across, .25 tall and .21 deep.
             float hs = m.HeadBone.localScale.y;   // a child's larger head
             var sh = new Vector3(.58f, .8f, .72f) * hs;
+            if (orc && OrcKit) { sh.x *= OrcHeadWide; sh.z *= OrcHeadWide; }   // what an orc wears on its head, as broad as its head
             var headAt = L(m.HeadBone) + new Vector3(0, .12f * s, .01f * s) * hs;   // a little high, so a helmet's rim clears the eyes
             headFrame = Region("Head frame", m.HeadBone, headAt - new Vector3(0, .8f * sh.y, 0), sh);
             headOutline = Outline(false); hairOutline = Outline(true);
@@ -441,17 +525,20 @@ namespace Crulanda.Encounter
         /// <summary>The sitting clip puts the hips this far behind where the figure stands: a seated body is moved forward by it, so a
         /// villager placed on a stool sits on it and not beside it (playtest note 30).</summary>
         const float SitShift = .42f;
-        struct PoseState { public string slot; public bool arms; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, twist, weight; }
+        /// <summary>Kevin's ploughing clip under the hoe stroke (off: the hand-set stroke alone, as FieldWorkTests measures it).</summary>
+        public static bool PloughClip;
+        struct PoseState { public string slot; public bool arms, hoe; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, twist, weight; }
         PoseState PoseOf(ActorPose pose, float speed, float t)
         {
-            var p = new PoseState();
+            var p = new PoseState(); ploughing = false;
             switch (pose)
             {
                 case ActorPose.Sit: p.slot = "sit"; p.shift = SitShift; break;
                 case ActorPose.Swim: p.slot = "swim"; break;   // still or moving: the stroke (slowed when still); the tread clip read as no pose at all
                 case ActorPose.Sneak: p.slot = speed > .3f ? "sneak" : "crouch"; break;
                 case ActorPose.Talk: p.slot = "talk"; break;
-                case ActorPose.Gather: p.slot = "gather"; break;
+                case ActorPose.Gather: p.slot = model.Has("k.gather1") ? GatherSlot : "gather"; break;   // Kevin's gathering, one of three by the figure (2026-10-14)
+                case ActorPose.Mine: p.slot = model.Has("k.mine") ? "k.mine" : "gather"; break;          // Kevin's pick at a seam
                 case ActorPose.Cower: p.slot = "crouch"; p.arms = true; p.armL = new Vector3(-150, 0, 25); p.armR = new Vector3(-150, 0, -25); p.elbowL = p.elbowR = -70; break;
                 case ActorPose.Hammer:   // steady strikes with the right hand; the left holds the work
                 {
@@ -460,6 +547,7 @@ namespace Crulanda.Encounter
                 }
                 case ActorPose.Chop:     // a big overhead swing, then a pause to set the next log
                 {
+                    if (model.Has("k.chop")) { p.slot = "k.chop"; break; }   // Kevin's pick driven down at the block (2026-10-14)
                     float k = Mathf.Repeat(t * .8f, 1), axe = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) * 160 : Mathf.Max(0, 160 - (k - .55f) * 900);
                     p.arms = true; p.armL = new Vector3(-axe, 0, 6); p.armR = new Vector3(-axe, 0, -6); p.elbowL = p.elbowR = -10; p.lean = axe < 40 ? 14 : 0; break;
                 }
@@ -468,6 +556,11 @@ namespace Crulanda.Encounter
                     p.elbowL = p.elbowR = -35; p.lean = 10; break;
                 case ActorPose.Work:     // hoeing (or hauling a bucket): a lift and a stroke down, leaning into it (playtest note 76: it read as standing still)
                 {
+                    // A long tool: the two-handed stroke (HoeStance, FieldArms; note 150). Under it the body works to Kevin's ploughing
+                    // clip (2026-10-14, Chris: "ploughing would be good one to use on the hoe"), its own lean taking half the stroke's bend;
+                    // the arms and the hoe stay the hand-set stroke (the clip alone held the shaft upright like a staff: frames 14:05).
+                    // (With the clip under it the fists came in to 22-25 cm of the chest and 44 cm apart, FieldWorkTests 16:20: off until it is tuned.)
+                    if (HoeReady && speed < 1.1f) { bool plough = PloughClip && model.Has("k.plough"); if (plough) p.slot = "k.plough"; p.bend = HoeBend() * (plough ? .5f : 1); p.hoe = true; break; }
                     float k = Mathf.Repeat(t * .9f, 1), lift = k < .55f ? Mathf.SmoothStep(0, 1, k / .55f) : 1 - Mathf.SmoothStep(0, 1, (k - .55f) / .2f);
                     float chop = 25 + lift * 85;
                     p.arms = true; p.armL = new Vector3(-chop, 0, 12); p.armR = new Vector3(-chop + 8, 0, -12); p.elbowL = p.elbowR = -20 - lift * 20; p.lean = 16 - lift * 8; break;
@@ -498,7 +591,7 @@ namespace Crulanda.Encounter
         /// <summary>Shooting, or a shot drawn: the bow stays out (not slung) till three seconds after the last arrow.</summary>
         bool BowBusy { get { return BowReady && (drawing || Time.time - shotAt < 3.2f); } }
         /// <summary>An arrow loosed now (CastRelease does this for a figure with a bow in hand).</summary>
-        public void Shoot() { shotAt = Time.time; }
+        public void Shoot() { shotAt = Time.time; if (model != null && model.HasBow && model.Bow) model.BowLoose(); }
         /// <summary>Shooting, or a shot drawn: the arms stay on the bow until three seconds after the last arrow.</summary>
         bool Bowing { get { return BowBusy && HoldsBow; } }
         public const float BowRelease = .12f, BowRenock = .45f, BowDrawn = 1.05f;
@@ -507,9 +600,9 @@ namespace Crulanda.Encounter
         {
             float since = drawing ? BowDrawn : Time.time - shotAt;
             Quaternion q; float elbow;
-            if (since < BowRelease) { float u = since / BowRelease; q = Quaternion.Slerp(FullDraw, Loosed, u); elbow = Mathf.Lerp(-125, -70, u); }                      // loosed: the hand flies back past the ear
-            else if (since < BowRenock) { float u = Mathf.SmoothStep(0, 1, (since - BowRelease) / (BowRenock - BowRelease)); q = Quaternion.Slerp(Loosed, Nocked, u); elbow = Mathf.Lerp(-70, -25, u); }   // back to the string
-            else { float u = Mathf.SmoothStep(0, 1, (since - BowRenock) / (BowDrawn - BowRenock)); q = Quaternion.Slerp(Nocked, FullDraw, u); elbow = Mathf.Lerp(-25, -125, u); }   // drawn to the jaw, and held
+            if (since < BowRelease) { float u = since / BowRelease; q = Quaternion.Slerp(FullDraw, Loosed, u); elbow = Mathf.Lerp(-125, -70, u); bowDraw = 0; }                      // loosed: the hand flies back past the ear, the string snaps straight
+            else if (since < BowRenock) { float u = Mathf.SmoothStep(0, 1, (since - BowRelease) / (BowRenock - BowRelease)); q = Quaternion.Slerp(Loosed, Nocked, u); elbow = Mathf.Lerp(-70, -25, u); bowDraw = 0; }   // back to the string
+            else { float u = Mathf.SmoothStep(0, 1, (since - BowRenock) / (BowDrawn - BowRenock)); q = Quaternion.Slerp(Nocked, FullDraw, u); elbow = Mathf.Lerp(-25, -125, u); bowDraw = Mathf.Max(.15f, u); }   // nocked and drawn to the jaw, and held
             p.arms = true; p.armL = new Vector3(-86, 0, 6); p.elbowL = -6; p.armR = q.eulerAngles; p.elbowR = elbow; p.twist = 35;
         }
         void CarryArms(ref PoseState p)
@@ -562,7 +655,8 @@ namespace Crulanda.Encounter
             }
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
             float dt = Time.deltaTime, target = dt > 0 ? delta.magnitude / dt : 0;
-            speed = Mathf.Lerp(speed, target, dt * 8); phase += dt * (2.2f + speed * 1.6f);
+            speed = Mathf.Lerp(speed, target, dt * 8); if (Riding) speed = 0;   // carried in a saddle: seated however fast its mount goes
+            phase += dt * (2.2f + speed * 1.6f);
             // Which way it is moving against the way it faces (strafing, backing): the figure's walk cycle follows it.
             if (target > .2f) { var local = transform.InverseTransformDirection(delta); var h = new Vector2(local.x, local.z).normalized; heading = Vector2.Lerp(heading, h, Mathf.Min(1, dt * 10)); }
             else heading = Vector2.Lerp(heading, new Vector2(0, 1), Mathf.Min(1, dt * 4));
@@ -570,7 +664,9 @@ namespace Crulanda.Encounter
             var p = PoseOf(moving && !travel ? ActorPose.None : Pose, speed, Time.time + variant * .7f);
             if (!p.arms && p.slot == null && Carry != Carrying.None) CarryArms(ref p);
             if (LyingLow) p = new PoseState { slot = "crouch" };   // an ambusher in wait (EncounterEnemy.Hide), crouched in the grass
-            if (Bowing && !dead) BowArms(ref p);
+            bool bowOn = Bowing && !dead;
+            if (model.HasBow) { model.Bow = bowOn; if (bowOn) bowDraw = model.BowDraw; }   // the archer's clips (Kevin Iglesias)
+            else if (bowOn) BowArms(ref p);                                                // posed arms where a figure has none
             // The player's jump (Round 22, note 50; 2026-10-10, Chris: "still feel floaty and when you land feet twist together"): the
             // take-off clip from its push-off while going up, the fall's loop coming down (the whole standing jump, crouch, air and
             // landing, had played in the air), and the landing's knee-dip on touching down, a moment of it running and longer standing.
@@ -584,9 +680,15 @@ namespace Crulanda.Encounter
                 // 2026-10-10), which read as the legs folding and the feet twisting together.
                 bool hop = motor.Jumped && motor.AirAge < .8f && model.Has("k.jumpstart");
                 if (motor.Airborne && model.Has("k.fall")) p = new PoseState { slot = hop ? "k.jumpstart" : "k.fall", weight = hop ? .8f : 1, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };
-                else if (!motor.Airborne && motor.LandedAge < (moving ? .16f : .4f) && model.Has("k.land")) p = new PoseState { slot = "k.land", weight = moving ? .3f : .5f, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };
+                else if (!motor.Airborne && !moving && motor.LandedAge < .4f && model.Has("k.land")) p = new PoseState { slot = "k.land", weight = .5f, arms = p.arms, armL = p.armL, armR = p.armR, elbowL = p.elbowL, elbowR = p.elbowR, twist = p.twist };   // running, none: the landing clip under the run turned the feet in (Chris, 2026-10-10)
             }
             if (dead) { p = new PoseState { slot = "death" }; body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; }
+            // A trade's tool (CarryTool): put away while seated, carrying a load, swimming or dead; at work only standing at it; a long
+            // one otherwise held like a staff in the right fist (StaffArm), whatever the clip's arm is doing (walking, talking).
+            toolAway = dead || p.slot == "sit" || p.slot == "swim" || p.slot == "swimidle" || Carry != Carrying.None;
+            ToolAtWork = !toolAway && !moving && WorkPose;
+            staffHold = Mathf.MoveTowards(staffHold, tradeTool != null && tradeToolLong && !toolAway && !ToolAtWork && !p.arms ? 1 : 0, dt * 5);
+            if (!dead) p.drop -= GroundGap(dt);
             model.Drive(speed, p.slot, dt, heading, p.weight > 0 ? p.weight : 1);
             if (p.arms) { poseArmL = p.armL; poseArmR = p.armR; poseElbowL = p.elbowL; poseElbowR = p.elbowR; }
             armWeight = Mathf.MoveTowards(armWeight, p.arms ? 1 : 0, dt * 4);
@@ -608,6 +710,22 @@ namespace Crulanda.Encounter
             else swimLift = 0;
             // A bow drawn: the chest turned side-on to the mark, the left shoulder leading, and the head kept on the mark; before the
             // arms, which are set in the body's frame.
+            // The archer's clips (Kevin Iglesias) are made for an archer standing side-on, so their bow arm points to the figure's left.
+            // Standing, the whole figure turns side-on to its mark by the angle between the bow arm (in the body's frame, as the clip has
+            // it this frame) and the way it faces, legs and all, as the clip is made; moving, the legs keep to the way it goes and the
+            // spine and chest take the turn. (2026-10-10, Chris: "bow still twisted": the chest alone had turned, 90 degrees over the hips.)
+            float still = 1 - Mathf.InverseLerp(.3f, 1.5f, speed);
+            if (fresh && model.HasBow && model.Bow && model.UpperArmL != null && model.HandL != null && model.Spine != null && model.Chest != null)
+            {
+                var aim = body.InverseTransformDirection(model.HandL.position - model.UpperArmL.position); aim.y = 0;
+                float off = aim.sqrMagnitude > .0004f ? Vector3.SignedAngle(aim, Vector3.forward, Vector3.up) : 0;
+                aimTwist = Mathf.MoveTowardsAngle(aimTwist, off, Mathf.Max(dt, .001f) * 400);
+                float chest = aimTwist * (1 - still);
+                model.Spine.rotation = Quaternion.AngleAxis(chest * .4f, body.up) * model.Spine.rotation;
+                model.Chest.rotation = Quaternion.AngleAxis(chest * .6f, body.up) * model.Chest.rotation;
+            }
+            else aimTwist = Mathf.MoveTowardsAngle(aimTwist, 0, Mathf.Max(dt, .001f) * 400);
+            float archerTurn = dead ? 0 : aimTwist * still; ArcherTurn = archerTurn;
             float twist = fresh ? p.twist * arms : 0;
             if (twist != 0 && model.Spine != null && model.Chest != null)
             {
@@ -620,22 +738,129 @@ namespace Crulanda.Encounter
                 PoseArm(armL, foreL, model.UpperArmL, model.LowerArmL, poseArmL, poseElbowL, arms);
                 PoseArm(armR, foreR, model.UpperArmR, model.LowerArmR, poseArmR, poseElbowR, arms);
             }
+            if (staffHold > 0 && fresh && !dead) StaffArm(staffHold);
+            // A hoer's shoulders squared to the stroke before the back bends, and turned once it is (HoeStance).
+            bool hoer = p.hoe && !ploughing && ToolAtWork && Pose == ActorPose.Work && !dead;
+            HoeStance(hoer, fresh && !dead, false);
             // An elder's stoop and a sleeper's slump bend the back, not the legs.
             float bend = fresh ? stoop + p.bend : 0;
             if (bend != 0 && model.Spine != null) model.Spine.rotation = Quaternion.AngleAxis(bend * .5f, body.right) * model.Spine.rotation;
             if (bend != 0 && model.Chest != null) model.Chest.rotation = Quaternion.AngleAxis(bend * .5f, body.right) * model.Chest.rotation;
+            HoeStance(hoer, fresh && !dead, true);
             // The figure as a whole moves only for a pose that leans or drops it, or a drinker's reel, and is put back once after:
             // otherwise the body is left to others (an elite's wind-up lean, an ambusher's crouch, a death).
             if (!dead)
             {
                 if (p.drop != 0 || p.shift != 0 || LyingLow) { body.localPosition = new Vector3(0, p.drop, p.shift); dropped = true; }
                 else if (dropped) { body.localPosition = Vector3.zero; dropped = false; }
-                if (Stagger > 0) { staggering = true; body.localEulerAngles = new Vector3(p.lean + Mathf.Sin(phase * .5f) * 6 * Stagger, 0, Mathf.Sin(phase * .5f + 1.1f) * 14 * Stagger); }
-                else if (p.lean != 0) { body.localEulerAngles = new Vector3(p.lean, 0, 0); leaned = true; }
+                if (Stagger > 0) { staggering = true; body.localEulerAngles = new Vector3(p.lean + Mathf.Sin(phase * .5f) * 6 * Stagger, archerTurn, Mathf.Sin(phase * .5f + 1.1f) * 14 * Stagger); }
+                else if (p.lean != 0 || Mathf.Abs(archerTurn) > .01f) { body.localEulerAngles = new Vector3(p.lean, archerTurn, 0); leaned = true; }
                 else if (staggering || leaned) { staggering = leaned = false; body.localEulerAngles = Vector3.zero; }
             }
+            if (fresh && !dead) FieldArms(dt, ToolAtWork && Pose == ActorPose.Work); else hoeActive = false;   // after the body is placed
             SyncFrames();
-            BowUpright(fresh && (p.twist != 0 || bowHeld != null) ? arms : 0);   // and while the arms come down after
+            bool clipBow = model.HasBow && model.Bow;
+            BowUpright(fresh && (clipBow || p.twist != 0 || bowHeld != null) ? (clipBow ? 1 : arms) : 0);   // and while the arms come down after
+            BowString(fresh && (clipBow || p.twist != 0 && arms > .6f));
+        }
+        float aimTwist;
+        /// <summary>How far the figure is turned side-on for the bow this frame (degrees; the motion capture logs it).</summary>
+        public float ArcherTurn { get; private set; }
+        // The player's capsule rests on its skin (CharacterController.skinWidth, 8 cm), and the model hung from the capsule's bottom, so
+        // the whole figure stood 8-9 cm above the ground (FootTests, 2026-10-10: capsule bottom .087 above it, the toes .09-.12 standing).
+        // On the ground the model is lowered by the gap a ray finds between the capsule's bottom and the ground under it; in the air the
+        // last gap is kept, so it never pops.
+        CharacterController capsule; bool capsuleChecked; float groundGap;
+        float GroundGap(float dt)
+        {
+            if (!capsuleChecked) { capsule = GetComponent<CharacterController>(); capsuleChecked = true; }
+            if (capsule == null || motor == null || motor.Airborne || motor.Swimming) return groundGap;
+            var bottom = transform.position + Vector3.up * (capsule.center.y - capsule.height / 2);
+            float best = float.MinValue;
+            foreach (var h in Physics.RaycastAll(bottom + Vector3.up * .5f, Vector3.down, 1.1f, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore))
+                if (!h.collider.transform.IsChildOf(transform) && h.point.y > best) best = h.point.y;
+            float want = best > float.MinValue ? Mathf.Clamp(bottom.y - best, 0, .25f) : 0;
+            groundGap = Mathf.MoveTowards(groundGap, want, dt * .8f);
+            return groundGap;
+        }
+        // ---------- the bowstring (2026-10-10, Chris: "doesn't even pull the string on bow shots") ----------
+        // The bows' strings are part of their meshes (one mesh, one material). When a bow comes into a hand, a copy of its mesh without
+        // the string is put on it (the string is the thin geometry on the tips' side running the bow's length), and a string of our own
+        // runs from nock to nock: straight at rest, pulled back by the drawing hand, with an arrow on it while it is drawn.
+        static readonly Dictionary<Mesh, (Mesh bare, Vector3 top, Vector3 bottom)> stringless = new Dictionary<Mesh, (Mesh, Vector3, Vector3)>();
+        static Material stringMat, shaftMat, headMat, fletchMat;
+        MeshFilter bowMesh; LineRenderer bowString; Transform bowArrow; Vector3 stringTop, stringBottom; float bowDraw;
+        /// <summary>The string's two nocks on the bow (mesh space) and the mesh without it; null bare when it cannot be found (or the mesh
+        /// is not readable), and the bow keeps its own.</summary>
+        static (Mesh, Vector3, Vector3) CutString(Mesh m)
+        {
+            if (m == null || !m.isReadable) return (null, default, default);
+            var v = m.vertices; if (v.Length < 8) return (null, default, default);
+            var e = m.bounds.extents; int ax = e.y >= e.x && e.y >= e.z ? 1 : e.x >= e.z ? 0 : 2;   // the bow's length
+            int dp = ax == 1 ? (e.x >= e.z ? 0 : 2) : ax == 0 ? (e.y >= e.z ? 1 : 2) : (e.x >= e.y ? 0 : 1);   // its depth: grip to string
+            int hi = 0, lo = 0; for (int i = 1; i < v.Length; i++) { if (v[i][ax] > v[hi][ax]) hi = i; if (v[i][ax] < v[lo][ax]) lo = i; }
+            float side = (v[hi][dp] + v[lo][dp]) / 2, half = (v[hi][ax] - v[lo][ax]) / 2, mid = (v[hi][ax] + v[lo][ax]) / 2, band = half * .06f;
+            bool On(Vector3 q) { return Mathf.Abs(q[dp] - side) < band; }
+            var bare = Object.Instantiate(m); bare.name = m.name + " (stringless)";
+            float top = float.MinValue, bottom = float.MaxValue; int cut = 0;
+            for (int sub = 0; sub < m.subMeshCount; sub++)
+            {
+                var tri = m.GetTriangles(sub); var keep = new List<int>(tri.Length);
+                for (int k = 0; k + 2 < tri.Length; k += 3)
+                {
+                    Vector3 a = v[tri[k]], b = v[tri[k + 1]], c = v[tri[k + 2]];
+                    bool inner = Mathf.Abs(a[ax] - mid) < half * .85f || Mathf.Abs(b[ax] - mid) < half * .85f || Mathf.Abs(c[ax] - mid) < half * .85f;
+                    if (On(a) && On(b) && On(c) && inner)
+                    { cut++; foreach (var q in new[] { a, b, c }) { top = Mathf.Max(top, q[ax]); bottom = Mathf.Min(bottom, q[ax]); } continue; }
+                    keep.Add(tri[k]); keep.Add(tri[k + 1]); keep.Add(tri[k + 2]);
+                }
+                bare.SetTriangles(keep, sub);
+            }
+            if (cut == 0) { Object.Destroy(bare); return (null, default, default); }
+            var t = Vector3.zero; t[dp] = side; t[ax] = top; var u = Vector3.zero; u[dp] = side; u[ax] = bottom;
+            return (bare, t, u);
+        }
+        void BowString(bool drawn)
+        {
+            var b = held != null && held.Length > 0 && HoldsBow ? held[0] : null;
+            var mf = b != null ? b.GetComponentInChildren<MeshFilter>() : null;
+            if (mf != bowMesh)
+            {
+                bowMesh = mf; if (bowString != null) { Destroy(bowString.gameObject); bowString = null; }
+                if (mf != null)
+                {
+                    var src = mf.sharedMesh;
+                    if (src != null && !stringless.TryGetValue(src, out var found)) { found = CutString(src); stringless[src] = found; if (found.bare != null) stringless[found.bare] = found; }
+                    if (src != null && stringless.TryGetValue(src, out var cut) && cut.bare != null)
+                    {
+                        mf.sharedMesh = cut.bare; stringTop = cut.top; stringBottom = cut.bottom;
+                        if (stringMat == null) stringMat = Mat(new Color(.82f, .78f, .66f), .3f);
+                        var go = new GameObject("Bowstring"); go.transform.SetParent(transform, false);
+                        bowString = go.AddComponent<LineRenderer>(); bowString.positionCount = 3; bowString.useWorldSpace = true; bowString.widthMultiplier = .012f;
+                        bowString.sharedMaterial = stringMat; bowString.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; bowString.numCapVertices = 2;
+                    }
+                }
+            }
+            if (bowString == null || bowMesh == null) { if (bowArrow != null) bowArrow.gameObject.SetActive(false); return; }
+            var top = bowMesh.transform.TransformPoint(stringTop); var bottom = bowMesh.transform.TransformPoint(stringBottom); var rest = (top + bottom) / 2;
+            float pull = drawn && model.HandR != null ? bowDraw : 0;
+            var nock = pull > 0 ? Vector3.Lerp(rest, model.HandR.position, pull) : rest;
+            bowString.SetPosition(0, top); bowString.SetPosition(1, nock); bowString.SetPosition(2, bottom);
+            // The arrow on the string while it is drawn: nocked at the hand, its head out past the bow.
+            bool arrow = pull > .1f;
+            if (arrow && bowArrow == null)
+            {
+                if (shaftMat == null) { shaftMat = Mat(new Color(.55f, .38f, .22f)); headMat = Mat(new Color(.3f, .3f, .32f), .5f, .6f); fletchMat = Mat(new Color(.7f, .16f, .12f)); }
+                bowArrow = new GameObject("Nocked arrow").transform; bowArrow.SetParent(transform, false);
+                Part(PrimitiveType.Cylinder, bowArrow, new Vector3(0, .36f, 0), new Vector3(.014f, .36f, .014f), shaftMat);
+                Part(PrimitiveType.Cube, bowArrow, new Vector3(0, .74f, 0), new Vector3(.03f, .07f, .012f), headMat, new Vector3(0, 0, 45));
+                foreach (float a in new[] { 0f, 120f, 240f }) Part(PrimitiveType.Cube, bowArrow, new Vector3(0, .07f, 0), new Vector3(.003f, .09f, .045f), fletchMat, new Vector3(0, a, 0));
+            }
+            if (bowArrow == null) return;
+            bowArrow.gameObject.SetActive(arrow);
+            if (!arrow) return;
+            var grip = bowMesh.transform.position; var dir = grip - nock; if (dir.sqrMagnitude < .0001f) dir = body.forward;
+            bowArrow.position = nock; bowArrow.rotation = Quaternion.FromToRotation(Vector3.up, dir.normalized);
         }
         Transform bowHeld; Quaternion bowRest;
         /// <summary>While a bow is drawn its limbs stand up and down, as they hang at rest: the fist carries the grip, but the arm raised to
@@ -646,7 +871,28 @@ namespace Crulanda.Encounter
             if (bowHeld != null && bowHeld != b) { bowHeld.localRotation = bowRest; bowHeld = null; }
             if (b == null) return;
             if (bowHeld != b) { bowHeld = b; bowRest = b.localRotation; }
-            b.rotation = Quaternion.Slerp(b.parent.rotation * bowRest, body.rotation * Quaternion.Euler(0, 0, -10), w);   // canted a little, the top limb out
+            // In the plane of the bow arm (the arrow's line), not the body's: an archer stands side-on to the mark (the clips).
+            var along = transform.forward;
+            if (model.HandL != null && model.UpperArmL != null) { var a = model.HandL.position - model.UpperArmL.position; a.y = 0; if (a.sqrMagnitude > .0004f) along = a.normalized; }
+            along.y = 0; if (along.sqrMagnitude < 1e-4f) along = body.forward;
+            along.Normalize();
+            // The bow set by its own mesh (2026-10-10, Chris: "bow is backwards", "rounded edge to mob and string towards shooter"):
+            // the length from bottom nock to top nock stands up, and the depth from the grip to the string points back along the
+            // arrow at the shooter, so the bow's rounded back faces the mark and its string the archer. (Turning the holder by
+            // LookRotation set the bow's thickness along the arrow: from behind its flat face showed, a quarter turn out.)
+            var mf = bowMesh != null && bowMesh.transform.IsChildOf(b) ? bowMesh : null;
+            Quaternion want;
+            if (mf != null && mf.sharedMesh != null && stringTop != stringBottom)
+            {
+                var lenL = (stringTop - stringBottom).normalized;
+                var depthL = (stringTop + stringBottom) / 2 - mf.sharedMesh.bounds.center; depthL -= Vector3.Dot(depthL, lenL) * lenL;
+                if (depthL.sqrMagnitude < 1e-8f) depthL = Vector3.Cross(lenL, Vector3.forward);
+                var meshWant = Quaternion.LookRotation(-along, Vector3.up) * Quaternion.Inverse(Quaternion.LookRotation(depthL.normalized, lenL));
+                var rel = Quaternion.Inverse(b.rotation) * mf.transform.rotation;   // the mesh in its holder, fixed
+                want = meshWant * Quaternion.Inverse(rel);
+            }
+            else want = Quaternion.LookRotation(along, Vector3.up);   // before the string is found (the first frame)
+            b.rotation = Quaternion.Slerp(b.parent.rotation * bowRest, want, w);
         }
         /// <summary>
         /// Edit mode (captures, tests): the model as it stands <paramref name="time"/> seconds into <paramref name="pose"/>, walking at
@@ -671,6 +917,61 @@ namespace Crulanda.Encounter
         public void PreviewDead() { if (model == null) return; model.Sample("death", 99); body.localRotation = Quaternion.identity; body.localPosition = Vector3.zero; SyncFrames(); }
         /// <summary>Turns a model arm so its frames stand as the old pivots would at these angles (the shoulder's Euler in the body,
         /// the elbow about the forearm's X), blended over the clip by <paramref name="w"/>.</summary>
+        float staffHold;
+        /// <summary>The right arm holding a staff (a trade's long tool, CarryTool): the upper arm down, a little forward and out, the
+        /// elbow bent so the forearm points ahead, the fist at the belt a hand's breadth out from the body, the shaft upright through it
+        /// and clear of the arm, the body and the legs (playtest notes 95, 109 and 119).</summary>
+        void StaffArm(float w)
+        {
+            if (model.UpperArmR == null || model.LowerArmR == null || model.HandR == null) return;
+            Vector3 up = body.up, ahead = body.forward, outward = body.right;
+            if (model.Chest != null && Vector3.Dot(model.UpperArmR.position - model.Chest.position, outward) < 0) outward = -outward;   // the right arm's own side
+            // Chris, 2026-10-12 (note 119): "standing weird", the fork floating in front of an open hand. Now the upper arm hangs
+            // nearly straight down by the side, the forearm reaches down and forward (about 35 degrees under level, an elbow of some
+            // 55), the knuckles point ahead with the knuckle row upright, and the fingers close round the shaft (palm in).
+            PointBone(model.UpperArmR, model.LowerArmR.position - model.UpperArmR.position, (-up + outward * .1f + ahead * .1f).normalized, w);
+            PointBone(model.LowerArmR, model.HandR.position - model.LowerArmR.position, (-up * .58f + ahead * .8f + outward * .04f).normalized, w);
+            if (model.MiddleR == null) return;
+            PointBone(model.HandR, model.MiddleR.position - model.HandR.position, (ahead - outward * .1f - up * .08f).normalized, w);
+            if (!model.HasFingersR) return;
+            var F = model.FingersR;
+            var len = (model.MiddleR.position - model.HandR.position).normalized;
+            var line = Vector3.ProjectOnPlane(F[0, 0].position - F[3, 0].position, len); var upright = Vector3.ProjectOnPlane(up, len);
+            if (line.sqrMagnitude > 1e-8f && upright.sqrMagnitude > 1e-8f) model.HandR.rotation = Quaternion.Slerp(Quaternion.identity, Quaternion.FromToRotation(line, upright), w) * model.HandR.rotation;
+            var knuckles = (F[0, 0].position - F[3, 0].position).normalized;
+            float s = Mathf.Sign(Vector3.Dot(knuckles, Vector3.Cross(F[1, 1].position - F[1, 0].position, -outward))); if (s == 0) s = 1;
+            for (int i = 0; i < 4; i++) for (int j = 0; j < 3; j++) F[i, j].rotation = Quaternion.AngleAxis(s * FingerCurl[j] * w, knuckles) * F[i, j].rotation;
+        }
+        /// <summary>How far each joint of a finger bends round a staff's shaft (knuckle, middle, tip), in degrees.</summary>
+        static readonly float[] FingerCurl = { 72, 88, 55 };
+        /// <summary>Where the closed right hand holds a staff: amid the middle finger's knuckle and its two joints, which ring the
+        /// shaft. False on a rig without fingers.</summary>
+        bool StaffGrip(out Vector3 at)
+        {
+            at = default;
+            if (model == null || !model.HasFingersR || model.MiddleR == null) return false;
+            var F = model.FingersR; at = (model.MiddleR.position + F[1, 1].position + F[1, 2].position) / 3; return true;
+        }
+        /// <summary>For tests (playtest note 119): with a long tool held like a staff, how far the shaft's axis passes from the
+        /// middle knuckle and from the middle fingertip joint, how far the upper arm is from hanging straight down and the elbow's
+        /// bend, in degrees. False when no staff is held.</summary>
+        public bool StaffHoldReport(out float knuckleGap, out float tipGap, out float shoulderFromDown, out float elbowBend)
+        {
+            knuckleGap = tipGap = shoulderFromDown = elbowBend = 0;
+            if (model == null || tradeTool == null || !tradeToolLong || !tradeTool.gameObject.activeInHierarchy || ToolAtWork || staffHold < .99f || !model.HasFingersR) return false;
+            Vector3 o = tradeTool.position, d = tradeTool.up;
+            float Gap(Vector3 p) { var v = p - o; return (v - Vector3.Dot(v, d) * d).magnitude; }
+            knuckleGap = Gap(model.MiddleR.position); tipGap = Gap(model.FingersR[1, 2].position);
+            var ua = model.LowerArmR.position - model.UpperArmR.position; var fa = model.HandR.position - model.LowerArmR.position;
+            shoulderFromDown = Vector3.Angle(ua, -body.up); elbowBend = Vector3.Angle(ua, fa);
+            return true;
+        }
+        /// <summary>Turns <paramref name="bone"/> so its limb (now pointing <paramref name="now"/>) points <paramref name="want"/>, by <paramref name="w"/>.</summary>
+        static void PointBone(Transform bone, Vector3 now, Vector3 want, float w)
+        {
+            if (now.sqrMagnitude < 1e-6f) return;
+            bone.rotation = Quaternion.Slerp(Quaternion.identity, Quaternion.FromToRotation(now, want), w) * bone.rotation;
+        }
         void PoseArm(Transform arm, Transform fore, Transform upperBone, Transform lowerBone, Vector3 shoulder, float elbow, float w)
         {
             var fa = FollowOf(arm); var ff = FollowOf(fore); if (fa.frame == null || ff.frame == null) return;

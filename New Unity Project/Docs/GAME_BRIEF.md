@@ -1,6 +1,6 @@
 # Crulanda — game brief (what this is, and the bar it is held to)
 
-Updated 2026-09-30. This is the standing direction for the project, gathered from Chris's instructions across sessions.
+Updated 2026-10-10 (first written 2026-09-30). This is the standing direction for the project, gathered from Chris's instructions across sessions.
 The handoff (`CLAUDE_HANDOFF.md`) says where the work stands; this file says what the game is meant to be. When they
 disagree, this file wins on direction and the handoff wins on current state.
 
@@ -16,10 +16,11 @@ games are style references only: no copied names, assets, zones or creatures fro
 
 ## What exists (Unity 6000.6.3f1, built-in pipeline)
 
-- **Five zones on a level ladder, cap 13:** Oakhaven (1-2, farmland village, the Great Oak, the Golden Cask inn),
-  Khaven Village (3-5, a walled village in permanent grim dusk beside the dead Whispering Wood), the Shattered Peaks
-  (6-8, a mountain toll pass held by Sandthrone mercenaries), the Ashland Rim (9-10, grey petrified ash beside the
-  Wasting, with the Ash-Walker caves and Weave-Eaters). All built from JSON by `ZoneBuilder` at load, 340-380 m across
+- **Five zones on a level ladder, cap 15 (30 in the end):** Oakhaven (1-5, farmland village, the Great Oak, the Golden Cask
+  inn), Khaven Village (5-9, a walled village in permanent grim dusk beside the dead Stillwood), the Shattered Peaks
+  (9-12, a mountain toll pass held by Sandthrone mercenaries), the Ashland Rim (12-15, grey petrified ash beside the
+  Wasting, with the Ash-Walker caves and Weave-Eaters), and the Verdant Shore (13-15). (Levels as of 2026-10-10, from the
+  zone files; the cap-15 rescale is in ROADMAP.) All built from JSON by `ZoneBuilder` at load, 340-380 m across
   (grown 2026-09-30 with 37 new places, 18 camps and 14 secrets in the new ground); Oakhaven is 560 m since playtest note 1
   (2026-10-01: farms, then wolf and boar country, then the hills, with the bandits' cave 270 m from the green).
 - **Living world:** villagers with trades and daily routines, hen-wives and coops, critters with legs, a day/night
@@ -36,9 +37,12 @@ games are style references only: no copied names, assets, zones or creatures fro
 - **Water:** stylized turquoise (Chris's chosen look): a sandy bed showing through pale shallows, foam at shores and
   around legs, a creek current, ripple rings, wading and swimming. Khaven's Gloom Creek stays murky.
 - **Camera and targeting:** trees fade when they block the view; a coloured ring under the selected target.
-- **A fifth zone, the Verdant Shore (11-13):** Book 3's giant-tree forest, with the Veridian Keepers' treehouses, the Temple, a
-  waterfall, glowing glades and the coast's salt-flats (WORLD_ZONES.md "The Verdant Shore"). The level cap is 13.
-- **Classes:** Warrior and Druid playable, with data-driven talent trees; saves per character (format 7).
+- **The Verdant Shore (13-15):** Book 3's giant-tree forest, with the Veridian Keepers' treehouses, the Temple, a
+  waterfall, glowing glades and the coast's salt-flats (WORLD_ZONES.md "The Verdant Shore").
+- **The Sealed Adit (10-12):** the first group dungeon, its own zone entered from the Peaks: five players (you, Mira and three
+  sims), seven bosses, gates, an escort, built halls; drawn out to about 1.35 km of cave on 2026-10-10 (DUNGEON_DESIGN.md).
+- **Classes:** seven playable (Warrior, Druid, Paladin, Ranger, Rogue, Mage, Archivist), with data-driven talent trees; saves
+  per character (format 10).
 - **Docs to read next:** `WORLD_ZONES.md` (how zones are built), `QUEST_DESIGN.md`, `SAVE_FORMAT.md`,
   `CHANGELOG.md`, `CRULANDA_CANON.md` and `CRULANDA_LOCATIONS.md` (what is canon).
 
@@ -63,7 +67,7 @@ reference only:
   a map-marked quest pickup. Decided: exploration is rewarded with **discoveries + loot** (a "Discovered" toast, XP, a
   cache, a Discoveries tab in the quest book). The overall order: **tree crowns, weather, the cave, secrets in every
   zone, the cave made a deep dungeon, then grow the zones** to about 340-380 m once there is content to fill them, then
-  the painted style pass. (All up to the zone growth are built, 2026-09-30; the painted style pass is next.)
+  the painted style pass. (All up to the zone growth were built by 2026-09-30; the painted style pass is still open on 2026-10-11, CLAUDE_HANDOFF 8F.)
 - **Seamless caves:** a rock-shell cave built into a hillside with no loading screen, darkening as you walk in. The
   first, **Crowsfoot Hollow**, is built (2026-09-30), the **Sandthrone deserters' cave** in Oakhaven's north hills: a quest
   from level 3 to clear the bandits and their game-only Bandit King so they stop harassing the villagers. Chris: "the cave
@@ -73,8 +77,8 @@ reference only:
 - **The next zone is a truly lush one** (Chris, 2026-09-30, with style references: a giant-tree forest of a thousand greens,
   cozy wooden houses built into the trees, waterfalls, flowers and glowing plants). Decided: **the Verdant Shore** (CANON,
   Book 3: "a forest that didn't know when to stop", trunks as wide as houses, the Veridian Keepers and their temple), set in
-  the game's time, before the books' exodus. It is the fifth zone, **levels 11-13, after the Ash Rim**, so the level cap rises
-  to 13; the way there crosses the ash-mountains west, as the survivors do in Book 3. The references are style only: nothing
+  the game's time, before the books' exodus. It is the fifth zone, **levels 13-15, after the Ash Rim** (planned
+  on 2026-09-30 as 11-13 with a cap of 13; the cap is 15 since 2026-10-07); the way there crosses the ash-mountains west, as the survivors do in Book 3. The references are style only: nothing
   is copied from any other game.
 
 ## Standing rules
@@ -84,11 +88,11 @@ reference only:
 - Evolve the world first; per-skill balancing comes later.
 - Chris skims: ask him decisions first and short. Keep going without waiting between ordered steps, and tell him at
   each publish. Finish each step (fix, test, re-shoot, verify, commit, publish, back up) before starting the next.
-- Validation runs against the copy in `work\encounter-validation`, never against the open project. Check every build
+- Validation runs against the copies in `D:\crulanda-work\encounter-validation` (and `-b`), never against the open project. Check every build
   log for `Shader error` (a broken shader silently falls back). Back up the save before a format change.
 
 ## Where things live
 
-`D:\code\mmo` is the git repo (backed up to `J:\claude\unity projects\mmo` by `tools\Backup.ps1`). The playable build
-is `outputs\Crulanda-Playable\Crulanda.exe`; run it with `--crulanda-temp-save` for a throwaway character. Every path
+`D:\code\mmo` is the git repo (backed up to `E:\claude\unity projects\mmo` by `tools\Backup.ps1`). The playable build
+is `D:\crulanda-work\outputs\Crulanda-Playable\Crulanda.exe`; run it with `--crulanda-temp-save` for a throwaway character. Every path
 is in `D:\code\mmo\CLAUDE.md`.

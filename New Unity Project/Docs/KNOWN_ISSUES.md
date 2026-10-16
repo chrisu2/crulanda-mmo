@@ -1,6 +1,11 @@
 # Known issues and limitations
 
-## Current playable scope
+**2026-10-11:** the two sections below ("Current playable scope" and "Technical boundaries") were written in Phase 0 (2026-09-28)
+and most of the scope is long past (seven classes, quests, items, dungeons, sims; real animation; a git repo since then). Still true:
+no audio at all, and the world clock and the village's stock are not saved. Nothing below has been rechecked item by item; the
+current state and what is verified is CLAUDE_HANDOFF.md.
+
+## Current playable scope (Phase 0, 2026-09-28)
 One player kit, one healer companion, three enemies, one equipment upgrade and a repeatable encounter.
 No full class system, general inventory/vendor system, quests, dungeon, or offscreen world simulation yet.
 Primitive art, no authored animation/audio, temporary IMGUI HUD and fixed keyboard bindings.

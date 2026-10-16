@@ -118,14 +118,14 @@ namespace Crulanda.Encounter
         static string LootKind(ItemDef d, int count)
         {
             string kind = d.kind == "gear" ? ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)] + "  ·  " + ItemDatabase.SlotNames[Mathf.Max(0, ItemDatabase.SlotIndex(d.slot))]
-                : d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "consumable" ? (d.food ? "Food" : "Potion") : ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)];
+                : d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "consumable" ? Consumables.KindWord(d) : d.kind == "recipe" ? "Recipe leaf" : ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)];
             return count > 1 ? kind + "  ·  " + count : kind;
         }
 
         /// <summary>Marks on an item square: a green arrow in its corner for gear you can wear now that beats what you wear in its slot (LootJudge).</summary>
         void SquareMarks(Rect r, ItemDef d)
         {
-            if (d == null || d.kind != "gear" || session.Items == null || !LootJudge.IsUpgrade(d, Worn(d), session.Progress.Level)) return;
+            if (d == null || d.kind != "gear" || session.Items == null || !LootJudge.IsUpgrade(d, Worn(d), session.Progress.Level, session.Progress.classId)) return;
             UpArrow(r.x + 4, r.y + 4, new Color(0, 0, 0, .85f), 1); UpArrow(r.x + 4, r.y + 4, Gain, 0);
         }
         /// <summary>What you wear in a piece's slot, or null when the slot is empty.</summary>
@@ -152,7 +152,7 @@ namespace Crulanda.Encounter
             var deltas = LootJudge.DeltaLines(d, worn);
             foreach (var (line, gain) in deltas) l.Add("<color=" + (gain ? GainHex : LossHex) + ">" + line + "</color>");
             if (worn != null && deltas.Count == 0) l.Add("The same as what you wear.");
-            if (LootJudge.IsUpgrade(d, worn, session.Progress.Level)) l.Add("<color=" + GainHex + "><b>An upgrade</b></color>");
+            if (LootJudge.IsUpgrade(d, worn, session.Progress.Level, session.Progress.classId)) l.Add("<color=" + GainHex + "><b>An upgrade</b></color>");
             return string.Join("\n", l);
         }
         /// <summary>

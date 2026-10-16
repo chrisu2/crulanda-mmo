@@ -11,6 +11,9 @@
 //   and fades into the depth colour at _Murk per metre (sooner at a slant).
 // - Painted highlights (_Sparkle): two soft noise layers sliding past each other; faint and sparse away from the sun, crowded
 //   and bright along the sun's (or moon's) reflection.
+// - Caustics (_Caustics): the ripples' light focused on the bed, cast where the view ray meets it, strongest in the shallows and
+//   gone by the deep: the crossing-threads trick of the stylized water pack Chris downloaded (2026-10-15 01:20, "use these
+//   where appropriate"; the rest of that pack this water already did), on our own noise, no texture.
 // - Foam: a soft band wherever the water touches something (from the depth texture), its width wobbling slowly, plus on still
 //   water a thinner line washing in toward the shore (_FoamWaves). Only the foam is lit (LightingWater); the rest is emission.
 // - The composite is written opaquely (finalcolor sets alpha 1 over premultiplied blending).
@@ -31,6 +34,7 @@ Shader "Crulanda/Water"
         _DeepDepth ("Deep by (m deep)", Float) = 2.2
         _Murk ("Murk (bed fades, per metre)", Float) = 1.1
         _Glow ("Light in the shallows", Range(0, 1)) = 0.75
+        _Caustics ("Caustics on the bed", Range(0, 1)) = 0.4
         _BedTint ("Bed seen through the water", Color) = (0.82, 1, 1, 1)
         _FoamColor ("Foam (alpha = opacity)", Color) = (0.84, 0.92, 0.91, 0.85)
         _FoamWidth ("Foam band (m)", Float) = 0.14
@@ -60,7 +64,8 @@ Shader "Crulanda/Water"
         float4 _CameraDepthTexture_TexelSize;
         fixed4 _DeepColor, _MidColor, _ShallowColor, _BedTint, _FoamColor;
         float4 _Drift;
-        float _MidDepth, _DeepDepth, _Murk, _Glow, _FoamWidth, _FoamWaves, _Sparkle, _SkyTint, _Bump, _FlowSpeed, _Wave, _Refract, _Glare;
+        float _MidDepth, _DeepDepth, _Murk, _Glow, _FoamWidth, _FoamWaves, _Sparkle, _SkyTint, _Bump, _FlowSpeed, _Wave, _Refract, _Glare, _Caustics;
+        float _CrulandaUnderground;   // 1 with the camera in a cave (UndergroundShading): no sun to light highlights, glints or caustics
         // The weather (WorldWeather, global): x cloud dimness by day, y rain. Zero without weather.
         float4 _WeatherTone;
         // Only the foam is lit here (it is the one thing on the water with a body of its own), softly so it never goes flat on
@@ -81,6 +86,15 @@ Shader "Crulanda/Water"
         {
             float2 i = floor(p), f = frac(p); f = f * f * (3 - 2 * f);
             return lerp(lerp(WaterHash(i), WaterHash(i + float2(1, 0)), f.x), lerp(WaterHash(i + float2(0, 1)), WaterHash(i + 1), f.x), f.y);
+        }
+        // Caustics: the pack's trick (two copies of one light pattern sliding opposite ways, the darker of the two kept, so the
+        // bright threads cross and knot) on a ridge of the value noise, in metres on the bed; cubed, so only the threads show.
+        float Caustic(float2 p, float t)
+        {
+            float a = 1 - abs(WaterNoise(p * 1.7 + float2(t * 0.09, t * 0.05)) * 2 - 1);
+            float b = 1 - abs(WaterNoise(p * 1.9 - float2(t * 0.07, t * 0.08) + 4.1) * 2 - 1);
+            float c = min(a, b);
+            return c * c * c;
         }
         struct Input { float2 uv_Normal; float2 flowFlag; float3 worldPos; float4 screenPos; float4 color : COLOR; float3 worldNormal; INTERNAL_DATA };
         // The surface composites itself over the grabbed scene, so it replaces what is behind it.
@@ -132,7 +146,7 @@ Shader "Crulanda/Water"
 
             // The scene's light now (ambient from above plus the sun or moon from above). The water's own colours follow it and
             // dim a little faster than it, so dusk and night water sit darker than the land around them instead of glowing.
-            float3 lightNow = ShadeSH9(float4(0, 1, 0, 1)) + _LightColor0.rgb * saturate(_WorldSpaceLightPos0.y) * 0.6;
+            float3 lightNow = ShadeSH9(float4(0, 1, 0, 1)) + _LightColor0.rgb * saturate(_WorldSpaceLightPos0.y) * 0.6 * (1 - _CrulandaUnderground);   // no sun on a cave's pool (note 221: it read as a pale sheet in the dark)
             float dim = saturate(dot(lightNow, float3(0.333, 0.333, 0.333)) * 1.15);
 
             // What is behind the water, the metres of water the view ray crosses to reach it (thick), and how deep the water is
@@ -155,6 +169,11 @@ Shader "Crulanda/Water"
             // bed reads pale and bright), and fades into the depth colour at _Murk per metre (sooner at a slant).
             float3 bedSeen = saturate(bed * lerp(1, _BedTint.rgb, wet));
             float3 lifted = 1 - (1 - bedSeen) * (1 - saturate(body * _Glow * wet));
+            // Caustics on the bed (the stylized water pack, 2026-10-15): cast where the view ray meets the bed (carried on under the
+            // surface), by the sun or moon, strongest a hand's depth down, gone by the deep and under cloud; seen with the bed.
+            float2 bedAt = (IN.worldPos - V * thick).xz;
+            float focus = smoothstep(0, 0.2, d) * (1 - smoothstep(_MidDepth, _DeepDepth, d)) * (1 - _WeatherTone.x) * saturate(_WorldSpaceLightPos0.y * 2);
+            lifted += _LightColor0.rgb * (Caustic(bedAt, t) * _Caustics * focus * wet * show) * (1 - _CrulandaUnderground);
             float clear = exp2(-_Murk * lerp(d, thick, 0.3)) * show;
             float3 water = lerp(body, lifted, clear);
 
@@ -178,11 +197,11 @@ Shader "Crulanda/Water"
             float lobe = pow(saturate(dot(R, _WorldSpaceLightPos0.xyz)), 10);
             float cut = lerp(0.7, 0.56, lobe), aa = fwidth(h);
             float spark = smoothstep(cut - aa, cut + 0.06 + aa, h) * saturate(1 - aa * 4) * show * wet;
-            float3 glint = _LightColor0.rgb * spark * lerp(0.14, 0.75, lobe) * _Sparkle;
+            float3 glint = _LightColor0.rgb * spark * lerp(0.14, 0.75, lobe) * _Sparkle * (1 - _CrulandaUnderground);
             // The sun's path itself (playtest note 9: glints on water): along the narrow reflection the brightest blobs go past
             // the paint's cap, so the bloom catches them as glints, a few and soft (the bloom's prefilter keeps one pixel from flaring).
             float path = pow(saturate(dot(R, _WorldSpaceLightPos0.xyz)), 120) * spark * _Sparkle;
-            float3 sunGlint = _LightColor0.rgb * path * 2.2;
+            float3 sunGlint = _LightColor0.rgb * path * 2.2 * (1 - _CrulandaUnderground);
 
             // Foam: a soft band hugging whatever the water touches (banks, rocks, posts, legs; from the depth texture), its width
             // wobbling slowly, and on still water a thinner line washing in toward the shore every few seconds (half as much on
@@ -197,6 +216,10 @@ Shader "Crulanda/Water"
             wash *= smoothstep(0, 0.3, phase) * (1 - smoothstep(0.75, 1, phase)) * smoothstep(0.3, 0.55, WaterNoise(fp * 1.9 + 5.1));
             foam = max(foam, wash * 0.8 * _FoamWaves * lerp(1, 0.5, flowing));
             foam *= _FoamColor.a * lerp(0.55, 1, dim) * show;
+            // In a cave the water is still and a flood lies a few centimetres over a rough floor: the foam traced every ridge that came
+            // near the surface as thin lines that moved with the eye (note 222). Underground the foam all but goes: a quarter of it, and
+            // none where the water is under 3 cm deep (so no ridge a centimetre under draws a line; a steep bank keeps a faint rim).
+            foam *= lerp(1, 0.25 * smoothstep(0.03, 0.12, d), _CrulandaUnderground);
 
             // Foam is white paint only by day: at night the moonlit ambient would light it brighter than the grass around the
             // pond (a glowing rim), so it greys down with the light (dim is about 1 by day, 0.4 on a moonlit night).

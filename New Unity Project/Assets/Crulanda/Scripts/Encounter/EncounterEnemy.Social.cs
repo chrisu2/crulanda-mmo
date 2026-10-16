@@ -56,6 +56,18 @@ namespace Crulanda.Encounter
             joinGroup = caller.OwnGroup(); joinFor = puller; joinAt = Time.time + Mathf.Max(0, delay);
             if (delay <= 0) Join();
         }
+        /// <summary>
+        /// (The Adit rework, 2026-10-15) Sent at <paramref name="foe"/> as one of <paramref name="band"/>, a linked group with no caller of its
+        /// own (an event's wave, Hobb's sappers off the powder: released by the session, EncounterSession.Release.cs): after <paramref name="delay"/>
+        /// seconds it joins the band and comes, and the band's anchor (where the event is, or where the foe stood) is its leash, not where it
+        /// spawned, so a wave walks the length of the Gallery to the island. A camp released by a boss's death or call answers the boss instead.
+        /// </summary>
+        public void Sent(FightGroup band, Actor foe, float delay)
+        {
+            if (band == null || foe == null || !CanAnswer) return;
+            joinGroup = band; joinFor = foe; joinAt = Time.time + Mathf.Max(0, delay);
+            if (delay <= 0) Join();
+        }
         FightGroup OwnGroup()
         {
             if (Group == null) { Group = new FightGroup { anchor = home }; Group.members.Add(this); }
@@ -84,7 +96,7 @@ namespace Crulanda.Encounter
         public void Rehome(Vector3 point)
         {
             if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position;
-            if (agent != null && agent.isOnNavMesh) agent.Warp(point); else transform.position = point + Vector3.up;
+            if (agent != null && agent.enabled && agent.isOnNavMesh) agent.Warp(point); else transform.position = point + Vector3.up;
             home = transform.position;
         }
         /// <summary>Everything a fight leaves on a mob, dropped: its group, a call it was answering, a blow half drawn, an enrage.</summary>

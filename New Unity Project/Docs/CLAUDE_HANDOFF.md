@@ -1,1369 +1,393 @@
-# Crulanda Unity 6 â€” Claude continuation handoff
-
-Updated 2026-09-28, America/New_York (latest logs cross into 2026-09-29 UTC).
-This is the authoritative current progress snapshot. Some older project documents retain historical status statements.
+# Crulanda: Claude handoff (Start here rewritten 2026-10-16 ~01:45: the stopping point after the castle night)
 
 ## Start here
 
-Chris wants you to continue developing the existing Unity project, not restart it.
-Phase 0 and the Phase 1 combat MVP are complete. Phase 2 classes/build trees are underway.
-The user requested this handoff because they ran out of tokens. Do not assume any agent is still working in the background.
-
-## RESUME HERE (updated 2026-10-10, 18:05) — barns, horizon, windmill, Mira's Invite, the jump, the bow, the Jailer and the Cantor
-**Playable build = release, published 18:04 to D:\crulanda-work\outputs (built 17:52; not yet committed when built, the commit follows).** Since 15:12, from Chris's playtest this afternoon:
-- barns with their doors in the gable end, an aisle between stalls, straw bedding, racks and bales (ZoneBuilder.WalkInBarn, swapped
-  footprint); the Old Fold's hut is the walk-in Fold barn and its flock sleeps there; Mira's Invite (party row, her frame, /invite mira);
-  the windmill's sails turn with the wind (they had been static-batched); a fuller horizon (woods over the ridge, a wooded hill ring with
-  a crown skyline, nearer mountains, Oakhaven's fog 150-480 m); the jump quicker and gentler (tuck held through a hop, a half-weight
-  landing dip, quick blends); the bow drawn, held and loosed by posed arms (no archery clips exist), an equipped bow in the left fist,
-  upright while drawn; the who list on the Menu, its headings aligned; the capture runs no longer leave the game windowed.
-- the Warrior's fourth path, the **Jailer** (Hock Cut, Weighted Net, Shackle Cast; tiers 0-3 built), and the Archivist's, the **Cantor**
-  (Mending Phrase, the Song of Mending, Chorus of the Weave; tiers 0-3 built). A class may have 13 actions (was 8).
-- **a talent point every level to 15** (EncounterProgress.TalentCap = LevelCap): it had stopped at 10, so no tier 3 was reachable.
-**Runs:** the full run (started 15:57) on the first half: EditMode 442/442, PlayMode 269/271, build and all five zones' tours and every capture clean, 0 shader errors; its two failures were tests (BuildingGroundTests measured a walk-in barn by its old outline; SimChatTests met a sim mid-fight) and are fixed. The rest checked in focused runs: EditMode 444/444; PlayMode 76/76 (every class loop, CrowdControl with the Jailer, the Archivist with the Cantor, sims) and 70/71 before it (barns, jump, footing, gear, whispers; its one failure the talent cap, fixed). MotionCapture frames checked by eye.
-**To check with Chris:** the horizon (first pass; he compared Elwynn), the jump and the bow in play (MotionCapture frames in
-D:\crulanda-work\ui-captures\motion look right), the barns. The who list still "opens nothing" for him and is not reproduced (his
-Player.log clean, his keys leave O on it): ask him to try Menu > Who.
-**Next (Chris's order):** the fourth paths go on: Ranger Skirmisher (melee: it needs a short blade or spear in hand for its blows, or the
-bow is swung), Rogue Swashbuckler, Mage Cinderwright. Then Phase 8.5 (gear fit; a Kevin Iglesias archery set would give real bow clips).
-Run the full run first next session (tools\validation\start_detached.ps1 -Arguments "-AllTests").
-
-## Earlier resume note (2026-10-10, 15:15) — walk-in barns and sleeping beasts PUBLISHED; full run green
-**Playable build = release, published 15:12 to D:\crulanda-work\outputs (commit 0a395a2):** everything below the 21:45 note, plus today:
-- walk-in barns (ZoneBuilder.WalkInBarn: the kit's materials, a 3.4 m doorway, two sliding doors slid aside on a rail as in Chris's picture,
-  straw, hay, a manger, a lantern), farm beasts that walk in at dusk, sleep in a stall (two sheep share one) and walk out after six
-  (Critter, ZoneBarn, CritterBody.Sleep); stowed wands, daggers and knives at the right hip (ActorVisual.Short).
-**Full run on f8e43bd (2026-10-10 13:50): EditMode 441/441, PlayMode 265/265, build and the Oakhaven and Adit tours clean, 0 shader errors.**
-The barn and wand commit came after it: BarnTests, BuildingGroundTests, VillageDayTests, GearVisualTests and MageLoopTests are green on it.
-**Gear fit (helms, armour, weapons) is Phase 8.5 (ROADMAP), Chris: "its own phase down the line".** Leave the helms as they are.
-**The who list (O, /who):** its window draws in the capture (ui-captures/mage-42-who.png) and /who toggles it in a test; Chris saw nothing.
-Ask him to try the 15:12 build and, if it still fails, send D:\..LocalLow\Crulanda\Crulanda - The Quiet Trail\Player.log.
-**Next (Chris's order):** the fourth talent paths, one class a round (TALENT_DEPTH.md): Warrior Jailer, Archivist Cantor, Ranger Skirmisher,
-Rogue Swashbuckler, Mage Cinderwright. Also open: the Medieval Village Kit (its zip is back in D:\crulanda-work\downloads), a level-1
-sim's armour (note 101, goes with Phase 8.5).
-
-## Earlier resume note (2026-10-09, 21:45) — playtest fixes published 21:40; the Vanguard in the build
-**Playable build = release, published 21:40 to D:\crulanda-work\outputs:** D1-D8, the Paladin's Vanguard, and Chris's evening reports:
-- respawned camp mobs came back as grey capsules (a D5 regression: Respawn re-lit the Body's placeholder capsule): FIXED (EncounterEnemy.Shown);
-- Mira mended only you and herself: FIXED, she mends the most hurt of the party incl. party sims (HealerCompanion);
-- the kit barns had no door (note 96 again; the kit's model has none on any face): FIXED, the painted barn's door on its front (ZoneBuilder.BarnDoor);
-- /adit did not level the party: FIXED (SimCompanion.MatchLevel).
-Tests for each, green; the full run has NOT been run since the Vanguard: run it first next session (tools\validation\start_detached.ps1 -Arguments "-AllTests"), then release_build.ps1 -Sync.
-**Open from Chris's reports (PLAYTEST_NOTES 101 and CHANGELOG):**
-- **The who list (O, /who) opens nothing for Chris.** A test shows WhoOpen toggling in the Adit; the draw is not checked. Ask him what he
-  sees in the 21:40 build; look at Player.log for an OnGUI exception from DrawWho (EncounterHud.Who.cs); note the O key is hard-coded
-  (EncounterSession: KeyCode.O), not read from KeyBindings' GameKey.Who.
-- **The wand on her back** (note 101): the Apprentice's Wand has no look family (Wand is no piece word in Resources/Gear/looks.json), so
-  it draws as a blade slung across the back. Add a wand family (a short rod, a gem at the tip), its word, its icon, and stow short
-  one-handers at the right hip (ActorVisual.Gear.Mount).
-- **Gear fit (helms, armour, weapons): Chris made it its own phase, 8.5, "down the line" (ROADMAP: the Modular Hero pack is a skinned
-  modular rig; only two of its FBX are imported). Leave the helms as they are until then.**
-- **The Medieval Village Kit's zip is back:** D:\crulanda-work\downloads\MedievalVillageKit_FBX.zip (it was lost with C:).
-- **A level-1 sim Warrior's armour looks like crap** (note 101): SimGear.Dress at level 1, the starter pieces' tints and the bleached shirt.
-**Then (TALENT_DEPTH.md, one class a round):** Warrior Jailer, Archivist Cantor, Ranger Skirmisher, Rogue Swashbuckler, Mage Cinderwright.
-
-## Earlier resume note (2026-10-09, 21:30) — the Paladin's Vanguard built and committed (NOT yet in a build); D1-D8 published
-**Playable build = D1-D8 (commit 37eb32d), a release build published 21:00 to D:\crulanda-work\outputs.** The Vanguard (below) came after
-it: it has had focused runs only. **First next session:** a full run (tools\validation\start_detached.ps1 -Arguments "-AllTests"), then
-tools\validation\release_build.ps1, back up, push.
-**The Paladin's fourth path, the Vanguard** (CHANGELOG 2026-10-09 The Paladin's fourth path; TALENT_DEPTH.md): Chris chose the name
-over Herald (no church in the books) and Marshal (a Warrior's word). Three actions on bar slots 11-13 (keys -, =, [): Plant the Colours,
-Close Ranks (a talent action; Conviction from allies rallied) and Press On (PartyDamageMultiplier, CompanionHaste). Branch vanguard in
-Talents/paladin.json: tiers 0-3 built (va-*, 9 talents, 23 ranks), tiers 4-6 written and unbuilt. Icons made. Sims' Paladins do not take
-it as a role yet. Tests: PaladinRulesTests (4 branches, 30 built, the cap-15 gates), PaladinLoopTests (the Vanguard in play), IconCoverage.
-Runs: EditMode all 441 green (one gate test fixed on the way), PlayMode Paladin/Druid/CrowdControl loops green. Also fixed: the hold
-labels on mob plates ceil'd a float (Held 11 s for 10): EncounterEnemy.Control.Left.
-**Next (TALENT_DEPTH.md, Chris's order: one class a round, published each time):** the other fourth paths: Warrior Jailer (control),
-Archivist Cantor (healer), Ranger Skirmisher (melee), Rogue Swashbuckler (support), Mage Cinderwright (pets); each is 3-4 actions, a
-branch to tier 3 with tiers 4-6 written, icons, tests. Rows 4-6 everywhere wait for Phase 9's levels (one point a level stays).
-Pattern to copy: this session's Vanguard commit (paladin.json branch, Encounter.asset abilities and unlocks, the kit's Use cases and
-overrides, EncounterInput keys if the bar grows, make_icons.py painters and a BRANCH palette, the two Paladin tests).
-**Left in the Adit for a later look:** the carriage moving on the ride out, a goblin figure for Quillet and Nix, the gunner on the roof.
-**Publishing:** full_run.ps1's lane B builds a DEVELOPMENT player (the tours need it). After a green run, run release_build.ps1.
-Focused test runs: focus_detached.ps1 -Runs EditMode|<filter>|<tag>#PlayMode|<filter>|<tag> -Log <file> (DONE ends the log).
-**Why the Claude app froze (2026-10-09; NOT Unity):** Windows toasts with Windows notifications off hung the app's main process at
-turn ends (event log Microsoft-Windows-PushNotification-Platform/Operational, 2416 with no 2418/3150 after it). Fixed: notifications on,
-question notifications set to badge, the sideloaded second Claude app removed (its settings in D:\crulanda-work\claude-app-old-backup).
-
-## Earlier resume note (2026-10-09, 21:05) — the Sealed Adit's engine work is COMPLETE (D1-D8) and PUBLISHED
-## Earlier resume note (2026-10-09, 20:00) — D4 published; D5 part 1 (Nix and the Rock-Eater) committed; the rest of D5 next
-## Earlier resume note (2026-10-09, 18:50) — D4 (the Weaver's escort) done, full run green, release build PUBLISHED
-**Playable build = D4 (commit 5f90443 + the docs commit after it), a release build published 18:45 to D:\crulanda-work\outputs; backed
-up to E:, pushed.** Full run: EditMode 440/440, PlayMode 254/254 (every fixture), build and the Adit tour clean, 0 shader errors.
-**D4** (CHANGELOG 2026-10-09 "The Weaver's unlocking"): Mother Quillet (AditWeaver.cs, EncounterSession.Weaver.cs) waits by the platform
-gate after the quiet way in, walks to the carriage's lock as one of your party, two waves come for her, Danner lies in wait and stands up
-at half the lock, the geodes go dark and "adit.lock" is kept; Pib's eighth Adit quest "The Weaver's Lock" (flag `key:adit.lock`); a HUD
-row and a nameplate for her. Tests: AditWeaverTests (new), QuestDataTests. `wip/d4-escort` is taken in by hand; the branch can go.
-**Not yet looked at by eye:** the lock plate on the carriage's platform side and Quillet herself (a villager figure scaled to .78 until
-there is a goblin figure). The Adit tour's "hollow hall" shot (world-captures/adit-86-hollow-hall.png) stands among the platform guards
-and the tour's player dies there: the tour's own doing, since before D4. Chris: play the quiet way (hand in The Pressed first).
-**Publishing:** full_run.ps1's lane B builds a DEVELOPMENT player (the tours need it; it carries the watermark). After a green run, run
-tools\validation\release_build.ps1: it builds the release player in lane B (--crulanda-release) and mirrors it into outputs\Crulanda-Playable
-(not while the game runs). Focused test runs: tools\validation\focus_detached.ps1 -Runs "EditMode|<filter>|<tag>#PlayMode|<filter>|<tag>"
--Log <file> (runs run_focus.ps1 outside the agent shell's process tree; "DONE" ends the log).
-**Next (Chris's order):** Nix's two-part fight, Mira's Hush, the rest of D5, D7 (sims join the escort and wait at gates), D8 (the rail
-ride out); talent rows 4-6; the Medieval Village Kit (its zip was lost with C:: Chris must download it again).
-**Why the Claude app froze (found 2026-10-09 17:15; it was NOT Unity or long sessions):** at each turn's end the app shows a Windows
-toast; Windows notifications were off, and the notification service sometimes never answered, so the app's main process hung until
-Windows shut down (event log Microsoft-Windows-PushNotification-Platform/Operational: event 2416 with no 2418/3150 after it; WER:
-MoAppHangXProc on svchost.exe). Fixed: Chris turned Windows notifications on; question notifications set to badge. Also removed: a second,
-sideloaded Claude app (Claude_pzs8sxrjxfjjc) beside the Store one (its settings and session lists are in D:\crulanda-work\claude-app-old-backup).
-If the app freezes again, check that event log first.
-
-## Earlier resume note (2026-10-09, afternoon) — set up again after losing C:; the Adit work merged on `integrate/adit`
-**Chris lost his C: drive on 2026-10-09.** D: (the repo, Unity's editor, the lore) and the E: backup survived. Lost with C:: Git
-(reinstalled), the `hel` workspace (validation copy, playable build, save backups, screenshots, handoff copy) and Chris's save
-(no copy anywhere: he starts a new character). New home for the workspace: `D:\crulanda-work` (see CLAUDE.md).
-**Set up again (done):** the Windows account is now `ChrisWin11`; Unity Hub signed in and licensed; Python 3.12
-(`%LOCALAPPDATA%\Programs\Python\Python312`, with numpy, Pillow, reportlab); every `tools\validation` script, Build-TestPlayer and
-make_history_pdf now use `D:\crulanda-work`; the 26 dead git worktrees (C: scratchpads) pruned (their branches kept).
-**417 `.meta` files had never been committed** (the Village, Nature and Fantasy kits, ArchivistKit, RogueKit, KeyBindings and
-others): their only copies were in the lost validation copies. Unity made new ones (ThirdPartyImport.cs sets the import settings,
-and no scene, prefab or material referred to them); they are committed now. Commit every new asset's `.meta` with it.
-**Branch `integrate/adit`** = main + `wip/d2-adit-quests` (D2 boss mechanics) + `web/adit-quests-loot` (the cloud's seven quests,
-four givers, cages, echo-jars, the Adit-Runner's Kit and The Dead Line's rewards). The local branch's own six quests and kit were
-dropped (Chris chose the cloud's). Fixed: the knockback stops at an edge (it gave up when the full distance was not walkable).
-**Quest gear (Chris: "do quest gear rewards first")** done on the same branch: QuestLog.GearRewards, The Dead Line's choice of
-three in the conversation, QuestGearTests; UI capture shots 43-44. Encounter.asset now registers Quests/adit.json and
-Items/loot.adit.json (only the validation copies had them). Full run: EditMode 440/440, PlayMode 245/245, build and tours clean
-(0 shader errors). Merged to `main` and published 2026-10-09 (Claude crashed once mid-run at 13:38; the rerun was green).
-**Next (Chris's order, 2026-10-09):** D3 gates and keys (the Pressed opens the quiet gate: `questsDone` has `side.adit.pressed`),
-D4 the Weaver's escort (and its step in The Dead Line), Nix's two-part fight, Mira's Hush, the rest of D5, D7, D8; talent rows 4-6;
-the Medieval Village Kit (its zip was in Downloads on C: and is lost: Chris must download it again).
-
-## Earlier resume note (2026-10-08, night) — on GitHub; cloud sessions may have worked while the PC was off
-**First, when the PC is back:** `git fetch`; look for `web/*` branches and draft PRs from Claude Code on the web, read
-`Docs/WEB_LOG.md`, test each in the validation copy, merge, build, publish, back up, push (`WEB_HANDOFF.md` section 5).
-**Repo:** private `https://github.com/chrisu2/crulanda-mmo` (origin, LFS), pushed 2026-10-08; push `main` after each commit.
-Remote Control is on for the local session.
-**Published:** crowd control C1-C5 (83b5e18): Rogue, Archivist, marks, per-class CC, rings, Adit mob casts and interrupts.
-**Committed after that:** D2 boss mechanics (EncounterEnemy.Boss, player stun/disarm, the Adit bosses' phases); see CHANGELOG.
-**Next:** D3 gates and keys, D4 the Weaver's escort, Nix's two-part fight, the Adit's quests and loot, Mira's Hush on request,
-talent rows 4-6 for the cap-30 levels; then the Medieval Village Kit and the Adit's look (local only).
-
-## Earlier resume note (2026-10-08, evening) — crowd control: engine, Rogue, Archivist, marks, per-class CC
-**Chris (2026-10-08): "we need CC classes"; "archivist and rogue both sound good"; "keep working".** Docs/CC_DESIGN.md is the plan.
-**Done:** C1 engine (EncounterEnemy.Control: incap/stun/fear/silence, DR, boss immunity, LoseSight, Release, RaidMarked/LeaveAlone);
-the Rogue (RogueKit, published 0ea8958) and the Archivist (ArchivistKit, 1ee87c5), each a separate character from the pause menu;
-raid marks Ctrl+1-4 with sims/Mira/the wolf leaving held and moon/cross mobs alone; per-class CC (Mage Ash Hex, Paladin Rebuke,
-Ranger Snare Trap on slot 0; Warrior Shield Bash and Shout; Quench/Censure/Pin silence).
-**Next:** sims as Rogues and Archivists (SimRoster.ClassIds: keep the first forty as they are, add the new classes after), sims putting
-CC on the moon and marking sim-led pulls, the Druid's Sleep of the Wood (its bar is full), Mira's Hush, C4 visuals, C5 the Adit
-re-tuned around CC and deepened; then the Medieval Village Kit, dungeon D2-D8. Chris is low on tokens: focused test runs only.
-
-## Earlier resume note (2026-10-08) — round 29 PUBLISHED (commit c8f57a4)
-**Playable build = round 29: cap 15, bands 1-5/5-9/9-12/12-15/13-15, slower XP (save format 10), the Shore a group zone, the Sealed Adit open (D1).** All tests green.
-**Next:** the wardrobe capture of the 25 helmets for Chris (note 88); the Medieval Village Kit import (ROADMAP); dungeon D2-D8. Chris is low on tokens: one careful pass, focused test runs.
-
-## Earlier resume note (2026-10-08, about 00:50) — WORK IN PROGRESS, NOT PUBLISHED
-**Playable build = round 28 (published 2026-10-07 23:35, commit 21a6b50).** The working tree holds round 29 (the cap-15 rescale) and the
-Sealed Adit's D1, committed as WIP (not green yet). Chris stopped the session ("about out of tokens").
-**State:** rescale applied (tools/wip/levels/rescale.py --write, regen_named.py --write), save format 10, the Adit zone live
-(adit.json, the Peaks' way in), its first loot and provisional elite moves, icons made. EditMode last ran 411/429 before the final
-batch of fixes; a rerun (c61e, lane B) and the dungeon/cave/quest/party PlayMode set (c61a, lane A) were in progress. Check their
-outputs (hel/work/encounter-validation*/c61*.log) before anything else; fix what is left in ONE pass (read every affected test first;
-memory: crulanda-data-change-cascades), then a full run, release build, publish (check Crulanda.exe closed), commit, backup.
-**Helms (note 88):** the kit's Resources path is fixed (Props/ModularHero/Models/Armor Parts/Armor Parts); the next lane B build's
-wardrobe capture (--crulanda-wardrobe-capture) renders the 25 helmets for Chris.
-**Then (Chris, 2026-10-08):** import the Medieval Village Kit (ROADMAP: FBX zip, vertex-colour shader, a capture for Chris); then dungeon D2-D8 (DUNGEON_DESIGN.md section 9), the enclave, Khaven kit, sound; Phase 9 (ROADMAP.md) after Phase 8.
-## Earlier resume note (2026-10-07, about 23:40)
-**Playable build = round 28 (notes 87, 89-93: key hints to Esc > Controls, chat focus, the wolf joins fights + companion bar, harder
-groups, outlying mobs), published 23:35, commit 21a6b50, backed up to E:. Full run c54: 428/428, 220/220, 0 shader errors.**
-**In the working tree, uncommitted:** the Sealed Adit zone switched on (tools/wip/dungeon/adit_layout.py --live wrote
-EncounterContent/Zones/adit.json and the Peaks' exit) with its first test run c55a in lane A (AditTests, CaveTests, RootDeepTests,
-HollowQuestTests). If green: D2 boss mechanics next (DUNGEON_DESIGN.md section 9). If not: fix, or `git checkout` peaks.json and
-delete adit.json to put it back to staged.
-**Round 29 (next, before D2 if Chris agrees the order): the cap-15 rescale**, tools/wip/levels/rescale.py --write (report checked;
-bands 1-5/5-9/9-12/12-15/13-15, the Shore a group zone: needs a `groupZone` flag read in EncounterSession.SpawnCamps making every
-mob elite-strength; slower XP; breadcrumbs checked), then WORLD_ZONES.md's camp table and DUNGEON_DESIGN.md's numbers (+3).
-**Helms (note 88):** Chosan's Modular Hero pack is in (Resources/Props/ModularHero); the wardrobe line-up with its 25 helmets is
-rendering to hel/work/ui-captures/wardrobe-r28 (06-helms-*.png) for Chris to judge. Then: the enclave interior (note 40), Khaven
-with the Village kit, sound; Phase 9 (zones, classes, races from the novels) after Phase 8.
-
-## Earlier resume note (updated 2026-10-07, about 22:30)
-**Round 27 = sims complete (ROADMAP 5.7, all six items).** Party kept across zones and sessions (WorldSave.party), sims invite you
-(Accept / Decline panel), /dungeon (a sim leads the run camp by camp, the mouth's outside camp first), trading with sims (Trade
-button on the sim frame), guilds (SimGuilds in EncounterSession.Guild.cs: four GAME-ONLY guilds, /g Guild chat, invitations, tags
-on plates and the who list, /guild, /gquit, EncounterProgress.guild), forty sims (SimRoster.Count 40, Grow for old worlds).
-Full run c52: EditMode 428/428, PlayMode 217/218 (the dungeon test's level rule tightened to one level under the first camp; rerun
-c53). Release build in lane B, then publish (check Crulanda.exe is closed), commit, backup.
-**Next: the dungeon.** Docs/DUNGEON_DESIGN.md (draft 1): the Sealed Adit under the Shattered Peaks, levels 7-9, one big dungeon
-from research of three classic dungeons (design lessons only). Chris was asked: setting OK? size (60-90 min, 25-min first part)
-OK? He said "ok finish sims" (the order). Confirm the setting and size, then build in the order of section 9 (cavern variant 3
-first). After it: the enclave interior (note 40), Khaven with the Village kit, sound; seasons (note 85) later.
-
-## Earlier resume note (updated 2026-10-07, about 20:25)
-**Playable build = round 26, built 20:20, published. Notes 75-84 and 86 done: Esc > Controls (key bindings, WASD/ESDF presets, G
-interact), H hails, crops grow (CropField, Resources/Shaders/Crop.shader) and farmers work them, the meadows dressed
-(ZoneBuilder.Meadow), weapons sheathed out of a fight, walled kit barns fitted by their walls (WallProp), cows keep apart, signs point
-at their place, darker greens and crimson/russet autumn, no grass in the hens' pan. Round 6 (crags, windmill, 30 m oak, nothing
-in the roads) published 18:36. Full runs c48 214/214, c49 212/214 with both fixed (reruns 5/5).**
-**Open:** the Medieval Village MegaKit is imported (Resources/Props/Village) and VillageKit assembles houses from it (Editor/
-VillageCapture; hel/work/ui-captures/village). Ask Chris whether to rebuild Oakhaven's houses with it (keeping doors, interiors,
-lit windows) or use it elsewhere. Note 85 (seasons) is on the roadmap. Then the enclave interior (note 40) and the sound phase.
-
-## Earlier resume note (2026-10-07, about 17:00)
-**Playable build = art round 4 (dead and twisted trees), built 16:18 from commit ea91c2f, published, backed up to E:.**
-Art round 5 (Megapack outbuildings: barns nobody lives in, the Golden Cask's stable over the hitch, the wooden Watchtower; Chris
-chose "outbuildings only" after Docs/art/megapack-houses.png) is in the working tree; full run c46 started 16:58: if green, release
-build in lane B, publish, commit, backup. Next after that: the enclave interior (note 40) and the sound phase; the Medieval
-Village MegaKit when it is in Downloads; the Megapack windmill has no lore spot yet.
-
-## Earlier resume note (2026-10-07, about 15:30)
-**Playable build = art round 3, built 15:06 from commit 5ca6d2d, published. Full run c41: 427/427, 214/214, five tours, 0 shader
-errors. Backed up to E:.** Art round 4 (the nature kit's dead trees for the dead woods, its twisted trees for the autumn
-broadleaf; TreeLimbTests counts only painted trees now) is in the working tree; its tours look right (Khaven, the Rim, Oakhaven,
-15:20) and full run c43 is running: if green, release build in lane B, publish, commit, backup.
-Rounds done today: 1 props (Fantasy Props MegaKit, Medieval props), 2 nature trees, 3 Megapack (haystacks, carts, target, kit
-rocks in green zones; HQ Rock Pack left out as photoreal), 4 dead and twisted trees. Tools: tools/wip/art/megapack_import.py,
-PropCapture.Render (props row + PROP/PROPMAT log), ZoneBuilder.ModelProp/GroundProp/KitTree/KitRock/DressNature/KitShade.
-**Next:** the Megapack's buildings are not placed (the houses have working doors, interiors and roof fade: a bigger job, ask Chris
-first); its white rock formations could become the Peaks' crags with the mountain tint; the Medieval Village MegaKit when it is
-in Downloads; then the enclave interior (note 40) and the sound phase.
-
-## Earlier resume note (2026-10-07, about 12:00)
-**Playable build = art round 2, the nature round, built 2026-10-07 13:01 (release) from commit 396ec3b, published. Full run c39: EditMode 427/427, PlayMode 212/214 (two sim-test races fixed, rerun 4/4), five tours, 0 shader errors. Committed and backed up to E:.**
-The Stylized Nature MegaKit (CC0) is under Resources/Props/Nature; ZoneBuilder.NatureKit (KitTree) makes every broadleaf "tree"
-prop, every forest-edge tree and every pine a kit model (the painted builders remain as fallback and still build the great oak,
-giant trees, dead trees and twisted woods), meadow bushes are the kit's bush (flowering now and then). Leaf cards go on the
-painted-leaf shader (ZoneBuilder.DressNature; the importer does it too), crowns take the leaf-family tints. The Mastwood and the
-Oakhaven tours look right (hel/work/world-captures, 11:48); Khaven keeps its dead woods. Zone/tree tests 7/7 before the run.
-Pitfall recorded in CHANGELOG: never match "_Normal" by Contains on this kit's file names.
-**Next:** the next art rounds: the Stylized Megapack 2in1 (.unitypackage in Downloads),
-the HQ Rock Pack (Asset Store cache) for crags and boulders, the kit's dead and twisted trees for Khaven and the Verdant giants,
-the Medieval Village MegaKit when it is in Downloads; then the enclave interior (note 40) and the sound phase.
-
-## Earlier resume note (2026-10-07, about 02:00)
-**Playable build = everything below, built 2026-10-07 03:28 (release) from commit af59508, published to Crulanda-Playable. Full run c37: EditMode 427/427, PlayMode 213/214 (NamedLootTests count fixed, rerun 7/7), five tours, 0 shader errors. c36 before it caught a build-breaking barrel bug (an empty Oakhaven in the tour): fixed. Committed and backed up to E:.**
-**What was done tonight (all in the working tree; commit and publish follow the c36 run):** Round 24 (notes 64-71: the horse
-stabled, the camera held indoors, one colourised chat window with chips, /invite across zones, healing seen, floating props seated;
-commit 952fc67; its full run c35 was 424/424 and 208/210 with two flaky or ordering failures, fixed, so it was not published on its
-own); Round 25 (note 72: party loot, coins split, need/greed rolls for uncommon and better, PartyLoot.cs); the alchemy bench place
-(Druid and Mage sims brew at the drying hut); the sentinel helm as the first model helm (GearLooks model.helm, ModelHelm, the
-Sentinel's Helm rare off the Rim's cultists, icon rendered by ModelIcons); 5.4 (SimPopulation.LiveAway: the unseen hunt, gather,
-sell, forge and level by the clock); 5.5 (whispers /w /r, SimMemory regard and standings, /friend /friends, friends greet you,
-ask you to group, hand you greed loot; rivals refuse); 5.6 (roles Tank/Healer/Damage, tanks peel and taunt, /assist, /lead runs
-to a camp with Lead/Stop buttons); art round 1, the props round (Fantasy Props MegaKit and Medieval props under
-Resources/Props, ZoneBuilder.ModelProp, barrels and crates everywhere, the inn's taproom, the smithy and the stalls dressed;
-PropCapture.Render draws the kit row to hel/work/ui-captures/props-row*.png). CHANGELOG 2026-10-07 has each.
-**Focused runs before c36:** EditMode LootData/GearLook/Icon/SimGear/SimEconomy/SimMemory/ZoneChat/SimRoster/CraftData green
-(44+33), PlayMode PartyLoot/SimParty/SimChat/SimLife/VillageHome 22/23 then the whisper test fixed and 4/4.
-**Backups go to E:\claude\unity projects\mmo now** (Chris moved them from J: on 2026-10-07; Backup.ps1 and CLAUDE.md updated).
-**Next (Chris's order):** the remaining art rounds: Stylized Nature MegaKit (trees, bushes, rocks for the outdoors), the Stylized
-Megapack 2in1 (a .unitypackage), the HQ Rock Pack (Asset Store cache), the Medieval Village MegaKit when it is in Downloads; then
-the Ash-Walker enclave interior (note 40) and the sound phase. ModelProp + PropCapture are the pattern: put a kit under
-Resources/Props, list the models in ZoneBuilder.KitProps, render the row, set any lying-down model upright in PropTurns, then
-place them from the builders with a painted fallback. Tests never need the kits (the builders fall back).
-Notes: run_tests.ps1 now waits ninety minutes for PlayMode (an hour ran out). VillageHomeTests.Every_villager_sleeps is flaky
-under lane B's load. Model: Fable 5.1, one agent at a time, no workflows. Chris asked for a shutdown at the end of this session.
-
-## Earlier resume note (2026-10-06, about 22:15)
-**Playable build = Phase 5.3 complete (5.3a-c) + Round 23 + zone chat, built 2026-10-06 22:06 from commit a2d6301 (+ the
-wrap-up commit). Last full run: EditMode 424/424, PlayMode 210/210, five tours, 0 shader errors. Committed and backed up to J:.**
-What is in it (see CHANGELOG 2026-10-06): sims live their day (hunt camp mobs that fight back, gather the nodes of their
-trade, sell at the stall, smiths forge and wear their own pieces, buy gear upgrades, rest at the inn, run back for their corpse,
-level and ding, take the roads between zones; the unseen move too); tagging (a sim's kill gives you nothing); invite up to
-three sims (mobs scale to the group); who list on O; zone chat (Enter; tabs All/Zone/Trade/LFG/Party/System; /s /z /t /lfg /p)
-with sims talking from what is true and answering you; Round 23 (notes 57-61: straw hat gone, solid farm animals, class
-attributes on the sheet, readable signs, farmhands in the fields).
-**Chris's playtest notes 47-63 are all done.** Open: the Ashen Marches sentinel helm as a model helm; an alchemy bench place so
-Druids and Mages brew (they only sell herbs now); whispers, friends and memory (rest of 5.5); 5.4 proper (offscreen levelling,
-online hours); 5.6 the full party system (loot rolls, roles, dungeon runs). Next on the roadmap: 5.4, then 5.5's rest, then 5.6.
-Tools: --crulanda-life-capture <dir> on a build shows the sims living (LifeCapture.cs); SimPopulation.Lively is off in editor
-test runs and other captures (SimLifeTests set LifeOverride). The run script sometimes reads the PlayMode xml a moment early
-("NO RESULTS"): read q-PlayMode.xml yourself. Model: Fable 5.1 (one agent at a time, no workflows). Chris asked that long test
-runs not be started when he is about to stop the machine; he had me shut the PC down at the end of this session.
-
-## Earlier resume note (2026-10-06, about 16:30)
-**Playable build = 5.3a (published 14:58, commit c1f4c6c): sims hunt camp mobs (which fight back), gather, rest at the inn,
-loiter; tagging; mobs scale to your group; who list (O); invite up to 3 sims; helms seated by measurement; T-pose fixed.**
-**Round 23 is COMMITTED (b7bce96 + the wrap-up commit) but UNTESTED and NOT PUBLISHED: Chris said "don't start a test run" and
-the run was stopped. First thing next session: run the full check (start_detached.ps1), fix what it finds (watch the village
-bedtime test: farmhands are new villagers; character-sheet and stat tests: class attributes are new base stats), then a
-release build and publish. Round 23 = playtest notes 57-61 (Docs/PLAYTEST_NOTES.md).**
-**Then, in Chris's order: zone chat (note 62; research and design in Docs/CHAT_RESEARCH.md: channels Zone, Trade, LFG, Party,
-Say; sims talk from what they are really doing, by their chatty weight; replies, grats, LF1M), then 5.3b (travel, death and
-corpse run, levelling), then 5.3c with note 63 (sims sell their goods, or craft their own gear with trade skills, to upgrade).**
-Tools: --crulanda-life-capture <dir> on a build shows the sims living (LifeCapture.cs); SimPopulation.Lively is off in editor
-test runs and other captures. Model on this machine: Opus 5.5 now (was Fable); still one agent at a time.
-
-## Earlier resume note (updated 2026-10-06, morning)
-**5.2b (invite sims, Chris moved it up): built and tested; see CHANGELOG. After it: 5.2 round 2 (gear on the sims, who
-list), then 5.3. Sim party tests load the "Oakhaven" scene.**
-**5.2 round 1 (the sims' roster, the world slot, figures in the zone by the clock): PUBLISHED, committed, backed up (CHANGELOG,
-SIMPLAYER_DESIGN.md). Next: 5.2 round 2 (gear on the sims from their gearSeed and level through GearLooks, a who list on the
-HUD, their levels rising a little by the clock), then 5.3 in-world life (utility AI: questing at camps, gathering, roads, the
-inn, dying and the corpse run). Note: a sim-population PlayMode test must load the "Oakhaven" scene (PlayableEncounter is the
-old test map with no zone, so no sims).**
-**Round 22 (playtest notes 47-53 from Chris's first go at the Mage and Ranger): PUBLISHED (build 00:55), commit 0f05e2b,
-backed up (CHANGELOG). Session commits, in order: 42b1644 Paladin, 892446c + 0e850e9 Ranger, 1347441 Mage, 0f05e2b Round 22.
-Unverified by eye in Round 22 (check first if Chris reports them): the signpost lettering (ZoneBuilder.Signpost, a TextMesh
-on each face: size, slant, which way it reads) and the half-raised cast pose (ModelFigure.DriveUpper blends the upper layer
-at .45 while a cast is drawn; the UAL1 Spell_Simple set is the only cast pose in the library and ends arms-out).
-Next: 5.2 sim profiles (Docs/ROADMAP.md), or whatever Chris's next playtest notes say. Chris runs on Fable: one agent at a
-time, no workflows.**
-**5.1c the Mage: PUBLISHED 2026-10-05 late night, committed, backed up (see CHANGELOG). Phase 5.1 is complete: five classes
-(Warrior, Druid, Paladin, Ranger, Mage). Next: 5.2 sim profiles (Docs/ROADMAP.md): ~20 persistent SimAdventurers with stable
-ids, name, race, class (any of the five kits), level, gear, personality and home zone, saved, materialised as figures in the
-player's zone. Mage notes: Heat gauge (MageKit.GainHeat/Overload), Cinder Field is a periodic effect on the player keyed
-"cinder" with fieldCentre/FieldRadius, Bind/Unbind drive PartyDamageMultiplier and CompanionHaste; the staff is a model class
-kit (Cartoon_Staff_01) like the Ranger's bow.**
-**5.1b the Ranger: PUBLISHED 2026-10-05 night, committed, backed up (see CHANGELOG).**
-Ranger notes for the Mage round: the ranged auto-attack is ClassKit.RangedAutoAttacks + AutoAttackRange (EncounterSession's
-BeginAutoAttack and the swing loop honour them; a release pose instead of a swing); the wolf is RangerPet (EncounterSession.Pet,
-SummonWolf/DismissPet, a party member through PartyActor so enemies turn on it; not saved); the bow is a model class kit
-(ActorVisual.ClassModels.cs HeldModel, gripped at its centre) that yields to a main-hand item like the Druid's staff.
-The Mage casts like the Druid's Thornsong (castTime abilities; TickCastPose): Combustion ranged, Heatweaver control, Spellbinder support.
-**5.1a the Paladin: PUBLISHED 2026-10-05 evening, committed, backed up. Flaky: VillageHomeTests.Every_villager_sleeps_behind_their_own_named_door (real-time wait, fails under lane B's load; passes alone).** Pattern for the Ranger and the Mage (one round each): a <Class>Kit : ClassKit after PaladinKit
-(own ability and unlock dictionaries, a BarIds order, ImplementedIds = every impl node of Talents/<class>.json), ClassKit.Create
-case, EncounterSession.<Class> property + LookForClass/TintForClass, ActorLook colours and ModelFigure spec, a class block and
-its abilities appended to Encounter.asset (YAML; the talent file's guid from a .meta you write: see scratchpad paladin_patch.py
-pattern in git history), make_icons.py painters for the actions and BRANCH colours for the branches (icons are required by
-IconCoverageTests; keep only the new PNGs, make_icons re-encodes all), EncounterCapture's build list, FigureCapture people-2,
-EditMode <Class>RulesTests + PlayMode <Class>LoopTests (StartClassOverride, scene PlayableEncounter), capture_extra.ps1 UI run.
-Ranger: Marksman ranged (bow: the packs' Bow_Basic/Medium/Epic models exist), Beastbond pet, Pathfinder control; needs a ranged
-auto-attack (MeleeAutoAttacks false, a shot on a timer) and a pet. Mage: Combustion ranged, Heatweaver control, Spellbinder
-support; casts like the Druid's Thornsong.
-**PHASE 5 NOW (Chris, 2026-10-05):** see Docs/ROADMAP.md (rewritten): 5.0 faster tests first, then 5.1 class kits Paladin,
-Ranger, Mage, then sim profiles, in-world life, offscreen world, chat and memory, groups.
-**Before that:** Round 21 (see its CHANGELOG entry; PLAYTEST_NOTES 33-46) is PUBLISHED (midday 2026-10-05), committed and backed up; waiting on Chris's playtest. Then, in this order:
-1. **Make PlayMode efficient** (Chris asked 2026-10-04; still NOT built): (a) run_tests picks fixtures from the files changed since
-   the last green run (art/shader/zone data: EditMode + build + tour only; gameplay code: the fixtures covering those files;
-   core: all); (b) fixtures share one scene load ([OneTimeSetUp]); (c) fixed waits become wait-until with a timeout; (d) PlayMode
-   split across two validation copies side by side. A full run is ~1 h 50 today (PlayMode ~55 min, build + 5 tours ~45).
-2. **The Ash-Walker enclave's interior** (note 40, Chris chose a real interior: a firelit hall behind the middle arch).
-3. **Art rounds from Chris's assets:** Stylized Nature MegaKit (outdoors), Medieval Village MegaKit (housing; not in Downloads yet
-   at 09:40), Fantasy Props MegaKit, Stylized Megapack 2in1 (Downloads), Medieval props and HQ Rock Pack (Asset Store cache),
-   the Ashen sentinel helm (needs a model-helm path in the armour code).
-4. **Sound phase** (Chris): ambience, weapon hits (slash, pierce, blunt each different), spells, mobs; music later.
-Asset notes: weapon prefabs in Resources/Weapons (packs in ThirdParty/, tools/wip/weapons/weapons_import.py; ThirdPartyImport
-caps their textures at 512 and writes WeaponReport.txt); model icons via run_method ModelIcons.Render -Graphics, then COPY the
-PNGs from the validation copy to the repo at once (any later sync mirrors them away) and give them metas (clone an icon meta
-with a new guid). make_icons.py re-encodes every PNG: keep only new files. Chris's save is not precious.
-
-## Earlier resume notes (2026-10-03/04)
-**NEXT (2026-10-04 15:50):**
-1. Nothing in flight: committed, published 15:50, backed up. Done today: notes 24, 25, 26, 28, 30, camera below level, full screen.
-1b. **FPS (note 23):** 94 (start of day) -> 104 -> 145 fps in Oakhaven at 1440x900 (published 19:20). The cause of most of it was
-   ZoneBuilder.FindZone re-parsing every zone's JSON per call from the HUD every frame. Left, per frame: camera ~2.3 ms (7,539
-   static renderers, 949 materials, critters built of many primitives), GUI ~1.8 ms (IMGUI; fine now), scripts ~2.3 ms. A UI
-   Toolkit HUD was tried and dropped (needs a ThemeStyleSheet and a font asset with font data). Probe: `<zone>-perf.txt`.
-2. **Make PlayMode efficient (Chris: "i want the most efficient playmode. whatever that takes").** Timings of the last full
-   run (00:47, scratchpad copy `playmode-timing-20261004.xml`; re-measure from `encounter-validation\q-PlayMode.xml`): 175
-   tests, 56 min of fixtures, no single hog: VillageWorkshop 259 s, VillagePurse 239, ZoneExit 233 (1 test), VillageHome 178,
-   CraftStation 140, SocialPull 131, LootWindow 121, EliteFight 119, NodePlacement 118, Cave 117, VillageErrand 115, Gather
-   109, NamedLoot 102 ... Each fixture reloads the Oakhaven scene (~10 s a load) and many wait fixed seconds. Plan agreed:
-   (a) the runner picks what to run from the files changed since the last green run (art, shaders, zone data only: EditMode +
-   build + tour, no PlayMode; gameplay code: the fixtures covering those files; core (session, save, ability runtime): all);
-   (b) fixtures share one scene load ([OneTimeSetUp]) and fixed waits become wait-until-true with a timeout; (c) split
-   PlayMode across two validation copies run side by side; (d) every playtest bug gets a regression test (boulders touch the
-   ground, a hit deer ends out of spell range, a cast lands at range + 5 m, a brim within 1.65 crowns, a staff slung on the run).
-2b. **The captures overwrite Chris's screen mode** (2026-10-04: "can't get it to full screen"): the tour and UI captures launch
-   the same product (company Crulanda, product "Crulanda - The Quiet Trail") with `-screen-fullscreen 0 -screen-width 1440`,
-   and Unity saves the last mode in HKCU\Software\Crulanda\Crulanda - The Quiet Trail, so his playable build opens windowed.
-   Fix: pass the window size without saving it (e.g. the captures restore the registry values after, or the capture builds use
-   their own product name), and keep his default FullScreenWindow. Workaround told to him: Alt+Enter, or `-screen-fullscreen 1`.
-3. Then the Ash Rim's camps and quests (`Docs/NEXT_PEAKS.md` "After Peaks"), playtest note 10 (cave lighting), armour.
-Chris's save is not precious to him (memory `crulanda-save-not-precious`): no save-compat effort for his sake.
-**The playable build:** published 2026-10-04 04:44: quick fixes (crowns in the shop/loot, Mira only when selected, drinking, the Tin crown); before it 02:48: POIs + achievements; before it 00:48: notes 20-22 (casts land at range + 5 m, grounded boulders, the coop sack, deer flee 25-35 m); before it 2026-10-03 23:35: the sun (note 9), hats, wheel zoom and staff slinging (notes 17-19); before it 22:25: the Peaks filled out (4 camps, 5 quests); before it 21:05: the dead trees rebuilt (playtest note 16: snags with heavy crooked limbs, blunt broken tops) and the board capture, on top of 17:25: notice boards with bounties and the rare courier posting, silver crowns, Khaven's
-four camps and five quests (12d8ddc), on top of the boars (14:42), the farm animals (13:06) and the real animals (01:59).
-**Last full run (2026-10-04 02:47):** EditMode 399/399, PlayMode 175/175, Oakhaven toured, no exceptions. 00:47: EditMode 396/396, PlayMode 175/175 (56 min of fixtures), Oakhaven toured, no exceptions. 23:33: EditMode 396/396, PlayMode 175/175, Oakhaven toured, no exceptions. 22:21: EditMode 396/396, PlayMode 175/175, build OK, the Peaks toured, no exceptions. 21:01: EditMode 396/396, PlayMode 175/175, build OK, Khaven toured, no exceptions in any game log. Before it, 17:19: EditMode 396/396, PlayMode 175/175 (two zone tests failed on the board's postings in the full run and were
-taught that a bounty belongs to the notice board; re-run green), build OK, Oakhaven toured, all shots, no exceptions in any game
-log, no shader errors.
-**Nothing in flight:** everything is committed, published and backed up.
-**What the game has now (newest first):** notice boards (one a zone by the inn or hall: three postings a game day, village bounties
-and Sandthrone contracts, a 1.5%-a-slot rare posting whose Bureau courier carries an Aether-Geode shard, the component for five
-resonance-tempered weapons at the forge); the coin is the silver crown; Khaven's Scarp hollows, Thicket deserters, Heights scree
-spiders and the Hush-Mother with five quests; boars (CraftPix, moved in code); farm animals in Oakhaven; real animals (Quaternius
-models through `ModelBeast`); foot armour; armour and hats fitted to the form; every person a Quaternius model (`ModelFigure`);
-before that the professions, loot, hunting, the five grown zones and the painted style (see the numbered history below and
-CHANGELOG.md).
-
-**Open (ask Chris before starting; he skims: put the question first or use the question prompt):**
-1. **Farm animals are in Oakhaven** (published 2026-10-03 13:06): more could go to the other zones' farms and towns (Khaven,
-   the Ash Rim's steadings), using the same kinds ("horse", "donkey", "cow") in their life.critters, at the END of each list.
-   The pack also has Bull, Alpaca, Fox, Husky and Shiba Inu (zip at `tools/wip/animals/source/AnimatedAnimalPack.zip`).
-2. **Still primitives**: spiders, the bramble-things, and the village's hens, sheep, cats, crows and rabbits. The CraftPix set
-   (zip kept) also has a hare, fox, bear, owl, squirrel, hedgehog: the procedural mode can move them (the hare could be the
-   game rabbit). A paid pack (polyperfect Low Poly Animated Animals, $50 on sale, has spider/hen/sheep/cat/rabbit with real
-   animations) was offered on 2026-10-03; Chris did not choose it then.
-3. Playtest notes 9 (bloom and sun) and 10 (baked cave lighting) are OPEN; note 12's armour designs could go further (plate
-   shapes, pauldrons); note 14's PDF was last brought up to date 2026-10-02 21:45 (`tools/docs/make_history_pdf.py`).
-
-**How to work (the rules that matter):** read `D:\code\mmo\CLAUDE.md` first. Sync into the validation copy and test there, never
-in Chris's open project. Never edit the repo's Assets while a run is in flight (`run_tests.ps1` and `build_and_tour.ps1` both
-mirror Assets when they start); stage elsewhere and apply after the build's mirror. Fast checks: `tools\validation\run_focus.ps1
--Filter <fixtures> -Platform EditMode|PlayMode`; renders in a minute: `run_method.ps1 -Method Crulanda.EditorTools.FigureCapture.Run
--Graphics` (people) or `...CreatureCapture.Run -Graphics` (animals), to `hel\work\ui-captures\figures`. The full check:
-`start_detached.ps1 -Arguments '-Zones zone.oakhaven'` (or `-NoTour` when nothing visible changed), then wait for
-`hel\work\full-run.done` (summary lines; fixed 2026-10-03 to read the mixed-encoding log). After the first Unity run of new
-files, copy their new `.meta` files back from the validation copy (its robocopy /MIR deletes them otherwise). Publish:
-robocopy `encounter-validation\Builds\Crulanda` to `hel\outputs\Crulanda-Playable` /MIR /XF *.log while Crulanda.exe is not
-running; copy this file to `hel\outputs\Crulanda-Claude-Handoff.md`; commit (repo-local author, Opus 5.5 trailer); then
-`tools\Backup.ps1`. Tests never touch Chris's save (SaveDirectoryOverride); back it up before any save-format change.
-
-## Resume notes as of 2026-10-01 night (history)
-**PUBLISHED 2026-10-01/02 (eleven publishes; the playable build is main at f046de3, published 2026-10-02 00:20):**
-1. The Root-Mother's Deep, Crowsfoot's hidden mouth, every trade has a day (4c579e6).
-2. The painted style pass parts 1-4 (03fd06d) and 3. part 5, painted masonry (17168d8).
-4. The out of work drink at the inn; the visual review's first batch (ecc233b).
-5. The visual review's second batch: Ash Rim, world edge, ruins, Peaks, caves (078d276).
-6. Trades steps 1-2 (format 8, materials, tools, the Trades window, new buildings, Maud's leather shop) and loot A1 (weapons in
-   hand) (4979457).
-7. **Trades steps 3-4 (households and homes; gathering in Oakhaven), loot A2 (armour on the body), visual items 10-11 (buildings
-   on slopes; the inns and the smithy as hero buildings)**, plus Chris's ore fix (no more green "peas"), knee-high herbs and
-   mourner's cap as a mushroom. Tests on this round: EditMode 240/240 (one test was wrong: its figure's own name started "Gear"),
-   PlayMode 108/108; five zones toured and the wardrobe 01-12 viewed. The tour/captures were rerun after the ore and herb fixes.
-8. **Trades steps 5, 6 and 8 and loot A3 (round3):** Maud's four trade bags (bought, or "A Wallet for Simples"), Hob Linden the
-   innkeeper and every trade at its own workshop, ten ore / eight timber / ten herbs in each of the other four zones, the loot
-   ledger drafted (104 named items, unregistered, on mannequins in wardrobe 13-18); herbs 1.3x and the hauberk's surcoat belted.
-   Tests: EditMode 285/286 (1 skipped), PlayMode 115/116, the one failure (Lisbet's drying errand, a timing flake in the test)
-   fixed in 78d0528 and its fixture 6/6.
-9. **Trades steps 7 and 9 and loot L1 (round 4):** purses (what you pay Maud feeds and warms the Tanner house; a cold chimney
-   when they go without), stations and charcoal (forge, oven, bench, the Cask's range and hearth, field stations in four zones,
-   the recipe pane), loot feel (beams on bodies by quality, the loot window, compare lines and upgrade arrows, call-outs); the
-   trades' herbs 1.3x, dewfern rebuilt (its fronds ran into the ground), vendor names in ink, Khaven's inn door fixed for the
-   navmesh (its taproom was cut off). Tests: EditMode 310/312 (1 skipped; one wrong test fixed), PlayMode 133/135 (both
-   failures fixed: a test bug and the Khaven door; their fixtures 6/6); five zones toured, then Khaven and Verdant again.
-10. **Trades steps 10 and 11 and loot L2 (round 5):** cooking (ten recipes at any fire, meats from the beasts), hunting (deer and
-   rabbits are game, never hens, sheep or cats; "Skin the body"; three new hides; Maud's other three bag quests; the skinner
-   sells salt), named loot live (the six loot files in Items, uniques by inventory, sets, vendor pieces; new characters start
-   with the Trailblade). Chris's save backed up first (`save-backups/20261001-2235-pre-loot`; it was still format 6 on disk).
-   Tests: EditMode 319/320 (1 skipped), PlayMode 150/151: `HuntTests.Game_bolts_and_sneaking_gets_closer` is INTERMITTENT (a
-   rabbit that should bolt stood and watched, at (25.9, -68.4) by the Brook pond; alert reset twice, so GameAnimal.Bolt gave up
-   or its path ended at once; passed alone and on a second fixture run). Published with that known. Oakhaven toured only.
-11. **Round 6: trades steps 12 and 13, loot L3, polish:** blacksmithing (five smelts, 21 pieces) and the two-craft rule with
-   take up and forget, alchemy (five potions), the Armoury (SAVE FORMAT 9; Chris's save backed up to
-   `save-backups/20261001-2315-before-format9`), rare and epic gear that glows on the body, no talking through walls, herbs
-   that follow the slope, the rabbit's bolt hardened. Tests: EditMode 341/341, PlayMode 154/158 with all four failures fixed
-   (three test-text bugs, and mourner's cap buried on two Khaven banks) and their fixtures 11/11.
-**Long runs go detached:** `tools\validation\start_detached.ps1 [-Arguments '-NoTests' | '-NoTour' | '-NoBuild' | '-Zones zone.khaven,zone.verdant']`
-runs `full_run.ps1` outside the tool's process tree; wait for `hel\work\full-run.done` (the log is mixed-encoding: read the result
-XMLs and logs directly). `-NoTour` builds and takes the HUD, wardrobe and loot shots but tours no zone; `-NoBuild` is tests only.
-**Chris's rule (2026-10-01): skip the zone tours on rounds that don't change how the world looks** (World code, zone data, art,
-visible creature or villager looks keep them; tour just the zones a round touches when that is enough). Never edit the repo's
-Assets while a run is in flight (it mirrors Assets).
-
-**CHRIS'S PLAYTEST NOTES COME FIRST: `Docs/PLAYTEST_NOTES.md`** (he jots issues as he plays; log each there, fix them in the
-next rounds, tell him which build has the fix). Fourteen notes by 2026-10-02 00:30; note 8 is praise (the lights), the rest are work.
-**IN FLIGHT (2026-10-02 00:30), in order of what to do when each comes back:**
-1. **Round 7 = notes 1, 2, 3** on branch `round7` (worktree `scratchpad\wt\int7`; merged from `fix/n23-social-elites` and
-   `fix/n1-oakhaven-grows`; compile ALL OK; NOT run): Oakhaven grown to 560 m with Crowsfoot Hollow moved to (-120, 240) and
-   turned; social aggro by kind; elites at 5.5x health with a named heavy blow, enrage and a call; guards. Fast-forward main to
-   it, run the full check with tests and tours of Oakhaven, Khaven and the Ash Rim (arrival points moved), look at everything
-   note 1's write-up lists (and the fight shots in `ui-captures\elite`), check the build log's zone build time (estimate
-   13 s editor, 11 s player) and frame cost (the ground is one 401k-triangle mesh), publish. Open decision for Chris in note 1:
-   the 120 m rule elsewhere (default taken: Oakhaven now; Khaven next if he wants it; the outposts keep their camps).
-2. **Art notes** (workflow `art-notes`, run wf_1ca487e1-45f): `fix/n4-sheep` (`wt\n4`: sheep, cats' tails, a critter line-up
-   shot), `fix/n56-ore-windfall` (`wt\n6`: less green ore, done by hand; the lumber trees), `fix/n9-sun` (`wt\n9`: sun and
-   bloom, then baked cave lighting), `fix/n11-icons` (`wt\n11`: generated icons for abilities and every item). And run
-   wf_99f8008d-998: `fix/n13-colour` (`wt\n13`: high-fantasy palettes). Each: design panel with previews, judges, build,
-   review, verify, fix. Previews are in `scratchpad\artnotes\<item>`. Merge after round 7; all change the look: tour.
-3. **Characters** (workflow `characters-design`, run wf_755e3e44-eb0; Chris chose "build them in code"): maps, three designs
-   with rendered previews, judges, the plan in `tools/wip/characters` on branch `plan/characters` (`wt\c0`), critics, then
-   step C1 (his own character smooth and moving, behind a switch) built and reviewed on that branch.
-4. **The PDF** (workflow `history-pdf`, run wf_e1fd6182-250): `Docs/Crulanda-Everything-Built-So-Far.pdf`, generator in
-   `tools/docs`. When it reports: open it, commit it, send it to Chris.
-**Then:** step 14 (depth and tuning), loot L4-L6, and whatever he notes next.
-
-**THE PLANS (read the owner notes first; they are his words and decisions):**
-- Professions, gathering, households, purses, bags, hunting: `tools/wip/professions/OWNER_NOTES.md`, `DESIGN.md`, `ADDENDUM.md`,
-  `BUILD_PLAN.md` (14 publishable steps on two tracks: A village 1, 3, 6, 7; B professions 2, 4, 5, 8-14).
-- Loot and worn appearances: `tools/wip/loot/OWNER_NOTES.md`, `DESIGN.md` (steps A1-A3 run beside professions; L1-L6 land at
-  professions step boundaries because they share the item code), `ITEMS_V1.md` (104 named items).
-- Defaults told to Chris and being built unless he objects: the leatherworker is Maud (her family: Fen the skinner, Nettie);
-  invented kin so every villager has a household, two new houses; a hide comes from searching the body (no skinning skill);
-  only a Blacksmith smelts; low skill never blocks a node; empty gear slots show empty; cloaks as a tenth slot last; boss trophies
-  become "one you do not own yet". To raise when L-steps start: a new character should not be left empty-handed (start with the
-  training blade equipped).
-- Chris's save is backed up before format 8: `hel/work/save-backups/20261001-1545-before-format8`.
-
-**Visual worklist** (`tools/wip/painted/visual_review.md`): items 10 (buildings on slopes) and 11 (the inns and the smithy as
-hero buildings) are done and published (2026-10-01 night), so all 14 ranked items are done. The reviewers' raw lists
-below them still hold smaller things: Mossveil Falls as a flat rectangle, mud/puddle/fire-bed discs, the giant trunks' straight
-moss line, the salt flats' squiggles, neon ferns on the Peaks' scree, hard-edged tall-grass discs.
-
-**How today's work was done, worth repeating:** design by a panel (readers map the code, three lenses design, one synthesis),
-critique, then build in worktrees with review and refutation before merging; for visual work, agents render and LOOK at generated
-textures before anything is built, patches are verified on scratch copies, and every batch is toured and looked at before it is
-published. Never edit Assets while a run is in flight (the tour mirrors Assets again). `run_focus.ps1 -Filter '<fixtures>'` runs
-a few fixtures fast; `build_art.ps1` builds generated art in the validation copy and brings it into the repo.
-
-**Chris asked whether to move to Unreal** (2026-10-01): answered no (the art, not the engine, is the limit; a port rewrites
-everything; a Unity lighting-pipeline trial is the cheap experiment). He did not ask for the trial.
-
-**The standing direction is in `GAME_BRIEF.md` (read it first): a high-fidelity, beautiful MMO-style world, AAA quality in a classic style, judged on details, graphics, lighting, mood and visual feel.**
-Chris's rules: work in order of importance; finish each step; keep going without waiting (memory: crulanda-autonomy); tell him at each publish.
-Chris was away from 2026-09-30 evening and gave authority to carry on through the phases unattended, publishing each.
-
-**State: everything below is PUBLISHED** to `outputs/Crulanda-Playable` and committed on `main` (backed up to J:). Tests: EditMode 183/183, PlayMode 76/76, 0 shader errors.
-- Published so far:
-  - steps 1-4 of the visual review;
-  - the turquoise water;
-  - the step-3 fix round;
-  - the cliff rework;
-  - the temp-save travel fix;
-  - the tree crowns (painted leaf cards);
-  - **WEATHER** (commit 58d06b1, published 2026-09-30 afternoon);
-  - **CROWSFOOT HOLLOW** (commit 87dd05b, published 2026-09-30 evening);
-  - **SECRETS** (commit f3f6b9a, published 2026-09-30 late evening): twenty hidden finds on no map, the Discoveries tab, save
-    format 7. Design: `WORLD_ZONES.md` "Secrets", `SAVE_FORMAT.md` format 7, the CHANGELOG.
-  - and now **CROWSFOOT HOLLOW GOES DEEP** (published 2026-09-30 night): the first dungeon, 114 m and 16 m down: the camp,
-    the Drop, the Store Caves (Quartermaster Hesk, elite 4; the strongbox and its key), the Deep Stair, the Echoing Hall
-    (Caddock, elite 5, drops Caddock's Tin Crown). The Tin Crown is level 4. A cave-name banner, dungeon respawns, no use
-    through rock, a kill plane under the deepest floor. Design: `WORLD_ZONES.md` "Caves you walk into", `QUEST_DESIGN.md`
-    section 5, the CHANGELOG.
-  - and now **THE ZONES GROWN** (published 2026-09-30 night): Oakhaven 380 m, Khaven 340, the Peaks and the Rim 360, with 37
-    new places, 18 camps (4 named elites) and 14 secrets in the new ground; Crowsfoot Ridge over the dungeon; loads faster
-    than before (parallel ground paint). Design: `WORLD_ZONES.md` "Zone size" and each zone's section, the CHANGELOG.
-  - and now **THE VERDANT SHORE** (published 2026-10-01): the fifth zone, levels 11-13 (cap 13), Book 3's giant-tree forest:
-    the Ridge of Long Shadows and the first view, Rootfast's treehouses, the Veridian Temple, Mossveil Falls, the Mistmere, the
-    Whispering Glade, the Salt-Flats, the Greying and Palemist Hollow; Keepers with their own talk; twelve quests from Grohl's
-    breadcrumb; and the lush art every zone now shares (painted ferns, broad leaves, reeds, flower drifts, giant trees,
-    waterfalls, mushrooms, real dead trees). Design: `WORLD_ZONES.md` "The Verdant Shore" and "Painted plants and lush props",
-    `QUEST_DESIGN.md`, the CHANGELOG.
-  - and now **THE ROOT-MOTHER'S DEEP and the hidden Crowsfoot mouth** (published 2026-10-01 morning): the Verdant Shore's
-    dungeon under the Temple (a second cavern plan, `variant: 1`, grown through earth and root: the Root Gallery, the Sap Well,
-    the Cold Stair, the Heart with the Root-Mother and the cold in her root; six camps and the Hollow Root-Warden; the finale
-    quest `main.verdant.5`); and Crowsfoot's mouth as a slot in a cliff face at the end of a bent track, not a rock on the
-    grass. Design: `WORLD_ZONES.md` "Caves you walk into", `QUEST_DESIGN.md`, the CHANGELOG.
-  - and now **EVERY TRADE HAS A DAY** (published 2026-10-01 morning): `VillageWork.cs`, daily shifts and errands for every
-    trade, goods carried in their hands between the trades (eggs, water, grain, flour, bread, logs, hides, herbs, hares,
-    wares), the village's stock, the trades talking about each other's goods, the hen-wife's full day (feed, eggs to the inn,
-    water to the hens' pan, dinner, feed, eggs to the stall, eggs home) and Oakhaven eggs on the merchant's stall. Design:
-    `WORLD_ZONES.md` "Life, day and night", the CHANGELOG.
-- **Weather** covers:
-  - per-zone seeded schedules (7-minute spells, one severity step at a time);
-  - a painted cloud layer and cloud shadows;
-  - rain with streaks, splashes, rings on water and wet ground;
-  - storms with lightning; Khaven ground mist, Peaks flurries and Rim ash squalls;
-  - wind gusts through grass and crowns;
-  - a chat line when the weather turns, and the weather under the minimap clock.
-  - Design and data: `WORLD_ZONES.md` "Weather"; the CHANGELOG has what the three tours and the independent review fixed.
-- Dev: F8 cycles the zone's weather in development builds; `--crulanda-weather rain` starts in it.
-- Marketing: `marketing/steam-blurb.md` is the Steam copy draft (commit 06e8795). Chris to confirm:
-  - the store title, "The Quiet Trail" (the productName) or "The Land of Crulanda" as the novels and bullet-hell use;
-  - that *The First Spoke* is out.
-
-~~THE VERDANT SHORE~~, ~~THE ROOT-MOTHER'S DEEP~~ and ~~EVERY TRADE HAS A DAY~~ DONE and published 2026-10-01. **NEXT JOB: THE
-PAINTED STYLE PASS on the four older zones**, reusing
-the lush art (the undergrowth, dead trees and glowing plants are already in them): richer saturated colour per biome, more
-plant kinds, sculpted rock with painted gradient shading, chunky stylized props (rope-and-post bridges, the `bridge`
-variant 1), a warm clear sky; each zone keeps its mood. Then: the Verdant Shore's optional extras from the zone agent's notes
-(low mist banks, glass-frog critters, a root-stair prop for the Temple, the west backdrop falling to the sea); a `hollow`
-mist-walker variant with violet-lit eyes; weather polish; audio.
-~~ZONE SIZE~~ DONE and published (item 0c below). Then: **THE PAINTED STYLE PASS** (item 5 under "Next" below, and
-GAME_BRIEF's art direction): richer saturated colour, more plant types (ferns, broad leaves, flowers, tall grasses),
-sculpted rock with painted gradient shading, chunky stylized props (rope-and-post bridges), a warm clear sky; every zone
-keeps its mood (Khaven grim dusk, the Rim grey). Plan it as a few publishes, biggest visual win first.
-More walk-in caves (a crypt under Khaven, a mine in the Peaks, a sunken ruin on the Rim) can reuse the `cavern` prop: a new
-plan in `ZoneBuilder.CavernPlan(variant)` (rows: x, z, half-width, height, floor drop).
-
-Weather polish for later (not blocking):
-- rain and thunder audio (there is no audio yet);
-- puddles;
-- a wet sheen on roofs and props;
-- villagers heading indoors in rain;
-- snow settling on the Peaks.
-
-**Next:**
-0. ~~Finish step 4 + water~~ DONE and published.
-0. ~~TREES~~ DONE and published 2026-09-30 (two passes). Original notes kept:
-   - The trunks are fine now. The problem is the CROWNS: every broadleaf/orchard tree is one or two smooth faceted balls on a stick (no leaf edge, no gaps, no branches inside), and the pines are perfect stacked cones. See `work\world-captures\oakhaven-99-target-ring.png` and `oakhaven-08-the-old-orchard.png`.
-   - Target look (Chris's reference, memory crulanda-direction): ragged leaf silhouettes, sky showing through, visible fronds and branch structure.
-   - Plan: leaf CARDS. Painted alpha-cutout leaf-cluster textures generated in ZoneSceneBuilder (green, yellow-green, autumn, a pine-bough variant); crowns from 8-14 crossed, tilted quads on short boughs plus a small dark inner core; pine tiers as tilted bough cards, not solid cones; a Crulanda/Leaf cutout shader (two-sided, wind sway, ShadowCaster with the cutout); TreeFade taught to fade cutout leaves. Keep crown volumes so bounds, colliders and navmesh don't change; keep the zone rng stream.
-   - **The patch is READY:** `tools\pending-patches\step3b-tree-crowns.json` (verdict fixable: apply `review.correctedEdits` and write `review.correctedNewFiles`, i.e. `World/Shaders/Leaf.shader` + `.meta`). The critic verified all anchors against the tree at commit f959dfd and the zone rng stream unchanged. Re-check the Great Oak anchor (`cap.center = new Vector3(0, 3.2f, 0); cap.height = 6.4f; cap.radius = 1.1f;`) before applying. Then: tests, build, four-zone tour, check `oakhaven-99-target-ring` and `oakhaven-08-the-old-orchard` and a pine shot, publish, tell Chris.
-0a. ~~WEATHER~~ DONE and published 2026-09-30 (commit 58d06b1; see WORLD_ZONES.md "Weather"). The original plan is kept below; cloud shadows ended up in the post composite, not a light cookie, because a cookie on the sun would push every lit surface into an extra forward pass.
-   - The goal in the brief: the landscape should show off weather, lighting and particles. Nothing weather-like exists yet beyond the fixed fog, the day/night cycle and the falling leaves/ash.
-   - Build a `WorldWeather` system (Scripts/World): a per-zone weather state that changes over game time (clear, overcast, rain, wind, and per-biome extras: mountain snow flurries in the Peaks, ash squalls on the Rim, drifting mist in Khaven's wood), blending fog density/colour, ambient and sun intensity, the sky's exposure/haze and the post grade over 20-40 s transitions.
-   - Rain: a particle system that follows the camera (world-space streaks, a ground splash layer, darker wet ground tint, water surface pocked with rings); rain never falls indoors or under the Wasting curtain.
-   - Wind: gusts that drive the existing grass and leaf sway (a global `_WindGust` shader value the Grass and Leaf shaders read), bend the falling leaves/ash, and lean the tall grass.
-   - Cloud shadow: a slow-scrolling soft cookie on the directional light (a generated cloud texture), strongest when overcast.
-   - Keep it cheap and data-driven: weather chances per zone in the JSON; a dev key to force a state; the capture tour shoots one rain and one overcast shot per zone. Night must stay readable; the HUD clock could show a small weather glyph.
-   - Tests: state machine transitions are deterministic under a seed; forcing rain sets the wet tint and spawns the system; no state leaves fog outside its band.
-0b. **TEMP-SAVE TRAVEL BUG** (Chris: "lose talent points going to new zones", confirmed twice): FIXED and PUBLISHED on 2026-09-30 (commit d9f6617; static `tempSaveRoot`, test `TempSaveTravelTests` passes: level, gold and a spent talent arrive in the next zone). Chris has been told. Cause: `--crulanda-temp-save` minted a new folder on every scene reload, so each zone started a fresh character. Real saves were never affected. Done.
-0c. **WORLD DEPTH (Chris, 2026-09-29: "zones do need to be bigger with more places and secrets to explore").** Decisions: rewards = DISCOVERIES + LOOT; order = CAVE, then SECRETS, then SIZE.
-   - Today every zone is a ~260 m square with 5 camps, and nearly every interactable is a map-marked quest pickup (Peaks: 6 interactables over 60 props). Nothing is hidden; wandering pays nothing.
-   - **Secrets:** hidden finds NOT marked on any map, a few per zone: a cache behind a waterfall / under a bridge, a lookout with a view, an abandoned camp with loot and a note, a Chronicle page in a hollow tree, a rare herb patch, a locked chest whose key is elsewhere. Each grants a 'Discovered: <name>' toast + XP, most hold a cache (gold, a rare item, a page). Add a Discoveries tab to the quest book (per zone, found/total), a `discoveries` list in the save (format 7), and a `secret` flag on props so maps skip them. Tests: every secret reachable on the navmesh; discovery toast and save round-trip.
-   - **Sub-areas:** the bandit cave first (item 2 in this list), then one per zone in the same vein: a crypt interior under Khaven, a mine or ledge path in the Peaks, a sunken ruin on the Rim.
-   - **Size:** grow zones to ~340-380 m LAST, once there is content to fill them; keep the village cores where they are (roads, exits and arrival points move with the edge: check ZoneExitTests). 
-   a. Apply the turquoise water: `tools\pending-patches\step5-stylized-water.json`. Use the review's `correctedNewFiles` (a full new `World/Shaders/Water.shader`; write it) and `correctedEdits` (2 in `ZoneBuilder.WaterMaterial()`, 1 in WORLD_ZONES.md). The night-foam glow is already fixed in the corrected version.
-   b. Lighten the bed so the shallows show sand, as in Chris's reference: `ZoneBuilder.PaintGround` shore paint (about line 529-531) darkens the waterline to .22/.2/.15 and the bed to .16/.15/.12. For non-gloom biomes use a pale sand (about .62/.56/.42) at the waterline and a slightly darker sand under water; keep Khaven dark.
-   c. `run_tests.ps1`, then `build_and_tour.ps1` for all four zones; check `Shader error` in the build log (a broken shader silently falls back).
-   d. Look at the water shots (oakhaven-99-creek/wading/pond/pond-night, 06-oak-creek-mill, 17-brook-pond, khaven-99-*) and the HUD shots (*-97-*, *-98-*, *-99-*): road signs at exits, no label overlaps, tracker readable.
-   e. Publish, back up, and **tell Chris step 4 is published and show him the water**.
-1. ~~Step 4, HUD~~ done (see above). Remaining detail: apply `tools\pending-patches\step4-hud.json` (overlaps, readability).
-   - Its `overlaps` patch rewrites `EncounterHud` label drawing and was already rebased once. Expect skipped edits; merge them.
-   - Also add world labels at exits ("Road to Khaven Village (3-5)") within about 30 m, so exits are easy to find. Chris was lost at a map edge with no exit.
-2. **NEW STEP, right after step 4: a seamless cave and the Sandthrone bandit quest.** Chris decided on 2026-09-29 (order: after the HUD, before the water).
-   - A quest appears at level 3: clear out the bandits and their Bandit King in a cave, so they stop harassing the villagers.
-   - Tie-in (chosen): SANDTHRONE DESERTERS. The Sandthrone is a canon mercenary company, antagonists in world_bible.md, holding the Peaks toll in book1 ch.5; in the game they already hold Khaven.
-     - A deserter band dug into a cave near Oakhaven and raids its farms.
-     - The 'Bandit King' is a GAME-ONLY character. Don't use canon Sandthrone names such as Zarytha Vex for him.
-     - The lore has no bandit king. Copper-Tithe (book1 ch.24) was rejected because they are sympathetic in canon.
-   - Seamless means no loading: a rock-shell cave built into a hillside (tunnels and chambers, blob-mesh walls and ceiling, a flat walkable floor on the terrain).
-     - Inside: navmesh, torches, and lighting and fog that darken as you walk in (a trigger volume lerping ambient, fog and post exposure).
-     - A camp of deserters, with the Bandit King (elite) in the deepest chamber and loot.
-   - Good spot: Oakhaven's north hills. Chris wandered to the north edge looking for a way out.
-   - Add tests: ZoneContentTests reachability inside the cave, and the quest data.
-3. **Step 5, stylized turquoise water:**
-   - Ready: `tools\pending-patches\step5-stylized-water.json` has a full new Water.shader plus WaterMaterial() edits, compile-checked with fxc. Use the review's `correctedNewFiles`/`correctedEdits` when the verdict is 'fixable'. `apply_patches.ps1` doesn't write new files.
-   - Otherwise re-run the design, which asks for: a depth colour ramp (pale teal to turquoise to deep teal), soft wobbly white foam at shores and objects, stylized sparkle bands, and little reflection.
-   - Khaven stays murky.
-4. **Step 6:** the painted style pass on all zones, keeping each zone's mood (see memory crulanda-direction).
-
-**Next, in order:**
-0. ~~Zone-travel bug~~: fixed or verified on 2026-09-29 (see above). The original report: Chris, 2026-09-29, playing the published build `76ed4eb`.
-   - Reproduce it first. Try each exit in Oakhaven (west road to Khaven, south road to the Ash Rim) and the others.
-   - Suspects, in order:
-     - Step 1's backdrop skirt, forest edge or boundary colliders keeping the player (a CharacterController, not a navmesh agent) out of the exit radius.
-     - E now picking a friend or target before the exit (`EncounterSession.Interact` / `TalkTarget` priority).
-     - The "not in combat" rule, or an ambush or camp near an exit keeping you in combat.
-     - Arrival points landing in blocked or unwalkable spots after the zone changes (the phantom-Wasting wall in Khaven and the Peaks was fixed on `main` in `191d9b8`).
-     - ZoneContentTests only path-checks exits on the navmesh.
-   - Add a PlayMode test that walks the player (the motor, not a teleport) into each exit and presses E, and checks that the zone changes.
-1. **Finish step 2:**
-   1. `git merge wip/step2-fix-round`.
-   2. Run `tools\validation\run_tests.ps1`, then `build_and_tour.ps1 -Zones zone.oakhaven, zone.khaven, zone.peaks, zone.ashrim`.
-   3. Check the build log for `Shader error`.
-   4. Verify the shots against the 7 problems:
-      - Khaven roads visible, boars visible in the grass;
-      - Peaks pines seated, rock not pale;
-      - Ash Rim cracks thin;
-      - the curtain has no seam and no night smears.
-   5. Commit, then publish: robocopy `work\encounter-validation\Builds\Crulanda` to `outputs\Crulanda-Playable` if Crulanda.exe isn't running.
-   6. Back up and **tell Chris step 2 is published**.
-   - Minor step-2 notes not yet addressed: Khaven reads one hue (rose) with no orange-versus-violet split; its leafy trees are grey puffs; the HUD clock shows day in permanent dusk; the Ash Rim's far trees are paler than the backdrop; the Peaks' far distance is a bit milky.
-2. **Step 3, props, landmarks and creatures:** patches are ready in `tools\pending-patches\step3-props-landmarks-creatures.json` (see its README).
-   - Floating props; the Pale's floating head; the Weave-Eater remodelled to canon (a drifting thread-mass, not a dog).
-   - Oakhaven, Khaven, Peaks and Ash landmarks that match their names.
-   - Tour framing.
-   - Expect some skipped edits, because step 2 changed `ZoneBuilder` after these were written; merge those by hand.
-   - **Also in step 3** (Chris, playtest screenshot, 2026-09-29): the broadleaf and orchard tree trunks "look bad". They are plain grey pipes.
-     - `ZoneBuilder.Broadleaf` adds a wider base cylinder (`h * .08`) that reads as a pipe collar.
-     - Fix: tapered trunks; a root flare like DeadTree's (a swell plus half-sunk buttress ridges) instead of the collar; bark colour variation; a slight lean; limbs that join the trunk.
-   - **PRIORITY in step 3: rebuild the Great Oak as the town's centrepiece.** Chris: "this tree looks terrible. this should be the center piece of town".
-     - CANON (book1/chapter_4.md, line 39): a massive, ancient oak dominating the centre of the communal square, the historical heart of the settlement. After the erasure it is found petrified mid-bloom, in spring leaf.
-     - So before the erasure, when the game is set, it must be ALIVE: in full leaf, with sprawling massive branches.
-     - Today it is `dead_oak` (DeadTree cylinders): a banded trunk where the cylinders overlap, stick limbs with ball knuckles, no leaves.
-     - Rebuild it as a new `great_oak` kind in oakhaven.json:
-       - a gnarled, tapered trunk mesh with smoothly merging limbs;
-       - a huge layered canopy of blob clumps with fresh green leaf (it may carry some autumn colour to fit Oakhaven's season);
-       - a big root flare, perhaps a low stone ring or bench round it;
-       - the green framing it.
-     - Keep its TreeFade and collider, and keep it readable from the whole village.
-   - **Also in step 3: critters have no legs.** Chris: "cats have no legs".
-     - In `WorldLife.cs` (the critter body switch, around line 715), the cat, chicken, rabbit and crow are built without legs. Only the deer and sheep have them.
-     - Add legs (cat: four slim legs and paws; chicken and crow: two thin legs and feet; rabbit: haunches and forepaws), sized so the bodies stand on the ground.
-     - Add a simple leg swing while they move, like the villagers' walk.
-3. **Step 4, HUD overlaps and readability:** `tools\pending-patches\step4-hud.json`.
-4. **Step 5: STYLIZED TURQUOISE WATER.** Chris's decision on 2026-09-29 replaces the realism plan. His reference was a screenshot of a lush tropical cove from a stylized MMO; use it for STYLE only, copying no assets or names.
-   - Bright clear pale-teal shallows over a visible sandy bed, deepening to rich turquoise and blue.
-   - Soft white foam lines at the shores and around rocks and legs, painted ripple highlights, little mirror reflection.
-   - Oakhaven, the Peaks and the Ash Rim get it. Khaven's Gloom Creek stays murky.
-   - The see-through water, murk and touch-foam we already have are the base. From `tools\pending-patches\step5-water-realism.json`, only parts of 'surface-detail' may still help (layered ripples); the planar-reflection camera is not needed for this style.
-5. **Step 6: PAINTED STYLE PASS on all zones, keeping each zone's mood** (Chris's decision the same day).
-   - Richer, saturated colour; many more plant types (broad leaves, ferns, flowers, tall grasses).
-   - Sculpted rock formations with painted gradient shading; chunky stylized props (rope-and-post wooden bridges); a warm, clear sky.
-   - Khaven stays grim dusk and the Ash Rim stays grey, painted in their own palettes.
-   - A planar reflection camera (`WaterReflection.cs` is in `newFiles`), plus finer ripples and sparkle.
-
-**Helper scripts** (`D:\code\mmo\tools\validation`):
-- `run_tests.ps1`.
-- `build_and_tour.ps1`: now skips the tour if the build fails, and waits 420 s per zone because the machine is slow under load.
-- Archive `work\world-captures` before each tour.
-
-## UPDATE 2026-09-29 (Claude session) â€” zones 1-10, camps, items, water, graphics
-- **Decision by Chris:** the level cap stays at 10 for now.
-  - Ladder: Oakhaven 1-2 â†’ Khaven 3-5 â†’ Shattered Peaks 6-8 â†’ Ashland Rim 9-10.
-  - Build order: Peaks then Ashlands.
-  - Graphics priorities: lighting and atmosphere, terrain and nature, characters and creatures. Buildings come later.
-- **Chris's standing requests:**
-  - Every zone keeps respawning camps for grinding.
-  - Breadcrumb quests carry you to the next zone.
-  - Water must look and behave correctly.
-- **Where to read:**
-  - CHANGELOG, the "Zones 1-10" entry.
-  - WORLD_ZONES.md: the new zones, the level ladder and camps table, Water, and Nature and post-processing.
-  - QUEST_DESIGN.md Â§8: the chain across zones.
-  - SAVE_FORMAT.md: formats 5 (XP curve) and 6 (bag and equipment).
-- **Key new code:**
-  - `World/ZoneWater.cs`: the single water model.
-  - `World/NatureFx.cs` and `World/ZonePost.cs`.
-  - `World/Shaders/Water`, `Grass` and `Post`.
-  - `Encounter/Items.cs`: `ItemDatabase` and `Inventory`.
-  - `Encounter/EncounterHud.Items.cs`: bags, the character sheet and vendors.
-  - Camps and ambush in `EncounterEnemy`, and swimming and sneaking in `AdventurerMotor`.
-- **Validation (2026-09-29):**
-  - EditMode 166/166, PlayMode 47/47. These include `ZoneContentTests` and `WaterTests` for all four zones.
-  - The player build succeeded, and world tours of all four zones were captured.
-- **Chris's save:** backed up to `work\save-backups\20260929-020630-pre-v6` before the format 6 build was published.
-- **Helper scripts** are in the session scratchpad (`run_tests.ps1`, `build_and_tour.ps1`, `build_ui_capture.ps1`).
-  - They mirror Assets into the validation copy and run `ZoneSceneBuilder.BuildOakhaven`, which registers zones, quests and items.
-  - `EncounterBuildPlayer.Build` now does the same before building.
-- **PowerShell gotcha:** never pass a single replacement pair as `@( @(a,b) )`. PowerShell flattens it, which corrupted two files once.
-- **Visual review:** 81 confirmed defects across the four zones, listed in `Docs/VISUAL_REVIEW_2026-09-29.md`. None are fixed yet. The main themes:
-  - The world's edge is visible past the exits.
-  - Night-facing sides render pure black.
-  - A grey slab sits under the bridge arches.
-  - Zone moods don't come through: Khaven isn't dusk or grey, Gloom Creek is chrome, the Peaks are grassy hills, and the Ash Rim is tan sand.
-  - Floating or clipping props.
-  - Landmarks that don't match their names.
-  - Speech bubbles and labels over the HUD.
-  - Capture-tour cameras stuck inside trees and walls.
-- **Open items:**
-  - Quest rewards don't grant items yet.
-  - Water doesn't receive shadows, and there is no underwater camera.
-  - No audio.
-  - Buildings pass (graphics) still to do.
-  - Hollow Men / the well at night (Chronicle II).
-
-## UPDATE 2026-09-29 (Claude session) â€” quests, village trades, direction decisions
-- **Decisions by Chris (2026-09-29):**
-  - The game is set BEFORE Oakhaven is erased, so the village stays standing and the erasure is not shown.
-  - The inn is the **Golden Cask**, the book's name (it was Whispering Barrel).
-  - When you need his input, ask prominently: use the question prompt, or put the question first and short. He skims long reports.
-- **Quests:** the framework and 10 Oakhaven quests are done. Read `Docs/QUEST_DESIGN.md` section 7. The book is on L. Save format 4 (`SAVE_FORMAT.md`).
-- **Village trades:**
-  - Trade outfits, `<Trade>` nameplates and workplaces: forge, stall, oven, tannery and woodpile.
-  - Residents (`life.residents`): Quill the Salt-Mender and Warden Ivel.
-  - See WORLD_ZONES.md, "Life, day and night".
-- **Next:** the well at night and the Hollow Men (Chronicle II onward), then Khaven quests and the Sandthrone contracts.
-- **Validation:** helper scripts are in the session scratchpad (they can be recreated from "Practical validation workflow" below).
-  They sync with robocopy /MIR, run EditMode and PlayMode, build, and capture with `--crulanda-ui-capture` and `--crulanda-world-capture`.
-
-## UPDATE 2026-09-28 (Claude session) â€” day/night cycle, hen-wives and chicken coops
-Chris asked for a chicken farmer who gathers eggs, feeds the chickens, and puts them in the coops at night.
-- `Scripts/World/WorldClock.cs`: the day/night cycle (40 min/day, static hour, lamps as `NightLights`) and `ZoneCoop`.
-- `ZoneBuilder.Coop` builds the `coop` prop. Oakhaven has three coops.
-- `WorldLife.cs`:
-  - Villager role `henwife` with a scheduled routine: open, feed, eggs, yard, herd, close.
-  - Every villager has a bedtime.
-  - Chickens link to a coop and gain the states Roost, Return and Feed.
-- Full description: WORLD_ZONES.md, "Life, day and night". Tests: VillageDayTests (PlayMode).
-- Earlier in this session (not yet in the CHANGELOG):
-  - WoW-classic-style HUD (`EncounterHud`, `HudMaps`): minimap, M zone map, scroll out to the world map.
-  - Oakhaven enlarged to 260 m with farms, mill, orchard, groves and instanced grass.
-  - Walk-in inn with a door; villagers and critters (`WorldLife.cs`).
-
-## UPDATE 2026-09-28 (Claude session, latest) â€” direction: evolve the world; Druid playable; Oakhaven zone
-Chris's direction (latest): stop per-skill testing/balancing; "the game needs to evolve first" - build graphics, zones
-and maps from the lore in `D:\code\crulanda` (world_bible.md, maps\*.png, interactive_map.html, chars\*.html, books).
-- Multi-class: `ClassKit` base (Warrior/Druid kits), per-class character saves (`encounter`, `encounter-druid`),
-  last-played remembered via a `profile` slot, switch character from the Esc pause menu. `--crulanda-class <id>` flag.
-- Druid playable: 4 forms (Barkhide/Thornclaw/Rootmend/Thornsong), Shift Breath + per-form pools, 22 base actions,
-  28 talents (rows 0-2 of druid.json). Shared frameworks added: PeriodicEffects (DoT/HoT/channels), enemy Slow/Root,
-  player cast bars with movement interrupt, keys 9/0.
-- World: data-driven zones (`Docs/WORLD_ZONES.md`), Oakhaven built from the canon village map and set as the opening
-  scene; procedural humanoid characters (`ActorVisual`); camera collision. Canon notes: `Docs/CRULANDA_LOCATIONS.md`
-  (Forgeborn is canon; Driftkin/Windcaller are not found in the lore folder).
-- Next world steps: zone-to-zone travel, a second zone (Khaven Village has a strong canon map), interiors for the inn,
-  ambient life (villagers), audio, then better character art.
-
-## UPDATE 2026-09-28 (Claude session, later) â€” Warrior tree is data-driven and 27 talents are playable
-Read PHASE2_CLASS_LOOPS.md "Update 2026-09-28 (later)" and SAVE_FORMAT.md for details. Key facts:
-- Source of truth for talents: workspace `work\calculator\trees\warrior.json` -> copied to
-  `Assets\Crulanda\EncounterContent\Talents\warrior.json` with `build.py --sync` (build.py refuses to run on drift).
-  Game loads it via EncounterContent.talentTree. Only nodes with `"impl": true` are playable, and each must be listed in
-  WarriorKit.ImplementedTalents with code behind it (TalentTree.Parse throws otherwise).
-- Budget = level + 1; tier gate 5 points per row in a branch; same rule in calculator (both modes).
-- Code: TalentTree.cs, WarriorKit.cs (new), EncounterSession/Enemy/Hud/Save/Input/Capture, HealerCompanion,
-  Combatant (barrier), AbilityDefinition (Intercept/Breach/Rally effects), ClassDefinition (talentId on unlocks).
-- Verified: 145/145 EditMode, 26/26 PlayMode, player build OK, HUD screenshots checked (work\ui-captures).
-- Build published to outputs\Crulanda-Playable. Chris's save was backed up to work\save-backups\*-pre-v3 (it was
-  still format 1, level 2) before the new build could migrate it. Zip checkpoint of Assets/Docs/Packages/ProjectSettings
-  from before this slice: work\checkpoints\pre-warrior-slice-*.zip (no Git on this machine).
-- Chris's Unity editor was open on Phase0_TestMap during this work; it will reimport the changed scripts when focused.
-
-## UPDATE 2026-09-28 (Claude session) â€” calculator delivered
-The all-class calculator from "IMMEDIATE UNFINISHED WORK" below now exists and was browser-tested:
-- Page: workspace `outputs\Crulanda-Talent-Calculator.html` (self-contained, ~290 KB; opens from disk).
-- Source: workspace `work\calculator\`: `trees\<class>.json` (20 files, hand-authored per path, PROVISIONAL / GAME-ONLY),
-  `template.html` (renderer), `build.py` (bundles; embeds the Warrior prototype mirroring WarriorTalents.cs),
-  `validate.py` (schema + tier-gate reachability under worst exclusive choice), `tweak.py` (lead-review pass; idempotent),
-  `lint.py` (cross-class duplicate names / borrowed MMO names / cheat-death effects), `summarize.py` (compact review view).
-  Rebuild: run `build.py` with the bundled Python. Old `data.json`/`generate.py` placeholders are superseded.
-- Proposed trees: 3 branches (Druid 4), 7 tiers x 4 columns, 5 points per tier gate, 30-42 ranks per branch,
-  one signature (tier 3-4) and one capstone (tier 6) per path; 1 point per level from level 1 up to level 50 (assumption, not approved).
-- Warrior has two modes: "Implemented prototype" (exact Unity rules, level 1-10) and the proposed 16-node-per-branch full tree
-  that grows out of the prototype nodes.
-- Features: search, per-tree/all reset, tooltips + inspector, dependency-safe refunds, build codes (URL hash, copy/load),
-  saved builds in browser storage, two-build compare. "Design emphasis" bars sum authored per-rank weights; they are
-  explicitly NOT DPS/healing measurements, and observations are allocation facts, not viability verdicts.
-- Verified: 25 in-browser rule/UI checks passed (prototype gates/levels/exclusive signature, tier gates, refund blocking,
-  code round-trip and rejection, save/compare/load, all 20 classes render, every branch fully purchasable under each exclusive choice),
-  no console errors, phone width has no horizontal scroll.
-- Not done: the in-game Unity talent panel still has not been visually inspected (needs a window capture incl. IMGUI);
-  HUD stretches non-uniformly on non-16:10 screens (see KNOWN_ISSUES). Proposed talents are unreviewed by the author,
-  unbalanced and not checked against the novels.
-- Next: Chris reviews trees in the calculator -> lock Warrior's next nodes -> implement them in Unity
-  (data-driven talent assets rather than static WarriorTalents) -> Druid four-path slice.
-
-## Exact locations
-
-- **Git repo (2026-09-29):**
-  - `D:\code\mmo` on branch `main`, first commit `72b4af7`. The repo root also holds `tools\` and `CLAUDE.md`.
-  - Never commit the game into the unrelated `D:\code` repo.
-  - Git is at `C:\Program Files\Git\cmd\git.exe` (not on PATH).
-  - The author is repo-local (`Chris Underwood <chrisu2@gmail.com>`), and there is no global identity.
-  - LFS is local to this repo.
-- **Backup:** `J:\claude\unity projects\mmo`, a full copy including `.git`.
-  - Run `D:\code\mmo\tools\Backup.ps1` after commits. It is additive; `-Full` includes Library, and `-Mirror` makes an exact copy.
-  - J: is slow (about 2 MB/s).
-- Lore: `D:\code\crulanda`
-- Chris's save: `C:\Users\chris\AppData\LocalLow\Crulanda\Crulanda - The Quiet Trail\CrulandaEncounter`. Save backups: workspace `work\save-backups`.
-- Screenshots: workspace `work\world-captures` and `work\ui-captures`.
-- Actual Unity project: `D:\code\mmo\New Unity Project`
-- Assets: `D:\code\mmo\New Unity Project\Assets`
-- Project docs: `D:\code\mmo\New Unity Project\Docs`
-- Unity: `D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe`
-- Validation project copy: `C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation`
-- Workspace: `C:\Users\chris\Documents\Codex\2026-09-28\hel`
-- Outputs: `C:\Users\chris\Documents\Codex\2026-09-28\hel\outputs`
-- Latest packaged player: `outputs\Crulanda-Playable\Crulanda.exe` under the workspace above.
-- Original brief: `C:\Users\chris\Downloads\CRULANDA_UNITY6_CLAUDE_MASTER.md`
-- Supplemental archive: `C:\Users\chris\Downloads\files.zip` (contains Phase 0 archive plus docs).
-- Original brief copied into project: `Docs\PROJECT_MASTER.md`.
-- Calculator reference screenshot: `C:\Users\chris\AppData\Local\Temp\codex-clipboard-27f154d6-8cf3-418c-a2d4-da297c823e45.png`.
-- Bundled Python: `C:\Users\chris\.cache\codex-runtimes\codex-primary-runtime\dependencies\python\python.exe`
-- Bundled Node: `C:\Users\chris\.cache\codex-runtimes\codex-primary-runtime\dependencies\node\bin\node.exe`
-
-This session had full filesystem access and used PowerShell. Since 2026-09-29 the project is under git (see above);
-earlier checkpoints are zip files in `work\checkpoints`.
-Do not overwrite or recreate the project or scene to update it. Preserve .meta GUIDs and user saves.
-
-## User direction and feedback
-
-- User repeatedly confirmed the project path above and granted full access.
-- Integrate the supplied foundation and validate in actual Unity before expanding the sandbox.
-- Handle technical testing autonomously; do not ask the user to play every tiny feature.
-- User confirmed the playable encounter worked, then said combat was too fast. It was slowed.
-- User later saw dead mobs from saved progress. We backed up their save and restarted fresh.
-- User noted walking through scenery. Solid scenery collision/navigation were added and tested.
-- User asked to see auto-attack timing. Do NOT add a separate toggle: keep auto-attacks starting from Strike/Challenge. Show countdown/progress between swings.
-- User wants 3â€“4 base builds per class, combining classic class trees, branching upgrades and hybrid investment.
-- Explicit examples: Warrior Tank/DPS/Support; Druid Tank/Melee/Healer/Ranged.
-- User then explicitly asked for the matrix for ALL classes. It has been expanded.
-- Latest feature request: a calculator visually like the supplied classic talent-tree screenshot, for every build, to explore choices and judge viability.
-- Be candid about proposed estimates versus measured game balance. No false claims that every class is playable.
-
-## Completed foundation / Phase 1
-
-Imported and repaired the provided Phase 0 foundation, then built the playable encounter.
-Assemblies include Core, Data, Gameplay, Persistence, DevTools, Game, Editor, Encounter, Abilities and Combat.
-
-Implemented:
-- Stable actor identity, registry, health/resources, stats/modifiers, content registry and persistence infrastructure.
-- Third-person movement, jump, orbit/zoom camera, tab/click enemy targeting.
-- Automatic melee attacks plus Strike, Challenge (taunt), Guard.
-- Three sentries, threat, leash, death/recovery and recruitable healer Mira.
-- Healer casting, mana, healing threat and opportunistic damage.
-- XP/levels, one loot/equipment upgrade, reward deduplication, save/load and Repeat Trail.
-- Shared per-actor ability runtime: cooldowns, global cooldowns, casts, interruption and resource commitment.
-- Shared Combatant/CombatMath, armor mitigation, timed statuses and derived stats.
-- Status refresh without magnitude stacking; expiry/death/disable/rebuild cleanup.
-- Batched stat mutations invalidate all related caches before notifications; regression coverage for reentrancy and lethal changes.
-- Time-based proximity threat rather than frame-dependent accumulation.
-- Solid scenery collision and blocked NavMesh footprints for tent, crate, rocks, trunks, ruins and boundaries.
-- Visible automatic swing countdown/progress; no extra activation control.
-
-Current scene: `Assets/Crulanda/Scenes/PlayableEncounter.unity`.
-Original foundation scene: `Assets/Crulanda/Scenes/Phase0_TestMap.unity`.
-Do not confuse the two; the foundation map has no playable character loop.
-
-Pacing defaults:
-- Regular sentries 240 HP, veteran 340 HP.
-- Player/enemy swing interval 2.6 seconds.
-- Strike +12 damage, 5-second cooldown.
-- Guard baseline 5 seconds, incoming damage multiplier 0.4.
-- Challenge taunt 3 seconds.
-- Healer heal 42, mana cost 18, cast 1.5s, cooldown 3.5s; bolt 7 every 4s.
-- Historical fresh-character fight timings about 21/24/35 seconds after corrected threat.
-
-## Phase 2 foundation already implemented
-
-Files under `Assets/Crulanda/Scripts/Encounter`:
-- `ClassDefinition.cs`: ClassDefinition, ClassAbilityUnlock, ClassLoadout. Profiles hold identity, role, resource capacity/regen, derived stats and ordered ability unlocks. IDs resolve against the catalog; invalid/duplicate/unknown unlocks are rejected.
-- `BuildTree.cs`: validates complete proposed rank allocations with rank/level gates, prerequisites, branch investment, budget, exclusive choices and reachable purchase order. Rejects cyclic or missing graph prerequisites.
-- EncounterContent now has `playerClass`; current serialized content is `class.warrior` with all original three actions available at level 1.
-- Session gates abilities before spending costs/effects and derives action ordering from the class profile.
-- HUD reads class/resource names and action slots from data. Number keys 1â€“8 are supported.
-- Actor.ConfigureResource configures class resource at spawn. Derived stats use playerClass.stats.
-- Legacy EncounterContent.playerStats remains for asset compatibility but is no longer authoritative; existing values were copied to playerClass.stats.
-
-No class selection, Druid forms, extra playable class kits or full equipment restrictions/trainers exist yet.
-
-## NEW: implemented Warrior talent prototype (latest code/build)
-
-This is newer than several older docs stating no tree exists.
-
-New file: `Assets/Crulanda/Scripts/Encounter/WarriorTalents.cs`.
-Nine nodes across three columns, 12 possible rank points in total:
-
-| Path | Early node (2 ranks, level 1) | Middle (1 rank, level 3, requires early 2/2) | Signature (1 rank, level 5, requires middle) |
-|---|---|---|---|
-| Tank | Tempered armor: +8 armor/rank | Steady challenge: landed Challenge refunds 10 vigor | Bulwark: Guard lasts 7s and reduces damage by 75% |
-| DPS | Weapon pressure: +2 weapon damage/rank, including autos | Finishing strike: Strike +8 against targets below 40% HP | Sweeping strike: Strike hits other living sentries within 4m of target for half raw damage; can pull extras |
-| Support | Rally reserve: +10 max vigor/rank, no extra regen | Rallying challenge: landed Challenge restores 12 mana to living/recruited Mira within 13m | Shared shelter: Guard heals nearby Mira for 20 and gives 30% damage reduction for 5s |
-
-Rules:
-- One talent point per level including level 1; capped at 10 for this prototype.
-- All three signature nodes share an exclusive group: only one signature can be chosen.
-- Cross-path investment in earlier talents is allowed within the budget.
-- Changes/refunds/full reset require alive, unpaused and out of combat.
-- Individual refunds validate the entire allocation; cannot orphan a dependent talent.
-- Changes save immediately; full respec is free during the prototype.
-- Talent stat modifiers have a dedicated source and are removed/reapplied, preventing stacking.
-- Respec/allocation changes remove active Guard/shared-shelter effects so talents do not leave temporary benefits behind.
-- Support healing creates threat attributed to the player.
-- Build UI opens with B or the Talents button. It has three connected columns, descriptions, rank counts, requirements, invest/refund and full reset.
-- Movement, target cycling and ability number keys are suppressed while the tree is open. Combat itself is not paused; allocation becomes read-only during combat.
-
-Modified files: EncounterSession.cs, EncounterHud.cs, EncounterProgress.cs, EncounterSave.cs, EncounterInput.cs, AdventurerMotor.cs.
-
-Important: the in-game talent UI has NOT been visually inspected yet, and the user has NOT played this talent build.
-The automated tests and player build passed. Do not equate that with completed visual QA or balanced builds.
-
-## Save migration and compatibility
-
-Current save folder:
-`C:\Users\chris\AppData\LocalLow\Crulanda\Crulanda - The Quiet Trail\CrulandaEncounter`
-Files: `encounter.save.json` plus `.bak`.
-
-Latest EncounterSave writes envelope formatVersion 2, gameVersion 0.2.0.
-- EncounterProgress now includes classId (`class.warrior`) and List<TalentRank> talents.
-- Version 1 reads explicitly migrate to Warrior and an empty talent list, preserving IDs, progression, equipment, party and enemies.
-- Version 2 validates known Warrior class identity and complete talent allocations.
-- Unknown/invalid allocations reject loading; existing save-protection behavior blocks overwrite of unreadable startup saves.
-- Legacy migration is persisted on the next normal save, not by overwriting during read.
-- Transient statuses/cooldowns remain unpersisted.
-- Only Warrior is currently supported by this save validator; expand it deliberately when other classes become playable.
-
-Previous user save backup is under workspace `work\save-backups\<timestamp>`.
-Do not reset or delete the user's progress just to test. Use isolated test save directories.
-
-## Latest validation â€” VERIFIED
-
-Unity 6000.6.3f1 ran these on the synchronized validation project copy, leaving the user's open project/editor untouched:
-- **142/142 EditMode tests passed.**
-- **22/22 PlayMode tests passed.**
-- **Windows player build succeeded.**
-
-New coverage:
-- Hybrid budgets, exclusive signature choice, level gates and prerequisite refunds.
-- Legacy save migration, v2 talent round trip, rejection of foreign talent IDs.
-- Talent stats survive reload and do not stack after respec/reallocation.
-- Tank Guard multiplier/duration and cleanup on respec.
-- DPS cleave and refusal to respec in combat.
-- Support mana restoration, healing and protection.
-- Existing class gating, swing timing, scenery/NavMesh, combat/healer/loot/equip/save/load regressions still pass.
-
-Reports copied to actual project `Docs\ValidationResults`:
-`talents-edit-results.xml`, `talents-play-results.xml`, `talents-edit.log`, `talents-play.log`, `talents-build.log`.
-Earlier reports remain for history.
-
-Latest build was copied into `outputs\Crulanda-Playable` during handoff (no player process was running).
-No user replay requested. No visual screenshot of the new tree was captured.
-
-## Full roster/build matrix â€” complete as a design document
-
-Project: `Docs\CLASS_BUILD_MATRIX.md`.
-User-facing copy: `outputs\Crulanda-Class-Build-Matrix.md`.
-
-Covers 20 entries / 61 proposed paths:
-1. Warrior: Tank / DPS / Support.
-2. Paladin: Oathguard / Judicator / Sanctuary.
-3. Ranger: Marksman / Beastbond / Pathfinder.
-4. Rogue / Assassin / Shadow Operative: Duelist / Assassin / Infiltrator (Spy grouped here).
-5. Cleric: Restoration / Aegis / Censure.
-6. Druid: Tank / Melee / Healer / Ranged.
-7. Shaman: Spirit / Weapon-channeler / Totemkeeper.
-8. Mage: Combustion / Heatweaver / Spellbinder.
-9. Necromancer: Bone host / Withering / Soul ward.
-10. Warlock: Pactbound / Affliction / Sacrifice.
-11. Bard: Anthem / Elegist / Skirmisher.
-12. Monk: Sentinel / Striker / Harmonist.
-13. Knight: Bastion / Challenger / Oathkeeper.
-14. Seer: Oracle / Fateweaver / Watcher.
-15. Tinker: Construct keeper / Gadgeteer / Field technician.
-16. Engineer: Artillerist / Demolitionist / Fortifier.
-17. Healer / medicinal practitioner: Herbalist / Woundkeeper / Apothecary.
-18. Mystic: Resonant / Prism guardian / Crystal binder.
-19. Windcaller: Storm conductor / Gale keeper / Tempest.
-20. Venom / Alchemical Specialist: Toxicologist / Catalyst / Chemist.
-
-The original brief had 12 generic classes and later additional Crulanda seeds. Covering all produces 20 candidates,
-not a decision to ship 20 classes. The up-to-15 final roster target and overlaps remain unresolved.
-Tinker/Engineer, Knight/Paladin/Warrior, Cleric/Healer, Rogue/Assassin, etc. have explicit differentiation notes.
-The user asked for ALL-class matrix coverage; do not limit the calculator to Warrior/Druid.
-The newer 3â€“4-build instruction takes precedence over the brief's earlier up-to-3 specializations.
-
-Novels were not supplied/cross-checked. Canon names/claims from the brief remain unverified.
-Avoid treating proposed spell names and mechanics as established Crulanda lore.
-
-## IMMEDIATE UNFINISHED WORK: visual all-class calculator
-
-The user's reference shows tall parallel trees, icon nodes, rank badges, connecting arrows,
-branch totals, tooltips/search, reset controls and a shared point budget. They want to see choices
-for every class/build and use the calculator to explore viability.
-
-What EXISTS:
-1. `outputs\Crulanda-Build-Workshop.html` (~20 KB): an earlier, self-contained preview.
-   - Actual 9-node Warrior prototype calculator with levels 1â€“10, ranked investment/refund and exclusive signatures.
-   - Other classes have build-path cards copied from the matrix and hybrid comparison selections.
-   - Does NOT yet match the full reference or provide detailed trees for all classes.
-   - No saved-build system, robust viability model or visual/browser QA completed.
-2. `work\calculator\generate.py`: draft data generator for the larger calculator.
-3. `work\calculator\data.json` (~251 KB): generated 20 classes / 61 paths / 13 draft nodes per path = 793 draft nodes.
-   - Seven tiers, branch-spend gates 0/5/10/15/20/25/30, proposed level gates, rank caps, prerequisite IDs.
-   - Per-path proposed signature names derive from the matrix's mechanics.
-   - Most passive nodes and numerical modifiers are generated templates, NOT individually designed/approved talents.
-   - Provisional model modifiers: damage, healing, mitigation, support, control, capacity, efficiency, regen, coverage, drain.
-   - There is NO completed renderer or viability evaluator consuming this new dataset yet.
-   - No assertions of balanced builds are warranted. Review/refine placeholders, especially duplicated percentage nodes.
-   - The intended full-tree point budget was still a design assumption (classic-style 51-point exploration was being considered), NOT a user-approved progression rule. Actual Unity prototype remains 1 point/level to level 10.
-
-The reference screenshot path is listed above. Do not copy branded art/assets; use the tree organization as a visual reference.
-
-What to do next:
-1. Inspect the existing Unity talent UI visually and address layout/input issues before calling it presentation-ready.
-2. Build the full standalone calculator with original icon/branch presentation, connected nodes, tooltips and locked/unlocked states.
-3. Cover every class in the matrix; clearly distinguish implemented Warrior prototype talents from proposed full-game design talents.
-4. Support add/refund, dependency-safe reset, branch/class totals, point/level budget, search and saved/imported/exported builds.
-5. Add explicit assumptions and comparison results for modeled damage/healing/durability/resource pressure/utility.
-   Allocation legality can be definitive; gameplay viability is speculative until classes/rotations/encounters are implemented.
-   Do not fake simulation by presenting generic percentage sums as measured DPS or a definitive viability score.
-6. Test prerequisite/refund/point-budget rules, imports, class changes, save slots and comparison behavior.
-7. Visually verify the calculator and open it for Chris. User asked to SEE options, not only receive another prose matrix.
-8. Continue Warrior build iteration and then Druid's four paths, using the calculator as a reviewed design surface.
-
-## Practical validation workflow
-
-Do not run two Unity processes against the same project directory concurrently.
-Copy changed source/assets from actual project to validation copy, preserving relative paths.
-Use hidden background processes for technical runs; do not close the user's open Unity editor.
-
-PowerShell test pattern (substitute EditMode/PlayMode and report names):
-
-```powershell
-$v = 'C:\Users\chris\Documents\Codex\2026-09-28\hel\work\encounter-validation'
-$unity = 'D:\unity\Hub\Editor\6000.6.3f1\Editor\Unity.exe'
-Start-Process $unity -WindowStyle Hidden -PassThru -ArgumentList @(
-  '-batchmode','-nographics','-projectPath',('"'+$v+'"'),
-  '-runTests','-testPlatform','PlayMode',
-  '-testResults',('"'+$v+'\talents-play-results.xml"'),
-  '-logFile',('"'+$v+'\talents-play.log"')
-)
-```
-
-Do NOT add `-quit` to test runs. Wait for completion and inspect XML test-run totals/failures.
-PlayMode full encounter runs take roughly 90â€“120 seconds.
-
-Build pattern:
-
-```powershell
-Start-Process $unity -WindowStyle Hidden -PassThru -ArgumentList @(
-  '-batchmode','-nographics','-quit','-projectPath',('"'+$v+'"'),
-  '-executeMethod','Crulanda.EditorTools.EncounterBuildPlayer.Build',
-  '-logFile',('"'+$v+'\talents-build.log"')
-)
-```
-
-Output: validation project `Builds\Crulanda`.
-Confirm `Build Finished, Result: Success` in the log, then copy to outputs only when the player is not running.
-New Unity-generated .meta files should be copied back to actual project only if missing; preserve existing GUIDs.
-
-There is an opt-in `--crulanda-capture <directory>` rendered smoke harness with isolated saves.
-It captures camera-rendered world frames, NOT IMGUI overlays. It cannot visually validate the talent HUD.
-Use actual window capture for HUD inspection, or a deliberate appropriate UI capture method.
-
-## Controls and practical limitations
-
-WASD move, Space jump, RMB orbit, wheel zoom, Tab/click target.
-1 Strike starts automatic attacks; 2 Challenge also starts autos; 3 Guard.
-E talk/recruit/revive/loot/travel; left-click selects NPCs; I bags; C character; L quest book; M map; B talents;
-Ctrl (hold) sneak; F5 save; F9 load; R recover after death; Esc pause. Development builds: F10 level 10, F11 skip an hour.
-Repeat Trail respawns enemies while keeping progression/equipment.
-
-Art is placeholder primitives; HUD is IMGUI. No final animation/audio/world art.
-Scenery collisions are added at runtime by EncounterNavigation based on existing prototype object names;
-agent navigation excludes renderer-bound footprints. This should eventually become authored collision/navigation data.
-Talent content is currently a static WarriorTalents definition in Encounter, not a general content-asset pipeline.
-Support targets Mira specifically; general friendly targeting/party support is future work.
-Cleave can aggro additional enemies intentionally. Talents are provisional and may change combat pacing.
-No DOT/HoT/CC/dispels framework, full inventory/vendors, quests, full parties, offscreen population simulation or dungeons yet.
-Do not claim Phase 2 complete just because the foundation and one small talent tree compile.
-
-## Handoff housekeeping
-
-Copies of this handoff are in project `Docs\CLAUDE_HANDOFF.md` and workspace `outputs\Crulanda-Claude-Handoff.md`.
-Roadmap, Phase 2 plan, build matrix and known-issues docs received dated handoff notes correcting their older no-tree/schema-1 status.
-The completed matrix and earlier browser preview remain available in outputs.
-There were no active background Unity test/build processes at the last completion check.
-No new calculator browser server was launched, and no new UI screenshot was captured.
-
-## STOPPED 2026-10-02 ~00:40 (Chris's usage limit)
-All agent work was stopped. Nothing is lost: each worktree keeps what its agents had committed, and each workflow can be
-resumed with `Workflow({scriptPath, resumeFromRunId})` (finished agents replay from cache).
-- Round 7 (notes 1-3) is on main (61a2e94, compile ALL OK, EditMode 369/369). Its detached full check was left running
-  locally (no cost); read `hel\work\full-run.done`, `q-PlayMode.xml` and the tour shots, fix, publish.
-- Stopped workflows (resume or rerun): art notes wf_1ca487e1-45f (sheep/cats, lumber trees, sun, caves, icons), colour
-  wf_99f8008d-998, characters wf_755e3e44-eb0, history PDF wf_e1fd6182-250 (its research notes are in
-  `scratchpad\history`; `tools/docs` holds a partial generator, uncommitted).
-- Ask Chris before starting multi-agent runs again: tonight's used his Fable allowance and his 5-hour limit.
-- The history PDF's writer finished a DRAFT before the stop: `Docs/Crulanda-Everything-Built-So-Far.pdf` (96 pages), built by
-  `tools/docs/make_history_pdf.py` from `tools/docs/history_content.md`. It was NOT fact-checked or page-checked (the
-  checkers never ran). Committed as a draft; check it before calling it final.
-
-### NEXT SESSION, IN ORDER (cheap first; ask Chris before any multi-agent run, with a cost estimate)
-1. Read `hel\work\full-run.done` and `encounter-validation\q-PlayMode.xml` for round 7 (notes 1-3, main at 61a2e94). Fix
-   failures by hand, look at the tour shots note 1's write-up lists and `ui-captures\elite`, publish, back up.
-2. Send Chris the PDF draft and ask if he wants it checked.
-3. His notes 4-13 (PLAYTEST_NOTES.md), one at a time, by hand: 5 (ore green) is done on `fix/n56-ore-windfall` and only needs
-   merging; then whichever he picks. Worktrees under `scratchpad\wt` hold any partial work from the stopped runs.
-
-## UPDATE 2026-10-02 morning (worked alone, no agents, at Chris's request: "dont overload the system")
-- **Round 7 PUBLISHED** (main e6cd39b): Chris's notes 1-3 (Oakhaven 560 m with Crowsfoot Hollow moved out; social pulls;
-  harder elites and Bandit King). The full run's six PlayMode failures were four test bugs (one long path across the big
-  zone, which Unity's pathfinder gives up on: tests now use `Tests/PlayMode/NavReach.Walkable`), Lark Hill's map mark on its
-  secret (moved), and a test timeout; fixtures 34/34 after. Oakhaven's player build of the zone is now 11.6-13.5 s (was 6.4).
-- Note for later: a mob that turns on a party member standing past its leash resets its whole group at once. Mira follows
-  the player so it does not arise in play, but a far-off heal could be used to reset a fight.
-- **Next, one at a time, asking Chris before anything with several agents:** the art notes (4-13) by hand, starting with
-  what is already built on its branch: note 5 (ore green) on `fix/n56-ore-windfall`. Then send him the PDF draft.
-
-## UPDATE 2026-10-02 midday: the other four zones grown, PUBLISHED (main 4c5dcc7, build of 12:27)
-- Chris said "yes. grow about 20%": Khaven 410 m, the Peaks, the Ash Rim and the Verdant Shore 430 m; every camp within
-  about 120 m of a home moved out whole to 125 m and more (`tools/wip/zonegrowth/grow_zone.py`, one zone a run; WORLD_ZONES.md
-  "The other four zones grown"; ZoneGrowthTests.NearHomes names the ones left by design).
-- The check found four things, all fixed: place_nodes.py's writer dropped the stations after the nodes (fixed; stations
-  restored from d9afc92); exits and arrivals left off their roads where a road's last bend changed (snapped back along the
-  road); the Fraying placed past the Ash Rim's Wasting curtain (grow_zone.py now keeps 15 m inside a curtain); a rabbit could
-  respawn in the Brook pond (GameAnimal.NearestDry). New EditMode tests: exits on roads in every zone, nothing in the unmade,
-  the creeks' line. EditMode 372/372; PlayMode fixtures 10/10 after; the zones toured.
-- Chris's new notes while playing: **15** (a few trees' limbs do not meet their trunks) and **6 again** (the lumber trees still
-  have sticks poking up; "need to look chopped down").
-- **NEXT (in hand):** note 6, the felled tree. Design previewed with the software renderer (`scratchpad\artnotes\windfall\d3`,
-  gen.py v2): an axe-cut stump (pale face, heartwood, a short hinge ridge, chips), the trunk limbed (flush stubs with pale
-  ends) and bucked in two with pale cut ends, the lopped crown as a low heap of bare branches that stays when the logs are
-  taken. Port it into `ZoneBuilder.Nodes.cs` Windfall (within -2.9..+2.5 m along X for WindfallYaw), then note 15 (find the
-  tree builder whose limbs float), then merge note 5 (ore, `fix/n56-ore-windfall`), one build for all three.
-
-## UPDATE 2026-10-02 afternoon: notes 4, 5, 6, 7 and 15 PUBLISHED (main dd653fa, build of 13:49)
-- 13:41 build: note 6 felled lumber trees (Windfall rebuilt; preview tools in `tools/wip/render`, design `tools/wip/windfall`),
-  note 15 limbs joined (ZoneBuilder.LimbAt; TreeLimbTests with ZoneBuilder.RecordWood), note 5 ore (fix/n56-ore-windfall
-  merged). Full check: EditMode 372/372, PlayMode 174/174, five zones toured.
-- 13:50 build: notes 4 and 7 (CritterBody: designer 0's sheep and jointed cat tail from the stopped art-notes run, previews in
-  `scratchpad\artnotes\critters\d0`); the Oakhaven tour now shoots `oakhaven-98-critters-lineup` and `-cats`. HuntTests and
-  VillageHomeTests 14/14.
-- **Note 11 icons PUBLISHED 14:12** (main: IconDb, Resources/Icons, tools/art/make_icons.py; rerun it after adding items).
-- **Open notes:** 9 (bloom and sun), 10 (baked cave lighting), 12 (smooth characters, "build them in code"),
-  13 (high-fantasy colour), 14 (the PDF: draft committed, not checked). The stopped run's previews for 9, 10, 11 and 13 are in
-  `scratchpad\artnotes\{sun,caves,icons,colour}` (no code in their worktrees). Ask Chris which next; work solo.
-
-## UPDATE 2026-10-02 late afternoon: notes 11, 13, 16 PUBLISHED (15:33); note 12 (smooth characters) IN HAND, solo
-- Published 14:12: note 11 icons. 15:33: note 13 colour (gear palettes, people, village) and note 16 (Khaven sign lantern).
-- Ultracode was switched on for the session; Chris chose "Solo, as today" (memory crulanda-usage-budget).
-- **Note 12, the smooth figure** (Chris: "still have the bubble forms/armor/characters"). Plan and state:
-  - C1a DONE on main (c933194): SmoothBody.cs lofts one skinned body per region on a skeleton (Body, Spine, Chest, Neck, Head;
-    Arm L/R + Forearm + Hand; Leg L/R + Shin + Foot), shoulder/hip pivots unchanged; head, face and hair on the Head bone;
-    knees/elbows/feet in ActorVisual.WalkJoints/Bend; a limb carrying something rigid stays near straight (Carries).
-    ActorVisual.Smooth=false gives the old block figure. Reference + preview: tools/wip/characters/body.py with
-    tools/wip/render/mesh_view.py (preview-v2.png sent to Chris). EditMode 378/378 after the gear tests were moved to regions.
-    Full check (tests, build, Oakhaven tour, wardrobe/fight shots) started 15:39.
-  - C1b NEXT: held weapons/shields on the forearm bones (hand point (-.005,-.335,.01) in Forearm R space; shield
-    (-.095,-.095,.06) in Forearm L); limb armour skinned to (pivot, lower bone[, foot]) in ActorVisual.GearArmor Fitted for
-    roots off the body (weights by y: elbow at -.285, knee at -.43, ankle at -.84 in pivot space), cached; GearPartCount to
-    count Renderers; tests: main hand parent "Forearm R", enemy "Body/Arm R/..." paths.
-  - C2: rounder armour shells (square 3-4 on the smooth torso), cloth that moves (verlet bones: tabards, skirts, capes, robes,
-    the long hair fall); C3: outfits (Dress) and class kits refitted; Pale and Keeper smooth.
-
-## UPDATE 2026-10-02 evening: note 12 C1a+C1b PUBLISHED (16:58); then REAL MODELS (C3), Chris AFK till ~22:30
-- C1b (limb armour and held gear skinned to the elbows and knees) published with C1a at 16:58; full check EditMode 378/378,
-  PlayMode 174/174. Chris: "that still looks REALLY blocky" -> chose real models: "Find real models", "Quaternius free",
-  "need females also"; armour to be REFIT, not redone. He granted download authority ("you have authority to download and
-  do what is need to make this a success"). Purchases stay his: Quaternius' $20 tier adds knight/noble/wizard outfits.
-- **The kits** (CC0): Universal Base Characters, Modular Character Outfits - Fantasy (Peasant, Ranger; m/f), Universal
-  Animation Library (UAL1_Standard, 43 clips). Zips in the session scratchpad; `tools/wip/characters/quaternius_import.py
-  <zip folder>` extracts into `Resources/Characters/{Bodies,Hair,Outfits,Animations,Textures}` (ORM -> MetalSmooth + Occlusion).
-  `Editor/CharacterImport.cs`: humanoid import, texture types, clip settings (loop the _Loop clips, root baked into the pose),
-  the kit materials (`Resources/Characters/Materials/*.mat`, so their shader variants ship), `Report()` (bones/meshes/clips to
-  CharacterReport.txt beside the validation project) and `Prepare()`.
-- **ModelFigure.cs**: the outfit's skeleton (male outfits use the slighter "Regular" skeleton; heads and necks match the
-  Superhero body exactly), the Superhero head cut at the collar (HeadOnly: triangles >= half weighted to Head/neck), its eyes
-  and brows, hair (male: SimpleParted/Buzzed/bald; female: Long/Buns/BuzzedFemale), beard, a hood (Ranger's, on any outfit),
-  tints (skin, hair, shirt, breeches, hood), turned 180 (the files face -Z). Motion: a PlayableGraph mixer (idle/walk/jog/
-  sprint by speed, sit, swim, sneak/crouch, talk, gather, death). Edit mode cannot run a graph on an Animator: `Sample` uses
-  AnimationClip.SampleAnimation.
-- **ActorVisual.Model.cs**: `ActorVisual.Models` (default on; off = the smooth figure). Frames rebuilt on the model's bones in
-  its bind pose and copied from them every LateUpdate: Arm/Forearm/Hand and Leg/Shin/Foot (-Y down the bone, +Z front,
-  scaled by limb length against .57 and .84), Head/Chest/Hips frames (old body space mapped onto the model's head, chest,
-  hips). Gear slot roots on the head/chest/hips frames (SlotParent), limb armour skinned as before but slimmed (ArmGirth .8,
-  LegGirth .72; SkinnedLimb cache keyed by joints and girth). Cover/Bare dye the model's cloth (or hands for gloves) and hide
-  its belts/bracers. Old kit on the body is remapped to the frames by height; flat boards (aprons, tabards, capes, shawls)
-  and skirt drums are left off, round head balls become the outfit's hood. Poses: PoseOf -> clip slot or old arm angles
-  (PoseArm onto the model's arms), back bends for stoop/slump, swim lift from the clip's head height, ambushers crouch,
-  the dead play Death01; the Body is only written for poses that lean/drop (elites' wind-up lean survives).
-  `Preview(pose, walk, t)` / `PreviewDead()` pose it in edit mode. Women by name list/trade (Female()).
-- **Editor/FigureCapture.cs** (`run_method.ps1 -Method Crulanda.EditorTools.FigureCapture.Run -Tag figures -Graphics`):
-  people, trades, poses, armour and faces to `hel\work\ui-captures\figures` in about a minute, no build.
-- `tools/validation/run_method.ps1` (new; `-Graphics` keeps the GPU). GPU skinning turned on (ProjectSettings, both copies).
-- Tests: GearVisualTests run on the smooth figure (Models off); new ModelFigureTests (5); focus run 21/21. GearBinderTests
-  accepts the chest frame. WorldLife's tankard hangs from `RightHandle` (rides the forearm).
-- **Metas**: robocopy /MIR deletes what Unity made in the validation copy; copy new .meta/.mat files back after each Unity run
-  (done for the kit, the materials, the scripts).
-- Committed 4078ab7 (models). The first full run (18:20) was STOPPED in PlayMode: `Villager.Emerge` hit a destroyed
-  MeshRenderer (Remap destroyed old board parts after WorldLife cached the villager's renderers) -> parts are now hidden and
-  unparented first (Kill). Follow-ups in the same round: rounder shells on models (GearArmor `Shell`, RoundSquare 3.2, keys
-  "+.round"), carry poses (`ActorVisual.Carry`, set by WorldLife Carry/DropLoad; FigureCapture "carry" row), the off-screen
-  guard (`ModelFigure.Visible`: PoseArm and back bends only when the Animator posed the bones). Markers: hel\work\c3-start.marker
-  (round3-start.marker is stale, 16:55).
-- `Ranger_White` kit material: T_Ranger_White_BaseColor.png (tools/wip/characters/concord: the green cloth bleached to linen
-  white by hue, leather and metal kept; other maps the Ranger's). `Spec.bleach` picks it for the Warrior, Collector, Warden,
-  Outrider, Cultist, Deserter, Bandit King and the stranger. Clip start offsets now hash the figure's name (no global Random).
-- NEXT for the models (seen in FigureCapture, not yet done): face pieces sit ~4 cm high (the head frame is lifted .12 for
-  helmets; masks and mouth scarves want a face frame at the old .8 -> HeadBone+.07); big balls on the chest still read as
-  bubbles (the skinner's pelt, the warden's bark pauldrons, the deserters' leather pauldron: drop chest spheres >= .2 on
-  models); the stranger's side panels; children are scaled adults; the armour's own designs (C2 proper: plate shapes, moving
-  cloth); a Peasant "bleached" copy for truer villager dyes; the $20 Quaternius tier (Chris's to buy) for knights/nobles.
-- **PUBLISHED 2026-10-02 19:37 (d618963, build of 19:27)**: models + round 2. Full run 2: EditMode 383/383, PlayMode 173/174
-  (HollowQuestTests' crown path, fixed in d618963). Backup OK.
-- Round 3 (uncommitted at 19:38, in full run 3): `Face frame` (old face .835 eyes/.745 mouth -> HeadBone+.10/.04; items with
-  y<.87 and z>=.09 on the head), chest Spheres >= .2 left off, Peasant figures `bleach` (their Ranger hood dyes true), the
-  merchant's collar box off models. `round3_toggle.py` (scratchpad) can back it in or out.
-- **PUBLISHED 2026-10-02 20:38 (round 3, build of 20:28)**: full run 3 EditMode 383/383, PlayMode 174/174, Oakhaven toured,
-  HUD/wardrobe/loot/fight shots; no exceptions in any player log. Chris was sent tools/wip/characters/models-preview.jpg.
-- Round 4 (full run 4 started 20:39): villager height .96-1.04 (Spec.scale by variant), `ChildHead` 1.22 (Head bone scaled
-  before the frames; head and face frames scale with it), stone figures use KitMat("Stone") (no asset: plain matte grey).
-- **PUBLISHED 2026-10-02 21:38 (round 4, build of 21:29)**: full run 4 EditMode 383/383, PlayMode 174/174, Oakhaven toured,
-  all shots taken, no exceptions in any player log.
-- **Round 5 (night, in full run 4 started ~23:05):** `ModelArmour.cs` (Cloud of the model's clothes in the bind pose by piece:
-  shirt = torso, sleeves = arms, trousers/boots = legs; cages per frame from convex outlines per 1.5 cm band; Warp keeps
-  BodyGap .62 / LimbGap .55 of the old clearance; hands/feet as boxes; weights from the 4 nearest cloth points, skirts lean to
-  the pelvis). GearArmor.Fitted sends every non-head group on a model to `ModelPart` (SkinnedMeshRenderer on the model's 65
-  bones). Hats: `HeadOutline` (skull, and skull+hair) in head-frame space; `HatFit` (rim to eyes+.065, crown to clear the skull
-  +.03), `Cap` (head shells for ball and pillbox caps), peaks to the front rim; armour head.cap/kettle/wrap/circlet/crown use it.
-  Swim still = "swim" slowed to .35. Mira's hood = her cloth. ModelFigureTests 6 (new: armour follows the form, hats).
-- **PUBLISHED 2026-10-02 23:44 (round 5, efba82b)**: armour that follows the form and fitted hats (see CHANGELOG).
-- **Round 6, feet (PUBLISHED 2026-10-03 00:44)**: `ModelArmour` cages keep a leg's foot as sections along z (`fz0`, `nf`, `fc`
-  middles, `fr` radii per angle; convex hull per 1.5 cm section with its neighbours); the old boot is `FootZ/FootW/FootH/FootY`
-  (heel to toe: z, half-width, half-height, middle) as a squarish oval, mapped section by section (`AlongFoot`), clearance
-  kept at LimbGap. The hand is still box to box. Full run (c3f-start.marker): EditMode 384/384, PlayMode 174/174, Oakhaven
-  toured.
-- **Round 7, real animals (PUBLISHED 2026-10-03 01:59)**: `Resources/Creatures` (Wolf, Stag, Deer FBX from the poly.pizza
-  bundle "Animated Animal Pack" = Quaternius Ultimate Animated Animals, CC0; Quaternius's Google Drive was over its download
-  quota; `tools/wip/animals/animals_import.py` copies them from the zip). `Editor/CreatureImport.cs`: Generic rig, materials
-  by description, readable, normals smoothed 70, the "AnimalArmature|X" takes kept and named X, loops for idles/walk/gallop/
-  eating; `CreatureImport.Report` writes CreatureReport.txt. `ModelBeast.cs`: Build(parent, kind, ground, height, Coat, shade)
-  measures the rest pose from the baked skin (renderer bounds carry a margin) and scales so the head (never the antlers) stands
-  at `height`; colours are the file's (linear, x.8 diffuse factor: undone, then to gamma) or a Coat by material name, with
-  `Native` coats for Stag/Deer; `Rounded` (PN-triangle midpoints, normals per colour patch; NB Vector3.normalized is zero under
-  1e-5 and these meshes are at 1/100 scale: `Unit`); a PlayableGraph with slots idle/idle2/headlow/eat/walk/run/attack/kick/
-  hitL/hitR/death/jump, ticked by its own Driver component (so a dead game animal's death plays on); Drive(speed, standing);
-  Play(one-shot); Die/Revive; Sample for edit mode. `Hips` = the "Back" bone (Body is the low root). `ActorVisual.Beasts.cs`:
-  BuildModelBeast for Wolf (ash = variant odd; Old Whitefoot by name; gloom), Stag (doe = Deer kind); BeastLate (dead: body set
-  upright, death held; LyingLow: headlow; standing: idle/idle2 or eat/idle; fighting: idle); Strike (EncounterEnemy swing and
-  elite ReleaseBlow), Flinch (Receive). CritterBody "deer": MakeModel (r < .5 Stag 1.75 m, else Deer 1.55 m); Stride/Rest/
-  Alert/LieDown/StandUp drive the model; Part uses DestroyImmediate in edit mode. Heights: wolf 1.0 (elite 1.12), stag 1.9,
-  doe 1.6 (elite x1.1). `Editor/CreatureCapture.cs` rows beasts-1/before/round/wolf/stag; sheet tools/wip/characters/show/
-  6-animals.jpg. Batch PlayMode draws nothing: the Animator (CullUpdateTransforms) leaves bones be, so PlayMode tests check
-  state (Model.Dead), EditMode tests check poses (Sample).
-- **Round 8, farm animals (PUBLISHED 2026-10-03 13:06, commit see git log: Farm animals)**: Horse, Donkey and Cow FBX added to Resources/Creatures
-  (`animals_import.py <zip> Horse Donkey Cow`); CritterBody kinds "horse", "donkey", "cow" (MakeModel with `FarmCoat(kind, r)`:
-  four horse coats, four cow coats, two donkey coats; heights 2.15 / 1.6 / 1.6 m; Speed 1.3/.9/.7, FleeSpeed 2.2/1.8,
-  FleeRadius 2.2/1.8; Rest grazes two thirds of the time; models off: `PlainBeast`, the old deer's body scaled, which the deer
-  now uses too). GameAnimals.NeverHunted gains horse, donkey, cow. Oakhaven's life.critters gains five groups at the END of the
-  list (the earlier critters' spawn draws unchanged): horse (-8.5,-9) r1.5 x1 (the Cask), horse (22,128) r6 x2 (Carder's field
-  barn), donkey (-63,-49) r2 x1 (the mill), cow (92,-119) r8 x4 (Brook), cow (-114,50) r6 x3 (Harrow); canonNote labels them
-  GAME-ONLY. CreatureCapture rows beasts-farm and beasts-cows; sheet tools/wip/characters/show/7-farm.jpg. Zone map plots:
-  scratchpad zonemap.py (roads, water, props, critters, camps on a 10 m grid).
-- **Round 9, boars (PUBLISHED 2026-10-03 14:42)**: CraftPix "Free Wild Animal 3D Low Poly Models" (free-game-assets.itch.io, no
-  login there; craftpix.net itself wants an account; licence: CraftPix freebie, commercial use OK, no redistribution of the
-  art; zip kept at tools/wip/animals/source/CraftPix-Free-Wild-Animal-3D-Models.zip, git-ignored): Resources/Creatures/Boar.fbx
-  + wild_animals_map.png (a 64x64 palette; CreatureImport: no mipmaps, uncompressed) + CraftPix-License.txt. The set's models
-  are RIGGED, NO CLIPS: `ModelBeast.Proc.cs` (partial) moves them: MakeRig finds the chest/rear spine (Neck's and Tail_1's
-  parents), legs = chains of 3+ bones hanging from them (side and front by position in the animal's frame), Pose() resets to
-  rest and swings legs about the animal's right axis (diagonal pairs, middle joint folds on the forward swing), neck/head/tail,
-  and moves/rolls the whole model (lunge, drop, death roll 88 deg about its middle onto the ground: halfWidth). Slots as the
-  clip animals (idle, idle2, eat, headlow, walk, run, attack, kick, hitL/R, death, jump). ModelBeast: textured materials keep
-  their atlas (Atlas()), facing from hips to head in any direction (Shape.yaw), Hips falls back to Spine_2, Neck to Neck.
-  ActorVisual.Beasts: Boar coats by name (wild .56/.49/.43, Carrion, Mire, Rockhide/Scree, gloom x.8), height .95 (elite 1.1).
-  CreatureCapture rows beasts-boar, beasts-boar-moves; sheet tools/wip/characters/show/8-boar.jpg.
-- **Round 10, Khaven camps and quests (PUBLISHED 2026-10-03 17:25 with the boards round, below; commit 12d8ddc)**: khaven.json camps 10-13 appended (Scarp hollows
-  (-100,115) hollow x5 L4-5; Thicket deserters (-150,-108) deserter x5 ambush; Heights scree spiders (160,25) spider x5 L5;
-  The Hush-Mother (-165,112) tag wolf x1 L6, not elite: an elite needs a signature loot list and the 104-item count is pinned by
-  LootDataTests), a "Deserters' strongbox" crates prop (interact only) and "The Thicket" landmark; Quests/khaven.json +5 quests
-  and item.charnel_silk (collect from kill:mob.spider.khaven*). Quest kill targets by camp index: mob.hollow.khaven.10.* and
-  mob.wolf.khaven.13.*. Rules met on the way: a new tag needs a SocialRulesTests kind and (for beasts) an ItemTests hide table;
-  camps 125 m+ from houses (ZoneGrowthTests). Zone maps: scratchpad zonemap.py.
-- **Round 11, notice boards + crowns (PUBLISHED 2026-10-03 17:25, the boards commit, see git log)**: `Bounties.cs` (BoardState in Progress.boards; Progress.days
-  ticks when the clock crosses 06:00 in EncounterSession.Update; Board(zone) draws Slots=3 from the zone's kind "bounty" quests,
-  giver/turnIn "board", seeded by zone+day; RareChance .015 a slot; Entries(); Finished(); ActiveRare(); CourierId()). No save
-  format bump: the two new Progress fields are declared BEFORE the lists the save tests pin (payload tail unchanged; older saves
-  load with days 0). Quests: kind "bounty" (never in questsDone; QuestDef.rare/poster). Session: UseInteractable on a "board"
-  prop -> OpenBoard (TalkTo("board") first so bring postings hand over; conversation npc = Bounties.BoardName; HUD intro "Pinned to
-  the board:"); AcceptQuest of a rare posting -> SpawnCourier (ActorLook.Collector, level zone max+2, on roads[0] two thirds
-  along, Camp=false, Enemies.Add); CompleteQuest -> Boards.Finished + DespawnCourier; Update respawns a courier for an active
-  rare posting on load. ZoneBuilder prop kind "board" (NoticeBoard: two stakes, a board, a pent roof, four pinned notices).
-  Content: Quests/bounties.json (22 postings: Oakhaven 4+1, Khaven 4+1, Peaks 3+1, Ash Rim 3+1, Verdant 3+1; kill targets by camp
-  tag, bring items are gathered/hunted materials only, visits at night); items.json mat.geode_shard (value 30, CANON-EXPANDED)
-  + temper.{copper,bogiron,ridgesteel,ashsteel,veridian} (quality 1 shard, stack 20; the craft.* curve tests pin their 21 pieces) (quality 3, mainhand); professions.json recipe.tempered_* (3
-  bars + wood + shard; value <= 1.5x cost); looks.json looks on the concord palette; a "board" prop in each zone by the inn/hall.
-  "gold" -> "crowns" in every user-facing string (Discoveries, HUD Items/Quests, Loot, Session, Items.cs, Quests.cs; the data
-  fields stay "gold"). Encounter.asset must list bounties.json (the register step adds it; copy the asset back from the validation
-  copy).
-- **Round 12, the Peaks' camps and quests (PUBLISHED 2026-10-03 22:25, see git log)**: peaks.json camps 9-12 appended (Adit
-  hollows (-128,-62) hollow x5 L7-8; Tarn shadows (-52,152) paleshadow x3 L8; False pilgrims (140,-70) cultist x5 ambush;
-  The Umbra Watcher (-140,40) pale x1 L8, not elite), a "False pilgrims' packs" crates prop (inserted before the board), the
-  canonNote; Quests/peaks.json +5 (npc.maddoc.adit, npc.tarsk.tarn, faction.sandthrone.2 (reputation copied from
-  faction.sandthrone.1), side.peaks.shrine (Maddoc -> Tarsk, night visit), npc.yara.watcher). No new items, tags or looks.
-- **Round 13, the sun + notes 17-19 (PUBLISHED 2026-10-03 23:35, see git log)**: ZonePost.Sun (pass 5 of Post.shader: disc,
-  halo, glow on sky pixels from the depth texture; corner rays now always set by Rays()); shafts x .6 x (1 + 1.3 low); veil in
-  the composite; Water.shader sunGlint (pow 120 lobe, uncapped). EncounterCapture world tour: 82-sun-dawn/noon/dusk (6.3, 12,
-  18.7 h, weather forced Clear, camera set directly). Hats: brim <= 1.65 crown before HatFit. Zoom: EncounterInput.Zoom takes
-  1-per-notch or 120-per-notch; AdventurerMotor 1.2 m a notch, 2.5-22 m. Staff: ActorVisual.ModelLate slings held gear
-  taller than 1.3 m (HeldTall, measured in hand, cached per held array) when speed > 3.2 (back below 2.2), unless
-  ActorVisual.Fighting(gameObject).
-- **Round 14, notes 20-22 (PUBLISHED 2026-10-04 00:48)**: EncounterSession.LandsOn/LandingLeeway (DruidKit casts, WarriorKit
-  blows); ZoneBuilder Perch boulders and "rock" props seated on the lowest of 3 x 3 ground samples under them; Coop's grain
-  sack rebuilt; GameAnimal bolt 25-35 m (deer), 12-16 (others), boltUntil 9 s, HurtFleeDistance 35 re-bolt.
-- **Round 15, POIs + achievements (PUBLISHED 2026-10-04 02:48)**: Achievements.cs (pure: Pois, Reach 6-18 m,
-  PoiXp 15 + 8 x levelMin, EliteKey/EliteKeys "mob.<tag>.<zone>.<camp>", Check(quiet), Titles, Wear); EncounterProgress
-  explored, achievements, title, bounties, rares, elitesSlain (declared after boards, before quests: no format bump);
-  EncounterSession Feats (made in TickFeats once the zone is up), Exploring (off for test runs, temp saves and captures),
-  ExplorePlaces every .25 s, Check every 1 s, quiet prime after a load, bounties/rares counted in CompleteQuest, elites in
-  EnemyDied; HUD: EncounterHud.Achievements.cs (the tab), six book tabs at 111 px, the title over the player frame, points on
-  the character sheet; HudMaps "?" for unexplored places. AchievementTests (3).
-- **Round 18, the Ash Rim's camps and quests (PUBLISHED 2026-10-04 20:45)**: ashrim.json camps 9-12 (Salt-road raiders
-  (-150,40) outrider x5 L9-10; Walled Mouth hollows (104,-146) hollow x5 L10; Reach-Stone shadows (138,122) paleshadow x3 L10;
-  Old Cinder-Jaw (-186,-40) hound x1 L10, look wolf), the "Overturned salt cart" prop, the canonNote; Quests/ashrim.json +5
-  (npc.brine.raiders, npc.grohl.mouth, side.ashrim.stones (night visit), npc.oska.jaw, side.ashrim.statue). Learned: a hound
-  camp's look is "wolf" (SocialAggro packs by look); a beast camp's levels must sit in its loot table's band (ItemTests).
-- **Round 19, the Verdant Shore's camps and quests (PUBLISHED 2026-10-04 22:40)**: verdant.json camps 15-18 (Fern Hollow briars
-  (44,-108) bramble x5 L11-12; Ridge crawlers (160,48) spider x5 L12; Void-Touchers below the ridge (172,-42) mistwalker x4 L13,
-  look hollow; Old Brine-Tusk (-160,-150) mossboar x1 L11, look boar), canonNote; Quests/verdant.json +5 (npc.reedsong.tusker,
-  npc.mosslantern.ridge, side.ondine.fog (night), npc.oakbane.ferns, side.iselle.glade (night, -> Willow-Whisper, "she")).
-- **Next asked by Chris (2026-10-04 22:30):** better models for the tree people (the Keepers are capsules with glowing stripes,
-  all alike). Chris is choosing a treant asset himself and will say; he asked whether Kevin Iglesias's "Human Basic Motions
-  FREE" (Unity Asset Store) can improve the figures' motion: yes, the figures are Humanoid (CharacterImport: animationType
-  Human), so its clips retarget; he is downloading it through the Package Manager (My Assets); unpack the .unitypackage from
-  %APPDATA%/Unity/Asset Store-5.x/ into the repo (a .unitypackage is a tar.gz of GUID folders: asset, asset.meta, pathname).
-- **Round 20, treants, motion, controls and new creatures (PUBLISHED 2026-10-05)**: assets Chris picked, each in the repo
-  with its license note: Kevin Iglesias's Human Basic Motions FREE (Resources/Characters/Animations/KI, tools/wip/characters/
-  ki_import.py; ModelFigure blends 8-way walk/run/sprint by heading, AdventurerMotor classic MMO facing); Tennessippi's Treant Pack
-  (CC0; Resources/Creatures/Treant1-2.fbx, Resources/CreatureSkins/Treant incl. _Grey/_Rot/_Glow from tools/wip/treants/skins.py;
-  ActorVisual.Beasts KeeperKind/KeeperBark: living, Greying withered, Greyheart, deep withered (Hollow.DepthAt), Root-Warden);
-  the old BuildKeeper is deleted. Blink's FREE Stylized Bear (Asset Store; Creatures/Bear.fbx + Creatures/BearClips, a file per
-  clip: CreatureImport names each clip for its file and takes the longest take; ModelBeast.Clip also loads "<Kind>Clips").
-  ChillLands' Ashen Marches Free (itch; zip kept in tools/wip/animals/source; tools/wip/animals/creatures_import.py): Spider,
-  Raven, Skeleton .fbx + <Kind>_palette.png (spider variants from palettes.py). New ActorLook.Bear and .Skeleton (appended),
-  "bear" solitary + skinnable, "skeleton" calls (kin "skeleton"). ModelBeast: Coat.Skin/Lit (albedo, normal map, emission mask;
-  painted models are not rounded and get tangents), Motions names for treant/bear/Ashen clips, attack2/3 and death2/3 slots,
-  DeathSlot, a model without a gallop walks all the way up; ModelBeast.Crumble.cs: Crumbles (skeletons fall into a heap of
-  bones) and TipsOver (crows keel onto their side). Camps: oakhaven "Hill hazel bears" (-70,178) x2 L2 and "Old Hazelmaw"
-  (-58,194) L3; peaks "High pines bears" (-44,96) x3 L7-8; khaven "The drowned dead" (32,-178) skeleton x4 L5, tag drowned.
-  Quests: npc.garet.bears, npc.yara.bears, npc.ansel.drowned. Loot tables bear and drowned, 5 items with icons (make_icons.py
-  re-encodes every PNG: keep only the new files). CreatureCapture rows beasts-treants, beasts-treant-moves, beasts-bears,
-  beasts-dead; CreatureImport.Report lists foreign rigs' bones and how far each clip carries the root.
-
-**EditMode c61e result (read after the stop): 421/429.** Left: Danner (boss step, paper fight, call reaches Sorrel: shorten callReach, boss=true needs BossHit/BossHealth step), Caddock paper fight at level 7 (retune his move for the new level), "Raw value by tier" (vendor test: the ore values 3/4 moved), the gear-entry count line in Every_item_file_parses_together, the distinct-move count (19), and ZoneGrowthTests home-camps table needs an "adit" key. PlayMode c61a output: hel/work tasks (not read).
+**Update 2026-10-16 ~11:40 (Chris on the castle preview, morning).** He played the preview: "inn does look better"; of the ivy "plants
+not even on the wall.only a few plants", then "still sparse looking". On `p9-capital`: the ivy follows each wall's real face (a ray back
+to the stone at every step), leaves lie flat, and it grows as wide sheets on almost every stretch up to the stone ledge. The castle preview
+was rebuilt three times (11:23, 11:31; frames `world-captures/crown-3`, `crown-4`); the frame rate at noon went 91 → 90 → 74 fps with the
+heavy ivy. Open: the upper walls above the ledge are bare (ask Chris: climb higher or hang from the top), and thin the far ivy if 74 fps
+feels heavy. The detail budget test (CrownZonePlayTests) now allows 3 M triangles. Then "save and backup and create handoff for next
+time" (this note). Everything below still holds.
+
+### The night of Oct 15-16
+
+**Stopping point: 2026-10-16 ~01:45.** Chris: "once complete find a stopping point. backup, publish all to git, and create a handoff for
+next time documenting everything done and what needs to be done." then "ok shutdown the computer when done". Everything below is pushed
+to GitHub (every branch), backed up to E:, and the PC shut down at his word. Nothing is VERIFIED until Chris sees it in his build.
+
+### Published
+- **The normal game** (`D:\crulanda-work\outputs\Crulanda-Playable`, 01:23, from `feet-bow-adit-kit` before the three merges below;
+  save backed up to `save-backups/20261016-0123-before-ccpack-publish`): the Adit run fixes (the bot counts height to the leader, out of
+  water at any distance, a sim with no path to you catches up, Lusk's Moon and his camp, a boss camp open while he lives), Chris's CC rule
+  (holds on elites half as long, each kind once a fight; Nix held once), every mob's signature move and the sims' holds (cc-pack), birds
+  that walk and hop now and then, the talent window's role tags. Tests 41/41 and a Nix win at 01:16. No full group run since adit-final11
+  (cut for the stopping point).
+- **The castle preview** (`D:\crulanda-work\outputs\Crulanda-Castle-Preview\Play Castle Preview.bat`, 01:27, from `p9-capital`): plays a
+  copy of Chris's saves in `D:\crulanda-work\castle-preview-save` (`--crulanda-save-dir`), because p9-capital moves the profile and world
+  saves to format 2. `/crown` jumps there. Frames: `D:\crulanda-work\world-captures\crown-2` (50).
+
+### Branches (all pushed; worktrees under D:\code\mmo-*)
+| Branch | What | State |
+|---|---|---|
+| `feet-bow-adit-kit` (D:\code\mmo) | the working branch; tonight merged: cc-pack, p86-craft, p86-buffs, p86-lockout | the three p86 merges are compile-checked only, not yet run together in Unity; they bring **character save format 11** (recipes, lockouts): back up Chris's saves before the next publish |
+| `p86-craft` | buffs, 37 found leaves, Leatherworking, Weaving, Simpling, every tier's nine slots | merged; 131/132 + 11/11 (the one red, set-piece icons `loot.set.t1_*`, is older than tonight: run tools/art/make_icons.py) |
+| `p86-buffs` | buff up before bosses (stop, eat, elixir, a class buff for every class) | merged; 26/27 (the same icons) + 30/30 |
+| `p86-lockout` | lockouts (dungeons 2 days, open-world elites a day, open-world bosses and raids a week, at 06:00) and the dungeon queue (J, /queue) | merged; 27/27 + 4/4 |
+| `p86-inns` | double doors, bigger inns, doorway queues, taprooms everywhere, step aside, rain shelter; table dressing on the table's top | NOT merged: 23/24 (a moved prop by a grove), 24/26 (two villagers couldn't path into the Cask; the Adit camp reach is the old search-budget red) |
+| `p86-lore` | the Lore tab's seven chapters, 91 secrets with clues, five new kinds, regrowing herbs | NOT merged: 31/31, 12/13 (a map's "?" mark stands on secret.oakhaven.elins-cairn) |
+| `p9-capital` | the castle: zone (p9-crown), halls (p9-halls), bank and Exchange (p9-exchange), inn and townsfolk (p9-cityinn), throne and floors (p9-throne), ivy/iron/gardens (p9-crowndetail), the two-part bank, bookcases, facing, doorways | NOT merged: 75/79 and 12/16 (below) |
+| `p9-lowtowns` | the cap 15 to 19 (one commit); tools/wip/talents19.py (the talent plan, not run) | waits on the castle |
+| `p85-hero` | the Modular Hero pack's base body, poses and presets (route a) | nothing built on it yet |
+
+### The castle's open reds (p9-capital, 2026-10-16 00:45-00:57)
+1. `Hall_roles_are_read_from_the_residents_role` expects "The Lantern Watch" (a guildmaster role parse after the merges).
+2. `The_Council_wardens_stand_in_pairs`: Warden Maeve Corbin has no partner (an odd warden after the townsfolk).
+3. The Gilded Lantern's city layout: seats 0.25 m from their tables (the test wants more room).
+4. `secret.crown.clerks-purse`'s clue names "The Spire" (a landmark): reword.
+5. Maddy Brook (water-carrier) can't be walked to from the Gilt Approach.
+6. The detail's cost check ("The detail stays cheap"): measure the ivy and garden triangles, trim.
+7. The Adit camp-reach red (old, the search budget; trust the hop map).
+Also look in the frames: Aethelgard did not read as seated and robed in crown-2/crown-07-the-audience-hall; the Crafters' Court is still bare.
+
+### Chris's words tonight (verbatim; the docs hold them in full)
+- "keep going finish phase 8" / "them move to 9"; the question prompts: Phase 8.6 on my defaults, the gear fit on the hero pack's body
+  (PHASE8_6_LIVING_WORLD.md, ROADMAP), the Lowtowns first in Phase 9 (ZONE_LOWTOWNS.md: Oakhaven's south road, Gorm himself, the
+  Council's warders, the dead-house cellar), Hallow's Creek on the recommended answers (DUNGEON2_DESIGN.md).
+- The castle (CAPITAL_HUB.md, all of it): "we need to implement a castle (central point) ..."; the Crown of Argentis, open from level 1,
+  Aethelgard, castle first; "use the map for reference design"; "make sure all professions are located in the castle"; the bank shared,
+  then "need a limited shared space. maybe 3 slots ... the remainder is character only"; the Exchange with sims; "i really want the castle
+  done asap so double down on it"; the inn redesigned; "lots more npcs in the castle with real jobs"; a castle on the northern skyline;
+  more detail (ivy, iron); "we need a real garden"; the fixes (the floor, the trainers, the mugs, the throne, the bookshelves); "need more
+  profession tools/small huts/vendored items" (NOT done: first job next time); "otherwise looks like a good start".
+- CC (CC_DESIGN.md): "you can't CC elites , bosses, world bosses , etc." then "normal CCs are cut in half the duration and can't imply the
+  same CC after the first" and, of Nix, "CC duration cut in half and can only have one cc type one time".
+- Lockouts (ADIT_REWORK.md, top): bosses/elites don't respawn; "Until a lockout resets", "Everywhere"; "the dungeons should include an
+  instance que that can be done every 2 days for loot"; "open world boss is once per week"; "raids once per week".
+- "we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses" (built: p86-buffs; the bosses not yet retuned for it).
+- "birds still hoppy/jumpy ..." (fixed); "in the talent tree you need to designate their distinction like tank/healer/dps/support" (fixed).
+
+### Next, in order
+1. The Crafters' Court: a workshop for every trade (huts or stalls, tools, stock) and vendors of each trade's tools and materials.
+2. The castle's reds above; frames of the throne (front, side, back), the inn, the gardens, the skyline from Oakhaven; then merge p9-capital.
+3. The p86-inns and p86-lore reds; merge them.
+4. Run the merged working branch in Unity (the p86 merges together), back up Chris's saves (format 11), publish, a full group run.
+5. Retune the bosses for buffed parties (Nix with one hold); the set-piece icons.
+6. Phase 8.5 on p85-hero (retarget, map the looks to parts); Phase 9: the Lowtowns (talents for 19 in tier 3 per talents19.py, then the zone).
+
+## Earlier start here (the evening of Oct 15)
+
+**Night of 2026-10-15 (~22:15): Chris: "keep going finish phase 8" then "them move to 9".** His answers tonight (question prompts,
+verbatim in the docs): Phase 8.6 on my defaults (PHASE8_6_LIVING_WORLD.md, end); Phase 8.5 by route (a), the hero pack's body (ROADMAP;
+**blocked until Chris downloads "Modular Hero" (CHOSAN) in the Package Manager's My Assets**: it is not on disk); Phase 9's first zone
+the Lowtowns & Rust Market 16-19 (ZONE_LOWTOWNS.md: arrival by Oakhaven's south road, Gorm himself, the Council's warders, the
+dead-house cellar); Hallow's Creek on the recommended answers (DUNGEON2_DESIGN.md, end).
+- **Branches and worktrees:** `feet-bow-adit-kit` (D:\code\mmo, the working branch; the Adit fixes); `cc-pack` (D:\code\mmo-ccpack:
+  every mob's signature move and the sims' holds; feet-bow merged in at 74aeaf9d; its tests (chainR157's set) still to run, merge if green);
+  three Phase 8.6 helpers' worktrees made at 7691e7db: `p86-inns` (D:\code\mmo-inns: steps 1-3, the inns, doorways, taprooms),
+  `p86-craft` (D:\code\mmo-craft: steps 4-6, buffs, found recipes and save format 11, crafting tiers and the new crafts), `p86-lore`
+  (D:\code\mmo-lore: steps 7-8, the Lore tab's chapters, secrets to about 90, the regrowing herbs); `p9-lowtowns` (D:\code\mmo-lowtowns:
+  the cap 15 to 19, 4d9c20fa; the rest of ZONE_LOWTOWNS.md section 10 to come). Compile scripts: scratchpad `b-<name>/build.py`.
+- **Phase 9 step 2 found:** at 19 a character has 20 points and most branches have 16-19 ranks built (only the Druid, the Warrior's
+  first three and the Archivist's Still Vow, Unwriting and Cantor reach 20): a tier more for every short branch before the cap ships.
+- **The full group run** (chainR161, adit-final9, 22:03) with the bot's height fix and the leader keeping a camp while it waits.
+
+**Current state: 2026-10-15 afternoon. Chris: "i told you to finish adit before shutting down" and a deadline at 18:00.** The Adit
+rework is finished in code and merged into `feet-bow-adit-kit` (the working branch, PR #2); `adit-rework` (worktree `D:\code\mmo-adit`)
+is the same. Nothing is VERIFIED until Chris sees it; talk to him in game terms (memory: plain-words-no-run-names, finish-the-named-task).
+- **Chris's answers (ADIT_REWORK section 1):** respawn 20 minutes; keep the ~75 minute run; build the Cove; add the Foundry's buckets.
+  Raids: the Spire at 30 is the first, twenty players. Class sets: "6 pieces. 2/6 give 1 special, 4/6 another ... 6/6 ... 3 special
+  abilities and these are class specific"; the Adit's are tier 1 (dungeon), higher tiers from raids (loot DESIGN.md 3.6, 3.8).
+- **What landed today (CHANGELOG "2026-10-15, 12:40-18:00"):** the Cove (S6), the polish (S7), eleven class sets, the deck-placement bug
+  and the rails it stood up, the far-prop culling kept off cave walls, the dungeon map (`tools/wip/dungeon/adit_map.py`, `/loc`), the
+  sim leader's give-up timer and long walk back, the run bot's unsearchable bodies.
+- **Speed:** the Adit with the Cove 100 fps at the yard and 125 in the Tally Hall (from 13 and 17 before PropCull and sleeping mobs).
+- **Tests:** the Adit play set 27/27 at 16:15 (AditPolish incl. the leader sent from the yard to Nix, AditCove, AditTests, AditCaveBuild, AditNav); the party tests 22/22 at 16:39 (SimPartyTests, GroupRunTests) with damage by role. **Group run:** The standard group run (a Paladin bot, a Warrior tank, a Druid healer, a Rogue, a Ranger) was played three times on Chris's screen: the first stood an hour (the leader gave Nix up after a wipe, the bot at a body it could not search), the second stood in water and fell off the rope bridge (rails opened by R129's CarriesOn rule beside the bridge tower), the third (16:22-16:31, every fix in) cleared 15 of 51 camps in 21 minutes, walked back from the yard after a wipe without stalling, and was stopped at its third death at Nix (Nix and the Rock-Eater stun the tank every 14 s; the party cannot beat him): Nix is a balance item, not a broken dungeon. The bot now takes each path corner (it cut the decks' turns and stepped off their open junctions) and counts swimming as stuck..
+- **Evening of Oct 15 (CHANGELOG "18:00-20:00"):** the sim parties wiped at Nix because of three solo-era rules (a mob reset when you fell; getting up pulled the party out and reset every mob; a rider's home stayed at its camp), not the duo's numbers; fixed, plus the revived leave the mobs' threat and the bot assists the tank. The party now beats the duo 3 of 3 (AditNixFightTests). Two helpers' work waits on branch `cc-pack` (worktree `D:\code\mmo-ccpack`): a signature move for every ordinary mob (54 new) and the sims' holds for every class with an area blow; merge only if its tests (chainR157) are green.
+- **Open, in order:** (1) **Nix and the Rock-Eater: half fixed (17:21 build).** Four group runs wiped at the duo. Found (logs and a helper's sums): the healer mended whoever had the lowest share of health, never the tank first (now: the tank first under 60%); the beast's every blow sat at the 60% cap (235 on a 392 tank, every 2.6 s, against ~30 healing a second), so easing Rock-Crush did nothing (now its hit is halved, health .9, its Shaken on its own foe only). `AditNixFightTests` (new, PlayMode: the run's party placed at the duo, ~2 min) then killed the beast in 61 s with the tank up, but lost to Nix on foot (.8 of an elite, 7,392 health, the party ~35 damage a second: 140 s, his enrage killed the tank at 204 s). Nix at .5 broke the duo's design range (SocialRulesTests: Nix .7-1, both 1.5-2.2) and the solo-elite rules, so he is back at .8. Tried at 17:25 and reverted: Nix's hit .6 with a later, milder enrage let a lone Warrior and a lone Barkhide Druid beat him (the solo rules: an elite of your level wants Mira), so Nix's own numbers cannot come down; the fix is the sim party (its damage on him, ~35 a second, and the tank's survival: the healer's 31 a second). Next: raise the party's damage on him (the sims' role damage, the bot's kit use) rather than Nix, and make AditNixFightTests reliable (its second run the sims never engaged and you died alone at 15 s: check the pull and the placement); then the group run to the Cove; (2) monsters' and sims' crowd control and area moves (Chris asked: most mobs have none; sims only the Rogue/Archivist hold and interrupts): one signature move a mob type, a control move for the classes without one, an area move for sims at three or more mobs; (3) the Cove's water still shows bright streaks in the tour frame near the camera (probably the tour lamp; check in play); (4) sims wear class sets for looks only; the action bar shows the old cooldowns; (5) the fixture and tour captures for Chris (the Cove, the buckets) and his play-through.
+- **Helpers' worktrees** (`D:\code\mmo-cove` adit-cove, `D:\code\mmo-polish` adit-polish, `D:\code\mmo-sets` class-sets) are merged and
+  can be removed (`git worktree remove`), their branches deleted, once Chris is happy.
+- **Phase 8.6 and Phase 9 wait:** the 14 decisions at the end of PHASE8_6_LIVING_WORLD.md (defaults proposed in chat 2026-10-15 ~13:00:
+  8.6 now, looks wait on 8.5, three craft slots with Leatherworking and Weaving, coin-only recipes, 30-minute buffs, bigger inns with
+  double doors and taprooms everywhere, step aside and shelter in rain); Phase 9 first zone to be picked by Chris; the orc race playable
+  next (Races.cs has the rule, no figure or pick yet).
+
+## Oct 15 small hours (history; Start here as it stood at 04:10)
+
+**Current state: 2026-10-15, about 04:30, the PC shut down at Chris's word** ("once all is done and clear. shutdown the computer").
+Chris played the Adit build through the small hours; his words verbatim in PLAYTEST_NOTES 199-225, what was done in CHANGELOG's
+2026-10-15 entries. Nothing is VERIFIED until Chris has seen it in his build. Talk to him in game terms, not run names
+(memory: plain-words-no-run-names).
+- **Branches:** `feet-bow-adit-kit` (PR #2) and `adit-rework` (worktree `D:\code\mmo-adit`, main merged in to the last commit), both
+  pushed. Do not merge either to `main` without Chris. **The published build comes from `adit-rework`.**
+- **Published:** 04:28 from `adit-rework` with everything below (the save backed up to `save-backups/20261015-0428-before-closing-publish`). Save backups in `D:/crulanda-work/save-backups/20261015-*`.
+- **The Adit's lag (notes 218, 225) is the night's big fix:** with the frame cap off, the yard went from 13 to 124 frames a second and the
+  Tally Hall from 17 to 166 (the probe in the Adit camera tour: `D:/crulanda-work/world-captures/adit-tour/adit-perf.txt`). The cost
+  was the zone's props (the whole dungeon drawn from anywhere: 15,857 renderers, 56 million triangles) and its 186 mobs. Now in a zone
+  with caves a prop more than 70 m from the camera is not drawn (`PropCull`), and a camp's idle mob more than 85 m from you sleeps
+  (`EncounterEnemy.Dormant`; wakes at 75 m, or the moment a call, threat or foe reaches it; road patrols never sleep). Watch for pop-in in
+  the biggest halls (the Foundry) and for any event whose mobs should move while you are far: they stand until you come or call them.
+- **New tonight, for Chris to look at (BUILT, OPEN):** the walk-in barns' walls no longer flicker; Nerve stays at 0 out of a fight; Mira
+  runs out of mana in long fights, warns, drinks between fights, and casts Briar Lash and Kindled Seed when nobody needs healing; cave
+  water without sunlit streaks, glow or foam lines; roamers outside half the open-air camps; worked nodes vanish whole and return sooner
+  with more people about; the Sound panel in the pause menu; the chapter-house doors open; the chapel's tour frame fixed.
+- **Asked of Chris, not answered:** whether "slow the progress down" (note 219) also means slower levelling (less XP); the 14
+  decisions at the end of `PHASE8_6_LIVING_WORLD.md` and the 13 at the end of `DUNGEON2_DESIGN.md`; the bandit camp, the Bandit King and
+  loot.
+- **Open work, in order:** Chris's reactions (the last tests: EditMode 22/22, PlayMode 35/36 at 04:10 with the one red fixed and BuildingGroundTests 2/2 at 04:27; every footing now 3 cm further out, so check a few buildings' looks); the fixture cave's two reds in `AditCaveBuildTests` (the test cave's rail and
+  loop, not the Adit's); sound effects and ambient sounds for the Sound panel's two empty channels (`AudioMix.Effective`); the Adit
+  played through; Phase 8.6 once Chris decides.
+- **How work runs:** up to three helpers (Chris: "you can run 3 bots at most"), none running Unity; compile with the scratch Roslyn
+  check (`scratchpad/ccf/build.py` for main, `scratchpad/cc/build.py` for the worktree; a new session must rebuild these, they live in
+  the old session's temp folder), commit by path; one Unity job at a time through hidden chains `D:/crulanda-work/chainRNN.ps1`
+  (R124 the last). Chains wait while the game is open. Never write a chain's paths through Python without raw strings: a backslash-a in
+  "\adit-perf" became a bell character tonight.
+
+## Oct 14 night (history; Start here as it stood at 23:00)
+
+**Current state: the night of 2026-10-14, 23:00** (Chris away from 20:30: "keep working till 11pm then backup, publish, and create a
+handoff. i wont be here to approve anything so you have full reign. shutdown at 11pm"). His words of the day verbatim in
+PLAYTEST_NOTES 179-199; what was done, in order, in `Docs/CHANGELOG.md` (2026-10-14, 11:40 on, and "The evening's reports").
+Nothing is VERIFIED until Chris has seen it in his build.
+- **Branch:** `feet-bow-adit-kit`, PR #2, pushed. Do not merge to `main` without Chris. The Adit rework is on `adit-rework` (worktree
+  `D:\code\mmo-adit`, pushed, not merged).
+- **Published (the playable build):** 19:54, the build of 19:51; the same build again at 20:12 (nothing newer). Saves backed up to
+  `D:/crulanda-work/save-backups/20261014-1954-before-shepherd-publish` and `-2012-before-night-publish`. It holds everything below.
+- **New today, for Chris to look at first (all BUILT, OPEN until he sees them):**
+  - **The wild woods** in every zone (the "Elwynn" brief): the zone's own trees as one canopy, old oaks (the broadleaf grown large,
+    not the half giant) only in the dense old-forest patches, fallen trunks the kit's dead trees, fuller glades. Frames:
+    `D:/crulanda-work/world-captures/oakhaven-21-the-mastwood.png`, `-37-lark-hill.png`, `-38-sallow-bottom.png`. Tour 111 a second.
+  - **Kevin's melee, spell and work motions** and **every spell's effect**: `D:/crulanda-work/ui-captures/combat3/<class>/sheet-b.png`;
+    the Scoundrel inside the yard: `ui-captures/combat5/scoundrel`.
+  - **The buff row** by the frames and **the Nerve panel** (movable): `ui-captures/combat4/scoundrel/10-scoundrel_rallying_verse-b.png`.
+  - **The inn's tables and benches standing** (the Fantasy pack's root turn kept in ModelProp; every table, bench, stool and mug of
+    that pack had lain on its side): `world-captures/oakhaven-99-inn-drinkers-night.png`.
+  - **The shepherds** Tam and Nell Sedge at Oakhaven's two flocks (the count at the gate, the shearing, the fleeces to the stall, the
+    afternoon feed; the merchant offers fleeces), the Old Fold's flock inside its walls: `world-captures/oakhaven-23-the-old-fold-night.png`.
+  - **Quit**: the pause menu's "Quit game", `/exit` and `/quit` (saved first, out of combat).
+  - Also: the orc's legs run in the air, the giants' roots, the birds' hops, the Morro villagers on their own avatars (the farmer's
+    sack and the skinner's bundle in their hands), the forge's sparks off, the barn's sill and turn, a poor drop's glint fading.
+- **Tests (TESTED):** the full PlayMode suite 345/349 at 16:33 (chainR72; see CHANGELOG); after that only the classes each change
+  touched (test-budget: Chris, "you just tested for 7 hours"): chainR76 14/14, R78 17/17, R79 EditMode 16/16 and PlayMode 15/16
+  (the home test's count, fixed). Balance 49 of 49 builds in range (`D:/crulanda-work/outputs/balance/balance.html`, the page Chris sorts).
+- **The Adit rework (`adit-rework`; ADIT_REWORK.md section 18):** the evening's runs took it from 18/29 Adit PlayMode classes to
+  20/29 at 20:06 and 19/29 after (one test, the fixture trestle's rail raycast, went red when the deck blocks were
+  named and not yet looked at); EditMode 44/44. The decks are whole and joined; the big find at 20:55 was that every branch cave's floor was cut off a few metres past
+  its mouth by its parent's knoll and shell (faces metres wide crossing the passage with their middles in the rock): `ZoneBuilder.Cut`
+  now drops a face with a corner inside another passage. That lifted the Sunless River (9 to 59 of 341 samples reached) and the Dry Ledge (0 to 54) but not the
+  Pen, the Cutting Drift, the Foundry, the Muster Yard, the Chapel or the Breach: the R87 map (21:12) then showed most "unreached" floor was PathComplete from a
+  reached sample metres away: one `NavMesh.CalculatePath` from the yard gives up part way through the drawn-out dungeon, so the
+  camps test, the breadcrumbs and the run order were measuring the search budget, not the caves. `NavReach.Length` now searches
+  leg by leg without giving up on a leg that ends farther off as the crow flies, and the camps test and the map use it (R88: Adit classes 16/23, AditGateTests green); still a leg-by-leg search ends in pockets,
+  so the map now also floods by hops (R90, the measure of the mesh itself): the River, the Dry Ledge, the Breach, the Quiet Miner's
+  Drift, the Pitch Pit and the Scriptorium are wholly reachable; **really cut off were four places;** the Pen was opened at
+  21:48 (the Spoil heaps camp's dressing blocks had walled the strip beside Lusk's stage: the camp is on the west side now, R92).
+  The Cutting Drift and the whole Geode Foundry opened at 21:56 (a knoll face wider than the drift's tube: `Cut` now tries each
+  edge's middle). The chapel opened at 23:41 (the altar stood in the doorway to the cloister stair) and the island under Lusk's stage
+  went at 00:13 (shelves inside a solid deck's body): **every floor of the Adit is reachable from the yard** (R99), the camps,
+  gates and breadcrumbs tests green, the Adit nav set 19/23 (R100, 00:24). The "solid" with mesh on its top was a buried cave's knoll poking into the hall (fixed 00:49).
+  Three helpers worked the small hours (Chris: "you can run 3 bots at most"): `AditDataTests` (every reference in the Adit's data
+  resolves), the Adit camera tour (`Crulanda.exe --crulanda-adit-tour <dir> --crulanda-zone zone.adit --crulanda-temp-save`,
+  28 frames: `D:/crulanda-work/world-captures/adit-tour` once it has run), and the release of `after` camps (bosses' relief shifts,
+  the Wake's waves), which the data named and nothing spawned. **The Phase 8.6 plan** is written:
+  `Docs/PHASE8_6_LIVING_WORLD.md` (PROVISIONAL; fourteen one-line decisions for Chris at its end; the inn-door jam's cause is in it:
+  a 1.6 m door and a navmesh baked at agent radius .5 leave a 0.6 m strip, one body at a time). **The Adit's nav, camps, gate and release tests are 26/26 (01:41):** every floor reachable, the way home
+  down the cloister stair (its foot was 1.5 m below the Gallery's floor), the bosses' relief shifts, the Wake's waves and the keg's
+  release written and tested. Left: the fixture test's knoll ray and rail check; the built rooms on the dungeon packs (a helper);
+  then play the run. The Adit camera tour ran once (28 frames, too dark: a lamp on its camera now, re-run pending); the release of `after`
+  camps is being written (ADIT_REWORK.md section 18).
+  The real short blocks the map names: the Pen's floor from the hall beside Lusk's stage (a "Solid" at (7, -24, -183)), and the
+  Cutting Drift's own floor past its Company door. Start the next Adit session from `adit-nav-diagnostics-R88.txt`. The diagnostics (`AditNavDiagnostics`, lane A) write
+  `D:/crulanda-work/encounter-validation/adit-nav-diagnostics.txt`: the deck tables, a floor map of every hall (reached from the yard
+  or not, what stands by the first unreached sample), each gate's crossing. Run the Adit set with a copy of `D:\crulanda-work\chainR86.ps1`.
+- **The small hours (00:40-01:45; CHANGELOG's top entry):** three helpers at a time (Chris: "you can run 3 bots at most"): Oakhaven's open
+  ground filled (eleven places, ten secrets), secrets' clues and villagers' stories in every zone with a Lore tab, the Phase 8.6 and
+  Hallow's Creek plans (decisions for Chris at their ends), the Adit's releases, camera tour and data check. In flight when this was
+  written: the dungeon packs into the builder (worktree), the water/grass/candle shaders, zone music and the Fantasy props (main).
+  Their files land uncommitted in each repo: compile with the scratch Roslyn check, commit by path, run the touched tests.
+- **Next, in order:** Chris's reactions to the above; the Adit (section 18's "still red"); the Stylized Newbie Weapons Pack (skinned
+  meshes: a bake before they can be held); the fixture test's knoll ray; the older list below.
+
+## Oct 12 night (history; these runs were stopped and replaced on Oct 13)
+
+**Read the "2026-10-13, 00:03 on" section below first: it is the current state.** (The bullets about suiteQ, chainR, editR and balC
+further down this section are from the night of Oct 12 and are history: those runs were stopped, and Oct 13's runs replaced them.)
+- **Branch:** `feet-bow-adit-kit`, PR #2. Do not merge it, and do not publish, without Chris.
+- **Published build:** commit 8dbb69d, published at 1:42 PM on Oct 12. Everything after that is committed and pushed but not published.
+- **Save backups:**
+  - `D:\crulanda-work\save-backups\20261012-1325-before-publish`
+  - `D:\crulanda-work\save-backups\20261012-1040-before-path-rework`
+  - `D:\crulanda-work\save-backups\grok-2155`
+- **Not compiled yet:** the Cleric, Shaman, race and race-UI code (from ae04cd6 onward). It is all committed but has not compiled once. The first compile comes from `editR` (below).
+- **Running now** in lane A, `D:\crulanda-work\encounter-validation`:
+  - `suiteQ`: the full PlayMode suite, started at 23:13. Results go to `suiteQ.xml` and `suiteQ.log` in lane A. It tests the code from before ae04cd6; the lane was copied when it started.
+  - Then `chainR` (`D:\crulanda-work\chainR.ps1`, PID 26280) runs three jobs one at a time. Each copies the current repo into the lane first.
+    - `editR`: the EditMode suite, which is the first compile of the new code. Output: `editR.xml`, `editR.log` and `editR.out`.
+    - `socialR`: SocialPullTests. Output: `socialR.xml`.
+    - `balC`: the balance harness with `CRULANDA_BALANCE_CLASSES=cleric,shaman`. Output: `balC.xml` and `D:\crulanda-work\outputs\balance\balance-cleric-shaman.csv` and `party_heal.csv`.
+- **First 3 steps:**
+  1. Check whether `chainR` (PID 26280) is still alive. Read `suiteQ.xml`, then `editR.xml`. If there's no xml, look for `error CS` in the log.
+  2. Fix the compile and test failures. The new code is in `ClericKit.cs`, `ShamanKit.cs`, `Races.cs`, `RaceTests.cs` and `BalanceHarness.cs`, plus the Cleric and Shaman blocks in `Encounter.asset`. Then rerun the failing test groups alone.
+  3. Read `balC` and report Cleric and Shaman DPS and HPS against the role medians and the caps. Check that the party heal rows now say "3 sims joined".
+
+## 2026-10-13, 00:03 on (Claude): pickup, then balance on fixed dummies
+- EditMode 456/460 at first (the Cleric and Shaman compile); the four failures fixed (icons for their 24 abilities and 115 talents, the
+  class count of ten), commit 05c78ff. After the refresh fix: **EditMode 461/461** (00:51).
+- **Balance (Chris: "dps and healing per sec on test runs ... on all classes", fixed dummies, "62-72 is good range", "a number for each
+  build ... tank/dps/support/healer/CC", "why is the druid healing so low").** All in `Docs/BALANCE_REPORT.md`, round 5. The table is
+  `D:\crulanda-work\outputs\balance\BALANCE_ALL.md` (`python tools\validation\balance_merge.py`); `balance_retune.py [--apply]
+  [--skip=a,b]` moves builds outside their target. Older runs in `outputs\balance\archive-*`.
+  - Fixed: refreshed heals/damage over time keep their tick schedule (the Druid's Seedling never healed); the Druid and Paladin heal the
+    whole party; the Shaman's charge; the heal scale in the Archivist, Paladin and Salt-Mender kits; the harness (no heals in damage
+    fights, Brand/Unwrite/Marrow Drain kept up, songs started once, heals taking turns in the heal tests).
+  - 35 of 40 builds in range after the first retune (01:15 run); the second retune and the harness's healing fixes are in the confirm run.
+  - Targets settled by Chris for level 15 (02:07: "the #s you proposed are good til lvl 15 and will change as we progress to 30"):
+    DPS 62-72, CC and Support 45-52, Tank 42-55, Healer at most 35 DPS and 40-50 HPS. Set them again for levels 16-30 (Phase 9).
+- **After 02:00 (Chris's briefs, all in BALANCE_REPORT.md):** spirits (SpiritCompanion.cs: aether butterfly for the Stormcaller, glade-fire
+  for the Rootmend); Oakhaven's training field (EncounterSession.Training.cs, ZoneBuilder.Training.cs, oakhaven.json; TrainingFieldTests);
+  area by specialization (EncounterSession.Spread.cs; AoE targets PROPOSED: x1.7 or more against three for the five area builds, x1.25 or
+  less for the rest); the tank test in the harness. None of these have been run yet: chainR12 (balance) and chainR13 (training tests)
+  run them. Then: tune the spread shares and the spirits so pet and player land on 62-72 and the area builds on x1.7; read the tank
+  ranking; keep one class (the Paladin) from leading all three roles; show Chris the field in a build.
+- **Next class, designed not built:** the Scoundrel (`Docs/CLASS_SCOUNDREL.md`; Chris: an assassin-type rogue with charisma for songs,
+  merchants and dealing; a single-target DPS path, a group-CC path, a support path; canon root Valen, "yes good example"). Chris settled
+  the questions (Scoundrel; three paths for now; races once all races are defined; song, special weapons later). Build when he says go.
+- **The grey (TODO 8) done:** Hollow Men's blows grey (EncounterEnemy.Grey.cs), EditMode test. GAME-ONLY mechanic, CANON creature.
+- **Adit NavMesh tests 3/3 (01:12):** the column and plinth tops are off the navmesh (TODO 14's code is done); the group run to the end
+  is still to do (`tools\validation\group_run.ps1` on Chris's screen, with the lane B build the chain makes).
+- SocialPull 7/8 at 01:14 ("The first is home"): fixed in 31cad5d (a mob finishes the walk home before strolling; far-off mobs ask
+  for the way home at most every 2 s). The full suite from 01:34 (`suiteS.xml`) includes it.
+- **Stopped at 02:29 (Chris: "once ... full playmode suite's result is finish we need to wrap it up"):** only the full suite from 01:34
+  ran to the end (`D:\crulanda-work\chainR9.ps1`, `encounter-validation\suiteS.xml`). **Result (01:34-03:00, code as of 01:34):
+  PlayMode 315/318.** SocialPull passed (the walk-home fix). The three failures are the known animation items: the hoe hand spread (hands
+  37-43 cm apart, 45-60 wanted; TODO 5), the foot flake (running after a jump, toes pulled up; TODO 4), and one new: a long tool's shaft
+  through a villager's leg while walking (Grete Lowe, 0.07 m; `A_long_tool_is_held_in_the_fist_like_a_staff_clear_of_the_arm`). The
+  work after 01:34 (spirits, training field, spread, tank test, harness fixes, the grey) is not in this run; chainR12/R13 test it. **Next session, first:** run
+  `D:\crulanda-work\chainR12.ps1` (all ten classes on the dummies with every Oct 13 change: the spirits, area spread, tank test, toggles
+  and healing fixes; the merge; EditMode `editT`; the lane B release build with -NoPublish) and then `chainR13.ps1` (TrainingFieldTests).
+  Both wait for `CHAIN9_DONE` in chainR9.out, which is there. Then tune: `balance_retune.py --apply`, the spread shares
+  (`EncounterSession.Spread.cs`) to x1.7 against three, and the spirits so pet and player land on 62-72; report the table and the tank
+  ranking to Chris; show him the training field in a build (republish only with his OK).
+
+- **2026-10-13, 12:42 on (Claude, after the restart):** chainR12 failed to compile (a comment had swallowed the end of a harness line);
+  fixed. Then the harness itself was found unfair, four ways (BALANCE_REPORT.md round 6): the test scene's other sentries took the area
+  spells (single-target numbers padded), the dummies were re-picked each fight (once off the navmesh: the Druid cast nothing), the
+  spread cache never switched on, the tank test hit for a flat 40 with threat piling up. All fixed; the honest table at 13:23 (27 of 40
+  in range), the tank ranking (Warrior, Shaman Stonebound, Druid Barkhide, Mason, Paladin Oathguard), the retune applied (d2a4880).
+  EditMode 461/462 (WorkshopDataTests insisted on "the last six" props; now the append rule, 37106f1). TrainingFieldTests 3/3. The
+  13:27 training frames (`D:\crulanda-work\ui-captures\training-20261013-1327`) showed the training dummy's nameplate floating off its
+  model (its agent snapped it away) and the HUD cut off under the saved layout: each dummy's look now on its own actor, the capture
+  frames the HUD (37106f1, 740f779).
+  **Confirm run 13:55: 40 of 40 builds in range** (BALANCE_REPORT.md; the Stormcaller's splash eased once more after it, untested).
+  Party-of-five healing reported (the Paladin, Salt-Mender and the Cantor leave a party low). **Open for Chris:** a party target for
+  healers; the single-target builds whose own spells hit several foes (the Unwriting, Thornsong, Bonecaller, Sifter, the Shaman's kit).
+- **The training field became a training yard** (Chris, ~13:40: "why is one in the river? sparring area needs to resemble something like
+  this? try the small props pack"; then "two archer targets upside down", "two dummies upside down", "area is not closed in"):
+  `Docs/TRAINING_YARD.md`. On dry ground at (58, 26), a closed ring of plank panels, tents, banners, dummies, butts, a healer's corner; the
+  Small Props Pack (CC0) imported to `Resources/Props/SmallProps` with an atlas material and half turns for its upside-down models.
+  TrainingFieldTests 4/4, EditMode 462/462; frames `D:\crulanda-work\ui-captures\training-20261013-1417` sent to Chris. Lane B holds a
+  release build of all this (not published: republish only with Chris's OK, saves backed up first).
+
+## Rules (from CLAUDE.md and Chris)
+- Run Unity only in the validation lanes: lane A (`D:\crulanda-work\encounter-validation`, tests) and lane B (`encounter-validation-b`, builds and captures).
+- Never run Unity on `D:\code\mmo`.
+- Run one Unity job at a time. Tests go through `C:\Users\ChrisWin11\crulanda-cap\rt.ps1 <PlayMode|EditMode> <filter> <name>`, which copies the repo Assets into lane A first.
+- After every chunk: commit, push, then `pwsh tools\Backup.ps1`, which copies to `E:\claude\unity projects\mmo`.
+- Keep `.meta` GUIDs. Write new metas yourself and never let assets re-import with new GUIDs.
+- Back up saves to `D:\crulanda-work\save-backups\<stamp>` before changing any save format.
+- Label all lore CANON, CANON-EXPANDED or GAME-ONLY. The canon source is `D:\code\crulanda`, which is read-only.
+- No machines, in lore or in kits.
+- Keep at most 3 `candidate-*` folders in `D:\crulanda-work`. Delete the oldest first, and never the published build.
+- Movement keys are ESDF.
+- Nothing is VERIFIED until Chris has seen it. Write TESTED or BUILT otherwise.
+- Hard stops: 35-minute chunks, each ending with commit, push, backup and a report.
+
+## Done on Oct 11-12, with commits
+- **Farmers and the hoe:**
+  - f4400b6: the farmer's grip and stance (note 119).
+  - 6feb10e and 5b5d931: the hoe stroke and the plough team (notes 150 and 155).
+  - 394ad33: the hoe hand spread (47-58 cm).
+  - The spread regressed later. dcd45d8 tried a margin change, which dfe50ff reverted.
+- **Class path reworks:**
+  - a0d3ca0: the Salt-Mender's fourth path, the Mender (healer, CANON-EXPANDED), with its sims and its own figure.
+  - cd9ca8d: the Mage's Cinderwright reworked into the Bonecaller (necromancer, GAME-ONLY), with a save migration.
+  - 4f5d5ca and f600363: the Archivist's Unwriting (damage over time) and Still Vow (shields).
+- **Auras:** efdef7f, 4756505 and 89488b0. The rings follow the drawn body, and the pet frame says "Thrall".
+- **Houses and trees fade:**
+  - 5819e26: houses are never see-through outdoors (note 159).
+  - 8f67fe5 and 8dbb69d: only the part that's in the way fades, and trees never vanish.
+- **Mira invites, the leash, the meter:** 8f67fe5 and 8dbb69d cover the invite target and Mira, and the leash. A group breaks off only past the far leash and after 5 s with no blows. 8dbb69d is the published build.
+- **Movable meter and pet bar:** d0b9aef (MovablePanelTests). Frames in c3ba8b3.
+- **Thrall:**
+  - ec8a817: built by hand in Blender (7.8k tris, same 18-bone rig and GUID).
+  - 7bd9f7e: narrower skull, angular jaw and a grave-cloth hood (note 175), plus an in-game video.
+  - Hunyuan3D wasn't used; its venv is broken (see PC notes).
+- **Balance harness** (`Tests/PlayMode/BalanceHarness.cs`, `Docs/BALANCE_REPORT.md`):
+  - da65872 (v2), 173c5d7 (v3) and 53e9161 (v4) fixed HPS, the seeded openings, the cooldown-first rotation, `foes_hit`, gear and the class filter.
+  - 7089d8b: round 1 retune with build damage scales (`EncounterSession.RoleScale.cs`) and role DPS caps (note 177). Healers must stay at or under 50% of the DPS median, control and support at 70-75%, enforced by `CapViolations`.
+  - c17f429: pet damage scale (Beastbond .75, Bonecaller 1.6).
+  - ae61e0b: v6.
+  - c6715af: v7, the Druid retune (Thornsong x2.1, Rootmend heals x2.2).
+  - dfe50ff: v8 confirm run. The casters are back to their numbers and the Druid retune holds.
+- **Party heal test (note 178):**
+  - ae61e0b and dcd45d8 added it, and 065561c made it wait for the sims and log why none joined.
+  - bb082f3: the test now makes its own SimPopulation and sim figures. Until then 0 sims joined, because PlayableEncounter has no zone. This hasn't been tested yet; `balC` is the first run.
+  - Healers in it: Paladin sanctuary, Salt-Mender mender, Archivist cantor, Druid rootmend, Cleric lantern and choir, Shaman rainspeaker.
+- **Zone-loading fix:** 512e056. The Oakhaven scene listed only 2 of its 6 zone files. This caused about 35 of the 42 PlayMode failures, and the reruns are now green (46/46 and 12/13).
+- **SocialPull test fix:** bb082f3. The test waits out QuietSeconds; it had been out of date since 8f67fe5. Not rerun yet; `socialR` is the rerun.
+- **Feet:** 0f81dbe. Standing, the body sits to the higher sole, which took FootTests from 12 problems to 1. GroundingTests passes. The rest is parked (see the TODO).
+- **Cleric and Shaman** (design in `Docs/CLASS_CLERIC_SHAMAN.md`):
+  - f264e07, ae04cd6 and 2c896da: ClericKit, with 12 abilities in `Encounter.asset` and `Talents/cleric.json` (Lantern, Choir, Censure and Warden, 17 ranks each). It's a healer that uses mana, labelled GAME-ONLY.
+  - 8b0d6bc and 323fa03: ShamanKit, with 12 abilities and `Talents/shaman.json` (Rainspeaker, Stormcaller, Stonebound and Gravewind, 17 ranks each). It's orc-only and CANON-EXPANDED, signed off by Chris.
+  - Both kits are switched on in `ClassKit.Create`. 96cb8be and 323fa03 add them to the harness.
+  - f526f6e: both count as healers in the sim hooks.
+- **Races** (`Docs/RACES.md`, `Scripts/Encounter/Races.cs`):
+  - 323fa03: Human and Orc.
+  - 391032e: orcs play Warrior, Ranger, Rogue, Mage and Shaman (no Druid). The Shaman is orc-only and the Cleric is human-only.
+  - Saves get a `raceId`; an old save reads as human.
+  - `EncounterSession.FreshProgress` takes a race and corrects a class/race clash.
+  - EditMode `RaceTests` has 5 tests.
+- **Orc sims and race in the UI:** ecf1238. About 1 in 4 sims whose class orcs can play is an orc (by roster position, so the rolls are unchanged). Race shows on a sim's card and on the character sheet.
+
+## PC notes
+- **Ethernet power saving:** with Chris's approval, Energy-Efficient Ethernet, Green Ethernet and Power Saving Mode on the Realtek 5GbE adapter were disabled (ffde5f1). The original values are in `D:\code\mmo\tools\nic_power_original.txt` for reverting.
+- **Disconnects:** the ~8:12 PM drops were on the agent connection, not the PC. The event logs showed no sleep, shutdown or NIC errors.
+- **Keep-awakes:**
+  - PID 19320 is the sleep keep-awake (`keepawake.ps1`, SetThreadExecutionState).
+  - PID 26952 is the disk keep-awake (`D:\code\mmo\tools\keepdisk.ps1`), which writes a tiny file to D: and E: every 15 min.
+  - Leave both running.
+- **Hunyuan3D-2 mini:** its venv under `D:\crulanda-work\tools` is broken and was never used.
+
+## Staged, not imported
+- Orc packs are in `D:\crulanda-work\imports\orcs`: "3D Stylized Orc - animations+PBR (13.6k faces)" and "Orc Army Pack" (includes an Orc Shaman).
+- Their rigs and scale haven't been checked against the humanoid/ModelFigure rig yet.
+
+## TODO, in order
+1. **Chris's reactions** to the woods, the motions, the effects, the butts and the trap (the frames named under Start here).
+2. **The Adit rework** (Chris: "adit dungeon need to be more complex like wow's wailing caves or the deadmine"; "you can start expanding
+   adit so not so empty next on the agenda"): branch `adit-rework`, worktree `D:\code\mmo-adit`, `Docs/ADIT_REWORK.md`. Build steps 1-3
+   written, the twelve new elites' moves and loot written (sections 14-17). Its first Unity run: EditMode 488/495, Adit PlayMode 19/30.
+   Red, in the order to fix (section 16): the cave web's joins (the Cutting Drift's lip into the Foundry), rock tops the navmesh bakes
+   on, the Sandthrone pickets 12 m up with no way there, two overseers 1.2 m apart, the run order from the bridge's tower, Lusk's door
+   after his death, the planner's modes test. Then S4-S7 (the releases, the Wake, the NEW moves, the cave map), then Chris's decisions
+   (section 1), then merge. Test with `rt.ps1` against the worktree's Assets (chainR68.ps1 is the pattern).
+3. **The Stylized Newbie Weapons Pack** (downloaded 12:01): its weapons are skinned meshes driven by the pack's own character script;
+   bake each to a plain mesh (an editor method) before `model.weapon` looks can hold them. Low-level gear.
+4. The hoe stroke's measures under the ploughing clip (FieldWorkTests: a stroke every 1-3 s), if the final run shows it red.
+5. Spell effects, second pass: each class's own colours and shapes where the packs' stock looks repeat (the healing glow is one green
+   for every healer; a cast's hand glow is the same sparks for all).
+6. Bonecaller tiers 4-6.
+7. An enemy that applies the grey (Adit/Wasting).
+8. The sim-follow flake.
+9. GroundingTests' sim 2.8 cm up; the parked tool shaft (VillageDayTests); EliteFightTests under -nographics.
+10. The three later dungeons (DUNGEON_DESIGN.md) when the level cap rises past 15.
+11. Republish only with Chris's OK; back up the save first (`chainR61.ps1` is the pattern).
+
+## Key docs (in `Docs\`)
+- `BALANCE_REPORT.md`: harness rounds v1-v8, caps, retunes.
+- `RACES.md`: canon check, race storage, orc plan.
+- `CLASS_CLERIC_SHAMAN.md`: design and status.
+- `PLAYTEST_NOTES.md`: Chris's words, numbered notes, TODOs.
+- `ZONE_FILL_PLAN.md`: note 172.
+- `HANDOFF_ARCHIVE.md`: older handoffs.
+- `D:\code\mmo\CLAUDE.md`: the rules.

@@ -1,0 +1,172 @@
+{
+  "zone": "zone.adit",
+  "canonStatus": "GAME-ONLY: the Sealed Adit's chapter of the book of lore, its lines the game's; the old mining tunnels and the rail deep down (book2 ch.19), aether-geodes (book1 ch.3), the Cult of Ash (book1 ch.10) and the Silent Pilgrims (world_bible.md) are CANON, as each line says.",
+  "entries": [
+    {
+      "id": "lore.adit.places.the-sealed-adit",
+      "chapter": "places",
+      "subject": "The Sealed Adit",
+      "line": "The old working's mouth in the mountain's flank, walled up from outside and broken open again. The cut runs in under the Peaks further than anyone mapped.",
+      "canonStatus": "CANON-EXPANDED: old mining tunnels under the Shattered Peaks are CANON (book2 ch.19); this working is GAME-ONLY."
+    },
+    {
+      "id": "lore.adit.places.the-cage-bowl",
+      "chapter": "places",
+      "subject": "The Cage Bowl",
+      "line": "A great bowl of a cave where the Company kept its pressed hands caged between shifts. The cages are still there, and the hooks.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.places.lusk-s-tally-hall",
+      "chapter": "places",
+      "subject": "Lusk's Tally Hall",
+      "line": "Where the gang-boss counted the carts down and the carts up, and docked the pay of every man short.",
+      "more": "His tally book: carts down, carts up, three lost on the stair and their men's pay docked, two hundred geodes cut, and the pressed hands counted with the carts.",
+      "page": "doc.adit.tally_book",
+      "canonStatus": "GAME-ONLY: Lusk and his tally. Aether-geodes are CANON (book1 ch.3)."
+    },
+    {
+      "id": "lore.adit.places.the-flooded-working",
+      "chapter": "places",
+      "subject": "The Flooded Working",
+      "line": "An old level the water took back when the miners stopped bailing it. Things live in it now.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.places.the-pen",
+      "chapter": "places",
+      "subject": "The Pen",
+      "line": "Where the Company penned the goblins it worked. Pib remembers it, and will not say more.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.places.the-singing-gallery",
+      "chapter": "places",
+      "subject": "The Singing Gallery",
+      "line": "The great cave that sings three notes when the air moves through it.",
+      "more": "A pilgrim's slate says the miners cut the north door to hear the notes, and that each colour of stone in the halls answers one of them.",
+      "page": "doc.adit.pilgrim_note",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible.md); the gallery's notes are GAME-ONLY."
+    },
+    {
+      "id": "lore.adit.places.the-geode-foundry",
+      "chapter": "places",
+      "subject": "The Geode Foundry",
+      "line": "Where the Company split the aether-geodes and sorted the shards, by hand and chisel, under the lamps.",
+      "canonStatus": "CANON-EXPANDED: aether-geodes are CANON (book1 ch.3); the Company's work here is GAME-ONLY."
+    },
+    {
+      "id": "lore.adit.places.the-ash-garden",
+      "chapter": "places",
+      "subject": "The Ash Garden",
+      "line": "A garden of grey ash and stone the Cult raked into patterns, where nothing grows, and that is the point of it.",
+      "canonStatus": "CANON-EXPANDED: the Cult of Ash is CANON (book1 ch.10); its garden is GAME-ONLY."
+    },
+    {
+      "id": "lore.adit.places.the-scriptorium",
+      "chapter": "places",
+      "subject": "The Scriptorium",
+      "line": "Where the Order's copyists wrote out their histories, and a censor struck out what should not be remembered.",
+      "more": "One page the censor missed: the first of the Order did not come to the fire to worship it. They came because the grey was coming down the valley, and the fire was warm.",
+      "page": "doc.adit.censored_history",
+      "canonStatus": "GAME-ONLY: the Order and its history. The Cult of Ash and the Wasting are CANON (book1 ch.10)."
+    },
+    {
+      "id": "lore.adit.places.the-muster-yard",
+      "chapter": "places",
+      "subject": "The Muster Yard",
+      "line": "Where the Order drilled its zealots in rows, under the eye of its master-at-arms.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.places.the-chapel-of-embers",
+      "chapter": "places",
+      "subject": "The Chapel of Embers",
+      "line": "The Order's fire chapel, deep under the mountain, where the heat comes through the rock of the stair down to it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.places.the-sunless-river",
+      "chapter": "places",
+      "subject": "The Sunless River",
+      "line": "A river that runs under the mountain in the dark, cold enough to stop the breath. Something lives in its pools.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.places.the-grey-breach",
+      "chapter": "places",
+      "subject": "The Grey Breach",
+      "line": "Where the grey broke into the workings from below, and the stone went smooth and silent.",
+      "canonStatus": "CANON-EXPANDED: the void eating through the Peaks' stone is CANON (world_bible.md); the breach is GAME-ONLY."
+    },
+    {
+      "id": "lore.adit.places.the-deep-way",
+      "chapter": "places",
+      "subject": "The Deep Way",
+      "line": "The long road down to the rail, lit by lichen where the lamps gave out.",
+      "more": "The lamp-men's own mixing card for the gallery oil: rendered mule fat, a little pitch, a fistful of salt against the damp. Warm it, do not boil it.",
+      "page": "doc.adit.lamp_oil",
+      "canonStatus": "GAME-ONLY: the lamp-men's card. The old workings' lamps are CANON (book2 ch.19)."
+    },
+    {
+      "id": "lore.adit.places.the-rail-hall",
+      "chapter": "places",
+      "subject": "The Rail Hall",
+      "line": "Where the deep line begins: the Company's carriages, its platform, and sleepers stacked like cordwood.",
+      "canonStatus": "CANON-EXPANDED: the rail deep under the Peaks is CANON (book2 ch.19); the Company's hall is GAME-ONLY."
+    },
+    {
+      "id": "lore.adit.places.the-dead-line",
+      "chapter": "places",
+      "subject": "The Dead Line",
+      "line": "A spur of the rail that runs to nowhere now.",
+      "more": "A letter under seal sends forty crates a month along it to the hub at the coast, where the Council's factor weighs them and asks nothing.",
+      "page": "doc.adit.sealed_letter",
+      "canonStatus": "PROVISIONAL: the letter is GAME-ONLY; the rail south to a coastal hub is CANON (book2 ch.19)."
+    },
+    {
+      "id": "lore.adit.places.the-black-cove",
+      "chapter": "places",
+      "subject": "The Black Cove",
+      "line": "An underground harbour on black water, with a barge scaffold and moorings, where the Company's crates went out.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.creatures.gang-boss-haddo-lusk",
+      "chapter": "creatures",
+      "subject": "Gang-Boss Haddo Lusk",
+      "line": "The gang-boss of the lower workings, who docks a dead man's pay and counts it as saved.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.creatures.old-kettle-the-pitch-boiler",
+      "chapter": "creatures",
+      "subject": "Old Kettle, the pitch-boiler",
+      "line": "He boils the pitch for the sleepers and the axles, somewhere past the stacked sleepers. Do not wake him.",
+      "more": "His chalked tally: fourteen barrels boiled, eleven sent up, three 'lost'. Knock first, it says.",
+      "page": "doc.adit.kettle_tally",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.creatures.the-foreman-who-forgot",
+      "chapter": "creatures",
+      "subject": "The Foreman Who Forgot",
+      "line": "The Umbra working's foreman, gone grey with his deep level. He still gives orders to nobody.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.creatures.the-quiet-miner",
+      "chapter": "creatures",
+      "subject": "The Quiet Miner",
+      "line": "A miner who lay down in his drift and went quiet. Some days he is there, and some days he is not.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.adit.herbs.last-light",
+      "chapter": "herbs",
+      "subject": "herb.last_light",
+      "line": "Where the fire chapel's heat seeps through the stair's wall, the ash's pale flower grows red and glows like coals.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    }
+  ]
+}

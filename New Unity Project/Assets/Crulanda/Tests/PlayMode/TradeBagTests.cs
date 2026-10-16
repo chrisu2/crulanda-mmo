@@ -119,6 +119,15 @@ namespace Crulanda.Tests
             yield return null;
         }
 
+        /// <summary>Goodbye shuts the shop and the bags it opened; bags you had open stay open (the tester's note 116, 2026-10-10).</summary>
+        [UnityTest] public IEnumerator Goodbye_shuts_the_shop_and_the_bags_it_opened()
+        {
+            yield return Open(10.5f);
+            var s = Session(); var maud = VillageLife.Active.Find(Maud); Assert.NotNull(maud);
+            s.InventoryOpen = false; s.OpenVendor(maud); Assert.AreEqual(Maud, s.VendorNpc); Assert.IsTrue(s.InventoryOpen, "the shop opens your bags");
+            s.CloseVendor(); Assert.IsNull(s.VendorNpc, "the shop shuts"); Assert.IsFalse(s.InventoryOpen, "and puts away the bags it opened");
+            s.InventoryOpen = true; s.OpenVendor(maud); s.CloseVendor(); Assert.IsTrue(s.InventoryOpen, "bags you had open stay open");
+        }
         [UnityTest] public IEnumerator Knocking_at_night_opens_her_wares()
         {
             yield return Open(23.5f);

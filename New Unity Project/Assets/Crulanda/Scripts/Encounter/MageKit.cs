@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using Crulanda.Gameplay;
@@ -14,16 +14,19 @@ namespace Crulanda.Encounter
     /// emptied and four seconds in which no Heat builds. Cinder Field burns the ground under the target, Smoulder slows, Ember
     /// Ward is a barrier. Bind makes the next Ember Bolt weaker and banks a Charge; Unbind spends it so the whole party hits
     /// harder for a while. Bar: 1 Ember Bolt, 2 Scorch, 3 Flare, 4 Cinder Field, 5 Smoulder, 6 Ember Ward, 7 Bind, 8 Unbind,
-    /// 9 Quench (talent). Base abilities and rows 0-2 of Talents/mage.json. Nothing here is saved.
+    /// 9 Quench (talent), 0 Ash Hex; the Bonecaller's (the necromancer, 2026-10-12) - Raise Bone Thrall, = Marrow Drain, [ Bone Spikes (talent). Base
+    /// abilities, rows 0-2 of Talents/mage.json and the Bonecaller's rows 0-3. Nothing here is saved.
     /// </summary>
-    public sealed class MageKit : ClassKit
+    public sealed class MageKit : ClassKit, IPetMaster
     {
         public static readonly string[] ImplementedIds = {
             "cb-kindling", "cb-hot-hands", "cb-stoked", "cb-flashpoint", "cb-backdraft", "cb-inferno", "cb-white-heat",
             "hw-cinders", "hw-slow-burn", "hw-wide-field", "hw-embers-underfoot", "hw-heat-haze", "hw-long-burn", "hw-firestorm",
-            "sb-reservoir", "sb-ward-weave", "sb-quench", "sb-shared-flame", "sb-steady-mind", "sb-quickening", "sb-binding-oath"
+            "sb-reservoir", "sb-ward-weave", "sb-quench", "sb-shared-flame", "sb-steady-mind", "sb-quickening", "sb-binding-oath",
+            "bc-hard-bone", "bc-sharp-marrow", "bc-grave-bond", "bc-long-drain", "bc-bone-spikes", "bc-death-echo", "bc-bone-armour", "bc-wide-spikes"   // the Bonecaller, rows 0-3
         };
-        public static readonly string[] BarIds = { "mage.ember_bolt", "mage.scorch", "mage.flare", "mage.cinder_field", "mage.smoulder", "mage.ember_ward", "mage.bind", "mage.unbind", "mage.quench", "mage.ash_hex" };
+        public static readonly string[] BarIds = { "mage.ember_bolt", "mage.scorch", "mage.flare", "mage.cinder_field", "mage.smoulder", "mage.ember_ward", "mage.bind", "mage.unbind", "mage.quench", "mage.ash_hex",
+            "mage.raise_thrall", "mage.marrow_drain", "mage.bone_spikes" };
         public const int MaxHeat = 100, FlareMinHeat = 30, EmberHeat = 15, ScorchHeat = 10, SmoulderHeat = 5;
         public const float OverloadBurn = .08f, OverloadSeconds = 4, HeatKept = 10, BoundLoss = .4f, UnbindBonus = .15f;
 
@@ -56,6 +59,10 @@ namespace Crulanda.Encounter
                 if (!abilities.ContainsKey(id) || !unlocks.ContainsKey(id)) throw new ArgumentException("Mage ability '" + id + "' is missing from content or unlocks.");
         }
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
+        /// <summary>Its standing party buff at a buff-up before a boss (Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"; GAME-ONLY):
+        /// a spark of the Mage's Heat lent to every mind. Half an hour, +3% Intellect on everyone (BossBuffs).</summary>
+        public static readonly ClassBuff Standing = new ClassBuff("class.mage", "Kindled Wits", Crulanda.Core.StatType.Intellect);
+        public override ClassBuff PartyBuff { get { return Standing; } }
         public override bool MeleeAutoAttacks { get { return false; } }   // a caster: no swings, a release at range
         int R(string id) { return s.TalentRank(id); }
         float Now { get { return Time.time; } }
@@ -111,6 +118,9 @@ namespace Crulanda.Encounter
                 case "mage.unbind": return Unbind(a);
                 case "mage.quench": return Quench(a);
                 case "mage.ash_hex": return AshHex(a);
+                case "mage.raise_thrall": return RaiseThrall(a);   // the Bonecaller
+                case "mage.marrow_drain": return MarrowDrain(a);
+                case "mage.bone_spikes": return BoneSpikes(a);
             }
             return false;
         }
@@ -126,7 +136,7 @@ namespace Crulanda.Encounter
         int HealActor(Actor target, int amount)
         {
             if (target == null || !target.IsAlive || amount <= 0) return 0;
-            int healed = target.GetComponent<Combatant>().Heal(amount);
+            int healed = target.GetComponent<Combatant>().Heal(amount, s.Player);
             if (healed > 0) { s.AddHealingThreat(healed); s.FloatText(target.transform.position, "+" + healed, new Color(1, .95f, .6f)); }
             return healed;
         }
@@ -143,7 +153,7 @@ namespace Crulanda.Encounter
                 s.Bolt(t, new Color(1, .55f, .15f), .2f);
                 float d = (a.power + 2 * Level) * (1 + .03f * R("cb-kindling"));
                 if (bound) { d *= 1 - Mathf.Max(.1f, BoundLoss - .1f * R("sb-steady-mind")); Binding = false; Charges = 1; s.Message("Bound: a Charge is banked for Unbind."); }
-                Hit(t, Dmg(d)); GainHeat(EmberHeat);
+                Hit(t, Dmg(d)); GainHeat(EmberHeat); MendHound();
             });
         }
         bool Scorch(AbilityDefinition a)
@@ -256,12 +266,91 @@ namespace Crulanda.Encounter
         public override float PartyDamageMultiplier(EncounterEnemy enemy) { return Unbound ? 1 + Bonus : 1; }
         public override float CompanionHaste { get { return Unbound ? .1f * R("sb-quickening") : 0; } }
 
+        // ---------- the Bonecaller (the necromancer; reworked from the Cinderwright, Chris 2026-10-12: "give the mage a necro build",
+        // then "Rework existing paths into the new builds"; GAME-ONLY: the books have no necromancy, the game's risen dead (the ossuary
+        // knight) are its bones; not the Wasting, which unmakes, where this calls the bones of the dead back up; no machines) ----------
+        // A bone thrall at heel (the risen dead's skeleton, a party member like the Ranger's wolf): Raise Bone Thrall calls it, Marrow
+        // Drain draws the life out of a foe over time into you and the thrall, Bone Spikes bursts the ground round the thrall.
+        public const float DrainEvery = 2, DrainShare = .5f, SpikeReach = 4, SpikeCost = .1f, BoneArmourCut = .3f;
+        public const int DrainTicks = 5;
+        /// <summary>The bone thrall at heel (null until raised, or once it has fallen).</summary>
+        public RangerPet Thrall { get { return s.Pet; } }
+        bool ThrallUp { get { return Thrall != null && Thrall.actor != null && Thrall.actor.IsAlive; } }
+        public bool Draining { get { foreach (var e in s.Enemies) if (e != null && periodic.Has("marrow", e)) return true; return false; } }
+        public float PetHealthScale { get { return 1 + .08f * R("bc-hard-bone"); } }
+        public float PetBiteScale { get { return 1 + .1f * R("bc-sharp-marrow"); } }
+        public bool PetHolds { get { return false; } }
+        /// <summary>Death Echo: each of its blows gives you back Mana.</summary>
+        public void OnPetBite(EncounterEnemy target, int bite)
+        {
+            int k = R("bc-death-echo"); if (k <= 0) return;
+            var pool = s.Player.Resource.Pool; pool.SetCurrent(Mathf.Min(pool.Max, pool.Current + k));
+        }
+        /// <summary>Grave Bond: an Ember Bolt that lands mends the thrall.</summary>
+        void MendHound() { int k = R("bc-grave-bond"); if (k > 0 && ThrallUp) Thrall.actor.GetComponent<Combatant>().Heal(Mathf.RoundToInt(Thrall.actor.Health.Pool.Max * .02f * k), s.Player); }
+        static readonly Color BoneWhite = new Color(.86f, .84f, .74f), DrainGreen = new Color(.5f, .85f, .55f);
+        /// <summary>Raise Bone Thrall: the bones of the dead stood up at your side; again, they are laid down.</summary>
+        bool RaiseThrall(AbilityDefinition a)
+        {
+            if (ThrallUp) return Start(With(a, 0, 0), () => { s.DismissPet(); s.Message("Your bone thrall is laid back down."); });
+            return Start(a, () => { s.SummonPet(this, "Bone thrall", "thrall", ActorLook.Skeleton); s.Message("The bones of the dead stand up at your side."); });
+        }
+        /// <summary>Marrow Drain: the life drawn out of the target every 2 s for 10 s (Long Drain: longer); half of each draw mends you and
+        /// your thrall. Bone Armour: while it draws, the thrall takes 30% less.</summary>
+        bool MarrowDrain(AbilityDefinition a)
+        {
+            if (!s.RequireEnemyInRange(a.range)) return false; var t = s.Target;
+            return Start(a, () => {
+                if (!s.LandsOn(t, a.range)) return;
+                s.Bolt(t, DrainGreen, .16f);
+                ArchivistKit.Aura(t.transform, "Marrow drain", new Color(.55f, .08f, .1f), DrainEvery * (DrainTicks + R("bc-long-drain")) + .3f, .5f, 1.1f, 8);   // the drain shows on the body
+                periodic.Add("marrow", t, Now, DrainEvery, DrainTicks + R("bc-long-drain"), Dmg(a.power + Level), (e, i) => {
+                    var enemy = (EncounterEnemy)e.target; if (!enemy.actor.IsAlive) return false;
+                    Hit(enemy, e.value); int back = Mathf.Max(1, Mathf.RoundToInt(e.value * DrainShare));
+                    PlayerCombat.Heal(back, s.Player); if (ThrallUp) Thrall.actor.GetComponent<Combatant>().Heal(back, s.Player);
+                    if (resetting == false) s.FloatText(enemy.transform.position + Vector3.up * 1.6f, "drained", DrainGreen);
+                    return true;
+                });
+                s.Message("Marrow Drain: the life drawn out of " + t.actor.DisplayName + ".");
+            });
+        }
+        /// <summary>Bone Spikes (a talent): bone bursts up round the thrall: every foe within 4 m (Wide Spikes: further) is struck and
+        /// slowed; it costs the thrall a tenth of its health.</summary>
+        bool BoneSpikes(AbilityDefinition a)
+        {
+            if (!Need(ThrallUp, "No thrall: Raise Bone Thrall first.")) return false;
+            return Start(a, () => {
+                if (!ThrallUp) return;
+                var at = Thrall.transform.position; float reach = SpikeReach + R("bc-wide-spikes"); int dealt = Dmg(a.power + 3 * Level);
+                foreach (var e in s.Enemies.ToArray())
+                    if (e != null && e.actor.IsAlive && !e.Game && !e.Hidden && (e.transform.position - at).sqrMagnitude <= reach * reach) { Hit(e, dealt); if (e.actor.IsAlive) e.Slow(.4f, 3); }
+                Thrall.actor.GetComponent<Combatant>().Damage(Mathf.Max(1, Mathf.RoundToInt(Thrall.actor.Health.Pool.Max * SpikeCost)));
+                SpikeFx(at, reach);
+                s.FloatText(at, "Bone Spikes", BoneWhite);
+            });
+        }
+        /// <summary>The spikes seen: a ring of bone shards standing out of the ground for a second and a half.</summary>
+        static void SpikeFx(Vector3 at, float reach)
+        {
+            var root = new GameObject("Bone spikes"); root.transform.position = at;
+            for (int i = 0; i < 14; i++)
+            {
+                float t = i * Mathf.PI * 2 / 14, r = reach * (.35f + .55f * ((i * 7) % 5) / 4f);
+                var g = GameObject.CreatePrimitive(PrimitiveType.Cylinder); UnityEngine.Object.Destroy(g.GetComponent<Collider>());
+                g.transform.SetParent(root.transform, false); g.transform.localPosition = new Vector3(Mathf.Cos(t) * r, .45f, Mathf.Sin(t) * r);
+                g.transform.localRotation = Quaternion.Euler(Mathf.Sin(t) * 18, 0, Mathf.Cos(t) * -18); g.transform.localScale = new Vector3(.13f, .5f, .13f);   // a metre tall, thick enough to read from the camera (step-4 frames)
+                g.GetComponent<Renderer>().material.color = BoneWhite;
+            }
+            UnityEngine.Object.Destroy(root, 1.5f);
+        }
+
         // ---------- incoming blows ----------
         public override int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
         {
             if (victim == null || !victim.IsAlive) return 0;
             int haze = R("hw-heat-haze");
             float mult = haze > 0 && InField(enemy) ? 1 - .04f * haze : 1;
+            if (ThrallUp && victim == Thrall.actor && R("bc-bone-armour") > 0 && Draining) mult *= 1 - BoneArmourCut;   // Bone Armour
             return victim.GetComponent<Combatant>().Damage(Mathf.RoundToInt(raw * mult));
         }
 
@@ -281,6 +370,7 @@ namespace Crulanda.Encounter
             resetting = true; periodic.Clear(); resetting = false;
             fieldUntil = unboundUntil = 0; backdraft = false;
             if (s.Player != null) PlayerCombat.ClearBarrier();
+            if (Thrall != null) Thrall.Refit();
         }
 
         // ---------- HUD ----------
@@ -292,6 +382,7 @@ namespace Crulanda.Encounter
                 if (Binding) parts.Add("Binding"); if (Charges > 0) parts.Add("Charge banked");
                 if (Unbound) parts.Add("Unbound " + (unboundUntil - Now).ToString("0.0") + "s");
                 if (FieldBurning) parts.Add("Cinder Field");
+                if (ThrallUp) parts.Add("Thrall " + Thrall.actor.Health.Pool.Current + "/" + Thrall.actor.Health.Pool.Max);
                 int barrier = PlayerCombat.Barrier; if (barrier > 0) parts.Add("Barrier " + barrier);
                 return string.Join("  ·  ", parts);
             }
@@ -300,6 +391,7 @@ namespace Crulanda.Encounter
         {
             var parts = new List<string>();
             if (periodic.Has("scorch", enemy)) parts.Add("Scorched");
+            if (periodic.Has("marrow", enemy)) parts.Add("Drained");
             if (InField(enemy)) parts.Add("In the cinders");
             if (enemy.Rooted) parts.Add("HELD " + enemy.RootRemaining.ToString("0.0") + "s"); else if (enemy.Slowed) parts.Add("SMOULDERING");
             return parts.Count == 0 ? null : string.Join("  ·  ", parts);

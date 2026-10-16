@@ -404,7 +404,7 @@ namespace Crulanda.Tests
         [Test] public void V8Payload_MigratesTo9_AddsArmouryLooksAndLuck_KeepsEveryOtherCharacter()
         {
             var step = new AddArmouryMigration();
-            Assert.AreEqual(8, step.FromVersion); Assert.AreEqual(9, step.ToVersion); Assert.AreEqual(10, EncounterSave.FormatVersion);
+            Assert.AreEqual(8, step.FromVersion); Assert.AreEqual(9, step.ToVersion); Assert.AreEqual(11, EncounterSave.FormatVersion);
             string v8 = OwnerSaveFixtures.V8Payload, v9 = step.Migrate(v8);
             Assert.AreEqual(v8.Substring(0, v8.Length - 1) + Tail9, v9, "Every character of the v8 payload is kept; the three lists go in before the closing brace.");
             Assert.AreEqual(v9, step.Migrate(v9), "A payload that has all three is left alone.");
@@ -415,14 +415,14 @@ namespace Crulanda.Tests
             Assert.Throws<SaveMigrationException>(() => step.Migrate(""));
             Assert.Throws<SaveMigrationException>(() => step.Migrate(null));
 
-            // The whole chain: the owner's format 6 gains format 7's list, format 8's two and format 9's three, and nothing else moves.
-            var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(step); m.Register(new SteeperCurveMigration());
+            // The whole chain: the owner's format 6 gains format 7's list, format 8's two, format 9's three and format 11's one, and nothing else moves.
+            var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(step); m.Register(new SteeperCurveMigration()); m.Register(new AddRecipesMigration());
             string v6 = OwnerSaveFixtures.V6Payload;
             var from6 = m.MigrateToVersion(new SaveEnvelope { formatVersion = 6, payloadType = "CrulandaEncounter", payloadJson = v6 }, EncounterSave.FormatVersion);
-            Assert.AreEqual(10, from6.formatVersion); Assert.AreEqual(new SteeperCurveMigration().Migrate(v6.Substring(0, v6.Length - 1) + ",\"discoveries\":[]" + Then9(Tail8)), from6.payloadJson);
+            Assert.AreEqual(11, from6.formatVersion); Assert.AreEqual(new AddRecipesMigration().Migrate(new SteeperCurveMigration().Migrate(v6.Substring(0, v6.Length - 1) + ",\"discoveries\":[]" + Then9(Tail8))), from6.payloadJson);
             var input = new SaveEnvelope { formatVersion = 8, payloadType = "CrulandaEncounter", payloadJson = v8 };
             var from8 = m.MigrateToVersion(input, EncounterSave.FormatVersion);
-            Assert.AreEqual(10, from8.formatVersion); Assert.AreEqual(new SteeperCurveMigration().Migrate(v9), from8.payloadJson);
+            Assert.AreEqual(11, from8.formatVersion); Assert.AreEqual(new AddRecipesMigration().Migrate(new SteeperCurveMigration().Migrate(v9)), from8.payloadJson);
             Assert.AreEqual(8, input.formatVersion); Assert.AreEqual(v8, input.payloadJson, "The envelope that was read is not touched.");
 
             // Through the save itself, then the Armoury's first bind: what he holds is found, and nothing else changes.
@@ -467,7 +467,7 @@ namespace Crulanda.Tests
                     // The next save is format 9 with the three lists at the end, and reads back the same.
                     save.Write(p);
                     Assert.IsTrue(store.TryRead("encounter", out var envelope, out _));
-                    Assert.AreEqual(10, envelope.formatVersion);
+                    Assert.AreEqual(11, envelope.formatVersion);
                     StringAssert.Contains(",\"pouches\":[],\"armoury\":[\"item.training_blade\"", envelope.payloadJson);
                     StringAssert.EndsWith("\"],\"lootLuck\":[]}", envelope.payloadJson);
                     Assert.IsTrue(save.Read(out var again, out message), message);
@@ -514,7 +514,7 @@ namespace Crulanda.Tests
                 p.lootLuck.Add(new LootLuck { source = "drop.oak.caddock", kills = 9 });   // a second entry for a source already listed
                 var save = new EncounterSave(root, TestTalents.Warrior()); save.Write(p);
                 Assert.IsTrue(new SaveFileStore(root).TryRead("encounter", out var envelope, out _));
-                Assert.AreEqual(10, envelope.formatVersion);
+                Assert.AreEqual(11, envelope.formatVersion);
                 StringAssert.Contains("\"lootLuck\":[{\"source\":\"drop.oak.caddock\",\"kills\":3,\"dry\":0},", envelope.payloadJson);
                 Assert.AreEqual(envelope.payloadJson, new AddArmouryMigration().Migrate(envelope.payloadJson), "A format-9 payload needs nothing from the step.");
                 Assert.IsTrue(save.Read(out var loaded, out var message), message);
@@ -550,6 +550,69 @@ namespace Crulanda.Tests
             StringAssert.Contains("\"experience\":" + xp + ",", outJson); StringAssert.StartsWith("{\"classId\":\"class.warrior\",", outJson); StringAssert.EndsWith(",\"gold\":7}", outJson);
             Assert.AreEqual("{\"gold\":7}", new SteeperCurveMigration().Migrate("{\"gold\":7}"), "no experience field: untouched");
             Assert.Throws<SaveMigrationException>(() => new SteeperCurveMigration().Migrate("[1,2]"));
+        }
+
+        // ---------- format 11: found recipes (Phase 8.6 step 5) ----------
+        /// <summary>
+        /// Format 10 → 11 adds the empty <c>recipes</c> list (the found recipes learned from leaves) before the closing brace and keeps every
+        /// other character; the whole chain from the owner's format 6 and 8 runs through it; through the save itself a format-10 file
+        /// loads with everything it held and the list empty, the file untouched until the next save; learned recipes then round-trip,
+        /// written before the discoveries (where EncounterProgress declares them, so a payload still ends as it did), blanks and repeats
+        /// dropped, an id this build does not know kept.
+        /// </summary>
+        [Test] public void V10Payload_MigratesTo11_AddsRecipes_KeepsEveryOtherCharacter()
+        {
+            var step = new AddRecipesMigration();
+            Assert.AreEqual(10, step.FromVersion); Assert.AreEqual(11, step.ToVersion); Assert.AreEqual(11, EncounterSave.FormatVersion);
+            // The owner's evening save, brought to format 10 by the steps before this one, is a format-10 payload.
+            string v10 = new SteeperCurveMigration().Migrate(new AddArmouryMigration().Migrate(OwnerSaveFixtures.V8Payload)), v11 = step.Migrate(v10);
+            // The same step adds the lockouts after the recipes (2026-10-15, branch p86-lockout: one format for both), each only when missing.
+            Assert.AreEqual(v10.Substring(0, v10.Length - 1) + ",\"recipes\":[],\"lockouts\":[]}", v11, "Every character of the v10 payload is kept; the two lists go in before the closing brace.");
+            Assert.AreEqual(v11, step.Migrate(v11), "A payload that has both lists is left alone.");
+            Assert.AreEqual("{\"recipes\":[],\"lockouts\":[]}", step.Migrate("{}"));
+            Assert.AreEqual("{ \"a\" : 1,\"recipes\":[],\"lockouts\":[]}", step.Migrate("  { \"a\" : 1 }\n"));
+            Assert.AreEqual("{\"recipes\" : [\"recipe.cordial_ox\"],\"lockouts\":[]}", step.Migrate("{\"recipes\" : [\"recipe.cordial_ox\"]}"), "Only the missing list is added.");
+            Assert.AreEqual("{\"lockouts\":[{\"id\":\"mob.x.adit.5\",\"until\":1}],\"recipes\":[]}", step.Migrate("{\"lockouts\":[{\"id\":\"mob.x.adit.5\",\"until\":1}]}"), "Only the missing list is added.");
+            Assert.AreEqual("{\"recipes\":[],\"lockouts\":[]}", step.Migrate("{\"recipes\":[],\"lockouts\":[]}"));
+            Assert.Throws<SaveMigrationException>(() => step.Migrate("[1,2]"));
+            Assert.Throws<SaveMigrationException>(() => step.Migrate(""));
+            Assert.Throws<SaveMigrationException>(() => step.Migrate(null));
+
+            // The whole chain, from the owner's morning (format 6): all five steps, and the list at the end.
+            var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); m.Register(new SteeperCurveMigration()); m.Register(step);
+            var from6 = m.MigrateToVersion(new SaveEnvelope { formatVersion = 6, payloadType = "CrulandaEncounter", payloadJson = OwnerSaveFixtures.V6Payload }, EncounterSave.FormatVersion);
+            Assert.AreEqual(11, from6.formatVersion); StringAssert.EndsWith(Then9(Tail8).Substring(0, Then9(Tail8).Length - 1) + ",\"recipes\":[],\"lockouts\":[]}", from6.payloadJson);
+            var input = new SaveEnvelope { formatVersion = 10, payloadType = "CrulandaEncounter", payloadJson = v10 };
+            var from10 = m.MigrateToVersion(input, EncounterSave.FormatVersion);
+            Assert.AreEqual(11, from10.formatVersion); Assert.AreEqual(v11, from10.payloadJson);
+            Assert.AreEqual(10, input.formatVersion); Assert.AreEqual(v10, input.payloadJson, "The envelope that was read is not touched.");
+
+            // Through the save: a format-10 file loads as it was, with no recipes, and the file is not touched.
+            string root = Temp();
+            try
+            {
+                var store = Saved(root, 10, v10);
+                string onDisk = File.ReadAllText(store.PathFor("encounter"));
+                var save = new EncounterSave(root, TestTalents.Warrior());
+                Assert.IsTrue(save.Read(out var p, out var message), message);
+                Assert.AreEqual(onDisk, File.ReadAllText(store.PathFor("encounter")), "Reading migrates in memory: the file is untouched until the next save.");
+                Assert.IsFalse(File.Exists(store.PathFor("encounter") + ".bak"), "Reading writes nothing.");
+                AsTheOwnersV8Held(p);
+                Assert.NotNull(p.recipes); Assert.IsEmpty(p.recipes);
+                // Learned recipes round-trip in format 11.
+                p.recipes.AddRange(new[] { "recipe.cordial_ox", "", "recipe.cordial_ox", "recipe.gone_from_this_build" });
+                save.Write(p);
+                Assert.IsTrue(store.TryRead("encounter", out var envelope, out _));
+                Assert.AreEqual(11, envelope.formatVersion);
+                StringAssert.Contains("\"recipes\":[\"recipe.cordial_ox\",\"\",\"recipe.cordial_ox\",\"recipe.gone_from_this_build\"],\"discoveries\":[]", envelope.payloadJson, "Before the discoveries.");
+                StringAssert.EndsWith("\"lootLuck\":[]}", envelope.payloadJson, "A payload still ends as it did.");
+                Assert.AreEqual(envelope.payloadJson, step.Migrate(envelope.payloadJson), "A format-11 payload needs nothing from the step.");
+                Assert.IsTrue(save.Read(out var again, out message), message);
+                CollectionAssert.AreEqual(new[] { "recipe.cordial_ox", "recipe.gone_from_this_build" }, again.recipes, "Kept in order; a blank and a repeat are dropped; an unknown id is kept.");
+                save.Write(again); Assert.IsTrue(save.Read(out var third, out message), message);
+                Assert.AreEqual(JsonUtility.ToJson(again), JsonUtility.ToJson(third), "And it reads back the same.");
+            }
+            finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
         }
     }
 }

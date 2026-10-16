@@ -28,7 +28,7 @@ namespace Crulanda.Encounter
         /// <summary>The bags window's line when no trade bag is worn (GAME-ONLY).</summary>
         public const string TradeBagNote = "Trade bags: Maud Tanner makes them, by the South road in Oakhaven.";
         static bool ItemUiBlocks(Vector2 p)
-        { return (bagsVisible && BagsRect.Contains(p)) || (charVisible && CharRect.Contains(p)) || (vendorVisible && VendorRect.Contains(p)) || confirmDestroy >= 0; }
+        { return (bagsVisible && BagsRect.Contains(p)) || (charVisible && CharRect.Contains(p)) || (vendorVisible && VendorRect.Contains(p)) || CapitalUiBlocks(p) || confirmDestroy >= 0; }
         const float Slot = 52, Gap = 6;
         // Drag state: from a bag slot (>= 0) or an equipment slot (dragEquip >= 0).
         int dragBag = -1, dragEquip = -1; static int confirmDestroy = -1;
@@ -53,6 +53,7 @@ namespace Crulanda.Encounter
             if (d.kind == "material") return "Mt";
             if (d.kind == "tool") return "Tl";
             if (d.kind == "bag") return "Bg";
+            if (d.kind == "recipe") return "Lf";
             switch (d.slot) { case "head": return "Hd"; case "neck": return "Nk"; case "shoulders": return "Sh"; case "chest": return "Ch"; case "hands": return "Gl"; case "legs": return "Lg"; case "feet": return "Ft"; case "mainhand": return "Wp"; case "offhand": return "Of"; }
             return "?";
         }
@@ -79,8 +80,9 @@ namespace Crulanda.Encounter
             if (d == null) return;
             var lines = new List<string>();
             if (d.kind == "gear") lines.Add(ItemDatabase.SlotNames[ItemDatabase.SlotIndex(d.slot)] + "  ·  " + ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)]);
-            else lines.Add(d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.kind == "bag" ? "Trade bag" : d.food ? "Food" : "Potion");
+            else lines.Add(d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.kind == "bag" ? "Trade bag" : d.kind == "recipe" ? "Recipe leaf" : Consumables.KindWord(d));
             var stats = ItemDatabase.StatLines(d); if (stats.Length > 0) lines.Add(stats);
+            if (d.kind == "recipe") lines.Add(LeafLine(d));
             if (d.kind == "bag")
                 lines.Add(Inventory.Wears(session.Progress, d.id) ? "<color=#8f8>Worn: " + d.slots + " slots for " + Inventory.HoldsWords(d.holds) + ".</color>"
                     : "Trade bag: " + d.slots + " slots for " + Inventory.HoldsWords(d.holds) + ". Use it to wear it.");
@@ -88,9 +90,11 @@ namespace Crulanda.Encounter
             var holder = string.IsNullOrEmpty(d.pouch) ? null : Inventory.BagFor(session.Items, d.pouch);
             if (holder != null) lines.Add("Goes in " + Article(holder.name) + " " + LowerFirst(holder.name) + ".");
             var named = LootLines(d); if (named != null) lines.Add(named);
+            if (!string.IsNullOrEmpty(d.classOnly))   // a class set's piece (loot DESIGN.md 3.8): red when it is not your class
+            { bool yours = Inventory.ClassMayWear(d, session.Progress.classId); lines.Add((yours ? "" : "<color=#ff5544>") + "Class: " + SimRoster.ClassName(d.classOnly) + (yours ? "" : "</color>")); }
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
-            lines.Add("Sells for " + (d.value) + " crowns");
+            lines.Add("Sells for " + Charm.Pay(session.Progress, d.value) + " crowns");   // the Scoundrel's charm (Charm.cs)
             if (compare && d.kind == "gear")
             {
                 var worn = session.Progress.equipment[ItemDatabase.SlotIndex(d.slot)];
@@ -99,6 +103,14 @@ namespace Crulanda.Encounter
             }
             tooltip = "<b><color=#" + ColorUtility.ToHtmlStringRGB(ItemDatabase.QualityColors[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)]) + ">" + d.name + "</color></b>\n" + string.Join("\n", lines);
             tooltipAt = Event.current.mousePosition;
+        }
+        /// <summary>What a leaf teaches, on its tooltip (Phase 8.6 step 5): "Teaches Bog-iron coif (Blacksmithing 28). Use it to learn it.",
+        /// green once known.</summary>
+        string LeafLine(ItemDef d)
+        {
+            var log = session.Professions; var r = log?.Db.Recipe(d.teaches); if (r == null) return "Teaches a recipe this world does not know.";
+            var trade = log.Db.Profession(r.profession); string what = "Teaches " + r.name + " (" + (trade != null ? trade.name : r.profession) + " " + r.skill + ").";
+            return log.Knows(r) ? "<color=#8f8>" + what + " Already known.</color>" : what + " Use it to learn it.";
         }
         /// <summary>"a" or "an" before a word (by its first letter).</summary>
         static string Article(string word) { return !string.IsNullOrEmpty(word) && "aeiouAEIOU".IndexOf(word[0]) >= 0 ? "an" : "a"; }
@@ -158,10 +170,12 @@ namespace Crulanda.Encounter
                 }
             }
             y += extra;
-            GUI.Label(new Rect(w.x + 14, y, w.width - 28, 40), "Drag to move · right-click to " + (session.VendorNpc != null ? "sell" : "equip / use") + " · drag out of the window to destroy", tiny);
+            GUI.Label(new Rect(w.x + 14, y, w.width - 28, 40), "Drag to move · right-click to " + (session.BankOpen ? "store" : session.ExchangeOpen ? "sell on the Exchange" : session.VendorNpc != null ? "sell" : "equip / use") + " · drag out of the window to destroy", tiny);
             if (session.PotionCooldown > 0) Shadow(new Rect(w.x + 14, y + 36, 300, 20), "Potion ready in " + Mathf.CeilToInt(session.PotionCooldown) + "s", tiny, new Color(.9f, .7f, .5f));
             if (session.VendorNpc != null && GUI.Button(new Rect(w.x + 14, w.yMax - 44, 150, 32), "Sell junk", micro)) session.SellJunk();
-            if (GUI.Button(new Rect(w.xMax - 124, w.yMax - 44, 110, 32), "Close [I]", micro)) { session.InventoryOpen = false; session.CloseVendor(); }
+            // A vault item let go anywhere on the bags (not on a slot) comes out wherever it fits.
+            if (e.type == EventType.MouseUp && e.button == 0 && dragVault >= 0 && w.Contains(e.mousePosition)) { session.WithdrawVault(dragVault); dragVault = -1; e.Use(); }
+            if (GUI.Button(new Rect(w.xMax - 124, w.yMax - 44, 110, 32), "Close [I]", micro)) { session.InventoryOpen = false; session.CloseVendor(); session.CloseCapital(); }
         }
         /// <summary>
         /// One bag slot: its square, its tooltip (an empty trade-bag slot says what it takes), and the mouse on it: drag from it, drop
@@ -177,12 +191,19 @@ namespace Crulanda.Encounter
             else if (p.bag[i].Empty && pouch != null && dragBag < 0 && dragEquip < 0) { tooltip = "<b>" + pouch.name + "</b>\nTakes " + Inventory.HoldsWords(pouch.holds) + "."; tooltipAt = mouse; }
             if (e.type == EventType.MouseDown && e.button == 0 && !p.bag[i].Empty) { dragBag = i; e.Use(); }
             else if (e.type == EventType.MouseDown && e.button == 1 && !p.bag[i].Empty)
-            { var it = session.Items?.Get(p.bag[i].item); if (session.VendorNpc != null && it?.kind != "bag") session.SellBag(i); else session.EquipFromBag(i); e.Use(); }
+            {
+                var it = session.Items?.Get(p.bag[i].item);
+                if (session.BankOpen) session.DepositBag(i);   // into the Treasury Vault (EncounterSession.Capital.cs)
+                else if (session.ExchangeOpen) session.ExchangeChoose(i);   // the lot to list on the Exchange
+                else if (session.VendorNpc != null && it?.kind != "bag") session.SellBag(i); else session.EquipFromBag(i);
+                e.Use();
+            }
             else if (e.type == EventType.MouseUp && e.button == 0)
             {
                 if (dragBag >= 0) session.MoveBag(dragBag, i);
                 else if (dragEquip >= 0) session.UnequipSlot(dragEquip, i);
-                dragBag = dragEquip = -1; e.Use();
+                else if (dragVault >= 0) session.WithdrawVault(dragVault, i);   // out of the vault into this slot
+                dragBag = dragEquip = dragVault = -1; e.Use();
             }
         }
 
@@ -200,7 +221,7 @@ namespace Crulanda.Encounter
         {
             ItemStyles(); var p = session.Progress; var w = CharRect; var pl = session.Player; var cls = session.ClassDef;
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(.3f, .22f, .12f, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
-            Shadow(new Rect(w.x + 16, w.y + 10, w.width - 32, 28), "You  ·  Level " + p.Level + " " + cls.displayName, heading, gold);
+            Shadow(new Rect(w.x + 16, w.y + 10, w.width - 32, 28), "You  ·  Level " + p.Level + " " + Races.Name(p.raceId) + " " + cls.displayName, heading, gold);
             // A standing figure in the middle, lightly tinted by what you wear.
             var mid = new Rect(w.x + 100, w.y + 64, w.width - 200, 250);
             Fill(mid, new Color(1, 1, 1, .03f));
@@ -242,7 +263,7 @@ namespace Crulanda.Encounter
                 "Agility  " + st.GetRounded(Crulanda.Core.StatType.Agility), "Intellect  " + st.GetRounded(Crulanda.Core.StatType.Intellect),
                 "Spirit  " + st.GetRounded(Crulanda.Core.StatType.Spirit) };
             string[] right = {
-                "Health  " + pl.Health.Pool.Max, EncounterHud.ResourceName(cls.resource) + "  " + pl.Resource.Pool.Max,
+                "Health  " + pl.Health.Pool.Max, EncounterHud.ResourceName(cls) + "  " + pl.Resource.Pool.Max,
                 "Attack power  " + st.GetRounded(Crulanda.Core.StatType.AttackPower), "Armor  " + st.GetRounded(Crulanda.Core.StatType.Armor),
                 "Damage taken  " + Mathf.RoundToInt(100f * 100 / (100 + st.Get(Crulanda.Core.StatType.Armor))) + "%" };
             for (int i = 0; i < left.Length; i++) { Shadow(new Rect(w.x + 24, y + i * 24, 220, 22), left[i], text, Color.white); Shadow(new Rect(w.x + 254, y + i * 24, 220, 22), right[i], text, Color.white); }
@@ -294,13 +315,23 @@ namespace Crulanda.Encounter
         void DrawDragAndConfirm()
         {
             var e = Event.current; var p = session.Progress;
+            if (dragVault >= 0)   // a vault item follows the pointer; let go away from the bags, it stays in the vault
+            {
+                var v = session.Vault;
+                if (v == null || dragVault >= v.slots.Count) dragVault = -1;
+                else
+                {
+                    ItemSquare(new Rect(e.mousePosition.x - Slot / 2, e.mousePosition.y - Slot / 2, Slot, Slot), v.slots[dragVault]);
+                    if (e.type == EventType.MouseUp) dragVault = -1;
+                }
+            }
             if (dragBag >= 0 || dragEquip >= 0)
             {
                 var s = dragBag >= 0 ? p.bag[dragBag] : p.equipment[dragEquip];
                 ItemSquare(new Rect(e.mousePosition.x - Slot / 2, e.mousePosition.y - Slot / 2, Slot, Slot), s);
                 if (e.type == EventType.MouseUp)
                 {
-                    bool overWindow = (bagsVisible && BagsRect.Contains(e.mousePosition)) || (charVisible && CharRect.Contains(e.mousePosition)) || (vendorVisible && VendorRect.Contains(e.mousePosition)) || TradesUiBlocks(e.mousePosition) || LootUiBlocks(e.mousePosition);
+                    bool overWindow = (bagsVisible && BagsRect.Contains(e.mousePosition)) || (charVisible && CharRect.Contains(e.mousePosition)) || (vendorVisible && VendorRect.Contains(e.mousePosition)) || CapitalUiBlocks(e.mousePosition) || TradesUiBlocks(e.mousePosition) || LootUiBlocks(e.mousePosition);
                     if (!overWindow && dragBag >= 0) confirmDestroy = dragBag;
                     dragBag = dragEquip = -1;
                 }

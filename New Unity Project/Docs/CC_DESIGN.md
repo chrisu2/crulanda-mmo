@@ -5,6 +5,13 @@ any CC classes yet, so that is something we need to look at next." Classic dunge
 taken out of the fight while the group kills the rest, casters interrupted. Crulanda has slows and roots (Ranger Pin and Snare, Druid
 Stillroot and Briar Snare) but nothing that takes a mob out of a fight, no interrupts, and sims that would break CC anyway.
 
+## Chris's rule (2026-10-15 ~23:05, verbatim): "you can't CC elites , bosses, world bosses , etc."
+Then, asked which effects and what of Nix (the question prompt, verbatim): "normal CCs are cut in half the duration and can't imply the same
+CC after the first." and, of the Nix duo, "CC duration cut in half and can only have one cc type one time".
+**The rule as built:** on an elite, a boss or a world boss every hold (stun, incapacitate: sleep, sap, hex, gouge; fear; root; disorient;
+slow) lasts half as long, and each kind lands once a fight: a second stun, a second fear and so on is "Immune" until the fight resets.
+Interrupts (a silence on a cast) are not holds and work as before. Nix follows it like any elite: held once, for half the time.
+
 ## Decisions for Chris (my picks first)
 1. **Classic strength (pick):** long CC (20-30 s) that breaks on damage, short stuns (3-4 s) that don't. (Or modern: everything short.)
 2. **Marking with keys (pick):** Ctrl+1 skull (kill first), Ctrl+2 moon (CC), Ctrl+3 cross (second CC), Ctrl+4 clear. Sims read the marks.
@@ -80,3 +87,138 @@ tuned so a group without CC struggles and a group that uses it doesn't.
 3. **C3 marks and sims:** the keys and markers; sims using CC and interrupts and marking on a sim-led run.
 4. **C4 feedback:** the visuals, rings, frame text, combat text.
 5. **C5 the Adit:** pulls re-tuned around CC, casters given real casts to interrupt, then the dungeon deepened.
+
+## Signature moves for every mob, 2026-10-15
+Chris, 2026-10-15: "also most mobs dont seem to be cc or aoe still a thing?" Until now only the Adit's seven casters and the elites did
+more than swing. Now every ordinary (non-elite) camp mob in all six zones has one signature move: a short cast with its bar on the
+nameplate and the target frame, stopped by any interrupt, stun or fear like any mob's cast (`MobCasts` in EncounterEnemy.Casts.cs).
+Elites keep their own moves (EliteMoves.cs). Status: written and compiled 2026-10-15; the Unity tests and a look in Chris's build still to do.
+
+What the 54 new moves are: 32 holds (root, stun, disorient or fear, on its foe or on everyone a few metres round its foe), 10 area
+hits round the mob, 12 hits on its foe; 12 of those 22 throw you back.
+
+Rules:
+- **Numbers kept to trash:** a cast of 0.7 to 2 s, every 12 to 16 s, the first 4 to 6 s into the fight; holds 1.5 to 3 s; damage at
+  most 2.5 swings (the sapper's Short Fuse, 3, stays the top). Step out of its reach before it lands and it misses.
+- **Beasts and briars don't cast:** their move is a wind-up of under a second (0.7 to 1 s), but it shows and is stopped the same way.
+- **The party's diminishing returns (new):** the same hold on the same one of the party within 18 s of the last that took lasts half as
+  long, a third time "Immune" (section 1's rule for mobs, turned round; `MobCasts.Diminished`). A pull of three overseers is a stun, a
+  short stun and an Immune, not a stun-lock. The netters' Weighted Net counts too; bosses' holds do not. Holds from trash don't break on damage (short, like the stuns in section 1).
+- **Knockback for trash (new):** `MobCast.knock`, the metres a hit or an area hit throws whoever it lands on, through the elites' own
+  knockback (`EncounterEnemy.Knock`: only ever onto walkable ground).
+- **An area hit waits for its foe to be in it** (2026-10-15): it used to go off wherever its foe stood (a sapper could light its fuse at a foe 20 m off).
+- **No slow on the party** exists (Slowed is a mob's state only), so the wolves' bite is a short root, not a slow. No WoW names
+  (no Hamstring, no Gore), and no machines.
+- **Grey Lull** (the grey whisperers): ADIT_REWORK.md section 5 asked a 4 s stun on the nearest one not its target; it is 3 s on its
+  foe (trash's cap, and nothing aims at "someone else" yet). Slag Splash and the scribes' Cinder Bolt are as section 5 has them.
+- **To watch:** Mira's Hush (every 15 s) and the sims' kicks (every 12 s) take the first cast they see, so they now go on trash moves too,
+  and a mender's heal may get through more often. The group runs will show whether the Adit's pulls need easing.
+
+**People with weapons: the Sandthrone company at work in the Adit, its deserters and riders outside, the Concord's wardens**
+
+| Mob (zone) | Move | Kind | Numbers | Label |
+|---|---|---|---|---|
+| Sandthrone overseer (Adit) | Whip-Crack | hold | stun 1.5 s on its foe, reach 6 m; cast 1.2 s, every 14 s, first 5 s in | GAME-ONLY |
+| Sandthrone digger (Adit) | Pick Sweep | area (blast) | 2 swings to all within 3 m; cast 1.5 s, every 14 s, first 6 s in | GAME-ONLY |
+| Sandthrone geode-carrier (Adit) | Geode Toss | hit (bolt) + knock | 2 swings to its foe, reach 12 m, thrown back 2.5 m; cast 1.4 s, every 15 s, first 5 s in | GAME-ONLY |
+| Sandthrone watchman (Adit) | Lamp-Flash | hold | disorient 2 s on its foe, reach 10 m; cast 1.4 s, every 15 s, first 5 s in | GAME-ONLY |
+| Sandthrone platform guard (Adit) | Haft-Shove | hit (bolt) + knock | 1.6 swings to its foe, reach 4 m, thrown back 3 m; cast 1.2 s, every 13 s, first 5 s in | GAME-ONLY |
+| Sandthrone docker (Adit) | Bale-Hook | hold | root 2 s on its foe, reach 6 m; cast 1.3 s, every 14 s, first 5 s in | GAME-ONLY |
+| Sandthrone geode-cutter (Adit) | Shard Spray | area (blast) | 2 swings to all within 3.5 m; cast 1.5 s, every 15 s, first 6 s in | GAME-ONLY |
+| Sandthrone sorter (Adit) | Cull-Stone | hit (bolt) | 1.8 swings to its foe, reach 18 m; cast 1.5 s, every 12 s, first 4 s in | GAME-ONLY |
+| Sandthrone smelter (Adit) | Slag Splash | area (blast) | 2.5 swings to all within 4 m; cast 2 s, every 15 s, first 5 s in | GAME-ONLY |
+| Sandthrone bargeman (Adit) | Barge-Pole Sweep | area (blast) | 1.6 swings to all within 3.5 m, thrown back 2.5 m; cast 1.6 s, every 16 s, first 6 s in | GAME-ONLY |
+| Sandthrone outrider (Khaven) | Pommel Strike | hold | stun 1.5 s on its foe, reach 4 m; cast 1.2 s, every 15 s, first 5 s in | GAME-ONLY |
+| Sandthrone deserter (Khaven, Oakhaven) | Dirty Kick | hold | disorient 1.5 s on its foe, reach 4 m; cast 1 s, every 15 s, first 6 s in | GAME-ONLY |
+| Sandthrone salt-raider (Ash Rim) | Fistful of Salt | hold | disorient 2 s on all within 2.5 m of its foe, reach 6 m; cast 1.3 s, every 15 s, first 5 s in | GAME-ONLY |
+| Sandthrone toll-guard (Peaks) | Halberd Sweep | area (blast) | 1.8 swings to all within 3.5 m, thrown back 2 m; cast 1.5 s, every 15 s, first 6 s in | GAME-ONLY |
+| Hollow forager (Oakhaven) | Sling Stone | hit (bolt) | 1.6 swings to its foe, reach 18 m; cast 1.5 s, every 14 s, first 4 s in | GAME-ONLY |
+| Concord warden (Oakhaven) | Warden's Manacle | hold | root 2 s on its foe, reach 5 m; cast 1.5 s, every 15 s, first 5 s in | GAME-ONLY |
+| Grey-robed false pilgrim (Peaks) | Sleeve-Knife | hit (bolt) | 2.2 swings to its foe, reach 4 m; cast 1 s, every 14 s, first 4 s in | GAME-ONLY |
+
+**The Ash cult**
+
+| Mob (zone) | Move | Kind | Numbers | Label |
+|---|---|---|---|---|
+| Ash zealot (Adit) | Fervent Cry | hold | fear 2 s on all within 5 m of its foe, reach 8 m; cast 1.8 s, every 16 s, first 6 s in | GAME-ONLY |
+| Ash scribe (Adit) | Cinder Bolt | hit (bolt) | 2.2 swings to its foe, reach 25 m; cast 2 s, every 12 s, first 4 s in | GAME-ONLY |
+| Bone-masked cultist (Ash Rim) | Ash Cloud | hold | disorient 2 s on all within 4 m of its foe, reach 10 m; cast 1.8 s, every 16 s, first 5 s in | GAME-ONLY |
+
+**The risen dead**
+
+| Mob (zone) | Move | Kind | Numbers | Label |
+|---|---|---|---|---|
+| Ash-bound dead (Adit) | Grave-Grip | hold | root 2 s on its foe, reach 3.5 m; cast 1 s, every 14 s, first 4 s in | GAME-ONLY |
+| Drowned dead (Khaven) | Black Water | area (blast) | 1.8 swings to all within 3.5 m; cast 1.5 s, every 15 s, first 5 s in | GAME-ONLY |
+
+**The grey, the Hollow, the Pale and the Wasting's other things**
+
+| Mob (zone) | Move | Kind | Numbers | Label |
+|---|---|---|---|---|
+| Greyed crawler (Adit) | Grey Clutch | hold | root 2 s on its foe, reach 4 m; cast 0.8 s, every 15 s, first 5 s in | GAME-ONLY |
+| Grey whisperer (Adit) | Grey Lull | hold | stun 3 s on its foe, reach 15 m; cast 2 s, every 16 s, first 6 s in | GAME-ONLY |
+| Pale shadow (Ash Rim, Peaks, Verdant) | Pale Dread | hold | fear 2 s on all within 3 m of its foe, reach 10 m; cast 1.6 s, every 16 s, first 5 s in | GAME-ONLY |
+| Pale watcher (Peaks) | Unblinking Gaze | hold | stun 2 s on its foe, reach 15 m; cast 1.8 s, every 16 s, first 5 s in | GAME-ONLY |
+| The Umbra Watcher (Peaks) | Umbra-Fall | hold | disorient 2.5 s on all within 4 m of its foe, reach 12 m; cast 2 s, every 15 s, first 5 s in | GAME-ONLY |
+| Weave-Eater (Ash Rim) | Thread-Snare | hold | root 2 s on all within 3 m of its foe, reach 8 m; cast 1.2 s, every 15 s, first 5 s in | GAME-ONLY |
+| Mist-walker (Verdant) | Palemist Breath | hold | disorient 2 s on all within 4 m of its foe, reach 8 m; cast 1.6 s, every 16 s, first 5 s in | GAME-ONLY |
+| Void-Toucher (Verdant) | Void Pulse | area (blast) | 2.2 swings to all within 4 m; cast 1.8 s, every 15 s, first 5 s in | GAME-ONLY |
+| Withered Keeper (Verdant) | Grey Roots | hold | root 2.5 s on all within 3 m of its foe, reach 10 m; cast 1.6 s, every 16 s, first 5 s in | GAME-ONLY |
+| Creeping briar (Verdant) | Thorn Burst | area (blast) | 1.8 swings to all within 3.5 m; cast 0.8 s, every 14 s, first 4 s in | GAME-ONLY |
+
+**Beasts: a wind-up of under a second, not a spell**
+
+| Mob (zone) | Move | Kind | Numbers | Label |
+|---|---|---|---|---|
+| Grey wolf (Khaven, Oakhaven) | Heel-Snap | hold | root 1.5 s on its foe, reach 3.5 m; cast 0.7 s, every 15 s, first 6 s in | GAME-ONLY |
+| Mountain wolf (Peaks) | Heel-Snap | hold | root 2 s on its foe, reach 3.5 m; cast 0.7 s, every 15 s, first 5 s in | GAME-ONLY |
+| Ash hound (Ash Rim) | Ash-Shake | hold | disorient 1.5 s on all within 3 m of its foe, reach 4 m; cast 0.8 s, every 15 s, first 5 s in | GAME-ONLY |
+| Company pit-hound (Adit) | Hold Fast | hold | root 2 s on its foe, reach 3.5 m; cast 0.7 s, every 14 s, first 4 s in | GAME-ONLY |
+| Old Cinder-Jaw (Ash Rim) | Jaw-Lock | hold | stun 1.5 s on its foe, reach 3.5 m; cast 0.9 s, every 14 s, first 5 s in | GAME-ONLY |
+| The Hush-Mother (Khaven) | Mother's Howl | hold | fear 2 s on all within 4 m of its foe, reach 6 m; cast 1 s, every 16 s, first 5 s in | GAME-ONLY |
+| Wild boar (Oakhaven) | Tusk-Toss | hit (bolt) + knock | 1.5 swings to its foe, reach 3.5 m, thrown back 2.5 m; cast 0.8 s, every 14 s, first 6 s in | GAME-ONLY |
+| Carrion boar (Khaven) | Tusk-Toss | hit (bolt) + knock | 1.8 swings to its foe, reach 3.5 m, thrown back 2.5 m; cast 0.8 s, every 14 s, first 5 s in | GAME-ONLY |
+| Mire boar (Khaven) | Mud-Splash | hold | disorient 1.5 s on all within 3 m of its foe, reach 4 m; cast 0.8 s, every 15 s, first 5 s in | GAME-ONLY |
+| Rockhide boar (Peaks) | Rockhide Ram | hit (bolt) + knock | 2 swings to its foe, reach 4 m, thrown back 3.5 m; cast 0.9 s, every 14 s, first 5 s in | GAME-ONLY |
+| Moss-backed boar (Verdant) | Tusk-Toss | hit (bolt) + knock | 2 swings to its foe, reach 3.5 m, thrown back 3 m; cast 0.8 s, every 14 s, first 5 s in | GAME-ONLY |
+| Old Brine-Tusk (Verdant) | Brine Charge | hit (bolt) + knock | 2.4 swings to its foe, reach 4 m, thrown back 3.5 m; cast 0.9 s, every 13 s, first 5 s in | GAME-ONLY |
+| Brown bear (Oakhaven) | Paw-Cuff | hold | stun 1.5 s on its foe, reach 4 m; cast 0.9 s, every 15 s, first 6 s in | GAME-ONLY |
+| Old Hazelmaw (Oakhaven) | Paw-Cuff | hold | stun 2 s on its foe, reach 4 m; cast 0.9 s, every 15 s, first 5 s in | GAME-ONLY |
+| Mountain bear (Peaks) | Paw-Cuff | hold | stun 2 s on its foe, reach 4 m; cast 0.9 s, every 15 s, first 5 s in | GAME-ONLY |
+| Greyed bear (Adit) | Grey Maul | area (blast) | 2.2 swings to all within 3.5 m, thrown back 2.5 m; cast 1 s, every 15 s, first 5 s in | GAME-ONLY |
+| Red hart (Oakhaven) | Antler Toss | hit (bolt) + knock | 1.6 swings to its foe, reach 3.5 m, thrown back 3 m; cast 0.8 s, every 15 s, first 5 s in | GAME-ONLY |
+| Moss-antler stag (Verdant) | Antler Sweep | area (blast) | 1.8 swings to all within 3 m, thrown back 2.5 m; cast 1 s, every 15 s, first 5 s in | GAME-ONLY |
+| Carr spider (Oakhaven) | Web-Spit | hold | root 2 s on its foe, reach 12 m; cast 0.9 s, every 15 s, first 5 s in | GAME-ONLY |
+| Charnel spider (Khaven) | Web-Spit | hold | root 2 s on its foe, reach 12 m; cast 0.9 s, every 15 s, first 5 s in | GAME-ONLY |
+| Canopy spider (Verdant) | Web-Drop | hold | root 2 s on all within 3 m of its foe, reach 12 m; cast 1 s, every 16 s, first 5 s in | GAME-ONLY |
+| Basalt spider (Verdant) | Grit-Spit | hold | disorient 1.5 s on its foe, reach 10 m; cast 0.9 s, every 15 s, first 5 s in | GAME-ONLY |
+## 7. Sims in a party: every class holds, and the area blow (2026-10-15; GAME-ONLY)
+Chris, watching the group runs: "also most mobs dont seem to be cc or aoe still a thing?" and "i do see a cc / i assume by rogue".
+Until then only a Rogue, an Archivist or a Scoundrel sim held anything (the moon, HoldTheMoon: unchanged). Now every class does
+(SimCompanion.Fight.cs). Names from the kits where they have one; Lantern Glare and Barrow Dread are new (PROVISIONAL, like the
+Cleric's and Shaman's kits).
+
+| Class | Hold | Kind | Seconds | Wait | Reach |
+|---|---|---|---|---|---|
+| Mage | Ash Hex | incap | 15 | 25 s | 25 m |
+| Druid | Sleep of the Wood | incap | 15 | 28 s | 25 m |
+| Ranger | Snare Trap (thrown at its feet) | incap | 12 | 25 s | 25 m |
+| Cleric | Lantern Glare (dazzled: the disorient) | incap | 10 | 25 s | 25 m |
+| Salt-Mender | Binding Salt | incap | 10 | 25 s | 25 m |
+| Shaman | Barrow Dread (the old dead's chill) | fear | 4 | 22 s | 20 m |
+| Paladin | Rebuke | stun | 3 | 20 s | 8 m |
+| Warrior | Shackle Cast, on an add hitting someone else (the healer first) | stun | 3 | 20 s | 20 m |
+| Rogue, Archivist, Scoundrel | the moon (HoldTheMoon, as before) | incap | 20 | 25 s | 25 m |
+
+Rules (as the moon is held): only with two or more mobs on the party; never a boss, the mob on the tank, your target or the skull; a
+long hold (incap, fear) never the tank's quarry nor its own; on a mob nobody holds and that will take it (immunity and the diminishing
+returns of section 1, checked first so "Immune" is not floated again and again); said in Party the first time in a fight, its name
+over the mob. A long hold keeps two of a pack of three or more free (the tank's and one for the area blows): the party holds the rest.
+A stun takes nobody out of the fight for long and does not break, so it is not counted. Pick: a mob marked cross (or the moon with no
+Rogue or Archivist along), then a caster, then one on the healer, then one on anyone but the tank; the nearer the better.
+
+**The area blow:** a damage-dealer every 10-15 s, with three or more mobs on the party within 6 m of its quarry, strikes its quarry and
+each of the others not held, running or marked to be left alone for 70% of its blow (a slash on each, or a bolt or arrow to each, its
+name over it: Spreading Flame, Spread Loose, Shard Spray, Knife Round, Echo Burst, Salt Spray). A tank's swing is a light cleave (60%
+of its blow, Wide Swing or Wide Judgement) with threat on each. Healers have none. Against one or two mobs nothing changes: the single
+target balance (a tank about 70% of a damage-dealer) holds.

@@ -24,6 +24,12 @@ namespace Crulanda.World
         /// <summary>Tests only: changes the zone's definition after it is chosen and before anything is built (to build a zone
         /// without some of its props and compare the two). Null in play; a test that sets it clears it in its teardown.</summary>
         public static Func<ZoneDefinition, ZoneDefinition> DefinitionFilter;
+        /// <summary>
+        /// A zone's JSON to build instead of the one in <see cref="zones"/> (the Adit rework: a fixture in a test, or the staged Adit behind
+        /// its flag): used when its id is the zone being built, or when no zone of that id is registered (a fixture). Null in play; whoever
+        /// sets it clears it.
+        /// </summary>
+        public static string ZoneJsonOverride;
         public bool HasZone(string id)
         {
             if (string.IsNullOrEmpty(id)) return false;
@@ -70,8 +76,18 @@ namespace Crulanda.World
 
         void Awake()
         {
-            Zone = (RequestedZoneId != null ? ParsedZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
+            Zone = null;
+            if (ZoneJsonOverride != null)
+            {
+                var over = ParseZone(ZoneJsonOverride);
+                string wanted = RequestedZoneId ?? (zoneJson != null ? JsonUtility.FromJson<ZoneDefinition>(zoneJson.text)?.id : null);
+                if (over != null && !string.IsNullOrEmpty(over.id) && (over.id == wanted || !HasZone(over.id))) Zone = over;
+            }
+            Zone = Zone ?? (RequestedZoneId != null ? ParsedZone(RequestedZoneId) : null) ?? ParseZone(zoneJson != null ? zoneJson.text : "{}");
             RequestedZoneId = null;
+            // The woods keep clear of the gathering nodes and stations as the file has them, filter or no filter (NodeStreamTests builds
+            // the zone without its nodes and wants the same woods: ZoneBuilder.Woods.cs).
+            if (Zone != null) WoodsKeepClear = Zone.nodes.Where(n => n != null).Select(n => (n.at, 5f)).Concat((Zone.stations ?? new ZoneStation[0]).Where(s => s != null).Select(s => (s.at, 6f))).ToArray();
             if (Zone != null && DefinitionFilter != null) Zone = DefinitionFilter(Zone);
             if (Zone == null || string.IsNullOrEmpty(Zone.id) || art == null) { Debug.LogError("Zone definition or art missing."); enabled = false; return; }
             Active = this;
@@ -80,9 +96,9 @@ namespace Crulanda.World
             rng = new System.Random(Zone.seed);
             props = new GameObject("Zone props").transform; props.SetParent(transform, false);
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
-            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); Lap("prepare");
-            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); Lap("groves");
-            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
+            PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); Lap("prepare");
+            BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildPaving(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
+            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); DistantSkyline.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
                 // Gloom: the tufts are dry, greyed straw and no wildflowers bloom.
@@ -107,13 +123,15 @@ namespace Crulanda.World
             var view = Camera.main;
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
             int before = MergeStatics();
-            try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
+            if (!NoStaticBatching) try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             Debug.Log("Static scenery merged: " + before + " renderers into " + statics.GetComponentsInChildren<MeshRenderer>().Length + ".");
             Lap("batching");
             // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).
             MapTexture = RenderMap(Mathf.Clamp(Mathf.RoundToInt(Zone.size * 4 / 256f) * 256, 1024, 2048));
+            CullWoodsFloor();   // after the map: from above, the woods would be culled off it
             Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
+            if (Hollow.All.Count > 0 && Application.isPlaying) gameObject.AddComponent<PropCull>().Init(props);   // a zone with caves: far props not drawn (note 225)
             BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves
             BuildStations();  // the trades' stations of their own (field anvils, benches, cookfires): streams of their own, no colliders
             gameObject.AddComponent<WorldWeather>().Init(this, sunLight);   // before the clock: its first light already has the weather in it
@@ -170,6 +188,7 @@ namespace Crulanda.World
             float h = hills * Zone.hillHeight * n + (hills > 0 ? hills * Crag(x, z) : 0) + CliffLift(x, z);   // mountain crags off the kept ways; shelves behind cliffs
             if (Zone.wasting != null && x > Zone.wasting.x - 4) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 6);  // unmade ground is dead flat
             if (shapes != null) h = Shape(x, z, h);   // landmark ground: level pads, perches and basins (ZoneShape)
+            if (Zone.terraces != null && Zone.terraces.Length > 0) h = Terraces(x, z, h);   // a city's plateau, terraces and ramps (ZoneBuilder.Crown)
             if (carveWater && Water != null) h = Water.Carve(x, z, h);   // creeks and lakes (see ZoneWater)
             return h;
         }
@@ -230,15 +249,33 @@ namespace Crulanda.World
         }
         readonly Dictionary<Vector2, float> fixedGround = new Dictionary<Vector2, float>();
         /// <summary>
-        /// Where to stand at a point: on the land, or on a cave passage's floor under it (Hollow), whichever is nearer the height
-        /// <paramref name="near"/> (where the thing was, or float.NegativeInfinity to prefer any passage floor): camps and their
-        /// respawns inside a cave, a save made down in one, and secrets tucked into one.
+        /// Where to stand at a point: on the land, on a cave passage's floor under it (Hollow; the bed of a pool sunk into it), or on a deck
+        /// in a cave (ZoneDeck), whichever is nearest the height <paramref name="near"/> (where the thing was), or float.NegativeInfinity
+        /// for the first passage floor there (decks then left out): camps and their respawns inside a cave, a save made down in one, and
+        /// secrets tucked into one. Caves may lie over each other where one opens high in another's wall, and decks stand over floors.
         /// </summary>
         public Vector3 StandAt(Vector2 p, float near, float lift = 0)
         {
-            float land = HeightAt(p.x, p.y), floor = land;
-            if (Hollow.FloorUnder(p, ref floor) && (float.IsNegativeInfinity(near) || Mathf.Abs(near - floor) < Mathf.Abs(near - land))) return new Vector3(p.x, floor + lift, p.y);
+            float land = HeightAt(p.x, p.y), best = land; bool any = false, first = float.IsNegativeInfinity(near);
+            foreach (var h in Hollow.All)
+            {
+                if (!h.FloorAt(p, out float f)) continue;
+                f -= BasinDip(h, p);
+                if (first) return new Vector3(p.x, f + lift, p.y);
+                if (!any || Mathf.Abs(near - f) < Mathf.Abs(near - best)) { best = f; any = true; }
+            }
+            if (!first && DeckTop(p, near, out float deck) && (!any || Mathf.Abs(near - deck) < Mathf.Abs(near - best))) { best = deck; any = true; }
+            if (any && Mathf.Abs(near - best) < Mathf.Abs(near - land)) return new Vector3(p.x, best + lift, p.y);
             return new Vector3(p.x, land + lift, p.y);
+        }
+        /// <summary>Every floor at a point in a cave, the caves' (the bed where a pool is sunk into one) and the decks' tops, into
+        /// <paramref name="into"/> (cleared first). False when there is none.</summary>
+        public bool FloorsAt(Vector2 p, List<float> into)
+        {
+            into.Clear();
+            foreach (var h in Hollow.All) if (h.FloorAt(p, out float f)) into.Add(f - BasinDip(h, p));
+            foreach (var d in DeckSpots) if (d.Top(p, out float y)) into.Add(y);
+            return into.Count > 0;
         }
         static List<Vector2> Densify(Vector2[] pts, float step)
         {
@@ -992,6 +1029,8 @@ namespace Crulanda.World
         /// "Footing" and "Door steps"). Colliders and the parts' transforms stay; only their mesh renderers go. Returns how many
         /// renderers there were.
         /// </summary>
+        /// <summary>Tests that read the scenery's meshes (BuildingGroundTests' flush faces) set this: static batching leaves them unreadable.</summary>
+        public static bool NoStaticBatching;
         int MergeStatics()
         {
             int total = 0;
@@ -1004,7 +1043,7 @@ namespace Crulanda.World
                 foreach (var mr in root.GetComponentsInChildren<MeshRenderer>())
                 {
                     total++;
-                    if (!mr.enabled || mr.sharedMaterials.Length != 1 || mr.sharedMaterial == null || mr.name == "Footing" || mr.name == "Door steps") continue;
+                    if (!mr.enabled || mr.sharedMaterials.Length != 1 || mr.sharedMaterial == null || mr.name == "Footing" || mr.name == "Footing coping" || mr.name == "Door steps") continue;
                     var mf = mr.GetComponent<MeshFilter>(); if (mf == null || mf.sharedMesh == null || mf.sharedMesh.subMeshCount != 1 || !mf.sharedMesh.isReadable) continue;
                     if (mr.GetComponent<MonoBehaviour>() != null) continue;
                     var key = (mr.sharedMaterial, mr.shadowCastingMode, mr.receiveShadows);
@@ -1114,7 +1153,7 @@ namespace Crulanda.World
             {
                 if (p == null || string.IsNullOrEmpty(p.kind)) continue;
                 // Moving parts (doors, wheels) and things that can be picked or emptied can't be static-batched.
-                var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "inn" || p.kind == "mill" || p.kind == "windmill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
+                var parent = p.kind == "bridge" || p.kind == "cavern" || p.kind == "inn" || WalksInCity(p.kind) || p.kind == "mill" || p.kind == "windmill" || p.kind == "coop" || p.kind == "herb" || !string.IsNullOrEmpty(p.interact) ? props : statics;
                 // Small things never stand in a road (playtest note 74): out to the verge, clear of the edge by their own reach.
                 float verge = Verge(p); if (verge > 0) p.at = OffRoad(p.at, verge);
                 var t = Root(p, parent);
@@ -1122,19 +1161,25 @@ namespace Crulanda.World
                 bool drop = (p.kind == "ruin" || p.kind == "ruined_house") && !ClearOfBuildings(p, t);
                 if (p.kind == "wall") WarnWallInBuilding(p);
                 // New landmark kinds draw from their own stream, after taking the draws the kind that stood here took, so
-                // every later prop, tree and rock keeps the layout it had.
-                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" ? 0 : -1;
+                // every later prop, tree and rock keeps the layout it had. A ruined_house of variant 1 (Wick's cot, Oakhaven's fill,
+                // 2026-10-15: a ruin added after the zone was laid out) draws from its own stream too, so the groves after it keep
+                // their trees; variant 0 (the Hollins' and the other zones' ruins) draws from the zone's, as it always did.
+                var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" || p.kind == "skep" || (p.kind == "ruined_house" && p.variant == 1) ? 0 : -1;
+                if (p.was == "ruined_house" && p.kind != "ruined_house") legacy = RuinDraws(p.size.x > 0 ? p.size : new Vector2(8, 6));   // raised over a fallen house (Wain's Rest, 2026-10-15): the ruin's draws
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
                     case "house": House(t, p.size.x > 0 ? p.size : new Vector2(7, 5), 3f, p.variant, false); break;
-                    case "inn": Inn(t, p.size.x > 0 ? p.size : new Vector2(12, 8), p.variant); break;
+                    case "inn": if (p.variant == 2) Waystation(t, p.size.x > 0 ? p.size : new Vector2(8, 6), p); else if (p.variant == 3) CityInn(t, p.size.x > 0 ? p.size : new Vector2(22, 16)); else Inn(t, p.size.x > 0 ? p.size : new Vector2(12, 8), p.variant); break;
                     case "barn": Barn(t, p.size.x > 0 ? p.size : new Vector2(12, 8)); break;
                     case "mill": Mill(t, p.size.x > 0 ? p.size : new Vector2(7, 6)); break;
                     case "well": Well(t, p.variant); break;
                     case "coop": Coop(t, string.IsNullOrEmpty(p.name) ? "Hen coop" : p.name); break;
                     case "forge": Forge(t); break;
+                    case "training_yard": TrainingYard(t, p.size); break;   // the sparring yard round the training field's dummies
+                    case "training_dummy": case "mending_dummy": break;   // the training field: its look goes on the session's own dummies (EncounterSession.Training)
                     case "stall": Stall(t, p.variant); break;
+                    case "market": MarketProp(t, p); break;   // the Fantasy pack's market pieces (ZoneBuilder.Market.cs; Chris, 2026-10-15: the fantasy assets in Downloads)
                     case "oven": Oven(t); break;
                     case "tannery": Tannery(t); break;
                     case "woodpile": Woodpile(t); break;
@@ -1153,7 +1198,7 @@ namespace Crulanda.World
                         Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
                     case "giant_tree": GiantTree(t, p.variant); trunks.Add(p.at); break;
                     case "fallen_giant": FallenGiant(t, p.size.x > 0 ? p.size.x : 36); break;
-                    case "treehouse": Treehouse(t, p.variant); trunks.Add(p.at); break;
+                    case "treehouse": Treehouse(t, p.variant, p.style == "inn"); trunks.Add(p.at); break;
                     case "waterfall": Waterfall(t, p.size.x > 0 ? p.size.x : 6, p.lift > 0 ? p.lift : 10); break;
                     case "mushrooms": Mushrooms(t, p.size.x > 0 ? p.size.x : 2, p.variant); break;
                     case "monolith": Monolith(t); break;
@@ -1204,6 +1249,7 @@ namespace Crulanda.World
                     case "wallow": Wallow(t, p.size.x > 0 ? p.size.x : 6); break;
                     case "cave": Cave(t, p.size.x > 0 ? p.size.x : 20); break;
                     case "shelter": Shelter(t); break;
+                    case "skep": Skep(t); break;   // a bee-wife's straw hives on a bench (Oakhaven's fill, 2026-10-15)
                     case "brazier": Brazier(t, Vector3.zero, p.variant == 1 ? Bone : null); Solid(t, new Vector3(0, .6f, 0), new Vector3(.8f, 1.2f, .8f)); break;
                     case "brood": Brood(t, p.size.x > 0 ? p.size.x : 5); break;
                     case "rib": Rib(t, p.size.x > 0 ? p.size.x : 6, p.size.y > 0 ? p.size.y : 7); break;
@@ -1213,11 +1259,16 @@ namespace Crulanda.World
                     case "wayshrine": Wayshrine(t); break;
                     case "cavern": Cavern(t, Hollow.All.Find(h => h.Name == t.name), p.variant); break;
                     case "chest": TreasureChest(t); break;
-                    default: Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;
+                    default: if (!CityProp(t, p)) Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;   // a city's kinds (ZoneBuilder.Crown)
                 }
                 rng = zoneRng;
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
-                if (t != null && Footprint(p).x > 0) t.gameObject.AddComponent<RoofFade>();   // see-through when it hides the player (playtest note 26)
+                if (t != null && Footprint(p).x > 0)   // see-through where it hides the player (playtest notes 26 and 120)
+                {
+                    var fade = t.gameObject.AddComponent<RoofFade>(); bool open = p.kind == "forge" || p.kind == "tannery" || p.kind == "shelter";
+                    fade.Half = Footprint(p) - Vector2.one * (open || p.kind == "tower" || p.kind == "crypt" || p.kind == "kitchen" ? .3f : p.kind == "inn" && p.variant == 2 ? .15f : .8f);   // the walls, not the eaves
+                    fade.Walled = !open;
+                }
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
                     Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, node = string.IsNullOrEmpty(p.node) ? null : p.node, position = t.position, root = t });
             }
@@ -1261,6 +1312,8 @@ namespace Crulanda.World
             {
                 case "barn" when p.size.x > 0 && WalksIn(p.name, p.size): return new Vector2(p.size.y, p.size.x) / 2 + Vector2.one * .8f;   // a walk-in barn runs back from its front
                 case "house": return (p.size.x > 0 ? p.size : new Vector2(7, 5)) / 2 + Vector2.one * .8f;
+                // A waystation (2026-10-15) to its walls' outer faces: Wain's Rest's waybook is pushed into a crack in its back wall, outside.
+                case "inn" when p.variant == 2: return (p.size.x > 0 ? p.size : new Vector2(8, 6)) / 2 + Vector2.one * .15f;
                 case "inn": case "barn": return (p.size.x > 0 ? p.size : new Vector2(12, 8)) / 2 + Vector2.one * .8f;
                 case "mill": case "keep": return (p.size.x > 0 ? p.size : new Vector2(7, 6)) / 2 + Vector2.one * .8f;
                 case "tower": return Vector2.one * ((p.size.x > 0 ? p.size.x : 4.4f) / 2 + .3f);
@@ -1270,7 +1323,7 @@ namespace Crulanda.World
                 case "leathershop": return LeatherShopSize / 2 + Vector2.one * .8f;
                 case "dryhut": return DryingHutSize / 2 + Vector2.one * .8f;
                 case "kitchen": return KitchenSize / 2 + new Vector2(.3f, .4f);
-                default: return Vector2.zero;
+                default: return CityFootprint(p);   // a city's halls and houses (ZoneBuilder.Crown); zero for anything else
             }
         }
         /// <summary>Whether a point stands under a building's roof (its footprint, eaves included), under an inn's porch or in a cave: no rain or snow falls there.</summary>
@@ -1495,10 +1548,13 @@ namespace Crulanda.World
         /// A walk-in inn: hollow ground floor behind a working door, with a bar, tables, stools and a lit hearth.
         /// Built at ground level (no plinth under the floor) so characters and navigation walk straight in.
         /// Each wall piece is its own collider/nav blocker so the interior stays open. variant 1 is the Cracked Hearth (CrackedHearth).
+        /// The door is a double door <paramref name="doorW"/> wide (Phase 8.6, 2026-10-15: two leaves, 2.6 m; it was one of 1.6) and the
+        /// room is laid out by its plan (InnPlan): five tables of three, the bar with two stools, the hearth's bench.
         /// </summary>
-        void Inn(Transform t, Vector2 size, int variant)
+        void Inn(Transform t, Vector2 size, int variant, float doorW = InnDoorW)
         {
-            float w = size.x, d = size.y, H = 6.4f, storey = 3.7f, wall = .3f, doorW = 1.6f, doorH = 2.4f;
+            var plan = InnPlan.For(size, variant, doorW);
+            float w = size.x, d = size.y, H = 6.4f, storey = 3.7f, wall = plan.wall, doorH = plan.doorH;
             var plaster = Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);
             var boards = Tint(art.timber, new Color(.38f, .27f, .18f));
             var dark = Tint(art.timber, new Color(.2f, .13f, .08f));
@@ -1509,6 +1565,7 @@ namespace Crulanda.World
             }
             // Floor, skirting and walls.
             Part(PrimitiveType.Cube, t, new Vector3(0, .02f, 0), new Vector3(w - wall, .05f, d - wall), boards);
+            HallFloor(t, w - wall, d - wall, .045f);   // solid: you stand on the boards, not 5 cm down in them (ZoneBuilder.Crown)
             WallPiece(new Vector3(0, H / 2, d / 2), new Vector3(w, H, wall));
             foreach (int s in new[] { -1, 1 }) WallPiece(new Vector3(s * w / 2, H / 2, 0), new Vector3(wall, H, d));
             float side = (w - doorW) / 2;
@@ -1516,9 +1573,10 @@ namespace Crulanda.World
             {
                 // The jambs' colliders stop .1 m short of the opening (the plaster doesn't): EncounterNavigation pads every blocker
                 // by .1 m and the navmesh erodes by the agent's .5 m, which left the 1.6 m door a one-voxel diagonal thread that broke
-                // at some angles to the grid (the Cracked Hearth's taproom was cut off from Khaven). The nav gap is now 1.6 m.
+                // at some angles to the grid (the Cracked Hearth's taproom was cut off from Khaven). With the 2.6 m double door the
+                // way through is 1.6 m (NavGap): two abreast.
                 var jamb = WallPiece(new Vector3(s * (doorW / 2 + side / 2), H / 2, -d / 2), new Vector3(side, H, wall)).GetComponent<BoxCollider>();
-                jamb.size -= new Vector3(.1f, 0, 0); jamb.center += new Vector3(s * .05f, 0, 0);
+                jamb.size -= new Vector3(JambShort, 0, 0); jamb.center += new Vector3(s * JambShort / 2, 0, 0);
             }
             WallPiece(new Vector3(0, doorH + (H - doorH) / 2, -d / 2), new Vector3(doorW, H - doorH, wall));
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
@@ -1558,58 +1616,60 @@ namespace Crulanda.World
                 BoxPart(t, new Vector3(w / 2 - 1.1f, H + roofH * .75f, d * .15f), new Vector3(1, roofH * 1.1f, 1), Masonry, null, 1);
                 BoxPart(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.3f + .04f, d * .15f), new Vector3(1.2f, .12f, 1.2f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);   // its cap
             }
-            // The door: a plank door on a hinge at the left jamb, on a stone threshold (with steps down if the ground falls away).
-            var hinge = new GameObject("Door hinge").transform; hinge.SetParent(t, false); hinge.localPosition = new Vector3(-doorW / 2, 0, -d / 2 - .02f);
-            var door = PlankDoor(hinge, new Vector3(doorW / 2, doorH / 2, 0), doorW, doorH, dark, .1f);
-            var doorCollider = door.AddComponent<BoxCollider>();
-            DoorSteps(t, 0, -d / 2 - wall / 2, .05f, 2, wall, footing);
-            var innDoor = new ZoneDoor { name = t.name, kind = "inn", openable = true, hinge = hinge, blocker = doorCollider, position = t.TransformPoint(new Vector3(0, 1, -d / 2)) };
+            // The door: two plank leaves on hinges at the two jambs (DoubleDoor), on a stone threshold (with steps down if the ground
+            // falls away).
+            var innDoor = DoubleDoor(t, -d / 2, doorW, doorH, dark, t.name);
+            DoorSteps(t, 0, -d / 2 - wall / 2, .05f, doorW + .4f, wall, footing);
             Doors.Add(innDoor); innDoor.SetOpen(true);   // the inn keeps its door open; villagers come and go
             if (art.particle != null && variant != 1) Smoke(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.4f, d * .15f));
-            // Inside: bar counter with barrels behind it, three tables with stools, and the hearth.
-            var bar = Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + 2.6f, .55f, d / 2 - 1.5f), new Vector3(4, 1.1f, .7f), boards);
+            // Inside (the plan's): the bar counter with barrels behind it and two stools before it, five tables of three, and the hearth.
+            var bar = Part(PrimitiveType.Cube, t, new Vector3(plan.bar.x, .55f, plan.bar.y), new Vector3(plan.barSize.x, 1.1f, plan.barSize.y), boards);
             bar.AddComponent<BoxCollider>(); bar.AddComponent<NavBlocker>();
-            Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + 2.6f, 1.12f, d / 2 - 1.5f), new Vector3(4.2f, .08f, .9f), dark);
+            Part(PrimitiveType.Cube, t, new Vector3(plan.bar.x + .05f, 1.12f, plan.bar.y), new Vector3(plan.barSize.x + .2f, .08f, .9f), dark);
             for (int i = 0; i < 3; i++) Barrel(t, new Vector3(-w / 2 + 1.2f + i * 1.1f, .045f, d / 2 - .55f), 1, i * 40);   // the kit's barrels behind the bar (2026-10-07)
             // The bar's top dressed from the Medieval props (2026-10-07): two mugs, a bottle and a candle along it.
             ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(-w / 2 + 1.3f, 1.16f, d / 2 - 1.5f), 20, .13f); ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(-w / 2 + 2.1f, 1.16f, d / 2 - 1.55f), -60, .13f);
             ModelProp(t, "Medieval/Prefabs/BottleV1", new Vector3(-w / 2 + 3.4f, 1.16f, d / 2 - 1.45f), 0, .28f); ModelProp(t, "Medieval/Prefabs/CandleV1", new Vector3(-w / 2 + 4.2f, 1.16f, d / 2 - 1.6f), 0, .2f);
+            bool kitTables = HasProp("Fantasy/Table_Large");
+            foreach (var (at, face) in plan.stools)
+            {
+                if (kitTables) ModelProp(t, "Fantasy/Stool", new Vector3(at.x, .045f, at.y), 0, .62f);
+                else { Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .32f, at.y), new Vector3(.36f, .32f, .36f), dark); Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .65f, at.y), new Vector3(.42f, .03f, .42f), boards); }
+            }
             // The innkeeper's place at the open end of the bar, and behind it the door to the rooms upstairs (barred to the player:
             // whoever lodges at the inn goes to bed through it), set between two of the back wall's windows. With a kitchen on the
             // back wall, the kitchen's own door shows in the taproom too.
-            Workplace(t, "bar", new Vector3(-w / 2 + 5.3f, 0, d / 2 - 1.4f), new Vector3(0, 1, -1));
-            float roomsX = -w / 2 + 5.4f;
+            Workplace(t, "bar", new Vector3(plan.stand.x, 0, plan.stand.y), new Vector3(0, 1, -1));
+            float roomsX = plan.roomsX;
             InnerDoor(t, roomsX, d / 2 - wall / 2, dark);
             Doors.Add(new ZoneDoor { name = t.name + ", upstairs", kind = "rooms", openable = false, position = t.TransformPoint(new Vector3(roomsX, 1, d / 2 - .7f)) });
             if (kitchen.HasValue) InnerDoor(t, kitchen.Value - KitchenDoorX, d / 2 - wall / 2, dark);
             // The kit's chandelier over the room and a bench by the hearth (2026-10-07); the tables below are the kit's where it is there.
-            ModelProp(t, "Fantasy/Chandelier", new Vector3(0, 2.55f, -.2f), 0, .8f); ModelProp(t, "Fantasy/Bench", new Vector3(w / 2 - 2.3f, .045f, .8f), 90, .5f);
-            ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(w / 2 - 1.3f, .045f, -1.2f), 0, .5f);
-            bool kitTables = HasProp("Fantasy/Table_Large"); int tableNo = 0;
-            foreach (var at in new[] { new Vector2(2.2f, -1.6f), new Vector2(2.8f, 1.3f), new Vector2(-2.8f, -1.9f) })
+            ModelProp(t, "Fantasy/Chandelier", new Vector3(0, 2.55f, -.2f), 0, .8f); ModelProp(t, "Fantasy/Bench", new Vector3(plan.bench.x, .045f, plan.bench.y), 90, .5f);
+            ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(plan.woodpile.x, .045f, plan.woodpile.y), 0, .5f);   // round the hearth's back (it stood where a table's seat is now)
+            for (int n = 0; n < plan.tables.Count; n++)
             {
+                var at = plan.tables[n]; float turn = plan.turns[n];
                 if (kitTables)
                 {
-                    float turn = tableNo * 50; tableNo++;
-                    ModelProp(t, "Fantasy/Table_Large", new Vector3(at.x, .045f, at.y), turn, .8f, false, 1.5f);
-                    for (int k = 0; k < 3; k++) { float a = (k * 120 + turn + 30) * Mathf.Deg2Rad; ModelProp(t, "Fantasy/Stool", new Vector3(at.x + Mathf.Cos(a) * 1.0f, .045f, at.y + Mathf.Sin(a) * 1.0f), -k * 120 - turn + 60, .45f); }
-                    ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, .845f, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, .845f, at.y + .25f), turn + 70, .12f);
+                    var table = ModelProp(t, "Fantasy/Table_Large", new Vector3(at.x, .045f, at.y), -turn, .8f, false, 1.5f);
+                    // On the table's own top as it came out (2026-10-16, Chris: "table and mug still not meeting. hovering over tables": the
+                    // width cap makes the long table lower than .8 m, and the mug and candle stood at a fixed .845).
+                    float top = table != null ? TopIn(t, table) : .845f;
+                    for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; ModelProp(t, "Fantasy/Stool", new Vector3(seat.x, .045f, seat.y), -(turn + k * 120) + 90, .45f); }
+                    ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, top, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, top, at.y + .25f), turn + 70, .12f);
                     continue;
                 }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .78f, at.y), new Vector3(1.2f, .04f, 1.2f), boards);
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .4f, at.y), new Vector3(.18f, .38f, .18f), dark);
-                for (int k = 0; k < 3; k++)
-                {
-                    float a = k * 120 * Mathf.Deg2Rad;
-                    Part(PrimitiveType.Cylinder, t, new Vector3(at.x + Mathf.Cos(a) * .95f, .25f, at.y + Mathf.Sin(a) * .95f), new Vector3(.4f, .25f, .4f), dark);
-                }
+                for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .25f, seat.y), new Vector3(.4f, .25f, .4f), dark); }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .88f, at.y), new Vector3(.12f, .08f, .12f), art.glass);   // candle
             }
-            var hearth = BoxPart(t, new Vector3(w / 2 - .6f, 1, .8f), new Vector3(.9f, 2, 2.4f), Masonry, null, 1);
+            var hearth = BoxPart(t, new Vector3(plan.hearth.x, 1, plan.hearth.y), new Vector3(plan.hearthSize.x, 2, plan.hearthSize.y), Masonry, null, 1);
             hearth.AddComponent<BoxCollider>(); hearth.AddComponent<NavBlocker>();
             Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.02f, .55f, .8f), new Vector3(.1f, .8f, 1.4f), art.glass);   // embers
             var fire = new GameObject("Hearth fire").AddComponent<Light>(); fire.transform.SetParent(t, false);
-            fire.transform.localPosition = new Vector3(w / 2 - 1.6f, 1, .8f); fire.type = LightType.Point; fire.range = 9; fire.intensity = 1.8f; fire.color = new Color(1, .55f, .25f);
+            fire.transform.localPosition = new Vector3(plan.fire.x, 1, plan.fire.y); fire.type = LightType.Point; fire.range = 9; fire.intensity = 1.8f; fire.color = new Color(1, .55f, .25f);
             AddStation("fire", t.name, Ground(new Vector2(fire.transform.position.x, fire.transform.position.z)), t);   // the hearth is a fire to cook at, named after the inn
             StationRoom(t, new Rect(-w / 2, -d / 2, w, d));   // worked from the taproom, not from the street or the kitchen through a wall
             var room = new GameObject("Taproom light").AddComponent<Light>(); room.transform.SetParent(t, false);
@@ -1619,6 +1679,7 @@ namespace Crulanda.World
             var glow = new GameObject("Inn lantern").AddComponent<Light>(); glow.transform.SetParent(t, false);
             glow.transform.localPosition = new Vector3(0, 2.2f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
             NightLights.Add(new NightLight { light = glow, dayIntensity = .6f, nightIntensity = 2.2f });   // faint by day: at 1.4 it bloomed to a pale blob on the plaster
+            RegisterInn(t, "tavern", innDoor, plan, plan.Inner);   // its seats, bar stools and bench for the village (VillageLife.FindPlaces)
         }
         /// <summary>
         /// The Cracked Hearth (inn variant 1): a stone chimney breast on the hearth gable (+X), split from its glowing ash-pit
@@ -1724,8 +1785,9 @@ namespace Crulanda.World
             float sill = Mathf.Clamp(DoorGround(t, 0, -L / 2 - .3f, doorW) + .03f, -1, .6f);
             foreach (int s in new[] { -1, 1 }) Piece(new Vector3(s * (doorW / 2 + .15f), (sill + doorH + .25f) / 2, -L / 2 - .02f), new Vector3(.3f, doorH + .25f - sill, wall + .14f), frame, false);
             Piece(new Vector3(0, doorH + .12f, -L / 2 - .02f), new Vector3(doorW + .6f, .26f, wall + .14f), frame, false);
-            // The sliding doors, slid open, hung in front of the gable either side of the doorway.
-            float floor = Mathf.Max(0, sill), leafW = doorW / 2 + .1f, leafH = doorH - floor - .05f, leafY = floor + .03f + leafH / 2, front = -L / 2 - wall / 2 - .12f, railY = doorH + .45f;
+            // The sliding doors, slid open, hung in front of the gable either side of the doorway, 6 cm clear of the sill's face (at .12 their
+            // stiles lay 1.5 cm off it: the building test's flush check, 2026-10-15).
+            float floor = Mathf.Max(0, sill), leafW = doorW / 2 + .1f, leafH = doorH - floor - .05f, leafY = floor + .03f + leafH / 2, front = -L / 2 - wall / 2 - .18f, railY = doorH + .45f;
             Piece(new Vector3(0, railY, front - .03f), new Vector3(2 * (doorW / 2 + leafW + .15f), .08f, .05f), iron, false);   // the rail, long enough for both leaves
             foreach (int s in new[] { -1, 1 })
             {
@@ -1807,7 +1869,7 @@ namespace Crulanda.World
             Eaves(roof, L - .2f, W, H, roofH, thatch);
             Gables(roof, L / 2, W, H, roofH, W / 2 + .7f, L / 2 + .5f, stone, W, .2f);
             // The stone sill round the outside, open at the doorway, and the threshold and steps.
-            Footing(t, W + .3f, L + .3f, .45f, .4f, 1, doorW / 2 + .1f);
+            Footing(t, W + .5f, L + .5f, .45f, .4f, 1, doorW / 2 + .1f);   // 10 cm proud of the boards: at W + .3 its face was the boards' own and the stone and planks flickered as the camera moved (Chris, 2026-10-15, note 216)
             DoorSteps(t, 0, -L / 2 - .15f, sill, doorW + .24f);
             Barns.Add(new ZoneBarn { name = t.name, door = t.TransformPoint(new Vector3(0, 0, -L / 2 - 2.4f)), inside = t.TransformPoint(new Vector3(0, 0, -L / 2 + 1.3f)),
                 right = t.TransformDirection(Vector3.forward), stalls = stalls.ToArray(), aisle = aisle.ToArray(), faces = faces.ToArray() });
@@ -1830,7 +1892,7 @@ namespace Crulanda.World
             if (WalksIn(t.name, size)) { WalkInBarn(t, w, d); return; }
             var boards = Tint(art.timber, new Color(.4f, .25f, .16f));
             BoxPart(t, new Vector3(0, h / 2, 0), new Vector3(w, h, d), boards);
-            Footing(t, w + .3f, d + .3f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors
+            Footing(t, w + .5f, d + .5f, .45f, .4f, 1, 1.75f);   // a stone sill round the boards' foot, stepping up and down the slope, open at the doors; 10 cm proud of the boards (flush, it flickered stone and wood: Chris 2026-10-14 19:45)
             for (float x = -w / 2; x <= w / 2 + .01f; x += 1.2f)
                 foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x, h / 2, sz * (d / 2 + .04f)), new Vector3(.12f, h, .08f), art.timber);
             // The doors in a frame of two posts and a lintel, braced corner to corner, down to the highest ground across the
@@ -1870,7 +1932,7 @@ namespace Crulanda.World
             Solid(t, new Vector3(0, 1.2f, 0), new Vector3(2.4f, 2.4f, 2.4f));
         }
         /// <summary>
-        /// A dead tree (Khaven's Whispering Wood, the Rim's husks, the unmade): a tapered, slightly bent bole on a root flare of
+        /// A dead tree (Khaven's Stillwood, the Rim's husks, the unmade): a tapered, slightly bent bole on a root flare of
         /// buttress ridges (Bole), ending in a broken leader; three to five limbs leaving it at different heights, each crooked (a
         /// kink part way) and tapering to a point, with branches off its length, not its tip, and twigs off those. Grey weathered
         /// wood, no bark grain in the shade. Its look is its own (TreeRandom); from the zone's stream it takes exactly the draws the
@@ -1948,7 +2010,7 @@ namespace Crulanda.World
             root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
             return root;
         }
-        /// <summary>Bark for dead woods: charred dark in the ash, weathered grey elsewhere (Khaven's Whispering Wood). One draw.</summary>
+        /// <summary>Bark for dead woods: charred dark in the ash, weathered grey elsewhere (Khaven's Stillwood). One draw.</summary>
         Material DeadBark() { float t = R01; return Tint(art.bark, Zone.biome == "ash" ? Color.Lerp(new Color(.2f, .18f, .16f), new Color(.3f, .27f, .24f), t) : Color.Lerp(new Color(.58f, .57f, .56f), new Color(.72f, .71f, .69f), t)); }
         static readonly Color[] Leaf = { new Color(.33f, .38f, .17f), new Color(.55f, .42f, .16f), new Color(.52f, .27f, .13f), new Color(.40f, .36f, .15f) };
         bool Gloom { get { return Zone.biome == "gloom"; } }
@@ -3634,6 +3696,7 @@ namespace Crulanda.World
             }
             float living = 1 - Unmade(p.x, p.y) / .55f; if (living <= 0) return 0;   // grass thins out along the grey's ragged front
             if (Hollow.CoverAt(p, 1.2f) > 0) return 0;   // a cave's bare floor
+            if (Paved(p)) return 0;   // a city's flagged streets and squares (ZoneBuilder.Crown)
             float verge = 0;   // 1 at a road's edge, 0 from 2.5 m out
             for (int k = 0; k < Zone.roads.Length; k++)
             {
@@ -3652,6 +3715,7 @@ namespace Crulanda.World
             float open = 1;
             foreach (var g in Zone.groves)
                 if (Mathf.Abs(p.x - g.center.x) < g.size.x / 2 && Mathf.Abs(p.y - g.center.y) < g.size.y / 2) open = g.kind == "dead" ? .15f : .45f;
+            if (InWoods(p)) open = Mathf.Min(open, .55f);   // under the wild woods' canopy (ZoneBuilder.Woods.cs)
             foreach (var (at, r) in grassBuildings) if ((p - at).sqrMagnitude < r * r) return 0;
             if (p.magnitude < Zone.flatRadius * .45f) open *= .35f;
             if (Zone.biome == "ash") return 0;                       // nothing grows in the ash
@@ -4268,8 +4332,8 @@ namespace Crulanda.World
             }
             if (cone == null) cone = ZoneMeshes.Cone(1, 1);
             Part(PrimitiveType.Cylinder, t, new Vector3(0, gy + .06f, .5f), new Vector3(1.2f, .05f, .7f), art.glass);   // embers on the cave floor
-            MeshPart(cone, t, new Vector3(0, gy + .08f, .55f), Glowing(new Color(1, .55f, .2f), 2.2f)).transform.localScale = new Vector3(.35f, 1, .3f);
-            Glow(t, new Vector3(0, gy + 1.5f, -.2f), 10, 1.5f, new Color(1, .55f, .25f), 2.4f);
+            var caveFire = Glow(t, new Vector3(0, gy + 1.5f, -.2f), 10, 1.5f, new Color(1, .55f, .25f), 2.4f);
+            CandleFlame.Attach(MeshPart(cone, t, new Vector3(0, gy + .08f, .55f), Glowing(new Color(1, .55f, .2f), 2.2f)), caveFire).transform.localScale = new Vector3(.35f, 1, .3f);   // wavering with its light (2026-10-15)
             float bx = g.y / 2 + 2;
             for (int i = 0; i < 3; i++) Part(PrimitiveType.Cube, t, new Vector3(bx + (i == 2 ? .35f : i * .75f), Floor(bx) + (i == 2 ? .75f : .25f), -1.5f), new Vector3(.7f, .5f, .5f), salt, Quaternion.Euler(0, R01 * 20 - 10, 0));
             Solid(t, new Vector3(bx + .4f, Floor(bx) + .5f, -1.5f), new Vector3(1.8f, 1, .8f));
@@ -4319,11 +4383,28 @@ namespace Crulanda.World
                 // A branch opens out of a cave already made: its mouth on that cave's floor (the Sealed Adit's ways out of the Gallery).
                 var parent = string.IsNullOrEmpty(p.within) ? null : Hollow.All.Find(o => o.Name == p.within);
                 float? mouthY = null; float parentAlong = 0;
-                if (parent != null && parent.FloorSmooth(p.at, out float fy)) { mouthY = fy; parentAlong = parent.Along[parent.Nearest(p.at, out _)]; }
+                // (the Adit rework) A mouth high in the parent's wall: rise metres over its floor there.
+                if (parent != null && parent.FloorSmooth(p.at, out float fy)) { mouthY = fy + p.rise; parentAlong = parent.Along[parent.Nearest(p.at, out _)]; }
                 var h = new Hollow(string.IsNullOrEmpty(p.name) ? "cavern" : p.name, p.at, p.rotation, plan, (x, z) => HeightAt(x, z), mouthY);
-                if (parent != null) { h.Parent = parent; h.ParentAlong = parentAlong; }
+                if (parent != null) { h.Parent = parent; h.ParentAlong = parentAlong; h.MouthRise = p.rise; }
+                h.Style = string.IsNullOrEmpty(p.style) ? null : p.style;
                 Hollow.All.Add(h);
             }
+            // (the Adit rework) A cave whose far end opens into another (ZoneProp.joins): which, how far into it, and how far its end stands
+            // over the other's floor there (a level way back round, or a lip over a hall).
+            foreach (var p in Zone.props)
+            {
+                if (p == null || p.kind != "cavern" || string.IsNullOrEmpty(p.joins)) continue;
+                string name = string.IsNullOrEmpty(p.name) ? "cavern" : p.name;
+                var h = Hollow.All.Find(o => o.Name == name); var target = Hollow.All.Find(o => o.Name == p.joins);
+                if (h == null || target == null || target == h || h.Centre.Count < 2) { Debug.LogWarning(Zone.id + ": the cavern '" + name + "' joins '" + p.joins + "', which is not a cavern of the zone."); continue; }
+                var end = h.Centre[h.Centre.Count - 1]; var at = new Vector2(end.x, end.z);
+                h.Join = target; h.JoinAlong = target.Along[target.Nearest(at, out _)];
+                h.JoinRise = target.FloorSmooth(at, out float ty) ? end.y - ty : 0;
+            }
+            // Where each ring has a floor of its own, now that every cave is made (a branch's first metres and a joining cave's last ones
+            // are the other's air).
+            foreach (var h in Hollow.All) h.ComputeFloored();
         }
         static float[][] PlanRows(float[] flat)
         {
@@ -4401,8 +4482,31 @@ namespace Crulanda.World
             }
             // A cave in a network (the Sealed Adit): its walls are open where another's passage runs through them, and none of it
             // stands in the other's air (Hollow.Open), so a branch's mouth is a hole in the Gallery's wall.
-            bool linked = Hollow.All.Count > 1 && Hollow.All.Exists(o => o != h && (o.Parent == h || h.Parent == o));
-            bool Cut(Vector3 a, Vector3 b2, Vector3 d) { return linked && Hollow.OpenInOther(h, t.TransformPoint((a + b2 + d) / 3)); }
+            bool linked = Hollow.All.Count > 1 && Hollow.All.Exists(o => o != h && (o.Parent == h || h.Parent == o || o.Join == h || h.Join == o));
+            // (The Adit rework) Where a mouth opens high in a wall, or a joining cave's end stands out over a hall (a lip), a face with any
+            // corner in the other's air goes too: the wall's faces are metres tall, and a half-cut one stood across the doorway's sill.
+            var sharp = Hollow.All.FindAll(o => o != h && ((o.Parent == h && o.MouthRaised) || (h.Parent == o && h.MouthRaised) || (o.Join == h && o.JoinRaised) || (h.Join == o && h.JoinRaised)));
+            bool SharpOpen(Vector3 world) { foreach (var o in sharp) if (o.Open(world)) return true; return false; }
+            bool Cut(Vector3 a, Vector3 b2, Vector3 d)
+            {
+                if (!linked) return false;
+                if (Hollow.OpenInOther(h, t.TransformPoint((a + b2 + d) / 3))) return true;
+                // (The Adit rework) A face with a corner well inside another cave's passage goes too: the parent's knoll and shell, their
+                // faces metres wide, crossed each branch a few metres past its mouth with their middles in the rock, and no branch's
+                // floor could be reached from the yard (AditNavDiagnostics 2026-10-14 20:55: the Pen, the Cutting Drift, the Foundry, the
+                // Muster Yard, the River, the Breach...).
+                if (Hollow.OpenInOther(h, t.TransformPoint(a), .7f) || Hollow.OpenInOther(h, t.TransformPoint(b2), .7f) || Hollow.OpenInOther(h, t.TransformPoint(d), .7f)) return true;
+                // And its edges' middles: the Gallery's knoll is some 13 m thick where the Cutting Drift's mouth sits 12 m up its wall, and a
+                // face there is wider than the drift's tube, spanning it with every corner and its middle in the rock (R91's picture, 21:45).
+                if (Hollow.OpenInOther(h, t.TransformPoint((a + b2) / 2), .7f) || Hollow.OpenInOther(h, t.TransformPoint((b2 + d) / 2), .7f) || Hollow.OpenInOther(h, t.TransformPoint((d + a) / 2), .7f)) return true;
+                if (sharp.Count == 0) return false;
+                Vector3 wa = t.TransformPoint(a), wb = t.TransformPoint(b2), wd = t.TransformPoint(d);
+                if (SharpOpen(wa) || SharpOpen(wb) || SharpOpen(wd)) return true;
+                // (S7, 2026-10-15) And anywhere on it: a face of the hall's knoll straddled the fixture loop's tube where the loop comes
+                // through it to its lip, corners above and below the passage, and stood across it by its wall (AditCaveBuildTests).
+                foreach (var o in sharp) if (o.OpenOnFace(wa, wb, wd)) return true;
+                return false;
+            }
             for (int i = 0; i + 1 < n; i++)
                 for (int k = 0; k + 1 < P; k++)
                 {
@@ -4424,15 +4528,17 @@ namespace Crulanda.World
             // What shows inside is the painted lining over that shell (the shell stays the collider and the navmesh's obstacle, not
             // drawn), and against it the rock, dripstone, root and earth that break the walls up. With no cave art the shell shows.
             var paint = roots ? art.caveEarth : art.cave;
-            var lining = paint != null ? Tint(paint, roots ? new Color(.5f, .4f, .27f) : variant == 2 ? AditLining(h.Name) : new Color(.56f, .51f, .45f)) : null;
-            if (lining != null) { body.GetComponent<MeshRenderer>().enabled = false; CaveLining(t, h, c, ring, n, P, seed, lining, linked); }
+            var lining = paint != null ? Tint(paint, roots ? new Color(.5f, .4f, .27f) : variant == 2 ? AditLining(AditPart(h)) : new Color(.56f, .51f, .45f)) : null;
+            if (lining != null) { body.GetComponent<MeshRenderer>().enabled = false; CaveLining(t, h, c, ring, n, P, seed, lining, linked, sharp.Count > 0 ? (Func<Vector3, bool>)SharpOpen : null); }
             int dressedFrom = t.childCount;
             CaveDressing(t, h, c, right, ring, n, P, roots, lining ?? (roots ? knoll : rock));
-            if (linked) for (int k = t.childCount - 1; k >= dressedFrom; k--)   // no fallen stone, ledge or dripstone in another cave's way
+            bool decked = DeckSpots.Count > 0;   // (the Adit rework) nor in a deck's way
+            if (linked || decked) for (int k = t.childCount - 1; k >= dressedFrom; k--)   // no fallen stone, ledge or dripstone in another cave's way
                 {
                     var r = t.GetChild(k).GetComponentInChildren<Renderer>(); if (r == null) continue;
-                    var b = r.bounds; bool inWay = Hollow.OpenInOther(h, b.center, 1f);
-                    for (int q = 0; q < 6 && !inWay; q++) { var e = Vector3.zero; e[q / 2] = (q % 2 == 0 ? 1 : -1) * b.extents[q / 2]; inWay = Hollow.OpenInOther(h, b.center + e, 1f); }
+                    var b = r.bounds; bool inWay = linked && Hollow.OpenInOther(h, b.center, 1f);
+                    for (int q = 0; q < 6 && !inWay && linked; q++) { var e = Vector3.zero; e[q / 2] = (q % 2 == 0 ? 1 : -1) * b.extents[q / 2]; inWay = Hollow.OpenInOther(h, b.center + e, 1f); }
+                    if (!inWay && decked) inWay = DeckOverlaps(b, .3f);
                     if (inWay) DestroyImmediate(t.GetChild(k).gameObject);
                 }
 
@@ -4443,7 +4549,8 @@ namespace Crulanda.World
                 float th = Mathf.Clamp(k - 1, 0, K) * Mathf.PI / K;
                 return 2f + 2.4f * Mathf.PerlinNoise(h.Along[i] * .16f + seed + 40, th * 1.3f + 5) + .9f * Mathf.PerlinNoise(h.Along[i] * .55f + seed, th * 3.4f + 9) + Mathf.Sin(th) * h.Height[i] * .35f;   // big swells and smaller knuckles
             }
-            int m = n + 3; var outer = new Vector3[m, P]; var outAlong = new float[m];
+            bool joined = h.Join != null;   // (the Adit rework) a joining cave's end stays open into the other: no tip closes its knoll
+            int m = n + (joined ? 0 : 3); var outer = new Vector3[m, P]; var outAlong = new float[m];
             for (int i = 0; i < n; i++)
             {
                 outAlong[i] = h.Along[i];
@@ -4457,7 +4564,7 @@ namespace Crulanda.World
             }
             var fwdEnd = c[n - 1] - c[n - 2]; fwdEnd.y = 0; fwdEnd.Normalize();
             var tip = c[n - 1] + fwdEnd * 3.5f + Vector3.up * 1.4f;
-            for (int j = 1; j <= 3; j++)
+            for (int j = 1; j <= 3 && !joined; j++)
             {
                 outAlong[n - 1 + j] = h.Along[n - 1] + j * 1.2f;
                 for (int k = 0; k < P; k++)
@@ -4500,7 +4607,11 @@ namespace Crulanda.World
             if (ov.Count > 65000) mound.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
             mound.SetVertices(ov); mound.SetUVs(0, ouv); mound.SetTriangles(ot, 0); mound.RecalculateNormals(); mound.RecalculateBounds();
             var hill = MeshPart(mound, t, Vector3.zero, knoll);
-            hill.AddComponent<MeshCollider>().sharedMesh = mound; hill.AddComponent<NavWalkable>();
+            hill.AddComponent<MeshCollider>().sharedMesh = mound;
+            // A walk-in cave's knoll is a hill to climb (the navmesh reads it); a branch cave's, inside another cave, is buried rock, and
+            // its crown pokes into the parent's hall near the wall as a floating floor (the Censored Room's over the Scriptorium at
+            // y -59.7, the Kennel's in the Muster Yard: "walkable triangles on solids", AditNavTests 2026-10-15).
+            if (h.Parent == null) hill.AddComponent<NavWalkable>();
 
             // Crests sunk into the mound's top and buttresses into its flanks (kept clear of the passage's walls); loose rock round the foot.
             bool Clear(Vector3 at, float radius)
@@ -4549,28 +4660,68 @@ namespace Crulanda.World
             // The floor: the passage's own, from wall foot to wall foot (the land is cut away inside, see ZoneMeshes.Ground), and a lip
             // of it out of the mouth onto the ground outside, so the way in has no seam. Earth over rock; walkable (navmesh), solid.
             {
-                var fv = new List<Vector3>(); var fuv = new List<Vector2>(); var ft = new List<int>();
+                var fv = new List<Vector3>(); var fuv = new List<Vector2>(); var ft = new List<int>(); var ends = new List<Vector3>();
                 var outward = c[0] - c[1]; outward.y = 0; outward.Normalize();
+                // (The Adit rework) A cave with pools or streams sunk into its floor (ZoneCaveWater) has its floor in columns about 1.2 m
+                // across, each point let down into the basin under it; every other cave keeps the one strip from wall foot to wall foot.
+                int cols = 1;
+                if (HasBasins(h)) { float halfMost = 0; for (int i = 0; i < n; i++) halfMost = Mathf.Max(halfMost, h.Half[i]); cols = Mathf.Clamp(Mathf.CeilToInt(halfMost * 2 / 1.2f), 2, 96); }
+                float scaleY = Mathf.Max(.01f, t.lossyScale.y);
                 for (int i = h.Parent != null ? 0 : -1; i < n; i++)
                 {
                     int r = Mathf.Max(0, i); Vector3 a = ring[r, 1], b = ring[r, P - 2];
                     if (i < 0) { a += outward * 2.4f; b += outward * 2.4f; a.y = LocalGround(t, a.x, a.z) + .02f; b.y = LocalGround(t, b.x, b.z) + .02f; }   // over the land's cut edge
-                    else a.y = b.y = c[r].y + (h.Parent != null ? .012f : 0);   // a branch's floor a hair over its parent's where they meet
-                    float fvv = (i < 0 ? -2.4f : h.Along[r]) / 2.4f;
-                    fv.Add(a); fv.Add(b); fuv.Add(new Vector2(0, fvv)); fuv.Add(new Vector2(Vector3.Distance(a, b) / 2.4f, fvv));
+                    else a.y = b.y = c[r].y + (h.Parent != null || h.Join != null ? .012f : 0);   // a branch's floor a hair over its parent's where they meet
+                    float fvv = (i < 0 ? -2.4f : h.Along[r]) / 2.4f, across = Vector3.Distance(a, b);
+                    ends.Add(a); ends.Add(b);
+                    for (int q = 0; q <= cols; q++)
+                    {
+                        var at = q == 0 ? a : q == cols ? b : Vector3.Lerp(a, b, q / (float)cols);
+                        if (cols > 1 && i >= 0)
+                        {
+                            var w = t.TransformPoint(at); float dip = BasinDip(h, new Vector2(w.x, w.z)) / scaleY;
+                            at.y -= q == 0 || q == cols ? Mathf.Min(dip, 1.05f) : dip;   // (the walls' feet go 1.2 m under the floor)
+                        }
+                        fv.Add(at); fuv.Add(new Vector2(q / (float)cols * across / 2.4f, fvv));
+                    }
                 }
-                int rowsF = fv.Count / 2;
+                int rowsF = ends.Count / 2, perRow = cols + 1;
                 for (int i = 0; i + 1 < rowsF; i++)
                 {
-                    int o = i * 2;
                     // A quad wholly in another cave's air is that cave's floor already (a branch's mouth in the Gallery).
-                    if (linked && Hollow.OpenInOther(h, t.TransformPoint((fv[o] + fv[o + 1] + fv[o + 2] + fv[o + 3]) / 4) + Vector3.up * .3f, .8f)) continue;   // the Gallery's floor there already (a band showed)
-                    ft.AddRange(new[] { o, o + 2, o + 1, o + 1, o + 2, o + 3 });
+                    if (linked && Hollow.FloorGivesWay(h, t.TransformPoint((ends[i * 2] + ends[i * 2 + 1] + ends[i * 2 + 2] + ends[i * 2 + 3]) / 4) + Vector3.up * .3f)) continue;   // the Gallery's floor there already (a band showed)
+                    for (int q = 0; q < cols; q++)
+                    {
+                        int o = i * perRow + q;
+                        ft.AddRange(new[] { o, o + perRow, o + 1, o + 1, o + perRow, o + perRow + 1 });
+                    }
                 }
                 if (ft.Count > 2 && Vector3.Cross(fv[ft[1]] - fv[ft[0]], fv[ft[2]] - fv[ft[0]]).y < 0) for (int q = 0; q < ft.Count; q += 3) { int sw = ft[q + 1]; ft[q + 1] = ft[q + 2]; ft[q + 2] = sw; }   // facing up
-                var floorMesh = new Mesh { name = h.Name + " floor" }; floorMesh.SetVertices(fv); floorMesh.SetUVs(0, fuv); floorMesh.SetTriangles(ft, 0); floorMesh.RecalculateNormals(); floorMesh.RecalculateBounds();
+                var floorMesh = new Mesh { name = h.Name + " floor" }; if (fv.Count > 65000) floorMesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32; floorMesh.SetVertices(fv); floorMesh.SetUVs(0, fuv); floorMesh.SetTriangles(ft, 0); floorMesh.RecalculateNormals(); floorMesh.RecalculateBounds();
                 var ground = MeshPart(floorMesh, t, Vector3.zero, Tint(art.soil, roots ? new Color(.2f, .16f, .1f) : new Color(.34f, .3f, .25f)));
                 ground.AddComponent<MeshCollider>().sharedMesh = floorMesh; ground.AddComponent<NavWalkable>();
+            }
+            // (The Adit rework) Where this cave's floor runs out as a ledge over another cave's air (a doorway high in a hall's wall, a lip
+            // over the Gallery), rock hangs under it, so from the floor below it reads as a shelf of the wall and not a sheet in the air.
+            // Its own stream; no colliders. Only for such mouths and lips: every other cave is as it was.
+            if (sharp.Count > 0)
+            {
+                var lr = TreeRandom(t.position + new Vector3(2.9f, 0, 6.1f)); float LR() { return (float)lr.NextDouble(); }
+                var ledgeRock = RockTint(new Color(.42f, .4f, .37f));
+                for (int i = 0; i < n; i += 2)
+                {
+                    if (!h.Floored(i)) continue;
+                    var w0 = h.Centre[i]; var q0 = new Vector2(w0.x, w0.z); bool hangs = false;
+                    foreach (var o in sharp) if (o.FloorAt(q0, out float under) && w0.y - under > 1.5f) { hangs = true; break; }
+                    if (!hangs) continue;
+                    for (int k = -1; k <= 1; k++)
+                    {
+                        var at = c[i] + right[i] * (k * h.Half[i] * .55f) + Vector3.down * .15f;
+                        float yaw = LR() * 360, wide = h.Half[i] * .5f + LR(), deep = 1.4f + LR() * 1.8f, long_ = 1.2f + LR();
+                        if (InDeckWay(t.TransformPoint(at), .3f)) continue;
+                        MeshPart(CragRock((int)(yaw / 60)), t, at, ledgeRock, Quaternion.Euler(180, yaw, 0)).transform.localScale = new Vector3(wide, deep, long_);
+                    }
+                }
             }
             // Where things stand inside: the passage floor under a point (in the root's frame), not the land far above it.
             float FloorY(float x, float z)
@@ -4588,6 +4739,11 @@ namespace Crulanda.World
             // Solid where it stands: you walk round a brazier, the desk, a stack of crates or the plunder, and so do the deserters.
             void Block(Vector3 at, Vector3 size, Quaternion rot)
             {
+                // Never on a deck's planks, nor up through them: the whole block's height is tried, a level every two metres (a block sat
+                // on the Foundry's walkway and cut its navmesh; a 3 m block at the bowl's floor rose through the overseers' walk 2 m over it,
+                // its foot alone tried: AditNavDiagnostics 2026-10-14, 17:14 and 20:14).
+                var centre = t.TransformPoint(at + rot * new Vector3(0, size.y / 2, 0)); float reach = Mathf.Max(size.x, size.z);
+                if (DeckOverlaps(new Bounds(centre, new Vector3(reach, size.y, reach)), .4f)) return;
                 var o = new GameObject("Solid"); o.transform.SetParent(t, false); o.transform.localPosition = at + rot * new Vector3(0, size.y / 2, 0); o.transform.localRotation = rot;
                 o.AddComponent<BoxCollider>().size = size; o.AddComponent<NavBlocker>();
             }
@@ -4869,7 +5025,9 @@ namespace Crulanda.World
         /// where it meets the knoll's cut face. In stretches of ten rings, so each takes the lights near it; it casts shadow both
         /// ways, as the shell did (no sun reaches the floor). No colliders; draws from no stream.
         /// </summary>
-        void CaveLining(Transform t, Hollow h, Vector3[] c, Vector3[,] ring, int n, int P, float seed, Material m, bool linked = false)
+        /// <param name="cutAlso">(The Adit rework) A world point in the air of a cave whose mouth opens high in this one's wall, or whose end
+        /// stands over it as a lip: a face with any corner there goes too (null: the face's middle alone decides, as everywhere else).</param>
+        void CaveLining(Transform t, Hollow h, Vector3[] c, Vector3[,] ring, int n, int P, float seed, Material m, bool linked = false, Func<Vector3, bool> cutAlso = null)
         {
             int W = 2 * P - 1; var g = new Vector3[n, W]; var nrm = new Vector3[n, W]; var col = new Color[n, W];
             for (int i = 0; i < n; i++)
@@ -4911,6 +5069,7 @@ namespace Crulanda.World
                     {
                         int a = i * W + k, b = a + W, d = a + 1, e = b + 1;
                         if (linked && Hollow.OpenInOther(h, t.TransformPoint((v[a] + v[b] + v[d] + v[e]) / 4))) continue;   // open into the next cave
+                        if (linked && cutAlso != null && (cutAlso(t.TransformPoint(v[a])) || cutAlso(t.TransformPoint(v[b])) || cutAlso(t.TransformPoint(v[d])) || cutAlso(t.TransformPoint(v[e])))) continue;
                         tri.AddRange(turned ? new[] { a, d, b, d, e, b } : new[] { a, b, d, d, b, e });
                     }
                 var mesh = new Mesh { name = h.Name + " lining" }; mesh.SetVertices(v); mesh.SetNormals(vn); mesh.SetColors(vc); mesh.SetTriangles(tri, 0); mesh.RecalculateBounds();
@@ -5071,20 +5230,34 @@ namespace Crulanda.World
             var tip = wallAt + lean * .6f;
             Part(PrimitiveType.Sphere, t, tip, Vector3.one * .14f, art.glass);
             if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-            MeshPart(cone, t, tip + Vector3.up * .04f, Glowing(new Color(1, .55f, .2f), 2.2f)).transform.localScale = new Vector3(.13f, .34f, .13f);
-            Glow(t, tip + inward * .3f + Vector3.up * .2f, 7.5f, 1.35f, new Color(1, .6f, .3f), 1.35f).gameObject.AddComponent<Flicker>();
+            // The flame wavers with its light (CandleFlame, from Chris's candle shader, 2026-10-15: "use these where appropriate").
+            var torchLight = Glow(t, tip + inward * .3f + Vector3.up * .2f, 7.5f, 1.35f, new Color(1, .6f, .3f), 1.35f); torchLight.gameObject.AddComponent<Flicker>();
+            CandleFlame.Attach(MeshPart(cone, t, tip + Vector3.up * .04f, Glowing(new Color(1, .55f, .2f), 2.2f)), torchLight).transform.localScale = new Vector3(.13f, .34f, .13f);
         }
         /// <summary>A campfire: a ring of stones, crossed logs on a bed of embers, two flames, a flickering light.</summary>
+        /// <summary>Real flames under a prop (Vefects' Free Fire VFX in Resources/Fx/Fire, its shaders written for the built-in pipeline;
+        /// 2026-10-14, Chris: "i added ... fire to myassets"): false when the pack is missing, for the painted flames instead. Draws nothing.</summary>
+        bool RealFire(Transform t, Vector3 local, float scale, string kind = "VFX_Fire_01_Small_Simple")
+        {
+            var src = Resources.Load<GameObject>("Fx/Fire/Particles/" + kind); if (src == null) return false;
+            var f = Instantiate(src, t); f.name = "Fire"; f.transform.localPosition = local; f.transform.localRotation = Quaternion.identity; f.transform.localScale = Vector3.one * scale;
+            foreach (var ps in f.GetComponentsInChildren<ParticleSystem>(true)) { var m = ps.main; m.scalingMode = ParticleSystemScalingMode.Hierarchy; }
+            return true;
+        }
         void Campfire(Transform t, Vector3 at)
         {
             var stone = Tint(art.stone, new Color(.34f, .32f, .3f)); var wood = Tint(art.timber, new Color(.22f, .15f, .09f));
             for (int i = 0; i < 9; i++) { var q = Quaternion.Euler(0, i * 40, 0); Lump(BoulderAt(i), t, at + q * new Vector3(0, .08f, .72f), new Vector3(.34f, .24f, .3f), stone, i * 47); }
             for (int i = 0; i < 3; i++) Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .14f, 0), new Vector3(.1f, .5f, .1f), wood, Quaternion.Euler(0, i * 60, 70));
             Part(PrimitiveType.Cylinder, t, at + new Vector3(0, .05f, 0), new Vector3(.9f, .03f, .9f), art.glass);
-            if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-            MeshPart(cone, t, at + new Vector3(0, .1f, 0), Glowing(new Color(1, .5f, .15f), 2.6f)).transform.localScale = new Vector3(.4f, .9f, .4f);
-            MeshPart(cone, t, at + new Vector3(.12f, .1f, -.08f), Glowing(new Color(1, .75f, .3f), 2.2f)).transform.localScale = new Vector3(.22f, .6f, .22f);
-            Glow(t, at + new Vector3(0, 1.1f, 0), 11, 1.9f, new Color(1, .55f, .25f), 1.9f).gameObject.AddComponent<Flicker>();
+            var fireLight = Glow(t, at + new Vector3(0, 1.1f, 0), 11, 1.9f, new Color(1, .55f, .25f), 1.9f); fireLight.gameObject.AddComponent<Flicker>();
+            if (!RealFire(t, at + new Vector3(0, .06f, 0), .55f))
+            {
+                if (cone == null) cone = ZoneMeshes.Cone(1, 1);
+                // The painted tongues waver with the light (CandleFlame, 2026-10-15).
+                CandleFlame.Attach(MeshPart(cone, t, at + new Vector3(0, .1f, 0), Glowing(new Color(1, .5f, .15f), 2.6f)), fireLight).transform.localScale = new Vector3(.4f, .9f, .4f);
+                CandleFlame.Attach(MeshPart(cone, t, at + new Vector3(.12f, .1f, -.08f), Glowing(new Color(1, .75f, .3f), 2.2f)), fireLight).transform.localScale = new Vector3(.22f, .6f, .22f);
+            }
         }
         /// <summary>A torn company banner on a pole: two strips of sand-coloured cloth, one hanging shorter where it ripped, a faded red stripe.</summary>
         void Banner(Transform t, Vector3 at, float yaw, Material cloth, Material wood, float height)
@@ -5121,6 +5294,31 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(1.1f, .5f, .5f), new Vector3(.35f, .2f, .3f), Tint(art.stone, new Color(.94f, .94f, .91f)));   // salt
             Solid(t, new Vector3(0, 1.1f, .2f), new Vector3(4, 2.2f, 3.8f));
         }
+        /// <summary>
+        /// A bee-wife's skeps (GAME-ONLY, Oakhaven's fill, 2026-10-15): three straw domes on a plank bench laid across two stone
+        /// blocks, each with its dark flight hole to the front, a flat stone weighting the lid of the last. Front faces -Z. Draws from
+        /// its own stream (TreeRandom, as the haystacks do), so nothing else in the zone moves.
+        /// </summary>
+        void Skep(Transform t)
+        {
+            var sr = TreeRandom(t.position); float S() { return (float)sr.NextDouble(); }
+            var stone = Tint(art.stone, new Color(.5f, .49f, .46f)); var plank = Tint(art.timber, Wither(new Color(.46f, .38f, .27f)));
+            var hole = Tint(art.stone, new Color(.05f, .045f, .04f));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * .95f, .21f, 0), new Vector3(.5f, .42f, .5f), stone, Quaternion.Euler(0, (S() - .5f) * 10, 0));
+            Part(PrimitiveType.Cube, t, new Vector3(0, .45f, 0), new Vector3(2.7f, .06f, .62f), plank);
+            float lidX = 0, lidY = 0;
+            for (int k = -1; k <= 1; k++)
+            {
+                var straw = Tint(art.hay, new Color(.72f + S() * .1f, .6f + S() * .08f, .34f + S() * .06f));
+                float x = k * .82f + (S() - .5f) * .06f, r = .25f + S() * .04f, h = .3f + S() * .05f;
+                Part(PrimitiveType.Cylinder, t, new Vector3(x, .48f + h / 2, 0), new Vector3(r * 2, h / 2, r * 2), straw);   // the straw coil's straight sides
+                Part(PrimitiveType.Sphere, t, new Vector3(x, .48f + h, 0), new Vector3(r * 2, r * 1.35f, r * 2), straw);   // its dome
+                Part(PrimitiveType.Cube, t, new Vector3(x, .56f, -r), new Vector3(.08f, .05f, .03f), hole);   // the flight hole
+                lidX = x; lidY = .48f + h + r * 1.35f / 2;
+            }
+            Part(PrimitiveType.Cube, t, new Vector3(lidX, lidY + .01f, 0), new Vector3(.28f, .05f, .24f), stone, Quaternion.Euler(0, S() * 40, 0));   // a flat stone weighting the last lid
+            Solid(t, new Vector3(0, .55f, 0), new Vector3(3, 1.1f, .8f));
+        }
         /// <summary>A fire-bowl on three legs (iron, or bone) with glowing coals and a flame; burns day and night.</summary>
         void Brazier(Transform t, Vector3 at, Material legs)
         {
@@ -5129,8 +5327,8 @@ namespace Crulanda.World
             Part(PrimitiveType.Sphere, t, at + new Vector3(0, 1, 0), new Vector3(.8f, .3f, .8f), iron);
             Part(PrimitiveType.Sphere, t, at + new Vector3(0, 1.07f, 0), new Vector3(.66f, .18f, .66f), art.glass);   // coals heaped in the bowl, showing over its rim
             if (cone == null) cone = ZoneMeshes.Cone(1, 1);
-            MeshPart(cone, t, at + new Vector3(0, 1.12f, 0), Glowing(new Color(1, .55f, .2f), 2.2f)).transform.localScale = new Vector3(.2f, .55f, .2f);
-            Glow(t, at + new Vector3(0, 1.7f, 0), 7, 1.2f, new Color(1, .58f, .28f), 1.9f);
+            var brazierLight = Glow(t, at + new Vector3(0, 1.7f, 0), 7, 1.2f, new Color(1, .58f, .28f), 1.9f);
+            CandleFlame.Attach(MeshPart(cone, t, at + new Vector3(0, 1.12f, 0), Glowing(new Color(1, .55f, .2f), 2.2f)), brazierLight).transform.localScale = new Vector3(.2f, .55f, .2f);   // wavering with its light (2026-10-15)
         }
         /// <summary>
         /// The Weave-Eater brood (GAME-ONLY; Weave-Eaters born of the frayed threads of the broken Weave are CANON, book1
@@ -5266,8 +5464,10 @@ namespace Crulanda.World
         /// A word in a searchable's prompt or name sets a scene round it: "camp" (a cold fire ring and a rolled bedroll in front),
         /// "log" or "trunk" (a fallen trunk behind it), "stump" (a hollow stump it is pushed into), "rocks" or "cleft" (two stones
         /// either side), "stone" (a flat stone half over it), "scrape" (a shallow scrape it lies half buried in).
-        /// Things you take (a note, a key, a herb) are kept apart from their scene: <see cref="ZoneSecretSpot.root"/> is the thing
-        /// alone, so only it vanishes when found (the nail, the crack and the stump stay). Metal catches the light in a small glint,
+        /// Phase 8.6 adds carving, read, grave, remains and shrine (ZoneBuilder.SecretLooks.cs): each builds what it stands on and is
+        /// moved clear like a herb; a carving in a cave is cut in the wall, as a page there is pushed into it.
+        /// Things you take (a note, a key, a herb, a dead adventurer's satchel) are kept apart from their scene: <see cref="ZoneSecretSpot.root"/> is the thing
+        /// alone, so only it vanishes when found (the nail, the crack, the stump and the bones stay). Metal catches the light in a small glint,
         /// pages are pale and the herbs glow faintly: enough to catch a curious eye, never a quest marker's glow.
         /// A herb, or a find in a scene of its own, that stands in a trunk or a rock is moved clear (up to 2.5 m; never onto a
         /// road, into water or a building); one tucked against a prop (a key on a gallows, a page in a wall) stays exactly put.
@@ -5282,17 +5482,22 @@ namespace Crulanda.World
                 if (s == null || string.IsNullOrEmpty(s.id)) continue;
                 string words = ((s.prompt ?? "") + " " + (s.name ?? "") + (s.kind == "vista" ? " " + (s.text ?? "") : "")).ToLowerInvariant();
                 bool Says(params string[] any) { foreach (var w in any) if (words.Contains(w)) return true; return false; }
+                bool alone = StandsAlone(s.kind);   // (Phase 8.6) a carving, a book, a grave, remains or a shrine: what it stands on is its own
                 string scene = s.kind == "vista" ? (Says("beacon") ? "beacon" : Says("salt") ? "salt" : Says("stones", "cairn") ? "cairn" : null)
-                    : Says("camp") ? "camp" : Says("log", "trunk") ? "log" : Says("stump") ? "stump" : Says("rocks", "cleft") ? "rocks" : Says("stone") ? "stone" : Says("scrape") ? "scrape" : null;
+                    : alone ? null : Says("camp") ? "camp" : Says("log", "trunk") ? "log" : Says("stump") ? "stump" : Says("rocks", "cleft") ? "rocks" : Says("stone") ? "stone" : Says("scrape") ? "scrape" : null;
                 var sr = new System.Random(Zone.seed ^ (Mathf.RoundToInt(s.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(s.at.y * 8) * 19349663) ^ 0x51c2e7);
                 float R() { return (float)sr.NextDouble(); }
-                var at = s.at;
-                if (s.kind == "herb" || (s.kind != "vista" && scene != null)) at = SecretClear(at, scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
+                var at = s.at; float near = float.NegativeInfinity;
+                // (The Adit rework) One placed in a cave by along and aside (its floor, or a deck over it at rise): exactly there.
+                var inCave = string.IsNullOrEmpty(s.cave) ? null : Hollow.All.Find(o => o.Name == s.cave);
+                if (inCave != null) { var w = inCave.At(s.along, s.aside); at = s.at = new Vector2(w.x, w.z); near = w.y + s.rise; }
+                else if (s.kind == "herb" || alone || (s.kind != "vista" && scene != null)) at = SecretClear(at, alone ? AloneClear(s.kind) : scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
                 var t = new GameObject("Secret: " + (string.IsNullOrEmpty(s.name) ? s.id : s.name)).transform; t.SetParent(all, false);
-                t.position = StandAt(at, float.NegativeInfinity); t.rotation = Quaternion.Euler(0, s.rotation, 0);   // in a cave: on its floor
+                t.position = StandAt(at, near); t.rotation = Quaternion.Euler(0, s.rotation, 0);   // in a cave: on its floor (or the deck it names)
                 // In a cave, a key on its nail or a page in a crack hangs on the rock itself: the nearest wall at its height, facing out.
-                if ((s.kind == "key" || s.kind == "note") && CaveWall(t.position + Vector3.up * s.height, out var wallAt, out var outOf))
-                { t.position = new Vector3(wallAt.x, t.position.y, wallAt.z) + outOf * .03f; t.rotation = Quaternion.LookRotation(-outOf); }
+                bool onWall = false;
+                if ((s.kind == "key" || s.kind == "note" || s.kind == "carving") && CaveWall(t.position + Vector3.up * (s.kind == "carving" ? 1.1f : s.height), out var wallAt, out var outOf))   // a carving is cut at chest height
+                { t.position = new Vector3(wallAt.x, t.position.y, wallAt.z) + outOf * .03f; t.rotation = Quaternion.LookRotation(-outOf); onWall = true; }
                 var item = new GameObject(s.kind).transform; item.SetParent(t, false); item.localPosition = Vector3.up * s.height;
                 switch (s.kind)
                 {
@@ -5309,6 +5514,11 @@ namespace Crulanda.World
                     case "herb": SecretHerb(item, R); break;
                     case "chest": SecretChest(item, t, R); break;
                     case "key": SecretKey(item, t, s.height, R); break;
+                    case "carving": SecretCarving(item, R, words, onWall); break;
+                    case "read": SecretRead(item, R, words); break;
+                    case "grave": SecretGrave(item, R); break;
+                    case "remains": SecretRemains(item, t, R); break;
+                    case "shrine": SecretShrine(item, R); break;
                     default: Debug.LogWarning(Zone.id + ": secret '" + s.id + "' has an unknown kind '" + s.kind + "'."); break;
                 }
                 if (s.kind != "vista")
@@ -5321,7 +5531,7 @@ namespace Crulanda.World
                         case "stone": SecretFlatStone(t, R); break;
                         case "scrape": SecretScrape(t, R); break;
                     }
-                bool pocketed = s.kind == "note" || s.kind == "key" || s.kind == "herb";   // what you take vanishes once found; its scene stays
+                bool pocketed = s.kind == "note" || s.kind == "key" || s.kind == "herb" || s.kind == "remains";   // what you take vanishes once found; its scene (the bones) stays
                 Secrets.Add(new ZoneSecretSpot { def = s, position = s.kind == "vista" ? t.position : item.position, root = pocketed ? item : t });
             }
         }
@@ -5757,7 +5967,7 @@ namespace Crulanda.World
                 case "signpost": return 1.3f;
                 case "cart": return 2.4f;
                 case "rock": return 1.2f * (1 + Mathf.Max(0, p.variant) * .6f);
-                case "monolith": case "grave": case "wayshrine": case "idol": case "shrine": case "board": case "brazier": case "barrels": case "crates": case "haystack": case "woodpile": case "target": case "dummy": case "banner": return 1.2f;
+                case "monolith": case "grave": case "wayshrine": case "idol": case "shrine": case "board": case "brazier": case "barrels": case "crates": case "haystack": case "woodpile": case "target": case "dummy": case "banner": case "skep": return 1.2f;
             }
             return 0;
         }
@@ -5790,7 +6000,7 @@ namespace Crulanda.World
             if (Mathf.Abs(p.x) > Half - 14 || Mathf.Abs(p.y) > Half - 14) return false;
             float y = 0; if (Hollow.CoverAt(p, 2) > 0 || Hollow.FloorUnder(p, ref y)) return false;
             if (NearRoad(p, 6) || Water.NearWater(p, 4) || InBuilding(p) || NearProp(p, 3) || Steep(p, 2) > .5f) return false;
-            foreach (var o in Zone.props) if (o != null && (o.kind == "house" || o.kind == "inn" || o.kind == "mill" || o.kind == "barn" || o.kind == "forge" || o.kind == "stall") && Vector2.Distance(o.at, p) < 115) return false;
+            foreach (var o in Zone.props) if (o != null && o.was != "ruined_house" && (o.kind == "house" || o.kind == "inn" || o.kind == "mill" || o.kind == "barn" || o.kind == "forge" || o.kind == "stall") && Vector2.Distance(o.at, p) < 115) return false;   // a waystation raised over a ruin (Wain's Rest) is no village: its camps keep their ground
             foreach (var c in Zone.clearings) if (c != null && Vector2.Distance(p, c.center) < c.radius + 4) return false;
             foreach (var e in Zone.exits) if (e != null && (Vector2.Distance(p, e.at) < 16 || Vector2.Distance(p, e.arrive) < 16)) return false;
             foreach (var z in AllZones()) foreach (var e in z.exits) if (e != null && e.to == Zone.id && Vector2.Distance(p, e.arrive) < 16) return false;

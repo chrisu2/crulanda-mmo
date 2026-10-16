@@ -5,6 +5,26 @@ using Crulanda.Combat;
 
 namespace Crulanda.Encounter
 {
+    /// <summary>Whoever keeps a pet (the Ranger's wolf; the Mage's ember hound, the Cinderwright's, 2026-10-11): how hardy and how fierce
+    /// their talents make it, and what its bites do for them.</summary>
+    public interface IPetMaster
+    {
+        float PetHealthScale { get; }
+        float PetBiteScale { get; }
+        /// <summary>Its bites hold attention like a tank's blows (the wolf's Howl).</summary>
+        bool PetHolds { get; }
+        void OnPetBite(EncounterEnemy target, int bite);
+    }
+
+    /// <summary>A party sim Ranger as its wolf's keeper: a plain wolf, no talents.</summary>
+    public sealed class SimPetMaster : IPetMaster
+    {
+        public float PetHealthScale { get { return 1; } }
+        public float PetBiteScale { get { return 1; } }
+        public bool PetHolds { get { return false; } }
+        public void OnPetBite(EncounterEnemy target, int bite) { }
+    }
+
     /// <summary>
     /// The Ranger's wolf (Phase 5.1b): a grey wolf on the pack's model (ActorLook.Wolf) that keeps to heel like Mira does, hunts
     /// joins whatever the Ranger fights (note 90), goes where the Ranger sets it (Sic; with Pack Sense whatever the Ranger shoots, the first bite harder), bites every two seconds with threat of its
@@ -16,7 +36,13 @@ namespace Crulanda.Encounter
     {
         public Actor actor;
         public EncounterSession session;
-        public RangerKit kit;
+        public IPetMaster kit;
+        /// <summary>What it is called in what you are told ("wolf", "hound").</summary>
+        public string Kind = "wolf";
+        /// <summary>Whose it is: you (null) or a party sim's (a sim Ranger's wolf, 2026-10-11, Chris: "need a paladin, ranger pet, etc"): it
+        /// heels to that sim and joins whatever that sim fights.</summary>
+        public SimCompanion Master;
+        Transform Heel { get { return Master != null ? Master.transform : session.Player.transform; } }
         NavMeshAgent agent; ActorVisual visual;
         float nextBite, nextCatchUp, fury = 1; int baseHealth;
         /// <summary>What it is hunting (null at heel).</summary>
@@ -29,20 +55,21 @@ namespace Crulanda.Encounter
         public void Command(Order o) { Mode = o; if (o == Order.Stay) { stayAt = transform.position; Quarry = null; fury = 1; } }
         public const float BiteInterval = 2, BiteReach = 2.2f;
 
-        public void Init(Actor a, EncounterSession s, RangerKit k)
+        public void Init(Actor a, EncounterSession s, IPetMaster k)
         {
             actor = a; session = s; kit = k; agent = GetComponent<NavMeshAgent>(); visual = GetComponent<ActorVisual>();
             baseHealth = 90 + 18 * Mathf.Max(1, session.Progress.Level);
             Refit(); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            actor.Health.Died += h => session.Meter.Death(actor);   // the scorecard's deaths
         }
         /// <summary>Its health for the Ranger's level and talents (kept whole when it grows).</summary>
         public void Refit()
         {
             if (actor == null || kit == null) return;
-            int max = Mathf.RoundToInt(baseHealth * kit.WolfHealthScale);
+            int max = Mathf.RoundToInt(baseHealth * kit.PetHealthScale);
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, max);
         }
-        public int Bite { get { return Mathf.Max(1, Mathf.RoundToInt((6 + 2 * Mathf.Max(1, session.Progress.Level)) * kit.WolfBiteScale)); } }
+        public int Bite { get { return Mathf.Max(1, Mathf.RoundToInt((6 + 2 * Mathf.Max(1, session.Progress.Level)) * kit.PetBiteScale)); } }
         /// <summary>Sent at a target; its first bite lands <paramref name="firstBite"/> times as hard (Sic).</summary>
         public void Hunt(EncounterEnemy target, float firstBite)
         {
@@ -55,12 +82,12 @@ namespace Crulanda.Encounter
         /// </summary>
         void Assist()
         {
-            var t = session.Target;
-            if (t != null && t.actor.IsAlive && session.FightingTarget && session.Distance(t) < 30) { Hunt(t, 1); return; }
+            var t = Master != null ? Master.Quarry : session.Target;
+            if (t != null && t.actor.IsAlive && !SimCompanion.Held(t) && (Master != null || session.FightingTarget) && Vector3.Distance(Heel.position, t.transform.position) < 30) { Hunt(t, 1); return; }
             EncounterEnemy best = null; float bestD = 25;
             foreach (var e in session.Enemies)
             {
-                if (e == null || !e.FightingParty || e.LeaveAlone) continue;
+                if (e == null || !e.FightingParty || e.LeaveAlone || SimCompanion.Held(e)) continue;   // a held mob is left held
                 float d = Vector3.Distance(transform.position, e.transform.position); if (d < bestD) { bestD = d; best = e; }
             }
             if (best != null) Hunt(best, 1);
@@ -73,8 +100,8 @@ namespace Crulanda.Encounter
         void Update()
         {
             if (session == null || session.Paused || actor == null || !actor.IsAlive) return;
-            var player = session.Player; if (player == null) return;
-            if (Quarry != null && (!Quarry.actor.IsAlive || !Quarry.Engaged && session.Distance(Quarry) > 40)) { Quarry = null; fury = 1; }
+            var player = Heel; if (player == null || (Master != null && !Master.actor.IsAlive)) return;
+            if (Quarry != null && (!Quarry.actor.IsAlive || !Quarry.Engaged && Vector3.Distance(player.position, Quarry.transform.position) > 40)) { Quarry = null; fury = 1; }
             if (Quarry == null) { if (Mode == Order.Assist) Assist(); else Defend(); }
             float toPlayer = Vector3.Distance(transform.position, player.transform.position);
             if (Time.time >= nextCatchUp)
@@ -98,7 +125,8 @@ namespace Crulanda.Encounter
                         nextBite = Time.time + BiteInterval;
                         int bite = Mathf.RoundToInt(Bite * fury); fury = 1;
                         Quarry.Receive(bite, actor);
-                        if (kit.WolfHowls) Quarry.threat.Add(actor.EntityId.Value, bite);   // Howl: its bites hold attention like a tank's
+                        if (kit.PetHolds) Quarry.threat.Add(actor.EntityId.Value, bite);   // Howl: its bites hold attention like a tank's
+                        kit.OnPetBite(Quarry, bite);
                         visual?.Strike();
                     }
                 }

@@ -76,6 +76,10 @@ namespace Crulanda.Encounter
                 if (!abilities.ContainsKey(id) || !unlocks.ContainsKey(id)) throw new ArgumentException("Druid ability '" + id + "' is missing from content or unlocks.");
         }
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
+        /// <summary>Its standing party buff at a buff-up before a boss (Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"; GAME-ONLY):
+        /// a touch of the wood's slow strength passed hand to hand. Half an hour, +3% Stamina on everyone (BossBuffs).</summary>
+        public static readonly ClassBuff Standing = new ClassBuff("class.druid", "Heartwood Kinship", Crulanda.Core.StatType.Stamina);
+        public override ClassBuff PartyBuff { get { return Standing; } }
         int R(string id) { return s.TalentRank(id); }
         float Now { get { return Time.time; } }
         int Level { get { return s.Player.Level; } }
@@ -87,7 +91,12 @@ namespace Crulanda.Encounter
         public void GainGlimmer(int n) { Glimmer = Clamp(Glimmer + n, PoolCap); }
 
         // ---------- action bar ----------
-        public override int ActionCount { get { return 11; } }   // the eleventh, on the minus key: Sleep of the Wood (CC_DESIGN section 2)
+        public override int ActionCount { get { return 11; } }
+        static readonly int[] stances = { 0, 1, 2, 3 };
+        /// <summary>The four forms on a bar of their own (Chris, 2026-10-13: the forms do not use up the ten).</summary>
+        public override int[] StanceSlots { get { return stances; } }
+        /// <summary>Slots 4-7 hold the current form's abilities: the bar keeps the place, not the ability.</summary>
+        public override string BookKey(int slot) { return slot >= 4 && slot < 8 ? "druid.form." + (slot - 4) : base.BookKey(slot); }   // the eleventh, on the minus key: Sleep of the Wood (CC_DESIGN section 2)
         public override AbilityDefinition ActionAt(int slot)
         {
             string id = slot < 4 ? ShiftIds[slot] : slot < 8 ? FormIds[(int)Form][slot - 4] : slot < 11 ? UtilityIds[slot - 8] : null;
@@ -222,7 +231,7 @@ namespace Crulanda.Encounter
             if (!Need(Bark >= 30, "Barkmend needs 30 Bark.")) return false;
             return Start(a, () => {
                 if (Bark < 30) return; Bark -= 30;
-                int healed = PlayerCombat.Heal(Mathf.RoundToInt(s.Player.Health.Pool.Max * .12f));
+                int healed = PlayerCombat.Heal(Mathf.RoundToInt(s.Player.Health.Pool.Max * .12f), s.Player);
                 s.AddHealingThreat(healed); s.FloatText(s.Player.transform.position, "+" + healed, new Color(.3f, 1, .7f));
             });
         }
@@ -298,22 +307,29 @@ namespace Crulanda.Encounter
         }
 
         // ---------- Rootmend ----------
-        /// <summary>Lowest-health living party member within heal range (you or recruited Mira).</summary>
+        /// <summary>Lowest-health living party member within heal range: you, recruited Mira or a sim in your party.</summary>
         public Actor HealTarget
         {
             get
             {
-                Actor best = s.Player;
-                if (s.Progress.recruited && s.Companion != null && s.Companion.actor.IsAlive &&
-                    Vector3.Distance(s.Player.transform.position, s.Companion.transform.position) <= HealRange &&
-                    s.Companion.actor.Health.Pool.Ratio < s.Player.Health.Pool.Ratio) best = s.Companion.actor;
+                // The whole party, the sims too (2026-10-13, the party heal test: only you and Mira were ever healed, so a party of
+                // five spent half the fight low under this healer while the Cleric and Shaman kept everyone up).
+                Actor best = s.Player; float low = s.Player.Health.Pool.Ratio;
+                void Consider(Actor who)
+                {
+                    if (who != null && who.IsAlive && who.Health.Pool.Ratio < low && Vector3.Distance(s.Player.transform.position, who.transform.position) <= HealRange)
+                    { best = who; low = who.Health.Pool.Ratio; }
+                }
+                if (s.Progress.recruited && s.Companion != null) Consider(s.Companion.actor);
+                foreach (var c in s.PartySims) if (c != null) Consider(c.actor);
+                foreach (var d in s.Healables()) Consider(d);   // the training field's mending dummy
                 return best;
             }
         }
         int HealActor(Actor target, int amount)
         {
             if (target == null || !target.IsAlive || amount <= 0) return 0;
-            int healed = target.GetComponent<Combatant>().Heal(amount); if (healed > 0) HealFx.Show(target.transform);
+            int healed = target.GetComponent<Combatant>().Heal(Mathf.RoundToInt(amount * s.PlayerHealScale), s.Player); if (healed > 0) HealFx.Show(target.transform);
             if (healed > 0) { s.AddHealingThreat(healed); s.FloatText(target.transform.position, "+" + healed, new Color(.3f, 1, .7f)); }
             return healed;
         }

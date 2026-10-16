@@ -94,8 +94,36 @@ namespace Crulanda.Encounter
         void Retexture(Renderer r)
         {
             var mats = r.sharedMaterials;
-            for (int i = 0; i < mats.Length; i++) { var (set, tint) = SetFor(mats[i] != null ? mats[i].name : "", r); mats[i] = KitMat(set, tint); }
+            for (int i = 0; i < mats.Length; i++)
+            {
+                string name = mats[i] != null ? mats[i].name : "";
+                if (spec.stone) { mats[i] = Ghost(name.ToLowerInvariant().Contains("eye")); continue; }
+                var (set, tint) = SetFor(name, r); mats[i] = KitMat(set, tint);
+            }
             r.sharedMaterials = mats;
+            if (spec.stone) { r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false; }
+        }
+        // A Hollow Man is an apparition (Chris, playtest note 99 of 2026-10-08, "hollow men should be ghostly, not with no textures",
+        // and 2026-10-10, "hallow man should be ghostly/apparitions"): every piece of it a see-through ashen grey lit a little from
+        // within, the eyes violet, casting no shadow. Made from the zone art's veil (Standard, Fade, emissive: that variant is in the
+        // build). GAME-ONLY look: book1 ch.4 has them as solid grey stone in the shape of a starving man.
+        static Material ghostBody, ghostEyes;
+        static Material Ghost(bool eyes)
+        {
+            var m = eyes ? ghostEyes : ghostBody; if (m != null) return m;
+            var zone = Crulanda.World.ZoneBuilder.Active; var veil = zone != null && zone.art != null ? zone.art.veil : null;
+            if (veil != null) m = new Material(veil);
+            else
+            {
+                m = new Material(Shader.Find("Standard")); m.SetFloat("_Mode", 2); m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha);
+                m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha); m.SetInt("_ZWrite", 0); m.EnableKeyword("_ALPHABLEND_ON"); m.renderQueue = 3000;
+            }
+            m.mainTexture = null; m.SetFloat("_Glossiness", .2f); m.EnableKeyword("_EMISSION");
+            m.color = eyes ? new Color(.8f, .6f, 1, .95f) : new Color(.66f, .68f, .76f, .36f);
+            m.SetColor("_EmissionColor", eyes ? new Color(.7f, .35f, 1) * 2.4f : new Color(.2f, .19f, .27f));
+            m.name = eyes ? "Hollow Man eyes" : "Hollow Man apparition";
+            if (eyes) ghostEyes = m; else ghostBody = m;
+            return m;
         }
         readonly Dictionary<Renderer, Material[]> undyed = new Dictionary<Renderer, Material[]>();
         /// <summary>
@@ -239,7 +267,21 @@ namespace Crulanda.Encounter
             HandL = B("hand_l", HumanBodyBones.LeftHand); HandR = B("hand_r", HumanBodyBones.RightHand); MiddleL = B("middle_01_l", HumanBodyBones.LeftMiddleProximal); MiddleR = B("middle_01_r", HumanBodyBones.RightMiddleProximal);
             UpperLegL = B("thigh_l", HumanBodyBones.LeftUpperLeg); UpperLegR = B("thigh_r", HumanBodyBones.RightUpperLeg); LowerLegL = B("calf_l", HumanBodyBones.LeftLowerLeg); LowerLegR = B("calf_r", HumanBodyBones.RightLowerLeg);
             FootL = B("foot_l", HumanBodyBones.LeftFoot); FootR = B("foot_r", HumanBodyBones.RightFoot); BallL = B("ball_l", HumanBodyBones.LeftToes); BallR = B("ball_r", HumanBodyBones.RightToes);
+            var f = new[] { "index", "middle", "ring", "pinky" };
+            var hb = new[,] { { HumanBodyBones.RightIndexProximal, HumanBodyBones.RightIndexIntermediate, HumanBodyBones.RightIndexDistal }, { HumanBodyBones.RightMiddleProximal, HumanBodyBones.RightMiddleIntermediate, HumanBodyBones.RightMiddleDistal }, { HumanBodyBones.RightRingProximal, HumanBodyBones.RightRingIntermediate, HumanBodyBones.RightRingDistal }, { HumanBodyBones.RightLittleProximal, HumanBodyBones.RightLittleIntermediate, HumanBodyBones.RightLittleDistal } };
+            FingersR = new Transform[4, 3];
+            for (int i = 0; i < 4; i++) for (int j = 0; j < 3; j++) FingersR[i, j] = B(f[i] + "_0" + (j + 1) + "_r", hb[i, j]);
+            FingersL = new Transform[4, 3];
+            for (int i = 0; i < 4; i++) for (int j = 0; j < 3; j++) FingersL[i, j] = B(f[i] + "_0" + (j + 1) + "_l", (HumanBodyBones)((int)hb[i, j] - 15));   // the left hand's bones are 15 before the right's
         }
+        /// <summary>The left hand's fingers, as <see cref="FingersR"/> (a hoe's front hand, a plough's handle).</summary>
+        public Transform[,] FingersL;
+        public bool HasFingersL { get { if (FingersL == null) return false; foreach (var t in FingersL) if (t == null) return false; return true; } }
+        /// <summary>The right hand's fingers (index, middle, ring, little; knuckle to tip), any of them null on a rig without them:
+        /// closed round a staff's shaft (ActorVisual.StaffArm, playtest note 119).</summary>
+        public Transform[,] FingersR;
+        /// <summary>True when every finger of the right hand was found.</summary>
+        public bool HasFingersR { get { if (FingersR == null) return false; foreach (var t in FingersR) if (t == null) return false; return true; } }
         /// <summary>True when the figure was drawn last frame (so its Animator, which culls its bones when it is not, posed them
         /// this frame).</summary>
         public bool Visible { get { foreach (var r in Renderers) if (r != null && r.isVisible) return true; return false; } }
@@ -253,6 +295,26 @@ namespace Crulanda.Encounter
         static readonly (string slot, string clip)[] Actions = {
             ("swing", "Sword_Attack"), ("jab", "Punch_Jab"), ("cross", "Punch_Cross"), ("hit", "Hit_Chest"), ("hithead", "Hit_Head"),
             ("castloop", "Spell_Simple_Idle_Loop"), ("castshot", "Spell_Simple_Shoot"), ("castenter", "Spell_Simple_Enter") };
+        /// <summary>Kevin Iglesias's Human Melee, Spellcasting and Throwing Animations FREE (2026-10-14, Chris: "we need more spell
+        /// animations and melee animations also"), upper body over the walk: a one-handed swing from the right and from the left, the
+        /// two-handed swing, the polearm's thrust, the shield's bash; flinches in a fight and in a cast; the cast drawn (in, held,
+        /// out); a spell let fly from the right hand, the left, both, called down, or all round, each whole (an instant spell) and
+        /// as its release alone (".cast", after a drawn cast); a weapon, a flask and a spear thrown.</summary>
+        static readonly (string slot, string file)[] KiActs = {
+            ("slashR", "Attack1H01_R"), ("slashL", "Attack1H01_L"), ("cleave", "Attack2H01"), ("thrustP", "AttackPolearm01"), ("bash", "AttackShield01"),
+            ("khit", "CombatDamage01"), ("kcasthit", "CastingDamage01"), ("kcastenter", "CastingEnter01"), ("kcastloop", "CastingIdle01"), ("kcastexit", "CastingExit01"),
+            ("boltR", "MagicAttackDirect1H01_R"), ("boltR.cast", "MagicAttackDirect1H01_R - Cast"), ("boltL", "MagicAttackDirect1H01_L"), ("boltL.cast", "MagicAttackDirect1H01_L - Cast"),
+            ("bolt2", "MagicAttackDirect2H01"), ("bolt2.cast", "MagicAttackDirect2H01 - Cast"), ("call", "MagicAttackCall1H01_L"), ("call.cast", "MagicAttackCall1H01_L - Cast"),
+            ("omni", "MagicAttackOmni01"), ("omni.cast", "MagicAttackOmni01 - Cast"), ("throw", "ThrowWeapon01_R"), ("throwball", "ThrowBall01_R"), ("throwspear", "ThrowSpear01_R") };
+        /// <summary>Kevin's work and stances, whole-body slots of the walk's mixer: the plough's stroke (the hoe: Chris, "ploughing would be
+        /// good one to use on the hoe"), three ways of gathering, the pick at a face and at the ground (a lumberjack's block), and the
+        /// stances of a fight unarmed, one-handed, two-handed and with a polearm.</summary>
+        static readonly (string slot, string file)[] KiWork = {
+            ("k.plough", "FarmingWithPlow01_R - Loop"), ("k.gather1", "Gathering01"), ("k.gather2", "Gathering02"), ("k.gather3", "Gathering03"),
+            ("k.mine", "MiningOneHand01_R - Wall"), ("k.chop", "MiningOneHand01_R - Ground"),
+            ("k.combat", "CombatIdle01"), ("k.combat1", "CombatIdle1H01"), ("k.combat2", "CombatIdle2H01"), ("k.combatP", "CombatIdlePolearm01") };
+        /// <summary>True when the figure has this upper-body action.</summary>
+        public bool HasAct(string slot) { return actOf.ContainsKey(slot); }
         AnimationLayerMixerPlayable layers; AnimationMixerPlayable upper;
         readonly List<(AnimationClipPlayable p, AnimationClip c)> acts = new List<(AnimationClipPlayable, AnimationClip)>();
         readonly Dictionary<string, int> actOf = new Dictionary<string, int>();
@@ -263,13 +325,62 @@ namespace Crulanda.Encounter
         public void Act(string slot)
         {
             if (!graph.IsValid() || !actOf.TryGetValue(slot, out int i)) return;
-            bool flinch = slot == "hit" || slot == "hithead";
-            if (flinch && Acting && acting != "hit" && acting != "hithead") return;
+            bool flinch = slot == "hit" || slot == "hithead" || slot == "khit" || slot == "kcasthit";
+            if (flinch && Acting && acting != "hit" && acting != "hithead" && acting != "khit" && acting != "kcasthit") return;
+            if (flinch && bowOn && HasBow) return;   // a shot being drawn is not broken by a flinch
             var (p, c) = acts[i]; p.SetTime(0); p.SetSpeed(flinch ? 1.4f : 1.25f);
             acting = slot; actUntil = Time.time + c.length / (flinch ? 1.4f : 1.25f);
         }
-        /// <summary>Holds the spell pose while a cast is drawn (the release is <see cref="Act"/>("castshot")).</summary>
-        public bool Casting { get { return casting; } set { if (value && !casting && actOf.TryGetValue("castenter", out int ce)) acts[ce].p.SetTime(0); casting = value; } }
+        // ---------- the bow (Kevin Iglesias's archer clips; 2026-10-10, Chris: "still no bow animations"; "bow is not held correctly") ----------
+        /// <summary>Foot IK on every clip (on since the figures were built); the motion capture compares a stride with it off.</summary>
+        public void SetFootIK(bool on) { foreach (var s in slots) s.p.SetApplyFootIK(on); for (int i = 0; i < acts.Count; i++) acts[i].p.SetApplyFootIK(on); }
+        /// <summary>The figure has the archer's three clips (Load, Hold, Release).</summary>
+        public bool HasBow { get { return actOf.ContainsKey("bowload") && actOf.ContainsKey("bowhold") && actOf.ContainsKey("bowrelease"); } }
+        /// <summary>On while shooting: the upper body nocks and draws (Load), holds at full draw (Hold) until <see cref="BowLoose"/>, looses
+        /// (Release) and draws again. Turned on, it starts at the draw.</summary>
+        public bool Bow { get { return bowOn; } set { if (value && !bowOn && Time.time - bowAt > BowCycle) bowAt = Time.time - ClipLen("bowrelease") / BowRate; bowOn = value; } }
+        bool bowOn; float bowAt = -99; double bowTime;
+        const float BowRate = 1.2f;
+        float BowCycle { get { return (ClipLen("bowrelease") + ClipLen("bowload")) / BowRate; } }
+        /// <summary>An arrow loosed now.</summary>
+        public void BowLoose() { bowAt = Time.time; }
+        float ClipLen(string slot) { return actOf.TryGetValue(slot, out int i) ? acts[i].c.length : 0; }
+        /// <summary>How far the string is drawn (0 loosed or reaching for the arrow, 1 at full draw), from where the clips are.</summary>
+        public float BowDraw { get; private set; }
+        string BowSlot()
+        {
+            float t = Time.time - bowAt, rel = ClipLen("bowrelease") / BowRate, load = ClipLen("bowload") / BowRate;
+            if (t < rel) { BowDraw = 0; bowTime = t * BowRate; return "bowrelease"; }
+            if (t < rel + load) { float u = (t - rel) / Mathf.Max(.01f, load); BowDraw = Mathf.SmoothStep(0, 1, Mathf.InverseLerp(.55f, 1, u)); bowTime = (t - rel) * BowRate; return "bowload"; }
+            BowDraw = 1; float hold = ClipLen("bowhold"); bowTime = hold > 0 ? (t - rel - load) % hold : 0; return "bowhold";
+        }
+        /// <summary>Holds the spell pose while a cast is drawn (the release is <see cref="Release"/>).</summary>
+        public bool Casting
+        {
+            get { return casting; }
+            set
+            {
+                if (value && !casting)
+                {
+                    castFrom = Time.time;
+                    if (actOf.TryGetValue("castenter", out int ce)) acts[ce].p.SetTime(0);
+                    if (actOf.TryGetValue("kcastenter", out int ke)) acts[ke].p.SetTime(0);
+                }
+                casting = value;
+            }
+        }
+        float castFrom;
+        /// <summary>A spell let fly: <paramref name="kind"/> ("boltR", "boltL", "bolt2", "call", "omni", "throw", "throwball",
+        /// "throwspear"; null: from the right hand), after a drawn cast its release alone (".cast"), else the whole motion; the old
+        /// release ("castshot") when the figure lacks Kevin's.</summary>
+        public void Release(string kind, bool drawn)
+        {
+            kind = string.IsNullOrEmpty(kind) ? "boltR" : kind;
+            if (drawn && actOf.ContainsKey(kind + ".cast")) Act(kind + ".cast");
+            else if (actOf.ContainsKey(kind)) Act(kind);
+            else if (actOf.ContainsKey("boltR")) Act(drawn && actOf.ContainsKey("boltR.cast") ? "boltR.cast" : "boltR");
+            else Act("castshot");
+        }
         /// <summary>The spine and all above it (arms, neck, head), as transform paths under the figure's Animator.</summary>
         AvatarMask UpperMask()
         {
@@ -288,19 +399,34 @@ namespace Crulanda.Encounter
         void DriveUpper(float dt)
         {
             if (!layers.IsValid()) return;
-            bool on = Acting || casting;
+            bool bow = bowOn && HasBow, on = Acting || casting || bow;
             // A cast drawn: the gathering of the hands (Spell_Simple_Enter) held at its end, not the loop's arms held out (Round 22, note 51).
-            string slot = Acting ? acting : casting ? (actOf.ContainsKey("castenter") ? "castenter" : "castloop") : null;
+            // Kevin's cast (2026-10-14): his gathering of the hands, then his held cast looping until the release.
+            bool kiCast = actOf.ContainsKey("kcastenter") && actOf.ContainsKey("kcastloop");
+            string slot = Acting ? acting : bow ? BowSlot() : casting ? (kiCast ? (Time.time - castFrom < ClipLen("kcastenter") ? "kcastenter" : "kcastloop") : actOf.ContainsKey("castenter") ? "castenter" : "castloop") : null;
+            if (bow && !Acting && actOf.TryGetValue(slot, out int bi)) acts[bi].p.SetTime(bowTime);   // the bow's clips run by the shot's own clock
             for (int i = 0; i < acts.Count; i++) upper.SetInputWeight(i, slot != null && actOf.TryGetValue(slot, out int s) && s == i ? 1 : 0);
             if (!Acting) acting = null;
-            float aim = !on ? 0 : Acting ? 1 : .45f;   // a cast drawn: the arm half-raised over the walk, not held out full for the whole draw (Round 22, note 51)
+            float aim = !on ? 0 : Acting || bow ? 1 : kiCast ? .9f : .45f;   // a cast drawn: the arm half-raised over the walk, not held out full for the whole draw (Round 22, note 51); Kevin's held cast is made to be held
+
             layerWeight = Mathf.MoveTowards(layerWeight, aim, dt * (on ? 12 : 5));
             layers.SetInputWeight(1, layerWeight);
-            if (slot == "castloop" && actOf.TryGetValue("castloop", out int cl)) { var (p, c) = acts[cl]; if (c.length > 0 && p.GetTime() > c.length) p.SetTime(p.GetTime() % c.length); }
+            if ((slot == "castloop" || slot == "kcastloop") && actOf.TryGetValue(slot, out int cl)) { var (p, c) = acts[cl]; if (c.length > 0 && p.GetTime() > c.length) p.SetTime(p.GetTime() % c.length); }
             if (slot == "castenter" && actOf.TryGetValue("castenter", out int en)) { var (p, c) = acts[en]; if (c.length > 0 && p.GetTime() > c.length - .02f) p.SetTime(c.length - .02f); }
         }
         readonly List<(AnimationClipPlayable p, AnimationClip c, bool loop)> slots = new List<(AnimationClipPlayable, AnimationClip, bool)>();
         readonly Dictionary<string, int> slotOf = new Dictionary<string, int>(); float[] weights; string current;
+        /// <summary>The clips in the blend now and their weights ("r.f .72 k.land .28"), for captures and tests.</summary>
+        public string Mix
+        {
+            get
+            {
+                if (weights == null) return "";
+                var sb = new System.Text.StringBuilder(); float sum = 0; foreach (var w in weights) sum += w;
+                foreach (var kv in slotOf) if (kv.Value < weights.Length && weights[kv.Value] > .01f) sb.Append(kv.Key).Append(' ').Append((weights[kv.Value] / Mathf.Max(.001f, sum)).ToString("0.00")).Append("  ");
+                return sb.ToString();
+            }
+        }
         static AnimationClip[] library;
         static AnimationClip[] Library { get { if (library == null) library = Resources.LoadAll<AnimationClip>("Characters/Animations/UAL1_Standard"); return library; } }
         /// <summary>The library's clip of this name (as in the file, after "Armature|"), or null.</summary>
@@ -322,13 +448,15 @@ namespace Crulanda.Encounter
         /// </summary>
         static readonly string[] Dirs = { "F", "FR", "R", "BR", "B", "BL", "L", "FL" };
         static readonly string[] DirFiles = { "Forward", "ForwardRight", "Right", "BackwardRight", "Backward", "BackwardLeft", "Left", "ForwardLeft" };
-        static AnimationClip KiClip(bool female, string file)
+        internal static AnimationClip KiClip(bool female, string file)
         {
             foreach (var c in Resources.LoadAll<AnimationClip>("Characters/Animations/KI/" + (female ? "Female/HumanF@" : "Male/HumanM@") + file))
                 if (c != null && !c.name.StartsWith("__preview__")) return c;
             return null;
         }
         bool ki; readonly List<string> morroIdles = new List<string>();
+        /// <summary>A woman's figure (Kevin's female clips).</summary>
+        public bool Female { get { return spec.female; } }
         /// <summary>Starts the figure's graph (play mode only; in edit mode the figure keeps its bind pose).</summary>
         public void StartMotion(string label)
         {
@@ -361,6 +489,7 @@ namespace Crulanda.Encounter
                 string slot = "m." + i; kiClips.Add((slot, c)); morroIdles.Add(slot);
             }
             ki = kiClips.Exists(k => k.Item1 == "w.F") && kiClips.Exists(k => k.Item1 == "r.F") && kiClips.Exists(k => k.Item1 == "k.idle");
+            foreach (var (slot, file) in KiWork) { var c = KiClip(spec.female, file); if (c != null) kiClips.Add((slot, c)); }
             if (ki) found.AddRange(kiClips);
             mixer = AnimationMixerPlayable.Create(graph, found.Count); weights = new float[found.Count];
             for (int i = 0; i < found.Count; i++)
@@ -374,6 +503,10 @@ namespace Crulanda.Encounter
             // The upper body's layer over the mixer (playtest note 25): its clips, a mask from the spine up, weight 0 until a blow.
             var actions = new List<(string, AnimationClip)>();
             foreach (var (slot, clip) in Actions) { var c = Clip(clip); if (c != null) actions.Add((slot, c)); }
+            // The bow (Kevin Iglesias's Human Archer Animations, 2026-10-10): nock and draw, hold at full draw, loose. Upper body only.
+            foreach (var (slot, file) in new[] { ("bowload", "BowShot01 - Load"), ("bowhold", "BowShot01 - Hold"), ("bowrelease", "BowShot01 - Release") })
+            { var c = KiClip(spec.female, file); if (c != null) actions.Add((slot, c)); }
+            foreach (var (slot, file) in KiActs) { var c = KiClip(spec.female, file); if (c != null) actions.Add((slot, c)); }
             if (actions.Count > 0)
             {
                 upper = AnimationMixerPlayable.Create(graph, actions.Count);

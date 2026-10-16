@@ -58,10 +58,14 @@ namespace Crulanda.Encounter
             if (EncounterInput.Press(KeyCode.Slash)) { Running = !Running; session.Message(Running ? "Running." : "Walking."); }
             var move = Vector2.ClampMagnitude(EncounterInput.Move, 1);
             Vector3 direction = Quaternion.Euler(0, yaw, 0) * new Vector3(move.x, 0, move.y);
+            // Held by a boss (EncounterSession.HoldPlayer): stunned or rooted you stand; feared you run from it; disoriented your steps go the wrong way.
+            if (session.PlayerStunned || session.PlayerRooted) direction = Vector3.zero;
+            else if (session.PlayerFeared) { var away = transform.position - session.PlayerFearFrom; away.y = 0; direction = away.sqrMagnitude > .01f ? away.normalized : transform.forward; }
+            else if (session.PlayerDisoriented) direction = -direction;
             // Water (surface and depth come from the same model the water is drawn with).
             var here = transform.position; float surface = 0, depth = 0;
             var zone = Crulanda.World.ZoneBuilder.Active;
-            bool wet = zone != null && zone.WaterAt(new Vector2(here.x, here.z), out surface, out depth);
+            bool wet = zone != null && zone.WaterAtPoint(here, out surface, out depth);   // (a cave's pools and streams too: the Adit rework)
             float feetUnder = wet ? surface - (here.y - 1) : 0;                     // how far the feet are below the surface
             // Hysteresis so the state doesn't flicker along a depth line: in at 0.12 m, out at 0.04 m.
             bool inWater = wet && feetUnder > (wasInWater ? .04f : .12f);
@@ -115,6 +119,14 @@ namespace Crulanda.Encounter
             wasInWater = inWater;
             if (direction.sqrMagnitude > .01f)
                 transform.rotation = Quaternion.Slerp(transform.rotation, Swimming ? Quaternion.LookRotation(direction) : Quaternion.Euler(0, yaw, 0), Time.deltaTime * 12);
+            // Standing in a fight (auto-attacking, or casting at the target), the figure turns to its target: it only turned to the
+            // camera's heading while moving, so an archer who stopped shot off to the side, the bow's back to the shooter as seen from
+            // the mark (2026-10-10, Chris: "not facing target", "bow is backwards").
+            else if (!Swimming && session.Target != null && session.Target.actor.IsAlive && !session.Target.Game && (session.AutoAttack || (session.PlayerCasting && !session.Working)))
+            {
+                var to = session.Target.transform.position - transform.position; to.y = 0;
+                if (to.sqrMagnitude > .04f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(to), Time.deltaTime * 10);
+            }
             var p = transform.position;
             if (p.y < Crulanda.World.Hollow.Lowest && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);   // fell out of the world (a cave's deep floor is not that)
         }
@@ -135,15 +147,18 @@ namespace Crulanda.Encounter
             foreach (var hit in Physics.SphereCastAll(pivot, .3f, -(rotation * Vector3.forward), distance, ~0, QueryTriggerInteraction.Ignore))
                 if (hit.collider != groundCollider && hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && hit.collider.GetComponentInParent<Crulanda.World.TreeFade>() == null && hit.distance > .05f)
                     allowed = Mathf.Min(allowed, hit.distance);
-            var camAt = pivot - rotation * Vector3.forward * Mathf.Max(1.2f, allowed);
+            // At least 1.2 m out of doors; indoors as close as the wall behind you allows (the tester's note 117, 2026-10-10: "The camera
+            // goes inside walls when you walk into a building": the 1.2 m put it into the wall a step behind you).
+            bool indoors = Crulanda.World.RoofFade.Inside(transform.position);
+            var camAt = pivot - rotation * Vector3.forward * Mathf.Max(indoors ? .45f : 1.2f, allowed);
             // Inside a building (the Golden Cask) the camera stays within its walls (Round 24, playtest note 65: turning the camera
-            // took it out through the wall, and the building faded away round you); the walls are not solid to the cast above.
+            // took it out through the wall, and the building faded away round you), whether or not the walls stop the cast above.
             Crulanda.World.RoofFade.ClampInside(transform.position + Vector3.up * .9f, ref camAt);
             // Out of doors the ground does not pull the camera in: it rides along the grass (looking up past you), never under it.
             if (groundCollider != null) { float g = zoneHere.HeightAt(camAt.x, camAt.z) + .35f; if (camAt.y < g) camAt.y = g; }
             // Keep the camera above any water surface (no looking up at the water from underneath).
             var zone = Crulanda.World.ZoneBuilder.Active;
-            if (zone != null && zone.WaterAt(new Vector2(camAt.x, camAt.z), out float s, out _) && camAt.y < s + .2f) camAt.y = s + .2f;
+            if (zone != null && zone.WaterAtPoint(camAt, out float s, out _) && camAt.y < s + .2f) camAt.y = s + .2f;
             view.transform.position = camAt;
             view.transform.rotation = rotation;
             // Trees between the camera and you turn see-through.
@@ -157,7 +172,7 @@ namespace Crulanda.Encounter
             controller.enabled = false; transform.position = point; controller.enabled = true; vertical = 0;
             // Arriving in water (spawn, load, travel) is not "entering" it: no splash.
             var zone = Crulanda.World.ZoneBuilder.Active;
-            wasInWater = zone != null && zone.WaterAt(new Vector2(point.x, point.z), out float s, out _) && point.y - 1 < s;
+            wasInWater = zone != null && zone.WaterAtPoint(point, out float s, out _) && point.y - 1 < s;
         }
         void Start() { Teleport(transform.position); }
     }

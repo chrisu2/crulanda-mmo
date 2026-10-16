@@ -1,5 +1,10 @@
 # Steam page copy for Crulanda: The Quiet Trail
 
+> **Out of date (checked 2026-10-10):** written 2026-09-30, when the game had four zones, levels 1-10 and two classes. Now: five
+> zones and the Sealed Adit dungeon, level cap 15, seven classes (Warrior, Druid, Paladin, Ranger, Rogue, Mage, Archivist), caves,
+> secrets and weather built. It also names the Salt-Menders, whose game version contradicts book 3 (Docs/LORE_AUDIT.md).
+> Refresh it before it is used; the text below is unchanged.
+
 Draft, 2026-09-30. The title comes from Unity's productName, `Crulanda - The Quiet Trail`, written here with a colon.
 The store copy claims only what is built, plus the weather that is being built now. Caves, secrets and bigger zones appear
 only in the announcement post, under "Coming next".

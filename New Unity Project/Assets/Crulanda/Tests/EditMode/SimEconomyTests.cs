@@ -16,7 +16,10 @@ namespace Crulanda.Tests
         [Test] public void Trades_follow_the_class_and_goods_sell_for_their_values()
         {
             Assert.AreEqual("mining", SimEconomy.GatherTrade("class.warrior")); Assert.AreEqual("herbalism", SimEconomy.GatherTrade("class.mage")); Assert.AreEqual("woodcutting", SimEconomy.GatherTrade("class.ranger"));
-            Assert.AreEqual("blacksmithing", SimEconomy.CraftTrade("class.paladin")); Assert.AreEqual("alchemy", SimEconomy.CraftTrade("class.druid")); Assert.IsNull(SimEconomy.CraftTrade("class.ranger"));
+            Assert.AreEqual("blacksmithing", SimEconomy.CraftTrade("class.paladin")); Assert.AreEqual("alchemy", SimEconomy.CraftTrade("class.druid"));
+            // Phase 8.6: every class has a maker (it was nothing for the Ranger): leather for the Ranger, Rogue and Scoundrel, cloth for the Mage, Archivist and Cleric.
+            Assert.AreEqual("leatherworking", SimEconomy.CraftTrade("class.ranger")); Assert.AreEqual("leatherworking", SimEconomy.CraftTrade("class.scoundrel")); Assert.AreEqual("weaving", SimEconomy.CraftTrade("class.mage"));
+            Assert.AreEqual("woodcutting", SimEconomy.GatherTrade("class.rogue"), "A leatherworker cuts the bark it tans with.");
             var items = Items(); var s = Sim("class.warrior", 3);
             SimEconomy.Add(s, "mat.copper_ore", 5); SimEconomy.Add(s, "mat.copper_ore", 2); SimEconomy.Add(s, "mat.oak_log", 1);
             Assert.AreEqual(7, SimEconomy.Count(s, "mat.copper_ore")); Assert.AreEqual(8, SimEconomy.GoodsCount(s));
@@ -66,6 +69,75 @@ namespace Crulanda.Tests
             var db = Professions(); var low = Sim("class.paladin", 1); var high = Sim("class.paladin", 5);
             Assert.IsTrue(SimEconomy.Gathers(low, db.Node("node.copper"))); Assert.IsFalse(SimEconomy.Gathers(low, db.Node("node.bogiron")), "skill 20 needs level 3");
             Assert.IsTrue(SimEconomy.Gathers(high, db.Node("node.bogiron"))); Assert.IsFalse(SimEconomy.Gathers(high, db.Node("node.yarrow")), "a paladin mines, not picks");
+        }
+
+        // ---------- Phase 8.6: the new crafts, the merchant's makings, spares to sell, found recipes left to the player ----------
+        /// <summary>A Ranger skins what it hunts and cuts a jerkin from three boar hides and a log's bark, buying the salt; it wears it.</summary>
+        [Test] public void A_leatherworker_cuts_a_jerkin_from_its_hides_buying_the_salt()
+        {
+            var items = Items(); var db = Professions(); var s = Sim("class.ranger", 1);
+            Assert.AreEqual("hide.boar", SimEconomy.HideFrom(items, "boar", 3), "A boar's hide for the bench."); Assert.AreEqual("junk.wolf_pelt", SimEconomy.HideFrom(items, "wolf", 3));
+            Assert.IsNull(SimEconomy.HideFrom(items, "quartermaster", 6), "A man gives no hide."); Assert.IsNull(SimEconomy.HideFrom(items, null, 1));
+            SimEconomy.Add(s, "hide.boar", 3); SimEconomy.Add(s, "mat.oak_log", 1);
+            Assert.IsNull(SimEconomy.Craftable(s, db, items), "No coin for the salt.");
+            s.coin = 5;
+            var r = SimEconomy.Craftable(s, db, items); Assert.NotNull(r); Assert.AreEqual("craft.copper_hide_jerkin", r.output); Assert.AreEqual("leatherworking", r.profession);
+            Assert.AreEqual("bench", SimEconomy.Workplace(r), "Worked at the bench, not the forge.");
+            Assert.AreEqual("craft.copper_hide_jerkin", SimEconomy.Craft(s, r, items));
+            Assert.AreEqual("craft.copper_hide_jerkin", SimEconomy.Worn(s, "chest")); Assert.AreEqual(5 - items.Get("mat.salt").value, s.coin, "The salt was bought.");
+            Assert.AreEqual(0, SimEconomy.Count(s, "hide.boar")); Assert.AreEqual(0, SimEconomy.Count(s, "mat.oak_log"));
+        }
+
+        /// <summary>A Mage weaves: the merchant's fleeces bought as needed, its own yarrow for the dye; the hood is worn.</summary>
+        [Test] public void A_weaver_buys_fleeces_and_dyes_with_its_own_herbs()
+        {
+            var items = Items(); var db = Professions(); var s = Sim("class.mage", 1);
+            SimEconomy.Add(s, "mat.yarrow", 2); s.coin = 20;
+            Assert.IsTrue(SimEconomy.MerchantSells("mat.fleece")); Assert.IsFalse(SimEconomy.MerchantSells("mat.yarrow"), "Herbs are gathered, never bought.");
+            var r = SimEconomy.Craftable(s, db, items); Assert.NotNull(r); Assert.AreEqual("weaving", r.profession);
+            Assert.AreEqual("bench", SimEconomy.Workplace(r));
+            int before = s.coin; string made = SimEconomy.Craft(s, r, items);
+            Assert.AreEqual(made, SimEconomy.Worn(s, items.Get(made).slot), "Worn.");
+            int fleeces = r.inputs.First(i => i.item == "mat.fleece").count;
+            Assert.AreEqual(before - fleeces * items.Get("mat.fleece").value, s.coin, "The fleeces were bought.");
+        }
+
+        /// <summary>
+        /// The sims sell crafted goods (Phase 8.6): a smith that already wears the cudgel forges a spare when the makings are in hand, keeps
+        /// it in its goods for you (never sold at the stall), makes no second spare of it, and holds two spares at most; the forge's work is
+        /// done at the forge.
+        /// </summary>
+        [Test] public void A_spare_piece_is_kept_to_sell_to_you_and_never_sold_at_the_stall()
+        {
+            var items = Items(); var db = Professions(); var s = Sim("class.warrior", 1);
+            SimEconomy.Wear(s, "mainhand", "craft.copper_cudgel"); SimEconomy.Wear(s, "offhand", "craft.copper_buckler");
+            SimEconomy.Add(s, "mat.copper_bar", 4); SimEconomy.Add(s, "mat.oak_log", 2); s.coin = 0;
+            var r = SimEconomy.Craftable(s, db, items); Assert.NotNull(r); Assert.AreEqual("craft.copper_cudgel", r.output, "Nothing better to make: a spare to sell.");
+            Assert.AreEqual("forge", SimEconomy.Workplace(r));
+            SimEconomy.Craft(s, r, items);
+            Assert.AreEqual(1, SimEconomy.Count(s, "craft.copper_cudgel"), "The spare is in its goods."); Assert.AreEqual("craft.copper_cudgel", SimEconomy.Worn(s, "mainhand"));
+            Assert.AreNotEqual("craft.copper_cudgel", SimEconomy.Craftable(s, db, items)?.output, "One spare of a piece.");
+            int sold = SimEconomy.SellAll(s, items);
+            Assert.AreEqual(1, SimEconomy.Count(s, "craft.copper_cudgel"), "Gear is never sold at the stall: it waits for you."); Assert.Greater(sold, 0, "The rest of its goods sold.");
+            SimEconomy.Add(s, "craft.copper_jerkin", 1);
+            SimEconomy.Add(s, "mat.copper_bar", 4); SimEconomy.Add(s, "mat.oak_log", 4);
+            Assert.AreEqual(SimEconomy.MaxSpares, 2);
+            var next = SimEconomy.Craftable(s, db, items);
+            Assert.IsTrue(next == null || items.Get(next.output).kind != "gear" || SimEconomy.Worn(s, items.Get(next.output).slot) != next.output, "No third spare.");
+        }
+
+        /// <summary>Found recipes are the player's: a sim with the makings and the skill for a cordial makes a taught simple instead.</summary>
+        [Test] public void Sims_make_only_what_their_skill_teaches()
+        {
+            var items = Items(); var db = Professions(); var s = Sim("class.druid", 15); s.coin = 100;
+            foreach (var i in db.Recipe("recipe.cordial_ox").inputs) SimEconomy.Add(s, i.item, i.count * 3);
+            for (int k = 0; k < 6; k++)
+            {
+                var r = SimEconomy.Craftable(s, db, items); if (r == null) break;
+                Assert.IsFalse(r.found, r.id + " is a found recipe: the sims never make one.");
+                SimEconomy.Craft(s, r, items);
+            }
+            Assert.AreEqual(0, SimEconomy.Count(s, "potion.cordial_ox"));
         }
     }
 }

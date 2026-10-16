@@ -43,7 +43,7 @@ namespace Crulanda.Tests
                     var c = z.camps[i]; if (c == null || !c.elite) continue;
                     bool beast = Beast(c.look); elites.Add((c, EliteMoves.For(c.mob, beast), beast)); where[c] = (z, i);
                 }
-            Assert.AreEqual(20, elites.Count, "twelve across the five zones and eight in the Sealed Adit (its rare, the Quiet Miner, among them)");
+            Assert.AreEqual(32, elites.Count, "twelve across the five zones and twenty in the Sealed Adit since its rework (its rare, the Quiet Miner, among them)");
         }
         // A camp mob's pace by its look (EncounterSession.SpawnCamps).
         static float Pace(string look) { return look == "wolf" ? 4.2f : look == "boar" ? 3.8f : look == "weaveeater" ? 3.4f : 2.8f; }
@@ -203,7 +203,7 @@ namespace Crulanda.Tests
                 }
             // Six elites stand with guards (Caddock, Hesk, the Brood Weave-Eater's broodmate, the Ash-Deacon, Greyheart, the
             // Root-Warden) and four have kin in earshot of their call (Hesk, Old Whitefoot, the Grey Sexton, the Sandthrone captain).
-            Assert.AreEqual(10 * Kits.Length, guarded, "Ten elites have guards (four of them the Sealed Adit's)."); Assert.AreEqual(8 * Kits.Length, answered, "Eight elites' calls are answered by kin (four of them the Sealed Adit's).");
+            Assert.AreEqual(20 * Kits.Length, guarded, "Twenty elites have guards (fourteen of them the reworked Adit's, 2026-10-14)."); Assert.AreEqual(15 * Kits.Length, answered, "Fifteen elites' calls are answered by kin (eleven of them the Sealed Adit's: Nix's since the Adit was filled, 2026-10-11, the Back drift cutters in his reach; the rework's bosses with guards in earshot, 2026-10-14).");
         }
         /// <summary>The least health a careful player with Mira ends with when an elite's call is answered.</summary>
         const float CallMargin = .1f;

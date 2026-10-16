@@ -52,6 +52,27 @@
     {"id": "pf-trapper", "name": "Trapper", "tier": 2, "col": 1, "max": 3, "req": "pf-pin", "kind": "passive", "icon": "gear", "desc": "Pin holds 1s longer per rank.", "emphasis": {"control": 1.5}, "impl": true},
     {"id": "pf-pathfinder", "name": "Pathfinder", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "banner", "desc": "Hunter's Mark also slows its target by 15%.", "emphasis": {"control": 2}, "impl": true}
    ]
+  },
+  {
+   "id": "skirmisher",
+   "name": "Skirmisher",
+   "role": "dps",
+   "loop": "Open with the bow, let the wolf take the pull, then bound in with Spear Lunge, whirl the haft through the pack, feint the blow that would hurt and leap clear with Disengage.",
+   "tradeoff": "The Skirmisher fights at a spear's length on a Ranger's leather: every second close is a risk the Marksman never takes.",
+   "nodes": [
+    {"id": "sk-long-haft", "name": "Long Haft", "tier": 0, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "target", "desc": "Spear Lunge reaches 1m further per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "sk-light-step", "name": "Light Step", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "wind", "desc": "You move 1% faster per rank while an enemy is within 5m.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "sk-bleeding-point", "name": "Bleeding Point", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Spear Lunge opens a wound that bleeds 2% of its hit a second for 6s per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sk-quick-recovery", "name": "Quick Recovery", "tier": 1, "col": 2, "max": 2, "req": null, "kind": "modifier", "icon": "clock", "desc": "Disengage comes back 1.5s sooner per rank.", "emphasis": {"tempo": 1, "mitigation": 0.5}, "impl": true},
+    {"id": "sk-feint", "name": "Feint", "tier": 2, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "eye", "desc": "New action: Feint: a false thrust; the target's next blow at you within 3s misses.", "emphasis": {"mitigation": 2}, "impl": true},
+    {"id": "sk-pack-tactics", "name": "Pack Tactics", "tier": 2, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "paw", "desc": "A foe you struck within 3s that your wolf is also on takes 3% more from the party per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sk-whirl-edge", "name": "Whirl Edge", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "sword", "desc": "Whirling Spear hits 10% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sk-hit-and-run", "name": "Hit and Run", "tier": 3, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "bolt", "desc": "After Disengage, your next Spear Lunge costs no Focus.", "emphasis": {"tempo": 2}, "impl": true},
+    {"id": "sk-thrown-spear", "name": "Thrown Spear", "tier": 4, "col": 1, "max": 1, "req": null, "kind": "modifier", "icon": "target", "desc": "Out of reach, Spear Lunge throws the spear from 15m instead.", "emphasis": {"damage": 1, "tempo": 1}, "impl": false},
+    {"id": "sk-second-wind", "name": "Second Wind", "tier": 4, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "heart", "desc": "A kill in melee gives back 5 Focus per rank.", "emphasis": {"sustain": 1}, "impl": false},
+    {"id": "sk-dancer", "name": "Dancer", "tier": 5, "col": 1, "max": 3, "req": "sk-feint", "kind": "modifier", "icon": "wind", "desc": "Feint makes one more blow miss per rank.", "emphasis": {"mitigation": 1.5}, "impl": false},
+    {"id": "sk-untouchable", "name": "Untouchable", "tier": 6, "col": 1, "max": 1, "req": "sk-dancer", "kind": "capstone", "icon": "star", "desc": "For 4s after Whirling Spear, half of every blow at you is turned aside.", "emphasis": {"mitigation": 3}, "impl": false}
+   ]
   }
  ]
 }

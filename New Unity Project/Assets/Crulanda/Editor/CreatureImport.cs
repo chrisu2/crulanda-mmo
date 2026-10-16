@@ -18,6 +18,25 @@ namespace Crulanda.EditorTools
     public sealed class CreatureImport : AssetPostprocessor
     {
         const string Root = "Assets/Crulanda/Resources/Creatures/";
+        /// <summary>Raised when these rules change, so Unity imports the creatures again (2026-10-13: the makers' normals for the new models,
+        /// and the loop of an "Armature|" take by its own name; 2026-10-14: the Orc Shaman's clips cut to the pack's own frames).</summary>
+        public override uint GetVersion() { return 7; }
+        /// <summary>
+        /// The Orc Shaman's clip files (the Orc Army Pack, 24 fps): each holds the pack's whole master take (frames 0-650, every clip in a
+        /// row), and the pack cuts its own clip out of it by these frames. Its body (the skinned Character1 bones) is baked only inside
+        /// those frames, while its staff, belt, eyes and teeth (rigid meshes on the control rig under "locomotion") play the whole take:
+        /// taken whole, the orc stood still with its arms down while its staff acted out every other clip apart from its hands (2026-10-14,
+        /// Chris: the staff floating by the ground, out to the side). Written here and not read from the meta: Unity writes this rule's
+        /// output back into the meta on import.
+        /// </summary>
+        static readonly Dictionary<string, (int first, int last)> OrcShamanFrames = new Dictionary<string, (int first, int last)> {
+            ["Walk"] = (10, 37), ["Run"] = (45, 63), ["Idle"] = (75, 96), ["BattleCry"] = (120, 200), ["Block"] = (228, 250), ["Attack01"] = (260, 281),
+            ["Attack02"] = (290, 322), ["Attack03"] = (350, 366), ["CastSpell"] = (372, 436), ["Spell"] = (450, 484), ["Hit"] = (500, 520), ["Die"] = (550, 572) };
+        /// <summary>DzenGames' Fantasy Skeleton (Khaven's drowned dead, 2026-10-14): one master take the pack slices into seven clips (its own
+        /// meta's frames), named for the motions ModelBeast plays. (name, first, last, loops)</summary>
+        static readonly (string name, int first, int last, bool loop)[] FantasySkeletonClips = {
+            ("Idle", 0, 70, true), ("Attack", 71, 118, false), ("Walk", 119, 141, true), ("Hit", 142, 186, false), ("CastSpell", 186, 246, false),
+            ("Idle_2", 246, 315, true), ("Death", 315, 346, false) };
         /// <summary>How sharp an edge must be to stay hard when the normals are smoothed (degrees).</summary>
         public const float Smoothing = 70;
         void OnPreprocessModel()
@@ -30,6 +49,18 @@ namespace Crulanda.EditorTools
             m.importAnimation = true; m.isReadable = true;
             m.importNormals = ModelImporterNormals.Calculate; m.normalCalculationMode = ModelImporterNormalCalculationMode.AreaAndAngleWeighted;
             m.normalSmoothingAngle = Smoothing; m.importTangents = ModelImporterTangents.None;
+            // The detailed models (2026-10-13: the orcs, the wild boar, the Toon RTS undead, the squirrel, the Living Birds) keep their makers'
+            // normals: calculated, the axe orc came out faceted, and these are not rounded (ModelBeast: only the low-poly animals are).
+            string file = System.IO.Path.GetFileName(assetPath);
+            if (file.StartsWith("Orc") || file.StartsWith("WildBoar") || file.StartsWith("UndeadUnit") || file.StartsWith("Squirrel") || file.StartsWith("Bird") || file.StartsWith("FantasySkeleton"))
+            { m.importNormals = ModelImporterNormals.Import; m.importTangents = ModelImporterTangents.CalculateMikk; }
+            // A model and the files of its clips each keep their top node (2026-10-13: a clip file with one top node lost it on import, its
+            // bones' paths no longer matched the model's, and only the staff, belt and teeth moved: Chris, "the only thing on orc that move").
+            if (file.StartsWith("Orc") || file.StartsWith("UndeadUnit") || file.StartsWith("Bird")) m.preserveHierarchy = true;
+            // The Living Birds are a Biped: the hop's and the flight's travel sits on "Bip01", a child of the file's root, so the clips' root
+            // locks (below) did nothing to it and the bird still went forward and snapped back (Chris, 2026-10-14 23:15: "birds still
+            // hopping"). Bip01 is the motion node: its travel is what the locks bake out.
+            if (file.StartsWith("Bird")) m.motionNodeName = "Bip01";
         }
         /// <summary>A palette texture (CraftPix's swatches): no mipmaps or compression to bleed one swatch into the next.</summary>
         void OnPreprocessTexture()
@@ -46,7 +77,7 @@ namespace Crulanda.EditorTools
             t.textureType = TextureImporterType.Default; t.sRGBTexture = true; t.mipmapEnabled = false; t.filterMode = FilterMode.Bilinear;
             t.wrapMode = TextureWrapMode.Clamp; t.textureCompression = TextureImporterCompression.Uncompressed; t.alphaSource = TextureImporterAlphaSource.None;
         }
-        static readonly string[] Loops = { "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating", "WalkForward", "RunForward", "WalkBackward", "RunBackward", "IdleCombat", "Eat", "Sleep", "StunnedLoop" };
+        static readonly string[] Loops = { "Run", "Running", "Walking", "Idle2", "watch01", "watch02", "peck", "preen", "sing", "ruffle", "hopForward", "flyStraight", "flyLeft", "flyRight", "Idle", "Idle_2", "Idle_2_HeadLow", "Idle_Headlow", "Walk", "Gallop", "Eating", "WalkForward", "RunForward", "WalkBackward", "RunBackward", "IdleCombat", "Eat", "Sleep", "StunnedLoop" };
         void OnPreprocessAnimation()
         {
             if (!assetPath.StartsWith(Root)) return;
@@ -60,14 +91,28 @@ namespace Crulanda.EditorTools
                 var only = clips.OrderByDescending(c => c.lastFrame - c.firstFrame).First();   // the file's real take (each has a one-frame one too)
                 only.name = u >= 0 ? file.Substring(u + 1) : file;
                 only.loopTime = System.Array.IndexOf(Loops, only.name) >= 0;
+                // The Living Birds' hops and flights carry the bird forward in the clip and snap it back at the loop (Chris, 2026-10-14 19:20:
+                // "birds hop around funny..looks like maybe back and forth"): the root's travel and turn are baked to where the clip began,
+                // and the code moves the bird.
+                if (file.StartsWith("Bird_")) { only.lockRootPositionXZ = true; only.keepOriginalPositionXZ = true; only.lockRootHeightY = true; only.keepOriginalPositionY = true; only.lockRootRotation = true; only.keepOriginalOrientation = true; }
+                // The Orc Shaman's: the pack's own frames out of its master take (its cycles' ends blended to meet, as the pack has them).
+                if (file.StartsWith("OrcShaman_") && OrcShamanFrames.TryGetValue(only.name, out var frames))
+                { only.firstFrame = frames.first; only.lastFrame = frames.last; only.loopPose = only.loopTime; }
                 m.clipAnimations = new[] { only }; return;
+            }
+            if (Path.GetFileName(assetPath).StartsWith("FantasySkeleton") && clips.Length > 0)
+            {
+                var take = clips.OrderByDescending(c => c.lastFrame - c.firstFrame).First();
+                m.clipAnimations = FantasySkeletonClips.Select(f => new ModelImporterClipAnimation { name = f.name, takeName = take.takeName, firstFrame = f.first, lastFrame = f.last, loopTime = f.loop, loopPose = f.loop }).ToArray();
+                return;
             }
             var keep = clips.Where(c => c.takeName.StartsWith(arm)).ToList();
             if (keep.Count == 0) keep = clips.ToList();
             foreach (var c in keep)
             {
                 c.name = c.takeName.StartsWith(arm) ? c.takeName.Substring(arm.Length) : c.takeName;
-                c.loopTime = System.Array.IndexOf(Loops, c.name) >= 0;
+                int bar = c.name.LastIndexOf('|');   // a take named "Armature|Idle" loops by its own name (the squirrel's, 2026-10-13)
+                c.loopTime = System.Array.IndexOf(Loops, bar >= 0 ? c.name.Substring(bar + 1) : c.name) >= 0;
             }
             m.clipAnimations = keep.ToArray();
         }

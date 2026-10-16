@@ -57,5 +57,47 @@ namespace Crulanda.EditorTools
             File.WriteAllBytes(Path.Combine(dir, "props-row-front.png"), tex.EncodeToPNG());
             Debug.Log("PROP_CAPTURE_DONE " + n + " placed, " + missing + " missing, " + dir);
         }
+
+        /// <summary>
+        /// The dungeon pieces (Resources/Props/Dungeon, Chris's download of 2026-10-10 for the Sealed Adit) at their own size, in a grid of
+        /// seven, a metre rule and a -Z arrow by each, with every piece's raw bounds in the log (DUNGEON_PROP), to ui-captures/dungeon-props.png
+        /// and dungeon-props-front.png (run_method PropCapture.RenderDungeon -Graphics).
+        /// </summary>
+        public static void RenderDungeon()
+        {
+            EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
+            var key = new GameObject("Key").AddComponent<Light>(); key.type = LightType.Directional; key.intensity = 1.2f; key.color = new Color(1, .95f, .86f); key.transform.rotation = Quaternion.Euler(40, -30, 0);
+            var fill = new GameObject("Fill").AddComponent<Light>(); fill.type = LightType.Directional; fill.intensity = .5f; fill.color = new Color(.7f, .8f, 1); fill.transform.rotation = Quaternion.Euler(20, 150, 0);
+            RenderSettings.ambientMode = UnityEngine.Rendering.AmbientMode.Flat; RenderSettings.ambientLight = new Color(.4f, .4f, .44f);
+            var all = Resources.LoadAll<GameObject>("Props/Dungeon"); System.Array.Sort(all, (a, b) => string.CompareOrdinal(a.name, b.name));
+            const int cols = 7; const float cell = 4.5f; int rows = (all.Length + cols - 1) / cols;
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Plane); floor.transform.localScale = new Vector3(cols * cell / 10 + 1, 1, rows * cell / 10 + 1);
+            floor.transform.position = new Vector3((cols - 1) * cell / 2, 0, (rows - 1) * cell / 2); floor.GetComponent<Renderer>().sharedMaterial.color = new Color(.35f, .33f, .3f);
+            for (int i = 0; i < all.Length; i++)
+            {
+                var foot = new Vector3((i % cols) * cell, 0, (rows - 1 - i / cols) * cell);
+                var go = Object.Instantiate(all[i]); go.name = all[i].name; go.transform.position = foot;
+                var b = new Bounds(); bool any = false;
+                foreach (var r in go.GetComponentsInChildren<Renderer>()) { if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds); }
+                if (any) go.transform.position += new Vector3(0, foot.y - b.min.y, 0);
+                var mats = new System.Text.StringBuilder();
+                foreach (var r in go.GetComponentsInChildren<Renderer>()) foreach (var m in r.sharedMaterials) if (m != null) mats.Append(m.name + "(" + ColorUtility.ToHtmlStringRGB(m.HasProperty("_BaseColor") ? m.GetColor("_BaseColor") : m.color) + ") ");
+                Debug.Log("DUNGEON_PROP " + all[i].name + " size " + b.size.ToString("0.00") + " centre " + (b.center - foot).ToString("0.00") + " rot " + all[i].transform.rotation.eulerAngles.ToString("0") + " scale " + all[i].transform.localScale.ToString("0.00") + " mats " + mats);
+                var rule = GameObject.CreatePrimitive(PrimitiveType.Cube); rule.transform.position = foot + new Vector3(1.8f, .5f, 0); rule.transform.localScale = new Vector3(.04f, 1, .04f);
+                var arrow = GameObject.CreatePrimitive(PrimitiveType.Cube); arrow.transform.position = foot + new Vector3(0, .01f, -1.6f); arrow.transform.localScale = new Vector3(.08f, .02f, .6f);
+            }
+            var cam = new GameObject("Camera").AddComponent<Camera>(); cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(.12f, .13f, .16f);
+            int w = 2400, h = 2000; cam.orthographic = true; cam.aspect = (float)w / h; cam.farClipPlane = 200;
+            cam.orthographicSize = rows * cell * .62f; var mid = new Vector3((cols - 1) * cell / 2, 0, (rows - 1) * cell / 2);
+            cam.transform.rotation = Quaternion.Euler(35, -30, 0); cam.transform.position = mid - cam.transform.forward * 60;
+            var rt = new RenderTexture(w, h, 24) { antiAliasing = 4 }; cam.targetTexture = rt; cam.Render(); RenderTexture.active = rt;
+            var tex = new Texture2D(w, h, TextureFormat.RGB24, false); tex.ReadPixels(new Rect(0, 0, w, h), 0, 0); tex.Apply(); RenderTexture.active = null;
+            string dir = Path.GetFullPath(Path.Combine(Application.dataPath, @"..\..\ui-captures")); Directory.CreateDirectory(dir);
+            File.WriteAllBytes(Path.Combine(dir, "dungeon-props.png"), tex.EncodeToPNG());
+            cam.transform.rotation = Quaternion.Euler(10, 0, 0); cam.transform.position = mid - cam.transform.forward * 60;
+            cam.Render(); RenderTexture.active = rt; tex.ReadPixels(new Rect(0, 0, w, h), 0, 0); tex.Apply(); RenderTexture.active = null;
+            File.WriteAllBytes(Path.Combine(dir, "dungeon-props-front.png"), tex.EncodeToPNG());
+            Debug.Log("DUNGEON_CAPTURE_DONE " + all.Length + " pieces, " + dir);
+        }
     }
 }

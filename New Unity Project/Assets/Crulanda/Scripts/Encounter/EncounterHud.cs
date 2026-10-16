@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         {
             var p = ScreenToCanvas(point.x, point.y);
             Vector2 fr = p - PanelOffset("frames"), mm = p - PanelOffset("minimap"), tr = p - PanelOffset("tracker"), br = p - PanelOffset("bar");   // each panel where it was put
-            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
+            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || HallUiBlocks(p) || QueueUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(fr)) || new Rect(1215, 0, 225, 240).Contains(mm) ||
                 (partySims > 0 && new Rect(10, 196, 400, 46 * partySims).Contains(fr)) || chatRect.Contains(p) ||   // the chat
                 new Rect(1110, 236, 330, 200).Contains(tr) || false;
@@ -65,32 +65,50 @@ namespace Crulanda.Encounter
             mMap = new Unity.Profiling.ProfilerMarker("HUD.Minimap"), mPanels = new Unity.Profiling.ProfilerMarker("HUD.Panels"), mWindows = new Unity.Profiling.ProfilerMarker("HUD.Windows");
         static readonly Unity.Profiling.ProfilerMarker mGather = new Unity.Profiling.ProfilerMarker("HUD.Gather"), mLayout = new Unity.Profiling.ProfilerMarker("HUD.Layout"),
             mDraw = new Unity.Profiling.ProfilerMarker("HUD.DrawPlates"), mPlaces = new Unity.Profiling.ProfilerMarker("HUD.PlaceNames");
-        void Awake() { useGUILayout = false; }
+        void Awake() { useGUILayout = false; CheckDisplay(); }
+        /// <summary>Back from another window (alt-tab): an open chat line takes the keys again, and the keyboard is switched back on if
+        /// the input system left it off (the tester's note 115, 2026-10-10: "After alt-tabbing or using chat, the game ignored keys until
+        /// I clicked inside the window").</summary>
+        void OnApplicationFocus(bool focused)
+        {
+            if (!focused) return;
+            if (chatTyping) chatFocus = true;
+#if ENABLE_INPUT_SYSTEM
+            var k = UnityEngine.InputSystem.Keyboard.current; if (k != null && !k.enabled) UnityEngine.InputSystem.InputSystem.EnableDevice(k);
+#endif
+        }
         void LateUpdate() { TickPaperDoll(); }
         void OnGUI()
         {
             if (Hidden || session == null || session.Player == null) return;
             Styles();
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
-            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
+            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; queueVisible = session.QueueOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null; hallVisible = session.Hall != null;
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
+            bankVisible = session.BankOpen; exchangeVisible = session.ExchangeOpen;
             GUI.matrix = CanvasMatrix;   // even and centred (playtest note 94; EncounterHud.Display)
             GUI.color = Color.white;
             using (mWorld.Auto()) DrawWorldLabels();
             // The movable panels (playtest note 97): each drawn where the player put it (EncounterHud.Display, PanelOffset).
-            using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
+            using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); DrawBuffs(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
             using (mMap.Auto()) { At("minimap"); maps.DrawMinimap(session, gold); }
-            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); DrawPetBar(); DrawMicroMenu(); DrawXpBar(); At(null); }
+            using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); At(null); if (session.SpellbookOpen) DrawSpellbook(); At("pet"); DrawPetBar(); At("nerve"); DrawNervePanel(); At("bar"); DrawMicroMenu(); DrawXpBar(); At(null); }
             var windows = mWindows.Auto();
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
+            if (session.BankOpen) DrawBank();   // the capital's counters (EncounterHud.Capital.cs)
+            if (session.ExchangeOpen) DrawExchange();
             if (session.InventoryOpen) DrawBags();
             if (session.TradesOpen) DrawTrades();
             if (session.BuildOpen) DrawBuild();
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
             if (session.WhoOpen) DrawWho();
+            if (session.QueueOpen) DrawQueue();   // the dungeon queue (Gather a Party, J)
+            if (session.MeterOpen && !BigWindowOpen) { At("meter"); DrawMeter(); At(null); }   // not over a big window (Chris, 2026-10-13: it lay over the talents)
+            if (session.ScorecardOpen) DrawScorecard();
             if (session.Conversation != null) DrawConversation();
+            if (session.Hall != null) DrawHall();   // the capital's halls (EncounterHud.Halls)
             DrawLoot();
             if (uiUnlocked) DrawPanelHandles();
             DrawDiscoveryToast();   // over the windows: it lasts a few seconds
@@ -100,7 +118,7 @@ namespace Crulanda.Encounter
                 GUI.Label(new Rect(530, 375, 400, 40), "YOU HAVE FALLEN", heading);
                 if (GUI.Button(new Rect(535, 433, 370, 44), "Recover [R]", button)) session.Recover();
             }
-            if (session.InventoryOpen || session.CharacterOpen || session.VendorNpc != null) DrawDragAndConfirm();
+            if (session.InventoryOpen || session.CharacterOpen || session.VendorNpc != null || session.BankOpen || session.ExchangeOpen) DrawDragAndConfirm();
             if (session.Paused) DrawPause();
             windows.Dispose();
         }
@@ -158,7 +176,7 @@ namespace Crulanda.Encounter
         }
         static Color ResourceColor(Crulanda.Core.ResourceKind kind)
         {
-            switch (kind) { case Crulanda.Core.ResourceKind.Mana: return new Color(.18f, .38f, .9f); case Crulanda.Core.ResourceKind.Breath: return new Color(.2f, .66f, .62f); default: return new Color(.86f, .62f, .16f); }
+            switch (kind) { case Crulanda.Core.ResourceKind.Mana: return new Color(.18f, .38f, .9f); case Crulanda.Core.ResourceKind.Breath: return new Color(.2f, .66f, .62f); case Crulanda.Core.ResourceKind.Salt: return new Color(.86f, .86f, .8f); default: return new Color(.86f, .62f, .16f); }
         }
 
         // ---------- frames ----------
@@ -170,7 +188,7 @@ namespace Crulanda.Encounter
             Shadow(new Rect(96, 24, 240, 20), "You · " + cls.displayName, frameName, Color.white);
             if (!string.IsNullOrEmpty(session.Progress.title)) Shadow(new Rect(96, 4, 300, 18), "\u201C" + session.Progress.title + "\u201D", tiny, gold);   // the title worn (Achievements)
             UnitBar(new Rect(96, 45, 244, 18), p.Health.Pool.Ratio, HealthGreen, p.Health.Pool.Current + " / " + p.Health.Pool.Max);
-            UnitBar(new Rect(96, 66, 244, 13), p.Resource.Pool.Ratio, ResourceColor(cls.resource), p.Resource.Pool.Current + " " + ResourceShort(cls.resource));
+            UnitBar(new Rect(96, 66, 244, 13), p.Resource.Pool.Ratio, ResourceColor(cls.resource), p.Resource.Pool.Current + " " + ResourceShort(cls));
             var status = session.Kit.StatusLine;
             if (!string.IsNullOrEmpty(status)) Shadow(new Rect(96, 84, 300, 20), status, tiny, new Color(1, .92f, .75f));
         }
@@ -215,6 +233,42 @@ namespace Crulanda.Encounter
             }
         }
         static readonly Color WeaverViolet = new Color(.68f, .5f, 1);
+        /// <summary>The buffs and songs on you and on each of the party (Chris, 2026-10-14: "we need a buff ui so i know what buff/songs
+        /// are on the party"): a row of chips beside each frame, each a status effect on that one (its name and seconds left) or the
+        /// kit's own buff on the whole party (a verse, a rally).</summary>
+        void DrawBuffs()
+        {
+            var kit = session.Kit; if (kit == null || session.Player == null) return;
+            var party = new List<(string, float)>(kit.PartyBuffs());
+            Chips(new Rect(352, 88, 420, 18), Buffs(session.Player, party));
+            var m = session.Companion;
+            if (m != null && m.actor != null && session.Progress.recruited) Chips(new Rect(334, 142, 460, 18), Buffs(m.actor, party));
+            for (int i = 0; i < session.PartySims.Count; i++)
+            {
+                var c = session.PartySims[i]; if (c == null || c.actor == null) continue;
+                Chips(new Rect(388, 200 + 46 * i + 16, 420, 18), Buffs(c.actor, party));
+            }
+        }
+        List<(string, float)> Buffs(Crulanda.Gameplay.Actor a, List<(string, float)> party)
+        {
+            var list = new List<(string, float)>();
+            var cb = a != null ? a.GetComponent<Crulanda.Combat.Combatant>() : null;
+            if (cb != null && cb.Statuses != null) cb.Statuses.Each(Time.time, (id, rem) => list.Add((session.StatusName(id), rem)));
+            list.AddRange(party);
+            return list;
+        }
+        void Chips(Rect row, List<(string name, float remaining)> buffs)
+        {
+            float x = row.x;
+            foreach (var (name, remaining) in buffs)
+            {
+                string text = remaining > 0 ? name + " " + Mathf.CeilToInt(remaining) + "s" : name;
+                float w = tiny.CalcSize(new GUIContent(text)).x + 10; if (x + w > row.xMax) break;
+                Fill(new Rect(x, row.y, w, row.height), new Color(.08f, .1f, .06f, .72f));
+                Shadow(new Rect(x + 5, row.y - 1, w, row.height + 2), text, tiny, remaining > 0 && remaining < 5 ? new Color(1, .8f, .6f) : new Color(.8f, 1, .8f));
+                x += w + 4;
+            }
+        }
         /// <summary>The target frame's line under a game animal's health (GAME-ONLY).</summary>
         public const string GameLine = "Game: it won't fight, but it will run. Skin it for its hide.";
         void DrawTargetFrame()
@@ -368,6 +422,21 @@ namespace Crulanda.Encounter
         /// The companion bar (playtest note 93, 2026-10-07: "a companion UI element that I can have him attack, assist, stay"): while the
         /// Ranger's wolf is out, left of the action bar, its health and three orders, the standing one lit.
         /// </summary>
+        /// <summary>The pet frame's name: the Bonecaller's thrall is not a wolf (step-4 frames).</summary>
+        public static string PetLabel(string kind) { return kind == "thrall" ? "Thrall" : "Wolf"; }
+        /// <summary>The Scoundrel's Nerve, its own small panel to move where you like (Chris, 2026-10-14: "need to see how much nerve the
+        /// scoundrel has built up", "a seperate small ui element i can move around"): the number, and ten pips, one lit for each tenth
+        /// built; lit gold when there is enough for Settle the Score to be worth it (half or more).</summary>
+        void DrawNervePanel()
+        {
+            var cls = session.ClassDef; if (cls == null || cls.id != "class.scoundrel" || session.Player == null) return;
+            var pool = session.Player.Resource.Pool; var box = new Rect(380, 96, 250, 44);
+            Fill(box, new Color(.07f, .06f, .05f, .9f)); Fill(new Rect(box.x, box.y, box.width, 2), new Color(.9f, .72f, .3f));
+            Shadow(new Rect(box.x + 10, box.y + 4, 120, 20), "Nerve", tiny, new Color(1, .92f, .75f));
+            Shadow(new Rect(box.x + 150, box.y + 4, 90, 20), pool.Current + " / " + pool.Max, tiny, Color.white);
+            int lit = Mathf.FloorToInt(pool.Ratio * 10 + .001f); var gold = pool.Ratio >= .5f ? new Color(1, .82f, .3f) : new Color(.85f, .6f, .25f);
+            for (int i = 0; i < 10; i++) Fill(new Rect(box.x + 10 + i * 23.2f, box.y + 26, 20, 10), i < lit ? gold : new Color(.25f, .22f, .16f, .9f));
+        }
         void DrawPetBar()
         {
             var pet = session.Pet; if (pet == null || pet.actor == null || !pet.actor.IsAlive) return;
@@ -375,7 +444,7 @@ namespace Crulanda.Encounter
             var box = new Rect(x0, y, 250, 76);
             Fill(box, new Color(.07f, .06f, .05f, .9f)); Fill(new Rect(box.x, box.y, box.width, 2), new Color(.62f, .52f, .33f));
             var hp = pet.actor.Health.Pool;
-            Shadow(new Rect(box.x + 8, box.y + 4, 120, 20), "Wolf", tiny, Color.white);
+            Shadow(new Rect(box.x + 8, box.y + 4, 120, 20), PetLabel(pet.Kind), tiny, Color.white);
             var bar = new Rect(box.x + 60, box.y + 9, 182, 10); Fill(bar, new Color(0, 0, 0, .6f));
             Fill(new Rect(bar.x, bar.y, bar.width * Mathf.Clamp01(hp.Ratio), bar.height), new Color(.3f, .75f, .3f));
             string[] labels = { "Attack", "Assist", "Stay" };
@@ -392,14 +461,24 @@ namespace Crulanda.Encounter
         }
         void DrawActionBar()
         {
-            int n = session.ActionCount; const float size = 50, gap = 6;
+            int n = session.BarSlots; const float size = 50, gap = 6;   // the chosen bar (EncounterSession.Bar, Docs/ACTION_BAR.md)
             float total = n * (size + gap) - gap, x0 = 720 - total / 2, y = 808;
             Fill(new Rect(x0 - 12, y - 10, total + 24, 82), new Color(.07f, .06f, .05f, .9f));
             Fill(new Rect(x0 - 12, y - 10, total + 24, 2), new Color(.62f, .52f, .33f));
             string hover = null; var mouse = Event.current.mousePosition;
-            for (int i = 0; i < n; i++)
+            for (int b = 0; b < n; b++)
             {
-                var a = session.ActionAt(i); var r = new Rect(x0 + i * (size + gap), y, size, size);
+                int i = session.BarKitSlot(b); var r = new Rect(x0 + b * (size + gap), y, size, size);
+                bool placing = session.SpellbookOpen && session.BookPick != null;
+                if (i < 0)   // an empty slot: the spellbook fills it
+                {
+                    Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), placing ? gold : new Color(.25f, .25f, .25f)); Fill(r, new Color(.1f, .09f, .08f));
+                    Shadow(r, EncounterInput.SlotLabel(b), keybind, new Color(.6f, .6f, .6f));
+                    if (GUI.Button(r, GUIContent.none, GUIStyle.none)) { if (placing) { session.PlaceOnBar(b, session.BookPick); session.BookPick = null; } else session.SpellbookOpen = true; }
+                    if (r.Contains(mouse)) hover = "An empty slot: choose what goes here in the spellbook (" + "P)";
+                    continue;
+                }
+                var a = session.ActionAt(i);
                 float remaining = session.CooldownRemaining(i); string locked = session.ActionLockLabel(i);
                 bool usable = session.Player.IsAlive && !session.Paused && locked == null;
                 Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), locked == null ? new Color(.62f, .52f, .33f) : new Color(.25f, .25f, .25f));
@@ -421,20 +500,77 @@ namespace Crulanda.Encounter
                     Shadow(r, remaining < 10 ? remaining.ToString("0.0") : Mathf.CeilToInt(remaining).ToString(), abbrev, new Color(1, .95f, .6f));
                 }
                 else if (remaining > 0) Fill(r, new Color(0, 0, 0, .35f));
-                Shadow(r, EncounterInput.SlotLabel(i), keybind, new Color(.9f, .9f, .9f));
+                Shadow(r, EncounterInput.SlotLabel(b), keybind, new Color(.9f, .9f, .9f));
                 string sub = locked ?? (a.cost > 0 ? a.cost.ToString() : "");
                 if (sub.Length > 0) Shadow(new Rect(r.x, r.yMax - 16, r.width - 3, 16), sub, new GUIStyle(keybind) { alignment = TextAnchor.LowerRight, fontSize = 10 }, locked == null ? new Color(.7f, .85f, 1) : new Color(.8f, .6f, .5f));
                 Shadow(new Rect(r.x - 6, r.yMax + 2, r.width + 12, 16), a.name.Length > 10 ? a.name.Substring(0, 9) + "…" : a.name, new GUIStyle(barText) { fontSize = 10, wordWrap = false, clipping = TextClipping.Clip }, new Color(.85f, .82f, .75f));
-                if (GUI.Button(r, GUIContent.none, GUIStyle.none) && usable) session.UseAbility(i);
+                if (placing) Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, 2), gold);
+                if (GUI.Button(r, GUIContent.none, GUIStyle.none)) { if (placing) { session.PlaceOnBar(b, session.BookPick); session.BookPick = null; } else if (session.SpellbookOpen) session.BookPick = session.Kit.BookKey(i); else if (usable) session.UseAbility(i); }
                 if (r.Contains(mouse))
                     hover = a.name + (locked != null ? "  (" + locked + ")" : "") + "\n" + a.description +
-                        (a.cost > 0 ? "\nCost: " + a.cost + " " + ResourceName(session.ClassDef.resource) : "") + (a.cooldown > 0 ? "   Cooldown: " + a.cooldown + "s" : "");
+                        (a.cost > 0 ? "\nCost: " + a.cost + " " + ResourceName(session.ClassDef) : "") + (a.cooldown > 0 ? "   Cooldown: " + a.cooldown + "s" : "");
+            }
+            // The stance bar (the Druid's forms, Shift+1-4), small, above the left end of the chosen bar.
+            var stances = session.Kit.StanceSlots;
+            for (int s2 = 0; s2 < stances.Length; s2++)
+            {
+                int i = stances[s2]; var a = session.ActionAt(i); if (a == null) continue;
+                var r = new Rect(x0 + s2 * 40, y - 52, 36, 36); string locked = session.ActionLockLabel(i); bool active = locked == "Active";
+                Fill(new Rect(r.x - 2, r.y - 2, r.width + 4, r.height + 4), active ? gold : new Color(.35f, .3f, .22f));
+                var icon = IconDb.Ability(a.id) ?? IconDb.Talent(a.id);
+                if (icon != null) GUI.DrawTexture(new Rect(r.x + 1, r.y + 1, r.width - 2, r.height - 2), icon, ScaleMode.ScaleToFit); else Shadow(r, Abbreviation(a.name), abbrev, Color.white);
+                Shadow(new Rect(r.x + 2, r.y, r.width, 14), "⇧" + (s2 + 1), new GUIStyle(keybind) { fontSize = 9 }, new Color(.9f, .9f, .9f));
+                if (GUI.Button(r, GUIContent.none, GUIStyle.none) && session.Player.IsAlive && !session.Paused) session.UseAbility(i);
+                if (r.Contains(mouse)) hover = a.name + (locked != null && !active ? "  (" + locked + ")" : active ? "  (your form)" : "") + "\n" + a.description + "\nShift+" + (s2 + 1);
             }
             if (hover != null)
             {
                 var h = small.CalcHeight(new GUIContent(hover), 380) + 16; var tr = new Rect(x0 + total - 400, y - 20 - h, 400, h);
                 Fill(tr, new Color(.04f, .05f, .07f, .95f)); Fill(new Rect(tr.x, tr.y, tr.width, 2), gold);
                 GUI.Label(new Rect(tr.x + 10, tr.y + 8, 380, h), hover, small);
+            }
+        }
+        /// <summary>The spellbook (P; Docs/ACTION_BAR.md): every ability of yours and to come; click one, then a bar slot, to put it there.
+        /// Alternate advancement at the foot: the points past the level cap and the next slot to buy.</summary>
+        /// <summary>A window that fills much of the screen: the meter keeps out of its way.</summary>
+        bool BigWindowOpen { get { return session.BuildOpen || session.CharacterOpen || session.InventoryOpen || session.QuestBookOpen || session.MapOpen || session.TradesOpen || session.SpellbookOpen; } }
+        void DrawSpellbook()
+        {
+            var book = session.Book(); const float w = 560; int rows = (book.Count + 1) / 2;
+            float h = 128 + rows * 46; var box = new Rect(720 - w / 2, Mathf.Max(40, 780 - h - 40), w, h);
+            Fill(box, new Color(.06f, .05f, .04f, .96f)); Fill(new Rect(box.x, box.y, box.width, 2), gold);
+            Shadow(new Rect(box.x + 14, box.y + 8, 300, 24), "SPELLBOOK", frameName, gold);
+            Shadow(new Rect(box.x + 14, box.y + 32, w - 60, 18), "Your bar has " + session.BarSlots + " slots. Click an ability, then a slot on the bar. P or Esc closes.", tiny, Color.white);
+            if (GUI.Button(new Rect(box.xMax - 32, box.y + 6, 24, 22), "x", slim)) { session.SpellbookOpen = false; session.BookPick = null; }
+            var mouse = Event.current.mousePosition; string tip = null;
+            for (int k = 0; k < book.Count; k++)
+            {
+                var e = book[k]; var a = session.ActionAt(e.slot); if (a == null) continue;
+                var r = new Rect(box.x + 14 + (k % 2) * (w / 2 - 6), box.y + 58 + (k / 2) * 46, w / 2 - 22, 40);
+                bool picked = session.BookPick == e.key; int at = session.Progress.bar.IndexOf(e.key);
+                Fill(r, picked ? new Color(.38f, .3f, .12f) : new Color(.12f, .11f, .09f));
+                if (picked) Fill(new Rect(r.x, r.y, r.width, 2), gold);
+                var icon = IconDb.Ability(a.id) ?? IconDb.Talent(a.id);
+                if (icon != null) { GUI.color = e.yours ? Color.white : new Color(.45f, .45f, .45f); GUI.DrawTexture(new Rect(r.x + 3, r.y + 3, 34, 34), icon, ScaleMode.ScaleToFit); GUI.color = Color.white; }
+                Shadow(new Rect(r.x + 42, r.y + 2, r.width - 46, 18), a.name, small, e.yours ? Color.white : new Color(.55f, .55f, .55f));
+                string note = !e.yours ? (session.ActionLockLabel(e.slot) ?? "to come") : at >= 0 ? "on the bar: " + EncounterInput.SlotLabel(at) : "not on the bar";
+                Shadow(new Rect(r.x + 42, r.y + 20, r.width - 46, 16), note, tiny, at >= 0 ? new Color(.7f, .85f, 1) : new Color(.75f, .7f, .6f));
+                if (GUI.Button(r, GUIContent.none, GUIStyle.none)) session.BookPick = picked ? null : e.key;
+                if (r.Contains(mouse)) tip = a.name + "\n" + a.description;
+            }
+            float ay = box.yMax - 58; Fill(new Rect(box.x + 10, ay - 6, w - 20, 1), new Color(.62f, .52f, .33f, .6f));
+            bool capped = session.Progress.Level >= EncounterProgress.LevelCap; int extra = session.Progress.aaSlots, have = session.AaAvailable;
+            string aa = !capped ? "Alternate advancement opens at level " + EncounterProgress.LevelCap + ": experience past it earns points that buy up to " + ActionBarRules.MaxExtraSlots + " more bar slots."
+                : extra >= ActionBarRules.MaxExtraSlots ? "Alternate advancement: all " + ActionBarRules.MaxExtraSlots + " extra slots bought (" + have + " points to spare)."
+                : "Alternate advancement: " + have + " point" + (have == 1 ? "" : "s") + " (" + ActionBarRules.AaProgress(session.Progress.experience) + " of " + ActionBarRules.AaPointXp + " experience to the next). The next slot costs " + session.NextSlotCost + ".";
+            GUI.Label(new Rect(box.x + 14, ay, w - 170, 48), aa, tiny);
+            GUI.enabled = capped && extra < ActionBarRules.MaxExtraSlots && have >= session.NextSlotCost;
+            if (GUI.Button(new Rect(box.xMax - 146, ay + 4, 132, 28), "Buy a bar slot", slim)) session.BuyBarSlot();
+            GUI.enabled = true;
+            if (tip != null)
+            {
+                var th = small.CalcHeight(new GUIContent(tip), 360) + 14; var tr = new Rect(box.xMax + 8, box.y, 380, th);
+                Fill(tr, new Color(.04f, .05f, .07f, .95f)); Fill(new Rect(tr.x, tr.y, tr.width, 2), gold); GUI.Label(new Rect(tr.x + 10, tr.y + 7, 360, th), tip, small);
             }
         }
         /// <summary>
@@ -458,6 +594,7 @@ namespace Crulanda.Encounter
             if (session.Professions != null) items.Add(("Trades   [K]", () => session.ShowTrades(!session.TradesOpen)));
             items.Add(("Map   [M]", () => session.MapOpen = !session.MapOpen));
             if (SimPopulation.Active != null) items.Add(("Who   [" + KeyBindings.Label(GameKey.Who) + "]", () => session.WhoOpen = !session.WhoOpen));   // 2026-10-10: Chris found no way to it
+            if (SimPopulation.Active != null) items.Add(("Dungeons   [" + KeyBindings.Label(GameKey.Queue) + "]", () => session.QueueOpen = !session.QueueOpen));   // the dungeon queue (Gather a Party)
             items.Add(("Save", () => session.Save()));
             items.Add(("Load", () => session.Load()));
             float w = 170, h = 32, top = button.y - 6 - items.Count * (h + 2);
@@ -492,6 +629,10 @@ namespace Crulanda.Encounter
                 case "class.mage": return new Color(.6f, .45f, .95f);
                 case "class.rogue": return new Color(.95f, .85f, .35f);
                 case "class.archivist": return new Color(.55f, .8f, 1f);
+                case "class.saltmender": return new Color(.92f, .92f, .86f);
+                case "class.cleric": return new Color(1f, .95f, .72f);
+                case "class.shaman": return new Color(.4f, .6f, 1f);
+                case "class.scoundrel": return new Color(.86f, .36f, .44f);   // claret and rose (2026-10-14)
                 default: return new Color(.78f, .61f, .43f);
             }
         }
@@ -500,27 +641,41 @@ namespace Crulanda.Encounter
             // Each class is a separate character with its own save; switching saves this one first. One button per other class.
             var others = new List<PlayableClass>();
             foreach (var c in session.content.AllClasses()) if (c.definition.id != session.ClassDef.id) others.Add(c);
-            Frame(new Rect(475, 325, 490, 250 + 48 * Mathf.Max(0, others.Count - 1)));
+            // (2026-10-13, Chris: "cant see all classes. need another mechanism to be able to choose": one button a class ran off the screen
+            // at ten classes; now a grid of three across.)
+            int rows = (others.Count + 2) / 3;
+            Frame(new Rect(475, 325, 490, 296 + 48 * rows));
             GUI.Label(new Rect(525, 351, 400, 35), "EXPEDITION PAUSED", heading);
             GUI.Label(new Rect(525, 398, 400, 35), "Progress autosaves out of combat.", text);
             if (controlsOpen) { DrawControls(); return; }
             if (displayOpen) { DrawDisplay(); return; }
+            if (soundOpen) { DrawSound(); return; }
             if (GUI.Button(new Rect(525, 448, 126, 44), "Resume [Esc]", button)) session.Resume();
             if (GUI.Button(new Rect(657, 448, 126, 44), "Controls", button)) controlsOpen = true;
             if (GUI.Button(new Rect(789, 448, 126, 44), "Display", button)) displayOpen = true;   // resolution, mode, UI scale (playtest note 94)   // key bindings (playtest note 75)
             GUI.enabled = !session.InCombat;
+            if (others.Count > 0) GUI.Label(new Rect(525, 500, 400, 30), "Play another character (each its own save):", text);
             for (int i = 0; i < others.Count; i++)
-                if (GUI.Button(new Rect(525, 504 + 48 * i, 390, 44), "Play your " + others[i].definition.displayName + " (separate character)", button)) { session.SwitchCharacter(others[i].definition.id); break; }
+                if (GUI.Button(new Rect(525 + (i % 3) * 132, 534 + 48 * (i / 3), 126, 44), others[i].definition.displayName, button)) { session.SwitchCharacter(others[i].definition.id); break; }
             GUI.enabled = true;
+            // Chris 2026-10-14: "all need an exit command to close the .exe" (also /exit and /quit in the chat): saved first, out of combat.
+            if (GUI.Button(new Rect(525, 540 + 48 * rows + 8, 126, 44), "Quit game", button)) session.Quit();
+            if (GUI.Button(new Rect(657, 540 + 48 * rows + 8, 126, 44), "Sound", button)) soundOpen = true;   // Chris 2026-10-15: sliders and mutes
         }
         public static string ResourceName(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Shift Breath" : kind.ToString(); }
         static string ResourceShort(Crulanda.Core.ResourceKind kind) { return kind == Crulanda.Core.ResourceKind.Breath ? "Breath" : kind.ToString(); }
+        /// <summary>The class's own name for its pool when it has one (the Scoundrel's Nerve), else the kind's.</summary>
+        public static string ResourceName(ClassDefinition cls) { return cls != null && !string.IsNullOrEmpty(cls.resourceName) ? cls.resourceName : ResourceName(cls != null ? cls.resource : Crulanda.Core.ResourceKind.None); }
+        static string ResourceShort(ClassDefinition cls) { return cls != null && !string.IsNullOrEmpty(cls.resourceName) ? cls.resourceName : ResourceShort(cls != null ? cls.resource : Crulanda.Core.ResourceKind.None); }
         public static string Pips(int value, int max) { return new string('●', Mathf.Clamp(value, 0, max)) + new string('○', Mathf.Max(0, max - value)); }
         // Panel geometry follows the branch count: 3 trees fit the original panel; 4 (Druid) use the full width.
-        float PanelX, PanelW, TreeLeft, TreeWidth, CellWidth, TileWidth;
-        const float TileHeight = 96, TierTop = 272, TierHeight = 128;
-        void LayoutTrees(int branches)
+        float PanelX, PanelW, TreeLeft, TreeWidth, CellWidth, TileWidth, TileHeight = 96, TierHeight = 128;
+        const float TierTop = 272, TreesBottom = 690;
+        /// <summary>The rows close up when a tree is four deep (Chris, 2026-10-13: the Mender's fourth row ran over Refund all and Close):
+        /// every row fits between the trees' top and the hint line at 700; three rows keep the old 128 spacing.</summary>
+        void LayoutTrees(int branches, int rows = 3)
         {
+            TierHeight = Mathf.Min(128, (TreesBottom - TierTop) / Mathf.Max(1, rows)); TileHeight = Mathf.Min(96, TierHeight - 8);
             PanelX = branches > 3 ? 20 : 155; PanelW = branches > 3 ? 1400 : 1130; TreeLeft = PanelX + 25;
             TreeWidth = (PanelW - 50 - 12 * (branches - 1)) / branches; CellWidth = TreeWidth / 4f; TileWidth = CellWidth - 6;
         }
@@ -528,7 +683,8 @@ namespace Crulanda.Encounter
         { return new Rect(TreeLeft + branch * (TreeWidth + 12) + n.col * CellWidth + 2, TierTop + n.tier * TierHeight, TileWidth, TileHeight); }
         void DrawBuild()
         {
-            var tree = session.Talents; var p = session.Progress; LayoutTrees(tree.Branches.Count);
+            var tree = session.Talents; var p = session.Progress; int deepest = 0; foreach (var br in tree.Branches) foreach (var nd in br.nodes) deepest = Mathf.Max(deepest, nd.tier);
+            LayoutTrees(tree.Branches.Count, deepest + 1);
             GUI.color = new Color(ink.r, ink.g, ink.b, 1); GUI.DrawTexture(new Rect(PanelX, 95, PanelW, 685), Texture2D.whiteTexture); GUI.color = Color.white;
             GUI.Label(new Rect(TreeLeft, 108, 850, 32), session.ClassDef.displayName.ToUpperInvariant() + " TALENTS", heading);
             GUI.Label(new Rect(TreeLeft, 142, PanelW - 50, 40), "Level " + p.Level + "  ·  " + tree.Available(p) + " of " + tree.Budget(p.Level) +
@@ -541,6 +697,11 @@ namespace Crulanda.Encounter
                 GUI.color = new Color(1, 1, 1, .05f); GUI.DrawTexture(new Rect(x - 6, 180, TreeWidth, 520), Texture2D.whiteTexture); GUI.color = Color.white;
                 GUI.contentColor = gold;
                 GUI.Label(new Rect(x, 184, 240, 26), branch.name.ToUpperInvariant() + "   " + tree.SpentIn(p, branch), text);
+                // Its part in a group, on a coloured tag at the header's right (2026-10-16, Chris: "in the talent tree you need to
+                // designate their distinction like tank/healer/dps/support").
+                { var (word, tint) = RoleTag(branch.role); var tag = new Rect(x + TreeWidth - 96, 186, 84, 20);
+                  GUI.color = new Color(tint.r, tint.g, tint.b, .85f); GUI.DrawTexture(tag, Texture2D.whiteTexture); GUI.color = Color.white;
+                  GUI.contentColor = Color.white; var c = new GUIStyle(tiny) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }; GUI.Label(tag, word, c); }
                 GUI.contentColor = Color.white;
                 GUI.Label(new Rect(x, 208, TreeWidth - 12, 60), branch.loop, tiny);
                 foreach (var n in branch.nodes)
@@ -769,6 +930,13 @@ namespace Crulanda.Encounter
             foreach (var e in session.Enemies) EnemyPlateAt(e, 25);
             // Game animals (deer, rabbits): a plate when close or targeted, so the fields are not a sea of names.
             foreach (var e in session.Game) EnemyPlateAt(e, session.Target == e ? 25 : 12);
+            // The training yard's mending dummy: a friend's name over it, so it is found (Chris, 15:20: "i dont see a healing dummy").
+            var mend = session.MendingDummy;
+            if (mend != null)
+            {
+                var top = mend.transform.position + Vector3.up * 1.2f; float dd = Vector3.Distance(player, top);
+                if (dd < 40 && ToCanvas(top, out var dp) && OnCanvasX(dp.x)) AddPlate(new Plate { dist = dd, fade = 1, top = -41, at = dp, named = true, name = "Mending dummy", title = Bracketed("Heal me"), mark = ' ' }, Mathf.Max(TextWidth(plateText, "Mending dummy"), 30) + 12);
+            }
             // Mira: nameplate, plus a gold ! until she has joined you (after that, whatever the quests say).
             var mira = session.Companion; if (mira == null) return;
             var head = mira.transform.position + Vector3.up * 1.4f; float md = Vector3.Distance(player, head);
@@ -800,13 +968,24 @@ namespace Crulanda.Encounter
                 }
                 // Level-coloured names (grey, green, yellow, orange, red by how the enemy compares to you).
                 Outlined(new Rect(a.x - 150, a.y - 25, 300, 22), p.name, plateText, target ? gold : ConColor(p.e.actor.Level));
-                if (p.e.RaidMarked != RaidMark.None)   // the raid mark above the name (CC step C3)
-                    Outlined(new Rect(a.x - 150, a.y - 45, 300, 22), p.e.RaidMarked == RaidMark.Skull ? "[ SKULL ]" : p.e.RaidMarked == RaidMark.Moon ? "( MOON )" : "< CROSS >", plateText,
+                if (p.e.RaidMarked != RaidMark.None && p.e.actor.IsAlive)   // the raid mark above the name (CC step C3): an icon (Chris, 2026-10-11: "you say Moon it really need to show an ICon"); gone with the mob ("once the mob that was cc dies. take off the icon")
+                {
+                    var icon = Mark(p.e.RaidMarked == RaidMark.Skull ? "skull" : p.e.RaidMarked == RaidMark.Moon ? "moon" : "cross");
+                    if (icon != null) { Fill(new Rect(a.x - 18, a.y - 63, 36, 36), new Color(0, 0, 0, .55f)); GUI.DrawTexture(new Rect(a.x - 16, a.y - 61, 32, 32), icon); }
+                    else Outlined(new Rect(a.x - 150, a.y - 45, 300, 22), p.e.RaidMarked == RaidMark.Skull ? "[ SKULL ]" : p.e.RaidMarked == RaidMark.Moon ? "( MOON )" : "< CROSS >", plateText,
                         p.e.RaidMarked == RaidMark.Skull ? Color.white : p.e.RaidMarked == RaidMark.Moon ? new Color(.6f, .8f, 1) : new Color(1, .4f, .35f));
+                }
                 Fill(new Rect(a.x - 66, a.y - 1, 132, 8), new Color(0, 0, 0, .75f));
                 Bar(new Rect(a.x - 65, a.y, 130, 6), p.e.actor.Health.Pool.Ratio, new Color(.8f, .3f, .25f), "");
                 var held = p.e.ControlLabel;   // crowd control on any mob, not just your target (CC step C4)
-                if (held != null) Outlined(new Rect(a.x - 150, a.y + 6, 300, 20), held, plateText, ControlRings.ColourFor(p.e));
+                if (held != null)
+                {
+                    // Who is held, seen at a glance (Chris, 2026-10-11: "show who is CCd"): the hold's icon beside its name and the plate tinted.
+                    var hc = ControlRings.ColourFor(p.e); var hi = Mark(HoldIcon(held));
+                    Fill(new Rect(a.x - 70, a.y - 27, 140, 26), new Color(hc.r, hc.g, hc.b, .3f));
+                    if (hi != null) { Fill(new Rect(a.x - 100, a.y - 30, 30, 30), new Color(0, 0, 0, .6f)); GUI.DrawTexture(new Rect(a.x - 98, a.y - 28, 26, 26), hi); }
+                    Outlined(new Rect(a.x - 150, a.y + 6, 300, 20), held, plateText, hc);
+                }
                 else if (p.e.Casting && p.e.Cast != null)
                 {
                     Fill(new Rect(a.x - 66, a.y + 9, 132, 6), new Color(0, 0, 0, .75f));
@@ -916,12 +1095,89 @@ namespace Crulanda.Encounter
             }
         }
         void Frame(Rect r) { GUI.color = ink; GUI.DrawTexture(r, Texture2D.whiteTexture); GUI.color = Color.white; }
+        /// <summary>The party's damage and healing meter (/meter): a row a member, damage and healing done, and each a second over the
+        /// party's fighting time since the reset. Under the quest tracker on the right.</summary>
+        /// <summary>Where the meter sits on the 1440x900 canvas for a party of <paramref name="rows"/>.</summary>
+        public static Rect MeterRect(int rows) { return new Rect(1100, 456, 340, 60 + 22 * Mathf.Max(1, rows)); }
+        void DrawMeter()
+        {
+            var m = session.Meter; var rows = new List<CombatMeter.Row>(m.Rows); float t = m.CombatSeconds;
+            var r = MeterRect(rows.Count);
+            Fill(r, new Color(0, 0, 0, .55f));
+            GUI.contentColor = gold; GUI.Label(new Rect(r.x + 10, r.y + 6, 200, 20), "DAMAGE AND HEALING", small); GUI.contentColor = Color.white;
+            GUI.Label(new Rect(r.x + 10, r.y + 22, 420, 18), (session.Meter.RunName != null ? session.Meter.RunName + "  ·  " : "") + "over " + Mathf.RoundToInt(t) + " s of fighting  ·  /meter reset", tiny);   // the run's name when one is set (the balance harness names each fight)
+            GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 178, r.y + 40, 80, 18), "damage", tiny);
+            GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 256, r.y + 40, 80, 18), "healing", tiny); GUI.contentColor = Color.white;
+            float y = r.y + 58;
+            foreach (var row in rows)
+            {
+                GUI.Label(new Rect(r.x + 10, y, 170, 20), row.name, small);
+                GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 178, y, 80, 20), row.damage.ToString("N0") + " " + row.Dps(t).ToString("0") + "/s", small);
+                GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 256, y, 74, 20), row.healing.ToString("N0") + " " + row.Hps(t).ToString("0") + "/s", small);
+                GUI.contentColor = Color.white; y += 22;
+            }
+            if (rows.Count == 0) GUI.Label(new Rect(r.x + 10, y, 300, 20), "Nothing yet.", small);
+        }
+        /// <summary>The run's scorecard (Chris, 2026-10-11): every member with its class, damage and healing a second, deaths; the MVP and the
+        /// healer of the run; what dropped, off whom, to whom.</summary>
+        void DrawScorecard()
+        {
+            var m = session.Meter; var rows = new List<CombatMeter.Row>(m.Rows); float t = m.CombatSeconds;
+            int lootLines = Mathf.Min(10, m.Drops.Count);
+            var r = new Rect(290, 110, 860, 190 + 26 * Mathf.Max(1, rows.Count) + 22 * Mathf.Max(1, lootLines));
+            Frame(r);
+            GUI.Label(new Rect(r.x + 30, r.y + 18, 800, 36), (session.ScorecardTitle ?? "THE RUN").ToUpperInvariant(), heading);
+            GUI.Label(new Rect(r.x + 30, r.y + 56, 800, 22), Mathf.FloorToInt(m.RunSeconds / 60) + " min " + (Mathf.FloorToInt(m.RunSeconds) % 60).ToString("00") + " s  ·  " + Mathf.RoundToInt(t) + " s of it fighting", small);
+            float y = r.y + 88;
+            GUI.contentColor = gold;
+            GUI.Label(new Rect(r.x + 30, y, 260, 22), "MEMBER", small); GUI.Label(new Rect(r.x + 300, y, 160, 22), "DAMAGE", small); GUI.Label(new Rect(r.x + 470, y, 160, 22), "HEALING", small); GUI.Label(new Rect(r.x + 640, y, 90, 22), "DEATHS", small);
+            GUI.contentColor = Color.white; y += 26;
+            var mvp = m.Mvp(); var healer = m.TopHealer();
+            foreach (var row in rows)
+            {
+                GUI.Label(new Rect(r.x + 30, y, 260, 22), row.name + (row == mvp ? "  ★" : ""), small);
+                GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 300, y, 160, 22), row.damage.ToString("N0") + "  " + row.Dps(t).ToString("0") + "/s", small);
+                GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 470, y, 160, 22), row.healing.ToString("N0") + "  " + row.Hps(t).ToString("0") + "/s", small);
+                GUI.contentColor = row.deaths > 0 ? new Color(1, .5f, .45f) : Color.white; GUI.Label(new Rect(r.x + 640, y, 90, 22), row.deaths.ToString(), small);
+                GUI.contentColor = Color.white; y += 26;
+            }
+            if (rows.Count == 0) { GUI.Label(new Rect(r.x + 30, y, 400, 22), "Nothing fought yet.", small); y += 26; }
+            y += 6; GUI.contentColor = gold;
+            GUI.Label(new Rect(r.x + 30, y, 800, 22), (mvp != null ? "MVP: " + mvp.name : "") + (healer != null ? "     Healer of the run: " + healer.name : ""), small);
+            GUI.contentColor = Color.white; y += 30;
+            GUI.Label(new Rect(r.x + 30, y, 400, 22), "LOOT" + (m.Coin > 0 ? "  ·  " + m.Coin + " coin to you" : ""), small); y += 24;
+            if (m.Drops.Count == 0) GUI.Label(new Rect(r.x + 30, y, 800, 22), "Nothing dropped.", tiny);
+            for (int i = Mathf.Max(0, m.Drops.Count - lootLines); i < m.Drops.Count; i++) { var d = m.Drops[i]; GUI.Label(new Rect(r.x + 30, y, 800, 22), d.item + "  off " + d.from + "  to " + d.to, tiny); y += 22; }
+            if (GUI.Button(new Rect(r.xMax - 150, r.yMax - 46, 120, 32), "Close [Esc]", button)) session.ScorecardOpen = false;
+        }
+        static Texture2D Mark(string id) { return IconDb.Load(IconDb.PathFor("mark", id)); }
+        /// <summary>Which hold icon a mob's control label calls for (Icons/mark): held, stunned, feared, silenced; null for none.</summary>
+        static string HoldIcon(string label)
+        {
+            if (string.IsNullOrEmpty(label)) return null;
+            if (label.StartsWith("Held")) return "held"; if (label.StartsWith("Stunned")) return "stunned"; if (label.StartsWith("Fleeing")) return "feared"; if (label.StartsWith("Silenced")) return "silenced";
+            return null;
+        }
         void Bar(Rect r, float fill, Color color, string label)
         {
             GUI.color = new Color(.12f,.15f,.17f); GUI.DrawTexture(r, Texture2D.whiteTexture);
             GUI.color = color; GUI.DrawTexture(new Rect(r.x,r.y,r.width * Mathf.Clamp01(fill),r.height), Texture2D.whiteTexture);
             GUI.color = Color.white;
             if (label.Length > 0) GUI.Label(new Rect(r.x+5,r.y-1,r.width,r.height+8), label, small);
+        }
+        /// <summary>A talent branch's part in a group, as its tag says it (the branch's role in the talent file).</summary>
+        static (string, Color) RoleTag(string role)
+        {
+            switch ((role ?? "").ToLowerInvariant())
+            {
+                case "tank": return ("TANK", new Color(.25f, .45f, .85f));
+                case "healer": return ("HEALER", new Color(.2f, .65f, .3f));
+                case "dps": return ("DPS", new Color(.75f, .22f, .2f));
+                case "pet": return ("DPS · PET", new Color(.75f, .22f, .2f));
+                case "control": return ("CONTROL", new Color(.55f, .3f, .75f));
+                case "utility": case "support": return ("SUPPORT", new Color(.8f, .6f, .15f));
+                default: return (string.IsNullOrEmpty(role) ? "" : role.ToUpperInvariant(), new Color(.4f, .4f, .4f));
+            }
         }
     }
 }

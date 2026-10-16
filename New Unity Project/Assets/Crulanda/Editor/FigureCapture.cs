@@ -13,11 +13,31 @@ namespace Crulanda.EditorTools
     /// </summary>
     public static class FigureCapture
     {
-        const string Out = @"C:\Users\chris\Documents\Codex\2026-09-28\hel\work\ui-captures\figures";
+        const string Out = @"D:\crulanda-work\ui-captures\figures";   // 2026-10-13: the old folder went with C:
         static Camera cam;
         static Transform stage;
 
-        public static void Run()
+        /// <summary>The orcs only (2026-10-13, Chris: "shaman is not an orc"): the classes orcs play, front and side, and their faces close.</summary>
+        public static void Orcs()
+        {
+            Stage();
+            var specs = new[] { O(ActorLook.Druid, 3, "Shaman"), O(ActorLook.Druid, 4, "Shaman (grey)"), O(ActorLook.Warrior, 1, "Warrior"), O(ActorLook.Ranger, 5, "Ranger"), O(ActorLook.Mage, 7, "Mage"), P(ActorLook.Druid, 3, null, "Human druid") };
+            Row("orcs-front", specs); Row("orcs-side", specs, 90);
+            Row("orcs-faces", specs, 0, close: true); Row("orcs-faces-side", specs, 60, close: true);
+            // Their motions (2026-10-14, Chris: the Shaman's staff floating apart from its hands): one orc a row, turned four ways (its front,
+            // its left side, its back, its right side: the staff's and the axe's side), standing, walking, casting (CastSpell partway through) and striking.
+            foreach (var (shot, look, variant, slot, time) in new[] { ("orc-shaman-idle", ActorLook.Druid, 3, "idle", .4f), ("orc-shaman-walk", ActorLook.Druid, 3, "walk", .3f),
+                ("orc-shaman-cast", ActorLook.Druid, 3, "cast", 1.1f), ("orc-shaman-strike", ActorLook.Druid, 3, "attack", .45f), ("orc-axe-idle", ActorLook.Warrior, 1, "idle", .4f),
+                ("orc-axe-walk", ActorLook.Warrior, 1, "walk", .6f), ("orc-axe-strike", ActorLook.Warrior, 1, "attack", 1.1f) })
+            {
+                var turned = new List<Spec>();
+                foreach (float turn in new[] { 0f, 90f, 180f, 270f }) { var s = O(look, variant, slot + " " + turn); s.slot = slot; s.time = time; s.turn = turn; turned.Add(s); }
+                Row(shot, turned.ToArray(), 0, gap: 1.8f);
+            }
+            Debug.Log("FIGURE_CAPTURE_DONE");
+        }
+        static Spec O(ActorLook look, int variant, string name) { var x = P(look, variant, null, "Orc " + name); x.orc = true; return x; }
+        static void Stage()
         {
             Directory.CreateDirectory(Out); CharacterImport.Prepare();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -30,7 +50,10 @@ namespace Crulanda.EditorTools
             cam = new GameObject("Camera").AddComponent<Camera>(); cam.fieldOfView = 28; cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(.62f, .7f, .8f);
             cam.nearClipPlane = .05f; cam.farClipPlane = 200;
             QualitySettings.shadowDistance = 40;
-
+        }
+        public static void Run()
+        {
+            Stage();
             var db = new ItemDatabase(); var looks = GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text);
             Row("people-1", new[] { P(ActorLook.Warrior), P(ActorLook.Druid), P(ActorLook.Healer), P(ActorLook.Collector), P(ActorLook.Warden), P(ActorLook.Outrider) });
             Row("people-2", new[] { P(ActorLook.Cultist), P(ActorLook.Deserter, 1, null, "Deserter a"), P(ActorLook.Deserter, 2, null, "Deserter bb"), P(ActorLook.BanditKing), P(ActorLook.Hollow), P(ActorLook.Sentry), P(ActorLook.Paladin), P(ActorLook.Ranger), P(ActorLook.Mage) });
@@ -84,7 +107,7 @@ namespace Crulanda.EditorTools
             Debug.Log("FIGURE_CAPTURE_DONE");
         }
 
-        sealed class Spec { public string act; public ActorLook look; public int variant; public string role, name; public ActorPose pose; public float walk, time = .4f; public bool dead; public string[] gear; public ItemDatabase db; public GearLooks looks; public Load load; public int count; public ActorVisual.Carrying carry; }
+        sealed class Spec { public string act, slot; public float turn; public ActorLook look; public int variant; public string role, name; public ActorPose pose; public float walk, time = .4f; public bool dead; public string[] gear; public ItemDatabase db; public GearLooks looks; public bool orc; public Load load; public int count; public ActorVisual.Carrying carry; }
         static Spec Ca(Load load, int count, ActorVisual.Carrying carry) { return new Spec { look = ActorLook.Villager, variant = 13, role = "baker", name = "Ama Rusk", walk = 1.5f, time = .3f, load = load, count = count, carry = carry }; }
         static Spec P(ActorLook look, int variant = 0, string role = null, string name = null, string[] gear = null, ItemDatabase db = null, GearLooks looks = null, float walk = 0)
         { return new Spec { look = look, variant = variant, role = role, name = name ?? look.ToString(), gear = gear, db = db, looks = looks, walk = walk }; }
@@ -92,21 +115,23 @@ namespace Crulanda.EditorTools
         static Spec Po(ActorPose pose, float walk, float time, bool dead = false) { return new Spec { look = ActorLook.Villager, variant = 23, role = "farmer", name = "Garet Moss", pose = pose, walk = walk, time = time, dead = dead }; }
 
         /// <summary>A row of figures, a metre and a bit apart, drawn from the front (or the side), and the shot saved.</summary>
-        static void Row(string shot, Spec[] specs, float yaw = 0, bool close = false)
+        static void Row(string shot, Spec[] specs, float yaw = 0, bool close = false, float gap = 0)
         {
             if (stage != null) Object.DestroyImmediate(stage.gameObject);
             stage = new GameObject("Stage").transform;
-            float gap = close ? .62f : 1.1f, x0 = -(specs.Length - 1) * gap / 2;
+            if (gap <= 0) gap = close ? .62f : 1.1f;
+            float x0 = -(specs.Length - 1) * gap / 2;
             for (int i = 0; i < specs.Length; i++)
             {
                 var s = specs[i];
                 var go = new GameObject(s.name); go.transform.SetParent(stage, false);
-                go.transform.SetPositionAndRotation(new Vector3(x0 + i * gap, 1, 0), Quaternion.Euler(0, 180 + yaw, 0));   // facing the camera (-Z), or side on
+                go.transform.SetPositionAndRotation(new Vector3(x0 + i * gap, 1, 0), Quaternion.Euler(0, 180 + yaw + s.turn, 0));   // facing the camera (-Z), or side on (or turned its own way)
                 new GameObject("Body").transform.SetParent(go.transform, false);
-                var v = ActorVisual.Attach(go, s.look, s.variant, s.role == "child", s.role);
+                var v = ActorVisual.Attach(go, s.look, s.variant, s.role == "child", s.role, s.orc);
                 if (s.gear != null) v.ApplyGearIds(s.gear, s.db, s.looks);
                 if (s.carry != ActorVisual.Carrying.None) { LoadProps.Build(go.transform, s.load, s.count); v.Carry = s.carry; }
                 if (s.dead) v.PreviewDead(); else v.Preview(s.pose, s.walk, s.time);
+                if (v.BeastModel != null) v.BeastModel.Sample(s.slot ?? (s.walk > 0 ? "walk" : "idle"), s.slot != null ? s.time : .4f);   // a whole orc on its own clips, not its file's rest pose
                 if (s.act != null) v.PreviewAct(s.act, s.time);
             }
             float width = specs.Length * gap + .3f, halfH = Mathf.Tan(cam.fieldOfView * .5f * Mathf.Deg2Rad), aspect = 16f / 9;

@@ -112,7 +112,7 @@ namespace Crulanda.Encounter
                 var names = named.Length == 0 ? null : Array.ConvertAll(named.Split(','), n => n.Trim());
                 for (int c = 0; c < camps.Length; c++)
                 {
-                    var camp = camps[c]; if (c == e || camp == null || camp.elite) continue;
+                    var camp = camps[c]; if (c == e || camp == null || (camp.elite && names == null)) continue;   // an elite guards only when named (the reworked Adit's Varrow with Ysolt, ADIT_REWORK 5)
                     bool guards = names != null ? Array.IndexOf(names, camp.name) >= 0 : Vector2.Distance(camp.center, lord.center) - camp.radius <= GuardPairing;
                     if (!guards) continue;
                     if (result[e] == null) result[e] = new List<int>();

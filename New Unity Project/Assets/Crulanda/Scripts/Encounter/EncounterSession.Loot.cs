@@ -67,6 +67,54 @@ namespace Crulanda.Encounter
         }
         /// <summary>Health back each second out of combat: 7, and what worn gear adds (capped at +20).</summary>
         int RestRegen { get { return 7 + GearFx.restRegen; } }
+
+        // ---------- class set bonuses (loot DESIGN.md 3.8) ----------
+        /// <summary>The scale on the player's hits (DamageScaleFor) and heals (PlayerHealScale) while an ability resolves: the worn
+        /// sets' abilityPower on it, and an echo's share. 1 at any other time, so later ticks and swings are untouched.</summary>
+        public float GearPowerNow { get; private set; } = 1;
+        readonly System.Random gearRng = new System.Random();
+        /// <summary>
+        /// An ability's effect as it resolves, with the worn class set bonuses (StartAbility): stronger by its abilityPower while it
+        /// runs, then its procs (resource back, another ability's cooldown cut, or an echo: the effect once more, free, at the echo's
+        /// power; an echo fires no procs of its own).
+        /// </summary>
+        void ResolveWithGear(Crulanda.Abilities.AbilityDefinition a, System.Action effect)
+        {
+            float was = GearPowerNow, scale = GearEffects.PowerScale(GearFx, a != null ? a.id : null);
+            GearPowerNow = was * scale;
+            try { effect(); } finally { GearPowerNow = was; }
+            if (a == null || GearFx.abilities.Count == 0) return;
+            var procs = GearEffects.Proc(GearFx, a.id, gearRng.NextDouble);
+            ApplyGearProcs(procs);
+            if (procs.echo > 0 && Player != null && Player.IsAlive)
+            {
+                GearPowerNow = was * scale * procs.echo;
+                try { effect(); } finally { GearPowerNow = was; }
+            }
+        }
+        /// <summary>A landed weapon swing or auto-shot: the worn sets' procs on "auto" (no echo: a swing is not an ability).</summary>
+        void GearSwingProcs()
+        {
+            if (GearFx.abilities.Count == 0) return;
+            var procs = GearEffects.Proc(GearFx, LootDatabase.AutoTrigger, gearRng.NextDouble); procs.echo = 0;
+            ApplyGearProcs(procs);
+        }
+        void ApplyGearProcs(GearProcs procs)
+        {
+            if (procs == null || !procs.Any || Player == null || !Player.IsAlive) return;
+            if (procs.resource > 0 && Player.Resource != null) Player.Resource.Pool.Change(procs.resource);
+            foreach (var (id, seconds) in procs.resets) abilities.Shorten(id, seconds, Time.time);
+            FloatText(Player.transform.position + Vector3.up * .4f, string.Join(" ", procs.fired.ConvertAll(ShortProc)), new Color(1f, .82f, .3f));
+        }
+        /// <summary>A fired proc's float: its text up to the colon ("Echo: ..." shows "Echo").</summary>
+        static string ShortProc(string text) { int c = text.IndexOf(':'); return c > 0 ? text.Substring(0, c) : text; }
+        /// <summary>The party's classes for a class set group (LootDatabase.Roll): yours first, then each sim's.</summary>
+        public List<string> PartyClasses()
+        {
+            var l = new List<string> { Progress != null ? Progress.classId : null };
+            foreach (var c in PartySims) if (c != null && c.sim != null) l.Add(c.sim.classId);
+            return l;
+        }
         /// <summary>
         /// A new character in the zones starts with the Tempered Trailblade in hand (loot step L2, the owner's call), so the empty
         /// hands of the gear looks are never the first thing seen. Saved characters are never changed; the old Quiet Trail keeps
@@ -77,8 +125,11 @@ namespace Crulanda.Encounter
             if (Zone == null || Progress == null || string.IsNullOrEmpty(content.itemId)) return;
             Inventory.Ensure(Progress);
             // The class's own first weapon (Round 22, note 48: "mage should start with wand or staff"): a wand for the Mage, a bow for the Ranger, the blade for the rest.
-            string starter = ClassDef != null && (ClassDef.id == "class.mage" || ClassDef.id == "class.archivist") ? "item.apprentice_wand" : ClassDef != null && ClassDef.id == "class.ranger" ? "item.hunting_bow" : content.itemId;
+            string starter = ClassDef != null && (ClassDef.id == "class.mage" || ClassDef.id == "class.archivist" || ClassDef.id == "class.saltmender") ? "item.apprentice_wand" : ClassDef != null && ClassDef.id == "class.ranger" ? "item.hunting_bow" : content.itemId;
+            if (ClassDef != null && ClassDef.id == "class.rogue") starter = "item.rogues_dirk";   // the Rogue's pair of dirks (Chris, 2026-10-11)
+            if (ClassDef != null && ClassDef.id == "class.scoundrel") starter = "item.scoundrels_dirk";   // one dirk, and a voice (2026-10-14)
             if (Progress.equipment[(int)EquipSlot.MainHand].Empty) Progress.equipment[(int)EquipSlot.MainHand] = new ItemStack { item = starter, count = 1 };
+            if (ClassDef != null && ClassDef.id == "class.rogue" && Progress.equipment[(int)EquipSlot.OffHand].Empty) Progress.equipment[(int)EquipSlot.OffHand] = new ItemStack { item = "item.rogues_second_dirk", count = 1 };
         }
         /// <summary>What taking says when the bags could not hold everything.</summary>
         public const string BodyKeepsLine = "Your bags are full. The rest stays on the body.";
@@ -103,6 +154,7 @@ namespace Crulanda.Encounter
         public void RollCorpse(EncounterEnemy corpse)
         {
             if (corpse == null) return;
+            if (corpse.NoLoot) { PutLoot(corpse, 0, null); return; }   // a boss or elite killed under its lockout: nothing, not even coin (Lockouts.RollsLoot)
             int coins = 1 + corpse.actor.Level * 2 + Random.Range(0, corpse.actor.Level + 2);
             if (corpse.Elite) coins *= 3;
             if (GearFx.coins > 0) coins = Mathf.RoundToInt(coins * (1 + GearFx.coins));
@@ -116,7 +168,7 @@ namespace Crulanda.Encounter
                 {
                     var context = LootContext.From(corpse.persistentId, Zone != null ? Zone.Zone.camps : null, corpse.actor.Level, corpse.Elite);
                     if (Armoury != null) { Armoury.Killed(context); armouryTallies = null; }
-                    drops = Loot.Roll(context, Items, owned, GearFx.luck, Progress.lootLuck, rng, has);
+                    drops = Loot.Roll(context, Items, owned, GearFx.luck, Progress.lootLuck, rng, has, PartyClasses());
                 }
                 else
                 {
@@ -160,10 +212,10 @@ namespace Crulanda.Encounter
             lootBody = corpse;
             if (!WorthAWindow(corpse.Drops)) { TakeAllLoot(); return; }
             // The windows drawn before it would take its clicks, so they shut while it is open (TickLoot shuts it if one opens).
-            Conversation = null; if (VendorNpc != null) CloseVendor(); TradesOpen = false; QuestBookOpen = false; ReadingDocument = null; MapOpen = false;
+            Conversation = null; if (VendorNpc != null) CloseVendor(); CloseCapital(); TradesOpen = false; QuestBookOpen = false; ReadingDocument = null; MapOpen = false;
         }
         /// <summary>Whether E on this camp body would take anything now: coins, a thing the bags have room for, or loot not yet rolled. A body with nothing that fits leaves E to Mira, villagers, nodes and doors.</summary>
-        bool CanTakeAny(EncounterEnemy e) { return e.Drops == null || e.Coins > 0 || Items == null || e.Drops.Exists(d => Inventory.Room(Progress, Items, d.item) > 0 && !HoldsUnique(d.item)); }
+        public bool CanTakeAny(EncounterEnemy e) { return e.Drops == null || e.Coins > 0 || Items == null || e.Drops.Exists(d => Inventory.Room(Progress, Items, d.item) > 0 && !HoldsUnique(d.item)); }
         public void CloseLoot() { lootBody = null; }
         /// <summary>Take all [E]: the coins, then each thing in order; what does not fit stays on the body. The window shuts either way.</summary>
         public void TakeAllLoot()
@@ -188,7 +240,7 @@ namespace Crulanda.Encounter
         void TakeCoins(EncounterEnemy body)
         {
             if (body.Coins <= 0) return;
-            int all = body.Coins, mine = SplitCoins(all); Progress.gold += mine; body.Coins = 0;   // split round the party (Round 25, note 72)
+            int all = body.Coins, mine = SplitCoins(all); Progress.gold += mine; body.Coins = 0; Meter.Coin += mine;   // split round the party (Round 25, note 72)
             Message(mine == all ? "Looted " + all + " crowns." : "Looted " + mine + " crowns, your share of " + all + ".");
         }
         /// <summary>
@@ -204,7 +256,7 @@ namespace Crulanda.Encounter
             // In a party, uncommon and better is rolled for (Round 25, note 72): off the body and into the roll.
             if (Rolled(drop.item)) { body.Drops[i] = new LootDrop(drop.item, 0); QueueRoll(drop.item, drop.count, body.actor.DisplayName); return 0; }
             int left = Items != null ? Inventory.Add(Progress, Items, drop.item, drop.count) : drop.count;
-            if (drop.count - left > 0) Received(drop.item, drop.count - left);
+            if (drop.count - left > 0) { Received(drop.item, drop.count - left); Meter.Loot(ItemName(drop.item) + (drop.count - left > 1 ? " x" + (drop.count - left) : ""), body.Name, "You"); }
             body.Drops[i] = new LootDrop(drop.item, left);
             return left;
         }
@@ -271,7 +323,7 @@ namespace Crulanda.Encounter
             SweepArmoury();
             if (lootBody == null) { lootBody = null; return; }   // a body destroyed by a load reads as null: forget it
             if (!Player.IsAlive || lootBody.actor == null || lootBody.actor.IsAlive || lootBody.Drops == null || Vector3.Distance(Player.transform.position, lootBody.transform.position) > LootReach
-                || Conversation != null || VendorNpc != null || TradesOpen || QuestBookOpen || MapOpen) CloseLoot();   // a window drawn under it opened: it gives way
+                || Conversation != null || VendorNpc != null || BankOpen || ExchangeOpen || TradesOpen || QuestBookOpen || MapOpen) CloseLoot();   // a window drawn under it opened: it gives way
         }
     }
 }

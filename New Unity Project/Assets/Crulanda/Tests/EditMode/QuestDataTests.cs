@@ -115,6 +115,31 @@ namespace Crulanda.Tests
         }
 
         /// <summary>
+        /// (The Adit rework, ADIT_REWORK.md sections 4 and 9) The run a sim leads goes past every boss the Adit's quests want and every boss
+        /// with a rail sigil: each is a fight of its wing's run (a step, there from the start, not optional), in a wing every run takes (not an
+        /// optional wing, not one side of a fork); the pinned camps keep their places (so saves and deeds keep their keys); and every page the
+        /// Adit's secrets give is written.
+        /// </summary>
+        [Test] public void The_Adit_run_passes_every_quest_boss_and_its_secrets_give_written_pages()
+        {
+            var db = QuestDatabase.Parse(Texts("Quests")); var adit = Zone("adit");
+            var every = new HashSet<string>(adit.wings.Where(w => !w.optional && string.IsNullOrEmpty(w.group)).Select(w => w.id));
+            void OnTheRun(ZoneCamp cp, string why) { Assert.IsTrue(DungeonPlan.RequiredCamp(cp) && every.Contains(cp.wing), why + ": " + cp.name + " is a fight every run takes (wing " + cp.wing + ", step " + cp.step + ")"); }
+            foreach (var (id, _, _, _, _) in AditQuests)
+                foreach (var o in db.Quests[id].steps.SelectMany(st => st.objectives).Where(o => o.type == "kill"))
+                {
+                    var bosses = adit.camps.Select((c, i) => (c, i)).Where(x => x.c.elite && QuestLog.Matches(o.target, "mob." + x.c.tag + ".adit." + x.i + ".0")).ToList();
+                    Assert.AreEqual(1, bosses.Count, id + ": " + o.target + " is one camp's boss");
+                    OnTheRun(bosses[0].c, id);
+                }
+            foreach (var cp in adit.camps.Where(c => !string.IsNullOrEmpty(c.key))) OnTheRun(cp, cp.key);
+            var pinned = new[] { (5, "Gang-Boss Haddo Lusk"), (13, "Quartermaster Brannigan Sorrel"), (16, "Rail-Captain Orsk Danner"), (21, "Nix, the turncoat"), (25, "The Vent-Hound"), (27, "Cinder-Warden Ysolt"), (31, "The Foreman Who Forgot") };
+            foreach (var (i, mob) in pinned) Assert.AreEqual(mob, adit.camps[i].mob, "camp " + i + " keeps its boss (its deed's key, mob.tag.adit." + i + ")");
+            Assert.AreEqual("The Quiet Miner", adit.camps[adit.camps.Length - 1].mob, "the rare one last (no other camp's draws move)");
+            foreach (var s in adit.secrets.Where(x => !string.IsNullOrEmpty(x.document))) Assert.IsTrue(db.Documents.ContainsKey(s.document), s.id + ": its page " + s.document + " is written");
+        }
+
+        /// <summary>
         /// The seven quests in order on one character, as the session drives the log: kills by enemy id (the Adit's camps' ids, mob.tag.adit.c.n),
         /// the item a boss drops for a "collect from a kill", the cages opened, the jars taken, hand-ins by talking, turn-ins with their
         /// pages; then The Dead Line and the letter open up and carry Danner's letter to the Salt-Mender.
@@ -151,7 +176,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(log.TalkTo("Brother Cael")); Assert.AreEqual(0, log.ItemCount("item.adit_echo_jar"), "All six handed over.");
             Assert.IsTrue(log.TurnIn(log.Def("side.adit.echoes"), out _)); Assert.Contains("doc.adit.echoes", pages);
             // Embers Below and What the Grey Takes: Ysolt's brand to Khaven, the Foreman's shard to the Salt-Mender.
-            log.Notify("kill", "mob.ysolt.adit.26.0"); log.LootFrom("mob.ysolt.adit.26.0"); Assert.IsTrue(log.TalkTo("Tamsin Rook")); Assert.IsTrue(log.TurnIn(log.Def("side.adit.embers"), out _));
+            log.Notify("kill", "mob.ysolt.adit.27.0"); log.LootFrom("mob.ysolt.adit.27.0"); Assert.IsTrue(log.TalkTo("Tamsin Rook")); Assert.IsTrue(log.TurnIn(log.Def("side.adit.embers"), out _));
             log.Notify("kill", "mob.foreman.adit.31.0"); log.LootFrom("mob.foreman.adit.31.0"); Assert.IsTrue(log.TalkTo("Lisle Tamber")); Assert.IsTrue(log.TurnIn(log.Def("side.adit.grey"), out _));
             Assert.AreEqual(250, log.Standing("saltmenders"));
 

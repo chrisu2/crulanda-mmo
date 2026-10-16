@@ -3,9 +3,16 @@
 Updated 2026-10-05 (rewritten: the 2026-09-28 version had fallen behind). PROJECT_MASTER.md remains the design brief; this file
 records where each of its phases stands and the order of the work. Update it every round that moves a phase.
 
+## Chris's order, 2026-10-11 (about 14:26, verbatim)
+"keep developing. once completed continue working on classes/perks/talent builds and add new classes/races based on lore canon. and all
+phases after." So: finish the Adit pass (CLAUDE_HANDOFF 8A); then the classes (the three missing fourth paths: the Ranger's Skirmisher, the
+Mage's Cinderwright, the Rogue's Swashbuckler; talent rows 4-6; perks), then new classes and races from the canon (Phase 9.2 and 9.3), then
+every phase after. **No machines** holds over all of it (CRULANDA_CANON): Phase 9.2's Tinker as written (Klyther Forgeheart's drones and
+scorpions) is machinery and is to be designed without it, or set aside, and the choice written down.
+
 ## Phases (PROJECT_MASTER.md)
 
-| Phase | Goal | Status (2026-10-09) |
+| Phase | Goal | Status (2026-10-09; what is verified, tested or only built: CLAUDE_HANDOFF.md, 2026-10-11) |
 |---|---|---|
 | 0 | Foundation | Done |
 | 1 | Combat sandbox | Done: shared abilities, threat, elites, level scaling (mobs above you hit harder, red at +3), crowd control (CC_DESIGN.md) |
@@ -50,10 +57,26 @@ out of that rig as loose nodes and pinned to our heads, which is why they cannot
 construction (needs the full package re-downloaded from the Asset Store, our animations retargeted through a Humanoid avatar, and a
 mapping from our items' looks to its parts, keeping the drawn pieces for what it lacks: cloth, leather, the zones' palettes); or
 (b) keep our figures and rewrite the fitting rules piece by piece. (a) is the lasting fix; (b) is the one that keeps failing.
-**Animations to buy with it (2026-10-10):** the game has no archery clips, so the bow is posed by hand (ActorVisual.BowArms, note 108);
+**Chris chose (a)** (2026-10-15 ~22:00, the question prompt, verbatim: "Rebuild on the hero pack's body (Recommended)"). The full
+package is not on disk (not in the Asset Store cache): Chris downloads "Modular Hero" (CHOSAN) in the Package Manager's My Assets first.
+**Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every
 class's figure, and Chris has looked at it.
+
+## Phase 8.6 plan: the living world's second pass (Chris, 2026-10-14 23:30-23:35, verbatim; queued, its place to be decided)
+Chris: "so what is the phases look like? the villagers and npcs need better ai" and "more things to do. more incentives for
+gathering/professions. make better gear. have gear change the way your character looks when equipping" (PLAYTEST_NOTES 203-204).
+After Phase 8 (Chris, 23:25: "work on phase 8"). His answer to what he saw (23:40, verbatim, PLAYTEST_NOTES 205): "running into each
+other and sometimes get stuck or delayed at door of inn..prob need double doors and inn a bit bigger so for people. need more / better
+loot obtained from crafting armor/weapons/potions/food buffs. find recipes/ book of lore/still havent found many secrets. all this for
+ALL Zones".
+- **Villager and NPC AI:** they run into each other and get stuck or delayed at the inn's door; the inn's door made double and the
+  inn a little bigger for the people in it; the villagers' way-finding and giving way to each other (every zone).
+- **More to do; gathering and the professions worth doing:** more and better loot made by crafting (armour, weapons, potions, food
+  buffs); recipes to find; a book of lore; the secrets ("still havent found many"): every zone.
+- **Better gear, and gear that changes the character's look when equipped** (with Phase 8.5's fit overhaul: the one phase if Chris
+  wants them together).
 
 ## Phase 9 plan: the wider world (after Phase 8; PROVISIONAL until each item is checked against the books)
 Everything here is drawn from the lore folder (D:\code\crulanda: world_bible.md, the three books) and labelled as the game labels lore:
@@ -62,11 +85,19 @@ CANON where the books name it, CANON-EXPANDED where the game fills in round a ca
 | Step | What gets done | Canon source |
 |---|---|---|
 | 9.1 Zones | New zones on the world map, each with its band, quests, camps, trades and a dungeon or landmark: the Lowtowns of Argentis (industry and poverty under the Crown), the Crown itself (white stone and gold), Port Caelum and the Glittering Coast (glass ships, the Gilded Bay), the Iron Citadel (the Iron Pact's fortress-monastery in a dormant volcano), the Archive of Silence (the Silent Pilgrims' library-temple), Hallow's Creek (the first town the Wasting took), the Warrens (the goblins' tunnels under the High City), the Tide-Watched Shores (blue water, no ash). Order and bands to be chosen with Chris. | world_bible.md Geography; book1 (the Lowtowns, the Deep Veins, the Warrens); book2 (the Wasting) |
-| 9.2 Classes | New class kits with talents, AI rotations, looks and sim support, modelled on the books' people: the Tinker (Klyther Forgeheart: drones and scorpions, an engineer), the Rogue (Valen: Thief's Grace, shards, vibration-locking), the Knight (Talira Frostveil, Kaelith Dawnstrike: swordmaster, Stormlight), the Archivist (the Silent Pilgrims: the Original Song, echo-jars), the Salt-Mender (salt-magic of the West). Names provisional. | world_bible.md Characters and Factions |
+| 9.2 Classes | New class kits with talents, AI rotations, looks and sim support, modelled on the books' people: ~~the Tinker (Klyther Forgeheart: drones and scorpions, an engineer)~~ set aside 2026-10-11 as machinery (his book-3 salt-stone craft goes to the Salt-Mender), the Rogue (Valen: Thief's Grace, shards, vibration-locking), the Knight (Talira Frostveil, Kaelith Dawnstrike: swordmaster; "Stormlight" not used, see CLASS_BUILD_MATRIX.md), the Archivist (the Silent Pilgrims: the Original Song, echo-jars), the Salt-Mender (salt-magic of the West). Names provisional. | world_bible.md Characters and Factions |
 | 9.3 Races | Playable and sim folk beyond the human regions: the goblins (the Weavers of the Warrens: vibration-locking, static-charting), the Forgeborn (Tynara Embercoil), the Veridian Keepers (beings of wood and moss; a Keeper playable only if the books allow), and the human peoples by region (Lowtowners, Coast folk, the North's survivors). Each with models, looks, voices in chat and a home zone. | world_bible.md Factions; the character sheets in chars/ |
 | 9.4 The sims in the wider world | The roster grows with the zones (more bands, more homes); guilds and trades reach the new places. | ROADMAP 5.7 |
 
 Each step is its own set of rounds; Chris picks the first zone, class and race when Phase 8 closes.
+**The first zone (Chris, 2026-10-15 ~22:00, the question prompt, verbatim): "Lowtowns & Rust Market 16-19 (Recommended)"**, the 16-30
+road's first band, east through Argentis's gate from the Shore. Hallow's Creek (DUNGEON2_DESIGN.md, 16-18) takes its recommended answers.
+Chris's order with it: "keep going finish phase 8" then "them move to 9".
+**Chris, 2026-10-16 ~14:50 (verbatim): "after this work on next dungeon and raise top level to 20. make sure there is a zone for 15-20 and a
+dungeon for the same range".** The cap goes to 20 (not 19), with a zone and a dungeon for 15-20.
+**Before it, the capital (Chris, 2026-10-15 ~22:25, verbatim):** "we need to implement a castle (central point) for auction house, library
+(lore), leader of crulanda (canon lore), guild halls, bank, etc more as we come up with it. check maps for location it should be located".
+His answers: the Crown of Argentis, open to everyone from level 1, High Councilor Aethelgard, castle first. CAPITAL_HUB.md.
 
 **The 16-30 road (Chris, side chat 2026-10-07; PROVISIONAL, mostly Book 1):** levels 16-30 use places already on the world map:
 the Lowtowns and the Rust Market (16-19), the Forge District (19-22), the Warrens with the Deep Veins dungeon (22-25), the Crown and
@@ -77,7 +108,9 @@ first a mix of the Deadmines, Wailing Caverns and Scarlet Monastery; bands low 1
 run under the smelters, a syndicate boss), the Deep Veins (23-25, the Warrens: the penal-legion mine of book1 ch.9, geode seams, the
 Blind Crow's goblins as allies, a Council overseer and his unmade labour as bosses), the Transit Hub (27-29, the Crown: the junction
 of every soul-prism and geode, cargo lifts, redaction squads, a Councillor's lieutenant; its last boss drops the letter that opens the Spire).
-**Endgame at the cap** (30 later; a cap-15 version in the Shore first): raids (the Spire of Agony first, ten players: you and sims, a
+**Raids (Chris, 2026-10-15, the question prompt: "Wait for the Spire at 30" and "20"):** no cap-15 raid; the Spire of Agony at 30 is
+the first, and a raid is **twenty players** (you and nineteen sims). The class sets' higher tiers drop there (PLAYTEST_NOTES 228).
+**Endgame at the cap** (30 later; the cap-15 Shore version dropped 2026-10-15): raids (the Spire of Agony first, twenty players: you and sims, a
 guild run, several bosses with the Adit's mechanics at scale; the Ashlands Sanctum later); world bosses (one roaming elite per high
 zone on a long timer, the Weave-Eater brood's mother on the Rim, a Pale King's shadow on the Shore, announced in Zone chat, a full
 group needed, guilds forming up); challenges (timed dungeon runs with a rating the sims' guilds compete on, a weekly notice-board bounty,
@@ -116,3 +149,6 @@ open the next round.
   drain faster (a water supply to keep up). Winter: snow on the ground in the high and northern places; the cold takes health and
   stops it coming back until you are warm (a fire, an inn, warm clothes). Builds on the crops' round (CropField), WorldWeather and
   WorldClock.
+
+**Asked (the question prompt, 2026-10-16 ~14:55, verbatim): "Lowtowns + Hallow's Creek (Recommended)".** The cap is 20; the Lowtowns & Rust
+Market zone is stretched to 15-20 (ZONE_LOWTOWNS.md) and Hallow's Creek to 15-20 (DUNGEON2_DESIGN.md), its door at Oakhaven's Road's End.

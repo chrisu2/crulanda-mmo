@@ -1,0 +1,407 @@
+{
+    "id":  "shaman",
+    "name":  "Shaman",
+    "resource":  "Breath",
+    "resourceDesc":  "Breath, a well of a hundred, pays for every call; it comes back steadily.",
+    "identity":  "An orc weather-speaker of the high moors who calls on rain, stone and the old dead. CANON-EXPANDED: orcs are canon (Gorm, Krunk); orc shamanism is not (Chris signed off 2026-10-12). Orc only.",
+    "canonStatus":  "CANON-EXPANDED",
+    "race":  "race.orc",
+    "branches":  [
+                     {
+                         "id":  "rainspeaker",
+                         "name":  "Rainspeaker",
+                         "role":  "healer",
+                         "loop":  "Rain Call over the party, Tide Mend the one in danger, Chain Mend when the hurt is spread.",
+                         "tradeoff":  "Rain Call is fixed where it falls; a party that moves leaves it.",
+                         "nodes":  [
+                                       {
+                                           "id":  "rs-tide",
+                                           "name":  "Deep Tide",
+                                           "tier":  0,
+                                           "col":  0,
+                                           "max":  5,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "heart",
+                                           "desc":  "Tide Mend and Chain Mend heal 4% more per rank.",
+                                           "emphasis":  {
+                                                            "healer":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "rs-deep-rain",
+                                           "name":  "Heavy Rain",
+                                           "tier":  0,
+                                           "col":  1,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "drop",
+                                           "desc":  "Rain Call heals 5% more per rank.",
+                                           "emphasis":  {
+                                                            "healer":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "rs-long-rain",
+                                           "name":  "Long Rain",
+                                           "tier":  1,
+                                           "col":  0,
+                                           "max":  3,
+                                           "req":  "rs-deep-rain",
+                                           "kind":  "passive",
+                                           "icon":  "clock",
+                                           "desc":  "Rain Call falls 2s longer per rank.",
+                                           "emphasis":  {
+                                                            "healer":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "rs-chain",
+                                           "name":  "Wide Chain",
+                                           "tier":  1,
+                                           "col":  1,
+                                           "max":  3,
+                                           "req":  "rs-tide",
+                                           "kind":  "passive",
+                                           "icon":  "link",
+                                           "desc":  "Chain Mend leaps to one more per rank.",
+                                           "emphasis":  {
+                                                            "healer":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "rs-springs",
+                                           "name":  "Moor Springs",
+                                           "tier":  2,
+                                           "col":  0,
+                                           "max":  2,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "drop",
+                                           "desc":  "Tide Mend gives back 2 Breath per rank.",
+                                           "emphasis":  {
+                                                            "healer":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "rs-ancestor",
+                                           "name":  "The Ancestors Hold",
+                                           "tier":  3,
+                                           "col":  1,
+                                           "max":  1,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "shield",
+                                           "desc":  "Once a fight, a blow that would kill a party member leaves them at 1.",
+                                           "emphasis":  {
+                                                            "healer":  1
+                                                        },
+                                           "impl":  true
+                                       }
+                                   ]
+                     },
+                     {
+                         "id":  "stormcaller",
+                         "name":  "Stormcaller",
+                         "role":  "dps",
+                         "loop":  "Squall to build charge, Thunderhead to spend it, Hailfall on a pack.",
+                         "tradeoff":  "Thunderhead without charge does nothing.",
+                         "nodes":  [
+                                       {
+                                           "id":  "sc-gale",
+                                           "name":  "Gale",
+                                           "tier":  0,
+                                           "col":  0,
+                                           "max":  5,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "bolt",
+                                           "desc":  "Squall deals 4% more per rank.",
+                                           "emphasis":  {
+                                                            "dps":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sc-quick-squall",
+                                           "name":  "Quick Squall",
+                                           "tier":  0,
+                                           "col":  1,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "clock",
+                                           "desc":  "Squall casts 0.15s faster per rank.",
+                                           "emphasis":  {
+                                                            "dps":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sc-charge",
+                                           "name":  "Building Storm",
+                                           "tier":  1,
+                                           "col":  0,
+                                           "max":  3,
+                                           "req":  "sc-gale",
+                                           "kind":  "passive",
+                                           "icon":  "bolt",
+                                           "desc":  "Thunderhead deals 10% more per charge per rank.",
+                                           "emphasis":  {
+                                                            "dps":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sc-hail",
+                                           "name":  "Hard Hail",
+                                           "tier":  1,
+                                           "col":  1,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "snow",
+                                           "desc":  "Hailfall deals 5% more per rank.",
+                                           "emphasis":  {
+                                                            "dps":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sc-eye",
+                                           "name":  "Eye of the Storm",
+                                           "tier":  2,
+                                           "col":  0,
+                                           "max":  2,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "eye",
+                                           "desc":  "Thunderhead deals 25% more to a foe under 30%.",
+                                           "emphasis":  {
+                                                            "dps":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sc-thunderclap",
+                                           "name":  "Thunderclap",
+                                           "tier":  3,
+                                           "col":  1,
+                                           "max":  1,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "bolt",
+                                           "desc":  "Thunderhead splashes 30% to foes within 5 m.",
+                                           "emphasis":  {
+                                                            "dps":  1
+                                                        },
+                                           "impl":  true
+                                       }
+                                   ]
+                     },
+                     {
+                         "id":  "stonebound",
+                         "name":  "Stonebound",
+                         "role":  "tank",
+                         "loop":  "Earthskin up, Rooting Stamp to hold the pack, Cairn on whoever is breaking.",
+                         "tradeoff":  "Little damage; the stamp has a short reach.",
+                         "nodes":  [
+                                       {
+                                           "id":  "sb-earthskin",
+                                           "name":  "Thick Skin",
+                                           "tier":  0,
+                                           "col":  0,
+                                           "max":  5,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "shield",
+                                           "desc":  "Earthskin absorbs 5% more per rank.",
+                                           "emphasis":  {
+                                                            "tank":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sb-stamp",
+                                           "name":  "Heavy Stamp",
+                                           "tier":  0,
+                                           "col":  1,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "fist",
+                                           "desc":  "Rooting Stamp deals 4% more per rank.",
+                                           "emphasis":  {
+                                                            "tank":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sb-rooted",
+                                           "name":  "Rooted",
+                                           "tier":  1,
+                                           "col":  0,
+                                           "max":  3,
+                                           "req":  "sb-stamp",
+                                           "kind":  "passive",
+                                           "icon":  "root",
+                                           "desc":  "Rooting Stamp slows 5% more per rank.",
+                                           "emphasis":  {
+                                                            "tank":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sb-cairn",
+                                           "name":  "High Cairn",
+                                           "tier":  1,
+                                           "col":  1,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "stone",
+                                           "desc":  "Cairn absorbs 8% more per rank.",
+                                           "emphasis":  {
+                                                            "tank":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sb-stone-blood",
+                                           "name":  "Stone Blood",
+                                           "tier":  2,
+                                           "col":  0,
+                                           "max":  2,
+                                           "req":  "sb-earthskin",
+                                           "kind":  "passive",
+                                           "icon":  "shield",
+                                           "desc":  "Under Earthskin, take 2% less per rank.",
+                                           "emphasis":  {
+                                                            "tank":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "sb-mountain",
+                                           "name":  "The Mountain",
+                                           "tier":  3,
+                                           "col":  1,
+                                           "max":  1,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "stone",
+                                           "desc":  "Once a fight, under 30% you gain a barrier of 30% of your health.",
+                                           "emphasis":  {
+                                                            "tank":  1
+                                                        },
+                                           "impl":  true
+                                       }
+                                   ]
+                     },
+                     {
+                         "id":  "gravewind",
+                         "name":  "Gravewind",
+                         "role":  "control",
+                         "loop":  "Moor Wind to slow a pack, Mist to root it, Barrow-call to hold the worst one.",
+                         "tradeoff":  "Low damage; roots break when the fight turns to them.",
+                         "nodes":  [
+                                       {
+                                           "id":  "gw-moor-wind",
+                                           "name":  "Biting Wind",
+                                           "tier":  0,
+                                           "col":  0,
+                                           "max":  5,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "wind",
+                                           "desc":  "Moor Wind slows 5% more per rank.",
+                                           "emphasis":  {
+                                                            "control":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "gw-mist",
+                                           "name":  "Wide Mist",
+                                           "tier":  0,
+                                           "col":  1,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "cloud",
+                                           "desc":  "Mist reaches 1 m wider per rank.",
+                                           "emphasis":  {
+                                                            "control":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "gw-barrow",
+                                           "name":  "Barrow Hold",
+                                           "tier":  1,
+                                           "col":  0,
+                                           "max":  3,
+                                           "req":  "gw-moor-wind",
+                                           "kind":  "passive",
+                                           "icon":  "skull",
+                                           "desc":  "Barrow-call holds 1s longer per rank.",
+                                           "emphasis":  {
+                                                            "control":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "gw-cold",
+                                           "name":  "Grave Cold",
+                                           "tier":  1,
+                                           "col":  1,
+                                           "max":  3,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "snow",
+                                           "desc":  "Moor Wind slows a further 5% per rank.",
+                                           "emphasis":  {
+                                                            "control":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "gw-long-dark",
+                                           "name":  "Long Dark",
+                                           "tier":  2,
+                                           "col":  0,
+                                           "max":  2,
+                                           "req":  null,
+                                           "kind":  "passive",
+                                           "icon":  "clock",
+                                           "desc":  "Mist and Barrow-call hold 0.5s longer per rank.",
+                                           "emphasis":  {
+                                                            "control":  1
+                                                        },
+                                           "impl":  true
+                                       },
+                                       {
+                                           "id":  "gw-wailing",
+                                           "name":  "Wailing Dead",
+                                           "tier":  3,
+                                           "col":  1,
+                                           "max":  1,
+                                           "req":  "gw-barrow",
+                                           "kind":  "passive",
+                                           "icon":  "skull",
+                                           "desc":  "Barrow-call also harms its foe over 6 s.",
+                                           "emphasis":  {
+                                                            "control":  1
+                                                        },
+                                           "impl":  true
+                                       }
+                                   ]
+                     }
+                 ]
+}

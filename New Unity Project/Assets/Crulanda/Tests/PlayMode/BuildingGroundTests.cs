@@ -28,7 +28,7 @@ namespace Crulanda.Tests
         void OnLoaded(Scene scene, LoadSceneMode mode) { var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (s != null) s.SaveDirectoryOverride = root; }
         [UnitySetUp] public IEnumerator Setup()
         {
-            WorldClock.Hour = 11;
+            WorldClock.Hour = 11; ZoneBuilder.NoStaticBatching = true;   // the flush-face check reads the walls' meshes
             root = Path.Combine(Path.GetTempPath(), "Crulanda-buildings-" + Guid.NewGuid().ToString("N"));
             SceneManager.sceneLoaded += OnLoaded;
             yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
@@ -36,7 +36,7 @@ namespace Crulanda.Tests
         }
         [UnityTearDown] public IEnumerator Cleanup()
         {
-            WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null;
+            WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null; ZoneBuilder.NoStaticBatching = false;
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
             yield return SceneManager.UnloadSceneAsync("Oakhaven");
@@ -58,6 +58,42 @@ namespace Crulanda.Tests
             return best;
         }
         static Vector2 Size(ZoneProp p) { return p.size.x > 0 ? p.size : p.kind == "house" ? new Vector2(7, 5) : p.kind == "mill" ? new Vector2(7, 6) : p.kind == "ruined_house" ? new Vector2(8, 6) : new Vector2(12, 8); }
+
+        /// <summary>
+        /// A wall face in the footing's own face flickers stone and wood as the camera moves (Chris, 2026-10-14 19:45 and 2026-10-15,
+        /// note 216: the walk-in barns' boards). The footing's face on each side is its coping's outermost vertex less the coping's
+        /// 5 cm; another mesh's triangle lying in that plane, inside the footing's height and run, is a face in it. Null if none.
+        /// </summary>
+        static string FlushWithFooting(Transform t, Transform footing)
+        {
+            var coping = t.Find("Footing coping"); if (coping == null) return null;
+            Vector3 L(Transform from, Vector3 v) { return t.InverseTransformPoint(from.TransformPoint(v)); }
+            float px = float.MinValue, nx = float.MaxValue, pz = float.MinValue, nz = float.MaxValue, top = float.MinValue, foot = float.MaxValue;
+            foreach (var v in coping.GetComponent<MeshFilter>().sharedMesh.vertices) { var l = L(coping, v); px = Mathf.Max(px, l.x); nx = Mathf.Min(nx, l.x); pz = Mathf.Max(pz, l.z); nz = Mathf.Min(nz, l.z); top = Mathf.Max(top, l.y); }
+            foreach (var v in footing.GetComponent<MeshFilter>().sharedMesh.vertices) foot = Mathf.Min(foot, L(footing, v).y);
+            px -= .05f; nx += .05f; pz -= .05f; nz += .05f;
+            // A face in the footing's: a triangle lying in its plane (all three corners within 1.5 cm of it, facing out along it, a
+            // hand's breadth or more), inside the footing's height and run. A beam or a rubble stone crossing the plane is not one.
+            foreach (var mf in t.GetComponentsInChildren<MeshFilter>())
+            {
+                if (mf.transform == footing || mf.transform == coping || mf.name == "Cellar vents" || mf.sharedMesh == null || !mf.sharedMesh.isReadable) continue;
+                var r = mf.GetComponent<Renderer>(); if (r == null || !r.enabled) continue;
+                var vs = mf.sharedMesh.vertices; var tris = mf.sharedMesh.triangles; var lv = new Vector3[vs.Length];
+                for (int i = 0; i < vs.Length; i++) lv[i] = L(mf.transform, vs[i]);
+                for (int i = 0; i + 2 < tris.Length; i += 3)
+                {
+                    Vector3 a = lv[tris[i]], b = lv[tris[i + 1]], c = lv[tris[i + 2]];
+                    var n = Vector3.Cross(b - a, c - a); float area = n.magnitude / 2; if (area < .01f) continue; n /= 2 * area;
+                    var mid = (a + b + c) / 3; if (mid.y < foot || mid.y > top - .1f) continue;
+                    bool In(float x, float plane) { return Mathf.Abs(x - plane) < .015f; }
+                    if (Mathf.Abs(n.x) > .95f && mid.z > nz + .02f && mid.z < pz - .02f)
+                        foreach (var plane in new[] { px, nx }) if (In(a.x, plane) && In(b.x, plane) && In(c.x, plane)) return "'" + mf.name + "' has a face in its footing's side (x " + plane.ToString("0.00") + ")";
+                    if (Mathf.Abs(n.z) > .95f && mid.x > nx + .02f && mid.x < px - .02f)
+                        foreach (var plane in new[] { pz, nz }) if (In(a.z, plane) && In(b.z, plane) && In(c.z, plane)) return "'" + mf.name + "' has a face in its footing's front or back (z " + plane.ToString("0.00") + ")";
+                }
+            }
+            return null;
+        }
 
         [UnityTest] public IEnumerator Every_building_stands_on_stone_down_to_the_ground()
         {
@@ -87,6 +123,7 @@ namespace Crulanda.Tests
                         low = Mathf.Min(low, zone.Ground(new Vector2(w.x, w.z)).y);
                     }
                     if (bottom > low - .1f) problems.Add(q + "its footing stops " + (bottom - low).ToString("0.00") + " m above the lowest ground round it");
+                    string flush = FlushWithFooting(t, footing); if (flush != null) problems.Add(q + flush);
                     // A door's threshold stone stands at the ground across the doorway, not under it (houses and barns: the inn's floor is level).
                     if (p.kind == "house" || p.kind == "barn" || p.kind == "mill")
                     {

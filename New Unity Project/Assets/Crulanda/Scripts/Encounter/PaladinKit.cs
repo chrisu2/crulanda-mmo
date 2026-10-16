@@ -27,7 +27,7 @@ namespace Crulanda.Encounter
             "va-colours-held", "va-press-harder", "va-rampart", "va-close-ranks", "va-press-longer", "va-steady-ranks", "va-comrades", "va-under-the-colours", "va-last-stand"
         };
         public static readonly string[] BarIds = { "paladin.smite", "paladin.oath", "paladin.mend", "paladin.ward", "paladin.judgement", "paladin.consecrate", "paladin.lay_on", "paladin.aegis", "paladin.censure", "paladin.rebuke",
-            "paladin.colours", "paladin.close_ranks", "paladin.press_on" };
+            "paladin.colours", "paladin.close_ranks", "paladin.press_on", "paladin.mending_oath" };
         public const int MaxConviction = 3, HealRange = 25;
         public const float WardMultiplier = .6f, ConsecrateRadius = 5, ColoursRadius = 8, PressHaste = .15f;
         const float ConvictionKept = 10;
@@ -65,6 +65,10 @@ namespace Crulanda.Encounter
                 if (!abilities.ContainsKey(id) || !unlocks.ContainsKey(id)) throw new ArgumentException("Paladin ability '" + id + "' is missing from content or unlocks.");
         }
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
+        /// <summary>Its standing party buff at a buff-up before a boss (Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"; GAME-ONLY):
+        /// the Vanguard's oath taken under the standard before the fight: every one of the party a little harder to cut. Half an hour, +3% armour on everyone (BossBuffs).</summary>
+        public static readonly ClassBuff Standing = new ClassBuff("class.paladin", "Sworn to the Colours", Crulanda.Core.StatType.Armor);
+        public override ClassBuff PartyBuff { get { return Standing; } }
         int R(string id) { return s.TalentRank(id); }
         float Now { get { return Time.time; } }
         int Level { get { return s.Player.Level; } }
@@ -90,6 +94,7 @@ namespace Crulanda.Encounter
                 case "paladin.smite": return Smite(a);
                 case "paladin.oath": return Oath(a);
                 case "paladin.mend": return Mend(a);
+                case "paladin.mending_oath": return MendingOath(a);
                 case "paladin.ward": return Ward(a);
                 case "paladin.judgement": return Judgement(a);
                 case "paladin.consecrate": return Consecrate(a);
@@ -109,6 +114,7 @@ namespace Crulanda.Encounter
             yield return s.Player;
             if (s.Progress.recruited && s.Companion != null) yield return s.Companion.actor;
             foreach (var c in s.PartySims) if (c != null && c.actor != null) yield return c.actor;
+            foreach (var d in s.Healables()) yield return d;   // the training field's mending dummy, while you are near (EncounterSession.Training)
         }
         Actor MostHurt()
         {
@@ -126,22 +132,29 @@ namespace Crulanda.Encounter
         int Dmg(float amount) { return Mathf.Max(1, Mathf.RoundToInt(amount)); }
         void Hit(EncounterEnemy t, int damage) { t.Receive(damage, s.Player); }
 
-        /// <summary>Lowest-health living party member within heal range (you or recruited Mira).</summary>
+        /// <summary>Lowest-health living party member within heal range: you, recruited Mira or a sim in your party.</summary>
         public Actor HealTarget
         {
             get
             {
-                Actor best = s.Player;
-                if (s.Progress.recruited && s.Companion != null && s.Companion.actor.IsAlive &&
-                    Vector3.Distance(s.Player.transform.position, s.Companion.transform.position) <= HealRange &&
-                    s.Companion.actor.Health.Pool.Ratio < s.Player.Health.Pool.Ratio) best = s.Companion.actor;
+                // The whole party, the sims too (2026-10-13, the party heal test: only you and Mira were ever healed, so a party of
+                // five spent half the fight low under this healer while the Cleric and Shaman kept everyone up).
+                Actor best = s.Player; float low = s.Player.Health.Pool.Ratio;
+                void Consider(Actor who)
+                {
+                    if (who != null && who.IsAlive && who.Health.Pool.Ratio < low && Vector3.Distance(s.Player.transform.position, who.transform.position) <= HealRange)
+                    { best = who; low = who.Health.Pool.Ratio; }
+                }
+                if (s.Progress.recruited && s.Companion != null) Consider(s.Companion.actor);
+                foreach (var c in s.PartySims) if (c != null) Consider(c.actor);
+                foreach (var d in s.Healables()) Consider(d);   // the training field's mending dummy
                 return best;
             }
         }
         int HealActor(Actor target, int amount)
         {
             if (target == null || !target.IsAlive || amount <= 0) return 0;
-            int healed = target.GetComponent<Combatant>().Heal(amount); if (healed > 0) HealFx.Show(target.transform);
+            int healed = target.GetComponent<Combatant>().Heal(Mathf.RoundToInt(amount * s.PlayerHealScale), s.Player); if (healed > 0) HealFx.Show(target.transform);   // the build's heal scale (RoleScale)
             if (healed > 0) { s.AddHealingThreat(healed); s.FloatText(target.transform.position, "+" + healed, new Color(1, .95f, .6f)); }
             return healed;
         }
@@ -248,6 +261,15 @@ namespace Crulanda.Encounter
 
         // ---------- Sanctuary: Mend, Lay On, Aegis ----------
         public int MendAmount(AbilityDefinition a) { return Mathf.RoundToInt((a.power + 2 * Level) * (1 + .04f * R("sa-devotion"))); }
+        /// <summary>Mending Oath (Chris, 2026-10-13: "yes give a slower group heal"; GAME-ONLY): sworn over 3 s, it mends everyone in
+        /// your party within 20 m (Devotion: more).</summary>
+        bool MendingOath(AbilityDefinition a)
+        {
+            return Start(a, () => {
+                int heal = Mathf.RoundToInt((a.power + Level) * (1 + .04f * R("sa-devotion")));
+                foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) HealActor(who, heal);
+            });
+        }
         bool Mend(AbilityDefinition a)
         {
             var target = HealTarget;

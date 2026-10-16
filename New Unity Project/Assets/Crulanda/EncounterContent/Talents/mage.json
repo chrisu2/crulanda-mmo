@@ -12,13 +12,111 @@
    "loop": "Build Heat with Ember Bolt and Scorch, release it with Flare before it reaches 100, and let Backdraft make the next bolt instant.",
    "tradeoff": "Overcommitting to Heat means an Overload: a burn of your own health and seconds of nothing.",
    "nodes": [
-    {"id": "cb-kindling", "name": "Kindling", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "flame", "desc": "Ember Bolt hits 3% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
-    {"id": "cb-hot-hands", "name": "Hot Hands", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "clock", "desc": "Ember Bolt casts 0.1s faster per rank.", "emphasis": {"tempo": 1}, "impl": true},
-    {"id": "cb-stoked", "name": "Stoked", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "spiral", "desc": "Scorch burns for one more tick per rank.", "emphasis": {"damage": 0.8}, "impl": true},
-    {"id": "cb-flashpoint", "name": "Flashpoint", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "star", "desc": "Flare hits 8% harder per rank.", "emphasis": {"damage": 1.5}, "impl": true},
-    {"id": "cb-backdraft", "name": "Backdraft", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "bolt", "desc": "After a Flare the next Ember Bolt is instant.", "emphasis": {"tempo": 1.5}, "impl": true},
-    {"id": "cb-inferno", "name": "Inferno", "tier": 2, "col": 1, "max": 1, "req": "cb-kindling", "kind": "passive", "icon": "flame", "desc": "A Flare of 70 Heat or more also burns a second enemy within 4 m for half.", "emphasis": {"damage": 1.5}, "impl": true},
-    {"id": "cb-white-heat", "name": "White Heat", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "crystal", "desc": "An Overload no longer burns you; it still empties the Heat and stalls it.", "emphasis": {"sustain": 2}, "impl": true}
+    {
+     "id": "cb-kindling",
+     "name": "Kindling",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "flame",
+     "desc": "Ember Bolt hits 3% harder per rank.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cb-hot-hands",
+     "name": "Hot Hands",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Ember Bolt casts 0.1s faster per rank.",
+     "emphasis": {
+      "tempo": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "cb-stoked",
+     "name": "Stoked",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "Scorch burns for one more tick per rank.",
+     "emphasis": {
+      "damage": 0.8
+     },
+     "impl": true
+    },
+    {
+     "id": "cb-flashpoint",
+     "name": "Flashpoint",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "star",
+     "desc": "Flare hits 8% harder per rank.",
+     "emphasis": {
+      "damage": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "cb-backdraft",
+     "name": "Backdraft",
+     "tier": 1,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "bolt",
+     "desc": "After a Flare the next Ember Bolt is instant.",
+     "emphasis": {
+      "tempo": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "cb-inferno",
+     "name": "Inferno",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": "cb-kindling",
+     "kind": "passive",
+     "icon": "flame",
+     "desc": "A Flare of 70 Heat or more also burns a second enemy within 4 m for half.",
+     "emphasis": {
+      "damage": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "cb-white-heat",
+     "name": "White Heat",
+     "tier": 2,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "crystal",
+     "desc": "An Overload no longer burns you; it still empties the Heat and stalls it.",
+     "emphasis": {
+      "sustain": 2
+     },
+     "impl": true
+    }
    ]
   },
   {
@@ -28,13 +126,111 @@
    "loop": "Lay a Cinder Field under the fight, slow with Smoulder what tries to leave it, and keep the field burning longer and wider.",
    "tradeoff": "The field is where it was cast; enemies that move or scatter take little of it.",
    "nodes": [
-    {"id": "hw-cinders", "name": "Cinders", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "flame", "desc": "Cinder Field burns 10% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
-    {"id": "hw-slow-burn", "name": "Slow Burn", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "clock", "desc": "Smoulder lasts 1s longer per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "hw-wide-field", "name": "Wide Field", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "spiral", "desc": "Cinder Field reaches 0.5 m further per rank.", "emphasis": {"control": 0.8}, "impl": true},
-    {"id": "hw-embers-underfoot", "name": "Embers Underfoot", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "modifier", "icon": "chain", "desc": "Enemies in your Cinder Field are slowed by 20%.", "emphasis": {"control": 1.5}, "impl": true},
-    {"id": "hw-heat-haze", "name": "Heat Haze", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "eye", "desc": "Enemies in your Cinder Field hit 4% softer per rank.", "emphasis": {"mitigation": 1}, "impl": true},
-    {"id": "hw-long-burn", "name": "Long Burn", "tier": 2, "col": 1, "max": 3, "req": "hw-cinders", "kind": "passive", "icon": "gear", "desc": "Cinder Field burns 2s longer per rank.", "emphasis": {"damage": 1}, "impl": true},
-    {"id": "hw-firestorm", "name": "Firestorm", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "skull", "desc": "Smoulder on a target standing in your Cinder Field holds it there for 2s.", "emphasis": {"control": 2}, "impl": true}
+    {
+     "id": "hw-cinders",
+     "name": "Cinders",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "flame",
+     "desc": "Cinder Field burns 10% harder per rank.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "hw-slow-burn",
+     "name": "Slow Burn",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Smoulder lasts 1s longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "hw-wide-field",
+     "name": "Wide Field",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "Cinder Field reaches 0.5 m further per rank.",
+     "emphasis": {
+      "control": 0.8
+     },
+     "impl": true
+    },
+    {
+     "id": "hw-embers-underfoot",
+     "name": "Embers Underfoot",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "chain",
+     "desc": "Enemies in your Cinder Field are slowed by 20%.",
+     "emphasis": {
+      "control": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "hw-heat-haze",
+     "name": "Heat Haze",
+     "tier": 1,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "Enemies in your Cinder Field hit 4% softer per rank.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "hw-long-burn",
+     "name": "Long Burn",
+     "tier": 2,
+     "col": 1,
+     "max": 3,
+     "req": "hw-cinders",
+     "kind": "passive",
+     "icon": "gear",
+     "desc": "Cinder Field burns 2s longer per rank.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "hw-firestorm",
+     "name": "Firestorm",
+     "tier": 2,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "skull",
+     "desc": "Smoulder on a target standing in your Cinder Field holds it there for 2s.",
+     "emphasis": {
+      "control": 2
+     },
+     "impl": true
+    }
    ]
   },
   {
@@ -44,13 +240,306 @@
    "loop": "Bind, cast a weaker Ember Bolt to bank a Charge, then Unbind when the party is on the target; Ember Ward and Quench cover the rest.",
    "tradeoff": "Every bound bolt is damage not dealt now, and a Charge wasted on an empty field is a bolt lost.",
    "nodes": [
-    {"id": "sb-reservoir", "name": "Reservoir", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "crystal", "desc": "Unbind lasts 1s longer per rank.", "emphasis": {"support": 1}, "impl": true},
-    {"id": "sb-ward-weave", "name": "Ward Weave", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Ember Ward holds 6% more per rank.", "emphasis": {"mitigation": 1}, "impl": true},
-    {"id": "sb-quench", "name": "Quench", "tier": 1, "col": 0, "max": 1, "req": null, "kind": "active", "icon": "hand", "desc": "New action: a cold snap that holds the target's swing back 2s and steadies your own Heat after an Overload.", "emphasis": {"control": 2}, "impl": true},
-    {"id": "sb-shared-flame", "name": "Shared Flame", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "heart", "desc": "Unbind also heals you and Mira for 3% of your health per rank.", "emphasis": {"sustain": 1}, "impl": true},
-    {"id": "sb-steady-mind", "name": "Steady Mind", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "eye", "desc": "A bound Ember Bolt loses 10% less per rank.", "emphasis": {"damage": 0.8}, "impl": true},
-    {"id": "sb-quickening", "name": "Quickening", "tier": 2, "col": 1, "max": 3, "req": "sb-reservoir", "kind": "passive", "icon": "clock", "desc": "While Unbound, Mira casts 10% faster per rank.", "emphasis": {"support": 1.5}, "impl": true},
-    {"id": "sb-binding-oath", "name": "Binding Oath", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "banner", "desc": "Unbind makes the party hit 25% harder instead of 15%.", "emphasis": {"support": 2}, "impl": true}
+    {
+     "id": "sb-reservoir",
+     "name": "Reservoir",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "crystal",
+     "desc": "Unbind lasts 1s longer per rank.",
+     "emphasis": {
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sb-ward-weave",
+     "name": "Ward Weave",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Ember Ward holds 6% more per rank.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sb-quench",
+     "name": "Quench",
+     "tier": 1,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "hand",
+     "desc": "New action: a cold snap that holds the target's swing back 2s and steadies your own Heat after an Overload.",
+     "emphasis": {
+      "control": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "sb-shared-flame",
+     "name": "Shared Flame",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Unbind also heals you and Mira for 3% of your health per rank.",
+     "emphasis": {
+      "sustain": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sb-steady-mind",
+     "name": "Steady Mind",
+     "tier": 1,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "eye",
+     "desc": "A bound Ember Bolt loses 10% less per rank.",
+     "emphasis": {
+      "damage": 0.8
+     },
+     "impl": true
+    },
+    {
+     "id": "sb-quickening",
+     "name": "Quickening",
+     "tier": 2,
+     "col": 1,
+     "max": 3,
+     "req": "sb-reservoir",
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "While Unbound, Mira casts 10% faster per rank.",
+     "emphasis": {
+      "support": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "sb-binding-oath",
+     "name": "Binding Oath",
+     "tier": 2,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "banner",
+     "desc": "Unbind makes the party hit 25% harder instead of 15%.",
+     "emphasis": {
+      "support": 2
+     },
+     "impl": true
+    }
+   ]
+  },
+  {
+   "id": "bonecaller",
+   "name": "Bonecaller",
+   "role": "pet",
+   "loop": "Raise the bone thrall and send it in, set Marrow Drain on what it fights so the life drawn out mends you both, and burst Bone Spikes round it when the pack closes.",
+   "tradeoff": "The thrall is your shield and half your damage: lose it and you are a Mage with a drain and no fire to spare.",
+   "canon": "GAME-ONLY (Chris, 2026-10-12: a necro build). The books have no necromancy; the game's risen dead are its bones. Not the Wasting. No machines.",
+   "nodes": [
+    {
+     "id": "bc-hard-bone",
+     "name": "Hard Bone",
+     "tier": 0,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Your bone thrall has 8% more health per rank.",
+     "emphasis": {
+      "pet": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bc-sharp-marrow",
+     "name": "Sharp Marrow",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "sword",
+     "desc": "Your bone thrall strikes 10% harder per rank.",
+     "emphasis": {
+      "pet": 1,
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bc-grave-bond",
+     "name": "Grave Bond",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "An Ember Bolt that lands mends your thrall for 2% of its health per rank.",
+     "emphasis": {
+      "pet": 1,
+      "sustain": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bc-long-drain",
+     "name": "Long Drain",
+     "tier": 1,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Marrow Drain draws once more per rank.",
+     "emphasis": {
+      "damage": 1,
+      "sustain": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bc-bone-spikes",
+     "name": "Bone Spikes",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "skull",
+     "desc": "New action: Bone Spikes: bone bursts up round your thrall, striking and slowing every foe within 4m; it costs the thrall a tenth of its health.",
+     "emphasis": {
+      "damage": 2,
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bc-death-echo",
+     "name": "Death Echo",
+     "tier": 2,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Each blow of your thrall gives you back 1 Mana per rank.",
+     "emphasis": {
+      "tempo": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bc-bone-armour",
+     "name": "Bone Armour",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": "bc-bone-spikes",
+     "kind": "signature",
+     "icon": "star",
+     "desc": "While your Marrow Drain draws on a foe, your thrall takes 30% less.",
+     "emphasis": {
+      "pet": 2,
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bc-wide-spikes",
+     "name": "Wide Spikes",
+     "tier": 3,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "target",
+     "desc": "Bone Spikes bursts 1m wider per rank.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "bc-twin-thralls",
+     "name": "Twin Thralls",
+     "tier": 4,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "skull",
+     "desc": "Raise a second, lesser thrall.",
+     "emphasis": {
+      "pet": 2
+     },
+     "impl": false
+    },
+    {
+     "id": "bc-ossuary-coat",
+     "name": "Ossuary Coat",
+     "tier": 4,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "You take 3% less per rank while your thrall stands.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "bc-rise-again",
+     "name": "Rise Again",
+     "tier": 5,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "A fallen thrall rises again once a fight at half health.",
+     "emphasis": {
+      "pet": 1
+     },
+     "impl": false
+    },
+    {
+     "id": "bc-the-bone-lord",
+     "name": "The Bone Lord",
+     "tier": 6,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Once a fight, raise every foe your party has felled near you as thralls for 15s.",
+     "emphasis": {
+      "pet": 3
+     },
+     "impl": false
+    }
    ]
   }
  ]

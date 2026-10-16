@@ -28,6 +28,7 @@ namespace Crulanda.World
             if (tallGrass == null || tallGrass.Length == 0) tallGrass = grass;
             if (grass == null || grass.Length == 0) return;
             tuft = TuftMesh();
+            if (GetComponent<GrassBend>() == null) gameObject.AddComponent<GrassBend>();   // feet part the grass (Grass.shader's _GrassBenders)
             // Its own copies: fading by distance (a cell is drawn while its centre is within DrawDistance + Cell on both axes, so
             // every tuft within DrawDistance + Cell / 2 of the camera is drawn: the fade ends there); a bleached one for tall drifts.
             var own = new Dictionary<Material, Material>(); var bleached = new Dictionary<Material, Material>();

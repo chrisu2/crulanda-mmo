@@ -357,7 +357,7 @@ namespace Crulanda.Tests
             // Out past the leash (it is measured from where the pull began): the whole group gives up at once.
             s.Messages.Clear();
             PutPlayer(s, mid, s.Leash + 30, 270);
-            yield return Until(() => !a.Engaged && !b.Engaged, 1);
+            yield return Until(() => !a.Engaged && !b.Engaged, EncounterEnemy.QuietSeconds + 2);   // they break off only once quiet (8f67fe5: no blow for QuietSeconds)
             Assert.IsFalse(a.Engaged || b.Engaged, "Both give up together.");
             Assert.AreEqual(a.actor.Health.Pool.Max, a.actor.Health.Pool.Current, "Whole again."); Assert.AreEqual(b.actor.Health.Pool.Max, b.actor.Health.Pool.Current, "Both of them.");
             Assert.IsNull(a.Group); Assert.IsNull(b.Group); Assert.IsTrue(a.Evading && b.Evading, "On their way home they notice nobody.");

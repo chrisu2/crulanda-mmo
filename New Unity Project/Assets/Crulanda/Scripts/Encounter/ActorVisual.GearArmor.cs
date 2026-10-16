@@ -426,7 +426,7 @@ namespace Crulanda.Encounter
             neckStill = OnShell(wornChest) || neckOver != "";
         }
         /// <summary>A class's own hood (the Druid's, the Ranger's, the Mage's) comes off under any head piece (2026-10-06: helmets sat on the Mage's hood).</summary>
-        void DruidHood(bool on) { if ((built == ActorLook.Druid || built == ActorLook.Ranger || built == ActorLook.Mage) && classKit != null) foreach (var t in classKit) if (t != null) t.gameObject.SetActive(on); }
+        void DruidHood(bool on) { if ((built == ActorLook.Druid || built == ActorLook.Ranger || built == ActorLook.Mage || built == ActorLook.SaltMender) && classKit != null) foreach (var t in classKit) if (t != null) t.gameObject.SetActive(on); }
         /// <summary>Gives back what a slot's piece covered (called whenever the slot is cleared).</summary>
         void Uncover(EquipSlot slot)
         {

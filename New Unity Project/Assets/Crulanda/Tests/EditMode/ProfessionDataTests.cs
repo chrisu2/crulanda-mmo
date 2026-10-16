@@ -25,8 +25,8 @@ namespace Crulanda.Tests
         [Test] public void ProfessionsFile_Parses()
         {
             var items = Items(); var db = Db(items);
-            CollectionAssert.AreEqual(new[] { "mining", "woodcutting", "herbalism", "cooking", "blacksmithing", "alchemy" }, db.Order.ConvertAll(d => d.id));
-            Assert.AreEqual(2, db.CraftSlots);
+            CollectionAssert.AreEqual(new[] { "mining", "woodcutting", "herbalism", "cooking", "blacksmithing", "alchemy", "leatherworking", "weaving" }, db.Order.ConvertAll(d => d.id), "Phase 8.6 added Leatherworking and Weaving after Alchemy.");
+            Assert.AreEqual(3, db.CraftSlots, "Three craft slots (Phase 8.6, decision 3; it was two).");
             foreach (var d in db.Order) { Assert.IsFalse(string.IsNullOrEmpty(d.name), d.id); Assert.IsFalse(string.IsNullOrEmpty(d.description), d.id + " has a page."); Assert.IsFalse(string.IsNullOrEmpty(d.canonStatus), d.id + " is labelled."); }
             // Gathering is three skills; two need a tool, and each tool teaches its own skill.
             Assert.AreEqual("gather", db.Profession("mining").kind); Assert.AreEqual("gather", db.Profession("woodcutting").kind); Assert.AreEqual("gather", db.Profession("herbalism").kind);
@@ -38,6 +38,7 @@ namespace Crulanda.Tests
             Assert.AreEqual("free", db.Profession("cooking").kind); Assert.AreEqual("fire", db.Profession("cooking").station);
             Assert.AreEqual("craft", db.Profession("blacksmithing").kind); Assert.AreEqual("forge", db.Profession("blacksmithing").station); Assert.AreEqual("blacksmith", db.Profession("blacksmithing").trainerRole);
             Assert.AreEqual("craft", db.Profession("alchemy").kind); Assert.AreEqual("bench", db.Profession("alchemy").station); Assert.AreEqual("herbalist", db.Profession("alchemy").trainerRole);
+            Assert.AreEqual("Simpling", db.Profession("alchemy").name, "Decision 5: shown as Simpling, its id kept so saves keep the skill.");
             Assert.IsTrue(ProfessionDatabase.FromTheStart(db.Profession("herbalism"))); Assert.IsTrue(ProfessionDatabase.FromTheStart(db.Profession("cooking")));
             Assert.IsFalse(ProfessionDatabase.FromTheStart(db.Profession("mining"))); Assert.IsFalse(ProfessionDatabase.FromTheStart(db.Profession("alchemy")));
             // Node kinds: one tier per zone for each gathering skill (1, 20, 40, 60, 80), each giving a material that stacks to 20.
@@ -188,7 +189,7 @@ namespace Crulanda.Tests
         /// nodes of that herb.</summary>
         [Test] public void EveryZone_HasTenOreEightTimberTenHerbNodes()
         {
-            var db = Db(Items()); var zones = Zones(); var problems = new List<string>();
+            var db = Db(Items()); var zones = Zones().Where(kv => !kv.Value.city).ToDictionary(kv => kv.Key, kv => kv.Value); var problems = new List<string>();   // a city (the Crown) has no nodes: its trainers teach, the wild zones give
             CollectionAssert.AreEquivalent(Tiers.Keys, zones.Keys, "The five zones, each with a tier.");
             foreach (var kv in zones)
             {
@@ -240,7 +241,7 @@ namespace Crulanda.Tests
             var items = Items(); var db = Db(items);
             var expect = new[] { ("recipe.charcoal_oak", "mat.oak_log", 1, 1), ("recipe.charcoal_blackpine", "mat.blackpine_log", 20, 2), ("recipe.charcoal_stonepine", "mat.stonepine_log", 40, 3),
                 ("recipe.charcoal_snag", "mat.snag_wood", 60, 4), ("recipe.charcoal_ghostoak", "mat.ghostoak_log", 80, 5) };
-            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("woodcutting").Select(r => r.id), "Woodcutting's recipes, easiest first.");
+            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("woodcutting").Where(r => r.output == "mat.charcoal").Select(r => r.id), "Woodcutting's charcoal, easiest first (its bows and staves since Phase 8.6 are the bowyer's).");
             foreach (var (id, log, skill, count) in expect)
             {
                 var r = db.Recipe(id); Assert.NotNull(r, id);
@@ -275,7 +276,7 @@ namespace Crulanda.Tests
                 ("recipe.cinder_loaf", 70, "mat.flour 2, mat.cinder_thistle 1, mat.charcoal 1", "food.cinder_loaf", 1, 660, 12, 8),
                 ("recipe.mossback_chop", 80, "mat.mossback_chop 2, mat.dewfern 1", "food.mossback_chop", 1, 820, 14, 18),
                 ("recipe.venison_pie", 90, "mat.venison 2, mat.flour 1", "food.venison_pie", 1, 900, 14, 16) };
-            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("cooking").Select(r => r.id), "Cooking's recipes, easiest first.");
+            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("cooking").Where(r => !r.found).Select(r => r.id), "Cooking's taught recipes, easiest first (the found dishes and feasts of Phase 8.6 come from leaves: ConsumableBuffTests).");
             var vendorFood = items.Vendors.SelectMany(v => v.items ?? new string[0]).Append(EncounterSession.FreshEggs).Distinct().Select(items.Get).Where(d => d != null && d.food).ToList();
             Assert.IsNotEmpty(vendorFood);
             foreach (var (id, skill, makings, output, count, heal, level, value) in expect)
@@ -342,7 +343,7 @@ namespace Crulanda.Tests
         {
             var db = Db(Items()); var zones = Zones(); var problems = new List<string>(); var everywhere = new HashSet<string>();
             var want = new Dictionary<string, string[]> { { "oakhaven", new[] { "bench", "fire", "forge" } }, { "khaven", new[] { "bench", "fire" } }, { "peaks", new[] { "fire", "forge" } },
-                { "ashrim", new[] { "bench", "fire", "forge" } }, { "verdant", new[] { "bench", "fire", "forge" } } };
+                { "ashrim", new[] { "bench", "fire", "forge" } }, { "verdant", new[] { "bench", "fire", "forge" } }, { "crown", new[] { "bench", "fire", "forge" } } };   // the Crown: the Crafters' Court and the inn's hearth (CAPITAL_HUB.md)
             foreach (var kv in zones)
             {
                 var z = kv.Value; var kinds = new SortedSet<string>(StringComparer.Ordinal); var names = new HashSet<string>();
@@ -400,7 +401,7 @@ namespace Crulanda.Tests
             var smelts = new[] { ("recipe.copper_bar", "mat.copper_ore", "mat.copper_bar", 1, 4), ("recipe.bogiron_bar", "mat.bogiron_ore", "mat.bogiron_bar", 20, 9),
                 ("recipe.ridgesteel_bar", "mat.adit_ore", "mat.ridgesteel_bar", 40, 11), ("recipe.ashsteel_bar", "mat.cinder_ore", "mat.ashsteel_bar", 60, 13), ("recipe.veridian_bar", "mat.veridian_ore", "mat.veridian_bar", 80, 19) };
             var all = db.RecipesFor("blacksmithing");
-            Assert.AreEqual(31, all.Count, "Five smelts, 21 pieces and the five resonance-tempered weapons (the notice boards' shard).");
+            Assert.AreEqual(45, all.Count, "Five smelts, 21 pieces and the five resonance-tempered weapons (the notice boards' shard); since Phase 8.6 the geode chips, five geode-set necks, two shields, the five tempered armour pieces and the ash-steel epic (the last six from leaves).");
             Assert.IsTrue(all.All(r => r.station == "forge"), "Everything a smith makes is made at a forge.");
             foreach (var (id, ore, bar, skill, value) in smelts)
             {
@@ -423,49 +424,163 @@ namespace Crulanda.Tests
                 string tier = item.Substring(6, item.IndexOf('_') - 6); if (tier == "heartwood") tier = "veridian";
                 Assert.IsTrue(r.inputs.Any(i => i.item == "mat." + tier + "_bar"), item + " is made of " + tier + " bars.");
             }
-            var tempered = all.Where(r => r.id.StartsWith("recipe.tempered_")).Select(r => r.id).ToList();
+            var tempered = all.Where(r => r.id.StartsWith("recipe.tempered_") && !r.found).Select(r => r.id).ToList();
             Assert.AreEqual(5, tempered.Count, "The five resonance-tempered weapons (the notice boards' Aether-Geode shard; 2026-10-03).");
             Assert.IsTrue(tempered.All(id => db.Recipe(id).inputs.Any(i => i.item == "mat.geode_shard")), "Each needs the shard.");
-            CollectionAssert.AreEqual(smelts.Select(x => x.Item1).Concat(Pieces.Select(p => "recipe." + p.item.Substring(6))).Concat(tempered).OrderBy(x => db.Recipe(x).skill).ThenBy(x => x, StringComparer.Ordinal), all.Select(r => r.id), "Easiest first.");
+            CollectionAssert.IsSubsetOf(smelts.Select(x => x.Item1).Concat(Pieces.Select(p => "recipe." + p.item.Substring(6))).Concat(tempered), all.Select(r => r.id));
+            CollectionAssert.AreEqual(all.OrderBy(x => x.skill).ThenBy(x => x.id, StringComparer.Ordinal).Select(x => x.id), all.Select(r => r.id), "Easiest first.");
         }
 
         /// <summary>
-        /// The crafted pieces sit on the generated-gear curve (DESIGN 5.2): each is gear of its slot, uncommon, required at its zone's top
-        /// level less one, with the damage or armour and the value generated uncommon gear has at that level, and one stat of about a
-        /// quarter of the curve's power. The capstone is the one rare: required at 12, 36 damage (under the 38 of every level-13 rare
-        /// weapon), +5 Strength and +5 Stamina. Every piece has its own look in looks.json and a line in the world's voice.
+        /// The plain crafted pieces (craft.*, Phase 8.6 step 6; DESIGN 5.2 before it): each is gear of its slot, uncommon, required at a
+        /// tier's level (copper 1 or 4, bog-iron 8, ridge-steel 11, ash-steel and veridian 14), and beats the vendor's and the camps'
+        /// generated uncommon of its level by one step: its damage or armour is the uncommon curve one level up, and its stat points are
+        /// more than the best suffix a generated piece of its level can carry. Its value is never above generated gear's. The capstone
+        /// stays the one taught rare: required at 14, 42 damage and 30 points, a step under the Shore's named rares. Every piece has its
+        /// own look in looks.json and a line in the world's voice.
         /// </summary>
-        [Test] public void CraftedGear_SitsOnTheGeneratedCurve()
+        [Test] public void CraftedGear_BeatsTheGeneratedUncommonByAStep()
         {
             var items = Items(); var looks = GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text);
             var crafted = items.Items.Values.Where(d => d.id.StartsWith("craft.", StringComparison.Ordinal)).ToList();
-            CollectionAssert.AreEquivalent(Pieces.Select(p => p.item), crafted.Select(d => d.id), "The 21 pieces, and nothing else, are craft.* items.");
+            CollectionAssert.IsSubsetOf(Pieces.Select(p => p.item), crafted.Select(d => d.id), "The Blacksmith's 21 pieces are still there.");
+            Assert.AreEqual(Pieces.Length + 57, crafted.Count, "And the 57 of Phase 8.6: four leather, four cloth, a bow, a staff and a geode-set neck a tier, and two shields.");
             foreach (var d in crafted)
             {
                 Assert.AreEqual("gear", d.kind, d.id); Assert.GreaterOrEqual(ItemDatabase.SlotIndex(d.slot), 0, d.id);
-                Assert.IsTrue(new[] { 1, 4, 8, 11, 14 }.Contains(d.level), d.id + " is required at a zone's top level less one (" + d.level + "; round 29: Khaven 8, the Peaks 11, the Rim and the Shore 14).");
+                Assert.IsTrue(new[] { 1, 4, 8, 11, 14 }.Contains(d.level), d.id + " is required at a tier's level (" + d.level + ").");
                 var l = looks.Resolve(d); Assert.IsFalse(l.fallback, d.id + " has its own look."); Assert.AreEqual(d.slot, GearLooks.Family(l.family).slot, d.id);
                 Assert.IsFalse(string.IsNullOrEmpty(d.description), d.id); Assert.IsTrue(d.canonStatus != null && d.canonStatus.StartsWith("GAME-ONLY"), d.id);
                 int stats = d.stamina + d.strength + d.agility + d.intellect + d.spirit;
                 if (d.id == "craft.heartwood_greatblade")
                 {
                     Assert.AreEqual(3, d.quality, "The capstone is rare."); Assert.AreEqual(14, d.level); Assert.AreEqual("mainhand", d.slot);
-                    Assert.LessOrEqual(d.weaponDamage, 42); Assert.Less(d.weaponDamage, items.Get(ItemDatabase.GearId("mainhand", 15, 3, 0)).weaponDamage, "Under a generated level-15 rare.");
-                    Assert.AreEqual(5, d.strength); Assert.AreEqual(5, d.stamina); Assert.AreEqual(10, stats);
+                    Assert.AreEqual(42, d.weaponDamage); Assert.AreEqual(30, stats); Assert.AreEqual(18, d.strength); Assert.AreEqual(12, d.stamina);
                     continue;
                 }
-                var gen = items.Get(ItemDatabase.GearId(d.slot, d.level + 1, 2, 0));
                 Assert.AreEqual(2, d.quality, d.id + " is uncommon.");
-                Assert.That(d.weaponDamage, Is.InRange(gen.weaponDamage - 1, gen.weaponDamage + 1), d.id + ": damage on the curve at level " + (d.level + 1));
-                Assert.That(d.armor, Is.InRange(gen.armor - 1, gen.armor + 1), d.id + ": armour on the curve at level " + (d.level + 1));
-                Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
-                Assert.AreEqual(gen.level, d.level, d.id);
-                Assert.AreEqual(Mathf.Max(1, Mathf.RoundToInt((d.level + 1) * 1.35f / 4)), stats, d.id + ": one stat of about a quarter of the curve's power.");
-                Assert.AreEqual(1, new[] { d.stamina, d.strength, d.agility, d.intellect, d.spirit }.Count(x => x > 0), d.id + " has one stat.");
-                // Above the vendor's common of its level, which has no stat to speak of.
+                float step = (d.level + 2) * 1.35f;   // the uncommon curve one level up
+                int wd = d.slot == "mainhand" ? Mathf.Max(1, Mathf.RoundToInt(3 + step * 1.6f)) : 0;
+                int arm = d.slot == "mainhand" || d.slot == "neck" ? 0 : Mathf.Max(1, Mathf.RoundToInt(step * (d.slot == "chest" || d.slot == "legs" ? 2.2f : d.slot == "offhand" ? 2.6f : 1.4f)));
+                Assert.That(d.weaponDamage, Is.InRange(wd - 1, wd + 1), d.id + ": damage of the uncommon curve at level " + (d.level + 2));
+                Assert.That(d.armor, Is.InRange(arm - 1, arm + 1), d.id + ": armour of the uncommon curve at level " + (d.level + 2));
+                var gen = items.Get(ItemDatabase.GearId(d.slot, d.level + 1, 2, 0));
+                int bestSuffix = Mathf.RoundToInt(5 * Mathf.Max(1, (d.level + 1) * 1.35f / 4));   // "of the Owl" and "of the Hearth" carry five points a k
+                Assert.Greater(stats, bestSuffix, d.id + ": more stat points than any generated uncommon of its level.");
+                Assert.GreaterOrEqual(d.weaponDamage, gen.weaponDamage, d.id); Assert.GreaterOrEqual(d.armor, gen.armor, d.id);
+                Assert.Greater(d.weaponDamage + d.armor + stats, gen.weaponDamage + gen.armor + bestSuffix, d.id + " beats the generated uncommon.");
+                Assert.LessOrEqual(d.value, gen.value, d.id + ": worth no more than generated gear.");
+                Assert.AreEqual(2, new[] { d.stamina, d.strength, d.agility, d.intellect, d.spirit }.Count(x => x > 0), d.id + " has two stats.");
                 var common = items.Get(ItemDatabase.GearId(d.slot, d.level + 1, 1, 0));
-                Assert.Greater(d.weaponDamage + d.armor, common.weaponDamage + common.armor, d.id + " beats the vendor's common.");
+                Assert.Greater(d.weaponDamage + d.armor + stats, common.weaponDamage + common.armor + common.stamina, d.id + " beats the vendor's common.");
             }
+        }
+
+        /// <summary>The five tiers of Phase 8.6 step 6, by the word in their pieces' ids (the heartwood capstone is veridian's).</summary>
+        static readonly string[] TierIds = { "copper", "bogiron", "ridgesteel", "ashsteel", "veridian" };
+        static string TierOf(string itemId) { var t = itemId.Substring(itemId.IndexOf('.') + 1); int u = t.IndexOf('_'); t = u < 0 ? t : t.Substring(0, u); return t == "heartwood" ? "veridian" : t; }
+
+        /// <summary>
+        /// Every tier fills its nine slots across the crafts (Phase 8.6 step 6: "each tier's nine slots across the crafts, so a crafted kit
+        /// is a kit"): the plain pieces of each tier (taught: no leaf) cover head, neck, shoulders, chest, hands, legs, feet, main hand and
+        /// off hand, made by the smith, the tanner, the weaver and the bowyer between them; and each tier has a leather kit and a cloth kit of
+        /// four pieces, a bow and a staff, and a geode-set neck.
+        /// </summary>
+        [Test] public void Every_tier_fills_its_nine_slots_across_the_crafts()
+        {
+            var items = Items(); var db = Db(items);
+            foreach (var tier in TierIds)
+            {
+                var recipes = db.Recipes.FindAll(r => !r.found && r.output.StartsWith("craft." + tier + "_", StringComparison.Ordinal));
+                var slots = new HashSet<string>(recipes.Select(r => items.Get(r.output).slot));
+                CollectionAssert.AreEquivalent(ItemDatabase.SlotIds, slots, tier + "'s plain pieces fill the nine slots.");
+                var trades = new HashSet<string>(recipes.Select(r => r.profession));
+                CollectionAssert.IsSubsetOf(new[] { "blacksmithing", "leatherworking", "weaving", "woodcutting" }, trades, tier + ": made across the crafts.");
+                Assert.AreEqual(4, recipes.Count(r => r.profession == "leatherworking"), tier + ": a leather kit of four.");
+                Assert.AreEqual(4, recipes.Count(r => r.profession == "weaving"), tier + ": a cloth kit of four.");
+                Assert.AreEqual(2, recipes.Count(r => r.profession == "woodcutting"), tier + ": a bow and a staff, as Woodcutting's (decision 4: bowyer work is Woodcutting recipes).");
+                Assert.IsTrue(recipes.Exists(r => r.profession == "blacksmithing" && items.Get(r.output).slot == "neck" && r.inputs.Any(i => i.item == "mat.geode_chip")), tier + ": a geode-set neck (decision 4: geode-cutting is Blacksmithing's).");
+            }
+            var chips = db.Recipe("recipe.geode_chips"); Assert.NotNull(chips, "Geode-cutting: a shard into chips at a forge.");
+            Assert.AreEqual("blacksmithing", chips.profession); Assert.AreEqual("mat.geode_shard", chips.inputs.Single().item); Assert.AreEqual(4, chips.count);
+        }
+
+        /// <summary>
+        /// The rares and epics (Phase 8.6 step 6): a tempered or mastered rare equals the zone's named loot (the named rares' curve at the
+        /// tier's level: damage or armour of generated rare gear one level up, and the boss pieces' six points a k) and needs one rare
+        /// thing, an Aether-Geode shard; the five tempered weapons are taught, every other rare comes from a leaf; and each tier has one epic,
+        /// from a found recipe only, on the epic curve, needing two shards.
+        /// </summary>
+        [Test] public void Rares_equal_the_named_loot_and_each_tier_has_one_epic_from_a_leaf()
+        {
+            var items = Items(); var db = Db(items); var looks = GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text);
+            var rares = db.Recipes.FindAll(r => items.Get(r.output).kind == "gear" && items.Get(r.output).quality == 3 && r.output != "craft.heartwood_greatblade");
+            Assert.AreEqual(25, rares.Count, "Five tempered weapons, and a mastered jerkin, a fine-woven robe, a seasoned bow and a tempered armour piece a tier.");
+            foreach (var r in rares)
+            {
+                var d = items.Get(r.output); var gen = items.Get(ItemDatabase.GearId(d.slot, d.level + 1, 3, 0));
+                Assert.AreEqual(gen.weaponDamage, d.weaponDamage, d.id + ": the named rares' damage."); Assert.AreEqual(gen.armor, d.armor, d.id + ": and armour.");
+                int stats = d.stamina + d.strength + d.agility + d.intellect + d.spirit;
+                Assert.AreEqual(Mathf.RoundToInt(6 * Mathf.Max(1, (d.level + 1) * 1.7f / 4)), stats, d.id + ": a boss piece's budget.");
+                Assert.AreEqual(1, r.inputs.Count(i => i.item == "mat.geode_shard"), r.id + " needs one rare thing: a geode shard.");
+                Assert.AreEqual(!r.found, d.id.IndexOf('_') < 0, r.id + ": the five tempered weapons are taught; the rest are found.");
+                Assert.IsFalse(looks.Resolve(d).fallback, d.id + " has its own look.");
+            }
+            foreach (var tier in TierIds)
+            {
+                var epics = db.Recipes.FindAll(r => items.Get(r.output).kind == "gear" && items.Get(r.output).quality == 4 && TierOf(r.output) == tier);
+                Assert.AreEqual(1, epics.Count, tier + " has one epic.");
+                var r = epics[0]; var d = items.Get(r.output);
+                Assert.IsTrue(r.found, r.id + ": from a found recipe only."); Assert.NotNull(ProfessionDatabase.LeafFor(items, r));
+                Assert.AreEqual(2, r.inputs.Single(i => i.item == "mat.geode_shard").count, r.id);
+                var gen = items.Get(ItemDatabase.GearId(d.slot, d.level + 1, 4, 0));
+                Assert.AreEqual(gen.weaponDamage, d.weaponDamage, d.id); Assert.AreEqual(gen.armor, d.armor, d.id);
+                Assert.IsFalse(string.IsNullOrEmpty(d.description), d.id); Assert.IsTrue(d.canonStatus.StartsWith("GAME-ONLY"), d.id);
+                Assert.IsFalse(looks.Resolve(d).fallback, d.id + " has its own look.");
+            }
+        }
+
+        /// <summary>Every gathered material (a node's) is wanted by at least two recipes (Phase 8.6: "every node's material wanted by at
+        /// least two recipes"), so every seam, windfall and herb has a use beyond one; and every hide that drops is worked by the tanner.</summary>
+        [Test] public void Every_node_material_is_wanted_by_two_recipes()
+        {
+            var items = Items(); var db = Db(items); var problems = new List<string>();
+            foreach (var item in db.Nodes.Select(n => n.item).Distinct())
+            {
+                int n = db.Recipes.Count(r => r.inputs.Any(i => i.item == item));
+                if (n < 2) problems.Add(item + " is wanted by " + n + " recipe(s).");
+            }
+            foreach (var hide in items.Items.Values.Where(Inventory.IsHide))
+                if (!db.Recipes.Any(r => r.profession == "leatherworking" && r.inputs.Any(i => i.item == hide.id))) problems.Add(hide.id + " is worked by no tanner's recipe.");
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
+        /// <summary>
+        /// The new crafts (Phase 8.6, decision 4): Leatherworking from the hides that drop (the leatherworker teaches it) and Weaving from the
+        /// folds' fleeces (the shepherd), each made at a bench or by a fire, each saying where it is taken up and what is said; the fleece is
+        /// a material the merchants sell, and selling one feeds the stall's wool. Alchemy keeps its id and shows as Simpling (decision 5).
+        /// </summary>
+        [Test] public void Leatherworking_and_Weaving_are_crafts_and_Alchemy_shows_as_Simpling()
+        {
+            var items = Items(); var db = Db(items);
+            foreach (var (id, role) in new[] { ("leatherworking", "leatherworker"), ("weaving", "shepherd") })
+            {
+                var d = db.Profession(id); Assert.NotNull(d, id);
+                Assert.AreEqual("craft", d.kind, id); Assert.AreEqual(role, d.trainerRole, id); Assert.AreEqual("GAME-ONLY", d.canonStatus, id);
+                CollectionAssert.AreEquivalent(new[] { "bench", "fire" }, ProfessionDatabase.Stations(d.station), id + ": at a bench or by a fire.");
+                Assert.IsFalse(string.IsNullOrEmpty(d.learnAt), id); Assert.IsFalse(string.IsNullOrEmpty(d.takeUp), id); Assert.IsTrue(d.helping.Contains("{name}"), id);
+                Assert.IsNotNull(ProfessionDatabase.LineFor(d.trainerLines, "Nobody In Particular"), id); Assert.IsNotNull(ProfessionDatabase.LineFor(d.helpLines, "Nobody In Particular"), id);
+                Assert.IsTrue(db.RecipesFor(id).Exists(r => r.skill == 1 && !r.found), id + " has something to make at 1.");
+                foreach (var word in new[] { "machine", "engine", "loom" }) StringAssert.DoesNotContain(word, (d.description + d.takeUp + d.learnAt).ToLowerInvariant(), id + ": no machines.");
+            }
+            Assert.AreNotEqual(ProfessionDatabase.LineFor(db.Profession("leatherworking").trainerLines, "Nobody In Particular"), ProfessionDatabase.LineFor(db.Profession("leatherworking").trainerLines, "Maud Tanner"), "Maud has her own words.");
+            var fleece = items.Get("mat.fleece"); Assert.NotNull(fleece);
+            Assert.AreEqual("material", fleece.kind); Assert.AreEqual("stall.wool", fleece.trade); Assert.AreEqual("GAME-ONLY", fleece.canonStatus);
+            Assert.Contains("mat.fleece", items.StockFor("Ama Rusk", "merchant", 2), "The stall sells the folds' fleeces.");
+            Assert.IsTrue(db.RecipesFor("weaving").Where(r => !r.found).All(r => r.inputs.Any(i => i.item == "mat.fleece")), "Weaving is fleece work.");
+            Assert.IsTrue(db.RecipesFor("leatherworking").All(r => r.inputs.Any(i => Inventory.IsHide(items.Get(i.item)))), "Leatherworking is hide work.");
+            var simpling = db.Profession("alchemy"); Assert.AreEqual("Simpling", simpling.name); StringAssert.Contains("not the Council's alchemy", simpling.description);
+            Assert.IsNull(db.Profession("simpling"), "The id stays alchemy, so saves keep their skill.");
         }
 
         /// <summary>
@@ -479,7 +594,7 @@ namespace Crulanda.Tests
             var expect = new[] { ("recipe.potion_minor", 1, "mat.yarrow 2, mat.vial 1", "potion.minor", 90), ("recipe.potion_healing", 20, "mat.mourners_cap 2, mat.yarrow 1, mat.vial 1", "potion.healing", 200),
                 ("recipe.potion_tarn", 40, "mat.tarnwort 2, mat.mourners_cap 1, mat.vial 1", "potion.tarn", 280), ("recipe.potion_salt", 60, "mat.cinder_thistle 2, mat.salt 1, mat.vial 1", "potion.salt", 360),
                 ("recipe.potion_dewfern", 80, "mat.dewfern 2, mat.tarnwort 1, mat.vial 1", "potion.dewfern", 520) };
-            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("alchemy").Select(r => r.id), "Alchemy's recipes, easiest first.");
+            CollectionAssert.AreEqual(expect.Select(e => e.Item1), db.RecipesFor("alchemy").Where(r => items.Get(r.output).heal > 0).Select(r => r.id), "Alchemy's healing draughts, easiest first (its tinctures, cordials, draughts for the pools, the cure and the salves since Phase 8.6 heal nothing).");
             foreach (var (id, skill, makings, output, heal) in expect)
             {
                 var r = db.Recipe(id); Assert.NotNull(r, id);

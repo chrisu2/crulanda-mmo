@@ -11,17 +11,17 @@ namespace Crulanda.Encounter
     /// quests, faction standing, Chronicle pages and the quest bag (empty when loading 1-3; the Chronicle catches up from
     /// what the character has already done). v1 (no talents) and v2 (9-node prototype ids) migrate on read; the migrated
     /// form is written on the next save. From format 6 on, each format step is a SaveMigrator step on the payload text
-    /// (6 → 7: <see cref="AddDiscoveriesMigration"/>, 7 → 8: <see cref="AddProfessionsMigration"/>, 8 → 9: <see cref="AddArmouryMigration"/>),
-    /// run before the payload is read.
+    /// (6 → 7: <see cref="AddDiscoveriesMigration"/>, 7 → 8: <see cref="AddProfessionsMigration"/>, 8 → 9: <see cref="AddArmouryMigration"/>,
+    /// 9 → 10: <see cref="SteeperCurveMigration"/>, 10 → 11: <see cref="AddRecipesMigration"/>), run before the payload is read.
     /// </summary>
     public sealed class EncounterSave
     {
-        public const int FormatVersion = 10;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck). 10: the cap-15 curve (experience migrated again, round 29)
+        public const int FormatVersion = 11;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck). 10: the cap-15 curve (experience migrated again, round 29). 11: found recipes and lockouts (recipes, Phase 8.6; lockouts, 2026-10-15)
         /// <summary>The most trade bags a save may list as worn.</summary>
         public const int MaxPouches = 8;
         /// <summary>The payload steps from format 6 on. Formats 1-5 are older than this chain and are upgraded in memory in Read.</summary>
         static readonly SaveMigrator Steps = CreateSteps();
-        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); m.Register(new SteeperCurveMigration()); return m; }
+        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); m.Register(new SteeperCurveMigration()); m.Register(new AddRecipesMigration()); return m; }
         /// <summary>9-node prototype ids (format 2) -> the nodes they became in the data-driven Warrior tree.</summary>
         public static readonly Dictionary<string, string> LegacyTalentIds = new Dictionary<string, string>(StringComparer.Ordinal) {
             { "tank.armor", "tk-tempered-armor" }, { "tank.challenge", "tk-steady-challenge" }, { "tank.bulwark", "tk-bulwark" },
@@ -41,6 +41,15 @@ namespace Crulanda.Encounter
             store = new SaveFileStore(root);
             this.talents = talents ?? throw new ArgumentNullException(nameof(talents));
             this.slot = string.IsNullOrWhiteSpace(slot) ? throw new ArgumentException("Save slot missing.") : slot;
+        }
+        /// <summary>How far from the zone's centre (across) and from sea level (down or up) a saved place may be: anything further is not a
+        /// save this game wrote. Was 60 down until the drawn-out Sealed Adit (2026-10-10) put its floors 80-90 m down, and a save there
+        /// came back a new character (2026-10-11); AditTests checks every floor of the dungeon against these.</summary>
+        public const float MaxAcross = 500, MaxDepth = 250, MaxHeight = 250;
+        public static bool Placeable(float x, float y, float z)
+        {
+            return !float.IsNaN(x) && !float.IsNaN(y) && !float.IsNaN(z) && !float.IsInfinity(x) && !float.IsInfinity(y) && !float.IsInfinity(z) &&
+                Math.Abs(x) <= MaxAcross && Math.Abs(z) <= MaxAcross && y >= -MaxDepth && y <= MaxHeight;
         }
         public void Write(EncounterProgress progress)
         {
@@ -64,9 +73,7 @@ namespace Crulanda.Encounter
                 var p = JsonUtility.FromJson<EncounterProgress>(envelope.payloadJson);
                 if (p == null || !Guid.TryParse(p.playerId, out _) || !Guid.TryParse(p.companionId, out _) ||
                     p.enemies == null || p.experience < 0 || p.gold < 0 ||
-                    float.IsNaN(p.x) || float.IsNaN(p.y) || float.IsNaN(p.z) ||
-                    float.IsInfinity(p.x) || float.IsInfinity(p.y) || float.IsInfinity(p.z) ||
-                    Math.Abs(p.x) > 500 || Math.Abs(p.z) > 500 || p.y < -60 || p.y > 60)   // (a cave's floor may lie well under the land)
+                    !Placeable(p.x, p.y, p.z))
                     throw new InvalidOperationException("Invalid encounter data.");
                 // Level curve changed in format 5: convert experience first so every level-based check sees the same level.
                 if (from < 5) p.experience = EncounterProgress.MigrateExperience(p.experience);
@@ -110,7 +117,13 @@ namespace Crulanda.Encounter
                 if (p.lootLuck == null) p.lootLuck = new List<LootLuck>();
                 if (p.keys == null) p.keys = new List<string>();   // dungeon step D3 (no format change: older saves have none)
                 if (p.spiritStones == null) p.spiritStones = new List<string>();
-                foreach (var list in new[] { p.armoury, p.looks, p.keys, p.spiritStones }) { list.RemoveAll(string.IsNullOrEmpty); var once = new HashSet<string>(StringComparer.Ordinal); list.RemoveAll(id => !once.Add(id)); }
+                // Format 11: the found recipes learned from leaves. Formats 1-10 have none. A blank id and a repeat are dropped; an id this
+                // content doesn't know is kept (ProfessionLog ignores it), so content can change.
+                if (p.recipes == null) p.recipes = new List<string>();
+                // Format 11 too: the lockouts (Lockouts). Formats 1-10 have none. A blank key, an expiry of zero or less and a repeat are
+                // dropped; one that has run out is kept until the session prunes it; a key this content doesn't know is kept.
+                Lockouts.Normalize(p);
+                foreach (var list in new[] { p.armoury, p.looks, p.keys, p.spiritStones, p.recipes }) { list.RemoveAll(string.IsNullOrEmpty); var once = new HashSet<string>(StringComparer.Ordinal); list.RemoveAll(id => !once.Add(id)); }
                 p.lootLuck.RemoveAll(l => l == null || string.IsNullOrEmpty(l.source));
                 foreach (var l in p.lootLuck) if (l.kills < 0 || l.dry < 0) throw new InvalidOperationException("Invalid loot data.");
                 var sources = new HashSet<string>(StringComparer.Ordinal);
@@ -129,6 +142,7 @@ namespace Crulanda.Encounter
                     p.inventory = new List<string>(); p.equippedItem = null;
                 }
                 if (p.bag.Count > Inventory.BagSize * 4 || p.equipment.Count != ItemDatabase.SlotIds.Length) throw new InvalidOperationException("Invalid item data.");
+                var retired = TalentMigration.DropRetired(p); if (retired != null) message = retired;   // paths reworked 2026-10-12
                 if (!talents.Validate(p, out var reason)) throw new InvalidOperationException(reason);
                 progress = p;
                 return true;
@@ -248,6 +262,48 @@ namespace Crulanda.Encounter
             string body = json.Substring(0, json.Length - 1).TrimEnd();
             for (int i = 0; i < Lists.Length; i++) if (!Has[i].IsMatch(json)) body += (body.EndsWith("{") ? "" : ",") + "\"" + Lists[i] + "\":[]";
             return body + "}";
+        }
+    }
+    /// <summary>
+    /// Save format 10 → 11 (Phase 8.6 step 5, found recipes): adds an empty <c>recipes</c> list (the recipes learned from leaves,
+    /// ProfessionLog.UseLeaf). An edit on the payload text, like <see cref="AddDiscoveriesMigration"/>: the list goes in before the closing
+    /// brace and every other character of the format-10 payload stays exactly as it was. A payload that already has the list is left
+    /// alone; one that isn't a JSON object is refused (the save is then not loaded, not changed). A save written afterwards carries the
+    /// list before <c>discoveries</c> (where EncounterProgress declares it); the order of a JSON object's fields means nothing to the read.
+    /// The same step adds an empty <c>lockouts</c> list after it (the bosses and elites killed and locked, Lockouts; 2026-10-15, branch
+    /// p86-lockout: one format for both, not a twelfth), each only when it is missing, as <see cref="AddArmouryMigration"/> does.
+    /// </summary>
+    public sealed class AddRecipesMigration : ISaveMigration
+    {
+        public int FromVersion { get { return 10; } }
+        public int ToVersion { get { return 11; } }
+        static readonly string[] Lists = { "recipes", "lockouts" };
+        static readonly Regex[] Has = { new Regex("\"recipes\"\\s*:"), new Regex("\"lockouts\"\\s*:") };
+        public string Migrate(string payloadJson)
+        {
+            string json = (payloadJson ?? "").Trim();
+            if (json.Length < 2 || json[0] != '{' || json[json.Length - 1] != '}') throw new SaveMigrationException("The save's payload is not a JSON object.");
+            bool all = true; foreach (var h in Has) all &= h.IsMatch(json);
+            if (all) return payloadJson;
+            string body = json.Substring(0, json.Length - 1).TrimEnd();
+            for (int i = 0; i < Lists.Length; i++) if (!Has[i].IsMatch(json)) body += (body.EndsWith("{") ? "" : ",") + "\"" + Lists[i] + "\":[]";
+            return body + "}";
+        }
+    }
+    /// <summary>Talent paths reworked (2026-10-12, Chris: "Rework existing paths into the new builds"): the Mage's Cinderwright became the
+    /// Bonecaller (cw-), the Archivist's Archive the Unwriting (ar-) and its Silent Vow the Still Vow (sv-). A save's points in a retired
+    /// path are refunded (dropped from the allocation, so they are free to spend again); every other pick is kept as it was.</summary>
+    public static class TalentMigration
+    {
+        public static readonly string[] RetiredPrefixes = { "cw-", "ar-", "sv-" };
+        public static bool Retired(string id) { if (string.IsNullOrEmpty(id)) return false; foreach (var x in RetiredPrefixes) if (id.StartsWith(x, StringComparison.Ordinal)) return true; return false; }
+        /// <summary>Drops the retired picks; returns what to tell the player, or null when nothing was retired.</summary>
+        public static string DropRetired(EncounterProgress p)
+        {
+            if (p == null || p.talents == null) return null;
+            int points = 0; foreach (var t in p.talents) if (t != null && Retired(t.id)) points += Math.Max(0, t.rank);
+            if (p.talents.RemoveAll(t => t != null && Retired(t.id)) == 0) return null;
+            return "Talent paths reworked (the Cinderwright is now the Bonecaller, the Archive the Unwriting, the Silent Vow the Still Vow): " + points + (points == 1 ? " point" : " points") + " refunded [B]. Nothing else changed.";
         }
     }
 }

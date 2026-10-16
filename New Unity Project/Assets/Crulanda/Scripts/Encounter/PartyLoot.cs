@@ -89,6 +89,7 @@ namespace Crulanda.Encounter
         {
             var r = Roll; if (r == null || r.Done) return;
             string winner = r.Resolve(); r.deadline = Time.time; string name = ItemName(r.item);
+            Meter.Loot(name + (r.count > 1 ? " x" + r.count : ""), r.from, winner == "you" ? "You" : (PartySim(winner)?.sim.name ?? winner));   // the scorecard's loot
             // Remembered (5.5): needing over a sim's need counts against you; passing to one that needed counts for you.
             foreach (var m in r.members)
             {

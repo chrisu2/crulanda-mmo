@@ -1,0 +1,206 @@
+{
+  "zone": "zone.khaven",
+  "canonStatus": "GAME-ONLY: Khaven's chapter of the book of lore, its lines the game's; the Blood-Stone Well, the Gallows Tree and the Cracked Hearth are CANON (the Khaven village map), the rest as each line says.",
+  "entries": [
+    {
+      "id": "lore.khaven.places.blood-stone-well",
+      "chapter": "places",
+      "subject": "Blood-Stone Well",
+      "more": "The beacon roll remembers the winter the well went red: they lit the beacon one night for the Peaks, and nobody answered. They have scrubbed the stone every morning since.",
+      "page": "doc.khaven.beacon_roll",
+      "canonStatus": "CANON-EXPANDED: the Blood-Stone Well is CANON (the Khaven village map); its red winter and the beacon are GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.places.drowned-graveyard",
+      "chapter": "places",
+      "subject": "Drowned graveyard",
+      "more": "The sexton's register of the low row: every name laid with salt on the tongue, as is proper in Khaven, and a coin for the road. The creek took the row anyway.",
+      "page": "doc.khaven.low_row",
+      "canonStatus": "GAME-ONLY: the register and the salt custom. The Hollow Men are a CANON creature (book1 ch.4)."
+    },
+    {
+      "id": "lore.khaven.places.the-listener-s-hut",
+      "chapter": "places",
+      "subject": "The Listener's Hut",
+      "more": "The Silent Pilgrim who kept the hut came to hear the Original Song in the wood's talk. The daybook grows less careful toward the end. The lamp is still lit.",
+      "page": "doc.khaven.listener",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and the Original Song are CANON (world_bible.md); the listener is GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.places.outrider-camp",
+      "chapter": "places",
+      "subject": "Outrider camp",
+      "more": "One outrider kept a second tally of his own: pewter plates, a pedlar's knife, a silver thimble, eleven sovereigns in small coin. The captain counts the cart; nobody counts the men.",
+      "page": "doc.khaven.skim",
+      "canonStatus": "GAME-ONLY: the outrider and his tally. The Sandthrone are CANON (world_bible.md)."
+    },
+    {
+      "id": "lore.khaven.places.the-fallen-watch",
+      "chapter": "places",
+      "subject": "The Fallen Watch",
+      "more": "The picket's orders, sealed with the Company's sun on a bar of sand, say Khaven pays toll at its own gate as at the road: one in ten, of coin and of everything else.",
+      "page": "doc.khaven.picket_orders",
+      "canonStatus": "GAME-ONLY: the picket and its orders. The Sandthrone are CANON (world_bible.md)."
+    },
+    {
+      "id": "lore.khaven.places.the-carrion-heights",
+      "chapter": "places",
+      "subject": "The Carrion Heights",
+      "more": "Old Kestrel sat nine nights with the crows up here and says they do not wait for the dead. They wait for the pale one at the barrow to finish its count.",
+      "page": "doc.khaven.crow_count",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Pale Things as cosmic auditors are CANON (world_bible.md); this one is GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.places.deep-stillwood",
+      "chapter": "places",
+      "subject": "Deep Stillwood",
+      "more": "A Sandthrone picket-man walked in here to be rid of the Company and sat down against a trunk to listen. The wood's talk was kind to him, his last leaf says. It is kind to everyone, at the end.",
+      "page": "doc.khaven.deserters_leaf",
+      "canonStatus": "GAME-ONLY: the Stillwood and its talk. The Sandthrone are CANON (world_bible.md)."
+    },
+    {
+      "id": "lore.khaven.places.the-plague-pit",
+      "chapter": "places",
+      "subject": "The Plague Pit",
+      "more": "The woman who nursed the fever year's sick, every house, until it took her too, lies apart under her own stone. Khaven would not put her in the pit with the rest.",
+      "secret": "secret.khaven.fever-nurse",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.places.the-corpse-road",
+      "chapter": "places",
+      "subject": "The Corpse Road",
+      "more": "The bearers' saint still stands where they rested the coffins, a crown in his dish for the road. Hollis Grane left one there every time he passed, for thirty years.",
+      "secret": "secret.khaven.bearers-shrine",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.places.the-thicket",
+      "chapter": "places",
+      "subject": "The Thicket",
+      "line": "Gloom-thorn too thick to walk through, and the deserters who live in it like it that way.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.people.wenna-coyle",
+      "chapter": "people",
+      "subject": "Wenna Coyle",
+      "more": "Her mother Mael nursed the fever year's sick until it took her too. Wenna keeps the stone clean, and still leaves pebbles on it.",
+      "secret": "secret.khaven.fever-nurse",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.people.hollis-grane",
+      "chapter": "people",
+      "subject": "Hollis Grane",
+      "more": "He carried the beacon fire up the mound in the fever year. It burned three nights and Oakhaven never answered. His name is on the roll as bearer.",
+      "page": "doc.khaven.beacon_roll",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.creatures.grey-wolf",
+      "chapter": "creatures",
+      "subject": "Grey wolf",
+      "line": "The grey wood's wolves: thin, grey and silent. They hunt the wood's edge at dusk, which in Khaven is most of the day.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.creatures.the-hush-mother",
+      "chapter": "creatures",
+      "subject": "The Hush-Mother",
+      "line": "The old she-wolf of the deep wood, where the trunks crowd too close for any wind. The pack goes quiet when she moves.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.creatures.carrion-boar",
+      "chapter": "creatures",
+      "subject": "Carrion boar",
+      "line": "Boar that root in the barrows and the drowned ground. Khaven does not eat them, and does not say why.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.creatures.mire-boar",
+      "chapter": "creatures",
+      "subject": "Mire boar",
+      "line": "Boar of the drowned barley fields, mud to the shoulder. Every flood brings more of them up the creek.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.creatures.sandthrone-outrider",
+      "chapter": "creatures",
+      "subject": "Sandthrone outrider",
+      "line": "Sandthrone riders who hold the road and call it a toll. They take one in ten of everything at Khaven's own gate.",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone mercenary company is CANON (world_bible.md); these men are GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.creatures.hollow-man",
+      "chapter": "creatures",
+      "subject": "Hollow Man",
+      "line": "The emptied dead, who will not lie down. Khaven salts its dead's tongues against them, and still some walk.",
+      "canonStatus": "CANON-EXPANDED: the Hollow Men are a CANON creature (book1 ch.4); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.creatures.the-grey-sexton",
+      "chapter": "creatures",
+      "subject": "The Grey Sexton",
+      "line": "Khaven's sexton, risen out of his own drowned row. He still tends the graves, after his fashion.",
+      "canonStatus": "CANON-EXPANDED: the Hollow Men are a CANON creature (book1 ch.4); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.creatures.the-pale-reckoner",
+      "chapter": "creatures",
+      "subject": "The Pale Reckoner",
+      "line": "A pale thing at the charnel barrow that counts, and counts, and has not finished.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Pale Things as cosmic auditors are CANON (world_bible.md); this one is GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.creatures.sandthrone-deserter",
+      "chapter": "creatures",
+      "subject": "Sandthrone deserter",
+      "line": "Sandthrone men who slipped the picket and went to ground in the thorn. They rob the road their old mates tax.",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone mercenary company is CANON (world_bible.md); these men are GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.creatures.charnel-spider",
+      "chapter": "creatures",
+      "subject": "Charnel spider",
+      "line": "Pale spiders of the charnel ground, fat on what the creek gives back.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.khaven.creatures.drowned-dead",
+      "chapter": "creatures",
+      "subject": "Drowned dead",
+      "line": "The dead the creek took out of the low graves, come back up the bank still wet. The salt did not hold them.",
+      "canonStatus": "CANON-EXPANDED: the Hollow Men are a CANON creature (book1 ch.4); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.khaven.herbs.bogiron",
+      "chapter": "herbs",
+      "subject": "node.bogiron",
+      "line": "Bog-iron raked out of the red seams in the drowned ground: soft, rusty, and the only iron Khaven has had since its smithies fell.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.khaven.herbs.blackpine",
+      "chapter": "herbs",
+      "subject": "node.blackpine",
+      "line": "Black pine brought down by the gales at the wood's edge. It burns slow and smoky, and Khaven burns nothing else.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.khaven.herbs.mourners-cap",
+      "chapter": "herbs",
+      "subject": "node.mourners_cap",
+      "line": "A grey toadstool of the graveyards and the dead wood. Bitter, and good against a fever, which Khaven learned the hard way.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.khaven.herbs.widows-lamp",
+      "chapter": "herbs",
+      "subject": "herb.widows_lamp",
+      "line": "A pale bell no bigger than a thumbnail, lit from inside like a lamp left in a window. Khaven picks it by day and never after dark.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    }
+  ]
+}

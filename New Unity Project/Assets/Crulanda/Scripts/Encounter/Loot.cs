@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using Crulanda.Abilities;
 using Crulanda.Core;
 using Crulanda.Gameplay;
 using Crulanda.World;
@@ -35,8 +36,15 @@ namespace Crulanda.Encounter
     /// kind: stat (stat names a StatType: MaxHealth, MaxPower, AttackPower, Armor or a primary stat; percent makes amount a
     /// percentage), onKillHeal, onKillPower, restRegen (health on the out-of-combat tick), coins or luck (percent on coins from
     /// bodies and on lucky drop groups). text is the tooltip line.
+    /// The class sets' kinds (DESIGN.md 3.8) change one of the wearer's own abilities, named by its id in ability: abilityCost
+    /// (amount less resource, or amount% with percent), abilityCooldown (amount seconds shorter, or amount%), abilityCastTime (amount
+    /// seconds quicker, or amount%), abilityPower (its hits and heals as it resolves amount% stronger). The procs fire as ability
+    /// resolves (ability "auto": a weapon swing or auto-shot that lands), chance% of the time: procResource (amount resource back),
+    /// procReset (amount seconds off the cooldown of the ability named in other: a large amount makes it ready) and procEcho (the
+    /// ability resolves a second time, free, at amount% power). GearEffects.Adjust, PowerScale and Proc work them out; the
+    /// session's StartAbility, the one door every kit's abilities pass through, carries them out.
     /// </summary>
-    [Serializable] public sealed class GearEffect { public string kind, stat, text; public float amount; public bool percent; }
+    [Serializable] public sealed class GearEffect { public string kind, stat, text, ability, other; public float amount, chance; public bool percent; }
     /// <summary>
     /// A drop list and the camp mobs it applies to: zone (the zone id without "zone."), tag, mob (the camp's mob name) and rank
     /// (elite, normal, or empty for both) narrow it when given; levelMin and levelMax bound the mob's level.
@@ -51,10 +59,20 @@ namespace Crulanda.Encounter
     /// One roll: chance, then one weighted pick. signature: a boss's own list, which gives a piece you do not own while there is
     /// one. lucky: worn luck raises the chance. pity: an epic that is certain on that many kills without it (while unowned).
     /// </summary>
-    [Serializable] public sealed class DropGroup { public float chance; public bool signature, lucky; public int pity; public DropPick[] pick = new DropPick[0]; }
+    /// <summary>
+    /// classSet: a class set's group (DESIGN.md 3.8). Its picks are class pieces (ItemDef.classOnly), and only those of a class in
+    /// the party can drop: the player's class weighs <see cref="LootDatabase.ClassSetOwnWeight"/> times one sim's, a piece the player
+    /// owns leaves the pool, and pity counts the kills without the player's own unowned piece, which is certain on the pity-th. It
+    /// neither spends nor is held back by the named-item cap, and it rolls only when the caller passes the party's classes.
+    /// </summary>
+    [Serializable] public sealed class DropGroup { public float chance; public bool signature, lucky, classSet; public int pity; public DropPick[] pick = new DropPick[0]; }
     [Serializable] public sealed class DropPick { public string item; public int weight = 1; }
-    /// <summary>A set: its pieces (each in its own slot) and the bonuses that switch on at a count of pieces worn.</summary>
-    [Serializable] public sealed class SetDef { public string id, name; public string[] pieces = new string[0]; public SetBonus[] bonuses = new SetBonus[0]; }
+    /// <summary>
+    /// A set: its pieces (each in its own slot) and the bonuses that switch on at a count of pieces worn. A class set (DESIGN.md 3.8)
+    /// names its class in cls (every piece is that class's only: ItemDef.classOnly), its tier (1: the dungeon sets of the Sealed
+    /// Adit; 2 and up: the raids', none built yet) with tierName for the tooltip ("Dungeon", "Raid"), and its canonStatus.
+    /// </summary>
+    [Serializable] public sealed class SetDef { public string id, name, cls, tierName, canonStatus; public int tier; public string[] pieces = new string[0]; public SetBonus[] bonuses = new SetBonus[0]; }
     [Serializable] public sealed class SetBonus { public int count; public GearEffect[] effects = new GearEffect[0]; }
     /// <summary>A pity counter: kills of a source (drop id and group) and how many of them in a row gave nothing. Saved from step L3.</summary>
     [Serializable] public sealed class LootLuck { public string source; public int kills, dry; }
@@ -103,7 +121,16 @@ namespace Crulanda.Encounter
         public ItemDatabase Items { get; private set; }
 
         /// <summary>The kinds of effect the game can carry out (DESIGN.md 3.6).</summary>
-        public static readonly string[] EffectKinds = { "stat", "onKillHeal", "onKillPower", "restRegen", "coins", "luck" };
+        public static readonly string[] EffectKinds = { "stat", "onKillHeal", "onKillPower", "restRegen", "coins", "luck",
+            "abilityCost", "abilityCooldown", "abilityCastTime", "abilityPower", "procResource", "procReset", "procEcho" };
+        /// <summary>The kinds that work on one of the wearer's abilities (DESIGN.md 3.8): they name it in ability.</summary>
+        public static readonly string[] AbilityKinds = { "abilityCost", "abilityCooldown", "abilityCastTime", "abilityPower", "procResource", "procReset", "procEcho" };
+        /// <summary>The procs: they carry a chance (percent) and may fire on <see cref="AutoTrigger"/>.</summary>
+        public static readonly string[] ProcKinds = { "procResource", "procReset", "procEcho" };
+        /// <summary>A proc's trigger for the weapon's own blows (a swing or an auto-shot that lands).</summary>
+        public const string AutoTrigger = "auto";
+        /// <summary>In a class set group the player's own class weighs this many times one sim's.</summary>
+        public const int ClassSetOwnWeight = 3;
         /// <summary>The stats an effect of kind "stat" may change.</summary>
         public static readonly StatType[] EffectStats = { StatType.MaxHealth, StatType.MaxPower, StatType.AttackPower, StatType.Armor, StatType.Strength, StatType.Agility, StatType.Stamina, StatType.Intellect, StatType.Spirit };
         public static readonly string[] SourceKinds = { "boss", "mob", "quest", "vendor", "world", "secret" };
@@ -163,10 +190,12 @@ namespace Crulanda.Encounter
                         if (!(g.chance > 0 && g.chance <= 1)) errors.Add(p + "chance " + g.chance + " is not inside (0, 1].");
                         if (g.pity < 0) errors.Add(p + "negative pity.");
                         if (g.pick == null || g.pick.Length == 0) errors.Add(p + "a group picks nothing.");
+                        if (g.classSet && g.signature) errors.Add(p + "a class set group is not a signature list.");
                         foreach (var k in g.pick ?? new DropPick[0])
                         {
                             if (k == null || items.Get(k.item) == null) errors.Add(p + "drops unknown item '" + k?.item + "'.");
                             else if (k.weight < 1) errors.Add(p + "'" + k.item + "' has weight " + k.weight + ".");
+                            else if (g.classSet && string.IsNullOrEmpty(items.Get(k.item).classOnly)) errors.Add(p + "'" + k.item + "' is on a class set group but is no class's piece.");
                         }
                     }
                     db.Drops.Add(d);
@@ -183,7 +212,9 @@ namespace Crulanda.Encounter
                         var d = items.Get(piece);
                         if (d == null || d.kind != "gear") errors.Add(p + "piece '" + piece + "' is not a known piece of gear.");
                         else if (!slots.Add(d.slot)) errors.Add(p + "two pieces for the " + d.slot + " slot.");
+                        else if ((d.classOnly ?? "") != (s.cls ?? "")) errors.Add(p + "piece '" + piece + "' is for '" + d.classOnly + "', the set for '" + s.cls + "'.");
                     }
+                    if (!string.IsNullOrEmpty(s.cls) && (s.tier < 1 || string.IsNullOrEmpty(s.tierName) || string.IsNullOrEmpty(s.canonStatus))) errors.Add(p + "a class set needs a tier (1 and up), a tierName and a canonStatus.");
                     int last = 1;
                     foreach (var b in s.bonuses ?? new SetBonus[0])
                     {
@@ -205,8 +236,14 @@ namespace Crulanda.Encounter
             if (string.IsNullOrEmpty(e.text)) errors.Add(p + "an effect has no text.");
             if (!(e.amount > 0)) errors.Add(p + "an effect amount must be above 0.");
             if (e.kind == "stat" && !(Enum.TryParse(e.stat ?? "", out StatType s) && Array.IndexOf(EffectStats, s) >= 0)) errors.Add(p + "effect stat '" + e.stat + "' is not one the game carries.");
-            if (e.kind != "stat" && e.percent) errors.Add(p + "only stat effects may be percentages.");
-            float cap = GearEffects.Cap(e.kind); if (e.amount > cap) errors.Add(p + e.kind + " " + e.amount + " is over its cap of " + cap + ".");
+            if (e.percent && !GearEffects.TakesPercent(e.kind)) errors.Add(p + "only stat, abilityCost, abilityCooldown and abilityCastTime effects may be percentages.");
+            float cap = GearEffects.Cap(e.kind, e.percent); if (e.amount > cap) errors.Add(p + e.kind + " " + e.amount + (e.percent ? "%" : "") + " is over its cap of " + cap + ".");
+            bool ability = Array.IndexOf(AbilityKinds, e.kind) >= 0, proc = Array.IndexOf(ProcKinds, e.kind) >= 0;
+            if (ability && string.IsNullOrEmpty(e.ability)) errors.Add(p + "a " + e.kind + " effect names no ability.");
+            if (ability && !proc && e.ability == AutoTrigger) errors.Add(p + "only procs fire on '" + AutoTrigger + "'.");
+            if (proc && !(e.chance > 0 && e.chance <= 100)) errors.Add(p + "a proc's chance " + e.chance + " is not inside (0, 100].");
+            if (!proc && e.chance != 0) errors.Add(p + "only procs have a chance.");
+            if (e.kind == "procReset" && string.IsNullOrEmpty(e.other)) errors.Add(p + "a procReset names no other ability.");
         }
         /// <summary>The kind of a source string (boss, mob, quest, vendor, world, secret), or null when it is malformed.</summary>
         public static string SourceKind(string source)
@@ -255,8 +292,10 @@ namespace Crulanda.Encounter
         /// passes the bags and equipment, null keeps it). An elite whose body would hold no gear gets a generated piece at its
         /// level (rare 35%, else uncommon), and 6% of an elite's generated rares come out epic. Named items the base roll already
         /// left on the body count toward the cap. owned may be null (nothing owned). The same seed gives the same drops.
+        /// <paramref name="classes"/>: the party's classes, the player's first and then each sim's (a class twice when two play it);
+        /// class set groups roll only with it (see <see cref="DropGroup.classSet"/> and RollClassSet).
         /// </summary>
-        public List<LootDrop> Roll(LootContext c, ItemDatabase items, Func<string, bool> owned, float luck, List<LootLuck> pity, System.Random rng, Func<string, bool> held = null)
+        public List<LootDrop> Roll(LootContext c, ItemDatabase items, Func<string, bool> owned, float luck, List<LootLuck> pity, System.Random rng, Func<string, bool> held = null, IList<string> classes = null)
         {
             items = items ?? Items; owned = owned ?? (_ => false);
             var matched = Matching(c); var drops = new List<LootDrop>();
@@ -270,6 +309,7 @@ namespace Crulanda.Encounter
                 for (int gi = 0; gi < d.groups.Length; gi++)
                 {
                     var g = d.groups[gi];
+                    if (g.classSet) { RollClassSet(d.id + "#" + gi, g, items, classes, owned, lucky, pity, rng, held, drops); continue; }
                     var pool = new List<DropPick>(); foreach (var k in g.pick) if (!drops.Exists(x => x.item == k.item) && !(held != null && IsUnique(k.item) && held(k.item))) pool.Add(k);
                     if (pool.Count == 0) continue;
                     bool epic = pool.TrueForAll(k => Quality(items, k.item) >= 4);
@@ -315,6 +355,39 @@ namespace Crulanda.Encounter
                 }
             return drops;
         }
+        /// <summary>
+        /// A class set group (DESIGN.md 3.8): the pieces for the classes in the party, weighted by how many play each (the player's
+        /// class <see cref="ClassSetOwnWeight"/> times), less the pieces the player owns of their own class and any unique one held.
+        /// The chance is the group's (luck scales it when lucky). Pity counts the kills on which the player's own unowned piece was
+        /// in the pool and did not drop; on the pity-th it is certain. Nothing without <paramref name="classes"/>.
+        /// </summary>
+        void RollClassSet(string key, DropGroup g, ItemDatabase items, IList<string> classes, Func<string, bool> owned, float lucky, List<LootLuck> pity, System.Random rng, Func<string, bool> held, List<LootDrop> drops)
+        {
+            if (classes == null || classes.Count == 0 || string.IsNullOrEmpty(classes[0])) return;
+            string mine = classes[0]; var pool = new List<DropPick>(); DropPick own = null;
+            foreach (var k in g.pick)
+            {
+                var d = items.Get(k.item); if (d == null || string.IsNullOrEmpty(d.classOnly) || drops.Exists(x => x.item == k.item)) continue;
+                if (held != null && IsUnique(k.item) && held(k.item)) continue;
+                int players = 0; for (int i = 0; i < classes.Count; i++) if (classes[i] == d.classOnly) players += i == 0 ? ClassSetOwnWeight : 1;
+                if (players == 0 || (d.classOnly == mine && owned(k.item))) continue;
+                pool.Add(new DropPick { item = k.item, weight = Math.Max(1, k.weight) * players });
+                if (d.classOnly == mine && own == null) own = k;
+            }
+            if (pool.Count == 0) return;
+            LootLuck counter = null;
+            if (pity != null && g.pity > 0 && own != null)
+            {
+                counter = pity.Find(x => x != null && x.source == key);
+                if (counter == null) { counter = new LootLuck { source = key }; pity.Add(counter); }
+                counter.kills++;
+            }
+            string picked = null;
+            if (counter != null && counter.dry + 1 >= g.pity) picked = own.item;
+            else if (rng.NextDouble() < g.chance * (g.lucky ? lucky : 1)) picked = Pick(pool, rng);
+            if (counter != null) counter.dry = own != null && picked == own.item ? 0 : counter.dry + 1;
+            if (picked != null) drops.Add(new LootDrop(picked, 1));
+        }
         static int Quality(ItemDatabase items, string id) { var d = items.Get(id); return d != null ? d.quality : 0; }
         static string Pick(List<DropPick> pool, System.Random rng)
         {
@@ -348,7 +421,7 @@ namespace Crulanda.Encounter
             if (s != null)
             {
                 int worn = SetWorn(s, p);
-                l.Add((s.name + " (" + worn + "/" + s.pieces.Length + ")", TipLine.Set));
+                l.Add((s.name + " (" + worn + "/" + s.pieces.Length + ")" + (s.tier > 0 ? "  ·  " + (string.IsNullOrEmpty(s.tierName) ? "" : s.tierName + " set, ") + "tier " + s.tier : ""), TipLine.Set));
                 foreach (var piece in s.pieces) { var d = Items.Get(piece); l.Add((d != null ? d.name : piece, p != null && Inventory.IsEquipped(p, piece) ? TipLine.PieceWorn : TipLine.PieceMissing)); }
                 foreach (var b in s.bonuses) foreach (var e in b.effects) l.Add(("(" + b.count + ") " + e.text, worn >= b.count ? TipLine.BonusOn : TipLine.BonusOff));
             }
@@ -479,6 +552,21 @@ namespace Crulanda.Encounter
         public float coins, luck;
         /// <summary>Each switched-on set bonus and worn effect, as its tooltip text.</summary>
         public readonly List<string> lines = new List<string>();
+        /// <summary>The switched-on effects on the wearer's abilities (LootDatabase.AbilityKinds), for GearEffects.Adjust, PowerScale and Proc.</summary>
+        public readonly List<GearEffect> abilities = new List<GearEffect>();
+    }
+
+    /// <summary>What the procs of one ability resolving (or one landed swing) came to: resource back, cooldowns cut, an echo.</summary>
+    public sealed class GearProcs
+    {
+        public int resource;
+        /// <summary>Ability id and seconds off its cooldown.</summary>
+        public readonly List<(string ability, float seconds)> resets = new List<(string, float)>();
+        /// <summary>The power of the echo (1 = full), 0 for none.</summary>
+        public float echo;
+        /// <summary>The tooltip texts of the procs that fired.</summary>
+        public readonly List<string> fired = new List<string>();
+        public bool Any { get { return resource > 0 || resets.Count > 0 || echo > 0; } }
     }
 
     /// <summary>Gear effects (DESIGN.md 3.6): pure sums over what is worn, with the caps applied.</summary>
@@ -486,10 +574,87 @@ namespace Crulanda.Encounter
     {
         public const float CoinsCap = .3f, LuckCap = .3f;
         public const int RestRegenCap = 20, OnKillHealCap = 60;
+        /// <summary>The class sets' caps (DESIGN.md 3.8): any percentage on an ability 50%, a cost 50 resource less, a cooldown 60 s
+        /// shorter, a cast 2 s quicker, procResource 50 resource, procReset 600 s (ready at once), procEcho 100% power.</summary>
+        public const float AbilityPercentCap = 50, AbilityCostCap = 50, AbilityCooldownCap = 60, AbilityCastCap = 2, ProcResourceCap = 50, ProcResetCap = 600, ProcEchoCap = 100;
+        /// <summary>A cast made quicker never drops under this (seconds), unless it was instant already.</summary>
+        public const float MinCastTime = .3f;
+        /// <summary>The kinds whose amount may be a percentage.</summary>
+        public static bool TakesPercent(string kind) { return kind == "stat" || kind == "abilityCost" || kind == "abilityCooldown" || kind == "abilityCastTime"; }
         /// <summary>The most one effect of a kind may give (coins and luck in percent). Stats and resource have no cap.</summary>
-        public static float Cap(string kind)
+        public static float Cap(string kind) { return Cap(kind, false); }
+        /// <summary>The cap for a flat amount or (<paramref name="percent"/>) a percentage.</summary>
+        public static float Cap(string kind, bool percent)
         {
-            switch (kind) { case "coins": return CoinsCap * 100; case "luck": return LuckCap * 100; case "restRegen": return RestRegenCap; case "onKillHeal": return OnKillHealCap; default: return float.MaxValue; }
+            if (percent && kind != "stat") return AbilityPercentCap;
+            switch (kind)
+            {
+                case "coins": return CoinsCap * 100; case "luck": return LuckCap * 100; case "restRegen": return RestRegenCap; case "onKillHeal": return OnKillHealCap;
+                case "abilityCost": return AbilityCostCap; case "abilityCooldown": return AbilityCooldownCap; case "abilityCastTime": return AbilityCastCap; case "abilityPower": return AbilityPercentCap;
+                case "procResource": return ProcResourceCap; case "procReset": return ProcResetCap; case "procEcho": return ProcEchoCap;
+                default: return float.MaxValue;
+            }
+        }
+
+        /// <summary>
+        /// The ability as the worn set bonuses make it (DESIGN.md 3.8): a copy with the same id (so its cooldown is the same one)
+        /// with the cost, cooldown and cast time the abilityCost, abilityCooldown and abilityCastTime effects on its id give (flat
+        /// first, then percentages; never under 0, and a cast never under <see cref="MinCastTime"/>). The ability itself when none
+        /// touch it. Power is not changed here: it is the session's scale while the ability resolves (<see cref="PowerScale"/>).
+        /// </summary>
+        public static AbilityDefinition Adjust(AbilityDefinition a, GearEffectTotals t)
+        {
+            if (a == null || t == null || t.abilities.Count == 0 || string.IsNullOrEmpty(a.id)) return a;
+            float costFlat = 0, costPct = 0, cdFlat = 0, cdPct = 0, castFlat = 0, castPct = 0; bool any = false;
+            foreach (var e in t.abilities)
+            {
+                if (e.ability != a.id) continue;
+                switch (e.kind)
+                {
+                    case "abilityCost": if (e.percent) costPct += e.amount; else costFlat += e.amount; any = true; break;
+                    case "abilityCooldown": if (e.percent) cdPct += e.amount; else cdFlat += e.amount; any = true; break;
+                    case "abilityCastTime": if (e.percent) castPct += e.amount; else castFlat += e.amount; any = true; break;
+                }
+            }
+            if (!any) return a;
+            float cast = a.castTime <= 0 ? a.castTime : Mathf.Max(Mathf.Min(MinCastTime, a.castTime), (a.castTime - castFlat) * (1 - Mathf.Min(castPct, AbilityPercentCap) / 100f));
+            return new AbilityDefinition
+            {
+                id = a.id, name = a.name, description = a.description, effect = a.effect, power = a.power, range = a.range, globalCooldown = a.globalCooldown, duration = a.duration, statusId = a.statusId,
+                cost = Mathf.Max(0, Mathf.RoundToInt((a.cost - costFlat) * (1 - Mathf.Min(costPct, AbilityPercentCap) / 100f))),
+                cooldown = Mathf.Max(0, (a.cooldown - cdFlat) * (1 - Mathf.Min(cdPct, AbilityPercentCap) / 100f)),
+                castTime = cast,
+            };
+        }
+        /// <summary>The scale on an ability's hits and heals while it resolves: 1 + the abilityPower percentages on its id (capped at +50%).</summary>
+        public static float PowerScale(GearEffectTotals t, string abilityId)
+        {
+            if (t == null || string.IsNullOrEmpty(abilityId)) return 1;
+            float pct = 0; foreach (var e in t.abilities) if (e.kind == "abilityPower" && e.ability == abilityId) pct += e.amount;
+            return 1 + Mathf.Min(pct, AbilityPercentCap) / 100f;
+        }
+        /// <summary>
+        /// The procs on <paramref name="trigger"/> (an ability's id as it resolves, or LootDatabase.AutoTrigger for a landed swing):
+        /// each rolls its chance on <paramref name="roll"/> (a number in [0, 1)) and, when it fires, adds its resource, its cut to
+        /// the other ability's cooldown or its echo (the strongest echo wins; an echo never echoes again: the session does not call
+        /// this for one).
+        /// </summary>
+        public static GearProcs Proc(GearEffectTotals t, string trigger, Func<double> roll)
+        {
+            var o = new GearProcs(); if (t == null || string.IsNullOrEmpty(trigger) || roll == null) return o;
+            foreach (var e in t.abilities)
+            {
+                if (e.ability != trigger || Array.IndexOf(LootDatabase.ProcKinds, e.kind) < 0) continue;
+                if (!(roll() < e.chance / 100f)) continue;
+                switch (e.kind)
+                {
+                    case "procResource": o.resource += Mathf.RoundToInt(e.amount); break;
+                    case "procReset": o.resets.Add((e.other, e.amount)); break;
+                    case "procEcho": o.echo = Mathf.Max(o.echo, Mathf.Min(e.amount, ProcEchoCap) / 100f); break;
+                }
+                if (!string.IsNullOrEmpty(e.text)) o.fired.Add(e.text);
+            }
+            return o;
         }
         /// <summary>
         /// Every effect of the named gear worn and of each set bonus whose count of pieces worn is reached, totalled and capped
@@ -530,6 +695,7 @@ namespace Crulanda.Encounter
                 case "restRegen": t.restRegen += Mathf.RoundToInt(e.amount); break;
                 case "coins": t.coins += e.amount / 100f; break;
                 case "luck": t.luck += e.amount / 100f; break;
+                case "abilityCost": case "abilityCooldown": case "abilityCastTime": case "abilityPower": case "procResource": case "procReset": case "procEcho": t.abilities.Add(e); break;
                 default: return;
             }
             if (!string.IsNullOrEmpty(e.text)) t.lines.Add(e.text);
@@ -550,9 +716,10 @@ namespace Crulanda.Encounter
         /// <summary>The candidate's score less the worn piece's (an empty slot scores 0).</summary>
         public static float Compare(ItemDef candidate, ItemDef worn) { return Score(candidate) - Score(worn); }
         /// <summary>Gear you can wear now that scores above what you wear in its slot (anything wearable beats an empty slot).</summary>
-        public static bool IsUpgrade(ItemDef candidate, ItemDef worn, int playerLevel)
+        public static bool IsUpgrade(ItemDef candidate, ItemDef worn, int playerLevel, string classId = null)
         {
             if (candidate == null || candidate.kind != "gear" || candidate.level > playerLevel) return false;
+            if (!Inventory.ClassMayWear(candidate, classId)) return false;   // another class's set piece (DESIGN.md 3.8)
             return worn == null || Compare(candidate, worn) > 0;
         }
         /// <summary>The differences stat by stat ("+3 weapon damage", "-2 Stamina"), each marked as a gain or a loss. Unchanged stats are left out.</summary>

@@ -42,6 +42,17 @@ namespace Crulanda.Encounter
         /// <summary>Whole seconds left until <paramref name="until"/>, rounded up, with a hair of slack: now + 10 read back in float can be 10.000008, and that must say 10, not 11.</summary>
         static int Left(float until) { return Mathf.CeilToInt(until - Time.time - .005f); }
         bool IsBoss { get { return Elite && Move != null && Move.boss; } }
+        /// <summary>A dungeon's boss (an elite whose move says so): the party's sims put no hold of theirs on it (SimCompanion.Fight).</summary>
+        public bool Boss { get { return IsBoss; } }
+        /// <summary>Whether a hold of this kind would take now, without trying it (a sim checks before it spends its move, so "Immune" is not
+        /// floated over a mob again and again): not a long hold on a boss, not a third of the same kind inside <see cref="DrWindow"/>.</summary>
+        public bool Takes(string kind)
+        {
+            if (!actor.IsAlive || Game) return false;
+            bool holdable = Elite && Move != null && Move.holdable;
+            if (IsBoss && !holdable && (kind == "incap" || kind == "fear")) return false;
+            return holdable || !(diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow && was.n >= 1);
+        }
         /// <summary>Seconds left on whatever control shows (0 when free).</summary>
         public float ControlSecondsLeft
         {

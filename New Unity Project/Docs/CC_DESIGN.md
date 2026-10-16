@@ -80,3 +80,34 @@ tuned so a group without CC struggles and a group that uses it doesn't.
 3. **C3 marks and sims:** the keys and markers; sims using CC and interrupts and marking on a sim-led run.
 4. **C4 feedback:** the visuals, rings, frame text, combat text.
 5. **C5 the Adit:** pulls re-tuned around CC, casters given real casts to interrupt, then the dungeon deepened.
+
+## 7. Sims in a party: every class holds, and the area blow (2026-10-15; GAME-ONLY)
+Chris, watching the group runs: "also most mobs dont seem to be cc or aoe still a thing?" and "i do see a cc / i assume by rogue".
+Until then only a Rogue, an Archivist or a Scoundrel sim held anything (the moon, HoldTheMoon: unchanged). Now every class does
+(SimCompanion.Fight.cs). Names from the kits where they have one; Lantern Glare and Barrow Dread are new (PROVISIONAL, like the
+Cleric's and Shaman's kits).
+
+| Class | Hold | Kind | Seconds | Wait | Reach |
+|---|---|---|---|---|---|
+| Mage | Ash Hex | incap | 15 | 25 s | 25 m |
+| Druid | Sleep of the Wood | incap | 15 | 28 s | 25 m |
+| Ranger | Snare Trap (thrown at its feet) | incap | 12 | 25 s | 25 m |
+| Cleric | Lantern Glare (dazzled: the disorient) | incap | 10 | 25 s | 25 m |
+| Salt-Mender | Binding Salt | incap | 10 | 25 s | 25 m |
+| Shaman | Barrow Dread (the old dead's chill) | fear | 4 | 22 s | 20 m |
+| Paladin | Rebuke | stun | 3 | 20 s | 8 m |
+| Warrior | Shackle Cast, on an add hitting someone else (the healer first) | stun | 3 | 20 s | 20 m |
+| Rogue, Archivist, Scoundrel | the moon (HoldTheMoon, as before) | incap | 20 | 25 s | 25 m |
+
+Rules (as the moon is held): only with two or more mobs on the party; never a boss, the mob on the tank, your target or the skull; a
+long hold (incap, fear) never the tank's quarry nor its own; on a mob nobody holds and that will take it (immunity and the diminishing
+returns of section 1, checked first so "Immune" is not floated again and again); said in Party the first time in a fight, its name
+over the mob. A long hold keeps two of a pack of three or more free (the tank's and one for the area blows): the party holds the rest.
+A stun takes nobody out of the fight for long and does not break, so it is not counted. Pick: a mob marked cross (or the moon with no
+Rogue or Archivist along), then a caster, then one on the healer, then one on anyone but the tank; the nearer the better.
+
+**The area blow:** a damage-dealer every 10-15 s, with three or more mobs on the party within 6 m of its quarry, strikes its quarry and
+each of the others not held, running or marked to be left alone for 70% of its blow (a slash on each, or a bolt or arrow to each, its
+name over it: Spreading Flame, Spread Loose, Shard Spray, Knife Round, Echo Burst, Salt Spray). A tank's swing is a light cleave (60%
+of its blow, Wide Swing or Wide Judgement) with threat on each. Healers have none. Against one or two mobs nothing changes: the single
+target balance (a tank about 70% of a damage-dealer) holds.

@@ -220,15 +220,20 @@ namespace Crulanda.Tests
                 float foot = ZoneBuilder.NodeFootprint(def.look) - .05f;
                 foreach (var cp in z.camps) if (cp != null && Vector2.Distance(at, cp.center) < cp.radius * 1.42f + foot) problems.Add(q + "stands in the camp '" + cp.name + "'");
                 foreach (var spot in zone.KeepClearSpots) if (Vector2.Distance(at, spot.at) < spot.r + foot) problems.Add(q + "stands in a cave's furnishings at " + spot.at);
-                // Where it belongs.
-                if (def.look == "windfall" && !z.groves.Any(g => g != null && g.kind != "orchard" && (def.id != "node.oak" || g.kind == "broadleaf") && OutsideRect(at, g.center, g.size) < 6 && OutsideRect(at, g.center, g.size) > -4))
+                // Where it belongs. The Lowtowns' salvage (ZONE_LOWTOWNS.md: slag-iron and cinder-beam are pulled from the fallen
+                // tenements, in a city with no crags or woods) stands by a fallen tenement: a slag heap within 4 m of the ruin's
+                // end, a burned beam within 5 m. Every other ore stands by a crag and every other windfall at a wood's edge.
+                bool salvage = def.id == "node.slagiron" || def.id == "node.cinderbeam";
+                if (salvage && !z.props.Any(p => p != null && p.kind == "ruin" && Vector2.Distance(p.at, at) < (p.size.x > 0 ? p.size.x : 6) / 2 + (def.look == "windfall" ? 5 : 4)))
+                    problems.Add(q + "is salvage with no fallen tenement by it");
+                if (!salvage && def.look == "windfall" && !z.groves.Any(g => g != null && g.kind != "orchard" && (def.id != "node.oak" || g.kind == "broadleaf") && OutsideRect(at, g.center, g.size) < 6 && OutsideRect(at, g.center, g.size) > -4))
                     problems.Add(q + (def.id == "node.oak" ? "is no windfall at a broadleaf wood's edge" : "is no windfall at a wood's edge"));
                 if (def.look == "herb")
                 {
                     if (i.kind == "node" && z.groves.Any(g => g != null && OutsideRect(at, g.center, g.size) < 0)) problems.Add(q + "is a herb in a wood, not in the open");
                     if (z.fields.Any(f => f != null && OutsideRect(at, f.center, f.size, f.rotation) < .5f)) problems.Add(q + "is a herb on a ploughed field");
                 }
-                if (def.look == "ore" && !z.props.Any(p => p != null && (p.kind == "cliff" || p.kind == "rock" || p.kind == "perch") && Vector2.Distance(p.at, at) < (p.kind == "cliff" ? (p.size.x > 0 ? p.size.x : 20) / 2 + 4 : 6))
+                if (!salvage && def.look == "ore" && !z.props.Any(p => p != null && (p.kind == "cliff" || p.kind == "rock" || p.kind == "perch") && Vector2.Distance(p.at, at) < (p.kind == "cliff" ? (p.size.x > 0 ? p.size.x : 20) / 2 + 4 : 6))
                     && !z.shapes.Any(sh => sh != null && sh.height > 8 && Vector2.Distance(sh.center, at) < sh.radius))
                     problems.Add(q + "is a seam with no crag or rock by it, and not on a ridge's crown");
             }

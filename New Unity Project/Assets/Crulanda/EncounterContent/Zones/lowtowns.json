@@ -6295,7 +6295,7 @@
       "node": "node.slagiron",
       "at": {
         "x": -55,
-        "y": -196
+        "y": -205
       },
       "rotation": 47
     },
@@ -6342,24 +6342,24 @@
     {
       "node": "node.slagiron",
       "at": {
-        "x": -30,
-        "y": -226
+        "x": 65,
+        "y": -155
       },
       "rotation": 329
     },
     {
       "node": "node.slagiron",
       "at": {
-        "x": 186,
-        "y": -150
+        "x": 95,
+        "y": -185
       },
       "rotation": 16
     },
     {
       "node": "node.slagiron",
       "at": {
-        "x": 60,
-        "y": -40
+        "x": -175,
+        "y": 95
       },
       "rotation": 63
     },
@@ -6422,8 +6422,8 @@
     {
       "node": "node.cinderbeam",
       "at": {
-        "x": -150,
-        "y": -225
+        "x": -165,
+        "y": -195
       },
       "rotation": 67
     },

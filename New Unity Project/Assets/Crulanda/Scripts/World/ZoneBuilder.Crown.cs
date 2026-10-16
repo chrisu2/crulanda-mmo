@@ -318,8 +318,17 @@ namespace Crulanda.World
             var font = Resources.GetBuiltinResource<Font>("LegacyRuntime.ttf"); if (font == null) return;
             var tm = new GameObject("Lettering").AddComponent<TextMesh>(); tm.transform.SetParent(t, false); tm.transform.localPosition = at;
             tm.text = text.ToUpperInvariant(); tm.font = font; tm.fontSize = 64; tm.characterSize = Mathf.Min(.06f, width / Mathf.Max(6, text.Length) * .26f); tm.fontStyle = FontStyle.Bold;
-            tm.anchor = TextAnchor.MiddleCenter; tm.alignment = TextAlignment.Center; tm.color = new Color(.62f, .45f, .12f);
+            tm.anchor = TextAnchor.MiddleCenter; tm.alignment = TextAlignment.Center; tm.color = new Color(1f, .84f, .42f);
             var r = tm.GetComponent<MeshRenderer>(); r.sharedMaterial = SignTextMaterial(font); r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+            // A plaque behind the letters (2026-10-16, Chris: "the signs in the castle need to be improved. the font on the building bleeds into
+            // the rock": dark gold straight on white stone, running into its mouldings): a slate board with a gilt frame, stood a little off
+            // the wall, the letters 4 cm in front of it in bright gilt (a dark oak board). Sized from the letters' own width.
+            float em = tm.characterSize * tm.fontSize * .1f, textW = Mathf.Min(width, em * .62f * tm.text.Length), boardW = textW + em * 1.2f, boardH = em * 1.9f;
+            var back = at + new Vector3(0, 0, .06f);
+            Part(PrimitiveType.Cube, t, back, new Vector3(boardW, boardH, .06f), DarkOak).name = "Plaque";
+            foreach (int sy in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, back + new Vector3(0, sy * (boardH / 2 + .03f), -.01f), new Vector3(boardW + .12f, .06f, .08f), Gilt).name = "Plaque frame";
+            foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, back + new Vector3(sx * (boardW / 2 + .03f), 0, -.01f), new Vector3(.06f, boardH + .12f, .08f), Gilt).name = "Plaque frame";
+            tm.transform.localPosition = at + new Vector3(0, 0, .02f);
         }
         /// <summary>A gilt spire on a point (a cone of gilt tiles, a ball and a pin at its tip).</summary>
         void GiltSpire(Transform t, Vector3 foot, float radius, float height, int sides = 8)

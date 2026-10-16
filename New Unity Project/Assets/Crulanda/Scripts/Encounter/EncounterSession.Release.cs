@@ -200,6 +200,7 @@ namespace Crulanda.Encounter
                 foreach (var ev in Zone.Zone.events)
                 {
                     if (ev == null || eventsDone.Contains(ev.id) || string.IsNullOrEmpty(ev.anchor) || !Zone.Anchors.TryGetValue(ev.anchor, out var at)) continue;
+                    if (ev.kind == "phase" || ev.kind == "escort") continue;   // (Hallow's Creek) a boss's phase or a gate's opening starts these, never a step onto the anchor
                     if (Vector3.Distance(Player.transform.position, at) > EventReach || !WingOpen(ev.wing)) continue;
                     StartEvent(ev.id); break;
                 }
@@ -237,6 +238,7 @@ namespace Crulanda.Encounter
         void RaiseWave(EventRun run, int n)
         {
             var wave = run.def.waves[n]; if (wave == null) return;
+            if (!string.IsNullOrEmpty(wave.unless) && !MobStanding(wave.unless)) return;   // (Hallow's Creek, N8) its boss is down: the wave never comes
             ReleaseAfter("event:" + run.def.id + (n + 1), LiveFoe(), null, !string.IsNullOrEmpty(wave.text) ? wave.text : WaveLine(wave.camp), 0);
         }
         bool AnyAlive(HashSet<int> camps)
@@ -248,6 +250,7 @@ namespace Crulanda.Encounter
         {
             running = null; eventsDone.Add(run.def.id);
             Message(EventLine(run.def, "end"));
+            EventOver(run.def.id);   // (Hallow's Creek) the Waking Hour's loop snaps: the Examiner stands stone (EncounterSession.Hallows.cs)
         }
         /// <summary>The whole party down: the living of its waves (and whatever they brought) go back into the dark, the fallen lie where they fell to be
         /// searched, and the event may start again (WeaverFell's pattern).</summary>
@@ -305,6 +308,7 @@ namespace Crulanda.Encounter
                     case "end": return "The last note dies in the door. The north neck is quiet, and the way down the shaft stair is yours.";
                     default: return "The song falls silent with nobody standing to hear it. What was coming melts back into the dark; it will come again when you do.";
                 }
+            var hallows = HallowsEventLine(ev.id, moment); if (hallows != null) return hallows;
             string name = string.IsNullOrEmpty(ev.id) ? "the event" : ev.id;
             return moment == "start" ? name + " begins." : moment == "end" ? name + " is over." : name + " goes quiet; it will come again.";
         }

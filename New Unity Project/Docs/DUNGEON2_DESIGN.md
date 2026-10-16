@@ -259,3 +259,31 @@ only; the wagon ride home; no respawns inside; no Hollow children placed; the Pr
 ## Levels 15-20 (Chris, 2026-10-16)
 "make sure there is a zone for 15-20 and a dungeon for the same range"; then "Lowtowns + Hallow's Creek (Recommended)". Hallow's Creek is
 15-20 (not 16-18): its wings stepped 15-17, 17-19 and the last bosses 20, its door at Oakhaven's Road's End as answered.
+
+## Status (p9-hallows)
+**WRITTEN, compiles, NOT RUN (no Unity yet); OPEN until Chris plays it.** Branch `p9-hallows` (worktree `D:\code\mmo-hallows`, from p9-lowtowns,
+cap 20), 2026-10-16. A first full pass at 15-20, built from `tools/wip/dungeon/hallows_layout.py` (the zone), `hallows_loot.py`, `hallows_lore.py`
+and `hallows_metas.py` (metas and registration).
+- **Built as designed:** the seven wings at 15-17 (road, bridge) and 17-19 (street, Granary, Cellars, Archive), the Pact-Captain and the Examiner
+  at 20; 56 camps, 15 elites each with its move (EliteMoves) and a signature list (loot.hallows.json, 23 rare pieces at 16-19; the class sets stay
+  the Adit's); the three rares; no respawns inside; the bridge's slabs, the lower orbit and its one-way drop; the gatehouse, the Granary's lofts,
+  the Archive's floor, shelves, gallery and cells, the tower's eight flights and the belfry; the chasm (a pit) and its fog that sets a fall back;
+  the hungry shadows (strips that slow and wear; agents walk round them); the paused townsfolk as stone figures; the cutters at three of them;
+  Gable's sign; the red door seen over a bollard wall; the painted dial a minute short of noon (no works); the Warden's walk (her cell opens on
+  Pardew's death, each wave only while its boss stands, the ward-lock unbound for good); the Waking Hour (the Examiner's bell at half, two
+  waves of ringers, then he stands stone 5 s); the bakery's Glitch; the wagon home once the Picker-Master is down; 8 secrets; six quests
+  (Tamsin, Quill, Sefa Brine, and three of Warden Ivel's: the Preservationists' second line, decision 13); Vala Solari named once, on the
+  Warden's papers; the door at Oakhaven's Road's End, "Hallow's Creek (dangerous, 15-20)"; the dungeon queue lists it.
+- **Changed from the design (say if wrong):** the Pact-Captain holds the tower's ground floor (the landings are corner squares of a spiral
+  stair); the gatehouse's town-side bar is left out (no respawns: nothing to keep behind it); the Cellars come up by a second cave at the
+  well-house and their bar is not built; the Granary is a standard-run wing whose camps are all optional (so the quick run leaves it); the
+  Cellars are the full run's side fights; the secrets' rings (Bet's, the Mason's, the Reed chest's) are coin, not items; the Iron Pact wears
+  the outriders' look and the Bureau the collectors' (PROVISIONAL looks).
+- **Not built yet:** the Waking Hour's colour swing and the paused moving (S7); the silver tint on the time-squalls; a stone look on a paused
+  member (the Bureau's holds are stuns); the Warden can be neither hit nor lost (PROVISIONAL); the map by height.
+- **New code (additive; the Adit untouched but for two generic fixes):** open-ground decks, drops, gates and anchors (ZoneBuilder.HallowsGround),
+  pits and hazards, ZoneRide, ZoneWave.unless, a boss phase of kind "event", gates worked by hand now open (pen, bar, hidden door: the
+  Adit's pen gate and sump bar too), the navmesh's reach raised to the highest deck.
+- **To run (lane A):** EditMode HallowsDataTests and the counted tests touched (SocialRules, EliteBalance, LootData, ZoneGrowth, ZoneLore);
+  PlayMode HallowsNavTests, ZoneContentTests, SecretPlacementTests, BuildingGroundTests; then walk it and capture the slabs, the square,
+  the Archive and the belfry.

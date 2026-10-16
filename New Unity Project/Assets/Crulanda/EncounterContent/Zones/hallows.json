@@ -1,0 +1,4442 @@
+{
+  "id": "zone.hallows",
+  "displayName": "Hallow's Creek",
+  "subtitle": "The town the Wasting paused",
+  "canonStatus": "CANON-EXPANDED",
+  "dungeon": true,
+  "canonNote": "Hallow's Creek, the first settlement the Wasting took, paused mid-second fifty years before the books: the white fences, the baker in his doorway, the ball in the air, the townsfolk stone to the skin with living eyes, the broken bridge's slabs hanging over the chasm, the crater with the red door at its heart, the Old Archive and the hungry shadows (CANON, book1 ch.15-21; world_bible). CANON-EXPANDED: the Bureau holding the town and cutting memory-quartz from the paused (book1 ch.3: geodes are fossilised memory), the Hollow as what the cut leaves, the bell tower with a painted dial a minute short of noon (no works). GAME-ONLY: every person, camp, the wings, the Waking Hour as a worked thing, the wagon. Kept out: the Archive's vault, the red door's riddle, the Prism, Hollow children. Docs/DUNGEON2_DESIGN.md.",
+  "size": 800,
+  "levelMin": 15,
+  "levelMax": 20,
+  "roadsNote": "the Ash Road, Main Street and the wagon track",
+  "biome": "ash",
+  "weather": [
+    {
+      "kind": "overcast",
+      "weight": 3
+    },
+    {
+      "kind": "ashsquall",
+      "weight": 2
+    },
+    {
+      "kind": "mist",
+      "weight": 1
+    }
+  ],
+  "worldMapPosition": {
+    "x": 0.66,
+    "y": 0.47
+  },
+  "worldMapNote": "East of Oakhaven, past the Road's End, in the grey.",
+  "flatRadius": 400,
+  "hillHeight": 0,
+  "seed": 9161,
+  "shapes": [
+    {
+      "name": "The crater",
+      "center": {
+        "x": 0,
+        "y": 70
+      },
+      "radius": 20,
+      "height": -16,
+      "blend": 4,
+      "paint": "unmade"
+    }
+  ],
+  "pits": [
+    {
+      "name": "The chasm",
+      "center": {
+        "x": 0,
+        "y": -173.69
+      },
+      "size": {
+        "x": 380,
+        "y": 73.43
+      },
+      "depth": 40,
+      "wall": 2.5,
+      "fog": -26
+    }
+  ],
+  "hazards": [
+    {
+      "name": "A long shadow on the road",
+      "kind": "shadow",
+      "from": {
+        "x": -7,
+        "y": -332
+      },
+      "to": {
+        "x": 2,
+        "y": -327
+      },
+      "width": 3,
+      "slow": 0.6,
+      "tick": 0.01,
+      "canonStatus": "CANON (the hungry shadows, book1 ch.17); GAME-ONLY strip"
+    },
+    {
+      "name": "A shadow across the farm track",
+      "kind": "shadow",
+      "from": {
+        "x": -14,
+        "y": -290
+      },
+      "to": {
+        "x": -4,
+        "y": -286
+      },
+      "width": 3,
+      "slow": 0.6,
+      "tick": 0.01,
+      "canonStatus": "CANON (the hungry shadows, book1 ch.17); GAME-ONLY strip"
+    },
+    {
+      "name": "A shadow under the stone trees",
+      "kind": "shadow",
+      "from": {
+        "x": 2,
+        "y": -268
+      },
+      "to": {
+        "x": 7,
+        "y": -276
+      },
+      "width": 3,
+      "slow": 0.6,
+      "tick": 0.01,
+      "canonStatus": "CANON (the hungry shadows, book1 ch.17); GAME-ONLY strip"
+    },
+    {
+      "name": "A shadow by the doorsteps",
+      "kind": "shadow",
+      "from": {
+        "x": -7,
+        "y": -96
+      },
+      "to": {
+        "x": -1,
+        "y": -92
+      },
+      "width": 3,
+      "slow": 0.6,
+      "tick": 0.01,
+      "canonStatus": "CANON (the hungry shadows, book1 ch.17); GAME-ONLY strip"
+    },
+    {
+      "name": "A shadow at the ford",
+      "kind": "shadow",
+      "from": {
+        "x": 2,
+        "y": 22
+      },
+      "to": {
+        "x": 7,
+        "y": 18
+      },
+      "width": 3,
+      "slow": 0.6,
+      "tick": 0.01,
+      "canonStatus": "CANON (the hungry shadows, book1 ch.17); GAME-ONLY strip"
+    },
+    {
+      "name": "A shadow in the long cellar",
+      "kind": "shadow",
+      "from": {
+        "x": -42.5,
+        "y": -33
+      },
+      "to": {
+        "x": -39.5,
+        "y": -30
+      },
+      "width": 2.5,
+      "slow": 0.6,
+      "tick": 0.01,
+      "canonStatus": "CANON (the hungry shadows, book1 ch.17); GAME-ONLY strip"
+    }
+  ],
+  "ride": {
+    "name": "The black-iron wagon",
+    "opensOn": "Picker-Master Fulke Yelland",
+    "seconds": 6,
+    "arrive": {
+      "x": 2,
+      "y": -372
+    },
+    "shut": "The wagon is the Picker-Master's: his teamsters will not let a stranger up while he stands.",
+    "text": "The mules lean into the traces. The wagon creaks out of the yard, round the chasm's east head on the Bureau's track and down to the milestone, where the grey thins. Nobody looks back at the town; it does not look back either."
+  },
+  "lighting": {
+    "sunPitch": 9,
+    "sunYaw": -60,
+    "sunIntensity": 0.55,
+    "sunColor": "#C8C4CE",
+    "ambientSky": "#77788A",
+    "ambientEquator": "#66667A",
+    "ambientGround": "#3A3A44",
+    "fogColor": "#8E8C9A",
+    "fogStart": 35,
+    "fogEnd": 190,
+    "sunHigh": 12,
+    "skyTint": "#7A788C",
+    "skyExposure": 0.8,
+    "skyHaze": 1.2
+  },
+  "spawns": {
+    "player": {
+      "x": 0,
+      "y": -376
+    },
+    "playerFacing": 0,
+    "companion": {
+      "x": 2,
+      "y": -378
+    },
+    "recovery": {
+      "x": -2,
+      "y": -378
+    },
+    "leash": 24,
+    "enemies": []
+  },
+  "objectives": [
+    "Cross the broken bridge into Hallow's Creek",
+    "Free the Preservationists' Warden from the Old Archive",
+    "Silence the bell in the Bell Tower"
+  ],
+  "exits": [
+    {
+      "to": "zone.oakhaven",
+      "name": "The Ash Road back to Oakhaven",
+      "at": {
+        "x": 0,
+        "y": -389
+      },
+      "arrive": {
+        "x": 236,
+        "y": 124.2
+      },
+      "radius": 3.5
+    }
+  ],
+  "roads": [
+    {
+      "name": "The Ash Road",
+      "width": 12,
+      "points": [
+        {
+          "x": 0,
+          "y": -396
+        },
+        {
+          "x": 0,
+          "y": -366
+        },
+        {
+          "x": 0,
+          "y": -211.5
+        }
+      ]
+    },
+    {
+      "name": "Main Street",
+      "width": 12,
+      "points": [
+        {
+          "x": 0,
+          "y": -121.37
+        },
+        {
+          "x": 0,
+          "y": 28
+        }
+      ]
+    },
+    {
+      "name": "The Granary road",
+      "width": 4,
+      "points": [
+        {
+          "x": 50,
+          "y": -60
+        },
+        {
+          "x": 75,
+          "y": -70
+        }
+      ]
+    },
+    {
+      "name": "The wagon track",
+      "width": 4,
+      "points": [
+        {
+          "x": 95,
+          "y": -114
+        },
+        {
+          "x": 200,
+          "y": -130
+        },
+        {
+          "x": 200,
+          "y": -250
+        },
+        {
+          "x": 60,
+          "y": -340
+        },
+        {
+          "x": 8,
+          "y": -366
+        }
+      ]
+    }
+  ],
+  "water": [
+    {
+      "name": "Hallow's Creek",
+      "width": 5,
+      "depth": 1.1,
+      "points": [
+        {
+          "x": -22,
+          "y": 25
+        },
+        {
+          "x": 0,
+          "y": 25
+        },
+        {
+          "x": 46,
+          "y": 24
+        },
+        {
+          "x": 46,
+          "y": -40
+        },
+        {
+          "x": 46,
+          "y": -100
+        },
+        {
+          "x": 46,
+          "y": -130.97
+        }
+      ]
+    },
+    {
+      "name": "The race",
+      "width": 2.5,
+      "depth": 1.1,
+      "points": [
+        {
+          "x": 46,
+          "y": -56
+        },
+        {
+          "x": 76,
+          "y": -59
+        },
+        {
+          "x": 116,
+          "y": -59
+        }
+      ]
+    }
+  ],
+  "clearings": [
+    {
+      "name": "The yard",
+      "center": {
+        "x": 0,
+        "y": -370
+      },
+      "radius": 18
+    }
+  ],
+  "groves": [
+    {
+      "name": "Stone trees, west of the road",
+      "kind": "dead",
+      "center": {
+        "x": -26,
+        "y": -335
+      },
+      "size": {
+        "x": 22,
+        "y": 60
+      },
+      "count": 30
+    },
+    {
+      "name": "Stone trees, east of the road",
+      "kind": "dead",
+      "center": {
+        "x": 26,
+        "y": -320
+      },
+      "size": {
+        "x": 22,
+        "y": 80
+      },
+      "count": 34
+    },
+    {
+      "name": "Stone trees by the lip",
+      "kind": "dead",
+      "center": {
+        "x": -30,
+        "y": -232
+      },
+      "size": {
+        "x": 30,
+        "y": 24
+      },
+      "count": 16
+    }
+  ],
+  "landmarks": [
+    {
+      "name": "The Ash Road",
+      "at": {
+        "x": 0,
+        "y": -300
+      },
+      "radius": 16,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Fossilised Farm",
+      "at": {
+        "x": -48,
+        "y": -282
+      },
+      "radius": 14,
+      "canonStatus": "CANON (book1 ch.17)"
+    },
+    {
+      "name": "The Bridge of Shattered Glass",
+      "at": {
+        "x": 0,
+        "y": -180
+      },
+      "radius": 20,
+      "canonStatus": "CANON (book1 ch.17)"
+    },
+    {
+      "name": "The bridge-head gatehouse",
+      "at": {
+        "x": 0,
+        "y": -128.37391924429124
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Main Street",
+      "at": {
+        "x": 0,
+        "y": -60
+      },
+      "radius": 14,
+      "canonStatus": "CANON (book1 ch.18)"
+    },
+    {
+      "name": "The Square",
+      "at": {
+        "x": 0,
+        "y": 70
+      },
+      "radius": 26,
+      "canonStatus": "CANON (book1 ch.19)"
+    },
+    {
+      "name": "The Granary on the race",
+      "at": {
+        "x": 95,
+        "y": -70
+      },
+      "radius": 16,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Old Archive",
+      "at": {
+        "x": 72,
+        "y": 70
+      },
+      "radius": 18,
+      "canonStatus": "CANON (book1 ch.18)"
+    },
+    {
+      "name": "The Bell Tower",
+      "at": {
+        "x": 0,
+        "y": 118
+      },
+      "radius": 8,
+      "canonStatus": "CANON-EXPANDED (book1 ch.21)"
+    },
+    {
+      "name": "The Cut-Store",
+      "at": {
+        "x": -41,
+        "y": -20
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "secrets": [
+    {
+      "id": "secret.hallows.satchel",
+      "name": "A Soldier's Satchel",
+      "kind": "cache",
+      "at": {
+        "x": 25,
+        "y": -246.3
+      },
+      "prompt": "Pull the satchel out from under the rock",
+      "text": "Wedged under the overhang's lip where the ash cannot reach it: a Pact-issue satchel, the strap cut, and a letter folded small inside.",
+      "xp": 220,
+      "canonStatus": "GAME-ONLY (the Iron Pact is CANON, book1 ch.2)",
+      "document": "doc.hallows.soldiers_letter",
+      "gold": 28,
+      "cave": "The overhang",
+      "along": 16.6,
+      "aside": -0.05
+    },
+    {
+      "id": "secret.hallows.bets-cart",
+      "name": "Bet's Packed Cart",
+      "kind": "cache",
+      "at": {
+        "x": -23.5,
+        "y": -101.5
+      },
+      "prompt": "Look under the stone tarpaulin",
+      "text": "The cart is packed for the road west and turned to stone with it: a chair lashed on top, a quilt, a tin box under the seat that the stone did not take.",
+      "xp": 260,
+      "canonStatus": "GAME-ONLY (Bet's letter is already in the game)",
+      "gold": 40
+    },
+    {
+      "id": "secret.hallows.masons-cache",
+      "name": "The Mason's Cache",
+      "kind": "cache",
+      "at": {
+        "x": -25,
+        "y": -166.36
+      },
+      "prompt": "Open the mortar-tub",
+      "text": "A mason's tub on the lowest slab, the mortar in it grey and set, and under it, wrapped in a leather apron, the man's own ring.",
+      "xp": 280,
+      "canonStatus": "GAME-ONLY",
+      "rise": -13,
+      "gold": 45
+    },
+    {
+      "id": "secret.hallows.two-coppers",
+      "name": "Two Coppers on the Sill",
+      "kind": "cache",
+      "at": {
+        "x": -9.4,
+        "y": -73.8
+      },
+      "prompt": "Pick up the two coppers",
+      "text": "Two copper pennies on the bakery's window sill, left for a loaf fifty years ago and never taken in. They are warm.",
+      "xp": 160,
+      "canonStatus": "CANON-EXPANDED (the baker and his shop, book1 ch.21; the coppers GAME-ONLY)",
+      "gold": 12
+    },
+    {
+      "id": "secret.hallows.reed-key",
+      "name": "Old Mother Reed's Key",
+      "kind": "key",
+      "at": {
+        "x": -34.5,
+        "y": 51.5
+      },
+      "prompt": "Take the key from the well-house hook",
+      "text": "On a hook inside the well-house door, where a careful woman would hang a spare: a small brass key with REED scratched on its bow.",
+      "xp": 120,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.hallows.reed-chest",
+      "name": "The Reed Chest",
+      "kind": "chest",
+      "at": {
+        "x": 7.4,
+        "y": -93.2
+      },
+      "prompt": "Unlock the chest by the fence",
+      "text": "A blanket chest set out by the Reed house's fence for a cart that never came, the lid stone but the lock still brass. Inside: linen, a kettle-holder worked with a kingfisher, and a purse.",
+      "xp": 300,
+      "canonStatus": "GAME-ONLY (Tamsin Reed and her mother are already in the game)",
+      "needs": "secret.hallows.reed-key",
+      "gold": 55
+    },
+    {
+      "id": "secret.hallows.archivists-page",
+      "name": "A Page in the Stacks",
+      "kind": "read",
+      "at": {
+        "x": 52,
+        "y": 80.2
+      },
+      "prompt": "Take the page from the gallery shelf",
+      "text": "Pushed behind a row of stone books on the north gallery, where no Bureau clerk has thought to look: one loose page in a careful First Era hand.",
+      "xp": 320,
+      "canonStatus": "CANON-EXPANDED (High Archivist Malakor and the Archivists are CANON, book1 ch.18; this page paraphrased, GAME-ONLY)",
+      "rise": 5,
+      "document": "doc.hallows.archivist_page"
+    },
+    {
+      "id": "secret.hallows.ringers-names",
+      "name": "The Ringers' Chalked Names",
+      "kind": "carving",
+      "at": {
+        "x": -4.6,
+        "y": 116
+      },
+      "prompt": "Read the names chalked on the tower wall",
+      "text": "Chalked low on the tower's inside wall in four hands: the ringers' names and a day of the week, the way bell-ringers mark a practice. The last one stops half way through the word.",
+      "xp": 200,
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "props": [
+    {
+      "kind": "cavern",
+      "name": "The well-house stair",
+      "at": {
+        "x": -32,
+        "y": 47
+      },
+      "rotation": -168.69,
+      "variant": 2,
+      "plan": [
+        0.0,
+        -1.0,
+        2.2,
+        3.2,
+        0.0,
+        0.0,
+        -0.0,
+        2.2,
+        3.2,
+        0.0,
+        0.0,
+        5.099,
+        2.4,
+        3.3,
+        -2.0,
+        0.981,
+        10.394,
+        3,
+        3.4,
+        -4.5,
+        1.961,
+        15.689,
+        3.5,
+        3.5,
+        -6.5,
+        1.961,
+        20.788,
+        3.5,
+        3.5,
+        -6.8,
+        1.961,
+        24.788,
+        0.3,
+        0.4,
+        -6.8
+      ],
+      "style": "cellar"
+    },
+    {
+      "kind": "cavern",
+      "name": "The Cellars",
+      "at": {
+        "x": -30,
+        "y": -77
+      },
+      "rotation": 0.0,
+      "variant": 2,
+      "plan": [
+        0.0,
+        -1.0,
+        2.2,
+        3.2,
+        0.0,
+        0.0,
+        0.0,
+        2.2,
+        3.2,
+        0.0,
+        0.0,
+        6.0,
+        2.4,
+        3.3,
+        -1.5,
+        -3.0,
+        14.0,
+        2.6,
+        3.4,
+        -3.5,
+        -7.0,
+        23.0,
+        3,
+        3.5,
+        -5.2,
+        -10.0,
+        35.0,
+        3.5,
+        3.5,
+        -6.0,
+        -11.0,
+        49.0,
+        6,
+        4.2,
+        -6.4,
+        -11.0,
+        59.0,
+        8,
+        4.5,
+        -6.5,
+        -11.0,
+        69.0,
+        5,
+        4,
+        -6.5,
+        -11.0,
+        79.0,
+        3.5,
+        3.5,
+        -6.7,
+        -10.0,
+        89.0,
+        3.5,
+        3.5,
+        -6.8,
+        -9.0,
+        98.0,
+        3.5,
+        3.5,
+        -6.8,
+        -8.4,
+        106.0,
+        3.5,
+        3.5,
+        -6.8
+      ],
+      "style": "cellar",
+      "joins": "The well-house stair"
+    },
+    {
+      "kind": "cavern",
+      "name": "The dark cellar",
+      "at": {
+        "x": -43.4,
+        "y": 6
+      },
+      "rotation": -82.093,
+      "variant": 2,
+      "plan": [
+        0.0,
+        -1.0,
+        1.6,
+        2.6,
+        0.0,
+        0.0,
+        0.0,
+        1.6,
+        2.6,
+        0.0,
+        -0.0,
+        3.635,
+        1.8,
+        2.8,
+        0.037,
+        -0.055,
+        7.665,
+        4.5,
+        3.4,
+        0.037,
+        -0.385,
+        13.677,
+        5,
+        3.5,
+        0.037,
+        -0.44,
+        17.708,
+        4,
+        3.3,
+        0.037,
+        -0.495,
+        21.708,
+        0.3,
+        0.4,
+        0.037
+      ],
+      "style": "darkcellar",
+      "within": "The Cellars"
+    },
+    {
+      "kind": "cavern",
+      "name": "The overhang",
+      "at": {
+        "x": 9.5,
+        "y": -245
+      },
+      "rotation": 90.0,
+      "variant": 2,
+      "plan": [
+        0.0,
+        -1.0,
+        2.6,
+        3,
+        0.0,
+        0.0,
+        0.0,
+        2.6,
+        3,
+        0.0,
+        0.0,
+        5.5,
+        3,
+        3.2,
+        -1.0,
+        1.0,
+        11.5,
+        4.2,
+        3.6,
+        -2.4,
+        1.5,
+        17.5,
+        4.5,
+        3.6,
+        -3.0,
+        1.832,
+        21.486,
+        0.3,
+        0.4,
+        -3.0
+      ],
+      "style": "overhang"
+    },
+    {
+      "kind": "grave",
+      "at": {
+        "x": 4,
+        "y": -368
+      },
+      "name": "The far milestone",
+      "scale": 1.35
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -56,
+        "y": -280
+      },
+      "name": "The fossilised farmhouse",
+      "rotation": 90,
+      "size": {
+        "x": 10,
+        "y": 12
+      },
+      "variant": 2,
+      "style": "stone"
+    },
+    {
+      "kind": "barn",
+      "at": {
+        "x": -40,
+        "y": -270
+      },
+      "name": "The stone byre",
+      "size": {
+        "x": 10,
+        "y": 6
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -30,
+        "y": -296
+      },
+      "size": {
+        "x": 24,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -30,
+        "y": -274
+      },
+      "size": {
+        "x": 10,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -44,
+        "y": -280
+      },
+      "name": "The stone dog",
+      "rotation": 200,
+      "variant": 4
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -52,
+        "y": -286
+      },
+      "name": "A farmer at his gate",
+      "rotation": 130
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": -118
+      },
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -121.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -114.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -8.9,
+        "y": -117.6
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": -118
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -121.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -114.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 8.9,
+        "y": -117.6
+      },
+      "rotation": 270,
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": -104
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -107.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -100.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 8.9,
+        "y": -103.6
+      },
+      "rotation": 270,
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": -90
+      },
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -93.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -86.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -8.9,
+        "y": -89.6
+      },
+      "rotation": 90,
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": -90
+      },
+      "name": "The Reed house",
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -93.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -86.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 8.9,
+        "y": -89.6
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": -76
+      },
+      "name": "Gable's bakery",
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -79.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -72.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -8.9,
+        "y": -75.6
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": -76
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -79.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -72.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 8.9,
+        "y": -75.6
+      },
+      "rotation": 270,
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": -62
+      },
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -65.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -58.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": -62
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -65.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -58.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 8.9,
+        "y": -61.6
+      },
+      "rotation": 270,
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": -48
+      },
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -51.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -44.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -8.9,
+        "y": -47.6
+      },
+      "rotation": 90,
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": -34
+      },
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -37.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -30.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -8.9,
+        "y": -33.6
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": -34
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -37.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -30.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 8.9,
+        "y": -33.6
+      },
+      "rotation": 270,
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": -20
+      },
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -23.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -16.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": -20
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -23.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -16.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 8.9,
+        "y": -19.6
+      },
+      "rotation": 270,
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": -6
+      },
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 1,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -9.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": -2.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -8.9,
+        "y": -5.6
+      },
+      "rotation": 90,
+      "variant": 2
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": -6
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 2,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -9.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": -2.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": -14,
+        "y": 8
+      },
+      "rotation": 270,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "variant": 3,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": 4.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -8.6,
+        "y": 11.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -8.9,
+        "y": 8.4
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "house",
+      "at": {
+        "x": 14,
+        "y": 8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 8
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": 4.8
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": 8.6,
+        "y": 11.2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 8.9,
+        "y": 8.4
+      },
+      "rotation": 270,
+      "variant": 2
+    },
+    {
+      "kind": "signpost",
+      "at": {
+        "x": -8.4,
+        "y": -71.5
+      },
+      "name": "Gable, Baker",
+      "rotation": 90
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -9.2,
+        "y": -76.5
+      },
+      "name": "The baker in his doorway",
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 9.2,
+        "y": -89.6
+      },
+      "name": "Old Mother Reed",
+      "rotation": 270,
+      "variant": 2
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 2.5,
+        "y": -60
+      },
+      "name": "A man with his hat in the wind",
+      "rotation": 30
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -3,
+        "y": -30
+      },
+      "name": "A woman calling down the street",
+      "rotation": 200
+    },
+    {
+      "kind": "hangball",
+      "at": {
+        "x": 3.5,
+        "y": -26
+      },
+      "name": "A ball in the air"
+    },
+    {
+      "kind": "cart",
+      "at": {
+        "x": -21,
+        "y": -104
+      },
+      "name": "Bet's cart",
+      "rotation": 30,
+      "style": "stone"
+    },
+    {
+      "kind": "fence",
+      "at": {
+        "x": -14,
+        "y": -110
+      },
+      "size": {
+        "x": 10,
+        "y": 0
+      },
+      "style": "stone"
+    },
+    {
+      "kind": "laundry",
+      "at": {
+        "x": 17,
+        "y": -48
+      },
+      "name": "The laundry yard",
+      "rotation": 90
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -9,
+        "y": -113
+      },
+      "name": "Marked for the cut",
+      "rotation": 90,
+      "variant": 3
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -7.5,
+        "y": -111
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": -9,
+        "y": -80
+      },
+      "name": "Marked for the cut",
+      "rotation": 90,
+      "variant": 3
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -7.5,
+        "y": -78
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 9,
+        "y": -6
+      },
+      "name": "Marked for the cut",
+      "rotation": 270,
+      "variant": 3
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 7.5,
+        "y": -4
+      },
+      "rotation": 270,
+      "variant": 1
+    },
+    {
+      "kind": "crater",
+      "at": {
+        "x": 0,
+        "y": 70
+      },
+      "name": "The crater",
+      "size": {
+        "x": 24,
+        "y": 25
+      }
+    },
+    {
+      "kind": "wellhouse",
+      "at": {
+        "x": -33,
+        "y": 49
+      },
+      "name": "The well-house",
+      "rotation": 30
+    },
+    {
+      "kind": "dead_oak",
+      "at": {
+        "x": 28,
+        "y": 52
+      },
+      "name": "The stone willow",
+      "scale": 1.3
+    },
+    {
+      "kind": "belfry",
+      "at": {
+        "x": 0,
+        "y": 118
+      },
+      "name": "The Bell Tower",
+      "size": {
+        "x": 12,
+        "y": 12
+      }
+    },
+    {
+      "kind": "archive",
+      "at": {
+        "x": 72,
+        "y": 70
+      },
+      "name": "The Old Archive",
+      "size": {
+        "x": 50,
+        "y": 24
+      }
+    },
+    {
+      "kind": "granary",
+      "at": {
+        "x": 95,
+        "y": -70
+      },
+      "name": "The Granary",
+      "size": {
+        "x": 40,
+        "y": 18
+      }
+    },
+    {
+      "kind": "gatehouse",
+      "at": {
+        "x": 0,
+        "y": -128.37
+      },
+      "name": "The bridge-head gatehouse",
+      "size": {
+        "x": 16,
+        "y": 14
+      }
+    },
+    {
+      "kind": "bridge",
+      "at": {
+        "x": 46,
+        "y": -60
+      },
+      "name": "The Granary footbridge",
+      "rotation": 90,
+      "size": {
+        "x": 8,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ride",
+      "at": {
+        "x": 93,
+        "y": -97
+      },
+      "name": "The black-iron wagon",
+      "rotation": 90,
+      "interact": "Climb onto the wagon"
+    },
+    {
+      "kind": "stone",
+      "at": {
+        "x": -5.5,
+        "y": -131.37
+      },
+      "name": "The gatehouse's spirit stone",
+      "interact": "Touch the spirit stone"
+    },
+    {
+      "kind": "stone",
+      "at": {
+        "x": 34,
+        "y": 48
+      },
+      "name": "The willow's spirit stone",
+      "interact": "Touch the spirit stone"
+    },
+    {
+      "kind": "copydesk",
+      "at": {
+        "x": 64,
+        "y": 85
+      },
+      "name": "A Bureau copying desk",
+      "interact": "Spoil the copies",
+      "once": true
+    },
+    {
+      "kind": "copydesk",
+      "at": {
+        "x": 80,
+        "y": 85
+      },
+      "name": "A Bureau copying desk",
+      "interact": "Spoil the copies",
+      "once": true
+    },
+    {
+      "kind": "copydesk",
+      "at": {
+        "x": 56,
+        "y": 62
+      },
+      "name": "A Bureau copying desk",
+      "rotation": 90,
+      "interact": "Spoil the copies",
+      "once": true
+    },
+    {
+      "kind": "satchel",
+      "at": {
+        "x": 73.5,
+        "y": 85.5
+      },
+      "name": "Warden Elvet's satchel",
+      "interact": "Take the Warden's papers"
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 85,
+        "y": -73
+      }
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 89,
+        "y": -73
+      },
+      "variant": 1
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 93,
+        "y": -73
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 97,
+        "y": -73
+      }
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 101,
+        "y": -73
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -14,
+        "y": -328
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 14,
+        "y": -300
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": -15,
+        "y": -262
+      },
+      "variant": 1
+    },
+    {
+      "kind": "rock",
+      "at": {
+        "x": 16,
+        "y": -232
+      },
+      "variant": 1
+    }
+  ],
+  "decks": [
+    {
+      "name": "Ramp to the first slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 0.0,
+        "y": -211.4
+      },
+      "at2": {
+        "x": 0.0,
+        "y": -207.07
+      },
+      "rise": 0.0,
+      "rise2": -1.5,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The first slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 0,
+        "y": -207.47
+      },
+      "at2": {
+        "x": 0,
+        "y": -201.47
+      },
+      "rise": -1.5,
+      "rise2": -1.5,
+      "width": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Ramp to the near table",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -0.29,
+        "y": -201.75
+      },
+      "at2": {
+        "x": 6.29,
+        "y": -195.3
+      },
+      "rise": -1.5,
+      "rise2": -4,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The near Table",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 6,
+        "y": -195.58
+      },
+      "at2": {
+        "x": 6,
+        "y": -186.58
+      },
+      "rise": -4,
+      "rise2": -4,
+      "width": 12,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Ramp to the third slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 6.36,
+        "y": -186.75
+      },
+      "at2": {
+        "x": -4.36,
+        "y": -181.69
+      },
+      "rise": -4,
+      "rise2": -6,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The third slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -4,
+        "y": -181.86
+      },
+      "at2": {
+        "x": -4,
+        "y": -176.86
+      },
+      "rise": -6,
+      "rise2": -6,
+      "width": 6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Ramp to the far table",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -4.36,
+        "y": -177.04
+      },
+      "at2": {
+        "x": 2.36,
+        "y": -173.69
+      },
+      "rise": -6,
+      "rise2": -7,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The far Table",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 2,
+        "y": -173.86
+      },
+      "at2": {
+        "x": 2,
+        "y": -164.86
+      },
+      "rise": -7,
+      "rise2": -7,
+      "width": 12,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Ramp to the fifth slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 1.71,
+        "y": -165.15
+      },
+      "at2": {
+        "x": 8.29,
+        "y": -158.7
+      },
+      "rise": -7,
+      "rise2": -4.5,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The fifth slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 8,
+        "y": -158.98
+      },
+      "at2": {
+        "x": 8,
+        "y": -152.98
+      },
+      "rise": -4.5,
+      "rise2": -4.5,
+      "width": 6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Ramp to the last slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 8.31,
+        "y": -153.22
+      },
+      "at2": {
+        "x": 1.69,
+        "y": -148.02
+      },
+      "rise": -4.5,
+      "rise2": -2.5,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The last slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 2,
+        "y": -148.26
+      },
+      "at2": {
+        "x": 2,
+        "y": -142.26
+      },
+      "rise": -2.5,
+      "rise2": -2.5,
+      "width": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Ramp to the far lip",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 2.13,
+        "y": -142.64
+      },
+      "at2": {
+        "x": -0.13,
+        "y": -136.0
+      },
+      "rise": -2.5,
+      "rise2": 0,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The low slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -16,
+        "y": -181.36
+      },
+      "at2": {
+        "x": -16,
+        "y": -175.36
+      },
+      "rise": -12,
+      "rise2": -12,
+      "width": 6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Mason's slab",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -22,
+        "y": -174.36
+      },
+      "at2": {
+        "x": -22,
+        "y": -164.36
+      },
+      "rise": -13,
+      "rise2": -13,
+      "width": 10,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The low ramp",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -14.61,
+        "y": -175.44
+      },
+      "at2": {
+        "x": -20.39,
+        "y": -174.29
+      },
+      "rise": -12,
+      "rise2": -13,
+      "width": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The first step-stone",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -16,
+        "y": -158.86
+      },
+      "at2": {
+        "x": -16,
+        "y": -155.86
+      },
+      "rise": -10.2,
+      "rise2": -10.2,
+      "width": 4,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The first stair",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -19.19,
+        "y": -164.72
+      },
+      "at2": {
+        "x": -15.81,
+        "y": -158.51
+      },
+      "rise": -13,
+      "rise2": -10.2,
+      "width": 2.6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The second step-stone",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -8.5,
+        "y": -155.36
+      },
+      "at2": {
+        "x": -5.5,
+        "y": -155.36
+      },
+      "rise": -7.4,
+      "rise2": -7.4,
+      "width": 4,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The second stair",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -14.38,
+        "y": -157.5
+      },
+      "at2": {
+        "x": -8.12,
+        "y": -155.23
+      },
+      "rise": -10.2,
+      "rise2": -7.4,
+      "width": 2.6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The third stair",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -5.9,
+        "y": -155.34
+      },
+      "at2": {
+        "x": 5.4,
+        "y": -156.0
+      },
+      "rise": -7.4,
+      "rise2": -4.5,
+      "width": 2.6,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The wall-walk",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -6.5,
+        "y": -133.97
+      },
+      "at2": {
+        "x": 6.5,
+        "y": -133.97
+      },
+      "rise": 5,
+      "rise2": 5,
+      "width": 2.4,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The wall-walk stair",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 6.3,
+        "y": -122.37
+      },
+      "at2": {
+        "x": 6.3,
+        "y": -133.17
+      },
+      "rise": 0,
+      "rise2": 5,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower flight 1",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 3.9,
+        "y": 115.2
+      },
+      "at2": {
+        "x": 3.9,
+        "y": 120.8
+      },
+      "rise": 0.0,
+      "rise2": 2.25,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower corner 1",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 3.9,
+        "y": 120.8
+      },
+      "at2": {
+        "x": 3.9,
+        "y": 123.0
+      },
+      "rise": 2.25,
+      "rise2": 2.25,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower flight 2",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 2.8,
+        "y": 121.9
+      },
+      "at2": {
+        "x": -2.8,
+        "y": 121.9
+      },
+      "rise": 2.25,
+      "rise2": 4.5,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The first landing",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -2.8,
+        "y": 121.9
+      },
+      "at2": {
+        "x": -5.0,
+        "y": 121.9
+      },
+      "rise": 4.5,
+      "rise2": 4.5,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower flight 3",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -3.9,
+        "y": 120.8
+      },
+      "at2": {
+        "x": -3.9,
+        "y": 115.2
+      },
+      "rise": 4.5,
+      "rise2": 6.75,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower corner 3",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -3.9,
+        "y": 115.2
+      },
+      "at2": {
+        "x": -3.9,
+        "y": 113.0
+      },
+      "rise": 6.75,
+      "rise2": 6.75,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower flight 4",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -2.8,
+        "y": 114.1
+      },
+      "at2": {
+        "x": 2.8,
+        "y": 114.1
+      },
+      "rise": 6.75,
+      "rise2": 9.0,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The second landing",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 2.8,
+        "y": 114.1
+      },
+      "at2": {
+        "x": 5.0,
+        "y": 114.1
+      },
+      "rise": 9.0,
+      "rise2": 9.0,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower flight 5",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 3.9,
+        "y": 115.2
+      },
+      "at2": {
+        "x": 3.9,
+        "y": 120.8
+      },
+      "rise": 9.0,
+      "rise2": 11.25,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower corner 5",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 3.9,
+        "y": 120.8
+      },
+      "at2": {
+        "x": 3.9,
+        "y": 123.0
+      },
+      "rise": 11.25,
+      "rise2": 11.25,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower flight 6",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 2.8,
+        "y": 121.9
+      },
+      "at2": {
+        "x": -2.8,
+        "y": 121.9
+      },
+      "rise": 11.25,
+      "rise2": 13.5,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The third landing",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -2.8,
+        "y": 121.9
+      },
+      "at2": {
+        "x": -5.0,
+        "y": 121.9
+      },
+      "rise": 13.5,
+      "rise2": 13.5,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower flight 7",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -3.9,
+        "y": 120.8
+      },
+      "at2": {
+        "x": -3.9,
+        "y": 115.2
+      },
+      "rise": 13.5,
+      "rise2": 15.75,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower corner 7",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -3.9,
+        "y": 115.2
+      },
+      "at2": {
+        "x": -3.9,
+        "y": 113.0
+      },
+      "rise": 15.75,
+      "rise2": 15.75,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Tower flight 8",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -2.8,
+        "y": 114.1
+      },
+      "at2": {
+        "x": 2.8,
+        "y": 114.1
+      },
+      "rise": 15.75,
+      "rise2": 18.0,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The belfry floor",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 1.1,
+        "y": 115.2
+      },
+      "at2": {
+        "x": 1.1,
+        "y": 123
+      },
+      "rise": 18,
+      "rise2": 18,
+      "width": 7.8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The belfry stair-head",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 3.9,
+        "y": 113.0
+      },
+      "at2": {
+        "x": 3.9,
+        "y": 115.2
+      },
+      "rise": 18,
+      "rise2": 18,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Archive floor",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 48,
+        "y": 70
+      },
+      "at2": {
+        "x": 96,
+        "y": 70
+      },
+      "rise": 2,
+      "rise2": 2,
+      "width": 23,
+      "canonStatus": "GAME-ONLY",
+      "solid": true
+    },
+    {
+      "name": "The copying cells",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 59,
+        "y": 84.5
+      },
+      "at2": {
+        "x": 85,
+        "y": 84.5
+      },
+      "rise": 2,
+      "rise2": 2,
+      "width": 5,
+      "canonStatus": "GAME-ONLY",
+      "solid": true
+    },
+    {
+      "name": "The Archive steps",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 38.6,
+        "y": 70.0
+      },
+      "at2": {
+        "x": 48.4,
+        "y": 70.0
+      },
+      "rise": 0,
+      "rise2": 2,
+      "width": 7,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The north gallery",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 50,
+        "y": 80.2
+      },
+      "at2": {
+        "x": 94.5,
+        "y": 80.2
+      },
+      "rise": 5,
+      "rise2": 5,
+      "width": 2.8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The south gallery",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 50,
+        "y": 59.8
+      },
+      "at2": {
+        "x": 94.5,
+        "y": 59.8
+      },
+      "rise": 5,
+      "rise2": 5,
+      "width": 2.8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The apse gallery",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 94.4,
+        "y": 59.8
+      },
+      "at2": {
+        "x": 94.4,
+        "y": 80.2
+      },
+      "rise": 5,
+      "rise2": 5,
+      "width": 2.8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The apse stair (south)",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 90.0,
+        "y": 66.9
+      },
+      "at2": {
+        "x": 90.0,
+        "y": 60.4
+      },
+      "rise": 2,
+      "rise2": 5,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The apse stair (north)",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 90.0,
+        "y": 73.1
+      },
+      "at2": {
+        "x": 90.0,
+        "y": 79.6
+      },
+      "rise": 2,
+      "rise2": 5,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The north loft",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 77,
+        "y": -63.4
+      },
+      "at2": {
+        "x": 113.5,
+        "y": -63.4
+      },
+      "rise": 4,
+      "rise2": 4,
+      "width": 3.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The south loft",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 77,
+        "y": -76.6
+      },
+      "at2": {
+        "x": 113.5,
+        "y": -76.6
+      },
+      "rise": 8,
+      "rise2": 8,
+      "width": 3.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The loft stair",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 78.0,
+        "y": -74.9
+      },
+      "at2": {
+        "x": 78.0,
+        "y": -64.6
+      },
+      "rise": 0,
+      "rise2": 4,
+      "width": 2.4,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The high stair",
+      "style": "timber",
+      "rails": "none",
+      "at": {
+        "x": 112.6,
+        "y": -64.6
+      },
+      "at2": {
+        "x": 112.6,
+        "y": -75.4
+      },
+      "rise": 4,
+      "rise2": 8,
+      "width": 2.4,
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "drops": [
+    {
+      "name": "Off the third slab",
+      "fromAt": {
+        "x": -6.2,
+        "y": -179.36
+      },
+      "fromRise": -6,
+      "toAt": {
+        "x": -15,
+        "y": -178.36
+      },
+      "toRise": -12,
+      "width": 2.5
+    }
+  ],
+  "gates": [
+    {
+      "title": "Tredway's gate",
+      "kind": "bossdoor",
+      "at": {
+        "x": 0,
+        "y": -121.37
+      },
+      "rotation": 0,
+      "width": 6,
+      "opensOn": "Sergeant Wymond Tredway",
+      "look": "door"
+    },
+    {
+      "title": "The Warden's cell",
+      "kind": "pen",
+      "at": {
+        "x": 72,
+        "y": 82
+      },
+      "rotation": 0,
+      "width": 2.4,
+      "rise": 2,
+      "prompt": "Lift the bar",
+      "opensOn": "Registrar Dunstan Pardew",
+      "look": "stockade"
+    },
+    {
+      "title": "The ward-lock",
+      "kind": "ward",
+      "at": {
+        "x": 0,
+        "y": 112
+      },
+      "rotation": 0,
+      "width": 3,
+      "look": "door"
+    },
+    {
+      "title": "The yard bar",
+      "kind": "bar",
+      "at": {
+        "x": 95,
+        "y": -113
+      },
+      "rotation": 0,
+      "width": 5,
+      "prompt": "Lift the yard bar",
+      "look": "bar",
+      "side": "far"
+    },
+    {
+      "title": "The dark cellar door",
+      "kind": "hiddendoor",
+      "cave": "The dark cellar",
+      "along": 3.5,
+      "prompt": "Feel along the wall",
+      "look": "door"
+    }
+  ],
+  "anchors": [
+    {
+      "name": "the milestone",
+      "at": {
+        "x": 0,
+        "y": -366
+      }
+    },
+    {
+      "name": "the gatehouse",
+      "at": {
+        "x": 0,
+        "y": -128.37
+      }
+    },
+    {
+      "name": "the bakery counter",
+      "at": {
+        "x": -14,
+        "y": -70
+      }
+    },
+    {
+      "name": "the well-house",
+      "at": {
+        "x": -31,
+        "y": 51
+      }
+    },
+    {
+      "name": "the Archive's steps",
+      "at": {
+        "x": 42,
+        "y": 70
+      }
+    },
+    {
+      "name": "the Warden's cell",
+      "at": {
+        "x": 72,
+        "y": 84.5
+      },
+      "rise": 2
+    },
+    {
+      "name": "the tower door",
+      "at": {
+        "x": 0,
+        "y": 109
+      }
+    },
+    {
+      "name": "the belfry stair-head",
+      "at": {
+        "x": 3.9,
+        "y": 114.1
+      },
+      "rise": 18
+    },
+    {
+      "name": "the wagon",
+      "at": {
+        "x": 89,
+        "y": -100
+      }
+    },
+    {
+      "name": "the Cut-Store",
+      "cave": "The Cellars",
+      "along": 61.86,
+      "aside": 0.0
+    }
+  ],
+  "wings": [
+    {
+      "id": "road",
+      "name": "The Ash Road"
+    },
+    {
+      "id": "bridge",
+      "name": "The Bridge of Shattered Glass",
+      "after": "road",
+      "exit": "walk",
+      "home": "the gatehouse"
+    },
+    {
+      "id": "street",
+      "name": "Main Street",
+      "after": "bridge"
+    },
+    {
+      "id": "granary",
+      "name": "The Granary on the race",
+      "after": "street",
+      "exit": "walk",
+      "home": "the wagon"
+    },
+    {
+      "id": "cellars",
+      "name": "The Cellars",
+      "after": "street",
+      "exit": "walk",
+      "home": "the well-house",
+      "optional": true
+    },
+    {
+      "id": "archive",
+      "name": "The Old Archive",
+      "after": "street",
+      "exit": "walk",
+      "home": "the Archive's steps"
+    },
+    {
+      "id": "walk",
+      "name": "The Warden's walk",
+      "after": "archive"
+    },
+    {
+      "id": "tower",
+      "name": "The Bell Tower",
+      "after": "walk"
+    }
+  ],
+  "events": [
+    {
+      "id": "glitch",
+      "kind": "hold",
+      "wing": "street",
+      "anchor": "the bakery counter",
+      "step": 0,
+      "waves": [
+        {
+          "at": 4,
+          "camp": "Hollow up the bakery trapdoor",
+          "text": "The bakery's bell gives one note. For a breath the room is warm and smells of bread; then the trapdoor lifts and the Hollow come up out of the cellar."
+        },
+        {
+          "at": 30,
+          "camp": "More Hollow up the trapdoor",
+          "text": "The bell rings again, a minute that will not end. More of them come up the cellar stair."
+        }
+      ]
+    },
+    {
+      "id": "walk",
+      "kind": "escort",
+      "wing": "walk",
+      "anchor": "the Warden's cell",
+      "step": 0,
+      "waves": [
+        {
+          "at": 20,
+          "camp": "Pact relief on the walk",
+          "unless": "Picker-Master Fulke Yelland",
+          "text": "Boots on the Granary road: the Pact's relief comes up from the yard to take the Warden back."
+        },
+        {
+          "at": 45,
+          "camp": "Hollow up out of the well",
+          "unless": "First-Cut",
+          "text": "Something climbs out of the well-house: the Hollow, come up from the Cellars after the Warden."
+        }
+      ]
+    },
+    {
+      "id": "waking",
+      "kind": "phase",
+      "wing": "tower",
+      "anchor": "the belfry stair-head",
+      "step": 0,
+      "waves": [
+        {
+          "at": 3,
+          "camp": "Ringers on the stair (first)",
+          "text": "Colour runs back into the town like water into a print. Below, the square moves; on the stair, two of the paused ringers wake and climb."
+        },
+        {
+          "at": 30,
+          "camp": "Ringers on the stair (second)",
+          "text": "Two more of the ringers come up the stair, their faces still stone, their hands already on the rope that is not there."
+        }
+      ]
+    }
+  ],
+  "camps": [
+    {
+      "name": "Pickers at the milestone",
+      "mob": "Bureau grey-picker",
+      "tag": "greypicker",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 15,
+      "levelMax": 15,
+      "respawn": 7200,
+      "center": {
+        "x": 2,
+        "y": -346
+      },
+      "wing": "road",
+      "step": 1
+    },
+    {
+      "name": "The road picket",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 15,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": -2,
+        "y": -318
+      },
+      "wing": "road",
+      "step": 2
+    },
+    {
+      "name": "Hurst's carters",
+      "mob": "Bureau teamster",
+      "tag": "teamster",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3,
+      "count": 3,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": -36,
+        "y": -284
+      },
+      "wing": "road",
+      "step": 3
+    },
+    {
+      "name": "Road-Captain Everard Hurst",
+      "mob": "Road-Captain Everard Hurst",
+      "tag": "roadcaptain",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.5,
+      "count": 1,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": -46,
+        "y": -289
+      },
+      "wing": "road",
+      "step": 3,
+      "elite": true,
+      "guards": "Hurst's carters"
+    },
+    {
+      "name": "Pickers by the overhang",
+      "mob": "Bureau grey-picker",
+      "tag": "greypicker",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": -3,
+        "y": -252
+      },
+      "wing": "road",
+      "step": 4
+    },
+    {
+      "name": "The picket at the lip",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": 1,
+        "y": -222
+      },
+      "wing": "road",
+      "step": 5
+    },
+    {
+      "name": "The road patrol",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2,
+      "count": 2,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": 0,
+        "y": -340
+      },
+      "wing": "road",
+      "route": [
+        {
+          "x": 0,
+          "y": -340
+        },
+        {
+          "x": 0,
+          "y": -300
+        },
+        {
+          "x": 0,
+          "y": -262
+        },
+        {
+          "x": 0,
+          "y": -232
+        }
+      ]
+    },
+    {
+      "name": "The span watch",
+      "mob": "Iron Pact crossbowman",
+      "tag": "pactbow",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": 0,
+        "y": -204.47
+      },
+      "wing": "bridge",
+      "step": 1,
+      "rise": -1.5
+    },
+    {
+      "name": "The near Table",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3,
+      "count": 4,
+      "levelMin": 16,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": 6,
+        "y": -191.08
+      },
+      "wing": "bridge",
+      "step": 2,
+      "rise": -4
+    },
+    {
+      "name": "The far Table",
+      "mob": "Bureau grey-picker",
+      "tag": "greypicker",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3,
+      "count": 3,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": 2,
+        "y": -169.36
+      },
+      "wing": "bridge",
+      "step": 3,
+      "rise": -7
+    },
+    {
+      "name": "Tredway's shield-line",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": 1,
+        "y": -130.37
+      },
+      "wing": "bridge",
+      "step": 4
+    },
+    {
+      "name": "Sergeant Wymond Tredway",
+      "mob": "Sergeant Wymond Tredway",
+      "tag": "spansergeant",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": -2,
+        "y": -129.37
+      },
+      "wing": "bridge",
+      "step": 4,
+      "elite": true,
+      "guards": "Tredway's shield-line"
+    },
+    {
+      "name": "The wall-walk bows",
+      "mob": "Iron Pact crossbowman",
+      "tag": "pactbow",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2,
+      "count": 2,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": 0,
+        "y": -133.97
+      },
+      "wing": "bridge",
+      "step": 4,
+      "rise": 5
+    },
+    {
+      "name": "The Fallen Mason",
+      "mob": "The Fallen Mason",
+      "tag": "fallenmason",
+      "look": "hollow",
+      "canonStatus": "GAME-ONLY (the Hollow are CANON, book1 ch.4)",
+      "radius": 1.5,
+      "count": 1,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": -22,
+        "y": -169.36
+      },
+      "wing": "bridge",
+      "elite": true,
+      "guards": "none",
+      "social": "solitary",
+      "optional": true,
+      "rise": -13
+    },
+    {
+      "name": "Cutters at the first doorstep",
+      "mob": "Bureau cutter",
+      "tag": "bureaucutter",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": -6,
+        "y": -113
+      },
+      "wing": "street",
+      "step": 1,
+      "gate": "Tredway's gate"
+    },
+    {
+      "name": "Cutters at the bakery step",
+      "mob": "Bureau cutter",
+      "tag": "bureaucutter",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": -6,
+        "y": -79
+      },
+      "wing": "street",
+      "step": 2,
+      "gate": "Tredway's gate"
+    },
+    {
+      "name": "Upcott's chalk-men",
+      "mob": "Bureau clerk",
+      "tag": "bureauclerk",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2.5,
+      "count": 2,
+      "levelMin": 17,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 12,
+        "y": -40
+      },
+      "wing": "street",
+      "step": 3,
+      "gate": "Tredway's gate"
+    },
+    {
+      "name": "Assessor Piers Upcott",
+      "mob": "Assessor Piers Upcott",
+      "tag": "assessor",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 19,
+        "y": -45
+      },
+      "wing": "street",
+      "step": 3,
+      "elite": true,
+      "guards": "Upcott's chalk-men",
+      "gate": "Tredway's gate"
+    },
+    {
+      "name": "Cutters at the last doorstep",
+      "mob": "Bureau cutter",
+      "tag": "bureaucutter",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 6,
+        "y": -8
+      },
+      "wing": "street",
+      "step": 4,
+      "gate": "Tredway's gate"
+    },
+    {
+      "name": "The ford watch",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": -3,
+        "y": 14
+      },
+      "wing": "street",
+      "step": 5,
+      "gate": "Tredway's gate"
+    },
+    {
+      "name": "The rim guard",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.0,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": -20,
+        "y": 42
+      },
+      "wing": "street",
+      "step": 6,
+      "gate": "Tredway's gate"
+    },
+    {
+      "name": "The street patrol",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2,
+      "count": 2,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": 0,
+        "y": -118
+      },
+      "wing": "street",
+      "gate": "Tredway's gate",
+      "route": [
+        {
+          "x": 0,
+          "y": -118
+        },
+        {
+          "x": 0,
+          "y": -80
+        },
+        {
+          "x": 0,
+          "y": -40
+        },
+        {
+          "x": 0,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "name": "The footbridge watch",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2,
+      "count": 2,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": 60,
+        "y": -62
+      },
+      "wing": "granary",
+      "step": 1,
+      "optional": true
+    },
+    {
+      "name": "The sorting floor",
+      "mob": "Bureau grey-picker",
+      "tag": "greypicker",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3.5,
+      "count": 4,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": 93,
+        "y": -70
+      },
+      "wing": "granary",
+      "step": 2,
+      "optional": true
+    },
+    {
+      "name": "The Picker-Master's sorters",
+      "mob": "Bureau grey-picker",
+      "tag": "greypicker",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2,
+      "count": 2,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 91,
+        "y": -63.4
+      },
+      "wing": "granary",
+      "step": 3,
+      "rise": 4,
+      "optional": true
+    },
+    {
+      "name": "Picker-Master Fulke Yelland",
+      "mob": "Picker-Master Fulke Yelland",
+      "tag": "pickermaster",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 98,
+        "y": -63.4
+      },
+      "wing": "granary",
+      "step": 3,
+      "elite": true,
+      "guards": "The Picker-Master's sorters",
+      "rise": 4,
+      "optional": true
+    },
+    {
+      "name": "Coldwell's netters",
+      "mob": "Iron Pact crossbowman",
+      "tag": "pactbow",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2,
+      "count": 2,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 93,
+        "y": -76.6
+      },
+      "wing": "granary",
+      "step": 4,
+      "rise": 8,
+      "optional": true
+    },
+    {
+      "name": "Gil Coldwell, the Loft Watch",
+      "mob": "Gil Coldwell, the Loft Watch",
+      "tag": "loftwatch",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 101,
+        "y": -76.6
+      },
+      "wing": "granary",
+      "step": 4,
+      "elite": true,
+      "guards": "Coldwell's netters",
+      "rise": 8,
+      "optional": true
+    },
+    {
+      "name": "The yard teamsters",
+      "mob": "Bureau teamster",
+      "tag": "teamster",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 3,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 95,
+        "y": -100
+      },
+      "wing": "granary",
+      "step": 5,
+      "optional": true
+    },
+    {
+      "name": "Hollow in the cellar stair",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 2,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": -36,
+        "y": -56
+      },
+      "wing": "cellars",
+      "cave": "The Cellars",
+      "along": 23.2,
+      "aside": 0.23
+    },
+    {
+      "name": "Hollow in the long cellar",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 2,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": -41,
+        "y": -36
+      },
+      "wing": "cellars",
+      "cave": "The Cellars",
+      "along": 43.87,
+      "aside": -0.38
+    },
+    {
+      "name": "First-Cut's kin",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": -38,
+        "y": -16
+      },
+      "wing": "cellars",
+      "cave": "The Cellars",
+      "along": 63.86,
+      "aside": 3.0
+    },
+    {
+      "name": "First-Cut",
+      "mob": "First-Cut",
+      "tag": "firstcut",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": -43,
+        "y": -20
+      },
+      "wing": "cellars",
+      "elite": true,
+      "guards": "First-Cut's kin",
+      "cave": "The Cellars",
+      "along": 59.84,
+      "aside": -1.98
+    },
+    {
+      "name": "Hollow at the far stair",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 2,
+      "count": 3,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": -40,
+        "y": 15
+      },
+      "wing": "cellars",
+      "cave": "The Cellars",
+      "along": 94.89,
+      "aside": -0.33
+    },
+    {
+      "name": "The Long Shadow",
+      "mob": "The Long Shadow",
+      "tag": "longshadow",
+      "look": "pale",
+      "canonStatus": "GAME-ONLY (the hungry shadows are CANON, book1 ch.17)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": -55,
+        "y": 7.5
+      },
+      "wing": "cellars",
+      "elite": true,
+      "guards": "none",
+      "social": "solitary",
+      "optional": true,
+      "gate": "The dark cellar door",
+      "cave": "The dark cellar",
+      "along": 12.69,
+      "aside": 0.17
+    },
+    {
+      "name": "Clerks in the reading hall",
+      "mob": "Bureau clerk",
+      "tag": "bureauclerk",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": 54,
+        "y": 70
+      },
+      "wing": "archive",
+      "step": 1,
+      "rise": 2
+    },
+    {
+      "name": "Clerks in the stacks",
+      "mob": "Bureau clerk",
+      "tag": "bureauclerk",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 66,
+        "y": 64
+      },
+      "wing": "archive",
+      "step": 2,
+      "rise": 2
+    },
+    {
+      "name": "Clerks at the lecterns",
+      "mob": "Bureau clerk",
+      "tag": "bureauclerk",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 77,
+        "y": 75
+      },
+      "wing": "archive",
+      "step": 3,
+      "rise": 2
+    },
+    {
+      "name": "Pardew's copyists",
+      "mob": "Bureau clerk",
+      "tag": "bureauclerk",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2,
+      "count": 2,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 84,
+        "y": 70
+      },
+      "wing": "archive",
+      "step": 4,
+      "rise": 2
+    },
+    {
+      "name": "Registrar Dunstan Pardew",
+      "mob": "Registrar Dunstan Pardew",
+      "tag": "registrar",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 88,
+        "y": 71
+      },
+      "wing": "archive",
+      "step": 4,
+      "elite": true,
+      "guards": "Pardew's copyists",
+      "rise": 2
+    },
+    {
+      "name": "Clerks from the cells",
+      "mob": "Bureau clerk",
+      "tag": "bureauclerk",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 80,
+        "y": 84.5
+      },
+      "wing": "archive",
+      "after": "loose:Registrar Dunstan Pardew",
+      "rise": 2
+    },
+    {
+      "name": "The Reader at the Desk",
+      "mob": "The Reader at the Desk",
+      "tag": "reader",
+      "look": "pale",
+      "canonStatus": "GAME-ONLY (the Archivists are CANON, book1 ch.18)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 66,
+        "y": 77
+      },
+      "wing": "archive",
+      "elite": true,
+      "guards": "none",
+      "social": "solitary",
+      "passive": true,
+      "optional": true,
+      "rise": 2
+    },
+    {
+      "name": "Pact relief on the walk",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 32,
+        "y": 92
+      },
+      "wing": "walk",
+      "after": "event:walk1"
+    },
+    {
+      "name": "Hollow up out of the well",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": -24,
+        "y": 57
+      },
+      "wing": "walk",
+      "after": "event:walk2"
+    },
+    {
+      "name": "The tower door watch",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 2.5,
+      "count": 3,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 2,
+        "y": 106
+      },
+      "wing": "tower",
+      "step": 1,
+      "gate": "The ward-lock"
+    },
+    {
+      "name": "Kersey's line",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": -1.5,
+        "y": 119.5
+      },
+      "wing": "tower",
+      "step": 2,
+      "gate": "The ward-lock"
+    },
+    {
+      "name": "Pact-Captain Rowena Kersey",
+      "mob": "Pact-Captain Rowena Kersey",
+      "tag": "pactcaptain",
+      "look": "outrider",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1,
+      "count": 1,
+      "levelMin": 20,
+      "levelMax": 20,
+      "respawn": 7200,
+      "center": {
+        "x": 1,
+        "y": 117
+      },
+      "wing": "tower",
+      "step": 2,
+      "elite": true,
+      "guards": "Kersey's line",
+      "gate": "The ward-lock"
+    },
+    {
+      "name": "The Examiner's clerks",
+      "mob": "Bureau clerk",
+      "tag": "bureauclerk",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1.2,
+      "count": 2,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 2.5,
+        "y": 121
+      },
+      "wing": "tower",
+      "step": 3,
+      "gate": "The ward-lock",
+      "rise": 18
+    },
+    {
+      "name": "Bureau Examiner Thurstan Vowell",
+      "mob": "Bureau Examiner Thurstan Vowell",
+      "tag": "examiner",
+      "look": "collector",
+      "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
+      "radius": 1,
+      "count": 1,
+      "levelMin": 20,
+      "levelMax": 20,
+      "respawn": 7200,
+      "center": {
+        "x": 1,
+        "y": 119
+      },
+      "wing": "tower",
+      "step": 3,
+      "elite": true,
+      "guards": "The Examiner's clerks",
+      "gate": "The ward-lock",
+      "rise": 18
+    },
+    {
+      "name": "Ringers on the stair (first)",
+      "mob": "Paused ringer",
+      "tag": "ringer",
+      "look": "pale",
+      "canonStatus": "GAME-ONLY camp; CANON townsfolk paused (book1 ch.17-21)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 0,
+        "y": 118
+      },
+      "wing": "tower",
+      "after": "event:waking1"
+    },
+    {
+      "name": "Ringers on the stair (second)",
+      "mob": "Paused ringer",
+      "tag": "ringer",
+      "look": "pale",
+      "canonStatus": "GAME-ONLY camp; CANON townsfolk paused (book1 ch.17-21)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": 0,
+        "y": 118
+      },
+      "wing": "tower",
+      "after": "event:waking2"
+    },
+    {
+      "name": "Hollow up the bakery trapdoor",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 2,
+      "count": 2,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": -22,
+        "y": -72
+      },
+      "wing": "street",
+      "after": "event:glitch1"
+    },
+    {
+      "name": "More Hollow up the trapdoor",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 2,
+      "count": 3,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 7200,
+      "center": {
+        "x": -22,
+        "y": -72
+      },
+      "wing": "street",
+      "after": "event:glitch2"
+    },
+    {
+      "name": "The Old Ram",
+      "mob": "The Old Ram",
+      "tag": "oldram",
+      "look": "boar",
+      "canonStatus": "GAME-ONLY (Bet's letter's ram, already in the game; the paused beasts are CANON-EXPANDED)",
+      "radius": 1.5,
+      "count": 1,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": -62,
+        "y": -300
+      },
+      "wing": "road",
+      "elite": true,
+      "guards": "none",
+      "social": "solitary",
+      "rare": 0.25,
+      "optional": true
+    },
+    {
+      "name": "The Grey Carter",
+      "mob": "The Grey Carter",
+      "tag": "greycarter",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 1.5,
+      "count": 1,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 7200,
+      "center": {
+        "x": 24,
+        "y": -300
+      },
+      "wing": "road",
+      "elite": true,
+      "guards": "none",
+      "social": "solitary",
+      "rare": 0.2,
+      "optional": true
+    },
+    {
+      "name": "The Lamplighter",
+      "mob": "The Lamplighter",
+      "tag": "lamplighter",
+      "look": "hollow",
+      "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
+      "radius": 1.2,
+      "count": 1,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": -4,
+        "y": -100
+      },
+      "wing": "street",
+      "elite": true,
+      "guards": "none",
+      "social": "solitary",
+      "rare": 0.2,
+      "optional": true,
+      "gate": "Tredway's gate",
+      "route": [
+        {
+          "x": -4,
+          "y": -100
+        },
+        {
+          "x": -4,
+          "y": -60
+        },
+        {
+          "x": -4,
+          "y": -20
+        },
+        {
+          "x": -4,
+          "y": -60
+        }
+      ]
+    }
+  ]
+}

@@ -110,6 +110,15 @@ namespace Crulanda.Encounter
             new MobCast { mob = "Charnel spider", name = "Web-Spit", kind = "net", cc = "root", seconds = 2, area = 0, cast = .9f, every = 15, first = 5, power = 0, reach = 12 },
             new MobCast { mob = "Canopy spider", name = "Web-Drop", kind = "net", cc = "root", seconds = 2, area = 3, cast = 1f, every = 16, first = 5, power = 0, reach = 12 },
             new MobCast { mob = "Basalt spider", name = "Grit-Spit", kind = "net", cc = "disorient", seconds = 1.5f, area = 0, cast = .9f, every = 15, first = 5, power = 0, reach = 10 },
+            // ---------- Hallow's Creek (Docs/DUNGEON2_DESIGN.md; GAME-ONLY): the Bureau's people, the Iron Pact, the Hollow, the ringers ----------
+            new MobCast { mob = "Bureau grey-picker", name = "Grit in the Eyes", kind = "net", cc = "disorient", seconds = 1.5f, area = 0, cast = 1.2f, every = 15, first = 5, power = 0, reach = 5 },
+            new MobCast { mob = "Iron Pact soldier", name = "Pact Shield-Bash", kind = "bolt", cast = 1.2f, every = 14, first = 5, power = 1.6f, reach = 4, knock = 2.5f },
+            new MobCast { mob = "Iron Pact crossbowman", name = "Pact Quarrel", kind = "bolt", cast = 1.5f, every = 13, first = 2, power = 2f, reach = 22 },
+            new MobCast { mob = "Bureau cutter", name = "Chisel Strike", kind = "blast", cast = 1.5f, every = 15, first = 6, power = 2f, reach = 3 },
+            new MobCast { mob = "Bureau clerk", name = "Mend the Copy", kind = "heal", cast = 2f, every = 14, first = 4, power = .3f, reach = 15 },   // the clerks ward and mend each other (the zealots' lesson)
+            new MobCast { mob = "Bureau teamster", name = "Cart-Whip", kind = "net", cc = "root", seconds = 2, area = 0, cast = 1.2f, every = 15, first = 5, power = 0, reach = 7 },
+            new MobCast { mob = "Hallow's Creek Hollow", name = "Grey Clutch of the Cut", kind = "drain", cast = 2f, every = 14, first = 4, power = 1.8f, reach = 6 },
+            new MobCast { mob = "Paused ringer", name = "The Ringer's Hand", kind = "net", cc = "stun", seconds = 1.5f, area = 0, cast = 1.4f, every = 15, first = 4, power = 0, reach = 4 },
         };
         public static MobCast For(string mob) { return string.IsNullOrEmpty(mob) ? null : All.FirstOrDefault(c => c.mob == mob); }
 

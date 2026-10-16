@@ -92,7 +92,39 @@ namespace Crulanda.World
         public ZoneEvent[] events = new ZoneEvent[0];
         /// <summary>Trails of living lichen along the run's way (<see cref="ZoneCrumb"/>).</summary>
         public ZoneCrumb[] crumbs = new ZoneCrumb[0];
+        // ---- a dungeon on open ground (Hallow's Creek, Docs/DUNGEON2_DESIGN.md section 5, N1-N7; all GAME-ONLY, all optional) ----
+        /// <summary>Pits sunk in the land (<see cref="ZonePit"/>: Hallow's Creek's chasm under the Bridge of Shattered Glass).</summary>
+        public ZonePit[] pits = new ZonePit[0];
+        /// <summary>Strips of ground that slow and wear on whoever stands in them, and that agents walk round (<see cref="ZoneHazard"/>: the
+        /// hungry shadows).</summary>
+        public ZoneHazard[] hazards = new ZoneHazard[0];
+        /// <summary>The ride home (<see cref="ZoneRide"/>: Hallow's Creek's wagon), or one with no name: none.</summary>
+        public ZoneRide ride;
     }
+    /// <summary>
+    /// A pit sunk in the land (GAME-ONLY; Hallow's Creek's chasm, DUNGEON2_DESIGN.md N3): a box of <see cref="size"/> round <see cref="center"/>
+    /// (turned by <see cref="rotation"/> degrees) whose ground falls <see cref="depth"/> metres under the land over <see cref="wall"/> metres in
+    /// from its edge (a sheer fall: no navmesh climbs it). fog: the height (over the yard) of the fog floor that sends anyone who falls
+    /// into it back to the last deck they stood on (never under the world); NaN or 0: none.
+    /// </summary>
+    [Serializable] public sealed class ZonePit { public string name; public Vector2 center, size; public float rotation, depth = 40, wall = 3, fog; }
+    /// <summary>
+    /// A strip of hazard ground (GAME-ONLY; Hallow's Creek's hungry shadows, DUNGEON2_DESIGN.md N4): from <see cref="from"/> to <see cref="to"/>,
+    /// <see cref="width"/> across. Standing in it slows you to <see cref="slow"/> of your pace and takes <see cref="tick"/> of your health a
+    /// second (never the last of it); agents pay <see cref="EncounterNavigationCost"/> times a metre to cross it, so they walk round it.
+    /// kind: "shadow" (dark, cold, a minute taken).
+    /// </summary>
+    [Serializable] public sealed class ZoneHazard
+    {
+        public string name, kind = "shadow", canonStatus; public Vector2 from, to; public float width = 3, slow = .6f, tick = .01f;
+        public const float EncounterNavigationCost = 8;
+    }
+    /// <summary>
+    /// The way home (GAME-ONLY; Hallow's Creek's black-iron wagon, DUNGEON2_DESIGN.md N7, generalised from the Adit's carriage): the prop
+    /// named <see cref="name"/> is boarded with E once <see cref="opensOn"/> (a mob) is dead this visit (empty: at once), and after
+    /// <see cref="seconds"/> on the bench the party stands at <see cref="arrive"/> (the zone's start when unset). text: the line said on arrival.
+    /// </summary>
+    [Serializable] public sealed class ZoneRide { public string name, opensOn, text, shut; public Vector2 arrive; public float seconds = 5; }
     /// <summary>
     /// Ambient life. villagers: how many named villagers live here (homes are the zone's barred houses, given by households).
     /// mood: "wary" (collectors about; brightens once they are gone) or "afraid". Critters never fight; they flee.
@@ -365,6 +397,10 @@ namespace Crulanda.World
         public int wall;
         public float from, to, aside, aside2, rise, rise2, width = 3, radius;
         public bool solid;
+        /// <summary>(Hallow's Creek, N1) A deck on open ground (no cave): from <see cref="at"/> to <see cref="at2"/> (round, of
+        /// <see cref="radius"/>, at <see cref="at"/>), its top <see cref="rise"/> metres over the yard (the land at the zone's start) at its
+        /// start and <see cref="rise2"/> at its end. A slab of the broken bridge, a loft, a landing, a ramp between them (ZoneBuilder.HallowsGround).</summary>
+        public Vector2 at, at2;
     }
     /// <summary>
     /// A one-way drop (GAME-ONLY): off a ledge or a deck's open end in one cave (from metres along fromCave, fromAside to the right of its
@@ -378,6 +414,9 @@ namespace Crulanda.World
         public string name, fromCave, toCave;
         public float from, fromAside, fromRise, to, toAside, toRise, width = 2;
         public bool falls, scenery;
+        /// <summary>(Hallow's Creek, N1) A drop on open ground (no fromCave): off <see cref="fromAt"/> at fromRise over the yard, down to
+        /// <see cref="toAt"/> at toRise (the third slab's edge to the lower orbit).</summary>
+        public Vector2 fromAt, toAt;
     }
     /// <summary>
     /// Water in a cave (GAME-ONLY; ZoneBuilder.AditWater). depth: how deep in the middle (over about 1.45 m you swim).
@@ -401,9 +440,16 @@ namespace Crulanda.World
     /// the elite whose people answer the loud way; opensOn: the mob whose death opens it; look (grille, door, boards, bar, stockade,
     /// bookcase, song; empty: by its kind); side: "far" when it is worked from beyond it (a bar lifted from the hub's side only).
     /// </summary>
-    [Serializable] public sealed class ZoneGateDef { public string title, cave, kind, prompt, lord, opensOn, look, side; public float along; }
-    /// <summary>A named place in a cave (GAME-ONLY): along, aside and rise over its floor (a deck). ZoneBuilder.Anchors holds where each stands.</summary>
-    [Serializable] public sealed class ZoneAnchor { public string name, cave; public float along, aside, rise; }
+    [Serializable] public sealed class ZoneGateDef
+    {
+        public string title, cave, kind, prompt, lord, opensOn, look, side; public float along;
+        /// <summary>(Hallow's Creek, N1) A gate on open ground (no cave): its middle at <see cref="at"/>, its face turned <see cref="rotation"/>
+        /// degrees (0: across a way running north), <see cref="width"/> across, its foot <see cref="rise"/> metres over the yard (0: on the land).</summary>
+        public Vector2 at; public float rotation, width = 6, rise;
+    }
+    /// <summary>A named place in a cave (GAME-ONLY): along, aside and rise over its floor (a deck). ZoneBuilder.Anchors holds where each stands.
+    /// (Hallow's Creek, N1) With no cave: at <see cref="at"/> on open ground, rise metres over the yard (on a deck there) or on the land at 0.</summary>
+    [Serializable] public sealed class ZoneAnchor { public string name, cave; public float along, aside, rise; public Vector2 at; }
     /// <summary>
     /// A wing of a dungeon (GAME-ONLY; the run a sim leads): id and name; after: the wings or groups done before it opens (comma-separated);
     /// group: wings of which one is enough (the Scriptorium or the Muster Yard); exit: "drop" or "walk", the way home from its end; home:
@@ -415,7 +461,13 @@ namespace Crulanda.World
     [Serializable] public sealed class ZoneEvent { public string id, kind, wing, anchor; public int step; public ZoneWave[] waves = new ZoneWave[0]; }
     /// <summary>A wave of an event: at seconds in, the camp (by name) it brings, and the line said as it comes (empty: the code's own line for that
     /// camp, else a plain one; EncounterSession.Release.cs, 2026-10-15).</summary>
-    [Serializable] public sealed class ZoneWave { public float at; public string camp, text; }
+    [Serializable] public sealed class ZoneWave
+    {
+        public float at; public string camp, text;
+        /// <summary>(Hallow's Creek, N8) A mob: the wave comes only while it still stands this visit (the Warden's walk: the Pact's wave unless
+        /// the Picker-Master is down, the Hollow's unless First-Cut is). Empty: always.</summary>
+        public string unless;
+    }
     /// <summary>A trail of living lichen along a cave (GAME-ONLY): from..to along it, aside of its middle (the way the run goes).</summary>
     [Serializable] public sealed class ZoneCrumb { public string cave; public float from, to, aside; }
     /// <summary>

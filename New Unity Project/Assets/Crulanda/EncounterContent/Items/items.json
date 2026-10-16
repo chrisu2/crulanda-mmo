@@ -2617,6 +2617,22 @@
       ]
     },
     {
+      "tag": "oldram",
+      "levelMin": 15,
+      "levelMax": 17,
+      "gearChance": 0.12,
+      "entries": [
+        {
+          "item": "junk.boar_meat",
+          "chance": 0.5
+        },
+        {
+          "item": "hide.boar",
+          "chance": 0.7
+        }
+      ]
+    },
+    {
       "tag": "pithound",
       "levelMin": 10,
       "levelMax": 12,

@@ -188,7 +188,7 @@ namespace Crulanda.Tests
             }
             // The targets (decision 7): about ninety in all, eight to fourteen in each of the middle zones.
             int total = zones.Sum(z => (z.secrets ?? new ZoneSecret[0]).Count(x => x != null));
-            if (total < 99 || total > 115) problems.Add(total + " secrets in all, not about ninety and the Lowtowns' fourteen");
+            if (total < 107 || total > 123) problems.Add(total + " secrets in all, not about ninety, the Lowtowns' fourteen and Hallow's Creek's eight");
             foreach (var id in new[] { "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns" })
             {
                 var z = zones.Find(x => x.id == id); int n = z == null ? 0 : z.secrets.Count(x => x != null);

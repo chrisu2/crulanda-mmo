@@ -36,6 +36,7 @@ namespace Crulanda.Encounter
             StartGreySeep();   // (S7) the Grey Spreads' lines across the Breach (EncounterSession.GreySpread.cs)
             StartSwingLoads();   // (S7) the Foundry's swing-loads and their rope teams (AditSwingLoad)
             StartHaul();     // (S6) the barge aground in the Black Cove and the rope teams on her warps (EncounterSession.Haul.cs)
+            StartHallows();  // (Hallow's Creek) the paused townsfolk, the wagon's mules, the Warden (EncounterSession.Hallows.cs)
             // The pressed goblins in their cages, and the doors of those opened before standing open (playtest note 125).
             foreach (var i in Zone.Interactables)
             {
@@ -167,6 +168,7 @@ namespace Crulanda.Encounter
                 case "stone": return Progress.spiritStones.Contains(i.Key(Zone.Zone.id)) ? "The spirit stone hums" : i.prompt;
                 case "weaver": return Weaver != null && Weaver.Now == AditWeaver.Stage.Waiting ? "Talk to " + AditWeaver.Name + " (walk her to the carriage)" : i.prompt;
                 case "carriage": return RideAllowed ? i.prompt + " (one ride out)" : "The carriage is loading: its lock still sings";
+                case "ride": case "ward": case "warden": case "pen": case "bar": case "hiddendoor": return HallowsPrompt(i);   // (Hallow's Creek, and the hand-worked gates: EncounterSession.Hallows.cs)
                 // (S6) Nothing to cut once the haul is over: a line saying how she lies (a null here fell back to the prop's own "Cut the
                 // warps", R132), and the bollards are no longer offered (EncounterSession.Haul.HideWarps).
                 case "warps":
@@ -200,6 +202,10 @@ namespace Crulanda.Encounter
                 case "weaver": TalkToWeaver(); return true;
                 case "carriage": RideCarriage(); return true;
                 case "warps": CutWarps(i); return true;   // (S6) the barge's warps at the bollards (EncounterSession.Haul.cs)
+                case "ride": RideWagon(i); return true;   // (Hallow's Creek) the black-iron wagon home (EncounterSession.Hallows.cs)
+                case "ward": StudyWard(i); return true;
+                case "warden": return TalkToWarden(i);
+                case "pen": case "bar": case "hiddendoor": return UseHandGate(i);   // gates worked by hand (the Adit rework's and Hallow's Creek's)
                 case "cage":   // the lock is the Company's: without Pib's quest, the goblin only shrinks back (with it, the quest counts it and it opens)
                     if (Quests != null && Quests.State(PressedQuest) != null) return false;
                     Message("The goblin inside flinches back from the bars. The padlock is the Company's: Pib, in the Peaks, knows how these open."); return true;

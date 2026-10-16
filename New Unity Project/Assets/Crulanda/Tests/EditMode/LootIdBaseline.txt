@@ -223,3 +223,27 @@ loot.set.t1_scoundrel_chest
 loot.set.t1_scoundrel_hands
 loot.set.t1_scoundrel_legs
 loot.set.t1_scoundrel_feet
+# Hallow's Creek, the second dungeon: its elites' signature pieces (2026-10-16)
+loot.hal.road_captains_grey_cloak
+loot.hal.carters_ash_boots
+loot.hal.old_rams_horn_torc
+loot.hal.grey_carters_reins
+loot.hal.the_span_holder
+loot.hal.pact_sergeants_greaves
+loot.hal.the_masons_trowel
+loot.hal.the_assessors_chalk
+loot.hal.assessors_grey_coat
+loot.hal.lamplighters_hood
+loot.hal.pickers_gloves
+loot.hal.picker_masters_hook
+loot.hal.loft_watch_jerkin
+loot.hal.the_cutters_chisel
+loot.hal.grey_quartz_pendant
+loot.hal.a_minute_in_amber
+loot.hal.registrars_robe
+loot.hal.ink_stained_gloves
+loot.hal.the_readers_lens
+loot.hal.pact_captains_breastplate
+loot.hal.pact_captains_sabatons
+loot.hal.the_examiners_sunburst
+loot.hal.the_examiners_seal

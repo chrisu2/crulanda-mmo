@@ -420,7 +420,7 @@ namespace Crulanda.Encounter
             why = null; route.Clear(); Dungeon = null; StoppedBy = null; waitingAt = null; wingSeen.Clear(); WingOrder.Clear(); walks.Clear(); RunMode = DungeonPlan.ParseMode(mode);
             if (session.Zone == null) { why = "There is nowhere to go."; return null; }
             var zone = session.Zone.Zone;
-            if (zone.wings != null && zone.wings.Length > 0 && zone.camps != null && Crulanda.World.Hollow.All.Count > 0)
+            if (zone.wings != null && zone.wings.Length > 0 && zone.camps != null && (Crulanda.World.Hollow.All.Count > 0 || zone.dungeon))   // (Hallow's Creek: a dungeon on open ground)
             {
                 var steps = DungeonPlan.Plan(zone, RunMode, transform.position, CampStand, AnchorAt, WalkLength, CampStanding, QuestWants, WingOrder);
                 int firstFight = steps.FindIndex(s => !s.regroup);
@@ -502,6 +502,7 @@ namespace Crulanda.Encounter
                 if (cp.rise > 0) y = session.Zone.StandAt(cp.center, y + cp.rise).y;
                 return new Vector3(cp.center.x, y, cp.center.y);
             }
+            if (h == null && Mathf.Abs(cp.rise) > .01f) return session.Zone.OpenPoint(cp.center, cp.rise);   // (Hallow's Creek) up on its deck on open ground
             return session.Zone.StandAt(cp.center, float.NegativeInfinity);
         }
         Vector3? AnchorAt(string name) { return session.Zone.Anchors.TryGetValue(name, out var p) ? (Vector3?)p : null; }

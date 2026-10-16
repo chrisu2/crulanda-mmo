@@ -1,0 +1,47 @@
+{
+  "zone": "zone.hallows",
+  "canonStatus": "GAME-ONLY: every clue and hint here is the game's. What they tell of is CANON or CANON-EXPANDED as hallows.json's canonNote says (book1 ch.15-21). Tamsin Reed, Ada Hollin and Bet are Oakhaven's people (GAME-ONLY); Mr Gable is CANON (book1 ch.21). Written 2026-10-16.",
+  "secrets": [
+    {
+      "id": "secret.hallows.satchel",
+      "clue": "Off the east side of the road in, under a lip of rock the ash cannot reach, a strap has been cut and something left behind.",
+      "hint": "A Pact soldier's mother in Oakhaven never had his last letter. Her boy wrote that he kept his things dry under a rock by the road."
+    },
+    {
+      "id": "secret.hallows.bets-cart",
+      "clue": "A cart packed for the road west, turned to stone in a side yard with a chair lashed on top. What was under the seat was not stone.",
+      "hint": "Ada Hollin says her sister Bet had the cart packed the night before. She was waiting for the morning."
+    },
+    {
+      "id": "secret.hallows.masons-cache",
+      "clue": "Below the slabs you cross, on the lowest of them, a mason left his tub of mortar and something wrapped in his apron.",
+      "hint": "They say the man who built the bridge would not leave it. If he is anywhere, he is under it."
+    },
+    {
+      "id": "secret.hallows.two-coppers",
+      "clue": "Two coins left on a shop's sill for a loaf, fifty years ago. When the shop bell rings, they are warm.",
+      "hint": "Mr Gable sold the best bread in the valley, the old folk say, and nobody ever left without paying. Nobody."
+    },
+    {
+      "id": "secret.hallows.reed-key",
+      "clue": "A careful woman hangs her spare key just inside the door of a little roofed house on the crater's rim, where the stair goes down.",
+      "hint": "Tamsin Reed says her grandmother kept a spare key to everything, and kept it where she drew her water."
+    },
+    {
+      "id": "secret.hallows.reed-chest",
+      "clue": "By the white fence of a house with a blue door gone grey, a blanket chest set out for a cart that never came. Its lock never turned to stone.",
+      "hint": "Tamsin Reed says her grandmother packed the blanket chest to follow them west, and never let anyone see the bottom of it."
+    },
+    {
+      "id": "secret.hallows.archivists-page",
+      "clue": "High on the gallery of the stone library, behind a row of stone books, one page is paper still.",
+      "hint": "The Preservationists say the old Archivists hid their own words among the books, where only a reader would look."
+    },
+    {
+      "id": "secret.hallows.ringers-names",
+      "clue": "Low on the inside wall of the tower where the bell hangs, four names in chalk, the way ringers mark a practice.",
+      "hint": "Bell-ringers chalk their names on the wall at practice. Four rang in that tower the day it stopped, the old folk say."
+    }
+  ],
+  "stories": []
+}

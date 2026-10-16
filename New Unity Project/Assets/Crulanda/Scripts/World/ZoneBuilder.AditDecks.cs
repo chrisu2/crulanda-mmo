@@ -138,11 +138,11 @@ namespace Crulanda.World
             if (Hollow.All.Count == 0) return;
             PrepareCaveWater();
             if (Zone.decks != null)
-                foreach (var d in Zone.decks) { if (d == null) continue; var spot = PrepareDeck(d); if (spot != null) DeckSpots.Add(spot); }
+                foreach (var d in Zone.decks) { if (d == null || string.IsNullOrEmpty(d.cave)) continue; var spot = PrepareDeck(d); if (spot != null) DeckSpots.Add(spot); }   // (a deck on open ground: ZoneBuilder.HallowsGround)
             if (Zone.drops != null)
                 foreach (var d in Zone.drops)
                 {
-                    if (d == null) continue;
+                    if (d == null || string.IsNullOrEmpty(d.fromCave)) continue;   // (a drop on open ground: ZoneBuilder.HallowsGround)
                     var fc = CaveNamed(d.fromCave); var tc = string.IsNullOrEmpty(d.toCave) ? fc : CaveNamed(d.toCave);
                     if (fc == null || tc == null) { Debug.LogWarning(Zone.id + ": the drop '" + d.name + "' names a cave the zone has not got."); continue; }
                     var from = CavePoint(fc, d.from, d.fromAside, d.fromRise); var to = CavePoint(tc, d.to, d.toAside, d.toRise);
@@ -301,7 +301,7 @@ namespace Crulanda.World
             var root = new GameObject("Cave works").transform; root.SetParent(props, false); root.SetPositionAndRotation(Vector3.zero, Quaternion.identity);
             var solidRoot = new GameObject("Decks").transform; solidRoot.SetParent(root, false);
             var look = new GameObject("Look").transform; look.SetParent(root, false);
-            foreach (var spot in DeckSpots) BuildDeck(spot, solidRoot, look);
+            foreach (var spot in DeckSpots) if (spot.cave != null) BuildDeck(spot, solidRoot, look);   // (open ground's own: ZoneBuilder.HallowsGround)
             JoinAprons(solidRoot);
             BuildCaveWater(root, look);
             foreach (var dl in dropLooks) BuildDrop(dl.def, dl.from, dl.to, root, look);

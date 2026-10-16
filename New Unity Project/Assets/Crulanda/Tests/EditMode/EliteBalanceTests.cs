@@ -43,7 +43,7 @@ namespace Crulanda.Tests
                     var c = z.camps[i]; if (c == null || !c.elite) continue;
                     bool beast = Beast(c.look); elites.Add((c, EliteMoves.For(c.mob, beast), beast)); where[c] = (z, i);
                 }
-            Assert.AreEqual(35, elites.Count, "twelve across the five zones and twenty in the Sealed Adit since its rework (its rare, the Quiet Miner, among them), and the Lowtowns' three (Phase 9.1)");
+            Assert.AreEqual(50, elites.Count, "twelve across the five zones, twenty in the Sealed Adit since its rework (its rare, the Quiet Miner, among them), the Lowtowns' three (Phase 9.1) and fifteen in Hallow's Creek (2026-10-16)");
         }
         // A camp mob's pace by its look (EncounterSession.SpawnCamps).
         static float Pace(string look) { return look == "wolf" ? 4.2f : look == "boar" ? 3.8f : look == "weaveeater" ? 3.4f : 2.8f; }
@@ -203,7 +203,7 @@ namespace Crulanda.Tests
                 }
             // Six elites stand with guards (Caddock, Hesk, the Brood Weave-Eater's broodmate, the Ash-Deacon, Greyheart, the
             // Root-Warden) and four have kin in earshot of their call (Hesk, Old Whitefoot, the Grey Sexton, the Sandthrone captain).
-            Assert.AreEqual(20 * Kits.Length, guarded, "Twenty elites have guards (fourteen of them the reworked Adit's, 2026-10-14)."); Assert.AreEqual(15 * Kits.Length, answered, "Fifteen elites' calls are answered by kin (eleven of them the Sealed Adit's: Nix's since the Adit was filled, 2026-10-11, the Back drift cutters in his reach; the rework's bosses with guards in earshot, 2026-10-14).");
+            Assert.AreEqual(29 * Kits.Length, guarded, "Twenty-nine elites have guards (fourteen of them the reworked Adit's, 2026-10-14; nine Hallow's Creek's, 2026-10-16)."); Assert.AreEqual(20 * Kits.Length, answered, "Twenty elites' calls are answered by kin (Hallow's Creek's five: Tredway, Yelland, First-Cut, Pardew and Kersey, 2026-10-16; eleven of them the Sealed Adit's: Nix's since the Adit was filled, 2026-10-11, the Back drift cutters in his reach; the rework's bosses with guards in earshot, 2026-10-14).");
         }
         /// <summary>The least health a careful player with Mira ends with when an elite's call is answered.</summary>
         const float CallMargin = .1f;

@@ -1807,6 +1807,8 @@ namespace Crulanda.Encounter
         /// </summary>
         public static float DeckHeight(Crulanda.World.ZoneCamp camp, Vector2 spot)
         {
+            if (camp != null && string.IsNullOrEmpty(camp.cave) && Mathf.Abs(camp.rise) > .01f && Crulanda.World.ZoneBuilder.Active != null)
+                return Crulanda.World.ZoneBuilder.Active.Datum + camp.rise;   // (Hallow's Creek) on open ground: on the deck that high over the yard
             if (camp == null || camp.rise <= 0 || string.IsNullOrEmpty(camp.cave)) return float.NegativeInfinity;
             var cave = Crulanda.World.Hollow.All.Find(h => h.Name == camp.cave); if (cave == null) return float.NegativeInfinity;
             return (cave.FloorAt(spot, out float floor) ? floor : cave.At(camp.along, camp.aside).y) + camp.rise;
@@ -1939,7 +1941,7 @@ namespace Crulanda.Encounter
             if (!BuildOpen && EncounterInput.Press(KeyCode.E)) Interact();
             if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
             TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
-            TickLockouts(); TickQueue();   // lockouts run out; the dungeon queue gathers its party, leads it and breaks it up (EncounterSession.Lockout, .Queue)
+            TickLockouts(); TickQueue(); TickHallows();   // lockouts run out; the dungeon queue gathers its party, leads it and breaks it up (EncounterSession.Lockout, .Queue)
 
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             if (!BuildOpen && EncounterInput.Press(KeyCode.P)) { SpellbookOpen = !SpellbookOpen; BookPick = null; }   // the spellbook (Docs/ACTION_BAR.md)

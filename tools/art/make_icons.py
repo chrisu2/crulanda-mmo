@@ -2159,6 +2159,8 @@ QUEST = {
     'item.adit_tally_book': (book, ('#5a3a22', '#9a9aa0'), dict(wrap='#3a2a1a')), 'item.adit_echo_jar': (flask, ('#c8a888',), dict(shape='round', glowc='#ffd0e0', cork='#8a5a3a')),
     'item.ysolt_ash_brand': (shard, ('#3a2a26', 'metal'), dict(glowc='#ff7a30', spark=True)), 'item.unmade_shard': (shard, ('#a8a8ac',), dict(glowc='#d8d8e0', thin=True)),
     'item.adit_sealed_letter': (letter, ('#2a2a30',), dict(broken=False)),
+    # Hallow's Creek (2026-10-16): the Picker-Master's black tally with the Bureau's sunburst, the Warden's papers in grey tape
+    'item.hallows_pickers_tally': (book, ('#1c1c22', '#8d96a3'), dict(seal='#2a2a30')), 'item.hallows_wardens_papers': (letter, ('#9a9890',), dict(broken=False, pouch_=True)),
     # the zones filled with quests (2026-10-13, Chris: "all zones full of quests")
     'item.brook_mark': (pelt, ('#5e4636',), dict(small=True, bristle=True, belly='#7a5e4a', spots='#1a1410')), 'item.wether_bell': (bell,),
     'item.hesk_tally': (book, ('#6b4a2c', '#8d96a3'), dict(wrap='#3e2c1c')),

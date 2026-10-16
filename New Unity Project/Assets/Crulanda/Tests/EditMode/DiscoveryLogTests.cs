@@ -328,7 +328,7 @@ namespace Crulanda.Tests
             // Shore 6-14, the Sealed Adit's (13 since its rework) kept, the Root-Mother's Deep up to three, Crowsfoot Hollow its two.
             Assert.GreaterOrEqual(Count("zone.oakhaven"), 20);
             foreach (var id in new[] { "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns" }) Assert.That(Count(id), Is.InRange(8, 14), id);
-            int total = zones.Sum(z => z.secrets.Length); Assert.That(total, Is.InRange(99, 115), "About ninety in all, and the Lowtowns' fourteen (Phase 9.1).");
+            int total = zones.Sum(z => z.secrets.Length); Assert.That(total, Is.InRange(107, 123), "About ninety in all, the Lowtowns' fourteen (Phase 9.1) and Hallow's Creek's eight (2026-10-16).");
             var shore = zones.Find(z => z.id == "zone.verdant");
             Assert.AreEqual(3, shore.secrets.Count(s => s.cave == "The Root-Mother's Deep"), "Three in the Root-Mother's Deep.");
             var oak = zones.Find(z => z.id == "zone.oakhaven");

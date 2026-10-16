@@ -1,0 +1,171 @@
+{
+  "items": [
+    {
+      "id": "loot.low.outfall_waders_boots",
+      "name": "Outfall Wader's Boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 3,
+      "level": 19,
+      "value": 80,
+      "armor": 48,
+      "stamina": 31,
+      "agility": 20,
+      "description": "Boots the drains took off somebody and kept. Salt has dried white along the tops, where the water stood.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.low.drain_pearl",
+      "name": "The Drain-Pearl",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 3,
+      "level": 19,
+      "value": 80,
+      "intellect": 31,
+      "spirit": 20,
+      "description": "A grey bead on a twist of drain wire that never dries, whatever you do. It is warm when the lamps go out.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.low.knuckle_irons",
+      "name": "Knuckle-Irons",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 19,
+      "value": 80,
+      "armor": 48,
+      "stamina": 20,
+      "strength": 31,
+      "description": "Leather gloves with filed iron studs sewn over the knuckles by someone who meant them.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.low.sifters_hook",
+      "name": "The Sifter's Hook",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 19,
+      "value": 112,
+      "weaponDamage": 57,
+      "stamina": 20,
+      "agility": 31,
+      "description": "A rag-picker's hook from the Rust Market, filed to a point and never once used on rags.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "loot.low.the_swallowed_lantern",
+      "name": "The Swallowed Lantern",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 3,
+      "level": 19,
+      "value": 80,
+      "armor": 88,
+      "intellect": 31,
+      "spirit": 20,
+      "description": "A street lamp the Lantern-Eater took whole. The glass is black from the inside, and now and then it still lights.",
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "vendors": [],
+  "gear": [
+    {
+      "id": "loot.low.outfall_waders_boots",
+      "look": "feet.boots:hobnail/ashwalker",
+      "source": "boss:Mother of Drains",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.low.drain_pearl",
+      "look": "neck.pendant:glass/pale+glow",
+      "source": "boss:Mother of Drains",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.low.knuckle_irons",
+      "look": "hands.gloves:plain/tollroad",
+      "source": "boss:Knuckle Brannoc",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.low.sifters_hook",
+      "look": "knife:hooked/tollroad",
+      "source": "boss:Knuckle Brannoc",
+      "boss": true,
+      "unique": true
+    },
+    {
+      "id": "loot.low.the_swallowed_lantern",
+      "look": "offhand.hung:shuttered/sandthrone+glow",
+      "source": "boss:The Lantern-Eater",
+      "boss": true,
+      "unique": true
+    }
+  ],
+  "drops": [
+    {
+      "id": "drop.lowtowns.mother_of_drains",
+      "zone": "lowtowns",
+      "mob": "Mother of Drains",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.low.outfall_waders_boots"
+            },
+            {
+              "item": "loot.low.drain_pearl"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.lowtowns.knuckle_brannoc",
+      "zone": "lowtowns",
+      "mob": "Knuckle Brannoc",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.low.knuckle_irons"
+            },
+            {
+              "item": "loot.low.sifters_hook"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "id": "drop.lowtowns.the_lantern_eater",
+      "zone": "lowtowns",
+      "mob": "The Lantern-Eater",
+      "rank": "elite",
+      "groups": [
+        {
+          "chance": 1,
+          "signature": true,
+          "pick": [
+            {
+              "item": "loot.low.the_swallowed_lantern"
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "sets": []
+}

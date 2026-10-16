@@ -63,26 +63,29 @@ namespace Crulanda.Tests
     /// </summary>
     public class LootDataTests
     {
-        static readonly Regex IdScheme = new Regex(@"^loot\.(oak|kha|pea|ash|ver|adit|hal|world|set)\.[a-z0-9_]+$");
-        static readonly Dictionary<string, string> FileShort = new Dictionary<string, string> { { "oakhaven", "oak" }, { "khaven", "kha" }, { "peaks", "pea" }, { "ashrim", "ash" }, { "verdant", "ver" }, { "world", "world" }, { "adit", "adit" }, { "hallows", "hal" }, { "sets", "set" } };
+        static readonly Regex IdScheme = new Regex(@"^loot\.(oak|kha|pea|ash|ver|adit|hal|low|world|set)\.[a-z0-9_]+$");
+        static readonly Dictionary<string, string> FileShort = new Dictionary<string, string> { { "oakhaven", "oak" }, { "khaven", "kha" }, { "peaks", "pea" }, { "ashrim", "ash" }, { "verdant", "ver" }, { "world", "world" }, { "adit", "adit" }, { "hallows", "hal" }, { "lowtowns", "low" }, { "sets", "set" } };
         /// <summary>The class sets' pieces (loot.sets.json, DESIGN.md 3.8): eleven classes, six pieces each.</summary>
         const int ClassPieces = 66;
         /// <summary>Hallow's Creek's signature pieces (loot.hallows.json, 2026-10-16) and its elites (three of them rares).</summary>
         const int HallowsPieces = 23, HallowsElites = 15, LowtownsElites = 3;
+        /// <summary>The Lowtowns' elites' signature pieces (loot.lowtowns.json, Phase 9.1): two each from the Mother of Drains and Knuckle
+        /// Brannoc, one from the rare Lantern-Eater. Too few for every slot, so the Lowtowns are not in ZoneShorts' every-slot check.</summary>
+        const int LowtownsPieces = 5;
 
         [Test] public void Every_item_file_parses_together()
         {
             var paths = LootTestData.LootPaths();
-            Assert.AreEqual(9, paths.Count, "Nine loot files (loot.sets.json the class sets', 2026-10-15; loot.hallows.json Hallow's Creek's, 2026-10-16): " + string.Join(", ", paths.Select(Path.GetFileName)));
+            Assert.AreEqual(10, paths.Count, "Ten loot files (loot.sets.json the class sets', 2026-10-15; loot.hallows.json Hallow's Creek's, 2026-10-16; loot.lowtowns.json the Lowtowns' elites', Phase 9.1): " + string.Join(", ", paths.Select(Path.GetFileName)));
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
-            Assert.AreEqual(155 + HallowsPieces + ClassPieces, named.Count, "And the class sets' 66 (loot.sets.json), and Hallow's Creek's twenty-three signature pieces (2026-10-16). " + "104 named items (ITEMS_V1.md), the reworked Adit's nineteen (2026-10-14), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), its set of five and The Dead Line's three (web/adit-quests-loot), and the Quiet Miner's cap (D3).");
-            Assert.AreEqual(109 + 17 + 8 + 1 + 13 + 19 + HallowsPieces + ClassPieces, loot.Gear.Count,   // and the Sealed Adit's seventeen, its set of five and The Dead Line's three, the Quiet Miner's cap, and the reworked Adit's nineteen (2026-10-14)
+            Assert.AreEqual(155 + HallowsPieces + LowtownsPieces + ClassPieces, named.Count, "And the class sets' 66 (loot.sets.json), Hallow's Creek's twenty-three signature pieces (2026-10-16) and the Lowtowns' five (Phase 9.1). " + "104 named items (ITEMS_V1.md), the reworked Adit's nineteen (2026-10-14), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), its set of five and The Dead Line's three (web/adit-quests-loot), and the Quiet Miner's cap (D3).");
+            Assert.AreEqual(109 + 17 + 8 + 1 + 13 + 19 + HallowsPieces + LowtownsPieces + ClassPieces, loot.Gear.Count,   // and the Sealed Adit's seventeen, its set of five and The Dead Line's three, the Quiet Miner's cap, and the reworked Adit's nineteen (2026-10-14)
  "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
             Assert.AreEqual(3 + 11, loot.Sets.Count, "Three sets: the Deserter King's Due, the Vigil and the Adit-Runner's Kit; and the eleven class sets.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
-            Assert.AreEqual(94 + HallowsPieces + ClassPieces, named.Count(id => items.Get(id).quality == 3), "And the class sets' 66 rares, and Hallow's Creek's twenty-three. " + "94 rare (45 the Sealed Adit's: the Quiet Miner's cap the 26th, the rework's nineteen signature pieces of 2026-10-14) (the Sentinel's Helm the 49th, 2026-10-07).");
+            Assert.AreEqual(94 + HallowsPieces + LowtownsPieces + ClassPieces, named.Count(id => items.Get(id).quality == 3), "And the class sets' 66 rares, Hallow's Creek's twenty-three and the Lowtowns' five. " + "94 rare (45 the Sealed Adit's: the Quiet Miner's cap the 26th, the rework's nineteen signature pieces of 2026-10-14) (the Sentinel's Helm the 49th, 2026-10-07).");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
         }
 
@@ -173,7 +176,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
                 Assert.AreEqual(gen.level, d.level, d.id + ": required level is the curve level less one.");
             }
-            Assert.AreEqual(155 + HallowsPieces + ClassPieces, n, "23 of Hallow's Creek, 110 of the five zones and the world, 45 of the Sealed Adit, 66 of the class sets");
+            Assert.AreEqual(155 + HallowsPieces + LowtownsPieces + ClassPieces, n, "5 of the Lowtowns, 23 of Hallow's Creek, 110 of the five zones and the world, 45 of the Sealed Adit, 66 of the class sets");
         }
 
         [Test] public void Named_gear_stat_budgets_hold()
@@ -237,7 +240,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(18, counts["quest"], "Eighteen quest rewards (three of them The Dead Line's, side.adit.dead_line).");
             Assert.AreEqual(5, counts["vendor"], "Five vendor pieces.");
             Assert.AreEqual(6, counts["world"], "Six world drops.");
-            Assert.AreEqual(82 + HallowsPieces + ClassPieces, counts["boss"], "Hallow's Creek's 23 signature pieces; the class sets' 66 (each from an Adit boss); 61 signature pieces (37 the Sealed Adit's, the Quiet Miner's cap and the reworked Adit's nineteen among them), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
+            Assert.AreEqual(82 + HallowsPieces + LowtownsPieces + ClassPieces, counts["boss"], "The Lowtowns' five and Hallow's Creek's 23 signature pieces; the class sets' 66 (each from an Adit boss); 61 signature pieces (37 the Sealed Adit's, the Quiet Miner's cap and the reworked Adit's nineteen among them), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
             Assert.AreEqual(44, counts["mob"], "44 from ordinary mobs.");
         }
 

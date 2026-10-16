@@ -247,3 +247,9 @@ loot.hal.pact_captains_breastplate
 loot.hal.pact_captains_sabatons
 loot.hal.the_examiners_sunburst
 loot.hal.the_examiners_seal
+# the Lowtowns' elites (loot.lowtowns.json, Phase 9.1)
+loot.low.outfall_waders_boots
+loot.low.drain_pearl
+loot.low.knuckle_irons
+loot.low.sifters_hook
+loot.low.the_swallowed_lantern

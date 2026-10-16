@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         /// <summary>The Armoury's group for pieces that drop anywhere (world sources), beside the five zones.</summary>
         public const string World = "world";
         /// <summary>The short zone names in loot ids ("loot.oak.") and the zones they stand for.</summary>
-        public static readonly (string shortId, string zone)[] ZoneShorts = { ("oak", "oakhaven"), ("kha", "khaven"), ("pea", "peaks"), ("ash", "ashrim"), ("ver", "verdant"), ("adit", "adit"), ("hal", "hallows") };   // the Sealed Adit (dungeon D6)
+        public static readonly (string shortId, string zone)[] ZoneShorts = { ("oak", "oakhaven"), ("kha", "khaven"), ("pea", "peaks"), ("ash", "ashrim"), ("ver", "verdant"), ("adit", "adit"), ("hal", "hallows"), ("low", "lowtowns") };   // the Sealed Adit (dungeon D6); the Lowtowns' elites' pieces (Phase 9.1)
         /// <summary>The kinds of source in the order the book lists them, and how an unknown piece of each kind is described.</summary>
         public static readonly (string kind, string heading, string unknown)[] Kinds = {
             ("boss", "Bosses", "Dropped by a boss"), ("mob", "Camps", "Dropped in the camps"), ("quest", "Quest rewards", "A quest reward"),

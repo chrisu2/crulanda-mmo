@@ -46,6 +46,26 @@ namespace Crulanda.Tests
             foreach (var m in EliteMoves.All) Assert.NotNull(Lockouts.KindFor(false, false, m.boss), m.mob);
         }
 
+        /// <summary>The zones of Phase 9 lock by their own flags and moves, with no table of their own (the session's LockKindOf): Hallow's
+        /// Creek a dungeon (two days, bosses and elites alike), the Lowtowns' three open-world elites a day (none has a boss's move), the
+        /// Crown none (a city: no camps); and any open-world elite with a boss's move a week.</summary>
+        [Test] public void The_zones_of_phase_nine_lock_by_their_kind()
+        {
+            var zones = new Dictionary<string, ZoneDefinition>();
+            foreach (var f in Directory.GetFiles(Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Zones"), "*.json")) { var z = JsonUtility.FromJson<ZoneDefinition>(File.ReadAllText(f)); zones[z.id] = z; }
+            LockoutKind Kind(ZoneDefinition z, ZoneCamp c) { return Lockouts.KindFor(z, EliteMoves.For(c.mob, false).boss); }
+            var hallows = zones["zone.hallows"]; Assert.IsTrue(hallows.dungeon, "Hallow's Creek is a dungeon");
+            int n = 0; foreach (var c in hallows.camps) if (c != null && c.elite) { n++; Assert.AreSame(Lockouts.Dungeon, Kind(hallows, c), c.mob + ": two days"); }
+            Assert.AreEqual(15, n, "Hallow's Creek's fifteen");
+            var low = zones["zone.lowtowns"]; Assert.IsFalse(low.dungeon || low.raid, "the Lowtowns are open world");
+            n = 0; foreach (var c in low.camps) if (c != null && c.elite) { n++; Assert.AreSame(Lockouts.WorldElite, Kind(low, c), c.mob + ": a day"); }
+            Assert.AreEqual(3, n, "the Mother of Drains, Knuckle Brannoc and the Lantern-Eater");
+            Assert.IsEmpty(zones["zone.crown"].camps, "the Crown: nothing to lock");
+            foreach (var z in zones.Values)
+                if (!z.dungeon && !z.raid)
+                    foreach (var c in z.camps) if (c != null && c.elite && EliteMoves.For(c.mob, false).boss) Assert.AreSame(Lockouts.WorldBoss, Kind(z, c), c.mob + ": an open-world boss, a week");
+        }
+
         [Test] public void Keys_are_the_camps()
         {
             Assert.AreEqual("mob.captain.peaks.3", Lockouts.KeyOf("mob.captain.peaks.3.0"), "the camp's elite, as the deeds count it");

@@ -188,3 +188,5 @@ of the zone's grass, topiary, small trees, rose arches, stone benches, urns. No 
 CrownZonePlayTests (the new detail test), then the Crown tour's gate, stair and garden frames for Chris.
 
 **Chris, 2026-10-16 (verbatim, screenshots of a street and the Gilt Gate's north wall): "plants not even on the wall.only a few plants. inn does look better".** The ivy remade as dense mats set on the wall's real face, leaves flat on the stone, about twice as many clumps.
+
+**Chris, 2026-10-16 (verbatim): "still sparse looking"** (the ivy made sheets, 74 fps at noon) **and "the signs in the castle need to be improved. the font on the building bleeds into the rock"** (each sign on a dark oak plaque with a gilt frame, the letters bright gilt in front). The Crafters' Court went to a helper (p9-court).

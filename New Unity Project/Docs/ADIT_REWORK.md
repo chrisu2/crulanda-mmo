@@ -11,6 +11,8 @@ dungeon's lockout is two real days (not one): the dungeon queue (a finder: pick 
 damage places by role, the party is taken to the door, the dungeon fresh for the run) gives its bosses' loot once every two days per
 character; queued again inside the lockout the run goes but the bosses drop no loot (PROVISIONAL: or the queue is shut until it
 resets). Open-world elites: once a real day.
+**Chris, 2026-10-15 ~23:55 (verbatim): "open world boss is once per week".** So an open-world boss (a world boss; a named boss camp out
+of a dungeon) is once a real week per character; open-world elites stay once a real day; dungeons two days.
 
 ## Chris's words (2026-10-14, verbatim)
 "what are the three new dungeons? you should have the build guide on levels. i think adit dungeon need to be more complex like wow's

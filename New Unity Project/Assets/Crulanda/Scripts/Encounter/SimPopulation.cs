@@ -31,6 +31,8 @@ namespace Crulanda.Encounter
             bool testRun = Application.isEditor && (Application.isBatchMode || System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-runTests") >= 0);
             Lively = LifeOverride ?? !(testRun || EncounterCapture.Requested && !LifeCapture.Requested);   // the life capture watches them live
             World = SimRoster.LoadOrCreate(root);
+            // The Exchange ran on while you were away (the real time since the world was saved, as world-hours, two days at most).
+            if (Lively) Exchange.CatchUp(World, System.DateTime.UtcNow, WorldClock.Hour, Session.Items); else Exchange.Ensure(World).clockAt = WorldClock.Hour;
             gameObject.AddComponent<SimChatter>().Init(this);   // the sims talking (zone chat, playtest note 62)
             Refresh();
             RestoreParty(World.party);
@@ -141,6 +143,7 @@ namespace Crulanda.Encounter
             string zone = ZoneId; if (zone == null || World == null) return;
             float hour = WorldClock.Hour;
             if (Lively) foreach (var s in World.sims) if (s.zone != zone && s.IsOnlineAt(hour)) { LiveAway(s, hour, Session.Items, Session.Professions?.Db); TickAway(s, hour); }
+            if (Lively) Exchange.Follow(World, hour, Session.Items);   // the capital's market keeps the world clock wherever you are (Exchange.cs)
             foreach (var s in World.sims)
             {
                 bool here = s.zone == zone && s.IsOnlineAt(hour) && !Session.InParty(s.id);   // one in your party is with you, not standing about
@@ -156,6 +159,7 @@ namespace Crulanda.Encounter
             foreach (var f in Figures) if (f != null) { f.sim.x = f.transform.position.x; f.sim.z = f.transform.position.z; }
             foreach (var c in Session.PartySims) if (c != null) { c.sim.x = c.transform.position.x; c.sim.z = c.transform.position.z; }
             World.party.Clear(); foreach (var c in Session.PartySims) if (c != null) World.party.Add(c.sim.id);   // the party, kept (round 27)
+            Exchange.Stamp(World, System.DateTime.UtcNow);   // so the next start knows how long you were away
             try { SimRoster.Save(Root, World); } catch (System.Exception e) { Debug.LogWarning("World save failed: " + e.Message); }
         }
         /// <summary>A place to stand in this zone: near one of its named places (a landmark), on the NavMesh.</summary>

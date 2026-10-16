@@ -198,3 +198,39 @@ drops blanks and repeats):
 - `spiritStones`: `List<string>`, the spirit stones touched, by `ZoneInteractable.Key` (`zone.adit|The Gallery's spirit stone|x|z`):
   `RecoveryPoint` in that zone is beside the stone.
 - Not saved: the platform gate (shut again on every visit) and a keg of powder in hand.
+
+## The profile slot, format 2 (2026-10-15, p9-exchange): the Treasury Vault
+File: the same root, slot "profile" (profile.save.json, .bak kept), payloadType CrulandaProfile. `CharacterProfile.FormatVersion = 2`.
+- Format 1 was `lastClass` alone (which character opens). Format 2 adds the Treasury Vault, shared by every character (Chris,
+  2026-10-15: "Shared by all (Recommended)"): `vault`, `List<ItemStack>` (the list index is the slot, an empty stack an empty slot;
+  48 slots, 12 more for each row bought) and `vaultRows`, the rows of 12 bought past the first four (0-4).
+- Migration 1 → 2 is `AddVaultMigration` (SaveMigrator, in `CharacterProfile.cs`): it inserts `"vault":[]` and `"vaultRows":0` before
+  the payload's closing brace and leaves every other character as it was (so `lastClass` comes through). A field already there is
+  left alone; a payload that is not a JSON object is refused. A format-1 profile, or none, opens an empty vault of 48; the file is
+  written as format 2 on the next vault change or character choice.
+- On read: a negative stack count or `vaultRows` outside 0-4 refuses the profile ("Invalid vault data."). A profile that is there but
+  unreadable, or newer than this build, opens no vault and is never written over by it (`LoadVault` null, `SaveVault` false); the
+  character choice reads as before.
+- `CharacterProfile.Remember` (choosing a character) now reads the profile and keeps the vault; before, it wrote `lastClass` alone.
+- Writes: the vault is written to the profile first, then the character is saved, after each deposit, withdrawal or row bought (a
+  crash between leaves the item in both, never in neither). Nothing is done in a fight, or with saving off.
+- An older build reads `lastClass` from a format-2 profile, but its next character choice writes format 1 without the vault: do not
+  run an older build against a profile that holds a vault.
+
+## The world slot, format 2 (2026-10-15, p9-exchange): the Exchange
+`WorldSave.FormatVersion = 2`. One new field at the end, `exchange` (`ExchangeState`, Exchange.cs):
+- `listings`: the lots up (id, item, count, seller (a sim id, "" yours), sellerName, owner (your character's class id), buyout for the
+  lot, startBid (0 buyout only), bid, bidder (a sim id, or "you:" and a class id), bidderName, deposit, listedAt, endsAt).
+- `parcels`: what waits at the clerk for a character (owner by class id, coin, item, count, note): sale coin with the deposit back,
+  bids given back, lots won, lots taken down or unsold.
+- `history`: the last 60 lines of what happened to your lots and bids (owner, line, at).
+- The Exchange's own clock: `hours` (world-hours since it opened, only rising; `endsAt` counts in them), `tickedTo` (the last whole
+  hour run), `clockAt` (the world-clock hour last seen) and `realUtc` (real time at the last world save: the next start runs the time
+  away at 36 world-hours a real hour, 48 at most). `nextId` numbers the lots.
+- Migration 1 → 2 is `AddExchangeMigration` (in `SimAdventurers.cs`), run by `SimRoster.Load`: it inserts `"exchange":{}` before the
+  closing brace and leaves every other character (the sims, the party, the guilds) as it was; `Exchange.Ensure` fills the empty lists.
+  A payload that already has it is left alone; one that is not a JSON object is refused.
+- An older build refuses a format-2 world ("Unsupported world save") and, as `LoadOrCreate` does with any unreadable world, makes a
+  new one and writes it (the format-2 world survives one save as world.save.json.bak). Do not run an older build after this one.
+- Back up the whole `CrulandaEncounter` folder (every character save, `profile.save.json`, `world.save.json` and their `.bak` files)
+  to `work\save-backups\<date>-pre-p9-exchange` before the first run of this build. The character format (10) is unchanged.

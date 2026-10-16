@@ -362,6 +362,7 @@ namespace Crulanda.Encounter
                 if (whole > 0) { foodCarry -= whole; Player.Health.ApplyHealing(whole); }
             }
             if (VendorNpc != null && Vector3.Distance(Player.transform.position, vendorAt) > 6) CloseVendor();   // walked away
+            TickCapital();   // the vault's or the Exchange's counter, the same
         }
         public float PotionCooldown { get { return Mathf.Max(0, potionReadyAt - Time.time); } }
         // Merchants.
@@ -379,6 +380,7 @@ namespace Crulanda.Encounter
             VendorStock = stock;
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
+            CloseCapital();   // one counter at a time
             if (VendorNpc == null) bagsForShop = !InventoryOpen;
             VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
             if (Charm.Haggle(Progress, VendorNpc)) Message("You haggle with " + VendorNpc + ": a further twentieth off what you buy here today.");   // the Scoundrel (Charm.cs)
@@ -408,7 +410,7 @@ namespace Crulanda.Encounter
             if (s == null || Items == null) return false;
             if (Player != null && Vector3.Distance(Player.transform.position, at) > 6) { Message(s.name + " is too far away to trade with."); return false; }
             if (SimMemory.Refuses(s)) { Message(s.name + " won't trade with you."); return false; }
-            CloseVendor(); bagsForShop = !InventoryOpen; VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
+            CloseVendor(); CloseCapital(); bagsForShop = !InventoryOpen; VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
             VendorStock = new List<string>(); foreach (var id in s.goodIds) if (Items.Get(id) != null) VendorStock.Add(id);
             if (VendorStock.Count == 0) Message(s.name + " has nothing to sell just now, but will buy (" + s.coin + " crowns on them).");
             return true;
@@ -534,7 +536,7 @@ namespace Crulanda.Encounter
         {
             if (open && Professions == null) { Message("You have no trade to speak of yet."); return; }
             TradesOpen = open;
-            if (open) { CharacterOpen = false; CloseVendor(); InventoryOpen = true; }
+            if (open) { CharacterOpen = false; CloseVendor(); CloseCapital(); InventoryOpen = true; }
         }
         /// <summary>A trade bag used from the bags: worn for good, its slots added under the bags' 24, or refused and kept ("You already carry one.").</summary>
         bool WearBag(int bagIndex)
@@ -1349,6 +1351,7 @@ namespace Crulanda.Encounter
             else if (LootOpen && !Paused) CloseLoot();
             else if (Conversation != null && !Paused) Conversation = null;
             else if (Hall != null && !Paused) Hall = null;
+            else if ((BankOpen || ExchangeOpen) && !Paused) CloseCapital();
             else if (VendorNpc != null && !Paused) CloseVendor();
             else if (TradesOpen && !Paused) TradesOpen = false;
             else if (WhoOpen && !Paused) WhoOpen = false;
@@ -2134,6 +2137,7 @@ namespace Crulanda.Encounter
                 NoteMet(talkTo.Name);   // the book of lore's People
                 if (QuestTalk(talkTo.Name, talkTo.transform.position)) talkTo.FacePlayer();
                 else if (HallTalk(talkTo)) talkTo.FacePlayer();   // the capital's halls: the audience, the Archive, a guild, a trainer (EncounterSession.Halls)
+                else if (CapitalTalk(talkTo)) { }   // the Treasury's banker, the Exchange's auctioneer (EncounterSession.Capital.cs)
                 else if (IsVendor(talkTo)) { OpenVendor(talkTo); talkTo.FacePlayer(); }
                 else VillageLife.Active.Talk(talkTo);
                 return;

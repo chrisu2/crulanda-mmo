@@ -362,5 +362,20 @@ namespace Crulanda.Tests
             foreach (var word in new[] { "gondola", " lift", "elevator", "engine", "gear-", "winch", "pulley", "auction house", "stormwind", "ironforge", "orgrimmar" })
                 Assert.IsFalse(text.Contains(word), "No '" + word.Trim() + "' in the Crown (no machines, Chris 2026-10-11; no World of Warcraft names).");
         }
+
+        /// <summary>The gardens (ZoneBuilder.CrownDetail, Chris 2026-10-16: "we need a real garden"): a lawn in each quarter of a big
+        /// enough one, where the zone's grass grows though the terrace is paved; never on the walks, the cross walks or the hedge.</summary>
+        [Test] public void The_gardens_have_lawns_off_their_walks()
+        {
+            var gardens = crown.props.Where(p => p != null && p.kind == "parterre").ToList();
+            Assert.GreaterOrEqual(gardens.Count, 4, "The Crown's gardens.");
+            foreach (var g in gardens)
+            {
+                var size = g.size.x > 0 ? g.size : new Vector2(12, 8);
+                foreach (var walk in new[] { Vector2.zero, new Vector2(0, size.y / 2 - .3f), new Vector2(size.x / 2 - .3f, 0), new Vector2(.5f, size.y / 4), new Vector2(size.x / 4, .5f), new Vector2(size.x / 2 - 1.1f, size.y / 4), new Vector2(size.x / 4, size.y / 2 - 1.1f) })
+                    Assert.IsFalse(ZoneBuilder.InGardenLawn(size, walk), g.name + ": no lawn on its walks or its hedge, at " + walk + ".");
+            }
+            Assert.GreaterOrEqual(gardens.Count(g => ZoneBuilder.InGardenLawn(g.size, g.size / 4)), 3, "Lawns in the bigger gardens.");
+        }
     }
 }

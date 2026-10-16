@@ -59,6 +59,7 @@ namespace Crulanda.World
         bool Paved(Vector2 p)
         {
             if (Zone.terraces == null) return false;
+            if (GardenLawn(p)) return false;   // a garden's lawn: the grass grows there (ZoneBuilder.CrownDetail)
             foreach (var t in Zone.terraces)
             {
                 if (t == null || !t.paved) continue;
@@ -91,6 +92,7 @@ namespace Crulanda.World
                 var pts = Densify(r.points, 1.25f);
                 MeshPart(ZoneMeshes.Ribbon(pts, r.width, q => HeightAt(q.x, q.y) + .07f), root, Vector3.zero, WayStone).name = "Paving " + r.name;
             }
+            BuildCrownDetail();   // the ivy, the weathering and the ironwork over it all (ZoneBuilder.CrownDetail)
         }
         Mesh PavingMesh(ZoneTerrace t)
         {
@@ -167,7 +169,7 @@ namespace Crulanda.World
                 case "statue": Statue(t, p.variant); return true;
                 case "city_lamp": CityLamp(t); return true;
                 case "council_banner": CouncilBannerPole(t, p.size.y > 0 ? p.size.y : 7); return true;
-                case "parterre": Parterre(t, p.size.x > 0 ? p.size : new Vector2(12, 8)); return true;
+                case "parterre": Garden(t, p.size.x > 0 ? p.size : new Vector2(12, 8)); return true;   // a real garden (ZoneBuilder.CrownDetail)
                 case "stair": Stair(t, p.size.x > 0 ? p.size : new Vector2(10, 20)); return true;
                 case "city_wall": CityWall(t, p.points, p.variant, p.size.x > 0 ? p.size.x : 40); return true;
                 case "city_gate": CityGate(t, p.size.x > 0 ? p.size.x : 6, p.variant == 1); return true;

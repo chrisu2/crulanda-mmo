@@ -178,6 +178,26 @@ namespace Crulanda.Encounter
             Message(line ?? "Nothing waits for you."); if (line != null) Save(false);
         }
 
+        /// <summary>
+        /// The Exchange's news for this character (Exchange.TakeNotices: a lot sold, run out, outbid on, won), told once: in play each as a
+        /// message as it happens (SimPopulation.Refresh); on login (<paramref name="away"/>) what happened while you were away, line by line
+        /// when there are three or fewer, else counted up. Whatever waits is at the Exchange's clerk.
+        /// </summary>
+        public void ExchangeNotices(bool away)
+        {
+            var w = ExchangeWorld; if (w == null || Progress == null) return;
+            var lines = Exchange.TakeNotices(Exchange.Ensure(w), Progress.classId); if (lines.Count == 0) return;
+            if (!away || lines.Count <= 3) { foreach (var l in lines) Message((away ? "While you were away, the Exchange: " : "The Exchange: ") + l); return; }
+            int sold = 0, unsold = 0, outbid = 0, won = 0;
+            foreach (var l in lines) { if (l.StartsWith("Sold")) sold++; else if (l.StartsWith("Outbid")) outbid++; else if (l.StartsWith("Won")) won++; else unsold++; }
+            var parts = new List<string>();
+            if (sold > 0) parts.Add(sold + (sold == 1 ? " lot sold" : " lots sold"));
+            if (unsold > 0) parts.Add(unsold + (unsold == 1 ? " lot ran out unsold" : " lots ran out unsold"));
+            if (outbid > 0) parts.Add("outbid " + (outbid == 1 ? "once" : outbid + " times"));
+            if (won > 0) parts.Add(won + (won == 1 ? " lot won" : " lots won"));
+            Message("While you were away, the Exchange: " + string.Join(", ", parts) + ". It all waits at the clerk in the Crown (My lots has the details).");
+        }
+
         // ---------- tester's commands (ZoneChat) ----------
         /// <summary>/bank: the vault's window where you stand (to try it before the castle's clerk is placed).</summary>
         void TesterBank() { if (Player != null && OpenBank("The Treasury Vault", Player.transform.position)) Message("Testing: the Treasury Vault: your own vault, and a shared shelf of 3 for all your characters. Walk off or Esc to close."); }

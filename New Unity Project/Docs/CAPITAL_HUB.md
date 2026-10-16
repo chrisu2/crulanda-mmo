@@ -227,3 +227,18 @@ profession tools/small huts/vendored items".** The Crafters' Court gets a worksh
 with each craft's tools and stock (a smith's forge, anvil, quench tub and racks; the leatherworker's stretching frames and hides; the
 weaver's loom, spindles and bolts; the herbalist's drying racks and jars; the cook's hearth and pots; the miner's and woodcutter's tool
 racks), and vendors selling each trade's tools and materials.
+## Status (p9-exchange2, 2026-10-16; written and compile-checked, NOT yet run in Unity)
+Chris (verbatim): "is the auction house fully functional?", then "id rather it be finished before testing". The Exchange finished:
+- **Your own bid:** Browse has a bid box on each lot, filled with the least next bid; refused under it or over your coin; at the buyout it buys outright.
+- **Sims buy gear:** your piece (or another sim's) goes to a sim it fits (its class's weight: mail, leather or cloth; a blade and shield
+  only for Warriors and Paladins; its level) and betters in that slot, at a fair price for its purse; it then wears it (seen on its figure),
+  the old piece a spare it may list.
+- **Sims trade among themselves:** they buy the makings their craft's recipes take, what their pack for the bosses lacks (so a sim stocks
+  its buff-up from the Exchange) and gear upgrades, at no more than a quarter over fair; an unsold lot goes up again 15% cheaper (three
+  times at most, never under the stall's price); their lots stay between 60 and 120.
+- **Crafted goods:** sims list spare leather and cloth pieces, dishes (hunters now cook their meat at the hearth), simples and draughts,
+  and leaves they turn up hunting (never their pack).
+- **Notices and prices:** a message when your lot sells, runs out or you are outbid or win (and on login, for the time away); "last sold"
+  per item (three an item, 150 in all) in Browse and when listing ("Fair: about N; last sold for M").
+- The world save's format is unchanged (only fields added that read as empty from an older world).
+To run: EditMode `ExchangeTests`, `SimEconomyTests`, `BuffUpRulesTests`; PlayMode `ExchangeLiveTests`.

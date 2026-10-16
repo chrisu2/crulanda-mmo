@@ -13,7 +13,9 @@ namespace Crulanda.Encounter
     /// (wornSlots/wornIds), or keeps a spare it already wears better to sell to you (never at the stall); a brewer or cook sells what
     /// it makes; and coin buys better gear (gearBonus raises the quality of what SimGear makes). The merchant sells charcoal, vials,
     /// fleeces and salt. Found recipes (a leaf's) are the player's: the sims make only what their skill teaches. Each keeps a pack of food
-    /// and simples for the bosses, made or bought (Stock, Kept; BossBuffs), eaten and drunk at the buff-up before a boss.
+    /// and simples for the bosses, made or bought (Stock, Kept; BossBuffs), eaten and drunk at the buff-up before a boss. The Exchange
+    /// (p9-exchange2): the meat of a hunt is cooked at the hearth (Cook), a leaf turns up now and then (LeafFor; never learned, never sold
+    /// at the stall), and a piece bought there is put on (PutOn), the old one kept as a spare to sell.
     /// </summary>
     public static class SimEconomy
     {
@@ -38,17 +40,20 @@ namespace Crulanda.Encounter
             s.goodCounts[i] += n; if (s.goodCounts[i] <= 0) { s.goodIds.RemoveAt(i); s.goodCounts.RemoveAt(i); }
         }
         public static int GoodsCount(SimAdventurer s) { int n = 0; foreach (var c in s.goodCounts) n += c; return n; }
-        /// <summary>Its goods less its pack for the bosses (<see cref="Kept"/>): what sends it to the stall.</summary>
-        public static int SellableCount(SimAdventurer s, ItemDatabase items) { int n = 0; for (int i = 0; i < s.goodIds.Count; i++) n += Mathf.Max(0, s.goodCounts[i] - Kept(s, items, s.goodIds[i])); return n; }
+        /// <summary>Its goods less its pack for the bosses (<see cref="Kept"/>) and any leaves it found (kept for the Exchange): what sends it to the stall.</summary>
+        public static int SellableCount(SimAdventurer s, ItemDatabase items) { int n = 0; for (int i = 0; i < s.goodIds.Count; i++) if (!IsLeaf(items?.Get(s.goodIds[i]))) n += Mathf.Max(0, s.goodCounts[i] - Kept(s, items, s.goodIds[i])); return n; }
+        /// <summary>A found recipe's leaf (kind "recipe"): a sim never learns one (found recipes are the player's), so every leaf it finds is a spare for the Exchange.</summary>
+        public static bool IsLeaf(ItemDef d) { return d != null && d.kind == "recipe"; }
         public static int Value(ItemDatabase items, string id) { var d = items?.Get(id); return d != null && d.value > 0 ? d.value : 1; }
-        /// <summary>Sells everything it carries (materials, potions and food, never gear: a spare piece is kept for trading with you) for the items' values;
-        /// its pack for the bosses (<see cref="Kept"/>: a dish, an elixir, a draught, a feast) is kept too.</summary>
+        /// <summary>Sells everything it carries (materials, potions and food, never gear: a spare piece is kept for trading with you and the Exchange,
+        /// nor a leaf: that is for the Exchange too) for the items' values; its pack for the bosses (<see cref="Kept"/>: a dish, an elixir, a draught,
+        /// a feast) is kept too.</summary>
         public static int SellAll(SimAdventurer s, ItemDatabase items)
         {
             int coin = 0;
             for (int i = s.goodIds.Count - 1; i >= 0; i--)
             {
-                var d = items?.Get(s.goodIds[i]); if (d != null && d.kind == "gear") continue;
+                var d = items?.Get(s.goodIds[i]); if (d != null && (d.kind == "gear" || IsLeaf(d))) continue;
                 int keep = Mathf.Min(s.goodCounts[i], Kept(s, items, s.goodIds[i])), sell = s.goodCounts[i] - keep;
                 coin += Value(items, s.goodIds[i]) * sell;
                 if (keep > 0) s.goodCounts[i] = keep; else { s.goodIds.RemoveAt(i); s.goodCounts.RemoveAt(i); }
@@ -156,6 +161,16 @@ namespace Crulanda.Encounter
             else Add(s, r.output, Mathf.Max(1, r.count));
             return r.output;
         }
+        /// <summary>Puts on a piece it bought on the Exchange (or won): worn in its slot; the piece it made or bought before for that slot goes
+        /// in its goods as a spare to sell (while it holds fewer than <see cref="MaxSpares"/>), else to the stall for its value.</summary>
+        public static void PutOn(SimAdventurer s, ItemDef d, ItemDatabase items)
+        {
+            if (s == null || d == null || d.kind != "gear") return;
+            var old = Worn(s, d.slot);
+            Wear(s, d.slot, d.id);
+            if (old == null || old == d.id || items?.Get(old) == null) return;
+            if (Spares(s, items) < MaxSpares) Add(s, old, 1); else s.coin += Value(items, old);
+        }
         public static string Worn(SimAdventurer s, string slot) { int i = s.wornSlots.IndexOf(slot); return i < 0 ? null : s.wornIds[i]; }
         public static void Wear(SimAdventurer s, string slot, string id)
         {
@@ -183,6 +198,47 @@ namespace Crulanda.Encounter
                 foreach (var e in t.entries) if (e != null && Inventory.IsHide(items.Get(e.item))) return e.item;
             }
             return null;
+        }
+        /// <summary>The meat a hunting sim brings home from an hour away (SimPopulation.LiveAway), by its level's beasts: boar, wolf, bear, hound, venison.</summary>
+        public static string MeatFor(int level) { return level <= 5 ? "junk.boar_meat" : level <= 9 ? "mat.wolf_haunch" : level <= 12 ? "mat.bear_haunch" : level <= 13 ? "mat.hound_flank" : "mat.venison"; }
+        /// <summary>What the inn sells a cook at its value: flour and salt.</summary>
+        public static bool CookBuys(string item) { return item == "mat.flour" || item == "mat.salt"; }
+        /// <summary>
+        /// Cooks a dish at the inn's hearth from the meat it brought home (any sim: a cook's fire needs no trade): the hardest taught cooking
+        /// recipe within its skill whose makings it has (flour and salt bought at the inn as needed, while its coin lasts). The dish goes in its
+        /// goods: its pack's dish first (<see cref="Kept"/>), the rest to sell at the stall or on the Exchange. The dish's id, or null.
+        /// </summary>
+        public static string Cook(SimAdventurer s, ProfessionDatabase db, ItemDatabase items)
+        {
+            if (s == null || db == null) return null;
+            RecipeDef best = null; int skill = Skill(s);
+            foreach (var r in db.Recipes)
+            {
+                if (r.profession != "cooking" || r.found || r.skill > skill || items?.Get(r.output) == null) continue;
+                bool ok = true; int buy = 0;
+                foreach (var i in r.inputs) { int have = Count(s, i.item); if (have >= i.count) continue; if (CookBuys(i.item)) buy += (i.count - have) * Value(items, i.item); else { ok = false; break; } }
+                if (!ok || buy > s.coin) continue;
+                if (best == null || r.skill > best.skill) best = r;
+            }
+            if (best == null) return null;
+            foreach (var i in best.inputs) { int have = Count(s, i.item); if (have < i.count) s.coin -= (i.count - have) * Value(items, i.item); Add(s, i.item, -Mathf.Min(have, i.count)); }
+            Add(s, best.output, Mathf.Max(1, best.count));
+            return best.output;
+        }
+        /// <summary>A leaf a hunting sim turns up now and then (from the bosses and caches it beats away from you): one whose recipe is within a
+        /// skill of its level's, picked by <paramref name="pick"/>. Null when the leaves are not loaded.</summary>
+        public static string LeafFor(int level, ProfessionDatabase db, ItemDatabase items, int pick)
+        {
+            if (db == null || items == null) return null;
+            var found = new List<string>(); int skill = 8 * Mathf.Max(1, level) + 10;
+            foreach (var d in items.Items.Values)
+            {
+                if (!IsLeaf(d) || string.IsNullOrEmpty(d.teaches)) continue;
+                var r = db.Recipes.Find(x => x.id == d.teaches); if (r != null && r.skill <= skill) found.Add(d.id);
+            }
+            if (found.Count == 0) return null;
+            found.Sort(string.CompareOrdinal);
+            return found[Mathf.Abs(pick) % found.Count];
         }
         /// <summary>The hide a leatherworker sim brings home from an hour's hunting away (SimPopulation.LiveAway), by its level's beasts.</summary>
         public static string HideFor(int level) { return level <= 5 ? "hide.boar" : level <= 9 ? "junk.wolf_pelt" : level <= 12 ? "hide.bear" : level <= 13 ? "junk.ash_hide" : "junk.moss_hide"; }

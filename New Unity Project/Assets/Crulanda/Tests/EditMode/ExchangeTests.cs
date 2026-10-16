@@ -11,7 +11,9 @@ namespace Crulanda.Tests
 {
     /// <summary>The Exchange (CAPITAL_HUB.md; Exchange.cs, world format 2): listing and its deposit, the sims buying fair lots and
     /// leaving silly ones, expiry, bids and being outbid, collecting at the clerk, the hours run while away, the sims' own lots, the
-    /// world save's round trip and its migration from format 1.</summary>
+    /// world save's round trip and its migration from format 1; and (p9-exchange2) typed bids, gear bought by a sim it fits and
+    /// worn, the sims trading among themselves, their lots bounded and put up again cheaper, their crafted goods and leaves listed,
+    /// the notices, and the last-sold prices.</summary>
     public class ExchangeTests
     {
         const string QuestItemFile = "{\"items\":[{\"id\":\"quest.sealed_letter\",\"name\":\"Sealed Letter\",\"kind\":\"quest\",\"quality\":1}]}";
@@ -222,7 +224,7 @@ namespace Crulanda.Tests
             foreach (var l in lots)
             {
                 Assert.AreEqual("mat.copper_ore", l.item); Assert.LessOrEqual(l.count, 20, "a stack at most");
-                float perOne = l.buyout / (float)l.count; Assert.GreaterOrEqual(perOne, 2 * .85f); Assert.LessOrEqual(perOne, 2 * 1.2f, "value 1 x common's markup of 2, give or take");
+                float perOne = l.buyout / (float)l.count; Assert.GreaterOrEqual(perOne, 2 * .85f * Math.Pow(Exchange.RelistCut, l.relisted) - .05f, "less each time it went up again"); Assert.LessOrEqual(perOne, 2 * 1.2f, "value 1 x common's markup of 2, give or take");
                 Assert.Less(l.startBid, l.buyout);
             }
             int listed = lots.Sum(l => l.count), held = w.sims.Sum(s => SimEconomy.Count(s, "mat.copper_ore"));
@@ -241,6 +243,7 @@ namespace Crulanda.Tests
                 var w = SimRoster.LoadOrCreate(root); var p = Character("class.warrior", 100); Inventory.Add(p, Db(), "potion.minor", 4);
                 var l = Exchange.List(w, p, Db(), 0, 50, 12, 48, out var why); Assert.NotNull(l, why);
                 w.exchange.parcels.Add(new ExchangeParcel { owner = "class.mage", coin = 7, note = "Sold" });
+                l.relisted = 2; w.exchange.history.Add(new ExchangeRecord { owner = "class.warrior", line = "Sold.", fresh = true }); w.exchange.sales.Add(new ExchangeSale { item = "potion.minor", each = 6, at = 1 });
                 w.exchange.hours = 3.5f; w.exchange.tickedTo = 3; Exchange.Stamp(w, new DateTime(2026, 10, 15, 21, 0, 0, DateTimeKind.Utc));
                 SimRoster.Save(root, w);
                 Assert.IsTrue(new SaveFileStore(root).TryRead("world", out var env, out _)); Assert.AreEqual(2, env.formatVersion); Assert.AreEqual(WorldSave.FormatVersion, env.formatVersion);
@@ -250,6 +253,8 @@ namespace Crulanda.Tests
                 Assert.AreEqual("class.warrior", bl.owner); Assert.AreEqual(l.endsAt, bl.endsAt, 1e-4f);
                 Assert.AreEqual(w.exchange.hours, back.exchange.hours, 1e-4f); Assert.AreEqual(w.exchange.nextId, back.exchange.nextId); Assert.AreEqual(w.exchange.realUtc, back.exchange.realUtc);
                 Assert.AreEqual(7, Exchange.Waiting(back.exchange, "class.mage").Single().coin);
+                Assert.AreEqual(1, back.exchange.history.Count(r => r.fresh), "a notice not yet told stays news"); Assert.AreEqual(2, bl.relisted);
+                Assert.AreEqual(6, Exchange.LastSold(back.exchange, "potion.minor"), "the last-sold prices are kept");
             }
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
         }
@@ -277,6 +282,209 @@ namespace Crulanda.Tests
                 Assert.IsNull(SimRoster.Load(root, out msg));
             }
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+        }
+    
+
+        // ---------- p9-exchange2: finished (Chris, 2026-10-16: "id rather it be finished before testing") ----------
+        static ProfessionDatabase trades;
+        static ProfessionDatabase Trades() { return trades ?? (trades = ProfessionDatabase.Parse(new[] { File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Professions", "professions.json")) }, Db())); }
+        static SimAdventurer Sim(WorldSave w, int i, string classId, int level, int coin = 500)
+        {
+            var s = w.sims[i]; s.classId = classId; s.level = level; s.coin = coin; return s;
+        }
+
+        [Test] public void A_typed_bid_is_refused_under_the_least_bid_or_over_your_coin_and_buys_at_the_buyout()
+        {
+            var w = World(online: 0); var p = Character("class.warrior", 120);
+            var l = SimLot(w, "potion.minor", 5, 200, 20);
+            Assert.IsFalse(Exchange.Bid(w, p, Db(), l.id, 19, out var why), "under the starting bid"); StringAssert.Contains("20 crowns", why);
+            Assert.IsFalse(Exchange.Bid(w, p, Db(), l.id, 150, out why), "more than your coin"); StringAssert.StartsWith("You need", why); Assert.AreEqual(120, p.gold);
+            Assert.IsTrue(Exchange.Bid(w, p, Db(), l.id, 57, out why), why); Assert.AreEqual(57, l.bid, "the amount typed, not the least"); Assert.AreEqual(63, p.gold);
+            Assert.AreEqual(59, Exchange.MinBid(l), "a twentieth over 57");
+            var mage = Character("class.mage", 300);
+            Assert.IsFalse(Exchange.Bid(w, mage, Db(), l.id, 58, out why), "under the least next bid");
+            Assert.IsTrue(Exchange.Bid(w, mage, Db(), l.id, 250, out why), "at or over the buyout it buys outright: " + why);
+            Assert.AreEqual(100, mage.gold, "for the buyout, not the 250 typed"); Assert.AreEqual(5, Inventory.Count(mage, "potion.minor")); Assert.IsFalse(w.exchange.listings.Contains(l));
+            Assert.AreEqual(57, Exchange.Waiting(w.exchange, "class.warrior").Single().coin, "the warrior's bid came back");
+            // A buyout-only lot takes no bid under the buyout, and a typed buyout buys it.
+            var only = SimLot(w, "potion.minor", 2, 30, 0); var rich = Character("class.cleric", 100);
+            Assert.IsFalse(Exchange.Bid(w, rich, Db(), only.id, 20, out why)); Assert.IsTrue(Exchange.Bid(w, rich, Db(), only.id, 30, out why), why); Assert.AreEqual(70, rich.gold);
+        }
+
+        [Test] public void Gear_fits_a_sim_by_class_weight_level_and_slot()
+        {
+            var w = World(); var warrior = Sim(w, 0, "class.warrior", 10); var mage = Sim(w, 1, "class.mage", 10); var ranger = Sim(w, 2, "class.ranger", 10); var young = Sim(w, 3, "class.warrior", 2);
+            var hauberk = Db().Get("craft.bogiron_hauberk"); var robe = Db().Get("craft.bogiron_wool_robe"); var jerkin = Db().Get("craft.bogiron_hide_jerkin");
+            Assert.IsTrue(SimGear.Fits(warrior, hauberk, Trades()), "mail for the mail classes"); Assert.IsFalse(SimGear.Fits(mage, hauberk, Trades())); Assert.IsFalse(SimGear.Fits(young, hauberk, Trades()), "level 8: not at 2");
+            Assert.IsTrue(SimGear.Fits(mage, robe, Trades()), "cloth for the cloth classes"); Assert.IsFalse(SimGear.Fits(warrior, robe, Trades()));
+            Assert.IsTrue(SimGear.Fits(ranger, jerkin, Trades()), "leather for the leather classes"); Assert.IsFalse(SimGear.Fits(mage, jerkin, Trades()));
+            Assert.IsTrue(SimGear.Fits(mage, Db().Get("craft.bogiron_torc"), Trades()), "a neck piece is anyone's");
+            Assert.IsTrue(SimGear.Fits(warrior, Db().Get("craft.bogiron_hatchet"), Trades()), "a hatchet for the Warrior");
+            Assert.IsFalse(SimGear.Fits(warrior, Db().Get("craft.bogiron_bow"), Trades()), "no bow: the Warrior's is a blade");
+            Assert.IsFalse(SimGear.Fits(ranger, Db().Get("craft.bogiron_hatchet"), Trades()), "the others keep their own weapons");
+            // An upgrade beats what it wears in the slot.
+            SimEconomy.Wear(warrior, "chest", "craft.copper_jerkin");
+            Assert.AreEqual("craft.copper_jerkin", SimGear.InSlot(warrior, "chest", Db()));
+            Assert.IsTrue(SimGear.IsUpgrade(warrior, hauberk, Db(), Trades())); Assert.IsFalse(SimGear.IsUpgrade(warrior, Db().Get("craft.copper_jerkin"), Db(), Trades()), "not what it wears");
+            SimEconomy.Wear(warrior, "chest", "craft.bogiron_hauberk"); Assert.IsFalse(SimGear.IsUpgrade(warrior, Db().Get("craft.copper_jerkin"), Db(), Trades()), "not a step down");
+        }
+
+        [Test] public void Your_gear_is_bought_by_a_sim_it_fits_and_betters_who_then_wears_it()
+        {
+            var w = World(); var warrior = Sim(w, 0, "class.warrior", 10); for (int i = 1; i < 6; i++) Sim(w, i, "class.mage", 10);
+            SimEconomy.Wear(warrior, "chest", "craft.copper_jerkin");
+            var p = Character("class.paladin", 100); Inventory.Add(p, Db(), "craft.bogiron_hauberk", 1);
+            int fair = Exchange.Fair(Db().Get("craft.bogiron_hauberk"), 1);
+            var l = Exchange.List(w, p, Db(), p.bag.FindIndex(s => s.item == "craft.bogiron_hauberk"), fair, 0, 48, out var why); Assert.NotNull(l, why);
+            var dressed = new List<string>(); Exchange.Wore = s => dressed.Add(s.id);
+            try { Exchange.Run(w, 47, 12, Db(), Trades()); } finally { Exchange.Wore = null; }
+            Assert.IsFalse(w.exchange.listings.Contains(l), "a fair piece that betters a warrior sells");
+            Assert.AreEqual("craft.bogiron_hauberk", SimEconomy.Worn(warrior, "chest"), "the warrior wears it"); CollectionAssert.Contains(SimGear.For(warrior, Db()), "craft.bogiron_hauberk", "and is seen in it");
+            CollectionAssert.Contains(dressed, warrior.id, "its figure is dressed again");
+            Assert.AreEqual(500 - fair, warrior.coin); Assert.AreEqual(fair + l.deposit, Exchange.Waiting(w.exchange, "class.paladin").Single().coin);
+            bool spare = SimEconomy.Count(warrior, "craft.copper_jerkin") == 1 || w.exchange.listings.Exists(o => o.seller == warrior.id && o.item == "craft.copper_jerkin");
+            Assert.IsTrue(spare, "the jerkin it took off is a spare to sell (or up on the Exchange)");
+            foreach (var m in w.sims.Skip(1)) Assert.IsNull(SimEconomy.Worn(m, "chest"), "no mage put on mail");
+            // A cloth robe finds no buyer among warriors.
+            var w2 = World(); var p2 = Character("class.mage", 100); Inventory.Add(p2, Db(), "craft.bogiron_wool_robe", 1);
+            foreach (var s in w2.sims) { s.level = 10; }
+            var robe = Exchange.List(w2, p2, Db(), 0, Exchange.Fair(Db().Get("craft.bogiron_wool_robe"), 1), 0, 48, out why); Assert.NotNull(robe, why);
+            Exchange.Run(w2, 47, 12, Db(), Trades());
+            Assert.IsTrue(w2.exchange.listings.Contains(robe), "no warrior buys a robe");
+        }
+
+        [Test] public void Sims_buy_from_each_other_what_they_want_and_the_market_moves()
+        {
+            // Gear: a warrior buys another sim's hauberk and wears it.
+            var w = World(); foreach (var s in w.sims) Sim(w, w.sims.IndexOf(s), "class.mage", 1);
+            var warrior = Sim(w, 1, "class.warrior", 10); SimEconomy.Wear(warrior, "chest", "craft.copper_jerkin");
+            int fair = Exchange.Fair(Db().Get("craft.bogiron_hauberk"), 1);
+            var hauberk = SimLot(w, "craft.bogiron_hauberk", 1, fair, 0, 48);
+            int before = w.sims.Sum(s => s.coin);
+            Exchange.Run(w, 47, 12, Db(), Trades());
+            Assert.IsFalse(w.exchange.listings.Contains(hauberk), "the warrior bought it");
+            Assert.AreEqual("craft.bogiron_hauberk", SimEconomy.Worn(warrior, "chest"));
+            Assert.AreEqual(500 + fair, w.sims[0].coin, "the seller was paid"); Assert.AreEqual(before, w.sims.Sum(s => s.coin), "coin moved, none made");
+            Assert.AreEqual(fair, Exchange.LastSold(w.exchange, "craft.bogiron_hauberk"), "the sale is noted");
+            // Makings: a smith buys ore for its bars; a mage (a weaver) does not.
+            var w2 = World(); for (int i = 0; i < 6; i++) Sim(w2, i, i == 2 ? "class.warrior" : "class.mage", i == 2 ? 3 : 1);   // a level-1 weaver's cloth takes no ore
+            var ore = SimLot(w2, "mat.copper_ore", 10, Exchange.Fair(Db().Get("mat.copper_ore"), 10), 0, 48);
+            Exchange.Run(w2, 47, 12, Db(), Trades());
+            Assert.IsFalse(w2.exchange.listings.Contains(ore), "the smith wanted the ore");
+            int smithHas = SimEconomy.Count(w2.sims[2], "mat.copper_ore") + w2.exchange.listings.Where(o => o.seller == w2.sims[2].id && o.item == "mat.copper_ore").Sum(o => o.count);
+            Assert.AreEqual(10, smithHas, "the smith has it (or has put spare ore up again)");
+            // The pack for the bosses: a sim lacking its dish buys one off the Exchange.
+            var w3 = World(); foreach (var s in w3.sims) s.level = 5;
+            var dish = BossBuffs.Pack("class.warrior", 5, Db()).Find(e => BossBuffs.IsDish(Db().Get(e.id))).id; Assert.NotNull(dish, "a level-5 dish");
+            var dishLot = SimLot(w3, dish, 1, Exchange.Fair(Db().Get(dish), 1), 0, 48);
+            Exchange.Run(w3, 47, 12, Db(), Trades());
+            Assert.IsFalse(w3.exchange.listings.Contains(dishLot), "bought for a pack");
+            Assert.AreEqual(1, w3.sims.Skip(1).Sum(s => SimEconomy.Count(s, dish)), "and kept in the pack, not put up again");
+            // Wanted by nobody: a leaf is never bought by a sim, and goes up again cheaper.
+            var w4 = World(); var leaf = SimLot(w4, "leaf.cordial_ox", 1, Exchange.Fair(Db().Get("leaf.cordial_ox"), 1), 0, 24); int first = leaf.buyout;
+            Exchange.Run(w4, 25, 12, Db(), Trades());
+            Assert.IsTrue(w4.exchange.listings.Contains(leaf), "unsold, it went up again"); Assert.AreEqual(1, leaf.relisted); Assert.Less(leaf.buyout, first, "cheaper");
+        }
+
+        [Test] public void An_unsold_sim_lot_goes_up_again_cheaper_down_to_the_stalls_price_then_home()
+        {
+            var w = World(online: 0); var l = SimLot(w, "mat.copper_ore", 20, 40, 20, 24);
+            Exchange.Run(w, 24, 12, Db());
+            Assert.IsTrue(w.exchange.listings.Contains(l)); Assert.AreEqual(1, l.relisted); Assert.AreEqual(34, l.buyout, "15% off"); Assert.AreEqual(17, l.startBid, "its starting bid too");
+            Assert.AreEqual(48, l.endsAt, 1e-4f, "for another day");
+            Exchange.Run(w, 24, 12, Db()); Assert.AreEqual(29, l.buyout);
+            Exchange.Run(w, 24, 12, Db()); Assert.AreEqual(25, l.buyout); Assert.AreEqual(3, l.relisted);
+            Exchange.Run(w, 24, 12, Db());
+            Assert.IsFalse(w.exchange.listings.Contains(l), "three times at most"); Assert.AreEqual(20, SimEconomy.Count(w.sims[0], "mat.copper_ore"), "back to its seller");
+            // At the stall's price already: home at once.
+            var cheap = SimLot(w, "mat.copper_ore", 20, 20, 0, 24);
+            Exchange.Run(w, 24, 12, Db()); Assert.IsFalse(w.exchange.listings.Contains(cheap)); Assert.AreEqual(40, SimEconomy.Count(w.sims[0], "mat.copper_ore"));
+        }
+
+        [Test] public void The_sims_lots_stay_bounded_and_a_crowded_old_market_is_trimmed()
+        {
+            var w = new WorldSave { seed = 3 };
+            string[] goods = { "mat.copper_ore", "mat.oak_log", "mat.yarrow", "junk.wolf_pelt", "hide.boar", "mat.mourners_cap", "mat.salt", "mat.flour" };
+            for (int i = 0; i < 40; i++)
+            {
+                var s = new SimAdventurer { id = "sim." + i, name = "Sim " + i, classId = "class.mage", level = 1, onlineFrom = 0, onlineHours = 24, coin = 0 };
+                foreach (var g in goods) SimEconomy.Add(s, g, 30);
+                w.sims.Add(s);
+            }
+            Exchange.Ensure(w); int most = 0;
+            for (int h = 0; h < 72; h++)
+            {
+                Exchange.Run(w, 1, h % 24, Db(), Trades());
+                int n = w.exchange.listings.Count(l => !Exchange.IsYours(l)); most = Math.Max(most, n);
+                Assert.LessOrEqual(n, Exchange.MaxSimListings, "hour " + h);
+            }
+            Assert.GreaterOrEqual(most, Exchange.MinSimListings, "a full market with goods to sell");
+            // An older world with more lots than the bound: the oldest go home.
+            var x = w.exchange;
+            while (x.listings.Count(l => !Exchange.IsYours(l)) < Exchange.MaxSimListings + 30) x.listings.Add(new ExchangeListing { id = x.nextId++, item = "mat.salt", count = 1, seller = "sim.0", sellerName = "Sim 0", buyout = 9, listedAt = x.hours, endsAt = x.hours + 48 });
+            int Total() { return w.sims.Sum(s => SimEconomy.GoodsCount(s)) + x.listings.Sum(l => l.count); }
+            int before = Total();
+            Exchange.Run(w, 1, 1, Db(), Trades());
+            Assert.LessOrEqual(x.listings.Count(l => !Exchange.IsYours(l)), Exchange.MaxSimListings);
+            Assert.AreEqual(before, Total(), "trimmed lots went back to their sellers: nothing lost");
+        }
+
+        [Test] public void Sims_list_their_crafted_goods_and_leaves_but_keep_their_pack()
+        {
+            var w = World(); var s = Sim(w, 0, "class.warrior", 5); for (int i = 1; i < 6; i++) w.sims[i].onlineHours = 0;   // only the lister online
+            var dish = BossBuffs.Pack("class.warrior", 5, Db()).Find(e => BossBuffs.IsDish(Db().Get(e.id))).id; Assert.NotNull(dish);
+            SimEconomy.Add(s, dish, 2); SimEconomy.Add(s, "leaf.cordial_ox", 1); SimEconomy.Add(s, "craft.copper_hide_jerkin", 1); SimEconomy.Add(s, "food.boar_stew", 6);
+            var seen = new HashSet<string>();
+            for (int h = 0; h < 300; h++) { Exchange.Run(w, 1, 12, Db(), Trades()); foreach (var l in w.exchange.listings) if (l.seller == s.id) seen.Add(l.item); }
+            CollectionAssert.Contains(seen, "leaf.cordial_ox", "a found leaf"); CollectionAssert.Contains(seen, "craft.copper_hide_jerkin", "a spare piece"); CollectionAssert.Contains(seen, "food.boar_stew", "a cooked dish");
+            Assert.AreEqual(2, SimEconomy.Count(s, dish), "its pack's two dishes are never listed"); CollectionAssert.DoesNotContain(seen, dish);
+            // The goods they come by: a leaf turned up on the hunt, meat cooked at the hearth.
+            Assert.NotNull(SimEconomy.LeafFor(5, Trades(), Db(), 7)); Assert.IsTrue(SimEconomy.IsLeaf(Db().Get(SimEconomy.LeafFor(5, Trades(), Db(), 7))));
+            var cook = new SimAdventurer { id = "sim.cook", name = "Cook", classId = "class.mage", level = 1 }; SimEconomy.Add(cook, "junk.boar_meat", 2);
+            Assert.AreEqual("food.boar_stew", SimEconomy.Cook(cook, Trades(), Db())); Assert.AreEqual(1, SimEconomy.Count(cook, "food.boar_stew")); Assert.AreEqual(0, SimEconomy.Count(cook, "junk.boar_meat"));
+            Assert.IsNull(SimEconomy.Cook(cook, Trades(), Db()), "no meat, no dish");
+            SimEconomy.Add(w.sims[1], "leaf.cordial_ox", 1); SimEconomy.SellAll(w.sims[1], Db());
+            Assert.AreEqual(1, SimEconomy.Count(w.sims[1], "leaf.cordial_ox"), "a leaf is not sold at the stall: it is for the Exchange");
+        }
+
+        [Test] public void Notices_tell_you_once_of_a_sale_an_expiry_and_being_outbid()
+        {
+            var w = World(); var p = Character("class.warrior", 200); Inventory.Add(p, Db(), "junk.wolf_pelt", 10);
+            var l = Exchange.List(w, p, Db(), 0, 40, 0, 48, out var why); Assert.NotNull(l, why);
+            Exchange.Run(w, 47, 12, Db());
+            var news = Exchange.TakeNotices(w.exchange, "class.warrior");
+            Assert.AreEqual(1, news.Count); StringAssert.StartsWith("Sold Grey wolf pelt x10", news[0]); StringAssert.Contains("waits at the clerk", news[0]);
+            Assert.AreEqual(0, Exchange.TakeNotices(w.exchange, "class.warrior").Count, "told once");
+            // Ran out unsold, and outbid: both told; another character's news waits for them.
+            var idle = World(online: 0); Inventory.Add(p, Db(), "junk.wolf_pelt", 5);
+            var dear = Exchange.List(idle, p, Db(), p.bag.FindIndex(s => s.item == "junk.wolf_pelt"), 400, 0, 12, out why); Assert.NotNull(dear, why);
+            var mageLot = SimLot(idle, "potion.minor", 5, 100, 20, 48); var mage = Character("class.mage", 100);
+            Assert.IsTrue(Exchange.Bid(idle, mage, Db(), mageLot.id, 20, out why), why);
+            Exchange.Run(idle, 12, 12, Db());
+            var warriorNews = Exchange.TakeNotices(idle.exchange, "class.warrior"); Assert.AreEqual(1, warriorNews.Count); StringAssert.Contains("did not sell", warriorNews[0]);
+            Assert.AreEqual(0, Exchange.TakeNotices(idle.exchange, "class.mage").Count, "nobody online: not outbid yet");
+            foreach (var s in idle.sims) s.onlineHours = 24;
+            Exchange.Run(idle, 40, 12, Db());   // the lot runs out at 48: outbid by then (most likely) or won
+            var mageNews = Exchange.TakeNotices(idle.exchange, "class.mage");
+            Assert.IsTrue(mageNews.Exists(n => n.StartsWith("Outbid") || n.StartsWith("Won")), "the mage hears it was outbid, or that it won: " + string.Join(" | ", mageNews));
+            // Your own buying is no news; an older history line is never told.
+            var buy = SimLot(w, "potion.minor", 1, 5, 0); Assert.IsTrue(Exchange.BuyOut(w, p, Db(), buy.id, out why), why);
+            w.exchange.history.Add(new ExchangeRecord { owner = "class.warrior", line = "Sold something long ago." });
+            Assert.AreEqual(0, Exchange.TakeNotices(w.exchange, "class.warrior").Count);
+        }
+
+        [Test] public void Last_sold_prices_are_kept_a_few_an_item_and_bounded_in_all()
+        {
+            var w = World(online: 0); var p = Character("class.warrior", 1000);
+            Assert.AreEqual(-1, Exchange.LastSold(w.exchange, "potion.minor"), "never sold");
+            var a = SimLot(w, "potion.minor", 5, 40, 0); Assert.IsTrue(Exchange.BuyOut(w, p, Db(), a.id, out var why), why);
+            Assert.AreEqual(8, Exchange.LastSold(w.exchange, "potion.minor"), "the price for one");
+            for (int i = 0; i < 6; i++) { var b = SimLot(w, "potion.minor", 1, 10 + i, 0); Assert.IsTrue(Exchange.BuyOut(w, p, Db(), b.id, out why), why); }
+            Assert.AreEqual(15, Exchange.LastSold(w.exchange, "potion.minor"), "the latest");
+            Assert.AreEqual(Exchange.SalesPerItem, w.exchange.sales.Count(o => o.item == "potion.minor"), "a few an item");
+            for (int i = 0; i < Exchange.SalesKept + 20; i++) w.exchange.sales.Add(new ExchangeSale { item = "gen.x." + i, each = 1 });
+            var c = SimLot(w, "junk.wolf_pelt", 2, 6, 0); Assert.IsTrue(Exchange.BuyOut(w, p, Db(), c.id, out why), why);
+            Assert.AreEqual(Exchange.SalesKept, w.exchange.sales.Count, "bounded in all"); Assert.AreEqual(3, Exchange.LastSold(w.exchange, "junk.wolf_pelt"));
         }
     }
 }

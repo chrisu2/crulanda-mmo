@@ -32,7 +32,9 @@ namespace Crulanda.Encounter
             Lively = LifeOverride ?? !(testRun || EncounterCapture.Requested && !LifeCapture.Requested);   // the life capture watches them live
             World = SimRoster.LoadOrCreate(root);
             // The Exchange ran on while you were away (the real time since the world was saved, as world-hours, two days at most).
-            if (Lively) Exchange.CatchUp(World, System.DateTime.UtcNow, WorldClock.Hour, Session.Items); else Exchange.Ensure(World).clockAt = WorldClock.Hour;
+            if (Lively) Exchange.CatchUp(World, System.DateTime.UtcNow, WorldClock.Hour, Session.Items, Session.Professions?.Db); else Exchange.Ensure(World).clockAt = WorldClock.Hour;
+            Session.ExchangeNotices(true);   // and what happened there while you were away, once
+            Exchange.Wore = s => { var f = Find(s.id); if (f != null) SimGear.Dress(f.visual, s, Session.Items); };   // a piece bought on the Exchange shows on the sim
             gameObject.AddComponent<SimChatter>().Init(this);   // the sims talking (zone chat, playtest note 62)
             Refresh();
             RestoreParty(World.party);
@@ -59,7 +61,7 @@ namespace Crulanda.Encounter
             if (back.Count > 0) Session.Message("Your party is with you: " + string.Join(", ", back) + ".");
             World.party.Clear(); foreach (var c in Session.PartySims) if (c != null) World.party.Add(c.sim.id);
         }
-        void OnDestroy() { if (Active == this) Active = null; }
+        void OnDestroy() { if (Active == this) { Active = null; Exchange.Wore = null; } }
         public string ZoneId { get { return Session != null && Session.Zone != null ? Session.Zone.Zone.id : null; } }
         public SimFigure Find(string simId) { return Figures.Find(f => f != null && f.sim.id == simId); }
         public SimFigure FindByName(string name) { return Figures.Find(f => f != null && f.sim.name == name); }
@@ -109,6 +111,8 @@ namespace Crulanda.Encounter
         /// material and sell it now and then, coin buys the gear upgrades (SimEconomy), and the crafters make what they can. Nothing happens while offline, and a
         /// sim here, seen, lives for real instead. Called from <see cref="Refresh"/>.
         /// </summary>
+        /// <summary>The chance in an hour's hunting away that a sim turns up a found recipe's leaf (it lists it on the Exchange).</summary>
+        public const float LeafChance = .03f;
         public static void LiveAway(SimAdventurer s, float hour, ItemDatabase items, ProfessionDatabase db)
         {
             if (s.lastAwayHour < 0) { s.lastAwayHour = hour; return; }
@@ -127,12 +131,15 @@ namespace Crulanda.Encounter
                         while (s.level < EncounterProgress.LevelCap && s.experience >= EncounterProgress.XpForLevel(s.level + 1)) s.level++;
                     }
                     if (SimEconomy.CraftTrade(s.classId) == "leatherworking") SimEconomy.Add(s, SimEconomy.HideFor(s.level), 1 + r.NextInt(0, 2));   // skinned (Phase 8.6)
+                    if (r.NextFloat() < .4f) SimEconomy.Add(s, SimEconomy.MeatFor(s.level), 1 + r.NextInt(0, 2));   // the meat of the kill, for the hearth
+                    if (r.NextFloat() < LeafChance) { var leaf = SimEconomy.LeafFor(s.level, db, items, r.NextInt(0, 1000)); if (leaf != null) SimEconomy.Add(s, leaf, 1); }   // a leaf from a boss or a cache: for the Exchange
                 }
                 else
                 {
                     string trade = SimEconomy.GatherTrade(s.classId); string mat = trade == "mining" ? "mat.copper_ore" : trade == "woodcutting" ? "mat.oak_log" : "mat.yarrow";
                     SimEconomy.Add(s, mat, 2 + r.NextInt(0, 4));
                 }
+                SimEconomy.Cook(s, db, items);   // the meat cooked at the hearth: its pack's dish, the rest to sell
                 if (SimEconomy.SellableCount(s, items) >= 8 && r.NextFloat() < .5f)
                 {
                     var recipe = SimEconomy.Craftable(s, db, items);
@@ -148,7 +155,8 @@ namespace Crulanda.Encounter
             string zone = ZoneId; if (zone == null || World == null) return;
             float hour = WorldClock.Hour;
             if (Lively) foreach (var s in World.sims) if (s.zone != zone && s.IsOnlineAt(hour)) { LiveAway(s, hour, Session.Items, Session.Professions?.Db); TickAway(s, hour); }
-            if (Lively) Exchange.Follow(World, hour, Session.Items);   // the capital's market keeps the world clock wherever you are (Exchange.cs)
+            if (Lively) Exchange.Follow(World, hour, Session.Items, Session.Professions?.Db);   // the capital's market keeps the world clock wherever you are (Exchange.cs)
+            Session.ExchangeNotices(false);   // your lots sold, run out, outbid on, won: told as they happen
             foreach (var s in World.sims)
             {
                 bool here = s.zone == zone && (s.IsOnlineAt(hour) || Session.QueueSim(s.id)) && !Session.InParty(s.id);   // one in your party is with you, not standing about; a queued sim is summoned, online or not

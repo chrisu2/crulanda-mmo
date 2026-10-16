@@ -8,9 +8,10 @@ namespace Crulanda.Encounter
     /// - The Treasury Vault: each character's own slots twelve to a row, and a shared shelf of 3 for all your characters. Right-click or drag a bag item onto it to store
     ///   it (onto a slot to put it there), right-click or drag a vault item onto the bags to take it out, drag within the vault to
     ///   move or stack; "Buy a row" adds 12 slots for the price shown.
-    /// - The Exchange: three tabs. Browse (the sims' lots, searched by name, slot, level range and quality; Buy outright or Bid the
-    ///   least next bid), My lots (the item chosen from the bags, by right-click or drag, with its buyout, starting bid and 12/24/48
-    ///   hours and the deposit; your lots up, which can be taken down until someone bids; what happened lately) and Collect (coin
+    /// - The Exchange: three tabs. Browse (the sims' lots, searched by name, slot, level range and quality, each with what one last sold
+    ///   for; Buy outright, or type a bid, prefilled with the least next bid, and Bid: at the buyout it buys outright), My lots (the
+    ///   item chosen from the bags, by right-click or drag, with its buyout, starting bid and 12/24/48 hours, the deposit, a fair price
+    ///   and what one last sold for; your lots up, which can be taken down until someone bids; what happened lately) and Collect (coin
     ///   and items waiting at the clerk).
     /// </summary>
     public sealed partial class EncounterHud
@@ -25,6 +26,14 @@ namespace Crulanda.Encounter
         Vector2 vaultScroll, browseScroll, mineScroll, collectScroll;
         static string browseText = "", browseMin = "", browseMax = "", sellBuyout = "", sellStart = "";
         static int browseSlot = -1, browseQuality = -1, sellHours = 24, sellFor = -1; static string sellItem;
+        /// <summary>The bid typed for each lot in Browse (by lot id), prefilled with the least next bid and raised to it when outbid.</summary>
+        static readonly Dictionary<int, string> bidTyped = new Dictionary<int, string>();
+        /// <summary>"last sold 4 each" / "last sold for 30": what the Exchange last saw one go for, or "" when it has not sold lately.</summary>
+        static string LastSoldLine(ExchangeState x, string item, int count)
+        {
+            int each = Exchange.LastSold(x, item); if (each < 0) return "";
+            return count > 1 ? "last sold " + TreasuryVault.Coin(each) + " each" : "last sold for " + TreasuryVault.Coin(each);
+        }
 
         /// <summary>A text box in a capital window: while it has the keys the character does not move (EncounterInput.Typing), and
         /// Return or Esc lets go of it.</summary>
@@ -147,15 +156,26 @@ namespace Crulanda.Encounter
                 var sq = new Rect(2, y + 4, 42, 42);
                 ItemSquare(sq, new ItemStack { item = l.item, count = l.count });
                 Shadow(new Rect(54, y + 2, 300, 22), d.name, frameName, QualityInk(d));
-                GUI.Label(new Rect(54, y + 24, 320, 22), l.sellerName + "  ·  " + Exchange.TimeLeft(x, l) + (d.level > 1 ? "  ·  level " + d.level : ""), tiny);
-                string bid = l.startBid <= 0 ? "buyout only" : l.bid > 0 ? "bid " + TreasuryVault.Coin(l.bid) + (Exchange.YouBid(l) && l.bidder == Exchange.YouId(p.classId) ? " (yours)" : " (" + l.bidderName + ")") : "bids from " + TreasuryVault.Coin(l.startBid);
-                GUI.Label(new Rect(380, y + 4, 200, 22), TreasuryVault.Coin(l.buyout), text);
-                GUI.Label(new Rect(380, y + 26, 220, 22), bid, tiny);
-                GUI.enabled = p.gold >= l.buyout;
-                if (GUI.Button(new Rect(view.width - 200, y + 10, 84, 30), "Buy", micro)) session.ExchangeBuy(l.id);
+                string sold = LastSoldLine(x, l.item, l.count);
+                GUI.Label(new Rect(54, y + 24, 320, 22), l.sellerName + "  ·  " + Exchange.TimeLeft(x, l) + (d.level > 1 ? "  ·  level " + d.level : "") + (sold.Length > 0 ? "  ·  " + sold : ""), tiny);
+                bool mine = l.bidder == Exchange.YouId(p.classId);
+                string bid = l.startBid <= 0 ? "buyout only" : l.bid > 0 ? "bid " + TreasuryVault.Coin(l.bid) + (mine ? " (yours)" : " (" + l.bidderName + ")") : "bids from " + TreasuryVault.Coin(l.startBid);
+                GUI.Label(new Rect(380, y + 4, 160, 22), TreasuryVault.Coin(l.buyout), text);
+                GUI.Label(new Rect(380, y + 26, 160, 22), bid, tiny);
+                // A bid of your own typing (Chris, 2026-10-16: "is the auction house fully functional?"): prefilled with the least next bid,
+                // refused under it or over your coin; at the buyout it buys outright.
                 int min = Exchange.MinBid(l);
-                GUI.enabled = l.startBid > 0 && min < l.buyout && p.gold >= min && l.bidder != Exchange.YouId(p.classId);
-                if (GUI.Button(new Rect(view.width - 110, y + 10, 84, 30), l.startBid > 0 ? "Bid " + min : "Bid", micro)) session.ExchangeBid(l.id, min);
+                if (l.startBid > 0 && !mine)
+                {
+                    string field = "cap.bid." + l.id;
+                    if (!bidTyped.TryGetValue(l.id, out var typed) || (GUI.GetNameOfFocusedControl() != field && Number(typed, 0) < min)) typed = min.ToString();
+                    typed = CapitalField(field, new Rect(view.width - 264, y + 13, 64, 24), typed, 7); bidTyped[l.id] = typed;
+                    int amount = Number(typed, 0); bool outright = amount >= l.buyout;
+                    GUI.enabled = amount <= p.gold && (outright || amount >= min);
+                    if (GUI.Button(new Rect(view.width - 194, y + 10, 84, 30), outright ? "Bid (buys)" : "Bid", micro)) { session.ExchangeBid(l.id, amount); bidTyped.Remove(l.id); GUI.FocusControl(null); }
+                }
+                GUI.enabled = p.gold >= l.buyout;
+                if (GUI.Button(new Rect(view.width - 104, y + 10, 84, 30), "Buy", micro)) session.ExchangeBuy(l.id);
                 GUI.enabled = true;
                 if (new Rect(0, y, 360, rowH).Contains(mouse)) { ItemTooltip(d, true); tooltipAt = new Vector2(view.x + mouse.x - browseScroll.x, view.y + mouse.y - browseScroll.y); }
             }
@@ -173,7 +193,8 @@ namespace Crulanda.Encounter
                 if (sellFor != at || sellItem != stack.item) { sellFor = at; sellItem = stack.item; sellBuyout = Exchange.Fair(d, stack.count).ToString(); sellStart = ""; }
                 ItemSquare(new Rect(r.x + 10, y + 10, Slot, Slot), stack);
                 Shadow(new Rect(r.x + 72, y + 8, 320, 24), d.name + (stack.count > 1 ? " x" + stack.count : ""), frameName, QualityInk(d));
-                GUI.Label(new Rect(r.x + 72, y + 32, 320, 22), "A fair price: about " + TreasuryVault.Coin(Exchange.Fair(d, stack.count)), tiny);
+                int lastEach = Exchange.LastSold(x, stack.item);
+                GUI.Label(new Rect(r.x + 72, y + 32, 320, 22), "Fair: about " + TreasuryVault.Coin(Exchange.Fair(d, stack.count)) + (lastEach > 0 ? "; last sold for " + TreasuryVault.Coin(lastEach * stack.count) : ""), tiny);
                 GUI.Label(new Rect(r.x + 400, y + 10, 70, 24), "Buyout", tiny);
                 sellBuyout = CapitalField("cap.buyout", new Rect(r.x + 470, y + 8, 90, 24), sellBuyout, 7);
                 GUI.Label(new Rect(r.x + 400, y + 40, 70, 24), "Start bid", tiny);

@@ -203,7 +203,7 @@ namespace Crulanda.Tests
                 }
             // Six elites stand with guards (Caddock, Hesk, the Brood Weave-Eater's broodmate, the Ash-Deacon, Greyheart, the
             // Root-Warden) and four have kin in earshot of their call (Hesk, Old Whitefoot, the Grey Sexton, the Sandthrone captain).
-            Assert.AreEqual(31 * Kits.Length, guarded, "Thirty-one elites have guards (fourteen of them the reworked Adit's, 2026-10-14; nine Hallow's Creek's, 2026-10-16; the Lowtowns' Mother of Drains and Knuckle Brannoc, Phase 9.1)."); Assert.AreEqual(20 * Kits.Length, answered, "Twenty elites' calls are answered by kin (Hallow's Creek's five: Tredway, Yelland, First-Cut, Pardew and Kersey, 2026-10-16; eleven of them the Sealed Adit's: Nix's since the Adit was filled, 2026-10-11, the Back drift cutters in his reach; the rework's bosses with guards in earshot, 2026-10-14).");
+            Assert.AreEqual(31 * Kits.Length, guarded, "Thirty-one elites have guards (fourteen of them the reworked Adit's, 2026-10-14; nine Hallow's Creek's, 2026-10-16; the Lowtowns' Mother of Drains and Knuckle Brannoc, Phase 9.1)."); Assert.AreEqual(21 * Kits.Length, answered, "Twenty-one elites' calls are answered by kin (one more since the Lowtowns' and Hallow's Creek's camps settled, 2026-10-16; Hallow's Creek's five: Tredway, Yelland, First-Cut, Pardew and Kersey, 2026-10-16; eleven of them the Sealed Adit's: Nix's since the Adit was filled, 2026-10-11, the Back drift cutters in his reach; the rework's bosses with guards in earshot, 2026-10-14).");
         }
         /// <summary>The least health a careful player with Mira ends with when an elite's call is answered.</summary>
         const float CallMargin = .1f;

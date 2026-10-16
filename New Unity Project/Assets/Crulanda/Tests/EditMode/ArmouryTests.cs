@@ -220,7 +220,7 @@ namespace Crulanda.Tests
             // Every list killed and every quest done: still nothing names a hidden find's piece or a world drop.
             foreach (var d in loot.Drops) p.lootLuck.Add(new LootLuck { source = d.id, kills = 5 });
             foreach (var g in loot.GearOrder) if (Kind(g) == "quest") p.questsDone.Add(g.source.Substring(6));
-            var hidden = loot.GearOrder.Where(g => Kind(g) == "secret").ToList(); Assert.AreEqual(7, hidden.Count, "Seven pieces lie in hidden finds.");
+            var hidden = loot.GearOrder.Where(g => Kind(g) == "secret").ToList(); Assert.AreEqual(10, hidden.Count, "Ten pieces lie in hidden finds (Hallow's Creek's three: Bet's cart, the mason's cache, the reed chest, 2026-10-16).");
             foreach (var g in hidden.Concat(loot.GearOrder.Where(g => Kind(g) == "world")))
             {
                 var e = log.EntryOf(g);

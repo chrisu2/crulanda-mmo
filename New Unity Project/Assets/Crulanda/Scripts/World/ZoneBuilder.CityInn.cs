@@ -12,7 +12,7 @@ namespace Crulanda.World
     /// tubs. Inside, a taproom two storeys high with a gallery round three walls on marble columns and stone corbels, reached by a stair
     /// along the front wall (walked: its ramp and the gallery's floor are in the navmesh, NavWalkable); the long polished bar under the
     /// back gallery with its stools, the barrels and bottles behind it; the hearth with a carved mantel and overmantel on the +x end, its
-    /// bench before it and the kitchen's range in the corner behind; three high-backed booths along the -x end; five round tables on
+    /// bench before it and the kitchen's range beside it; three high-backed booths along the -x end; five round tables on
     /// the floor; chandeliers and sconces. The room is its plan's (<see cref="InnPlan"/>, variant 3): what the builder lays out, the
     /// tests measure and the village's life reads (its seats, the bar, the kitchen, the hatch and the servers' places; ZoneInn "city").
     /// Only the walls, the bar, the hearth, the range, the columns and the stair's ramp are solid; the doorway is step-free (the footing
@@ -238,7 +238,7 @@ namespace Crulanda.World
             StationRoom(t, new Rect(-w / 2, -d / 2, w, d));
             CityBench(t, new Vector3(plan.bench.x, 0, plan.bench.y), 270, 2.2f);   // its back to the room, facing the fire
             ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(plan.woodpile.x, .045f, plan.woodpile.y), 0, .5f);
-            // ---------- the kitchen's corner: the range with its pot, the cook's place, the hatch where goods are handed in ----------
+            // ---------- the kitchen's end: the range with its pot, the cook's place, the hatch where goods are handed in ----------
             var range = BoxPart(t, new Vector3(plan.range.x, .55f, plan.range.y), new Vector3(plan.rangeSize.x, 1.1f, plan.rangeSize.y), Masonry, null, 1);
             range.AddComponent<BoxCollider>(); range.AddComponent<NavBlocker>();
             Part(PrimitiveType.Cube, t, new Vector3(plan.range.x - plan.rangeSize.x / 2 - .02f, .5f, plan.range.y), new Vector3(.05f, .4f, .8f), art.glass);

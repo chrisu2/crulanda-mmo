@@ -188,3 +188,16 @@ of the zone's grass, topiary, small trees, rose arches, stone benches, urns. No 
 CrownZonePlayTests (the new detail test), then the Crown tour's gate, stair and garden frames for Chris.
 
 **Chris, 2026-10-16 (verbatim, screenshots of a street and the Gilt Gate's north wall): "plants not even on the wall.only a few plants. inn does look better".** The ivy remade as dense mats set on the wall's real face, leaves flat on the stone, about twice as many clumps.
+## Status (p9-court, 2026-10-16; written and compile-checked, NOT yet run in Unity)
+Chris (verbatim, of the court's frame): "need more profession tools/small huts/vendored items". `ZoneBuilder.CrownCourt.cs` (GAME-ONLY; hooked by
+one line in CityProp's default and one in BuildStations): eight open-fronted workshops round the Crafters' Court (`court_workshop`, variant =
+trade: the Smithy, Leather-shop, Loom-house, Still-room, Cookshop, Bowyer's, Ore-house, Herbary), white stone and timber under slate or striped
+canvas, the trade's name in gilt and its hung sign; each trade's station inside (the zone's station on the workshop's station spot, drawn as the
+trade's own: anvil and quench tub, cutting bench, hand loom with clay warp weights, still-table, raised hearth, bowyer's bench); the trainer at
+it facing out, a stall-keeper behind a counter (`court-vendor:<trade>`, stock by name in Items/court.json), five apprentices at the workshops'
+benches; a well with a rope over a bar and a trough, a board of orders, benches, goods, two lamps. No machines. Stock is tools and makings
+only (no ore, logs, herbs, hides, meat or bags: the existing no-coin-loop tests). **After main (p86-craft) is merged:** add `mat.fleece` to
+Prue Calvert, and leaves to the keepers (e.g. the smith's, tanner's, weaver's, bowyer's, cook's and herbalist's leaves sold by name).
+To run: EditMode `CrownCourtTests`, `CrownZoneTests`, `ProfessionDataTests`, `ItemTests`; PlayMode `CrownCourtPlayTests`, `CrownZonePlayTests`,
+`NodePlacementTests`, `CrownLifeTests`; the Crown tour's frames "The Crafters' Court", "The Court Smithy", "The Court Loom-house" and the
+station frames.

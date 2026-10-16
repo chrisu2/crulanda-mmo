@@ -177,7 +177,7 @@ namespace Crulanda.World
                 case "lowtowns": Lowtowns(t, p.size.x > 0 ? p.size : new Vector2(200, 80)); return true;
                 case "sea": Sea(t, p.size.x > 0 ? p.size : new Vector2(40, 200)); return true;
                 case "spot": return true;   // a named place and nothing to see (where a guild's members stand in their hall: "hall.lantern-watch")
-                default: return false;
+                default: return CourtProp(t, p);   // the Crafters' Court's workshops and yard (ZoneBuilder.CrownCourt), else none
             }
         }
         /// <summary>A stream of its own for a prop, keyed on where it stands (nothing else in the zone draws differently for it).</summary>

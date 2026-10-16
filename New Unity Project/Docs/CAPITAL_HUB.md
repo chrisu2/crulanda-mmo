@@ -131,3 +131,6 @@ the inn code: the dressing sits on the table's own top), "all trainers standing 
 "floor is blocked in armory" (fixed: no plinth across a hall's door).
 **Chris, 2026-10-16 ~01:40 (verbatim, a screenshot of the audience hall): "falling through the floor. he needs more regal attire and
 sitting on a throne".**
+**Chris, 2026-10-16 ~01:55 (verbatim): "need a limited shared space. maybe 3 slots and maybe they can buy more in the future. the
+remainder is character only".** So the Treasury Vault is two parts: a shared shelf of 3 slots for all your characters (more bought
+later), kept in the profile; and the character's own vault (48 slots, rows bought with coin), kept on the character.

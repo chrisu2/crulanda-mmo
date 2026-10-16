@@ -45,7 +45,7 @@ namespace Crulanda.Encounter
         /// <summary>The run's scorecard (CombatMeter.Scorecard): shown when a sim-led run is called cleared or the dungeon's last boss falls, and
         /// by /scorecard (Chris, 2026-10-11).</summary>
         public bool ScorecardOpen; public string ScorecardTitle;
-        public void ShowScorecard(string title) { ScorecardTitle = title; ScorecardOpen = true; Message("The scorecard: " + title + " (/scorecard shows it again)."); }
+        public void ShowScorecard(string title) { ScorecardTitle = title; ScorecardOpen = true; Message("The scorecard: " + title + " (/scorecard shows it again)."); QueueRunDone(); }
         void OnHealed(Actor by, Actor who, int amount) { meter?.Heal(by, amount); }
         public ClassKit Kit { get; private set; }
         public WarriorKit Warrior { get { return Kit as WarriorKit; } }
@@ -1394,6 +1394,7 @@ namespace Crulanda.Encounter
             else if (VendorNpc != null && !Paused) CloseVendor();
             else if (TradesOpen && !Paused) TradesOpen = false;
             else if (WhoOpen && !Paused) WhoOpen = false;
+            else if (QueueOpen && !Paused) QueueOpen = false;
             else if (ScorecardOpen && !Paused) ScorecardOpen = false;
             else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
             else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
@@ -1481,6 +1482,8 @@ namespace Crulanda.Encounter
             StartQuests(); StartDiscoveries(); StartArmoury(); StartAdit();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [" + KeyBindings.InteractLabel + "], then follow the path to the sentries.");
             ReconcileQuests();
+            SweepLockouts();   // the bosses and elites locked for you are not there (EncounterSession.Lockout; after the quests, for their exception)
+            ArriveQueued();   // a queued run arriving at its dungeon's door (EncounterSession.Queue)
             nextSave = Time.time + 30;
         }
         public static EncounterProgress FreshProgress(string classId = "class.warrior", string raceId = null)
@@ -1890,6 +1893,7 @@ namespace Crulanda.Encounter
             if (!Paused && EncounterInput.Press(KeyCode.M)) MapOpen = !MapOpen;
             if (!Paused && Quests != null && EncounterInput.Press(KeyCode.L)) { QuestBookOpen = !QuestBookOpen; if (!QuestBookOpen) ReadingDocument = null; }
             if (!Paused && SimPopulation.Active != null && EncounterInput.Press(KeyCode.O)) WhoOpen = !WhoOpen;
+            if (!Paused && Zone != null && EncounterInput.Press(KeyCode.J)) QueueOpen = !QueueOpen;   // the dungeon queue (Gather a Party)
             if (Paused) return;
             if (EncounterInput.Press(KeyCode.B)) BuildOpen = !BuildOpen;
             // Moving interrupts the player's own cast-time abilities (instant abilities are unaffected).
@@ -1928,6 +1932,7 @@ namespace Crulanda.Encounter
             if (!BuildOpen && EncounterInput.Press(KeyCode.E)) Interact();
             if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
             TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
+            TickLockouts(); TickQueue();   // lockouts run out; the dungeon queue gathers its party, leads it and breaks it up (EncounterSession.Lockout, .Queue)
 
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             if (!BuildOpen && EncounterInput.Press(KeyCode.P)) { SpellbookOpen = !SpellbookOpen; BookPick = null; }   // the spellbook (Docs/ACTION_BAR.md)
@@ -2222,6 +2227,11 @@ namespace Crulanda.Encounter
             GreySeepOnDeath(enemy);   // (S7) the Foreman's death stops the Grey Spreads (EncounterSession.GreySpread.cs)
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
+            // Lockouts (EncounterSession.Lockout): a boss or elite locked for you already (a queued run's fresh dungeon, a quest's kill) gives
+            // no loot; one that was not is locked from now.
+            bool lockedKill = LockedFor(enemy); enemy.NoLoot = lockedKill;
+            if (lockedKill) Message("No loot: " + enemy.Name + " is locked for you for another " + Lockouts.Words(Lockouts.Left(Progress, Lockouts.KeyOf(enemy.persistentId), Lockouts.UtcNow())) + ".");
+            else LockOnKill(enemy);
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
             if (NamedElite(enemy)) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }   // the camp's own elite, not a machine it rides
             if (enemy.Camp) TakeKey(enemy);   // a sigil boss's key (EncounterSession.Adit.cs)
@@ -2372,6 +2382,7 @@ namespace Crulanda.Encounter
             if (Professions != null) Professions.Bind(Progress);
             if (Armoury != null) Armoury.Bind(Progress);
             if (Feats != null) { Feats.Bind(Progress); featsPrimed = false; }
+            SweepLockouts();   // the loaded character's lockouts (EncounterSession.Lockout)
         }
         public void RepeatTrail()
         {

@@ -1510,3 +1510,24 @@ index goes from 96 to 99, so his elitesSlain key ("mob.quietminer.adit.N") diffe
    a line, the dark drift's lichen. Front, back and side frames to Chris.
 4. A lane B group run (`group_run.ps1 -Mode` standard), timed against about 75 minutes, watching the catwalk crossing (how often the
    sims are knocked back) and the Breach.
+
+## Status (p86-lockout)
+2026-10-15, branch `p86-lockout` off `p86-craft` (worktree `D:\code\mmo-lockout`). WRITTEN and compiled outside Unity; not run in Unity,
+not committed, OPEN until Chris confirms in his build. The rule as Chris gave it (the top of this file, on `main`): bosses and elites
+do not respawn; once per character per lockout, everywhere.
+- **Lockouts** (`Lockouts.cs`, `EncounterSession.Lockout.cs`, `EncounterEnemy.Lockout.cs`): a boss or elite your party kills is locked
+  for you: a dungeon's two days, an open-world boss's (a boss's move: Caddock, the Root-Warden) a week, a raid's a week (the zone flag
+  `raid`, none built), any other elite a day; each to 06:00 local. Locked, it is not there: put away on the zone's load (dead, body gone,
+  the door its death opens standing open), and one killed this visit goes when it would have respawned. The ordinary mobs keep the
+  20-minute respawn (section 1, Q1). A boss a quest you hold still needs stays, with no loot. Saved in format 11 with the recipes
+  (`lockouts`; SAVE_FORMAT.md). `/lockouts` lists them; `/lockouts clear` is a tester's, as `/level`.
+- **The dungeon queue, "Gather a Party"** (`EncounterSession.Queue.cs`, `EncounterHud.Queue.cs`; J, the Menu's Dungeons, `/queue`):
+  the dungeons with their levels and your lockouts; pick one or "Any for my level" and your part (tank, healer, damage); after a few
+  seconds a tank, a healer and damage of your level are summoned from the roster (online or not), and the party is taken to the door
+  (the yard, 0,-382). The Adit is fresh for the run: every boss stands, and the ones locked for you drop nothing. The tank leads
+  (`LeadDungeon`). A minute after the run's scorecard, on leaving the dungeon, or by "Leave the party", the queued sims go back where
+  they were.
+- Tests written, not run: EditMode `LockoutTests` (new), `SaveMigratorTests` (format 11's step now adds the lockouts too); PlayMode
+  `DungeonQueueTests` (new), `RockEaterTests` (the duo's come-back test clears its lockouts first).
+- For the group runs: a run that walks into the Adit on a save that killed its bosses in the last two days finds them gone; the run
+  tool's temp saves start clean, and `/queue` brings them all back (without loot).

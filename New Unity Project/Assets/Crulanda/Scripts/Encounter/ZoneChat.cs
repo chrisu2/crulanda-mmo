@@ -159,6 +159,11 @@ namespace Crulanda.Encounter
                     case "/lead": case "/run": Lead(arg); return;
                     case "/dungeon": LeadDungeon(arg); return;   // "/dungeon quick", "/dungeon full" (the Adit rework)
                     case "/buff": BuffUp(); return;   // buff up before a boss (2026-10-15, BossBuffs): eat, drink, your class's buff on the party
+                    case "/queue":   // the dungeon queue (Gather a Party; EncounterSession.Queue): alone the window, "/queue <dungeon>|any" queues, "/queue leave" stops
+                        if (arg.Length == 0) { QueueOpen = !QueueOpen; return; }
+                        if (string.Equals(arg, "leave", StringComparison.OrdinalIgnoreCase)) { if (QueuedFor != null) LeaveQueue(); else if (QueueRunZone != null) DisbandQueue("You leave the queued party."); else Message("You are not queued."); return; }
+                        JoinQueue(arg); return;
+                    case "/lockouts": case "/lockout": if (string.Equals(arg, "clear", StringComparison.OrdinalIgnoreCase)) TesterClearLockouts(); else ListLockouts(); return;   // the bosses and elites locked for you (Lockouts); "clear" is a tester's, as /level
                     case "/exit": case "/quit": Quit(); return;   // Chris 2026-10-14: "all need an exit command to close the .exe"
                     case "/scorecard": ScorecardOpen = !ScorecardOpen; if (ScorecardOpen && ScorecardTitle == null) ScorecardTitle = (Meter.RunName ?? "The run") + " so far"; return;
                     case "/level": TesterLevel(arg); return;   // Chris, 2026-10-13: "i need a way to fast level for testing" / "and then reset to 1 when not testing"
@@ -197,7 +202,7 @@ namespace Crulanda.Encounter
                             }
                             Message("/music <0-1> sets the music's level; /music off silences it."); return;
                         }
-                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick takes only what must be done, full every side room too); /buff (eat, drink and lay your class's buff on the party: the leader stops to buff up before a boss); /g guild chat, /guild (who is in it), /gquit."); Message("Music: /music <0-1> sets its level, /music off silences it."); return;
+                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap, /lockouts clear ends every lockout."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick takes only what must be done, full every side room too), /queue [dungeon|any|leave] (the dungeon queue, J: a party of your level to a dungeon's door), /buff (eat, drink and lay your class's buff on the party: the leader stops to buff up before a boss); /lockouts (the bosses and elites locked for you); /g guild chat, /guild (who is in it), /gquit."); Message("Music: /music <0-1> sets its level, /music off silences it."); return;
                     case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": case "/gu": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;
                 }

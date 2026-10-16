@@ -46,7 +46,10 @@ namespace Crulanda.Encounter
             foreach (var id in new List<string>(ids))
             {
                 var s = World.sims.Find(x => x.id == id); if (s == null || Session.InParty(id)) continue;
-                if (!s.IsOnlineAt(hour)) { Session.Message(s.name + " has logged off since."); continue; }
+                // A sim the dungeon queue brought (EncounterSession.Queue): it comes into the run's dungeon online or not, and anywhere else
+                // the run is over, so it goes back where it came from.
+                if (Session.QueueSim(id) && Session.QueueRunZone != ZoneId) { Session.SendQueueSimHome(s); continue; }
+                if (!s.IsOnlineAt(hour) && !Session.QueueSim(id)) { Session.Message(s.name + " has logged off since."); continue; }
                 var at = Session.Player.transform.position - Session.Player.transform.forward * (2 + k) + Session.Player.transform.right * (k % 2 == 0 ? 1.5f : -1.5f); k++;
                 s.zone = ZoneId; s.x = at.x; s.z = at.z; Refresh();
                 if (Session.Invite(id, true)) back.Add(s.name);
@@ -145,7 +148,7 @@ namespace Crulanda.Encounter
             if (Lively) foreach (var s in World.sims) if (s.zone != zone && s.IsOnlineAt(hour)) { LiveAway(s, hour, Session.Items, Session.Professions?.Db); TickAway(s, hour); }
             foreach (var s in World.sims)
             {
-                bool here = s.zone == zone && s.IsOnlineAt(hour) && !Session.InParty(s.id);   // one in your party is with you, not standing about
+                bool here = s.zone == zone && (s.IsOnlineAt(hour) || Session.QueueSim(s.id)) && !Session.InParty(s.id);   // one in your party is with you, not standing about; a queued sim is summoned, online or not
                 var f = Find(s.id);
                 if (here && f == null) { Figures.Add(SimFigure.Spawn(this, s)); SimChatter.Active?.Arrived(s); }
                 else if (!here && f != null) { if (!s.IsOnlineAt(hour)) SimChatter.Active?.LoggedOff(s); Figures.Remove(f); Destroy(f.gameObject); }

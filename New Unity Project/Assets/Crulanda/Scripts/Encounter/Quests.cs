@@ -451,6 +451,30 @@ namespace Crulanda.Encounter
             }
             return false;
         }
+        /// <summary>
+        /// Whether a quest you hold still needs this enemy killed (the lockouts' quest exception, 2026-10-15): a kill objective that names it
+        /// and is not yet met, or a "collect ... from kill:" objective for it whose item you lack, in the current step; or any such objective
+        /// in a step still to come. A quest done or handed in needs nothing.
+        /// </summary>
+        public bool StillNeedsKill(string enemyId)
+        {
+            if (string.IsNullOrEmpty(enemyId)) return false;
+            foreach (var (q, s) in Active())
+            {
+                if (q.steps == null) continue;
+                for (int k = s.step; k < q.steps.Length; k++)
+                {
+                    var step = q.steps[k]; if (step == null || step.objectives == null) continue;
+                    for (int i = 0; i < step.objectives.Length; i++)
+                    {
+                        var o = step.objectives[i]; bool now = k == s.step;
+                        if (o.type == "kill" && Matches(o.target, enemyId) && (!now || Count(s, i) < o.count)) return true;
+                        if (o.type == "collect" && o.target != null && o.target.StartsWith("kill:") && Matches(o.target.Substring(5), enemyId) && ItemCount(o.item) < o.count) return true;
+                    }
+                }
+            }
+            return false;
+        }
         /// <summary>Loot for "collect ... from kill:&lt;enemy&gt;" objectives. Returns the item given, or null.</summary>
         public string LootFrom(string enemyId)
         {

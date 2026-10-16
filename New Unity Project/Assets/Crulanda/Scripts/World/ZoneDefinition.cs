@@ -13,6 +13,9 @@ namespace Crulanda.World
         public string id, displayName, subtitle, canonStatus, canonNote;
         /// <summary>A dungeon (the Sealed Adit): a zone of caves you go into from another zone; the sims never wander into it on their own.</summary>
         public bool dungeon;
+        /// <summary>A raid (none built yet; Chris, 2026-10-15: "raids once per week"): its bosses and elites lock for a week (the lockout
+        /// table, Encounter.Lockouts), not a dungeon's two days.</summary>
+        public bool raid;
         /// <summary>A group zone (the Verdant Shore, round 29; Chris: "all epic mobs, group required"): every camp mob has an elite's
         /// health and blows (EncounterEnemy.Tough), though only the named ones are elites.</summary>
         public bool groupZone;

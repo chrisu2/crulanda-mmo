@@ -91,7 +91,7 @@ namespace Crulanda.Tests
                 var v = life.Find(r.name); if (v == null) { problems.Add(r.name + " is not spawned"); continue; }
                 if (r.at != Vector2.zero && Vector2.Distance(new Vector2(v.transform.position.x, v.transform.position.z), r.at) > 2) problems.Add(r.name + " stands " + v.transform.position + ", not at the post " + r.at);
                 if (!NavMesh.SamplePosition(v.transform.position, out var hit, 2, NavMesh.AllAreas)) { problems.Add(r.name + " stands off the navmesh"); continue; }
-                if (!NavReach.Walkable(start, hit.position)) problems.Add(r.name + " (" + r.role + ") can't be walked to from the Gilt Approach");
+                if (!NavReach.Walkable(start, hit.position)) problems.Add(r.name + " (" + r.role + ") can't be walked to from the Gilt Approach (stands " + v.transform.position.ToString("F1") + ", navmesh " + hit.position.ToString("F1") + ", doing " + v.name + ")");
             }
             var aethelgard = life.Find("High Councilor Aethelgard"); Assert.IsNotNull(aethelgard, "The High Councilor receives in the keep.");
             Assert.IsFalse(aethelgard.GetComponent<Collider>() != null && aethelgard.GetComponent<EncounterEnemy>() != null, "He is no enemy: visited, never fought.");

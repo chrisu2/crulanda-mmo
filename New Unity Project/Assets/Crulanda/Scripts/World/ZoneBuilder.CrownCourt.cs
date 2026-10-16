@@ -88,14 +88,14 @@ namespace Crulanda.World
 
         /// <summary>The Court's ways (the zone's x, y), kept clear of everything the Court builds: in from the Crown Square south and north
         /// of the Treasury, across it west and east of the well, out to the east colonnade between the Still-room and the Herbary, and
-        /// along the north colonnade between its columns (CrownCourtTests, CrownCourtPlayTests).</summary>
+        /// along the north colonnade between its columns as far as the east colonnade's corner column (CrownCourtTests, CrownCourtPlayTests).</summary>
         public static readonly (string name, Vector2[] points)[] CourtWays = {
             ("the south way in", new[] { new Vector2(63, 65), new Vector2(91, 65) }),
             ("the north way in", new[] { new Vector2(63, 93), new Vector2(68, 93), new Vector2(68, 86), new Vector2(91, 86) }),
             ("the cross, west of the well", new[] { new Vector2(79, 65), new Vector2(79, 86) }),
             ("the cross, east of the well", new[] { new Vector2(91, 65), new Vector2(91, 86) }),
             ("the way to the east colonnade", new[] { new Vector2(91, 76), new Vector2(104, 76) }),
-            ("the north colonnade", new[] { new Vector2(68, 93), new Vector2(72, 97.5f), new Vector2(103, 97.5f) }) };
+            ("the north colonnade", new[] { new Vector2(68, 93), new Vector2(72, 97.5f), new Vector2(100, 97.5f) }) };   // to the column where it meets the east colonnade, not through it
         /// <summary>Points every 25 cm along the Court's ways, with each way's name.</summary>
         public static IEnumerable<(string name, Vector2 at)> CourtWayPoints()
         {
@@ -400,8 +400,27 @@ namespace Crulanda.World
                     // Bars and ingots stacked on a bench along the left wall; a weapon stand of finished work at the front.
                     CityTable(t, new Vector3(-w / 2 + .75f, 0, 1.0f), 90, 1.5f, .6f);
                     for (int k = 0; k < 18; k++) Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + .62f + (k % 3) * .11f, .86f + (k / 9) * .06f, .45f + ((k / 3) % 3) * .38f), new Vector3(.09f, .05f, .28f), Tint(art.metal, CourtMetals[(k / 3) % CourtMetals.Length]));
-                    ModelProp(t, "Fantasy/WeaponStand", new Vector3(-w / 2 + .6f, .05f, -.7f), 90, 1.6f, true, .9f);
-                    if (ModelProp(t, "Fantasy/Bucket_Metal", new Vector3(1.25f, .05f, .55f), 0, .38f) != null)
+                    // A rack of finished work at the front left (the kit's weapon stand, or a painted rack of blades and axe heads when the
+                    // kit is missing), solid; a bucket of coal by the hearth (the kit's, or a painted pail).
+                    var rack = new Vector3(-w / 2 + .6f, 0, -.7f);
+                    if (ModelProp(t, "Fantasy/WeaponStand", rack + Vector3.up * .05f, 90, 1.6f, true, .9f) == null)
+                    {
+                        foreach (int k in new[] { -1, 1 }) Stake(t, rack + new Vector3(0, -.05f, k * .42f), .1f, 1.5f, oak);
+                        foreach (float y in new[] { .55f, 1.2f }) Part(PrimitiveType.Cube, t, rack + new Vector3(0, y, 0), new Vector3(.08f, .06f, .95f), oak);
+                        for (int k = 0; k < 4; k++)
+                        {
+                            float z = -.3f + k * .2f;
+                            Part(PrimitiveType.Cube, t, rack + new Vector3(.06f, .85f, z), new Vector3(.02f, .75f, .05f), iron, Quaternion.Euler(0, 0, 4));   // a blade
+                            Part(PrimitiveType.Cube, t, rack + new Vector3(.06f, 1.27f, z), new Vector3(.03f, .1f, .14f), Tint(art.metal, CourtMetals[1 + k % 2]));   // its hilt
+                        }
+                        Blocker(t, rack + new Vector3(0, .75f, 0), new Vector3(.3f, 1.5f, .95f));
+                    }
+                    var pail = new Vector3(1.25f, .05f, .55f);
+                    if (ModelProp(t, "Fantasy/Bucket_Metal", pail, 0, .38f) == null)
+                    {
+                        MeshPart(PropMesh("Coal pail", () => Turned(new[] { new Vector2(0, 0), new Vector2(.15f, 0), new Vector2(.18f, .36f), new Vector2(.16f, .36f), new Vector2(.14f, .04f), new Vector2(0, .04f) }, 10)), t, pail, iron);
+                        Rod(t, pail + new Vector3(-.17f, .36f, 0), pail + new Vector3(.17f, .36f, 0), .015f, iron);
+                    }
                         for (int k = 0; k < 4; k++) Lump(BoulderAt(k), t, new Vector3(1.25f + (k % 2 - .5f) * .1f, .36f, .55f + (k / 2 - .5f) * .1f), new Vector3(.1f, .06f, .1f), coal, k * 33);
                     break;
                 }

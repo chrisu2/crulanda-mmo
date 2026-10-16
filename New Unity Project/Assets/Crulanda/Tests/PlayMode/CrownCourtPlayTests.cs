@@ -53,7 +53,11 @@ namespace Crulanda.Tests
                 var tr = ZoneBuilder.CourtTradeOf(p); var t = Built(zone, p.name);
                 if (t == null) { problems.Add(p.name + " is not built"); continue; }
                 if (t.GetComponent<RoofFade>() == null) problems.Add(p.name + " does not fade where it hides you");
-                if (t.GetComponentsInChildren<Renderer>().Length < 60) problems.Add(p.name + " has next to nothing in it (" + t.GetComponentsInChildren<Renderer>().Length + " parts)");
+                // Built in the static scenery, its plain parts are merged into one mesh a material (ZoneBuilder.MergeStatics): so it is
+                // counted by its materials and its vertices, not its renderers (the Smithy showed 28 renderers merged from hundreds of parts).
+                var looks = t.GetComponentsInChildren<Renderer>(); int materials = looks.SelectMany(x => x.sharedMaterials).Where(m => m != null).Distinct().Count();
+                int verts = looks.Select(x => x.GetComponent<MeshFilter>()).Where(f => f != null && f.sharedMesh != null).Sum(f => f.sharedMesh.vertexCount);
+                if (materials < 12 || verts < 3000) problems.Add(p.name + " has next to nothing in it (" + looks.Length + " renderers, " + materials + " materials, " + verts + " vertices)");
                 if (t.GetComponentsInChildren<Collider>().Length < 5) problems.Add(p.name + ": its walls and posts are not solid");
                 // Its front: walked to from the Gilt Approach.
                 var before = zone.Ground(ZoneBuilder.CourtWorld(p, new Vector2(0, -tr.d / 2 - 1)));

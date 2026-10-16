@@ -252,6 +252,11 @@ namespace Crulanda.World
         public float Wet { get { return wet; } }
 
         ZoneBuilder zone; Light sun; WeatherLook shown; float wet; WeatherKind? forced; WeatherKind scheduled;
+        /// <summary>The zone's squall colour (ZoneDefinition.squallTint), clear for none: Hallow's Creek's silver time-squalls.</summary>
+        Color squallTint;
+        /// <summary>Whether this zone's squalls are tinted (a time-squall: Hallow's Creek), and the tint (tests read it).</summary>
+        public bool SquallTinted { get { return squallTint.a > 0; } }
+        public Color SquallTint { get { return squallTint; } }
         Material clouds, haze, droplets; Mesh domeMesh; Transform dome; ParticleSystem rain, splash, snow, drift;
         Material ground; Color groundColor; float groundGloss = -1;
         float splashDue, hazeDue, nextBolt, boltAt = -99; bool sheltered; Vector3 lastFocus; System.Random fx;
@@ -259,6 +264,8 @@ namespace Crulanda.World
         public void Init(ZoneBuilder builder, Light sunLight)
         {
             Active = this; zone = builder; sun = sunLight; fx = new System.Random(builder.Zone.seed + 4099);
+            // (Hallow's Creek's time-squalls, decision 9) a squall's dust in the zone's own colour: silver there, dun everywhere else.
+            squallTint = !string.IsNullOrEmpty(builder.Zone.squallTint) && ColorUtility.TryParseHtmlString(builder.Zone.squallTint, out var st) ? st : Color.clear;
             Schedule = WeatherSchedule.For(builder.Zone);
             if (Clock < 0) Clock = Schedule.CalmFrom(UnityEngine.Random.Range(0, 48) * (double)WeatherSchedule.SpellSeconds);
             shown = Schedule.LookAt(Clock, out scheduled); Kind = scheduled; wet = Soaked(shown) ? 1 : 0;
@@ -433,6 +440,7 @@ namespace Crulanda.World
             float mist = shown.mist, ash = shown.ash * .85f; dust = ash > mist;
             var fog = RenderSettings.fogColor; float g = fog.grayscale;
             tint = dust ? Color.Lerp(fog, new Color(g * 1.08f, g, g * .9f), .8f) : Color.Lerp(fog, Color.white, Mathf.Lerp(.3f, .1f, dark));
+            if (dust && squallTint.a > 0) tint = Color.Lerp(fog, new Color(squallTint.r * 1.15f, squallTint.g * 1.15f, squallTint.b * 1.2f), .85f);   // a time-squall's silver, a little brighter than the fog
             float amount = Mathf.Max(mist, ash); tint.a = (dust ? .3f : .34f) * amount;   // a squall's dust is thick and dun
             wind = new Vector3(dir.x, 0, dir.y) * (dust ? 1.5f + 4 * shown.wind : .25f + .6f * shown.wind) + Vector3.up * .03f;
             return amount;

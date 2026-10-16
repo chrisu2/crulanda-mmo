@@ -251,6 +251,79 @@ namespace Crulanda.Tests
             Clean(bad, "quest objectives");
         }
 
+        /// <summary>The second pass (2026-10-16): the design's departures closed in the data.</summary>
+        [Test] public void The_pact_captain_holds_the_second_landing_on_a_floor()
+        {
+            var kersey = zone.camps.Single(c => c.mob == "Pact-Captain Rowena Kersey"); var line = zone.camps.Single(c => c.name == "Kersey's line");
+            Assert.AreEqual(9, kersey.rise, .01f, "the second landing (+9), not the ground floor (DUNGEON2_DESIGN 2.7)"); Assert.AreEqual(9, line.rise, .01f, "her line with her");
+            var landing = zone.decks.Single(d => d.name == "The second landing");
+            Assert.AreEqual("floor", landing.style); Assert.AreEqual(9, landing.rise, .01f); Assert.GreaterOrEqual(landing.width, 7.5f); Assert.GreaterOrEqual(Vector2.Distance(landing.at, landing.at2), 5.5f, "a floor to fight on");
+            foreach (var n in new[] { "The first landing", "The third landing", "The belfry floor" }) Assert.IsTrue(zone.decks.Any(d => d.name == n), n);
+            Assert.AreEqual(4.5f, zone.decks.Single(d => d.name == "The first landing").rise, .01f); Assert.AreEqual(13.5f, zone.decks.Single(d => d.name == "The third landing").rise, .01f);
+            Assert.IsTrue(zone.anchors.Any(a => a.name == "the second landing" && Mathf.Approximately(a.rise, 9)), "the anchor the nav test walks to");
+            // No flight passes under a floor with less than 2.2 m over it: every pair of tower decks that overlap in plan are 2.2 m apart or more.
+            var tower = zone.decks.Where(d => string.IsNullOrEmpty(d.cave) && Vector2.Distance((d.at + d.at2) / 2, new Vector2(0, 118)) < 9).ToList();
+            var bad = new List<string>();
+            Rect Plan(ZoneDeck d) { var lo = Vector2.Min(d.at, d.at2); var hi = Vector2.Max(d.at, d.at2); bool alongX = Mathf.Abs(d.at2.x - d.at.x) > Mathf.Abs(d.at2.y - d.at.y); var half = alongX ? new Vector2(0, d.width / 2) : new Vector2(d.width / 2, 0); return Rect.MinMaxRect(lo.x - half.x + .05f, lo.y - half.y + .05f, hi.x + half.x - .05f, hi.y + half.y - .05f); }
+            foreach (var a in tower) foreach (var b in tower)
+            {
+                if (a == b || !Plan(a).Overlaps(Plan(b))) continue;
+                float gap = Mathf.Min(a.rise, a.rise2) - Mathf.Max(b.rise, b.rise2);
+                if (gap > 0 && gap < 2.2f + (a.style == "stone" ? 1.1f : a.style == "floor" ? .4f : .3f)) bad.Add(a.name + " is " + gap.ToString("0.00") + " m over " + b.name);
+            }
+            Clean(bad, "tower decks with too little head-room");
+        }
+
+        [Test] public void The_bars_are_as_designed_and_the_run_lifts_the_trapdoor()
+        {
+            var sally = zone.gates.Single(g => g.title == "The sally-port bar");
+            Assert.AreEqual("bar", sally.kind); Assert.AreEqual("far", sally.side, "the gatehouse's town-side bar: lifted from the town side"); Assert.IsFalse(string.IsNullOrEmpty(sally.prompt));
+            var gate = zone.gates.Single(g => g.title == "Tredway's gate"); Assert.AreEqual(gate.at.y, sally.at.y, .01f, "in the gatehouse's north wall with Tredway's gate");
+            var trap = zone.gates.Single(g => g.title == "The well-house trapdoor");
+            Assert.AreEqual("bar", trap.kind); Assert.AreEqual("far", trap.side, "lifted from below only"); Assert.IsTrue(trap.behind, "it bars again behind the party");
+            Assert.AreEqual("The well-house stair", trap.cave); Assert.IsTrue(caves.ContainsKey(trap.cave));
+            Assert.AreEqual(trap.title, zone.wings.Single(w => w.id == "cellars").gate, "the Cellars' way out is through it");
+            Assert.IsTrue(zone.gates.Where(g => g.behind).All(g => g.kind == "bar" && g.side == "far"));
+            var order = new List<string>(); var full = Plan(DungeonPlan.Mode.Full, order);
+            int lastCellar = full.FindLastIndex(s => !s.regroup && s.wing == "cellars"); Assert.GreaterOrEqual(lastCellar, 0, "the full run takes the Cellars");
+            var after = full[lastCellar + 1]; Assert.IsTrue(after.regroup && after.name == "the well-house" && after.wing == "cellars", "after the Cellars' last fight the run regroups at the well-house (through the trapdoor), not back the way it came: " + after.name);
+            Assert.IsFalse(Plan(DungeonPlan.Mode.Quick, new List<string>()).Any(s => s.wing == "cellars"), "the quick run leaves the Cellars");
+        }
+
+        [Test] public void The_secrets_give_what_the_design_says()
+        {
+            var items = LootTestData.Items(); var loot = LootTestData.Loot(items);
+            var want = new Dictionary<string, string> { { "secret.hallows.bets-cart", "loot.hal.the_hollins_ring" }, { "secret.hallows.masons-cache", "loot.hal.the_mortar_ring" }, { "secret.hallows.reed-chest", "loot.hal.the_kingfisher_ring" } };
+            foreach (var kv in want)
+            {
+                var s = zone.secrets.Single(x => x.id == kv.Key);
+                Assert.AreEqual(kv.Value, s.item, kv.Key + " holds its ring"); Assert.AreEqual(0, s.gold, kv.Key + ": the ring, not coin");
+                var d = items.Get(kv.Value); Assert.NotNull(d, kv.Value); Assert.AreEqual("gear", d.kind); StringAssert.Contains("Ring", d.name); Assert.AreEqual("GAME-ONLY", d.canonStatus);
+                var g = loot.Meta(kv.Value); Assert.NotNull(g); Assert.AreEqual("secret:" + kv.Key, g.source, kv.Value + " is the secret's");
+                Assert.IsTrue(File.Exists(Path.Combine(Application.dataPath, "Crulanda/Resources/Icons/item/" + kv.Value.Replace('.', '-') + ".png")), kv.Value + " has its icon (tools/wip/dungeon/hallows_icons.py)");
+            }
+            var mortar = loot.Meta("loot.hal.the_mortar_ring"); Assert.IsTrue(mortar.effects != null && mortar.effects.Any(e => e.kind == "procRoot" && e.ability == LootDatabase.AutoTrigger), "the Mortar ring roots (section 2.2)");
+            Assert.AreEqual(0, zone.secrets.Single(x => x.id == "secret.hallows.satchel").gold, "the satchel holds the soldier's letter");
+            Assert.IsFalse(string.IsNullOrEmpty(zone.secrets.Single(x => x.id == "secret.hallows.satchel").document));
+            Assert.AreEqual("Grey Quartz Ring", items.Get("loot.hal.grey_quartz_pendant").name, "First-Cut's Grey Quartz Ring (section 2.5)");
+        }
+
+        [Test] public void The_town_wakes_for_its_hold_and_the_squalls_are_silver()
+        {
+            var glitch = zone.events.Single(e => e.id == EncounterSession.GlitchEvent); var waking = zone.events.Single(e => e.id == EncounterSession.WakingEvent);
+            Assert.That(glitch.hold, Is.InRange(60, 90), "a Glitch wakes them for 60-90 s (section 4.2)"); Assert.AreEqual(90, waking.hold, .01f, "the Waking Hour, 90 s (E3)");
+            Assert.AreEqual(4, zone.camps.Where(c => c.after != null && c.after.StartsWith("event:waking")).Sum(c => c.count), "four paused ringers");
+            Assert.IsTrue(waking.waves.All(w => w.at < waking.hold - EncounterSession.SnapWarnSeconds), "every ringer climbs before the snap is warned");
+            var walk = zone.events.Single(e => e.id == EncounterSession.WalkEvent);
+            CollectionAssert.AreEqual(new[] { 33f, 67f }, walk.waves.Select(w => w.at).ToArray(), "the walk's waves at a third and two thirds of the way (E2)");
+            Assert.IsTrue(ColorUtility.TryParseHtmlString(zone.squallTint, out var silver), "the time-squalls' tint"); Assert.Less(Mathf.Abs(silver.r - silver.b), .15f, "silver, not dun");
+            StringAssert.Contains("silver", zone.squallText);
+            var vowell = EliteMoves.For(EncounterSession.ExaminerName, false); var upcott = EliteMoves.For("Assessor Piers Upcott", false);
+            Assert.AreEqual("stone", vowell.ccLook, "the Examiner's hour is the pause"); Assert.AreEqual("stone", upcott.ccLook, "and the Assessor's mark");
+            Assert.Greater(vowell.ccWarn, vowell.ccSeconds, "warned by the bell's hum, longer than the pause lasts (section 4.3)");
+            Assert.Greater(EliteMoves.For("The Long Shadow", false).ccWarn, 0, "the Long Shadow's minute is telegraphed");
+        }
+
         [Test] public void No_machines_and_vala_solari_named_once()
         {
             var texts = new[] { "Zones/hallows.json", "Quests/hallows.json", "Lore/hallows.json", "Items/loot.hallows.json" }.Select(f => File.ReadAllText(Path.Combine(Content, f))).ToList();

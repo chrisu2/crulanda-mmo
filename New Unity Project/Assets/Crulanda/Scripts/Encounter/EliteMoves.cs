@@ -31,6 +31,11 @@ namespace Crulanda.Encounter
         // disorient?"): cc "stun", "root", "fear" or "disorient", every ccEvery seconds for ccSeconds, on everyone within ccReach of it
         // (0: on whoever it fights). EncounterEnemy.Boss.HoldParty; EncounterSession.HoldPlayer and SimCompanion.HoldUntil take it.
         public string cc, ccName, ccText; public float ccEvery, ccSeconds = 3, ccReach;
+        /// <summary>(Hallow's Creek, DUNGEON2_DESIGN 4.3) A hold warned before it falls: ccWarn seconds of a mark on the ground (round the elite out
+        /// to ccReach, or under whoever it fights) and ccWarnText said, then the hold; 0: no warning. ccLook "stone": the Bureau's pause, the one
+        /// held turned to grey stone while it lasts (StoneHold), and while anyone of the party is stone it starts nothing new (no heavy blow, no
+        /// second pause: "none starts while someone is held").</summary>
+        public float ccWarn; public string ccWarnText, ccLook;
         /// <summary>Held by the party's crowd control for the full time, no immunity and no diminishing (the duo's Nix).</summary>
         public bool holdable;
     }
@@ -204,6 +209,7 @@ namespace Crulanda.Encounter
                 enrage = "The Fallen Mason lays a course of nothing between you and the edge." },
             new EliteMove { mob = "Assessor Piers Upcott", name = "Tally-Rod", windup = 1.8f, blow = 3.8f, reach = 3.6f, every = 11, callReach = 20, callMost = 2,
                 cc = "stun", ccName = "Marked for the cut", ccSeconds = 3, ccEvery = 15, ccReach = 0, ccText = "Upcott chalks a cross on you, and you go to stone where you stand.",
+                ccWarn = 2, ccWarnText = "Upcott licks the end of his chalk and looks at you as if you were a doorstep.", ccLook = "stone",
                 call = "Upcott taps the chalk on his board: \"More hands. This one's for the cut.\"", callShort = "More hands", enrage = "Upcott throws the chalk away and takes up the cutter's mallet." },
             new EliteMove { mob = "The Lamplighter", name = "Pole-Hook", windup = 1.9f, blow = 3.8f, reach = 4.2f, every = 11,
                 cc = "fear", ccName = "Lights out", ccSeconds = 4, ccEvery = 18, ccReach = 6, ccText = "The Lamplighter puts out a lamp that was never lit, and the dark comes after you.",
@@ -220,6 +226,7 @@ namespace Crulanda.Encounter
                 call = "First-Cut shrieks, and the niches in the walls answer.", callShort = "The shriek", enrage = "First-Cut's grey splits along the old chisel-line, and it does not slow." },
             new EliteMove { mob = "The Long Shadow", name = "Cold Hand", windup = 2.2f, blow = 4, reach = 3.8f, every = 12,
                 cc = "stun", ccName = "A minute taken", ccSeconds = 4, ccEvery = 18, ccReach = 4, ccText = "The Long Shadow passes over you and takes a minute: you stand in it, unable to move.",
+                ccWarn = 2.5f, ccWarnText = "The Long Shadow lengthens across the cellar floor toward you. Get out of it.",
                 enrage = "The Long Shadow stretches across the whole cellar floor." },
             new EliteMove { mob = "Registrar Dunstan Pardew", name = "Ledger-Spine", windup = 1.9f, blow = 3.8f, reach = 3.6f, every = 11, callReach = 20, callMost = 2,
                 cc = "stun", ccName = "Hush", ccSeconds = 2, ccEvery = 16, ccReach = 5, ccText = "\"Hush.\" Pardew's voice is very quiet, and you cannot move for it.",
@@ -233,6 +240,7 @@ namespace Crulanda.Encounter
                 call = "Kersey calls up the tower: \"Line! Down the stair!\"", callShort = "Line!", enrage = "Kersey plants the halberd and draws her sword." },
             new EliteMove { mob = "Bureau Examiner Thurstan Vowell", name = "The Seal", boss = true, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 4, reach = 3.8f, every = 12, callReach = 12, callMost = 2,
                 cc = "stun", ccName = "The hour", ccSeconds = 3, ccEvery = 18, ccReach = 8, ccText = "The bell hums under the Examiner's hand and the hour comes for you: stone, where you stand.",
+                ccWarn = 3.2f, ccWarnText = "The great bell begins to hum under the Examiner's hand. Get clear of him before the hour comes.", ccLook = "stone",
                 phases = new[] { new BossPhase { at = .5f, kind = "event", camp = "waking", text = "Vowell takes hold of the bell rope. \"It is nearly noon,\" he says. \"It is always nearly noon.\"" } },
                 call = "Vowell: \"Clerks. Take their names.\"", callShort = "Take their names", enrageAt = .35f, enrageHaste = .6f, enrage = "Vowell lets go of the rope. The bell goes on ringing without him." },
         };

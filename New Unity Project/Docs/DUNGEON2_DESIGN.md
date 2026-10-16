@@ -274,12 +274,12 @@ and `hallows_metas.py` (metas and registration).
   waves of ringers, then he stands stone 5 s); the bakery's Glitch; the wagon home once the Picker-Master is down; 8 secrets; six quests
   (Tamsin, Quill, Sefa Brine, and three of Warden Ivel's: the Preservationists' second line, decision 13); Vala Solari named once, on the
   Warden's papers; the door at Oakhaven's Road's End, "Hallow's Creek (dangerous, 15-20)"; the dungeon queue lists it.
-- **Changed from the design (say if wrong):** the Pact-Captain holds the tower's ground floor (the landings are corner squares of a spiral
+- **Changed from the design in the first pass, CLOSED in the second (below):** the Pact-Captain holds the tower's ground floor (the landings are corner squares of a spiral
   stair); the gatehouse's town-side bar is left out (no respawns: nothing to keep behind it); the Cellars come up by a second cave at the
   well-house and their bar is not built; the Granary is a standard-run wing whose camps are all optional (so the quick run leaves it); the
   Cellars are the full run's side fights; the secrets' rings (Bet's, the Mason's, the Reed chest's) are coin, not items; the Iron Pact wears
   the outriders' look and the Bureau the collectors' (PROVISIONAL looks).
-- **Not built yet:** the Waking Hour's colour swing and the paused moving (S7); the silver tint on the time-squalls; a stone look on a paused
+- **Not built in the first pass, BUILT in the second (below):** the Waking Hour's colour swing and the paused moving (S7); the silver tint on the time-squalls; a stone look on a paused
   member (the Bureau's holds are stuns); the Warden can be neither hit nor lost (PROVISIONAL); the map by height.
 - **New code (additive; the Adit untouched but for two generic fixes):** open-ground decks, drops, gates and anchors (ZoneBuilder.HallowsGround),
   pits and hazards, ZoneRide, ZoneWave.unless, a boss phase of kind "event", gates worked by hand now open (pen, bar, hidden door: the
@@ -287,3 +287,44 @@ and `hallows_metas.py` (metas and registration).
 - **To run (lane A):** EditMode HallowsDataTests and the counted tests touched (SocialRules, EliteBalance, LootData, ZoneGrowth, ZoneLore);
   PlayMode HallowsNavTests, ZoneContentTests, SecretPlacementTests, BuildingGroundTests; then walk it and capture the slabs, the square,
   the Archive and the belfry.
+
+## Status (p9-hallows2, the second pass: the design finished)
+**WRITTEN, compiles, NOT RUN (no Unity in this pass); OPEN until Chris plays it.** Branch `p9-hallows2` (worktree `D:\code\mmo-hallows2`, from
+p9-lowtowns), 2026-10-16. Chris: "no thanks i dont want a half assed version. complete it first". Every departure above is closed:
+- **The Pact-Captain on the second landing (2.7):** the tower rebuilt as four landings by stairs round the walls: eight flights of 2.25 m,
+  the first landing (+4.5) and third (+13.5) corner landings, the **second landing a stone floor at +9** (7.8 x 5.6 m and its two corner
+  squares) where Kersey and her line stand ("Form the line": a 3 s root on everyone within 4 m, every 15 s), the belfry at +18 over the
+  landing, its stair-head the NE corner. No flight passes under a floor with less than 2.2 m (HallowsDataTests checks every pair).
+- **The bars (3, 5):** the gatehouse's town-side bar is a sally-port beside Tredway's gate, barred from Main Street's side (lifted there
+  with E: the way back over the slabs for a group leaving early, the Pact kept behind it); the Cellars' far bar is **the well-house
+  trapdoor**, lifted from below only and barring again behind the party once all are up (ZoneGateDef.behind): never walked back, never
+  come into from the Square. The run: after the Cellars' last fight the leader regroups at the well-house through the trapdoor
+  (ZoneWing.gate; DungeonPlan) and lifts a bar itself when it stands on the bar's side (SimCompanion; a bar is no stop for the run).
+  Hand gates' E spots now stand on the side they are worked from.
+- **The secrets (2, 5):** Bet's cart holds **The Hollins' Ring**, the Fallen Mason's cache **The Mortar Ring** (a landed blow may root the
+  target 3 s: a new gear proc, procRoot), the Reed chest **The Kingfisher Ring** (rare named gear, source "secret:", GAME-ONLY, icons by
+  `tools/wip/dungeon/hallows_icons.py` on make_icons' drawers); the satchel holds only its letter; the two coppers stay coins (they are
+  coppers). First-Cut's piece is the Grey Quartz Ring (id kept). The game has no ring or trinket slot: the rings hang at the neck on their
+  cords, the Minute in Amber and the Examiner's Seal are held in the off hand.
+- **The town waking (4.1-4.3; decision 9):** a Glitch (the bakery's, 60 s) or the Waking Hour (90 s, four ringers) swings the grade back
+  to full colour (ZonePost.Swing), wakes the paused near it (the whole town at the Hour) so they move, and shifts the hungry shadows; three
+  seconds before the loop snaps a ring is warned round every townsperson awake near you and every ringer still climbing; whoever stands in
+  one is paused 3 s (stone); the ringers go back to stone; the Examiner stands stone 5 s with the skull on him (the party's marked window).
+  The time-squalls' dust is silver, the grade cast silver under them, and the chat says a time-squall blows in.
+- **The pause (4.3, N6):** the Assessor's and the Examiner's holds turn the one held (you or a sim) to grey stone while they last
+  (StoneHold); they are warned first (the bell's hum: 3.2 s, longer than the pause), and nothing new starts while anyone is stone. The
+  Long Shadow's minute is telegraphed too.
+- **The Warden (3, 6, decision 13):** Elvet is an actor now: the walk's waves come at her (at a third and two thirds of the way), the
+  party mends and guards her as Mother Quillet, she waits while the party fights or falls behind; if she falls the waves go back and she
+  is in her cell again to be walked (talk to her); she keeps the tower door on later visits. Her frame and nameplate are on the HUD.
+- **The map by height (S7):** a camp up a stair says how high ("+9 m"); camps and enemies off your floor are drawn faint.
+- **Fixed from the first Unity run (lane A, 16:20):** the cells' floor began half a metre past the hall's, a slot under every cell door
+  that cut the Warden's cell off the navmesh (no way into the cell; she never left it); the dark cellar's crawl (3.2 m wide, 2.6 high,
+  the hidden door's frame in it) was too low and narrow for the navmesh (the Long Shadow "no way there"; now 5.2 m and 3.5 m); the wagon
+  test rode with the yard's teamsters standing at the wagon (the ride is refused in a fight); the navmesh's "Combined Mesh" read error is
+  the shared static batching (another helper's fix), not Hallows' decks (they are never batched).
+- **Still not built, and why:** the Archive's door shutting behind the Warden (the Archive is doorless: its doors were blown in, CANON);
+  N9's shared rules (the party held to five, the deepest stone) are the shared dungeon code's, not changed here.
+- **To run (lane A):** EditMode HallowsDataTests, LootDataTests, ClassSetTests, SocialRulesTests, EliteBalanceTests, DiscoveryLogTests;
+  PlayMode HallowsNavTests (all), SecretPlacementTests, ZoneContentTests, AditCaveBuildTests (the cave gates); then walk the tower to the
+  belfry, the trapdoor from below, the Warden's walk, and capture the Waking Hour's swing and a time-squall.

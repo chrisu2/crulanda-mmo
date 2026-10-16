@@ -24,6 +24,8 @@
       "weight": 1
     }
   ],
+  "squallTint": "#C9CDDA",
+  "squallText": "A time-squall blows in over the town: the ash in it glitters silver, and for a breath your shadow is a step behind you.",
   "worldMapPosition": {
     "x": 0.66,
     "y": 0.47
@@ -506,7 +508,6 @@
       "xp": 220,
       "canonStatus": "GAME-ONLY (the Iron Pact is CANON, book1 ch.2)",
       "document": "doc.hallows.soldiers_letter",
-      "gold": 28,
       "cave": "The overhang",
       "along": 16.6,
       "aside": -0.05
@@ -520,10 +521,10 @@
         "y": -101.5
       },
       "prompt": "Look under the stone tarpaulin",
-      "text": "The cart is packed for the road west and turned to stone with it: a chair lashed on top, a quilt, a tin box under the seat that the stone did not take.",
+      "text": "The cart is packed for the road west and turned to stone with it: a chair lashed on top, a quilt, a tin box under the seat that the stone did not take, and in it a ring on a cord.",
       "xp": 260,
       "canonStatus": "GAME-ONLY (Bet's letter is already in the game)",
-      "gold": 40
+      "item": "loot.hal.the_hollins_ring"
     },
     {
       "id": "secret.hallows.masons-cache",
@@ -538,7 +539,7 @@
       "xp": 280,
       "canonStatus": "GAME-ONLY",
       "rise": -13,
-      "gold": 45
+      "item": "loot.hal.the_mortar_ring"
     },
     {
       "id": "secret.hallows.two-coppers",
@@ -576,11 +577,11 @@
         "y": -93.2
       },
       "prompt": "Unlock the chest by the fence",
-      "text": "A blanket chest set out by the Reed house's fence for a cart that never came, the lid stone but the lock still brass. Inside: linen, a kettle-holder worked with a kingfisher, and a purse.",
+      "text": "A blanket chest set out by the Reed house's fence for a cart that never came, the lid stone but the lock still brass. Inside: linen, a kettle-holder worked with a kingfisher, and Old Mother Reed's ring with the same bird cut in its stone.",
       "xp": 300,
       "canonStatus": "GAME-ONLY (Tamsin Reed and her mother are already in the game)",
       "needs": "secret.hallows.reed-key",
-      "gold": 55
+      "item": "loot.hal.the_kingfisher_ring"
     },
     {
       "id": "secret.hallows.archivists-page",
@@ -751,33 +752,33 @@
       "plan": [
         0.0,
         -1.0,
-        1.6,
         2.6,
+        3.5,
         0.0,
         0.0,
         0.0,
-        1.6,
         2.6,
+        3.5,
         0.0,
         -0.0,
         3.635,
-        1.8,
-        2.8,
+        2.6,
+        3.5,
         0.037,
         -0.055,
         7.665,
         4.5,
-        3.4,
+        3.6,
         0.037,
         -0.385,
         13.677,
         5,
-        3.5,
+        3.6,
         0.037,
         -0.44,
         17.708,
         4,
-        3.3,
+        3.4,
         0.037,
         -0.495,
         21.708,
@@ -2540,7 +2541,7 @@
         "x": 3.9,
         "y": 120.8
       },
-      "rise": 0.0,
+      "rise": 0,
       "rise2": 2.25,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
@@ -2648,7 +2649,7 @@
       "canonStatus": "GAME-ONLY"
     },
     {
-      "name": "The second landing",
+      "name": "The second landing (stair-head)",
       "style": "stone",
       "rails": "none",
       "at": {
@@ -2659,8 +2660,42 @@
         "x": 5.0,
         "y": 114.1
       },
-      "rise": 9.0,
-      "rise2": 9.0,
+      "rise": 9,
+      "rise2": 9,
+      "width": 2.2,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The second landing",
+      "style": "floor",
+      "rails": "none",
+      "at": {
+        "x": 1.1,
+        "y": 115.2
+      },
+      "at2": {
+        "x": 1.1,
+        "y": 120.8
+      },
+      "rise": 9,
+      "rise2": 9,
+      "width": 7.8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The second landing (north corner)",
+      "style": "floor",
+      "rails": "none",
+      "at": {
+        "x": 3.9,
+        "y": 120.8
+      },
+      "at2": {
+        "x": 3.9,
+        "y": 123.0
+      },
+      "rise": 9,
+      "rise2": 9,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -2669,14 +2704,14 @@
       "style": "stone",
       "rails": "none",
       "at": {
-        "x": 3.9,
-        "y": 115.2
+        "x": 2.8,
+        "y": 121.9
       },
       "at2": {
-        "x": 3.9,
-        "y": 120.8
+        "x": -2.8,
+        "y": 121.9
       },
-      "rise": 9.0,
+      "rise": 9,
       "rise2": 11.25,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
@@ -2686,12 +2721,12 @@
       "style": "stone",
       "rails": "none",
       "at": {
-        "x": 3.9,
-        "y": 120.8
+        "x": -2.8,
+        "y": 121.9
       },
       "at2": {
-        "x": 3.9,
-        "y": 123.0
+        "x": -5.0,
+        "y": 121.9
       },
       "rise": 11.25,
       "rise2": 11.25,
@@ -2703,12 +2738,12 @@
       "style": "stone",
       "rails": "none",
       "at": {
-        "x": 2.8,
-        "y": 121.9
+        "x": -3.9,
+        "y": 120.8
       },
       "at2": {
-        "x": -2.8,
-        "y": 121.9
+        "x": -3.9,
+        "y": 115.2
       },
       "rise": 11.25,
       "rise2": 13.5,
@@ -2720,12 +2755,12 @@
       "style": "stone",
       "rails": "none",
       "at": {
-        "x": -2.8,
-        "y": 121.9
+        "x": -3.9,
+        "y": 115.2
       },
       "at2": {
-        "x": -5.0,
-        "y": 121.9
+        "x": -3.9,
+        "y": 113.0
       },
       "rise": 13.5,
       "rise2": 13.5,
@@ -2737,12 +2772,12 @@
       "style": "stone",
       "rails": "none",
       "at": {
-        "x": -3.9,
-        "y": 120.8
+        "x": -2.8,
+        "y": 114.1
       },
       "at2": {
-        "x": -3.9,
-        "y": 115.2
+        "x": 2.8,
+        "y": 114.1
       },
       "rise": 13.5,
       "rise2": 15.75,
@@ -2754,12 +2789,12 @@
       "style": "stone",
       "rails": "none",
       "at": {
-        "x": -3.9,
-        "y": 115.2
+        "x": 2.8,
+        "y": 114.1
       },
       "at2": {
-        "x": -3.9,
-        "y": 113.0
+        "x": 5.0,
+        "y": 114.1
       },
       "rise": 15.75,
       "rise2": 15.75,
@@ -2771,12 +2806,12 @@
       "style": "stone",
       "rails": "none",
       "at": {
-        "x": -2.8,
-        "y": 114.1
+        "x": 3.9,
+        "y": 115.2
       },
       "at2": {
-        "x": 2.8,
-        "y": 114.1
+        "x": 3.9,
+        "y": 120.8
       },
       "rise": 15.75,
       "rise2": 18.0,
@@ -2788,11 +2823,11 @@
       "style": "timber",
       "rails": "none",
       "at": {
-        "x": 1.1,
+        "x": -1.1,
         "y": 115.2
       },
       "at2": {
-        "x": 1.1,
+        "x": -1.1,
         "y": 123
       },
       "rise": 18,
@@ -2806,11 +2841,11 @@
       "rails": "none",
       "at": {
         "x": 3.9,
-        "y": 113.0
+        "y": 120.8
       },
       "at2": {
         "x": 3.9,
-        "y": 115.2
+        "y": 123.0
       },
       "rise": 18,
       "rise2": 18,
@@ -2841,15 +2876,15 @@
       "rails": "none",
       "at": {
         "x": 59,
-        "y": 84.5
+        "y": 84.2
       },
       "at2": {
         "x": 85,
-        "y": 84.5
+        "y": 84.2
       },
       "rise": 2,
       "rise2": 2,
-      "width": 5,
+      "width": 5.8,
       "canonStatus": "GAME-ONLY",
       "solid": true
     },
@@ -3054,6 +3089,19 @@
       "look": "door"
     },
     {
+      "title": "The sally-port bar",
+      "kind": "bar",
+      "at": {
+        "x": -5.6,
+        "y": -121.37
+      },
+      "rotation": 0,
+      "width": 1.8,
+      "prompt": "Lift the sally-port bar",
+      "look": "bar",
+      "side": "far"
+    },
+    {
       "title": "The Warden's cell",
       "kind": "pen",
       "at": {
@@ -3098,6 +3146,16 @@
       "along": 3.5,
       "prompt": "Feel along the wall",
       "look": "door"
+    },
+    {
+      "title": "The well-house trapdoor",
+      "kind": "bar",
+      "cave": "The well-house stair",
+      "along": 13,
+      "prompt": "Lift the trapdoor bar",
+      "look": "door",
+      "side": "far",
+      "behind": true
     }
   ],
   "anchors": [
@@ -3155,7 +3213,7 @@
       "name": "the belfry stair-head",
       "at": {
         "x": 3.9,
-        "y": 114.1
+        "y": 121.9
       },
       "rise": 18
     },
@@ -3165,6 +3223,14 @@
         "x": 89,
         "y": -100
       }
+    },
+    {
+      "name": "the second landing",
+      "at": {
+        "x": 1.1,
+        "y": 118
+      },
+      "rise": 9
     },
     {
       "name": "the Cut-Store",
@@ -3203,7 +3269,8 @@
       "after": "street",
       "exit": "walk",
       "home": "the well-house",
-      "optional": true
+      "optional": true,
+      "gate": "The well-house trapdoor"
     },
     {
       "id": "archive",
@@ -3230,6 +3297,7 @@
       "wing": "street",
       "anchor": "the bakery counter",
       "step": 0,
+      "hold": 60,
       "waves": [
         {
           "at": 4,
@@ -3251,13 +3319,13 @@
       "step": 0,
       "waves": [
         {
-          "at": 20,
+          "at": 33,
           "camp": "Pact relief on the walk",
           "unless": "Picker-Master Fulke Yelland",
           "text": "Boots on the Granary road: the Pact's relief comes up from the yard to take the Warden back."
         },
         {
-          "at": 45,
+          "at": 67,
           "camp": "Hollow up out of the well",
           "unless": "First-Cut",
           "text": "Something climbs out of the well-house: the Hollow, come up from the Cellars after the Warden."
@@ -3270,6 +3338,7 @@
       "wing": "tower",
       "anchor": "the belfry stair-head",
       "step": 0,
+      "hold": 90,
       "waves": [
         {
           "at": 3,
@@ -3277,7 +3346,7 @@
           "text": "Colour runs back into the town like water into a print. Below, the square moves; on the stair, two of the paused ringers wake and climb."
         },
         {
-          "at": 30,
+          "at": 40,
           "camp": "Ringers on the stair (second)",
           "text": "Two more of the ringers come up the stair, their faces still stone, their hands already on the rope that is not there."
         }
@@ -4205,18 +4274,19 @@
       "tag": "pactsoldier",
       "look": "outrider",
       "canonStatus": "GAME-ONLY (the Bureau and the Iron Pact are CANON, book1 ch.2-3)",
-      "radius": 1.5,
+      "radius": 1.2,
       "count": 2,
       "levelMin": 19,
       "levelMax": 19,
       "respawn": 7200,
       "center": {
-        "x": -1.5,
-        "y": 119.5
+        "x": -1.2,
+        "y": 119.2
       },
       "wing": "tower",
       "step": 2,
-      "gate": "The ward-lock"
+      "gate": "The ward-lock",
+      "rise": 9
     },
     {
       "name": "Pact-Captain Rowena Kersey",
@@ -4230,14 +4300,15 @@
       "levelMax": 20,
       "respawn": 7200,
       "center": {
-        "x": 1,
-        "y": 117
+        "x": 1.6,
+        "y": 117.4
       },
       "wing": "tower",
       "step": 2,
       "elite": true,
       "guards": "Kersey's line",
-      "gate": "The ward-lock"
+      "gate": "The ward-lock",
+      "rise": 9
     },
     {
       "name": "The Examiner's clerks",

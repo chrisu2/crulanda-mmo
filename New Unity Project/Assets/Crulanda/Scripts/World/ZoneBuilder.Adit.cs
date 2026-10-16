@@ -1167,7 +1167,7 @@ namespace Crulanda.World
                 {
                     if (gd == null || gd.cave != h.Name || string.IsNullOrEmpty(gd.title) || Gates.Exists(g => g != null && g.Cave == h.Name && g.Title == gd.title)) continue;
                     var gate = Gate(gd.along, gd.title, string.IsNullOrEmpty(gd.kind) ? "bossdoor" : gd.kind, gd.prompt, gd.lord, gd.look, gd.side == "far");
-                    gate.OpensOn = gd.opensOn;
+                    gate.OpensOn = gd.opensOn; gate.ShutsBehind = gd.behind;   // (Hallow's Creek) a bar that bars again behind the party
                 }
             }
             // A cave of a style with no dressing of its own yet (the Adit rework): lamps down its walls and a pale light high in its wide

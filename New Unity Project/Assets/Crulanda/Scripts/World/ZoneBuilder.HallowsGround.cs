@@ -24,7 +24,26 @@ namespace Crulanda.World
         /// <summary>The height open ground's heights are measured from: the land at the zone's start (the yard).</summary>
         public float Datum { get; private set; }
         /// <summary>A strip of hazard ground as worked out: its data, its ends on the ground plane, its half width and the floor it lies on.</summary>
-        public sealed class HazardSpot { public ZoneHazard def; public Vector2 a, b; public float half, floor; }
+        public sealed class HazardSpot
+        {
+            public ZoneHazard def; public Vector2 a, b; public float half, floor;
+            /// <summary>Where its ends lie when it has not shifted, and its strips on the ground (moved with it when it shifts).</summary>
+            public Vector2 a0, b0; public readonly List<Transform> looks = new List<Transform>();
+        }
+        /// <summary>
+        /// (DUNGEON2_DESIGN 4.1: "At the Waking Hour they shift.") Each hungry shadow slides sideways by <paramref name="metres"/> (one way or the
+        /// other by turns, as the light of a waking town comes from somewhere else); 0 puts them back. The navmesh's costly patches stay where
+        /// they were baked: a shift of a metre or two still overlaps them, and the strips go back when the town sleeps again.
+        /// </summary>
+        public void ShiftHazards(float metres)
+        {
+            for (int i = 0; i < Hazards.Count; i++)
+            {
+                var h = Hazards[i]; var dir = (h.b0 - h.a0).normalized; var side = new Vector2(dir.y, -dir.x) * (i % 2 == 0 ? metres : -metres);
+                var was = h.a; h.a = h.a0 + side; h.b = h.b0 + side; var by = h.a - was;
+                foreach (var t in h.looks) if (t != null) t.position += new Vector3(by.x, 0, by.y);
+            }
+        }
         /// <summary>The zone's hazard strips (the hungry shadows).</summary>
         public readonly List<HazardSpot> Hazards = new List<HazardSpot>();
         /// <summary>The navmesh's costly patches over the hazard strips (EncounterNavigation): centre, rotation, size.</summary>
@@ -89,7 +108,7 @@ namespace Crulanda.World
                 {
                     if (h == null) continue;
                     var mid = (h.from + h.to) / 2; var dir = h.to - h.from; float len = dir.magnitude; if (len < .3f) continue;
-                    var spot = new HazardSpot { def = h, a = h.from, b = h.to, half = Mathf.Max(.5f, h.width / 2), floor = StandAt(mid, float.NegativeInfinity).y };
+                    var spot = new HazardSpot { def = h, a = h.from, b = h.to, a0 = h.from, b0 = h.to, half = Mathf.Max(.5f, h.width / 2), floor = StandAt(mid, float.NegativeInfinity).y };
                     Hazards.Add(spot);
                     HazardAreas.Add((new Vector3(mid.x, spot.floor + .5f, mid.y), Quaternion.LookRotation(new Vector3(dir.x, 0, dir.y)), new Vector3(h.width, 2.5f, len)));
                 }
@@ -152,8 +171,9 @@ namespace Crulanda.World
             {
                 var ab = h.b - h.a; var mid = (h.a + h.b) / 2; var rot = Quaternion.LookRotation(new Vector3(ab.x, 0, ab.y));
                 var at = new Vector3(mid.x, h.floor + .03f, mid.y);
-                Part(PrimitiveType.Cube, root, at, new Vector3(h.half * 2, .02f, ab.magnitude), dark, rot).name = "Shadow: " + h.def.name;
-                Part(PrimitiveType.Cube, root, at - Vector3.up * .005f, new Vector3(h.half * 2 + 1.2f, .02f, ab.magnitude + 1.2f), dim, rot).name = "Shadow's edge";
+                var strip = Part(PrimitiveType.Cube, root, at, new Vector3(h.half * 2, .02f, ab.magnitude), dark, rot); strip.name = "Shadow: " + h.def.name;
+                var edge = Part(PrimitiveType.Cube, root, at - Vector3.up * .005f, new Vector3(h.half * 2 + 1.2f, .02f, ab.magnitude + 1.2f), dim, rot); edge.name = "Shadow's edge";
+                h.looks.Add(strip.transform); h.looks.Add(edge.transform);
             }
             // The chasm's fog floor: a still sheet of the grey's static, lit faintly violet from under.
             if (Zone.pits != null)
@@ -170,7 +190,8 @@ namespace Crulanda.World
         /// where it is built up, a plinth to the land; over the chasm a slab with a broken underside of hanging rubble.</summary>
         void BuildOpenDeck(ZoneDeckSpot spot, Transform root, Material m)
         {
-            var d = spot.def; float thick = d.style == "timber" ? .3f : 1.1f;
+            // style "floor" (the tower's second landing): a floor of dressed stone laid in its hall, no hanging rubble under it, no posts.
+            var d = spot.def; float thick = d.style == "timber" ? .3f : d.style == "floor" ? .4f : 1.1f;
             var go = new GameObject("Deck: " + d.name).transform; go.SetParent(root, false); spot.root = go;
             if (spot.round)
             {
@@ -194,7 +215,7 @@ namespace Crulanda.World
                 float low = Mathf.Min(a.y, b.y) - thick, under = Mathf.Min(spot.under[0], spot.under[spot.under.Length - 1]);
                 Plinth(go, new Vector3((a.x + b.x) / 2, low, (a.z + b.z) / 2), under, new Vector3(spot.half * 2 - .1f, 0, new Vector2(along.x, along.z).magnitude - .1f), flat, m);
             }
-            else if (d.style != "timber" && spot.under[0] < a.y - 8)
+            else if (d.style == "stone" && spot.under[0] < a.y - 8 && FogFloor(new Vector2(a.x, a.z), out _))
             {
                 // A slab of the old bridge, frozen where the blast left it: rubble hanging under it, nothing holding it up.
                 var rubble = Tint(art.stone, new Color(.5f, .5f, .53f)); var rr = new System.Random(Mathf.RoundToInt(a.x * 13 + a.z * 7));
@@ -261,12 +282,12 @@ namespace Crulanda.World
                     }
                     break;
             }
-            var gate = root.gameObject.AddComponent<ZoneGate>(); gate.Title = gd.title; gate.Cave = null; gate.Along = 0; gate.Lord = gd.lord; gate.Grille = bars;
+            var gate = root.gameObject.AddComponent<ZoneGate>(); gate.Title = gd.title; gate.Cave = null; gate.Along = 0; gate.Lord = gd.lord; gate.Grille = bars; gate.ShutsBehind = gd.behind;
             gate.Rise = high + .2f; gate.Kind = kind; gate.FromFar = gd.side == "far"; gate.OpensOn = string.IsNullOrEmpty(gd.opensOn) ? null : gd.opensOn;
             gate.Init(new Vector3(w + .2f, high, .6f));
             Gates.Add(gate);
             string prompt = !string.IsNullOrEmpty(gd.prompt) ? gd.prompt : kind == "ward" ? "Study the ward-lock" : null;
-            if (prompt != null) Interactables.Add(new ZoneInteractable { name = gd.title, prompt = prompt, kind = kind, position = foot - root.forward * 1.2f, root = root, gate = gate });
+            if (prompt != null) Interactables.Add(new ZoneInteractable { name = gd.title, prompt = prompt, kind = kind, position = foot + root.forward * (gate.FromFar ? 1.2f : -1.2f), root = root, gate = gate });
             return gate;
         }
     }

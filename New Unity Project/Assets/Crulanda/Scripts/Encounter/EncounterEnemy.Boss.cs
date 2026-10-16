@@ -29,6 +29,30 @@ namespace Crulanda.Encounter
     {
         readonly HashSet<int> phasesDone = new HashSet<int>();
         float nextRingAt, nextBlinkAt, nextHoldAt, weaponUp = 1; bool calledOnPull, saidHold; Actor lastFoe;
+        /// <summary>(Hallow's Creek) A warned hold (EliteMove.ccWarn): when it falls (0: none coming), where its mark lies, and its mark.</summary>
+        float holdWarnAt, holdWarnFrom; BlowMark holdMark;
+        /// <summary>A hold being warned now (its mark on the ground), and how far through the warning it is (0 to 1).</summary>
+        public bool HoldWarning { get { return holdWarnAt > 0; } }
+        public float HoldWarnProgress { get { return holdWarnAt > 0 ? Mathf.Clamp01((Time.time - holdWarnFrom) / Mathf.Max(.01f, holdWarnAt - holdWarnFrom)) : 0; } }
+        /// <summary>(Hallow's Creek, DUNGEON2_DESIGN 4.3: "none starts while someone is held") An elite whose hold is the Bureau's pause starts
+        /// no heavy blow and no new pause while anyone of the party stands stone.</summary>
+        bool HoldsOff { get { return Move != null && Move.ccLook == "stone" && StoneHold.AnyIn(session.PartyActors()); } }
+        /// <summary>Starts the warning before a hold: the mark round it (or under whoever it fights) filling for ccWarn seconds, and its words.</summary>
+        void BeginHoldWarn()
+        {
+            holdWarnFrom = Time.time; holdWarnAt = Time.time + Move.ccWarn;
+            if (holdMark == null) holdMark = BlowMark.Create();
+            ShowHoldMark();
+            session.FloatText(transform.position + Vector3.up * .5f, (Move.ccName ?? Move.cc) + "...", BlowColor);
+            if (!string.IsNullOrEmpty(Move.ccWarnText)) session.Message(Move.ccWarnText);
+        }
+        void ShowHoldMark()
+        {
+            if (holdMark == null) return;
+            var feet = Move.ccReach > 0 || Victim == null ? transform.position - Vector3.up : Victim.transform.position - Vector3.up;
+            holdMark.Show(feet, Move.ccReach > 0 ? Move.ccReach : 1.6f, HoldWarnProgress);
+        }
+        void EndHoldWarn() { holdWarnAt = 0; if (holdMark != null) holdMark.Hide(); }
         /// <summary>Its hold on the party (EliteMove.cc): on everyone within ccReach, or on whoever it fights.</summary>
         void HoldParty()
         {
@@ -39,6 +63,7 @@ namespace Crulanda.Encounter
                 if (a == null || !a.IsAlive) continue;
                 if (a == session.Player) session.HoldPlayer(Move.cc, Move.ccSeconds, transform.position, Name + "'s " + (Move.ccName ?? Move.cc));
                 else { var c = a.GetComponent<SimCompanion>(); if (c != null) c.HoldUntil(Move.cc, Move.ccSeconds, transform.position); else continue; }
+                if (Move.ccLook == "stone") StoneHold.Apply(a.gameObject, Move.ccSeconds);   // (Hallow's Creek, the pause) grey stone while it lasts
                 held++;
             }
             if (held == 0) return;
@@ -62,10 +87,16 @@ namespace Crulanda.Encounter
                 if (nextRingAt <= 0) nextRingAt = now + Move.ringEvery * .6f;
                 else if (now >= nextRingAt) { nextRingAt = now + Move.ringEvery; Ring(); }
             }
-            if (!string.IsNullOrEmpty(Move.cc) && Move.ccEvery > 0 && !WindingUp && Victim != null)
+            // A warned hold falls when its warning is out, whatever else it is doing (the mark was there to be seen).
+            if (holdWarnAt > 0) { ShowHoldMark(); if (now >= holdWarnAt) { EndHoldWarn(); if (Victim != null) HoldParty(); } }
+            else if (!string.IsNullOrEmpty(Move.cc) && Move.ccEvery > 0 && !WindingUp && Victim != null)
             {
                 if (nextHoldAt <= 0) nextHoldAt = now + Move.ccEvery * .7f;
-                else if (now >= nextHoldAt) { nextHoldAt = now + Move.ccEvery; HoldParty(); }
+                else if (now >= nextHoldAt)
+                {
+                    if (HoldsOff) nextHoldAt = now + 1;   // someone stands stone: no new pause until they are free
+                    else { nextHoldAt = now + Move.ccEvery; if (Move.ccWarn > 0) BeginHoldWarn(); else HoldParty(); }
+                }
             }
             if (Move.blinkEvery > 0 && !WindingUp && Victim != null)
             {
@@ -171,6 +202,6 @@ namespace Crulanda.Encounter
             for (int i = 0; i < kin.Count; i++) kin[i].Answer(this, foe, SocialAggro.CallBeat + SocialAggro.CallStagger * i);
             if (kin.Count > 0) session.Message(string.IsNullOrEmpty(Move.deathText) ? "Boots on the stone: more of them come." : Move.deathText);
         }
-        void ResetBoss() { phasesDone.Clear(); weaponUp = 1; calledOnPull = false; nextRingAt = nextBlinkAt = 0; }
+        void ResetBoss() { phasesDone.Clear(); weaponUp = 1; calledOnPull = false; nextRingAt = nextBlinkAt = 0; EndHoldWarn(); }
     }
 }

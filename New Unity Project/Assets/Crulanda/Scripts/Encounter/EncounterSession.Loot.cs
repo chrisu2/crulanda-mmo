@@ -104,6 +104,7 @@ namespace Crulanda.Encounter
             if (procs == null || !procs.Any || Player == null || !Player.IsAlive) return;
             if (procs.resource > 0 && Player.Resource != null) Player.Resource.Pool.Change(procs.resource);
             foreach (var (id, seconds) in procs.resets) abilities.Shorten(id, seconds, Time.time);
+            if (procs.root > 0 && Target != null && Target.actor != null && Target.actor.IsAlive) Target.Root(procs.root);   // (Hallow's Creek) the Mortar Ring sets it in the mortar
             FloatText(Player.transform.position + Vector3.up * .4f, string.Join(" ", procs.fired.ConvertAll(ShortProc)), new Color(1f, .82f, .3f));
         }
         /// <summary>A fired proc's float: its text up to the colon ("Echo: ..." shows "Echo").</summary>

@@ -13,13 +13,13 @@ HERE = os.path.dirname(os.path.abspath(__file__))
 OUT = os.path.join(HERE, '..', '..', '..', 'New Unity Project', 'Assets', 'Crulanda', 'EncounterContent', 'Items', 'loot.hallows.json')
 F = np.float32
 def rnd(x): return int(round(float(x)))     # Mathf.RoundToInt: to even on a half, of the float
-def curve(slot, level, q=3):
+def curve(slot, level, q=3, per=6):
     c = level + 1; power = F(c) * F({2: 1.35, 3: 1.7, 4: 2.1, 5: 2.5}[q])
     d = {}
     if slot == 'mainhand': d['weaponDamage'] = max(1, rnd(F(3) + power * F(1.6)))
     elif slot != 'neck': d['armor'] = max(1, rnd(power * F(2.2 if slot in ('chest', 'legs') else 2.6 if slot == 'offhand' else 1.4)))
     d['value'] = max(1, rnd(F(c * (1 + q)) * F(1.4 if slot == 'mainhand' else 1)))
-    k = max(F(1), power / F(4)); budget = rnd(F(6) * k)
+    k = max(F(1), power / F(4)); budget = rnd(F(per) * k)
     return d, budget
 
 # (boss, its level, [(slug, name, slot, look, stat shares, description)])
@@ -48,7 +48,7 @@ B = [
    ('loft_watch_jerkin', "Loft Watch's Jerkin", 'chest', 'chest.jerkin:leather/sandthrone', {'agility': 3, 'stamina': 2}, "A Pact archer's jerkin, padded at the shoulder where the net-bow kicks.")]),
  ('First-Cut', 19, [
    ('the_cutters_chisel', "The Cutter's Chisel", 'mainhand', 'knife:hooked/tollroad', {'agility': 3, 'stamina': 2}, "The chisel the Bureau's first cutter used on the first of the paused. It has never come clean."),
-   ('grey_quartz_pendant', 'Grey Quartz Pendant', 'neck', 'neck.pendant:glass/pale+glow', {'intellect': 3, 'spirit': 2}, "A chip of memory-quartz on a cord. Hold it and you remember a kitchen you have never stood in.")]),
+   ('grey_quartz_pendant', 'Grey Quartz Ring', 'neck', 'neck.pendant:glass/pale+glow', {'intellect': 3, 'spirit': 2}, "A ring cut from one chip of memory-quartz, worn on a cord. Hold it and you remember a kitchen you have never stood in.")]),
  ('The Long Shadow', 19, [
    ('a_minute_in_amber', 'A Minute in Amber', 'offhand', 'offhand.hung:shuttered/sandthrone+glow', {'intellect': 3, 'spirit': 2}, "A drop of amber with nothing in it but a minute. It is always the same minute.")]),
  ('Registrar Dunstan Pardew', 19, [
@@ -64,6 +64,19 @@ B = [
    ('the_examiners_seal', "The Examiner's Seal", 'offhand', 'offhand.hung:scale/concord', {'intellect': 3, 'stamina': 2}, "The Examiner's seal on a fob: the High Council's word, pressed into wax a thousand times, into stone once.")]),
 ]
 STATS = ['stamina', 'strength', 'agility', 'intellect', 'spirit']
+# The secrets' rings (DUNGEON2_DESIGN sections 2 and 5: Bet's cart, the Fallen Mason's cache with its "Mortar" ring that roots, the Reed chest):
+# rare named gear held by a secret (source "secret:<id>"), on the curve at the level of where it lies, a rare's budget (5k, not a signature
+# piece's 6k). The game has no ring slot, so each is worn at the neck on its cord (a ring on a pendant's look). All GAME-ONLY.
+# (secret id, level, slug, name, look, stat shares, description, effects)
+SECRETS = [
+ ('secret.hallows.bets-cart', 17, 'the_hollins_ring', "The Hollins' Ring", 'neck.pendant:signet/oakhaven', {'stamina': 3, 'spirit': 2},
+  "A plain gold ring on a bootlace, out of the tin box under the seat of Bet's cart. Somebody meant to come back for it.", None),
+ ('secret.hallows.masons-cache', 17, 'the_mortar_ring', 'The Mortar Ring', 'neck.cord:knot/pale', {'strength': 3, 'stamina': 2},
+  "The Fallen Mason's own ring, grey with fifty years of mortar that never set until he did. Whatever it strikes, it holds.",
+  [{'kind': 'procRoot', 'ability': 'auto', 'chance': 8, 'amount': 3, 'text': 'Mortar: a landed blow has an 8% chance to set the target in the mortar, rooted for 3 seconds.'}]),
+ ('secret.hallows.reed-chest', 18, 'the_kingfisher_ring', 'The Kingfisher Ring', 'neck.pendant:drop/pilgrim', {'intellect': 3, 'spirit': 2},
+  "Old Mother Reed's ring, a kingfisher cut in its blue stone, kept in the blanket chest for the day the cart came. Tamsin's mother wore one like it.", None),
+]
 
 def main():
     items, gear, drops = [], [], []
@@ -84,6 +97,19 @@ def main():
         slugb = ''.join(ch if ch.isalnum() else '_' for ch in boss.lower()).strip('_')
         while '__' in slugb: slugb = slugb.replace('__', '_')
         drops.append({'id': 'drop.hallows.' + slugb, 'zone': 'hallows', 'mob': boss, 'rank': 'elite', 'groups': [{'chance': 1, 'signature': True, 'pick': pick}]})
+    for sid, level, slug, name, look, w, desc, effects in SECRETS:
+        d, budget = curve('neck', level, per=5)
+        tot = sum(w.values()); stats = {s: int(budget * w[s] // tot) for s in w}
+        stats[max(w, key=w.get)] += budget - sum(stats.values())
+        iid = 'loot.hal.' + slug
+        it = {'id': iid, 'name': name, 'kind': 'gear', 'slot': 'neck', 'quality': 3, 'level': level, 'value': d['value']}
+        for s in STATS:
+            if stats.get(s): it[s] = stats[s]
+        it['description'] = desc; it['canonStatus'] = 'GAME-ONLY'
+        items.append(it)
+        g = {'id': iid, 'look': look, 'source': 'secret:' + sid, 'unique': True}
+        if effects: g['effects'] = effects
+        gear.append(g)
     with io.open(OUT, 'w', encoding='utf-8', newline='\n') as f:
         f.write(json.dumps({'items': items, 'vendors': [], 'gear': gear, 'drops': drops, 'sets': []}, indent=2, ensure_ascii=False) + '\n')
     print(len(items), 'items')

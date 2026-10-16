@@ -129,10 +129,73 @@ namespace Crulanda.Tests
             pardew.Receive(1000000, s.Player); yield return Frames(30);
             Assert.IsTrue(cell.Open, "the cell opens as the Registrar falls");
             Assert.NotNull(s.Warden, "the Warden walks"); Assert.AreEqual(EncounterSession.WalkEvent, s.EventRunning, "the walk's waves are coming");
-            for (float w = 0; w < 150 && !s.Warden.Arrived; w += Time.deltaTime) { Time.timeScale = 4; yield return null; }
-            Time.timeScale = 1;
+            Assert.AreEqual(HallowsWarden.Stage.Walking, s.Warden.Now);
+            Assert.AreSame(s.Warden.actor, s.PartyActor(s.Warden.actor.EntityId.Value), "she is one of the party for every mob (the waves come at her)");
+            var motor = s.Player.GetComponent<AdventurerMotor>();
+            // She waits for the party: with you far off she does not walk on.
+            motor.Teleport(zone.Ground(zone.Zone.spawns.player, .3f)); yield return Frames(30);
+            Assert.IsTrue(s.Warden.Holding, "she waits while none of the party is near");
+            // Struck down, she falls, the walk's waves go back, and a little later she is in her cell to be walked again.
+            HallowsWarden.BackAfter = 1;
+            s.Warden.actor.Health.ApplyDamage(s.Warden.actor.Health.Pool.Max * 10); yield return Frames(5);
+            Assert.AreEqual(HallowsWarden.Stage.Fallen, s.Warden.Now, "she can fall"); Assert.IsNull(s.EventRunning, "the walk falls with her");
+            for (float w = 0; w < 5 && s.Warden.Now != HallowsWarden.Stage.Waiting; w += Time.deltaTime) yield return null;
+            Assert.AreEqual(HallowsWarden.Stage.Waiting, s.Warden.Now, "back in her cell"); Assert.IsTrue(s.Warden.actor.IsAlive);
+            var talk = zone.Interactables.Find(i => i.kind == "warden"); Assert.NotNull(talk);
+            s.UseInteractable(talk); yield return Frames(3);
+            Assert.AreEqual(HallowsWarden.Stage.Walking, s.Warden.Now, "spoken to, she walks again"); Assert.AreEqual(EncounterSession.WalkEvent, s.EventRunning);
+            // Kept company, she gets to the tower's door.
+            for (float w = 0; w < 150 && !s.Warden.Arrived; w += Time.deltaTime)
+            {
+                Time.timeScale = 4;
+                if (Vector3.Distance(s.Player.transform.position, s.Warden.transform.position) > 6) motor.Teleport(s.Warden.transform.position + Vector3.up * .2f - s.Warden.transform.forward * 2);
+                yield return null;
+            }
+            Time.timeScale = 1; HallowsWarden.BackAfter = 30;
             Assert.IsTrue(s.Warden.Arrived, "she gets to the tower's door");
             Assert.IsTrue(ward.Open, "and the ward-lock is unbound"); Assert.IsTrue(s.Progress.keys.Contains(EncounterSession.WardKey), "for good");
+        }
+
+        /// <summary>The Pact-Captain holds the tower's second landing (DUNGEON2_DESIGN 2.7): a floor at +9 walked to from the tower's door up the
+        /// stairs round the walls, she stands on it, and the belfry is above it.</summary>
+        [UnityTest, Timeout(300000)] public IEnumerator The_pact_captains_landing_is_reached_from_the_towers_door()
+        {
+            var s = Session(); var zone = s.Zone; zone.OpenGates(); yield return Frames(60);
+            var landing = zone.DeckSpots.Find(d => d.def != null && d.def.name == "The second landing"); Assert.NotNull(landing, "the second landing's floor");
+            Assert.AreEqual("floor", landing.def.style); Assert.GreaterOrEqual(landing.def.width, 7.5f, "a floor to fight on, not a corner of the stair");
+            Assert.AreEqual(9, zone.Anchors["the second landing"].y - zone.Datum, .4f, "at +9");
+            var door = On(zone.Anchors["the tower door"] + Vector3.up * .2f, "the tower door"); var up = On(zone.Anchors["the second landing"] + Vector3.up * .2f, "the second landing");
+            Assert.AreEqual(9, up.y - zone.Datum, .6f, "the navmesh is on the landing, not the ground under it");
+            float walk = NavReach.Length(door, up); Assert.Less(walk, 80, "up the stairs from the door to the landing (" + walk.ToString("0") + " m)");
+            Assert.Less(NavReach.Length(up, On(zone.Anchors["the belfry stair-head"] + Vector3.up * .2f, "the belfry stair-head")), 80, "and on up to the belfry");
+            var kersey = s.Enemies.Find(e => e != null && e.MobName == "Pact-Captain Rowena Kersey"); Assert.NotNull(kersey);
+            Assert.AreEqual(9, kersey.transform.position.y - 1 - zone.Datum, 1.2f, "the Pact-Captain stands on the landing");
+            var move = EliteMoves.For(kersey.MobName, false); Assert.AreEqual("root", move.cc); Assert.AreEqual("Form the line", move.ccName); Assert.Greater(move.ccReach, 0, "on everyone near her");
+        }
+
+        /// <summary>The bars (sections 3 and 5): the gatehouse's sally-port lifts from the town side only; the Cellars' far trapdoor lifts from
+        /// below only and bars again behind the party once all are up on the Square.</summary>
+        [UnityTest] public IEnumerator The_bars_lift_from_their_own_side_and_the_trapdoor_bars_behind()
+        {
+            var s = Session(); var zone = s.Zone; yield return Frames(30);
+            var motor = s.Player.GetComponent<AdventurerMotor>();
+            foreach (var e in s.Enemies.ToArray()) if (e != null && e.Camp && e.actor.IsAlive) e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 10);   // nobody in the way
+            yield return Frames(5);
+            IEnumerator Beside(ZoneGate g, float side) { motor.Teleport(On(g.transform.position + g.transform.forward * side + Vector3.up * .3f, g.Title + "'s side", 4) + Vector3.up * .3f); yield return Frames(5); }
+            var sally = zone.Gates.Find(g => g.Title == "The sally-port bar"); Assert.NotNull(sally, "the gatehouse's town-side bar");
+            Assert.IsTrue(sally.FromFar); var sallyUse = zone.Interactables.Find(i => i.gate == sally); Assert.NotNull(sallyUse);
+            yield return Beside(sally, -2.5f); s.UseInteractable(sallyUse); yield return Frames(2);
+            Assert.IsFalse(sally.Open, "barred from the town side: not lifted from inside the gatehouse");
+            yield return Beside(sally, 2.5f); s.UseInteractable(sallyUse); yield return Frames(2);
+            Assert.IsTrue(sally.Open, "lifted from Main Street");
+            var trap = zone.Gates.Find(g => g.Title == "The well-house trapdoor"); Assert.NotNull(trap, "the Cellars' far trapdoor");
+            Assert.IsTrue(trap.FromFar && trap.ShutsBehind); var trapUse = zone.Interactables.Find(i => i.gate == trap); Assert.NotNull(trapUse);
+            yield return Beside(trap, -4); s.UseInteractable(trapUse); yield return Frames(2);
+            Assert.IsFalse(trap.Open, "never come into from the Square");
+            yield return Beside(trap, 2.5f); s.UseInteractable(trapUse); yield return Frames(2);
+            Assert.IsTrue(trap.Open, "lifted from below");
+            motor.Teleport(zone.Anchors["the well-house"] + Vector3.up * .3f); yield return Frames(10);
+            Assert.IsFalse(trap.Open, "and it bars again behind you: the Cellars are never walked back");
         }
 
         [UnityTest] public IEnumerator The_wagon_takes_you_home_once_the_picker_master_is_down()
@@ -142,6 +205,9 @@ namespace Crulanda.Tests
             StringAssert.Contains("Picker-Master", s.InteractPromptFor(wagon), "his, while he stands");
             var yelland = s.Enemies.Find(e => e != null && e.MobName == "Picker-Master Fulke Yelland"); Assert.NotNull(yelland);
             yelland.Receive(1000000, s.Player); yield return Frames(10);
+            // (The yard's teamsters stand at the wagon, and the ride is refused in a fight: the yard is cleared first, as a party would.)
+            foreach (var e in s.Enemies.ToArray()) if (e != null && e.Camp && e.actor.IsAlive && Vector3.Distance(e.transform.position, wagon.position) < 45) e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 10);
+            yield return Frames(5);
             foreach (var e in s.Enemies.ToArray()) if (e != null && e.actor.IsAlive) e.ResetFight();
             yield return Frames(10);
             s.Player.GetComponent<AdventurerMotor>().Teleport(wagon.position + Vector3.up * .3f + Vector3.right * 1.5f); yield return Frames(5);

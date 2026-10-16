@@ -137,6 +137,7 @@ namespace Crulanda.Encounter
         /// <summary>Where a band with no caller leashes from: the running event's anchor while the foe holds it (within a mob's far leash), else where the foe stands.</summary>
         Vector3 BandAnchor(Actor foe)
         {
+            if (running != null && running.def.kind == "escort") return foe.transform.position;   // (Hallow's Creek) a walk's band leashes from whom it came for, not from where she started
             if (running != null && !string.IsNullOrEmpty(running.def.anchor) && Zone.Anchors.TryGetValue(running.def.anchor, out var at) && Vector3.Distance(at, foe.transform.position) <= 40) return at;
             return foe.transform.position;
         }
@@ -212,9 +213,13 @@ namespace Crulanda.Encounter
             var ev = EventNamed(id); if (ev == null || running != null || eventsDone.Contains(id)) return false;
             running = new EventRun { def = ev };
             Message(EventLine(ev, "start"));
+            EventBegun(id);   // (Hallow's Creek) a Glitch or the Waking Hour wakes the town (EncounterSession.Hallows.cs)
             StartCoroutine(RunEvent(running));
             return true;
         }
+        /// <summary>Gives up the event of that id while it runs (its waves back into the dark, as with the whole party down): the Warden fallen.</summary>
+        public void AbandonEvent(string id) { if (running != null && running.def.id == id) FailEvent(running); }
+        EventRunView RunView(EventRun run) { return new EventRunView { Id = run.def.id, Camps = run.camps }; }
         ZoneEvent EventNamed(string id)
         {
             if (Zone == null || Zone.Zone.events == null || string.IsNullOrEmpty(id)) return null;
@@ -230,16 +235,26 @@ namespace Crulanda.Encounter
                 yield return null;
                 if (Paused || Zone == null) continue;
                 if (PartyDown()) { FailEvent(run); yield break; }
-                run.clock += Time.deltaTime * EventSpeed;
+                // (Hallow's Creek) An escort's clock is the share of the walk done, in hundredths (its waves at a third and two thirds of the way).
+                if (run.def.kind == "escort") run.clock = Mathf.Max(run.clock, EscortShare() * 100);
+                else run.clock += Time.deltaTime * EventSpeed;
                 while (run.next < waves.Length && run.clock >= waves[run.next].at) { RaiseWave(run, run.next); run.next++; }
-                if (run.next >= waves.Length && !AnyAlive(run.camps)) { FinishEvent(run); yield break; }
+                if (run.def.hold > 0)
+                {
+                    // A held event (a Glitch, the Waking Hour) lasts its hold: three seconds before it is out the loop's snap is warned (never
+                    // while someone is held: it waits), and it snaps once the warning has run, whatever of its waves still stands.
+                    if (run.clock >= run.def.hold - SnapWarnSeconds * EventSpeed) SnapWarning(RunView(run));
+                    if (run.next >= waves.Length && run.clock >= run.def.hold && SnapWarned()) { FinishEvent(run); yield break; }
+                }
+                else if (run.next >= waves.Length && !AnyAlive(run.camps)) { FinishEvent(run); yield break; }
             }
         }
         void RaiseWave(EventRun run, int n)
         {
             var wave = run.def.waves[n]; if (wave == null) return;
             if (!string.IsNullOrEmpty(wave.unless) && !MobStanding(wave.unless)) return;   // (Hallow's Creek, N8) its boss is down: the wave never comes
-            ReleaseAfter("event:" + run.def.id + (n + 1), LiveFoe(), null, !string.IsNullOrEmpty(wave.text) ? wave.text : WaveLine(wave.camp), 0);
+            // (Hallow's Creek, E2) an escort's waves come at whom the party escorts (the Warden), not at you.
+            ReleaseAfter("event:" + run.def.id + (n + 1), run.def.kind == "escort" ? EscortFoe() : LiveFoe(), null, !string.IsNullOrEmpty(wave.text) ? wave.text : WaveLine(wave.camp), 0);
         }
         bool AnyAlive(HashSet<int> camps)
         {
@@ -250,7 +265,7 @@ namespace Crulanda.Encounter
         {
             running = null; eventsDone.Add(run.def.id);
             Message(EventLine(run.def, "end"));
-            EventOver(run.def.id);   // (Hallow's Creek) the Waking Hour's loop snaps: the Examiner stands stone (EncounterSession.Hallows.cs)
+            EventOver(RunView(run));   // (Hallow's Creek) a Glitch's or the Waking Hour's loop snaps; at the Hour the Examiner stands stone (EncounterSession.Hallows.cs)
         }
         /// <summary>The whole party down: the living of its waves (and whatever they brought) go back into the dark, the fallen lie where they fell to be
         /// searched, and the event may start again (WeaverFell's pattern).</summary>
@@ -265,6 +280,7 @@ namespace Crulanda.Encounter
             foreach (int c in run.camps) released.Remove(c);
             running = null;
             Message(EventLine(run.def, "fail"));
+            EventFailed(run.def.id);   // (Hallow's Creek) the town sleeps again; the Warden goes back to her cell (EncounterSession.Hallows.cs)
         }
         /// <summary>A wing is open when the wings (or groups: one side of a fork is enough) its data names in after are done this visit.</summary>
         public bool WingOpen(string wingId)

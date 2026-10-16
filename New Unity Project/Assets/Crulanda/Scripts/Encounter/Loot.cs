@@ -122,11 +122,12 @@ namespace Crulanda.Encounter
 
         /// <summary>The kinds of effect the game can carry out (DESIGN.md 3.6).</summary>
         public static readonly string[] EffectKinds = { "stat", "onKillHeal", "onKillPower", "restRegen", "coins", "luck",
-            "abilityCost", "abilityCooldown", "abilityCastTime", "abilityPower", "procResource", "procReset", "procEcho" };
+            "abilityCost", "abilityCooldown", "abilityCastTime", "abilityPower", "procResource", "procReset", "procEcho", "procRoot" };
         /// <summary>The kinds that work on one of the wearer's abilities (DESIGN.md 3.8): they name it in ability.</summary>
-        public static readonly string[] AbilityKinds = { "abilityCost", "abilityCooldown", "abilityCastTime", "abilityPower", "procResource", "procReset", "procEcho" };
-        /// <summary>The procs: they carry a chance (percent) and may fire on <see cref="AutoTrigger"/>.</summary>
-        public static readonly string[] ProcKinds = { "procResource", "procReset", "procEcho" };
+        public static readonly string[] AbilityKinds = { "abilityCost", "abilityCooldown", "abilityCastTime", "abilityPower", "procResource", "procReset", "procEcho", "procRoot" };
+        /// <summary>The procs: they carry a chance (percent) and may fire on <see cref="AutoTrigger"/>. (Hallow's Creek, the Mortar Ring)
+        /// procRoot: the target struck is rooted for its amount in seconds.</summary>
+        public static readonly string[] ProcKinds = { "procResource", "procReset", "procEcho", "procRoot" };
         /// <summary>A proc's trigger for the weapon's own blows (a swing or an auto-shot that lands).</summary>
         public const string AutoTrigger = "auto";
         /// <summary>In a class set group the player's own class weighs this many times one sim's.</summary>
@@ -564,9 +565,11 @@ namespace Crulanda.Encounter
         public readonly List<(string ability, float seconds)> resets = new List<(string, float)>();
         /// <summary>The power of the echo (1 = full), 0 for none.</summary>
         public float echo;
+        /// <summary>Seconds the target struck is rooted (procRoot: the Mortar Ring), 0 for none.</summary>
+        public float root;
         /// <summary>The tooltip texts of the procs that fired.</summary>
         public readonly List<string> fired = new List<string>();
-        public bool Any { get { return resource > 0 || resets.Count > 0 || echo > 0; } }
+        public bool Any { get { return resource > 0 || resets.Count > 0 || echo > 0 || root > 0; } }
     }
 
     /// <summary>Gear effects (DESIGN.md 3.6): pure sums over what is worn, with the caps applied.</summary>
@@ -577,6 +580,8 @@ namespace Crulanda.Encounter
         /// <summary>The class sets' caps (DESIGN.md 3.8): any percentage on an ability 50%, a cost 50 resource less, a cooldown 60 s
         /// shorter, a cast 2 s quicker, procResource 50 resource, procReset 600 s (ready at once), procEcho 100% power.</summary>
         public const float AbilityPercentCap = 50, AbilityCostCap = 50, AbilityCooldownCap = 60, AbilityCastCap = 2, ProcResourceCap = 50, ProcResetCap = 600, ProcEchoCap = 100;
+        /// <summary>The longest a procRoot holds the target (seconds).</summary>
+        public const float ProcRootCap = 4;
         /// <summary>A cast made quicker never drops under this (seconds), unless it was instant already.</summary>
         public const float MinCastTime = .3f;
         /// <summary>The kinds whose amount may be a percentage.</summary>
@@ -591,7 +596,7 @@ namespace Crulanda.Encounter
             {
                 case "coins": return CoinsCap * 100; case "luck": return LuckCap * 100; case "restRegen": return RestRegenCap; case "onKillHeal": return OnKillHealCap;
                 case "abilityCost": return AbilityCostCap; case "abilityCooldown": return AbilityCooldownCap; case "abilityCastTime": return AbilityCastCap; case "abilityPower": return AbilityPercentCap;
-                case "procResource": return ProcResourceCap; case "procReset": return ProcResetCap; case "procEcho": return ProcEchoCap;
+                case "procResource": return ProcResourceCap; case "procReset": return ProcResetCap; case "procEcho": return ProcEchoCap; case "procRoot": return ProcRootCap;
                 default: return float.MaxValue;
             }
         }
@@ -651,6 +656,7 @@ namespace Crulanda.Encounter
                     case "procResource": o.resource += Mathf.RoundToInt(e.amount); break;
                     case "procReset": o.resets.Add((e.other, e.amount)); break;
                     case "procEcho": o.echo = Mathf.Max(o.echo, Mathf.Min(e.amount, ProcEchoCap) / 100f); break;
+                    case "procRoot": o.root = Mathf.Max(o.root, Mathf.Min(e.amount, ProcRootCap)); break;
                 }
                 if (!string.IsNullOrEmpty(e.text)) o.fired.Add(e.text);
             }
@@ -695,7 +701,7 @@ namespace Crulanda.Encounter
                 case "restRegen": t.restRegen += Mathf.RoundToInt(e.amount); break;
                 case "coins": t.coins += e.amount / 100f; break;
                 case "luck": t.luck += e.amount / 100f; break;
-                case "abilityCost": case "abilityCooldown": case "abilityCastTime": case "abilityPower": case "procResource": case "procReset": case "procEcho": t.abilities.Add(e); break;
+                case "abilityCost": case "abilityCooldown": case "abilityCastTime": case "abilityPower": case "procResource": case "procReset": case "procEcho": case "procRoot": t.abilities.Add(e); break;
                 default: return;
             }
             if (!string.IsNullOrEmpty(e.text)) t.lines.Add(e.text);

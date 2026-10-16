@@ -112,6 +112,6 @@ namespace Crulanda.Encounter
             if (!Enraged) return;
             Enraged = false; transform.localScale = calmScale;
         }
-        void OnDestroy() { if (mark != null) Destroy(mark.gameObject); }
+        void OnDestroy() { if (mark != null) Destroy(mark.gameObject); if (holdMark != null) Destroy(holdMark.gameObject); }
     }
 }

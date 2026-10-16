@@ -231,8 +231,20 @@ namespace Crulanda.Encounter
                 Shadow(new Rect(70, y + 26, 280, 18), w.Status, tiny, new Color(.88f, .82f, 1));
                 UnitBar(new Rect(70, y + 42, 184, 4), w.Now == AditWeaver.Stage.Matching ? w.Matched : w.Walked, WeaverViolet, "");
             }
+            // (Hallow's Creek, E2) Warden Elvet while she walks, lies fallen or waits in her cell to be walked again: her health, how the walk goes.
+            var wd = session.Warden;
+            if (wd != null && wd.actor != null && wd.Now != HallowsWarden.Stage.Arrived)
+            {
+                float y = 200 + 46 * session.PartySims.Count + (w != null && w.actor != null && (w.Now == AditWeaver.Stage.Walking || w.Now == AditWeaver.Stage.Matching || w.Now == AditWeaver.Stage.Fallen) ? 56 : 0);
+                Fill(new Rect(48, y, 214, 48), new Color(0, 0, 0, .5f));
+                Portrait(new Vector2(40, y + 20), 40, wd.actor.IsAlive ? WardenGreen : new Color(.4f, .4f, .4f), "E", wd.actor.Level.ToString());
+                Shadow(new Rect(70, y - 3, 190, 20), EncounterSession.WardenName, tiny, Color.white);
+                UnitBar(new Rect(70, y + 16, 184, 10), wd.actor.Health.Pool.Ratio, HealthGreen, "");
+                Shadow(new Rect(70, y + 26, 280, 18), wd.Status, tiny, new Color(.82f, .95f, .82f));
+                UnitBar(new Rect(70, y + 42, 184, 4), wd.Walked, WardenGreen, "");
+            }
         }
-        static readonly Color WeaverViolet = new Color(.68f, .5f, 1);
+        static readonly Color WeaverViolet = new Color(.68f, .5f, 1), WardenGreen = new Color(.5f, .85f, .55f);
         /// <summary>The buffs and songs on you and on each of the party (Chris, 2026-10-14: "we need a buff ui so i know what buff/songs
         /// are on the party"): a row of chips beside each frame, each a status effect on that one (its name and seconds left) or the
         /// kit's own buff on the whole party (a verse, a rally).</summary>
@@ -925,6 +937,16 @@ namespace Crulanda.Encounter
                 {
                     string wtitle = Bracketed("Weaver of the Warrens");
                     AddPlate(new Plate { dist = wd, fade = 1, top = -41, at = wp, named = true, name = AditWeaver.Name, title = wtitle, mark = ' ' }, Mathf.Max(TextWidth(plateText, AditWeaver.Name), TextWidth(plateText, wtitle)) + 8);
+                }
+            }
+            var elvet = session.Warden;   // (Hallow's Creek, E2) Warden Elvet: her name and what she is
+            if (elvet != null && elvet.actor != null)
+            {
+                var root = elvet.transform.position; float ed = Vector3.Distance(player, root + Vector3.up * 1.3f);
+                if (ed <= 30 && ToCanvas(root + Vector3.up * 1.3f, out var ep) && OnCanvasX(ep.x) && !Occluded(elvet, root + Vector3.up * .85f))
+                {
+                    string etitle = Bracketed("Warden of the Preservationists");
+                    AddPlate(new Plate { dist = ed, fade = 1, top = -41, at = ep, named = true, name = EncounterSession.WardenName, title = etitle, mark = ' ' }, Mathf.Max(TextWidth(plateText, EncounterSession.WardenName), TextWidth(plateText, etitle)) + 8);
                 }
             }
             foreach (var e in session.Enemies) EnemyPlateAt(e, 25);

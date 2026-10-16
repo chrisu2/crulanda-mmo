@@ -43,7 +43,14 @@ namespace Crulanda.Encounter
                 // A place not yet explored is a "?" (Achievements: walk there and it is named).
                 foreach (var l in z.landmarks) into.Add(new MapMark { kind = MarkKind.Landmark, world = zone.GroundFixed(l.at), text = s.Feats == null || s.Feats.Explored(z, l) ? l.name + CaveBand(z, l.name) : "?" });
                 if (z.camps != null)
-                    foreach (var c in z.camps) if (c != null && !InCave(c.center)) into.Add(new MapMark { kind = MarkKind.Camp, world = zone.GroundFixed(c.center), text = c.mob, camp = c });
+                    foreach (var c in z.camps)
+                    {
+                        if (c == null || InCave(c.center)) continue;
+                        // (Hallow's Creek: the map by height, DUNGEON2_DESIGN S7) a camp up on a deck on open ground is marked at its height (a loft,
+                        // a landing, the belfry), so the maps can say how high and fade what is not on your floor.
+                        var at = zone.GroundFixed(c.center); if (string.IsNullOrEmpty(c.cave) && Mathf.Abs(c.rise) >= 2) at.y = zone.Datum + c.rise;
+                        into.Add(new MapMark { kind = MarkKind.Camp, world = at, text = c.mob, camp = c });
+                    }
                 foreach (var e in z.exits) into.Add(new MapMark { kind = MarkKind.Exit, world = zone.GroundFixed(e.at), text = e.name, to = ZoneById(zone, e.to) });
             }
             foreach (var enemy in s.Enemies) if (enemy != null && enemy.actor.IsAlive && !enemy.Hidden) into.Add(new MapMark { kind = MarkKind.Enemy, world = enemy.transform.position, text = enemy.actor.DisplayName });
@@ -197,7 +204,7 @@ namespace Crulanda.Encounter
                     // Where the road goes, and its level band, tucked inside the rim.
                     if (m.to != null) { var inward = (center - at.Value).normalized * 16; Shadowed(new Rect(at.Value.x + inward.x - 40, at.Value.y + inward.y - 9, 80, 18), Band(m.to), centered, BandColor(m.to, s.Progress.Level)); }
                 }
-                else if (m.kind == MarkKind.Enemy) { var at = toMini(m.world, false); if (at.HasValue) Dot(at.Value, 9, new Color(.95f, .25f, .2f)); }
+                else if (m.kind == MarkKind.Enemy) { var at = toMini(m.world, false); if (at.HasValue) Dot(at.Value, 9, new Color(.95f, .25f, .2f, OffFloor(s, m.world) ? .35f : 1)); }   // faint off your floor (the map by height)
                 else QuestMark(m, person, place, 15);
             }
             if (s.Companion != null)
@@ -235,6 +242,9 @@ namespace Crulanda.Encounter
             GUI.Label(new Rect(w.x + 20, w.yMax - 30, 700, 24), s.MapWorld ? "Scroll in (or press Zone map) to return to the zone." : "Scroll out (or press World map) for the world map.", note);
         }
         Vector2 OnMap(Rect map, Vector2 uv) { return new Vector2(map.x + uv.x * map.width, map.y + (1 - uv.y) * map.height); }
+        /// <summary>(The map by height, Hallow's Creek's S7) Whether a place is off your floor: more than 5 m above or below your feet (a loft, a
+        /// landing, the belfry over the square; a slab under the bridge).</summary>
+        public static bool OffFloor(EncounterSession s, Vector3 world) { return s != null && s.Player != null && Mathf.Abs(world.y - (s.Player.transform.position.y - 1)) > 5; }
         void DrawZoneMap(EncounterSession s, ZoneBuilder zone, Rect map, Color gold)
         {
             var z = zone.Zone; var side = new Rect(map.xMax + 20, map.y, WindowRect.xMax - map.xMax - 40, map.height);
@@ -256,8 +266,11 @@ namespace Crulanda.Encounter
                     {
                         // A red ring with the pack and its levels.
                         var c = m.camp; float rr = Mathf.Max(10, c.radius / z.size * map.width);
-                        GUI.color = new Color(.9f, .25f, .2f, .5f); GUI.DrawTexture(new Rect(at.x - rr, at.y - rr, rr * 2, rr * 2), pin); GUI.color = Color.white;
-                        Shadowed(new Rect(at.x - 110, at.y + rr - 2, 220, 20), c.mob + "  " + (c.levelMin == c.levelMax ? c.levelMin.ToString() : c.levelMin + "-" + c.levelMax) + (c.elite ? "  elite" : ""), centered, LevelColor(c.levelMax, s.Progress.Level));
+                        // The map by height: a camp up a stair says how high ("+9 m"), and one off your floor is drawn faint.
+                        bool raised = string.IsNullOrEmpty(c.cave) && Mathf.Abs(c.rise) >= 2; float faint = OffFloor(s, m.world) ? .4f : 1;
+                        GUI.color = new Color(.9f, .25f, .2f, .5f * faint); GUI.DrawTexture(new Rect(at.x - rr, at.y - rr, rr * 2, rr * 2), pin); GUI.color = Color.white;
+                        var lc = LevelColor(c.levelMax, s.Progress.Level); lc.a *= faint;
+                        Shadowed(new Rect(at.x - 110, at.y + rr - 2, 220, 20), c.mob + "  " + (c.levelMin == c.levelMax ? c.levelMin.ToString() : c.levelMin + "-" + c.levelMax) + (c.elite ? "  elite" : "") + (raised ? "  " + (c.rise > 0 ? "+" : "") + Mathf.RoundToInt(c.rise) + " m" : ""), centered, lc);
                         break;
                     }
                     case MarkKind.Exit:
@@ -269,7 +282,7 @@ namespace Crulanda.Encounter
                         Shadowed(new Rect(lx, ly, tw + 4, 20), text, label, m.to != null ? BandColor(m.to, s.Progress.Level) : gold);
                         break;
                     }
-                    case MarkKind.Enemy: Dot(at, 10, new Color(.95f, .25f, .2f)); break;
+                    case MarkKind.Enemy: Dot(at, 10, new Color(.95f, .25f, .2f, OffFloor(s, m.world) ? .35f : 1)); break;
                     default: QuestMark(m, onMap, onMap, 20); break;
                 }
             }

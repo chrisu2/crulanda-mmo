@@ -20,6 +20,8 @@ namespace Crulanda.World
         /// <summary>(The Adit rework, ZoneGateDef) What kind of gate it is (liftgate, platformgate, bossdoor, bar, pen, hiddendoor), the mob whose
         /// death opens it (or null), and whether it is worked from its far side (a bar lifted from the hub's side only).</summary>
         public string Kind, OpensOn; public bool FromFar;
+        /// <summary>(Hallow's Creek, ZoneGateDef.behind) It bars again once the party is all through to its near side.</summary>
+        public bool ShutsBehind;
         /// <summary>Where its bars go as it opens, in its own frame, instead of up by <see cref="Rise"/> (a bookcase sliding aside into
         /// the rock); zero: up.</summary>
         public Vector3 Slide;

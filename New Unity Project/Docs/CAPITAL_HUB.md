@@ -125,3 +125,7 @@ leads to the Crown) the Crown of Argentis shows on the northern skyline: the wal
 **Chris, 2026-10-16 ~01:15 (verbatim, with a screenshot of the Gilt Gate's stair): "will need to add more detail. search online for
 vines/ivy or something so it is not so white . maybe add some iron or something".** Searched (CC0 sources: Quaternius, Kenney, Poly
 Pizza); chosen: ivy grown by the builder (painted style, any wall), weathering, and ironwork; a CC0 ivy pack only if the grown ivy reads badly.
+**Chris, 2026-10-16 ~01:30 (verbatim, with a screenshot of the parterres' red and yellow balls in plain boxes): "we need a real garden.
+need to use some of our texture packs".** And of the inn (screenshot): "table and mug still not meeting. hovering over tables" (fixed in
+the inn code: the dressing sits on the table's own top), "all trainers standing backwards" (fixed: a post in a city faces the room),
+"floor is blocked in armory" (fixed: no plinth across a hall's door).

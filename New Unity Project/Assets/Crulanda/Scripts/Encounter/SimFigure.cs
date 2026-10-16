@@ -119,7 +119,19 @@ namespace Crulanda.Encounter
             }
             return best;
         }
-        ZoneDoor Inn { get { var zb = Session.Zone; return zb == null ? null : zb.Doors.Find(d => d != null && d.kind == "inn"); } }
+        /// <summary>The walk-in inn nearest it (every zone with folk has one since Phase 8.6, 2026-10-15: the taverns, the Peaks' and the
+        /// Rim's waystations, the Shore's hearth-house), or null.</summary>
+        public ZoneInn Inn
+        {
+            get
+            {
+                var zb = Session.Zone; if (zb == null) return null; ZoneInn best = null; float bd = float.MaxValue;
+                foreach (var i in zb.Inns) { if (i == null || i.door == null || i.door.Way == null) continue; float d = (i.door.position - transform.position).sqrMagnitude; if (d < bd) { bd = d; best = i; } }
+                return best;
+            }
+        }
+        /// <summary>Where it goes to rest: a stride in past the doorway's inside point, in the room.</summary>
+        static Vector3 RestAt(ZoneInn inn) { var w = inn.door.Way; return w.Inside + w.inward * 1.2f; }
         Vector3? Place(string kind) { var life = VillageLife.Active; if (life == null || !life.Places.TryGetValue(kind, out var list) || list.Count == 0) return null; return list[Mathf.Abs(sim.variant) % list.Count]; }
         /// <summary>The road out it would take: to a zone whose levels suit it (its own home best when it has outgrown this one).</summary>
         public ZoneExit FindExit()
@@ -144,7 +156,7 @@ namespace Crulanda.Encounter
             int goods = SimEconomy.SellableCount(sim, Session.Items); var recipe = SimEconomy.Craftable(sim, Session.Professions?.Db, Session.Items);
             float hunt = prey != null ? .35f + .6f * sim.bold + Noise() : -1;
             float gather = node != null ? .3f + .5f * (1 - sim.bold) + Noise() : -1;
-            float rest = inn != null ? (health < .6f ? 1.2f : .12f + .2f * sim.chatty) + Noise() : -1;
+            float rest = inn != null ? (health < .6f ? 1.2f : .12f + .2f * sim.chatty) + (GiveWay.Raining ? .6f : 0) + Noise() : -1;   // in the rain, in at the inn (decision 13)
             float trade = (goods >= 6 || SimEconomy.CanUpgrade(sim)) && Place("stall") != null ? .5f + goods * .04f + Noise() : -1;
             float craft = recipe != null && Place(SimEconomy.Workplace(recipe)) != null ? .75f + Noise() : -1;
             int fit = SimPopulation.Suits(Session.ZoneId, sim.level);
@@ -170,7 +182,7 @@ namespace Crulanda.Encounter
             {
                 case Doing.Hunt: goal = 2 + Mathf.Abs(sim.gearSeed) % 3; until = Time.time + 240; if (prey == null) Quarry = FindPrey(); if (Quarry == null) { Activity = Doing.Loiter; until = Time.time + 20; } break;
                 case Doing.Gather: goal = 1 + Mathf.Abs(sim.gearSeed / 7) % 3; until = Time.time + 200; if (node == null) Node = FindNode(); if (Node == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(Node.position); break;
-                case Doing.Inn: { var inn = Inn; until = Time.time + 150; if (inn == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(inn.position); break; }
+                case Doing.Inn: { var inn = Inn; until = Time.time + 150; if (inn == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(RestAt(inn)); break; }
                 case Doing.Trade: { var at = Place("stall"); until = Time.time + 120; if (at == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(at.Value); break; }
                 case Doing.Craft: { if (Recipe == null) Recipe = SimEconomy.Craftable(sim, Session.Professions?.Db, Session.Items); var at = Recipe != null ? Place(SimEconomy.Workplace(Recipe)) : null; until = Time.time + 120; if (at == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(at.Value); break; }
                 case Doing.Travel: { if (Exit == null) Exit = FindExit(); until = Time.time + 300; if (Exit == null) { Activity = Doing.Loiter; until = Time.time + 20; } else { Go(Session.Zone.Ground(Exit.at)); SimChatter.Active?.Leaving(sim, Exit); } break; }
@@ -183,7 +195,48 @@ namespace Crulanda.Encounter
         {
             if (agent == null || !agent.enabled || !agent.isOnNavMesh) return;
             if (NavMesh.SamplePosition(to, out var hit, 4, NavMesh.AllAreas)) to = hit.position;
-            agent.isStopped = false; agent.speed = 1.9f; agent.SetDestination(to); stuckSince = Time.time;
+            // Through an inn's doorway by its lane (Phase 8.6 step 2, DoorwayRoute), as the villagers go.
+            DropRoute(); route = Activity == Doing.Hunt ? null : DoorwayRoute.Plan(Session.Zone, transform.position, to);
+            agent.isStopped = false; agent.speed = 1.9f; agent.SetDestination(route != null ? route.Start : to); stuckSince = Time.time;
+            headway.Reset(transform.position, Time.time);
+        }
+        // ---------- the doorway, the watchdog, giving way (Phase 8.6 step 2 and decision 13, 2026-10-15) ----------
+        DoorwayRoute route; readonly Headway headway = new Headway(); float nextGiveWay; bool walkingSet; int prioritySet = -1;
+        /// <summary>On the way through an inn's doorway (in line for its lane, or on it), or null.</summary>
+        public DoorwayRoute Route { get { return route; } }
+        void DropRoute() { if (route != null) { route.Drop(this); route = null; } }
+        /// <summary>At a doorway a sim comes after the village's folk, and one just standing about after everyone (ZoneDoorway).</summary>
+        int Rank { get { return Activity == Doing.Loiter ? ZoneDoorway.Idler : ZoneDoorway.Sim; } }
+        /// <summary>Walking it gives way to the villagers (80; standing about, 90); stopped it avoids nobody and the walkers go round it
+        /// (as Villager.Avoid).</summary>
+        void Avoid()
+        {
+            bool moving = Walking || route != null; int priority = !moving ? 30 : Rank == ZoneDoorway.Idler ? 90 : 80;
+            if (moving == walkingSet && priority == prioritySet) return;
+            walkingSet = moving; prioritySet = priority;
+            agent.obstacleAvoidanceType = moving ? ObstacleAvoidanceType.HighQualityObstacleAvoidance : ObstacleAvoidanceType.NoObstacleAvoidance;
+            agent.avoidancePriority = priority;
+        }
+        /// <summary>The doorway, a step aside for you and yours, and the stuck watchdog's step, each frame; true while the doorway has it.</summary>
+        bool Underway()
+        {
+            if (!agent.enabled || !agent.isOnNavMesh) return false;
+            Avoid(); float now = Time.time;
+            if ((Walking || Activity == Doing.Loiter) && Activity != Doing.Hunt && now >= nextGiveWay && GiveWay.Due(Session, transform.position, out var aside))
+            { nextGiveWay = now + 3; headway.BeginStep(agent, aside, GiveWay.Step); }
+            headway.Steer(agent, Time.deltaTime);
+            if (route != null && Activity != Doing.Hunt)
+            {
+                if (route.Tick(agent, this, Rank, now)) { stuckSince = now; if (route.Waiting) headway.Reset(transform.position, now); else Watch(now); return true; }
+                route = null; stuckSince = now;
+            }
+            if (Walking && Activity != Doing.Hunt) Watch(now);
+            return false;
+        }
+        void Watch(float now)
+        {
+            headway.Tick(transform.position, agent.pathPending ? float.MaxValue : agent.remainingDistance, now);
+            if (headway.StepDue(now)) headway.BeginStep(agent);
         }
         bool Near(Vector3 p, float d) { return Vector3.Distance(new Vector3(transform.position.x, 0, transform.position.z), new Vector3(p.x, 0, p.z)) < d; }
         void Face(Vector3 p) { var f = p - transform.position; f.y = 0; if (f.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(f); }
@@ -194,7 +247,8 @@ namespace Crulanda.Encounter
             if (population == null || Session == null || Session.Paused || agent == null) return;
             if (!actor.IsAlive) { Fallen(); return; }
             if (Activity == Doing.Down) { Activity = Doing.Loiter; until = Time.time; }
-            switch (Activity)
+            if (!Hidden && Underway()) { }   // at an inn's doorway: the lane, then on with whatever it was doing
+            else switch (Activity)
             {
                 case Doing.Hunt: Hunt(); break;
                 case Doing.Gather: Gather(); break;
@@ -388,19 +442,20 @@ namespace Crulanda.Encounter
             if (Hidden)
             {
                 actor.Health.ApplyHealing(Mathf.Max(3, actor.Health.Pool.Max / 30));
-                if (Time.time >= until) { Show(true); Choose(); }
+                if (Time.time >= until) { Show(true); Choose(); }   // out again through the door's lane (Go: DoorwayRoute)
                 return;
             }
-            // In at the door; or close by and no longer getting anywhere (playtest note 98, "people get stuck in inn door": a crowd at the
-            // doorway, or the door's own frame, held them on the step).
-            bool jammed = Near(inn.position, 5f) && agent.velocity.sqrMagnitude < .04f && Time.time - stuckSince > 2;
-            if (Near(inn.position, 2.6f) || jammed) { Show(false); until = Time.time + 60 + (sim.variant % 5) * 15; return; }
-            if (!Walking && Time.time - stuckSince > 1) Go(inn.position);
+            // In through the door and a stride into the room (Phase 8.6, 2026-10-15: it vanished on the step before, in everyone's way);
+            // or close by the door and no headway for two seconds (the watchdog; playtest note 98, "people get stuck in inn door").
+            bool jammed = Near(inn.door.position, 5f) && headway.StillFor(Time.time) > 2 && Time.time - stuckSince > 2;
+            if (route == null && inn.Contains(transform.position, .3f) || jammed) { Show(false); until = Time.time + 60 + (sim.variant % 5) * 15; return; }
+            if (!Walking && Time.time - stuckSince > 1) Go(RestAt(inn));
             if (Time.time - stuckSince > 60) Choose();
         }
-        /// <summary>Goes in (hidden: no body, no plate, no NavMesh) or comes out at the door.</summary>
+        /// <summary>Goes in (hidden: no body, no plate, no NavMesh) or comes out where it went in.</summary>
         void Show(bool on)
         {
+            if (!on) DropRoute();
             Hidden = !on;
             foreach (var r in renderers) if (r != null && r.name != "Body") r.enabled = on;
             if (agent != null) agent.enabled = on;
@@ -408,7 +463,7 @@ namespace Crulanda.Encounter
         /// <summary>Beaten: down where it fell; after a while it comes to at the zone's recovery point and runs back for its corpse (5.3b).</summary>
         void Fallen()
         {
-            if (Activity != Doing.Down) { Activity = Doing.Down; downSince = Time.time; Quarry = null; if (agent.isOnNavMesh) agent.isStopped = true; visual.Pose = ActorPose.None; }
+            if (Activity != Doing.Down) { Activity = Doing.Down; downSince = Time.time; Quarry = null; DropRoute(); if (agent.isOnNavMesh) agent.isStopped = true; visual.Pose = ActorPose.None; }
             if (Time.time - downSince < 10) return;
             CorpseAt = transform.position; MarkCorpse();
             var back = Session.RecoveryPoint; if (NavMesh.SamplePosition(back, out var hit, 6, NavMesh.AllAreas)) back = hit.position;
@@ -436,7 +491,7 @@ namespace Crulanda.Encounter
             corpse = go.transform;
         }
         void ClearCorpse() { if (corpse != null) { corpse.gameObject.SetActive(false); Destroy(corpse.gameObject); corpse = null; } }   // gone at once, not at the frame's end
-        void OnDisable() { if (visual != null && (Activity == Doing.Gather || Activity == Doing.Craft)) visual.Pose = ActorPose.None; }
+        void OnDisable() { DropRoute(); if (visual != null && (Activity == Doing.Gather || Activity == Doing.Craft)) visual.Pose = ActorPose.None; }
         void OnDestroy() { ClearCorpse(); }
     }
 }

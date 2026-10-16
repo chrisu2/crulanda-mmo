@@ -940,7 +940,8 @@
       "size": {
         "x": 14,
         "y": 14
-      }
+      },
+      "style": "inn"
     },
     {
       "kind": "treehouse",

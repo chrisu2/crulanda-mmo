@@ -172,14 +172,17 @@ namespace Crulanda.World
             if (!primitives.TryGetValue(type, out var m) || m == null) { var o = GameObject.CreatePrimitive(type); m = o.GetComponent<MeshFilter>().sharedMesh; DestroyImmediate(o); primitives[type] = m; }
             return m;
         }
-        /// <summary>How far an inn's porch reaches out from its front wall's face (InnFront), and half its posts' spacing.</summary>
-        const float InnPorchDeep = 2.3f, InnPorchHalf = 1.3f;
-        /// <summary>Whether a point stands under an inn's porch roof, out past the inn's footprint (UnderRoof: no rain falls there).</summary>
+        /// <summary>How far an inn's porch reaches out from its front wall's face (InnFront), and half its posts' spacing: half a metre
+        /// past each jamb of the double door (Phase 8.6, 2026-10-15; at 1.3 the posts left the way between them 1.2 m, narrower than
+        /// the door it leads to).</summary>
+        const float InnPorchDeep = 2.3f, InnPorchHalf = InnDoorW / 2 + .5f;
+        /// <summary>Whether a point stands under an inn's porch roof, out past the inn's footprint (UnderRoof: no rain falls there). A
+        /// waystation (variant 2) has no porch: its door stands under the roof's eaves.</summary>
         bool UnderPorch(Vector2 p)
         {
             foreach (var b in Zone.props)
             {
-                if (b == null || b.kind != "inn") continue;
+                if (b == null || b.kind != "inn" || b.variant == 2) continue;
                 float d = b.size.x > 0 ? b.size.y : 8, face = d / 2 + .15f, r = b.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), s = Mathf.Sin(r); var q = p - b.at;
                 float lx = q.x * c - q.y * s, lz = q.x * s + q.y * c;   // along its local x and z (as InBuilding)
                 if (Mathf.Abs(lx) <= InnPorchHalf + .6f && lz <= -face + .1f && lz >= -(face + InnPorchDeep + .1f)) return true;
@@ -277,9 +280,9 @@ namespace Crulanda.World
             foreach (float x in frontWindows) FlowerBox(t, new Vector3(x, .86f, face - .25f), 1.05f, R);
             // The porch: two posts and their plates back to the wall, a beam across, a small gable roof with its end boarded and
             // a king post and barge boards on it; the lantern hangs from its ridge round the inn's lantern light.
-            // The posts and timbers stand under the roof's flat ceiling (eave - .12). Both inns take the same depth: the Cracked
-            // Hearth's posts then stand clear of Khaven's barrels at (-7, 12).
-            float deep = InnPorchDeep, px = InnPorchHalf, eave = 2.7f, rise = .85f, zp = face - deep + .3f, span = px * 2 + .9f;
+            // The posts and timbers stand under the roof's flat ceiling (eave - .12). Both inns take the same depth, and the posts stand
+            // half a metre past the door's jambs (2026-10-15: Khaven's barrels moved out of their way, to (-4.74, 12.39)).
+            float deep = InnPorchDeep, px = doorW / 2 + .5f, eave = 2.7f, rise = .85f, zp = face - deep + .3f, span = px * 2 + .9f;
             foreach (int k in new[] { -1, 1 })
             {
                 float g = LocalGround(t, k * px, zp);

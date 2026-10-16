@@ -775,7 +775,7 @@
   ],
   "props": [
     {
-      "kind": "house",
+      "kind": "inn",
       "name": "Pilgrims' Rest",
       "at": {
         "x": -16,

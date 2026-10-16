@@ -39,8 +39,8 @@ namespace Crulanda.Encounter
             if (who == null) { ChatSay(ChatChannel.Say, "You", "Hail!"); return; }
             string first = who.Split(' ')[0];
             ChatSay(ChatChannel.Say, "You", Pick(new[] { "Hail, " + first + "!", "Well met, " + first + ".", "Good day, " + first + "." }));
-            if (v != null) StartCoroutine(Answer(v.Name, v.transform, VillagerHail(v)));
-            else if (sf != null) { SimChatter.Active?.Hailed(sf.sim); Face(sf.transform); }
+            if (v != null) { NoteMet(v.Name); StartCoroutine(Answer(v.Name, v.transform, VillagerHail(v))); }   // the book of lore's People
+            else if (sf != null) { NoteMetSim(sf.sim); SimChatter.Active?.Hailed(sf.sim); Face(sf.transform); }
             else if (pc != null) StartCoroutine(Answer(pc.sim.name, pc.transform, Pick(new[] { "o/", "hey", "yo" })));
             else if (mira) StartCoroutine(Answer("Mira", Companion.transform, Pick(new[] { "I'm right here, you know.", "Hail yourself. Shall we go?", "Yes, yes. Hello." })));
         }

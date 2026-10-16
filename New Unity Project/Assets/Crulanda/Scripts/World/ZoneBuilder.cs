@@ -5451,8 +5451,10 @@ namespace Crulanda.World
         /// A word in a searchable's prompt or name sets a scene round it: "camp" (a cold fire ring and a rolled bedroll in front),
         /// "log" or "trunk" (a fallen trunk behind it), "stump" (a hollow stump it is pushed into), "rocks" or "cleft" (two stones
         /// either side), "stone" (a flat stone half over it), "scrape" (a shallow scrape it lies half buried in).
-        /// Things you take (a note, a key, a herb) are kept apart from their scene: <see cref="ZoneSecretSpot.root"/> is the thing
-        /// alone, so only it vanishes when found (the nail, the crack and the stump stay). Metal catches the light in a small glint,
+        /// Phase 8.6 adds carving, read, grave, remains and shrine (ZoneBuilder.SecretLooks.cs): each builds what it stands on and is
+        /// moved clear like a herb; a carving in a cave is cut in the wall, as a page there is pushed into it.
+        /// Things you take (a note, a key, a herb, a dead adventurer's satchel) are kept apart from their scene: <see cref="ZoneSecretSpot.root"/> is the thing
+        /// alone, so only it vanishes when found (the nail, the crack, the stump and the bones stay). Metal catches the light in a small glint,
         /// pages are pale and the herbs glow faintly: enough to catch a curious eye, never a quest marker's glow.
         /// A herb, or a find in a scene of its own, that stands in a trunk or a rock is moved clear (up to 2.5 m; never onto a
         /// road, into water or a building); one tucked against a prop (a key on a gallows, a page in a wall) stays exactly put.
@@ -5467,20 +5469,22 @@ namespace Crulanda.World
                 if (s == null || string.IsNullOrEmpty(s.id)) continue;
                 string words = ((s.prompt ?? "") + " " + (s.name ?? "") + (s.kind == "vista" ? " " + (s.text ?? "") : "")).ToLowerInvariant();
                 bool Says(params string[] any) { foreach (var w in any) if (words.Contains(w)) return true; return false; }
+                bool alone = StandsAlone(s.kind);   // (Phase 8.6) a carving, a book, a grave, remains or a shrine: what it stands on is its own
                 string scene = s.kind == "vista" ? (Says("beacon") ? "beacon" : Says("salt") ? "salt" : Says("stones", "cairn") ? "cairn" : null)
-                    : Says("camp") ? "camp" : Says("log", "trunk") ? "log" : Says("stump") ? "stump" : Says("rocks", "cleft") ? "rocks" : Says("stone") ? "stone" : Says("scrape") ? "scrape" : null;
+                    : alone ? null : Says("camp") ? "camp" : Says("log", "trunk") ? "log" : Says("stump") ? "stump" : Says("rocks", "cleft") ? "rocks" : Says("stone") ? "stone" : Says("scrape") ? "scrape" : null;
                 var sr = new System.Random(Zone.seed ^ (Mathf.RoundToInt(s.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(s.at.y * 8) * 19349663) ^ 0x51c2e7);
                 float R() { return (float)sr.NextDouble(); }
                 var at = s.at; float near = float.NegativeInfinity;
                 // (The Adit rework) One placed in a cave by along and aside (its floor, or a deck over it at rise): exactly there.
                 var inCave = string.IsNullOrEmpty(s.cave) ? null : Hollow.All.Find(o => o.Name == s.cave);
                 if (inCave != null) { var w = inCave.At(s.along, s.aside); at = s.at = new Vector2(w.x, w.z); near = w.y + s.rise; }
-                else if (s.kind == "herb" || (s.kind != "vista" && scene != null)) at = SecretClear(at, scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
+                else if (s.kind == "herb" || alone || (s.kind != "vista" && scene != null)) at = SecretClear(at, alone ? AloneClear(s.kind) : scene == "camp" ? 1.9f : scene == "log" ? 1.5f : scene == "rocks" ? .9f : .5f);
                 var t = new GameObject("Secret: " + (string.IsNullOrEmpty(s.name) ? s.id : s.name)).transform; t.SetParent(all, false);
                 t.position = StandAt(at, near); t.rotation = Quaternion.Euler(0, s.rotation, 0);   // in a cave: on its floor (or the deck it names)
                 // In a cave, a key on its nail or a page in a crack hangs on the rock itself: the nearest wall at its height, facing out.
-                if ((s.kind == "key" || s.kind == "note") && CaveWall(t.position + Vector3.up * s.height, out var wallAt, out var outOf))
-                { t.position = new Vector3(wallAt.x, t.position.y, wallAt.z) + outOf * .03f; t.rotation = Quaternion.LookRotation(-outOf); }
+                bool onWall = false;
+                if ((s.kind == "key" || s.kind == "note" || s.kind == "carving") && CaveWall(t.position + Vector3.up * (s.kind == "carving" ? 1.1f : s.height), out var wallAt, out var outOf))   // a carving is cut at chest height
+                { t.position = new Vector3(wallAt.x, t.position.y, wallAt.z) + outOf * .03f; t.rotation = Quaternion.LookRotation(-outOf); onWall = true; }
                 var item = new GameObject(s.kind).transform; item.SetParent(t, false); item.localPosition = Vector3.up * s.height;
                 switch (s.kind)
                 {
@@ -5497,6 +5501,11 @@ namespace Crulanda.World
                     case "herb": SecretHerb(item, R); break;
                     case "chest": SecretChest(item, t, R); break;
                     case "key": SecretKey(item, t, s.height, R); break;
+                    case "carving": SecretCarving(item, R, words, onWall); break;
+                    case "read": SecretRead(item, R, words); break;
+                    case "grave": SecretGrave(item, R); break;
+                    case "remains": SecretRemains(item, t, R); break;
+                    case "shrine": SecretShrine(item, R); break;
                     default: Debug.LogWarning(Zone.id + ": secret '" + s.id + "' has an unknown kind '" + s.kind + "'."); break;
                 }
                 if (s.kind != "vista")
@@ -5509,7 +5518,7 @@ namespace Crulanda.World
                         case "stone": SecretFlatStone(t, R); break;
                         case "scrape": SecretScrape(t, R); break;
                     }
-                bool pocketed = s.kind == "note" || s.kind == "key" || s.kind == "herb";   // what you take vanishes once found; its scene stays
+                bool pocketed = s.kind == "note" || s.kind == "key" || s.kind == "herb" || s.kind == "remains";   // what you take vanishes once found; its scene (the bones) stays
                 Secrets.Add(new ZoneSecretSpot { def = s, position = s.kind == "vista" ? t.position : item.position, root = pocketed ? item : t });
             }
         }

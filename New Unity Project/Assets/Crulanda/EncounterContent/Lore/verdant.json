@@ -1,0 +1,252 @@
+{
+  "zone": "zone.verdant",
+  "canonStatus": "GAME-ONLY: the Verdant Shore's chapter of the book of lore, its lines the game's; the Verdant Ocean, the Keepers and the Root-Mother are CANON (book3; world_bible.md), as each line says.",
+  "entries": [
+    {
+      "id": "lore.verdant.places.rootfast",
+      "chapter": "places",
+      "subject": "Rootfast",
+      "more": "The Keepers read their tale-book aloud at dusk to whoever sits: of the Keeper who held a shining seed a hundred years, and found it shone only because she held it.",
+      "page": "doc.verdant.tale_book",
+      "canonStatus": "CANON-EXPANDED: the Keepers' bower and their rule against hoarding are CANON (book3 ch.2, 7); the tale is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.places.the-veridian-temple",
+      "chapter": "places",
+      "subject": "The Veridian Temple",
+      "more": "Willow-Whisper would not call it a song: the Root-Mother dreams of rain still deciding to fall, of every root on the Shore at once, and of a cold she will not name.",
+      "page": "doc.verdant.root_mother",
+      "canonStatus": "CANON-EXPANDED: the Root-Mother is CANON (book3); the dream as told is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.places.the-whispering-glade",
+      "chapter": "places",
+      "subject": "The Whispering Glade",
+      "more": "Sister Iselle listened in the glade for eleven days for the Original Song's three notes: Earth under hearing, Spirit at dusk, and a gap where the third should be.",
+      "page": "doc.verdant.three_notes",
+      "canonStatus": "CANON-EXPANDED: the Original Song's three notes are CANON (book3 ch.5, world_bible.md); Iselle's listening is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.places.the-salt-flats",
+      "chapter": "places",
+      "subject": "The Salt-Flats",
+      "more": "The Salt-Menders' tide-post counts the years the salt came further in, a notch a year, with a name by some. Older than the ships, Ondine says, and that is the point of it.",
+      "secret": "secret.verdant.tide-post",
+      "canonStatus": "CANON-EXPANDED: the Salt-Flats (book3 ch.3) and the Salt-Menders are CANON; the post is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.places.mossveil-falls",
+      "chapter": "places",
+      "subject": "Mossveil Falls",
+      "more": "Willow-Whisper left a leaf at the lip for the ones who will come over the ridge one day. The river remembers every face that ever looked down from here.",
+      "page": "doc.verdant.falls_remember",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Verdant Ocean and the survivors who crest the ridge are CANON (book3 ch.1-4); the leaf is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.places.the-verdant-ocean",
+      "chapter": "places",
+      "subject": "The Verdant Ocean",
+      "more": "What the Keepers sing to a sapling on its first night: before the first leaf, the Mother; before the Mother, the sea. Grow slow, little one.",
+      "page": "doc.verdant.first_cycle",
+      "canonStatus": "CANON-EXPANDED: the Root-Mother and the First Cycle are CANON (book3 ch.2, 7; world_bible.md); the song is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.places.the-fern-hollow",
+      "chapter": "places",
+      "subject": "The Fern Hollow",
+      "more": "A Keeper slept a hundred years under these ferns, and the moss where she lay still glows like a banked coal, warm to the hand.",
+      "secret": "secret.verdant.lantern-moss",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.1-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.places.the-greying",
+      "chapter": "places",
+      "subject": "The Greying",
+      "more": "Willow-Whisper says a cold came before the first leaf, out of nowhere, and went back there, and the Root-Mother remembers it. The Ghost-Oaks here are going grey from the heart out.",
+      "page": "doc.verdant.shore_remembers",
+      "canonStatus": "CANON-EXPANDED: the Root-Mother and the cold that unmade the cycle before this one are CANON (book3 ch.6-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.people.ondine-varro",
+      "chapter": "people",
+      "subject": "Ondine Varro",
+      "more": "She came with the glass-ships to chart the shore, and has read what the last one left: a log kept dry under a drift-log above the tide-line, out of Port Caelum.",
+      "page": "doc.verdant.ship_log",
+      "canonStatus": "CANON-EXPANDED: Port Caelum and its glass ships are CANON (world_bible.md); Ondine and the log are GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.people.moss-lantern",
+      "chapter": "people",
+      "subject": "Moss-Lantern",
+      "more": "She cut the count of the lanterns into bark, from the First Cycle on, and left it on the rock above the glade for any flesh-folk who climb that high.",
+      "page": "doc.verdant.lantern_count",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.1-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.people.sister-iselle",
+      "chapter": "people",
+      "subject": "Sister Iselle",
+      "more": "Brother Wystan went below the root-stair to find the missing note and did not come back. Iselle has his silver mask, and the page that was folded in its lining.",
+      "page": "doc.verdant.wystan",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and their silver masks are CANON (book3 ch.5); Wystan is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.people.willow-whisper",
+      "chapter": "people",
+      "subject": "Willow-Whisper",
+      "more": "Every Keeper who goes down to sit with the Root-Mother cuts one mark by the sap pool. There are more marks than there are Keepers. She has stopped counting them.",
+      "secret": "secret.verdant.deep-count",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.1-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.people.reed-song",
+      "chapter": "people",
+      "subject": "Reed-Song",
+      "more": "Lichen-Still stayed with the Root-Mother when the cold first came into the root, and the root took the stone in like a hand closing. Reed-Song carries the lamps down.",
+      "secret": "secret.verdant.deep-sleeper",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother and the cold in the root (book3 ch.6-7); Lichen-Still is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.people.oak-bane",
+      "chapter": "people",
+      "subject": "Oak-Bane",
+      "more": "The ore-hunter asked first, so Oak-Bane let him through the briar way. Oak-Bane went down after, to bring him up, and left him where the root had taken him.",
+      "page": "doc.verdant.ore_hunter",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.1-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.people.alder-knot",
+      "chapter": "people",
+      "subject": "Alder-Knot",
+      "more": "Alder-Knot carved the moss-saint in the little shrine east of the glowing caps, and will not say whose face it has.",
+      "secret": "secret.verdant.moss-saint",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.1-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.creatures.moss-backed-boar",
+      "chapter": "creatures",
+      "subject": "Moss-backed boar",
+      "line": "Boar with moss growing on their backs, so slow in the green that they pass for hummocks until they move.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.verdant.creatures.old-brine-tusk",
+      "chapter": "creatures",
+      "subject": "Old Brine-Tusk",
+      "line": "A great boar of the salt shore, his tusks white with salt-crust. He eats what the tide leaves.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.verdant.creatures.moss-antler-stag",
+      "chapter": "creatures",
+      "subject": "Moss-antler stag",
+      "line": "Stags whose antlers grow moss as the trees do. The Keepers do not hunt them, and ask you not to, and know you will.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.verdant.creatures.basalt-spider",
+      "chapter": "creatures",
+      "subject": "Basalt spider",
+      "line": "Black spiders of the ridge's basalt, the colour of the rock until they move.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.verdant.creatures.canopy-spider",
+      "chapter": "creatures",
+      "subject": "Canopy spider",
+      "line": "Spiders that live in the high leaves and come down on a thread, quieter than a leaf falling.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.verdant.creatures.creeping-briar",
+      "chapter": "creatures",
+      "subject": "Creeping briar",
+      "line": "Briars that walk, slowly, toward anything warm. The Keepers cut them back from the bower every spring.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.verdant.creatures.withered-keeper",
+      "chapter": "creatures",
+      "subject": "Withered Keeper",
+      "line": "Keepers gone grey from the heart out, like the Ghost-Oaks they slept under. They walk their old rounds and do not know you.",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.1-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.creatures.greyheart",
+      "chapter": "creatures",
+      "subject": "Greyheart",
+      "line": "The oldest of the withered, at the heart of the grey stand. He was a Voice of the Wood, once.",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.1-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.creatures.mist-walker",
+      "chapter": "creatures",
+      "subject": "Mist-walker",
+      "line": "Shapes in the hollow's fog that walk when you walk and stop when you stop.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.verdant.creatures.void-toucher",
+      "chapter": "creatures",
+      "subject": "Void-Toucher",
+      "line": "Mist-walkers that touched the void below the ridge and came back wrong. The air goes still round them.",
+      "canonStatus": "PROVISIONAL foreshadowing: the void eating at the world is CANON (world_bible.md); these are GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.creatures.pale-shadow",
+      "chapter": "creatures",
+      "subject": "Pale shadow",
+      "line": "A shadow among the trees where nothing casts it, cold and counting.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Pale Things as cosmic auditors are CANON (world_bible.md); this one is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.creatures.old-ninebranch",
+      "chapter": "creatures",
+      "subject": "Old Ninebranch",
+      "line": "The old king of the stags, nine tines to a side. The Keepers say he remembers the First Cycle.",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers are CANON (book3 ch.1-7); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.creatures.the-hollow-root-warden",
+      "chapter": "creatures",
+      "subject": "The Hollow Root-Warden",
+      "line": "The guardian of the deep root, gone hollow in the cold that came up it. It still guards; it no longer remembers what.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother and the cold in the root (book3 ch.6-7); the Warden is GAME-ONLY."
+    },
+    {
+      "id": "lore.verdant.herbs.veridian",
+      "chapter": "herbs",
+      "subject": "node.veridian",
+      "line": "Veridian, the green-bronze ore of the Shore's deep ground. The Keepers say it is the Mother's and not for selling, and look the other way.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.verdant.herbs.veridian-rich",
+      "chapter": "herbs",
+      "subject": "node.veridian_rich",
+      "line": "Where the green runs thick, under the temple and in the deep halls, the seams come away in slabs.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.verdant.herbs.ghostoak",
+      "chapter": "herbs",
+      "subject": "node.ghostoak",
+      "line": "Ghost-Oak windfalls: pale wood, light as cork and harder than iron. A Ghost-Oak takes a hundred years to fall and a hundred more to rot.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.verdant.herbs.dewfern",
+      "chapter": "herbs",
+      "subject": "node.dewfern",
+      "line": "Dewfern holds the morning's dew all day in its curled fronds. The Keepers drink from it and leave the plant.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.verdant.herbs.lantern-moss",
+      "chapter": "herbs",
+      "subject": "herb.lantern_moss",
+      "line": "Moss that glows like a banked coal, gold-green and warm. The Keepers say it grows where one of them once slept a hundred years.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    }
+  ]
+}

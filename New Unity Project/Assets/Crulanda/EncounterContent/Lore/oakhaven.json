@@ -1,0 +1,208 @@
+{
+  "zone": "zone.oakhaven",
+  "canonStatus": "GAME-ONLY: Oakhaven's chapter of the book of lore, its lines the game's; what they tell of is CANON or CANON-EXPANDED as each says and as oakhaven.json's canonNote gives it (book1 ch.4; world_bible.md).",
+  "entries": [
+    {
+      "id": "lore.oakhaven.places.the-great-oak",
+      "chapter": "places",
+      "subject": "The Great Oak",
+      "more": "The chapel book's first leaf tells it: the first families set an acorn in the middle of the square and swore on it that while the oak stands, Oakhaven stands. Nobody can say how old the oak is now. Everyone has a grandmother who tried.",
+      "page": "doc.oakhaven.acorn_oath",
+      "canonStatus": "CANON-EXPANDED: the Great Oak as the heart of the settlement is CANON (book1 ch.4); the oath and the chapel book are GAME-ONLY."
+    },
+    {
+      "id": "lore.oakhaven.places.the-black-iron-wagon",
+      "chapter": "places",
+      "subject": "The black-iron wagon",
+      "more": "The Bureau's own field ledger says what the cage was for: two hundred and forty souls counted, three of them marked as resonance candidates, the rest tallied as cover. The wagon came for the three.",
+      "page": "doc.oakhaven.ledger",
+      "canonStatus": "CANON-EXPANDED: the ledger's figures and its purpose follow book1 ch.4; the wagon is GAME-ONLY."
+    },
+    {
+      "id": "lore.oakhaven.places.hallow-s-creek-milestone",
+      "chapter": "places",
+      "subject": "Hallow's Creek milestone",
+      "more": "A letter that came west down that road tells how the east meadow at Hallow's Creek went pale in a night, grass and fence-posts and the old ram with them, and how nobody there thought it more than a blight.",
+      "page": "doc.oakhaven.hallows_creek",
+      "canonStatus": "CANON-EXPANDED: Hallow's Creek, the first settlement the Wasting took, is CANON (world_bible.md); the letter is GAME-ONLY."
+    },
+    {
+      "id": "lore.oakhaven.places.the-watchtower",
+      "chapter": "places",
+      "subject": "The Watchtower",
+      "more": "The watch book keeps the grey's line in the watchers' own hands, night by night: the far hedge, then the hedge itself, then the field beyond Hollin's. The writing gets smaller as it goes.",
+      "page": "doc.oakhaven.watch_book",
+      "canonStatus": "GAME-ONLY: the watchtower and its book. The Wasting unmaking rather than burning is CANON (book1 ch.4; world_bible.md)."
+    },
+    {
+      "id": "lore.oakhaven.places.crowsfoot-hollow",
+      "chapter": "places",
+      "subject": "Crowsfoot Hollow",
+      "more": "Caddock's orders, copied fair by his quartermaster, show what the hollow is: a deserters' kingdom of one hall and one chair, kept on a bowl a day and whatever the King says. Nobody sits in the chair to see what it is like.",
+      "page": "doc.oakhaven.kings_orders",
+      "canonStatus": "GAME-ONLY: Caddock, his hollow and his orders. The Sandthrone company, whose deserters these are, is CANON (world_bible.md)."
+    },
+    {
+      "id": "lore.oakhaven.places.the-harrow-knoll",
+      "chapter": "places",
+      "subject": "The Harrow knoll",
+      "more": "The stones on the crown are Sel Harrow's: one for every seventh day since the collectors took his girl, thirty and more. He means to go on until the pile is taller than she was.",
+      "secret": "secret.oakhaven.elins-cairn",
+      "canonStatus": "GAME-ONLY: the Harrows and their stones. The Council's collectors are CANON-EXPANDED (book1 ch.4)."
+    },
+    {
+      "id": "lore.oakhaven.places.old-wayshrine",
+      "chapter": "places",
+      "subject": "Old wayshrine",
+      "more": "A Salt-Mender keeps a drop behind the plinth: coin, a draught, a scrap of instruction in a careful hand. The menders pass through Oakhaven quietly and leave the shrine a little better than they found it.",
+      "secret": "secret.oakhaven.menders-drop",
+      "canonStatus": "CANON-EXPANDED: the Salt-Menders are CANON, the game's the forerunners of book 3's (LORE_AUDIT.md); the shrine and the drop are GAME-ONLY."
+    },
+    {
+      "id": "lore.oakhaven.people.corwin-ashby",
+      "chapter": "people",
+      "subject": "Corwin Ashby",
+      "line": "The village elder. He remembers the east when it was green, and says so, often.",
+      "more": "He gave you the old lullaby every Oakhaven mother sings, sleep now, stone and sky, and asked you to keep it somewhere the grey won't reach.",
+      "page": "doc.oakhaven.lullaby",
+      "canonStatus": "CANON-EXPANDED: the lullaby's first line is CANON (book1 ch.23, 'an old lullaby from Oakhaven'); Corwin and the rest of it are GAME-ONLY."
+    },
+    {
+      "id": "lore.oakhaven.people.hesper-crane",
+      "chapter": "people",
+      "subject": "Hesper Crane",
+      "more": "She keeps back what she won't sell: a moonbell dried in a twist of paper, and a note in her granddaughter Lisbet's hand thanking her for the yarrow.",
+      "secret": "secret.oakhaven.hespers-simples",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.people.osk-farrow",
+      "chapter": "people",
+      "subject": "Osk Farrow",
+      "more": "He keeps what he owes the Cask for the winter wood in a tin under the cutters' trunk, so that he can't drink it. So far it has worked.",
+      "secret": "secret.oakhaven.cutters-tin",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.creatures.grey-wolf",
+      "chapter": "creatures",
+      "subject": "Grey wolf",
+      "line": "Lean grey wolves out of the woods north and south, bolder every year the grey creeps closer. They come to the fold at dusk.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.creatures.old-whitefoot",
+      "chapter": "creatures",
+      "subject": "Old Whitefoot",
+      "line": "The old pack-leader with one white forefoot. The north farms dug a pit for his grandsire, and he has never once gone near it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.creatures.wild-boar",
+      "chapter": "creatures",
+      "subject": "Wild boar",
+      "line": "Boar of the copses and the sallows, gone wild from the farms' swine and wilder since. They rip up the turnip rows by night.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.creatures.sandthrone-deserter",
+      "chapter": "creatures",
+      "subject": "Sandthrone deserter",
+      "line": "Men who walked away from the Sandthrone with their gear and no pay, and found a king in the hills who would feed them. They rob the north farms for him.",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone mercenary company is CANON (world_bible.md); these men are GAME-ONLY."
+    },
+    {
+      "id": "lore.oakhaven.creatures.caddock-the-bandit-king",
+      "chapter": "creatures",
+      "subject": "Caddock, the Bandit King",
+      "line": "A deserter who crowned himself in tin and keeps court in the deep hall of the hollow. His men call him King because he feeds them.",
+      "canonStatus": "GAME-ONLY: Caddock is ours; no canon Sandthrone name is used for him."
+    },
+    {
+      "id": "lore.oakhaven.creatures.quartermaster-hesk",
+      "chapter": "creatures",
+      "subject": "Quartermaster Hesk",
+      "line": "Caddock's quartermaster, who can write, and makes sure you know it. He keeps the King's stores in the caves past the Drop.",
+      "more": "His stores-list for the King tallies Oakhaven farm by farm: seed-corn from the Carder barn, a string of hams, a good pair of boots, the copper kettle. He priced the kettle at fourpence.",
+      "page": "doc.oakhaven.hesks_tally",
+      "canonStatus": "GAME-ONLY: Hesk and his tally. The Sandthrone company is CANON (world_bible.md)."
+    },
+    {
+      "id": "lore.oakhaven.creatures.brown-bear",
+      "chapter": "creatures",
+      "subject": "Brown bear",
+      "line": "Brown bears of the mast woods and the berry downs. Slow to anger, and quick to finish whatever angered them.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.creatures.old-hazelmaw",
+      "chapter": "creatures",
+      "subject": "Old Hazelmaw",
+      "line": "The great bear of the hazel thickets, grey at the muzzle. The hunters leave him be, and he leaves them be, mostly.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.creatures.concord-warden",
+      "chapter": "creatures",
+      "subject": "Concord warden",
+      "line": "A Concord picket at the ruts into the grey, turning back anyone who would walk east. They say it is for your safety.",
+      "canonStatus": "CANON-EXPANDED: the Concord follows world_bible.md; this picket at the grey is GAME-ONLY."
+    },
+    {
+      "id": "lore.oakhaven.creatures.red-hart",
+      "chapter": "creatures",
+      "subject": "Red hart",
+      "line": "A red stag of the open downs, quick to bolt and dangerous at bay. The Cask pays well for venison and asks nothing.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.creatures.hollow-forager",
+      "chapter": "creatures",
+      "subject": "Hollow forager",
+      "line": "Caddock's foragers, down from the hollow with sacks to fill. Hungry men with knives: no worse than wolves, and no better.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.creatures.carr-spider",
+      "chapter": "creatures",
+      "subject": "Carr spider",
+      "line": "Spiders of the wet sallows, big as a cat, their webs strung between the willows like washing. The swineherd swears the webs took his boots.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.oakhaven.herbs.copper",
+      "chapter": "herbs",
+      "subject": "node.copper",
+      "line": "Green-stained copper in the hillside seams, the first ore anyone in Oakhaven learns to break. The smith takes all of it and asks for more.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.oakhaven.herbs.copper-rich",
+      "chapter": "herbs",
+      "subject": "node.copper_rich",
+      "line": "Where a seam runs thick the green comes away in fistfuls. The quarrymen kept quiet about where.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.oakhaven.herbs.oak",
+      "chapter": "herbs",
+      "subject": "node.oak",
+      "line": "Windfall oak: limbs and trunks the storms bring down. Oakhaven does not fell a living oak. It waits.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.oakhaven.herbs.yarrow",
+      "chapter": "herbs",
+      "subject": "node.yarrow",
+      "line": "Yarrow, the hedge-wife's first herb: for cuts, for fevers, and for an excuse to walk the meadows. Lisbet dries it head-down in her hut.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.oakhaven.herbs.moonbell",
+      "chapter": "herbs",
+      "subject": "herb.moonbell",
+      "line": "A pale bell that glows faintly in a copse's shade. The hedge-wives say it only grows where the ground is still sure of itself. They say it less often now.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    }
+  ]
+}

@@ -691,6 +691,11 @@ namespace Crulanda.Encounter
                 GUI.color = new Color(1, 1, 1, .05f); GUI.DrawTexture(new Rect(x - 6, 180, TreeWidth, 520), Texture2D.whiteTexture); GUI.color = Color.white;
                 GUI.contentColor = gold;
                 GUI.Label(new Rect(x, 184, 240, 26), branch.name.ToUpperInvariant() + "   " + tree.SpentIn(p, branch), text);
+                // Its part in a group, on a coloured tag at the header's right (2026-10-16, Chris: "in the talent tree you need to
+                // designate their distinction like tank/healer/dps/support").
+                { var (word, tint) = RoleTag(branch.role); var tag = new Rect(x + TreeWidth - 96, 186, 84, 20);
+                  GUI.color = new Color(tint.r, tint.g, tint.b, .85f); GUI.DrawTexture(tag, Texture2D.whiteTexture); GUI.color = Color.white;
+                  GUI.contentColor = Color.white; var c = new GUIStyle(tiny) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }; GUI.Label(tag, word, c); }
                 GUI.contentColor = Color.white;
                 GUI.Label(new Rect(x, 208, TreeWidth - 12, 60), branch.loop, tiny);
                 foreach (var n in branch.nodes)
@@ -1153,6 +1158,20 @@ namespace Crulanda.Encounter
             GUI.color = color; GUI.DrawTexture(new Rect(r.x,r.y,r.width * Mathf.Clamp01(fill),r.height), Texture2D.whiteTexture);
             GUI.color = Color.white;
             if (label.Length > 0) GUI.Label(new Rect(r.x+5,r.y-1,r.width,r.height+8), label, small);
+        }
+        /// <summary>A talent branch's part in a group, as its tag says it (the branch's role in the talent file).</summary>
+        static (string, Color) RoleTag(string role)
+        {
+            switch ((role ?? "").ToLowerInvariant())
+            {
+                case "tank": return ("TANK", new Color(.25f, .45f, .85f));
+                case "healer": return ("HEALER", new Color(.2f, .65f, .3f));
+                case "dps": return ("DPS", new Color(.75f, .22f, .2f));
+                case "pet": return ("DPS · PET", new Color(.75f, .22f, .2f));
+                case "control": return ("CONTROL", new Color(.55f, .3f, .75f));
+                case "utility": case "support": return ("SUPPORT", new Color(.8f, .6f, .15f));
+                default: return (string.IsNullOrEmpty(role) ? "" : role.ToUpperInvariant(), new Color(.4f, .4f, .4f));
+            }
         }
     }
 }

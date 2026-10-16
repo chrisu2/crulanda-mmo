@@ -2,6 +2,21 @@
 
 ## Start here
 
+**Night of 2026-10-15 (~22:45): Chris: "keep going finish phase 8" then "them move to 9".** His answers tonight (question prompts,
+verbatim in the docs): Phase 8.6 on my defaults (PHASE8_6_LIVING_WORLD.md, end); Phase 8.5 by route (a), the hero pack's body (ROADMAP;
+**blocked until Chris downloads "Modular Hero" (CHOSAN) in the Package Manager's My Assets**: it is not on disk); Phase 9's first zone
+the Lowtowns & Rust Market 16-19 (ZONE_LOWTOWNS.md: arrival by Oakhaven's south road, Gorm himself, the Council's warders, the
+dead-house cellar); Hallow's Creek on the recommended answers (DUNGEON2_DESIGN.md, end).
+- **Branches and worktrees:** `feet-bow-adit-kit` (D:\code\mmo, the working branch; the Adit fixes); `cc-pack` (D:\code\mmo-ccpack:
+  every mob's signature move and the sims' holds; feet-bow merged in at 74aeaf9d; its tests (chainR157's set) still to run, merge if green);
+  three Phase 8.6 helpers' worktrees made at 7691e7db: `p86-inns` (D:\code\mmo-inns: steps 1-3, the inns, doorways, taprooms),
+  `p86-craft` (D:\code\mmo-craft: steps 4-6, buffs, found recipes and save format 11, crafting tiers and the new crafts), `p86-lore`
+  (D:\code\mmo-lore: steps 7-8, the Lore tab's chapters, secrets to about 90, the regrowing herbs); `p9-lowtowns` (D:\code\mmo-lowtowns:
+  the cap 15 to 19, 4d9c20fa; the rest of ZONE_LOWTOWNS.md section 10 to come). Compile scripts: scratchpad `b-<name>/build.py`.
+- **Phase 9 step 2 found:** at 19 a character has 20 points and most branches have 16-19 ranks built (only the Druid, the Warrior's
+  first three and the Archivist's Still Vow, Unwriting and Cantor reach 20): a tier more for every short branch before the cap ships.
+- **The full group run** (chainR161, adit-final9, 22:03) with the bot's height fix and the leader keeping a camp while it waits.
+
 **Current state: 2026-10-15 afternoon. Chris: "i told you to finish adit before shutting down" and a deadline at 18:00.** The Adit
 rework is finished in code and merged into `feet-bow-adit-kit` (the working branch, PR #2); `adit-rework` (worktree `D:\code\mmo-adit`)
 is the same. Nothing is VERIFIED until Chris sees it; talk to him in game terms (memory: plain-words-no-run-names, finish-the-named-task).

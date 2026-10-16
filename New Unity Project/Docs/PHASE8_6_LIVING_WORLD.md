@@ -231,3 +231,5 @@ Druid's, the Archivist's songs, the Shaman's and the Cleric's blessings, whichev
 (you) does the same from the bags; then the pull. Sims carry what they craft and buy (SimEconomy), so a richer sim party is better
 buffed. Bosses are then tuned for a buffed party (the buffs worth about 10-15% of the party's damage and survival), so going in unbuffed
 is harder, not impossible. Lands on top of step 4 (the consumables, branch p86-craft) once its tests pass.
+- Wain's Rest's roof of salt-cart canvas (the inns helper's PROVISIONAL choice, the Deacon's Tally saying its rafters were burnt): Chris,
+  2026-10-15 ~23:30, verbatim: "canvas roof is fine. i really want the castle done asap so double down on it".

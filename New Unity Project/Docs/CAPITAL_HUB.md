@@ -110,3 +110,7 @@ a bank; "etc more as we come up with it".
 **Decisions answered (2026-10-15 ~22:45, the question prompt, verbatim):** the bank "Shared by all (Recommended)": the vault lives in
 the profile save (profile.save.json, beside the characters), not on a character, so the character format is untouched by it (the
 profile's format goes up one, Chris's saves backed up first); the Exchange "Sims list and buy (Recommended)".
+
+**Chris, 2026-10-15 ~23:30 (verbatim): "i really want the castle done asap so double down on it".** Three helpers on it from 23:35: the
+zone and buildings (p9-crown), the bank and the Exchange (p9-exchange), the halls' people and systems (p9-halls: Aethelgard's audience,
+the Archive's reading room, the guild halls, the trainers, the dresser); the talent tiers for 19 paused.

@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-15, 20:00-22:10: the full run's falls, warps and stalls (Chris watching: "warrior fell off again", "outside again"; all OPEN)
+- **The Warrior fell off every run:** a knockback picked the nearest floor, which on a catwalk could be the hall below. A knockback now starts
+  from the floor under the victim and lands on that same floor or not at all (`EncounterEnemy.Boss` Knock, `AditSwingLoad` KnockAlong).
+- **The party warped onto the grass over the Sunless River:** every catch-up teleport (the run bot's rescue, a sim's, Mira's) lands only on
+  your level now.
+- **Sims warped out of a fight to catch up with you** (after you got up at the stone the duo reset): a sim stays while its own target fights the
+  party or any fight is within 30 m (at 15 m the healer and the archer were pulled out).
+- **The leader stood "leading you" at the yard for minutes:** it asked for its way every frame and a long way never got worked out. It asks
+  when the way changes or every 2 s, and a way still being worked out after 3 s is walked cave by cave.
+- **The party stood outside on the grass for twenty minutes after the wipe at Nix** (adit-final8): the bot walked back from the stone and
+  stopped on the yard's grass right over the tank, who was 50 m below in the cave: by the flat distance it had arrived. The bot now counts the
+  height, and ten seconds with no headway on another level warps it beside the leader, on the leader's level.
+- **Nix's camp was given up with Nix alive:** the leader's "nothing to fight here for 45 s, leave it" clock ran while it waited for you; it now
+  runs only with the party there.
+
 ## 2026-10-15, 18:00-20:00: the party fights on when you fall (three solo-era bugs; Chris: "ugh more wasted time for dumb bugs that should have already been caught")
 Why the sim parties wiped at the Nix duo all afternoon was not the duo's numbers: three rules from before parties existed.
 - **A mob reset the moment you fell** (`EncounterEnemy`: `if (!Player.IsAlive) ResetFight()`), whoever else was fighting it. Now a mob with a
@@ -10,7 +25,12 @@ Why the sim parties wiped at the Nix duo all afternoon was not the duo's numbers
 - **Mira stood idle while you were down**: she now heals and fights on while the party is still in a fight.
 - **A rider's home stayed at its camp:** Nix, off the dead beast, walked back there and reset after the lull his own Shriek made. His home is
   now where he climbs down.
-- **The fight test** (`AditNixFightTests`): you get up as the run does and a reset duo is pulled again.
+- **Whoever gets up at the stone leaves every mob's threat list:** Nix had chased the revived tank across the dungeon past his leash and reset
+  at 426 health with three sims on him.
+- **The run bot assists the tank** (RunCapture and the test): it went for Nix while he was free and died at 15 s in every fight.
+- **The fight test** (`AditNixFightTests`): you get up as the run does, back where you fell, and a reset duo is pulled again.
+- **Result (20:16-20:21):** the run's party beat the duo 3 of 3 (Nix down at 211-225 s; the tank and you fall near the end and the
+  rest finish him: hard, winnable); the party and death tests 44/44. Published 20:2x and the full group run started.
 - **Silent test runs:** batch-mode tests, tours, captures and group runs mute every sound (`QuietRuns`; Chris: "please turn the music off in
   future testing").
 - **The duo's moves 11% further apart** (Chris: "move timer to 11%" after a 12% win with the tank never low).

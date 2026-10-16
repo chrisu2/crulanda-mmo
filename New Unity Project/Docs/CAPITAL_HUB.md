@@ -106,3 +106,7 @@ a bank; "etc more as we come up with it".
   (Mining, Herbalism, Woodcutting, Skinning, Fishing if it exists) with their trainers, and the crafts (Blacksmithing at a forge,
   Simpling (Alchemy) at a still-table, Cooking at the inn's kitchen, Leatherworking, Weaving at a loom, and whatever Phase 8.6 adds) with
   their stations and trainers, all usable from level 1; the Treasury beside them for materials.
+
+**Decisions answered (2026-10-15 ~22:45, the question prompt, verbatim):** the bank "Shared by all (Recommended)": the vault lives in
+the profile save (profile.save.json, beside the characters), not on a character, so the character format is untouched by it (the
+profile's format goes up one, Chris's saves backed up first); the Exchange "Sims list and buy (Recommended)".

@@ -1151,14 +1151,28 @@ namespace Crulanda.Encounter
         {
             float now = Time.time;
             headway.Tick(transform.position, agent.pathPending ? float.MaxValue : agent.remainingDistance, now);
-            if (headway.Lost(now))
-            {
-                partner = null; CancelErrand(false); DropRoute(); activity = "wander"; headway.Reset(transform.position, now);
-                var alt = life.RandomPlace("wander"); if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = now + 5; }
-                return true;
-            }
+            if (headway.Lost(now)) { GiveUpWay(now); return true; }
             if (headway.StepDue(now)) headway.BeginStep(agent);
             return false;
+        }
+        /// <summary>The inn's staff (the city inn's cook, servers and pot-boy): their posts are inside it.</summary>
+        bool InnStaff { get { return Role == "cook" || Role == "server" || Role == "potboy"; } }
+        /// <summary>
+        /// A walk given up (no headway for ten seconds, or a path that cannot reach): off wandering somewhere else. The inn's staff go
+        /// back to their post instead (a server's place, else the kitchen), and if even that walk is given up they stop where they
+        /// are a while and choose again, never turned round for good on a way they cannot walk (CrownLifeTests, 2026-10-16: a server
+        /// "stood stuck ... on the way to 'wander'" all evening by the Gilded Lantern's range).
+        /// </summary>
+        void GiveUpWay(float now)
+        {
+            partner = null; CancelErrand(false); DropRoute(); headway.Reset(transform.position, now);
+            string next = "wander";
+            if (InnStaff) next = life.Places.TryGetValue("serve", out var serve) && serve.Count > 0 ? "serve" : "kitchen";
+            bool again = InnStaff && activity == next;
+            activity = next;
+            var alt = again ? null : InnStaff ? life.RandomPlace(next, this) : life.RandomPlace(next);
+            if (alt.HasValue) Go(alt.Value);
+            else { state = State.Activity; if (InnStaff && agent.isOnNavMesh) agent.isStopped = true; until = now + 5; }
         }
         /// <summary>Folk taking their ease (on the green, at the well, wandering) step aside too; those at work or sat down do not.</summary>
         bool Idle { get { return state == State.Activity && (activity == "green" || activity == "well" || activity == "wander"); } }
@@ -1708,7 +1722,7 @@ namespace Crulanda.Encounter
                 if (route.Tick(agent, this, Rank, Time.time)) { if (route.Waiting) headway.Reset(transform.position, Time.time); else Watch(); BarkAtPlayer(); return; }
                 route = null;
             }
-            if (state == State.Travel && Stranded) { partner = null; CancelErrand(false); activity = "wander"; var alt = life.RandomPlace("wander"); if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = Time.time + 5; } return; }
+            if (state == State.Travel && Stranded) { GiveUpWay(Time.time); return; }
             if (state == State.Travel && Arrived) StartActivity();
             if (state == State.Travel && Watch()) return;
             if (state == State.Activity)

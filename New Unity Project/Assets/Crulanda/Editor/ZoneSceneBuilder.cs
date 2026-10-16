@@ -19,6 +19,7 @@ namespace Crulanda.EditorTools
         public const string OakhavenScene = "Assets/Crulanda/Scenes/Oakhaven.unity";
         const string OakhavenJson = "Assets/Crulanda/EncounterContent/Zones/oakhaven.json";
         public const string ProfessionsFolder = "Assets/Crulanda/EncounterContent/Professions";
+        public const string LoreFolder = "Assets/Crulanda/EncounterContent/Lore";
 
         [MenuItem("Crulanda/World/Build Oakhaven")]
         public static void BuildOakhaven()
@@ -65,9 +66,20 @@ namespace Crulanda.EditorTools
                 }
             trades.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
             content.professionFiles = trades.ToArray();
+            // The book of lore (EncounterContent/Lore, Phase 8.6): one file a zone; the folder may be missing in an older checkout.
+            var lore = new System.Collections.Generic.List<TextAsset>();
+            if (AssetDatabase.IsValidFolder(LoreFolder))
+                foreach (var guid in AssetDatabase.FindAssets("t:TextAsset", new[] { LoreFolder }))
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(guid);
+                    if (path.EndsWith(".json")) lore.Add(AssetDatabase.LoadAssetAtPath<TextAsset>(path));
+                }
+            lore.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+            content.loreFiles = lore.ToArray();
             EditorUtility.SetDirty(content);
             Debug.Log("Registered " + files.Count + " quest files and " + items.Count + " item files.");
             Debug.Log("Registered " + trades.Count + " profession files.");
+            Debug.Log("Registered " + lore.Count + " lore files.");
         }
         /// <summary>Where step A3's wardrobe stand-in (LootDraft) was written; step L2 loads the loot files as item files, so it is removed.</summary>
         const string OldLootDraft = "Assets/Crulanda/Resources/Gear/LootDraft.asset";

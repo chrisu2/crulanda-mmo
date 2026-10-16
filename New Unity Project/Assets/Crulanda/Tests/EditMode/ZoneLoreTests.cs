@@ -56,10 +56,11 @@ namespace Crulanda.Tests
             Assert.IsFalse(DiscoveryLog.Mentions("the tower east of the village", "The Watchtower"));
             // Secrets a zone (2026-10-15: two lore pages each in Khaven, the Peaks, the Rim and the Shore; Oakhaven's fifteen grew to 25
             // the same night by another hand, and may grow on: each new one needs its lines in Resources/Lore/oakhaven.json, which
-            // the check above names).
-            var counts = zones.Where(z => !z.dungeon).ToDictionary(z => z.id, z => (z.secrets ?? new ZoneSecret[0]).Count(s => s != null));
-            Assert.GreaterOrEqual(counts["zone.oakhaven"], 25); Assert.AreEqual(10, counts["zone.khaven"]); Assert.AreEqual(10, counts["zone.peaks"]);
-            Assert.AreEqual(10, counts["zone.ashrim"]); Assert.AreEqual(8, counts["zone.verdant"]);
+            // the check above names). Phase 8.6 step 8 (decision 7, about 90 in all): three more each in Khaven, the Peaks and the Rim,
+            // three on the Shore and three in its Root-Mother's Deep; the Sealed Adit's thirteen have their lines in Resources/Lore/adit.json.
+            var counts = zones.ToDictionary(z => z.id, z => (z.secrets ?? new ZoneSecret[0]).Count(s => s != null));
+            Assert.GreaterOrEqual(counts["zone.oakhaven"], 25); Assert.AreEqual(13, counts["zone.khaven"]); Assert.AreEqual(13, counts["zone.peaks"]);
+            Assert.AreEqual(13, counts["zone.ashrim"]); Assert.AreEqual(14, counts["zone.verdant"]); Assert.AreEqual(13, counts["zone.adit"]);
         }
 
         [Test] public void Every_named_person_in_every_zone_has_two_or_three_stories_and_nobody_else_has_any()
@@ -89,13 +90,13 @@ namespace Crulanda.Tests
         {
             var quests = QuestDatabase.Parse(Texts("Quests")); var zones = Zones();
             var lore = quests.Documents.Values.Where(d => d.IsLore).Select(d => d.id).ToList();
-            Assert.AreEqual(8, lore.Count, "Eight pages of the book of lore (2026-10-15): two each in Khaven, the Peaks, the Rim and the Shore.");
+            Assert.AreEqual(14, lore.Count, "Fourteen pages of the book of lore: two each in Khaven, the Peaks, the Rim and the Shore (2026-10-15), and six at the books, shelves and dead of Phase 8.6.");
             var held = new Dictionary<string, ZoneSecret>();
             foreach (var z in zones) foreach (var s in z.secrets ?? new ZoneSecret[0]) if (s != null && !string.IsNullOrEmpty(s.document)) held[s.document] = s;
             foreach (var id in lore)
             {
                 Assert.IsTrue(held.ContainsKey(id), id + " lies at no hidden find.");
-                Assert.AreEqual("note", held[id].kind, id + ": a page is a note (ZoneBuilder builds notes; there is no 'page' kind).");
+                CollectionAssert.Contains(new[] { "note", "read", "remains" }, held[id].kind, id + ": a page lies in a note, a book to read or a dead adventurer's satchel (there is no 'page' kind).");
                 Assert.IsFalse(string.IsNullOrEmpty(quests.Documents[id].canonStatus), id + ": a lore page says what it is.");
             }
             Assert.IsFalse(quests.Documents["doc.khaven.low_row"].IsLore, "A Chronicle page is not lore.");

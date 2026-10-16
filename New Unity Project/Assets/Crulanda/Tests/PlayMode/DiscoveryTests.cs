@@ -21,7 +21,10 @@ namespace Crulanda.Tests
     /// - searching a cache with E pays XP (levelling up as a quest reward does), gold, its item into the bags and its Chronicle page;
     /// - a chest is locked until its key is found, then opens; a key you take vanishes;
     /// - finds survive a save and load (and a load of an older save gives back what it hadn't found) and a whole reload of the zone;
-    /// - the Discoveries tab counts found / total per zone, this one first, naming only the found; no map mark is a secret.
+    /// - the Discoveries tab counts found / total per zone, this one first, naming only the found; no map mark is a secret;
+    /// - (Phase 8.6) a wayshrine found blesses you, and after that takes a crown for its blessing; a rare herb found is gone till the next
+    ///   game day, then grows back and is picked again with Herbalism, which the book of lore records; the tab counts the hidden by
+    ///   region; the book of lore loads with the session and knows the zone's places.
     /// </summary>
     public class DiscoveryTests
     {
@@ -304,6 +307,58 @@ namespace Crulanda.Tests
             yield return new WaitForSeconds(.7f);
             Assert.AreEqual(xp, t.Progress.experience, "Never pays twice."); Assert.AreEqual(gold, t.Progress.gold);
             Assert.IsTrue(t.DiscoveryTallies()[0].found.Exists(f => f.id == cache.id), "The book shows it found.");
+        }
+
+        [UnityTest] public IEnumerator A_wayshrine_blesses_and_a_rare_herb_grows_back_a_day_after_it_is_picked()
+        {
+            var s = Session(); var spots = QuietSpots(s, 2);
+            var shrine = Test("shrine", "shrine", "Test Shrine", xp: 5); var herb = Test("bells", "herb", "Test Bells", xp: 5); herb.item = "herb.moonbell";
+            var shrineSpot = Hide(s, shrine, spots[0]); var herbSpot = Hide(s, herb, spots[1]);
+            var statuses = s.Player.GetComponent<Crulanda.Combat.Combatant>().Statuses;
+            yield return StandBy(s, spots[0]);
+            s.Progress.gold = 0;
+            s.Interact();
+            Assert.IsTrue(s.Discoveries.IsFound(shrine), "Found.");
+            Assert.Greater(statuses.Remaining(DiscoveryLog.BlessingId, Time.time), 590, "Found, it blesses you at once.");
+            Assert.AreEqual(DiscoveryLog.BlessingName, s.StatusName(DiscoveryLog.BlessingId), "Named on the buff row.");
+            Assert.AreSame(shrineSpot, s.NearbySecret, "A found shrine is still there to use."); Assert.AreEqual("Leave a crown at the shrine", s.InteractPrompt);
+            s.Interact(); Assert.AreEqual(0, s.Progress.gold, "Still blessed: no crown asked for.");
+            statuses.Remove(DiscoveryLog.BlessingId);
+            s.Interact(); Assert.AreEqual(0, statuses.Remaining(DiscoveryLog.BlessingId, Time.time), "No crown to leave, no blessing.");
+            s.Progress.gold = 2; s.Interact();
+            Assert.AreEqual(1, s.Progress.gold, "A crown in the dish."); Assert.Greater(statuses.Remaining(DiscoveryLog.BlessingId, Time.time), 590, "Blessed again.");
+
+            // The herb: found and picked, gone till tomorrow; a game day on it is back, and picked again with Herbalism.
+            s.Progress.professions.Find(x => x.id == "herbalism").skill = 20;   // moonbell asks Herbalism 10
+            yield return StandBy(s, spots[1]);
+            s.Interact();
+            Assert.IsTrue(s.Discoveries.IsFound(herb)); Assert.AreEqual(1, Inventory.Count(s.Progress, "herb.moonbell"), "The find's own.");
+            Assert.IsNull(s.NearbySecret, "Picked today: nothing left to pick.");
+            s.Progress.days++;
+            yield return new WaitForSeconds(.7f);   // the regrowth is looked at every half second
+            Assert.AreSame(herbSpot, s.NearbySecret, "Grown back by the next day.");
+            Assert.IsTrue(herbSpot.root.GetComponentsInChildren<Renderer>().Any(r => r.enabled), "It shows again.");
+            Assert.IsTrue(s.PickedHerb(herbSpot, DiscoveryLog.HerbNode(herb, s.Professions.Db, s.Items)), "Picked with Herbalism.");
+            Assert.AreEqual(2, Inventory.Count(s.Progress, "herb.moonbell"));
+            Assert.IsNull(s.NearbySecret, "Gone again until tomorrow.");
+            Assert.IsFalse(herbSpot.root.GetComponentsInChildren<Renderer>().Any(r => r.enabled), "Picked, it is hidden.");
+            if (s.Lore != null) Assert.IsTrue(s.Lore.Knows(LoreBook.WorkedKey(s.Zone.Zone.id, "herb.moonbell")), "The book of lore has the herb now.");
+        }
+
+        [UnityTest] public IEnumerator The_book_of_lore_loads_and_the_tab_counts_the_hidden_by_region()
+        {
+            var s = Session(); var zone = s.Zone.Zone;
+            Assert.NotNull(s.Lore, "The lore files are registered (EncounterContent.loreFiles).");
+            Assert.GreaterOrEqual(s.Lore.Files.Count, 6, "One for every zone.");
+            Assert.AreEqual(Achievements.Pois(zone).Count(), s.Lore.Lines(zone, LoreBook.Places).Count, "Every place of the zone is in the book.");
+            var place = Achievements.Pois(zone).First(); s.Progress.explored.Add(Achievements.PoiKey(zone, place));
+            Assert.IsTrue(s.Lore.Lines(zone, LoreBook.Places).First(l => l.subject == place.name).known, "A place reached is known.");
+            var person = LoreBook.PeopleOf(zone).First(); Assert.IsTrue(s.Lore.Meet(zone, person)); Assert.IsTrue(s.Lore.Lines(zone, LoreBook.People).First(l => l.subject == person).known);
+            var here = s.DiscoveryTallies()[0];
+            Assert.Greater(here.regions.Count, 0, "The zone's hidden finds are counted by its places.");
+            Assert.AreEqual(here.Hidden, here.regions.Sum(r => r.count), "Every hidden one, once.");
+            foreach (var (place2, count) in here.regions) Assert.IsTrue(zone.landmarks.Any(l => l.name == place2), place2 + " is a place on the map.");
+            yield return null;
         }
 
         [UnityTest] public IEnumerator The_book_counts_found_of_total_per_zone_and_no_map_marks_a_secret()

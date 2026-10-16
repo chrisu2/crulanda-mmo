@@ -6,6 +6,11 @@ Asked (the question prompt, verbatim): "Until a lockout resets (Recommended)" an
 dungeons and in the open world, is killed and looted once per character per lockout; dead for that character until the lockout resets
 (a real-time day for dungeons' bosses and the open world's elites, at 06:00 local; a real-time week for raids when they come). The
 ordinary mobs keep the 20-minute respawn. Kept on the character (save format 11, with Phase 8.6's recipes).
+**Then (Chris, 2026-10-15 ~23:50, verbatim): "the dungeons should include an instance que that can be done every 2 days for loot."** So a
+dungeon's lockout is two real days (not one): the dungeon queue (a finder: pick a dungeon or "any", the sims fill the tank, healer and
+damage places by role, the party is taken to the door, the dungeon fresh for the run) gives its bosses' loot once every two days per
+character; queued again inside the lockout the run goes but the bosses drop no loot (PROVISIONAL: or the queue is shut until it
+resets). Open-world elites: once a real day.
 
 ## Chris's words (2026-10-14, verbatim)
 "what are the three new dungeons? you should have the build guide on levels. i think adit dungeon need to be more complex like wow's

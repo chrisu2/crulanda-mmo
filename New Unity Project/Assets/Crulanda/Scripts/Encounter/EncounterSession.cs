@@ -1391,6 +1391,10 @@ namespace Crulanda.Encounter
             // in a test that forgets to point the session elsewhere: the real folder is the player's, shared by every build.
             bool testRun = Application.isEditor && (Application.isBatchMode || Array.IndexOf(Environment.GetCommandLineArgs(), "-runTests") >= 0);
             Exploring = !testRun && !UseTempSave && !EncounterCapture.Requested && SaveDirectoryOverride == null;
+            // A preview build's own save folder (2026-10-16, the castle preview: Chris plays a copy of his saves there, so a newer save
+            // format never reaches the real folder his published build reads): --crulanda-save-dir <folder>.
+            { var sa = Environment.GetCommandLineArgs(); int at = Array.IndexOf(sa, "--crulanda-save-dir");
+              if (at >= 0 && at + 1 < sa.Length && SaveDirectoryOverride == null && !testRun) { SaveDirectoryOverride = sa[at + 1]; Exploring = true; } }
             if ((UseTempSave || testRun || Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0) && SaveDirectoryOverride == null)
             {
                 // Test runs: a fresh throwaway character that never touches the real save folder. One folder for the whole

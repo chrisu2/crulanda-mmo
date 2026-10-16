@@ -176,6 +176,24 @@ namespace Crulanda.Encounter
                     case "/groster": case "/ginfo": GuildRoster(); return;
                     case "/gquit": LeaveGuild(); return;
                     case "/invis": Unseen = !Unseen; Message(Unseen ? "Unseen: mobs will not notice you (until you hit one). /invis again to be seen." : "Seen again."); return;
+                    case "/lowtowns":   // a tester's way there (2026-10-16, Chris: "just let me know when i can test/see the new zone"), at level 17 at least
+                        {
+                            var to = Zone != null ? Zone.FindZone("zone.lowtowns") : null; if (to == null) { Message("The Lowtowns is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            if (Progress.Level < 17) { Progress.experience = EncounterProgress.XpForLevel(17); ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); }
+                            Message("To The Lowtowns at level " + Progress.Level + "...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.lowtowns", name = "/lowtowns", arrive = to.spawns.player });
+                            return;
+                        }
+                    case "/hallows":   // a tester's way there (2026-10-16, Chris: "just let me know when i can test/see the new zone"), at level 16 at least
+                        {
+                            var to = Zone != null ? Zone.FindZone("zone.hallows") : null; if (to == null) { Message("Hallow's Creek is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            if (Progress.Level < 16) { Progress.experience = EncounterProgress.XpForLevel(16); ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); }
+                            Message("To Hallow's Creek at level " + Progress.Level + "...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.hallows", name = "/hallows", arrive = to.spawns.player });
+                            return;
+                        }
                     case "/crown":   // a tester's way to the capital (2026-10-16, Chris's castle preview: the bat took him to the Adit)
                         {
                             var crown = Zone != null ? Zone.FindZone("zone.crown") : null; if (crown == null) { Message("The Crown of Argentis is not in this build."); return; }

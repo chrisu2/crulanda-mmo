@@ -663,7 +663,7 @@ namespace Crulanda.Encounter
             { float near = Vector3.Distance(transform.position, Leading.Value); if (near < 20 || session.InCombat && near < 35) wingSeen.Add(route[0].wing); }
             // A camp nobody can get at (2026-10-11, the group run: an Ash mender up where no one reached it held the run): forty-five seconds
             // at the camp with nothing to fight and it is left behind (and a regroup the party never comes to).
-            if (Leading.HasValue && quarry == null && waitingAt == null && !StepDone() && Vector3.Distance(transform.position, Leading.Value) < 18 && !session.InCombat)
+            if (Leading.HasValue && quarry == null && waitingAt == null && !StepDone() && Vector3.Distance(transform.position, Leading.Value) < 18 && !session.InCombat && PartyBehind() <= 18)   // with the party there (adit-final8: waiting for you at Nix's camp after the wipe, it gave the duo up with Nix alive)
             {
                 if (campIdleSince < 0) campIdleSince = Time.time;
                 else if (Time.time - campIdleSince > 45) { campIdleSince = -1; LeaveCamp(); }

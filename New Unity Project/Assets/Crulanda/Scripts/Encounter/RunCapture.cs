@@ -72,7 +72,7 @@ namespace Crulanda.Encounter
             string wingNow = null; int wingNo = 0, wingDone = 0, wingCamps = 0; float gateSince = -1; bool regrouping = false;
             var motor = s.Player.GetComponent<AdventurerMotor>(); AdventurerMotor.Running = true;
             int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0, pathAt = 0; Vector3 pathGoal = Vector3.zero; NavMeshPath path = null; int holds = 0; string lastHold = null; var simHeld = new Dictionary<SimCompanion, bool>();
-            float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1, atCorpseSince = -1; var stuckFrom = s.Player.transform.position;
+            float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1, atCorpseSince = -1, headBest = 0, headAt = Time.time; UnityEngine.Object headFor = null; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
             Time.timeScale = Speed;
             Shot(s, directory, "00-" + Clock(0) + "-setting-out", ref shots, leader);
@@ -195,6 +195,14 @@ namespace Crulanda.Encounter
                     if (Time.time >= nextSwing) { nextSwing = Time.time + .4f; BotCast(s); }
                 }
                 var to = goal - me; to.y = 0; float dist = to.magnitude;
+                // The leader on another level is not reached by standing over it (2026-10-15, adit-final8: the bot stood on the grass of the yard
+                // with the tank 50 m below in the cave, "there" by the flat distance, while the tank waited for it for twenty minutes): the whole
+                // distance, and ten seconds with no headway on another level is stuck too.
+                bool otherLevel = foe == null && corpse == null && Mathf.Abs(goal.y - me.y) > 4;
+                if (otherLevel) dist = Mathf.Max(dist, Vector3.Distance(goal, me));
+                UnityEngine.Object goalOf = foe != null ? (UnityEngine.Object)foe : corpse != null ? corpse : leader;
+                if (goalOf != headFor || dist <= reach + 1) { headFor = goalOf; headBest = dist; headAt = Time.time; }
+                else if (dist < headBest - 2) { headBest = dist; headAt = Time.time; }
                 // Along the cave's own paths, corner by corner, as the sims go (a straight line stopped at every wall and pot: Chris, 2026-10-11,
                 // "stuck on wall"); the path refreshed every half second.
                 if (dist > reach)
@@ -214,10 +222,11 @@ namespace Crulanda.Encounter
                 {
                     // Swimming counts as stuck too: the paths never run through swim-deep water, so the bot has no way out of a pool it has
                     // fallen or been knocked into, and it bobs about more than a metre (adit-final2, 2026-10-15: "just standing in water").
-                    if (dist > reach + 1 && (Vector3.Distance(stuckFrom, me) < 1 || motor.Swimming))
+                    if (dist > reach + 1 && (Vector3.Distance(stuckFrom, me) < 1 || motor.Swimming || otherLevel && Time.time - headAt > 10))
                     {
                         var at = goal - to.normalized * Mathf.Min(2.5f, dist * .5f);
-                        if (NavMesh.SamplePosition(at, out var hit, 4, NavMesh.AllAreas) && Mathf.Abs(hit.position.y - at.y) < 1.6f) { motor.Teleport(hit.position + Vector3.up * 1.05f); warps++; Log(Clock(t) + "  stuck; warped " + (foe != null ? "to the fight" : corpse != null ? "to the body" : "to the leader") + " (" + warps + ")"); }
+                        // Onto the level of what it is after (checked against at.y, a point off a sloping cave floor, it refused every rescue in adit-final8).
+                        if (NavMesh.SamplePosition(at, out var hit, 4, NavMesh.AllAreas) && Mathf.Abs(hit.position.y - goal.y) < 3f) { motor.Teleport(hit.position + Vector3.up * 1.05f); warps++; headAt = Time.time; Log(Clock(t) + "  stuck; warped " + (foe != null ? "to the fight" : corpse != null ? "to the body" : "to the leader") + " (" + warps + ")"); }
                     }
                     stuckAt = Time.time; stuckFrom = me;
                 }

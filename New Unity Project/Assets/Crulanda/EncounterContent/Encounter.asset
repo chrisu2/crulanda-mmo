@@ -2456,6 +2456,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: d0ff85cb9a9d4cb9b5f491280a3765d4, type: 3}
   - {fileID: 4900000, guid: 054a04e7f4394eaaa901ab85f74744a2, type: 3}
   - {fileID: 4900000, guid: 18fb20f367634b13b043a5ef942ce07d, type: 3}
+  - {fileID: 4900000, guid: 16fbf31f9a40415fae6bd7551292d66e, type: 3}
   itemFiles:
   - {fileID: 4900000, guid: 7cab9a409af043aea37f75e1a8cad32b, type: 3}
   - {fileID: 4900000, guid: 9e17c1814ba469b4f98e9dfdd42e93d9, type: 3}
@@ -2467,6 +2468,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 8551b0a84e6e40eabece9e15ae762d17, type: 3}
   - {fileID: 4900000, guid: 09624b8f2d254830aac358cd2c9554c3, type: 3}
   - {fileID: 4900000, guid: 40f5f23a51b24db1b0c96d2f90139115, type: 3}
+  - {fileID: 4900000, guid: 92e250e2188149de9d153fb12ac722ab, type: 3}
   professionFiles:
   - {fileID: 4900000, guid: 3ed5b143fd404108b1209da3f52c5162, type: 3}
   loreFiles:
@@ -2476,6 +2478,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 3ed78fc4f8b24eb19a6980e00016799a, type: 3}
   - {fileID: 4900000, guid: f3fdf6dbffdf40428ecfe0103735b50d, type: 3}
   - {fileID: 4900000, guid: b8126f3a4d2e4577b07f8dfa311fe007, type: 3}
+  - {fileID: 4900000, guid: 862e84e9204241cc9ad606979102c0fb, type: 3}
   playerStats:
     baseHealth: 180
     healthPerLevel: 25

@@ -167,6 +167,20 @@ namespace Crulanda.Encounter
             new EliteMove { mob = "Powder-Sergeant Hobb", name = "Fuse-Pick", windup = 1.8f, blow = 3.8f, reach = 3.6f, every = 10, callReach = 30, callMost = 2,
                 ringEvery = 12, ringReach = 4.5f, ringName = "Short Fuse",
                 call = "Hobb whistles for the sappers.", callShort = "Sappers!", enrage = "Hobb lights the whole bandolier." },
+            // ---------- The Lowtowns (Phase 9.1, Docs/ZONE_LOWTOWNS.md section 4; GAME-ONLY) ----------
+            // The Mother of Drains: a great Weave-Eater in the deepest court, at night only; salt calcifies her once a fight and a harpoon pins her.
+            new EliteMove { mob = "Mother of Drains", name = "Drowning Coil", windup = 2.1f, blow = 4.1f, reach = 4.4f, every = 11, callReach = 30, callMost = 3,
+                cc = "root", ccName = "Coiled", ccSeconds = 3, ccEvery = 16, ccReach = 5, ccText = "The Mother of Drains wraps the wet dark round your legs.",
+                call = "The Mother of Drains lets out a sound like water going down a drain, and the courts answer.", callShort = "The drains answer",
+                enrage = "The Mother of Drains swells until the court's lamps gutter." },
+            // Knuckle Brannoc: the Iron Teeth's yard-boss by the Outfall, with his two sifters.
+            new EliteMove { mob = "Knuckle Brannoc", name = "Iron Knuckles", windup = 1.7f, blow = 3.9f, reach = 3.5f, every = 10, callReach = 34, callMost = 2, knock = 3,
+                call = "Brannoc bangs his iron knuckles together: \"Teeth! Yard!\"", callShort = "Teeth! Yard!",
+                enrage = "Brannoc spits out a tooth and grins with the rest." },
+            // The rare (one visit in four): a Weave-Eater that drinks the lamps of one lane dark as it goes.
+            new EliteMove { mob = "The Lantern-Eater", name = "Lamp-Drinker", windup = 2, blow = 3.8f, reach = 4, every = 11,
+                cc = "disorient", ccName = "Snuffed", ccSeconds = 3, ccEvery = 17, ccReach = 6, ccText = "The Lantern-Eater drinks the light out of your eyes.",
+                enrage = "Every lamp in the lane goes out at once." },
             new EliteMove { mob = "Old Kettle, the pitch-boiler", name = "Ladle", windup = 2, blow = 4, reach = 3.6f, every = 11, ringEvery = 14, ringReach = 4.5f, ringName = "Hot Pitch",
                 cc = "root", ccName = "Stuck in the pitch", ccSeconds = 2, ccEvery = 20, ccReach = 4.5f, ccText = "The pitch takes your boots and holds them.",
                 callReach = 26, callMost = 2, call = "Old Kettle bangs the ladle on the pot: \"Who's hungry?\"", callShort = "Who's hungry?", enrage = "Old Kettle tips the pot over." },

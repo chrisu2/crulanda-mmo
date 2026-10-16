@@ -380,6 +380,7 @@ namespace Crulanda.Encounter
             SpellFx.Struck(transform);   // struck by an ability resolving: its effect shows here
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
+            if (damage > 0 && WeaveEaterRules.Struck(this, source, Time.time) && source == session.Player) session.Message(WeaveEaterRules.BlackenedLine);   // steel through a Weave-Eater (the Lowtowns)
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * session.DamageScaleFor(source)));
             if (!Game && source != null) session.Meter.Damage(source, actual);
             if (!Game) session.SpreadBlow(this, source, actual);   // an area build's blows splash onto foes near this one (EncounterSession.Spread)

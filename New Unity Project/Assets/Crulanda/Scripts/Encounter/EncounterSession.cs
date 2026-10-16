@@ -344,6 +344,7 @@ namespace Crulanda.Encounter
         public bool UseItem(int i)
         {
             var d = Items?.Get(Progress.bag[i].item); if (d == null || d.kind != "consumable") return false;
+            if (WeaveEaterRules.ThrownKind(d) != null) return ThrowItem(d);   // salt and the bone harpoon are thrown at the target (EncounterSession.Lowtowns)
             string why = Consumables.Refusal(d, InCombat, ClassDef);
             if (why != null) { Message(why); return false; }
             bool potion = Consumables.OnPotionCooldown(d);
@@ -1311,6 +1312,7 @@ namespace Crulanda.Encounter
         public string StatusName(string id)
         {
             var food = Consumables.StatusName(id); if (food != null) return food;   // a dish's, a tincture's or a salve's (Phase 8.6)
+            var steel = WeaveEaterRules.StatusName(id); if (steel != null) return steel;   // blackened steel (the Lowtowns' Weave-Eaters)
             var standing = ClassBuffs.StatusName(id); if (standing != null) return standing;   // a class's standing buff (the buff-up before a boss)
             var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id == DiscoveryLog.BlessingId ? DiscoveryLog.BlessingName : id;   // a shrine's blessing (the lore pass)
         }
@@ -1721,6 +1723,7 @@ namespace Crulanda.Encounter
                     enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
                     enemy.FleeAt = elite ? 0 : camp.flee;   // bolts at low health (D5; EncounterEnemy.Flee)
                     enemy.Gap = gap;
+                    enemy.NightOnly = camp.night;   // a night camp (the Drain Courts): gone by day (EncounterEnemy.Night)
                     if (camp.route != null && camp.route.Length > 1)   // a patrol: its road, each a little to the side of the next
                     {
                         var road = new Vector3[camp.route.Length]; var side = Side(camp.route) * gap * 1.15f * (n - (camp.count - 1) / 2f);
@@ -1788,7 +1791,7 @@ namespace Crulanda.Encounter
                         enemy.Camp = true; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = at; enemy.CampRadius = 4;
                         enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear; enemy.FleeAt = camp.flee;
                         a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
-                        enemy.Tough = Zone.Zone.groupZone;
+                        enemy.Tough = Zone.Zone.groupZone; enemy.NightOnly = camp.night;
                         a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, enemy.Tough, beast));
                         a.Health.ApplyHealing(a.Health.Pool.Max);
                         enemy.HitBase = EncounterEnemy.MobHit(level, false, enemy.Tough); if (enemy.Tough) a.transform.localScale = Vector3.one * 1.08f;
@@ -1886,6 +1889,7 @@ namespace Crulanda.Encounter
         {
             if (Player == null) return;
             TickDormant();
+            TickNight();   // the Lowtowns' night camps up out of the drains and back down (EncounterSession.Lowtowns)
             AdvanceToast();
             // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.
             if (lastHour >= 0 && Bounties.DayTurned(lastHour, Crulanda.World.WorldClock.Hour)) Progress.days++;

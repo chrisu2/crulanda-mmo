@@ -192,6 +192,9 @@ namespace Crulanda.World
         public bool optional, passive;
         /// <summary>How far above its cave's floor it stands (on a deck: a trestle's landing, a catwalk); 0 on the floor.</summary>
         public float rise;
+        /// <summary>A night camp (the Lowtowns' Drain Courts, Phase 9.1; GAME-ONLY): its mobs come up after dark (WorldClock.IsNight) and are
+        /// gone by day, back down the drains; one fighting stays until the fight is done (EncounterEnemy.Night).</summary>
+        public bool night;
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }
@@ -251,6 +254,9 @@ namespace Crulanda.World
         /// 1.05) and skyHaze (atmosphere thickness): the procedural sky's daytime look. Night falls the same everywhere.
         /// </summary>
         public float sunHigh, skyExposure, skyHaze; public string skyTint;
+        /// <summary>A smog that thins after dark (the Lowtowns, Phase 9.1): the fog's far end reaches this share further at night
+        /// (.5: half as far again). 0: the same by night as by day.</summary>
+        public float nightClear;
     }
     [Serializable] public sealed class ZoneSpawns
     {

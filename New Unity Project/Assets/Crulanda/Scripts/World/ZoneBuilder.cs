@@ -98,7 +98,7 @@ namespace Crulanda.World
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); Lap("prepare");
             BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
-            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
+            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); LowtownBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");   // the Lowtowns' roofs past the edge and the Crown (ZoneBuilder.Lowtowns)
             if (art.grass != null && art.grass.Length > 0)
             {
                 // Gloom: the tufts are dry, greyed straw and no wildflowers bloom.
@@ -602,7 +602,9 @@ namespace Crulanda.World
                 grassA = new Color(.13f, .33f, .14f); grassB = new Color(.24f, .46f, .17f); grassC = new Color(.36f, .55f, .2f);
                 dirt = new Color(.33f, .25f, .16f); rut = new Color(.24f, .18f, .12f); mud = new Color(.2f, .16f, .11f);
             }
-            var toSun = Quaternion.Euler(55, Zone.lighting.sunYaw, 0) * Vector3.back;   // the day sun, roughly (mountain counter-shading)
+            bool lowtowns = Zone.biome == "lowtowns";   // the Lowtowns (ZoneBuilder.Lowtowns): sooty setts, the ways a wetter grey
+            if (lowtowns) { dirt = new Color(.27f, .26f, .25f); rut = new Color(.19f, .185f, .18f); mud = new Color(.17f, .15f, .13f); }
+            var toSun =Quaternion.Euler(55, Zone.lighting.sunYaw, 0) * Vector3.back;   // the day sun, roughly (mountain counter-shading)
             float size = Zone.size, half = size / 2, texel = size / res;
             // Ash crust: petrified-ash plates, a Voronoi network with one jittered site per 5 m cell (sx/sz in cell units, three
             // cells of margin), plus each site's 8 bisectors with its neighbours (unit normal bx/bz, offset bo, neighbour bn), so
@@ -694,6 +696,7 @@ namespace Crulanda.World
                         c = Color.Lerp(earth, sere, Mathf.Clamp01((Mathf.PerlinNoise(x * .05f + 70, z * .05f + 33) - .35f) * 2.2f));
                         c = Color.Lerp(c, new Color(.27f, .25f, .24f), Mathf.Clamp01((Mathf.PerlinNoise(x * .025f + 5, z * .025f + 81) - .64f) * 3) * .7f) * (.9f + n2 * .15f);
                     }
+                    if (lowtowns) c = LowtownGround(x, z, n1, n2, n3);   // sooty setts and black puddles (ZoneBuilder.Lowtowns)
                     // Fields: tilled furrows or golden stubble, following each field's rotation.
                     foreach (var f in Zone.fields)
                     {
@@ -1179,6 +1182,9 @@ namespace Crulanda.World
                     case "training_dummy": case "mending_dummy": break;   // the training field: its look goes on the session's own dummies (EncounterSession.Training)
                     case "stall": Stall(t, p.variant); break;
                     case "market": MarketProp(t, p); break;   // the Fantasy pack's market pieces (ZoneBuilder.Market.cs; Chris, 2026-10-15: the fantasy assets in Downloads)
+                    case "tenement": case "warehouse": case "lane_wall": case "brick_bridge": case "drain_mouth": case "dock": case "barge": case "market_hall": case "dead_house": case "holding_house":
+                    case "town_wall": case "chimney_stack": case "lane_lamp": case "cobbles": case "puddle": case "washing_line": case "soup_hall": case "toll_house": case "dye_vat": case "shard_rack":
+                        LowtownProp(t, p); break;   // the Lowtowns' kinds (ZoneBuilder.Lowtowns.cs, Phase 9.1)
                     case "oven": Oven(t); break;
                     case "tannery": Tannery(t); break;
                     case "woodpile": Woodpile(t); break;
@@ -1318,6 +1324,7 @@ namespace Crulanda.World
                 case "tower": return Vector2.one * ((p.size.x > 0 ? p.size.x : 4.4f) / 2 + .3f);
                 case "crypt": return new Vector2(3.6f, 4.6f);
                 case "forge": return new Vector2(2.9f, 2.4f);
+                case "tenement": case "warehouse": case "dead_house": case "holding_house": case "market_hall": case "soup_hall": case "toll_house": return LowtownFootprint(p);   // the Lowtowns' buildings (ZoneBuilder.Lowtowns)
                 case "tannery": case "shelter": return new Vector2(2.2f, 2.1f);
                 case "leathershop": return LeatherShopSize / 2 + Vector2.one * .8f;
                 case "dryhut": return DryingHutSize / 2 + Vector2.one * .8f;
@@ -1554,7 +1561,7 @@ namespace Crulanda.World
         {
             var plan = InnPlan.For(size, variant, doorW);
             float w = size.x, d = size.y, H = 6.4f, storey = 3.7f, wall = plan.wall, doorH = plan.doorH;
-            var plaster = Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);
+            var plaster = Zone.biome == "lowtowns" ? SootBrick(variant + 2) : Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);   // the Rusty Spoon: soot brick (ZoneBuilder.Lowtowns)
             var boards = Tint(art.timber, new Color(.38f, .27f, .18f));
             var dark = Tint(art.timber, new Color(.2f, .13f, .08f));
             GameObject WallPiece(Vector3 pos, Vector3 scale)
@@ -1605,8 +1612,8 @@ namespace Crulanda.World
                     if (sz > 0) Window(t, new Vector3(x, storey + 1.3f, sz * (d / 2 + wall / 2)), .8f, .7f, sz, variant, false, false);
                 }
             float roofH = Mathf.Max(2.4f, d * .5f);
-            MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH, .25f, .6f - wall / 2), t, new Vector3(0, H, 0), variant % 2 == 0 ? art.thatch : art.slate);
-            Eaves(t, w, d, H, roofH, variant % 2 == 0 ? art.thatch : art.slate);
+            MeshPart(ZoneMeshes.GableRoof(w + 1.2f, d + 1.4f, roofH, .25f, .6f - wall / 2), t, new Vector3(0, H, 0), InnRoof(variant));
+            Eaves(t, w, d, H, roofH, InnRoof(variant));
             Gables(t, w / 2 + wall / 2, d + wall, H, roofH, d / 2 + .7f, w / 2 + .6f, plaster, 2, .22f);   // the end walls' outer faces, out to the front and back walls' faces
             if (variant == 1) CrackedHearth(t, w, H, roofH);   // the Cracked Hearth: its chimney breast split, the fire showing through
             else
@@ -1673,7 +1680,7 @@ namespace Crulanda.World
             var room = new GameObject("Taproom light").AddComponent<Light>(); room.transform.SetParent(t, false);
             room.transform.localPosition = new Vector3(-1, storey - .6f, 0); room.type = LightType.Point; room.range = 8; room.intensity = 1.1f; room.color = new Color(1, .78f, .5f);
             // Outside: the framing, the jetty, the porch with its lantern, the sign, window boxes, a bench and barrels (InnFront).
-            InnFront(t, w, d, H, storey, doorW, doorH, roofH, variant, kitchen, plaster, variant % 2 == 0 ? art.thatch : art.slate);
+            InnFront(t, w, d, H, storey, doorW, doorH, roofH, variant, kitchen, plaster, InnRoof(variant));
             var glow = new GameObject("Inn lantern").AddComponent<Light>(); glow.transform.SetParent(t, false);
             glow.transform.localPosition = new Vector3(0, 2.2f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
             NightLights.Add(new NightLight { light = glow, dayIntensity = .6f, nightIntensity = 2.2f });   // faint by day: at 1.4 it bloomed to a pale blob on the plaster
@@ -3716,6 +3723,7 @@ namespace Crulanda.World
             foreach (var (at, r) in grassBuildings) if ((p - at).sqrMagnitude < r * r) return 0;
             if (p.magnitude < Zone.flatRadius * .45f) open *= .35f;
             if (Zone.biome == "ash") return 0;                       // nothing grows in the ash
+            if (Zone.biome == "lowtowns") return 0;                  // nor on the Lowtowns' setts (ZoneBuilder.Lowtowns)
             if (Zone.biome == "mountain")
             {
                 // Thin alpine turf in tufts: none on rock, scree or steep ground, under a face or round a crag's foot (the
@@ -5805,6 +5813,7 @@ namespace Crulanda.World
         // ---------- edges ----------
         void BuildForestEdge()
         {
+            if (Zone.biome == "lowtowns") { LowtownEdge(); return; }   // a town's edge: blind backs of tenements and the setts (ZoneBuilder.Lowtowns)
             // A ragged ring of woods: pine and autumn broadleaf; grey dead wood, dark pine and boulders in gloom. A Wasting holds the east side.
             float edge = Half - 5; var sides = Zone.wasting != null ? new[] { 0, 1, 2 } : new[] { 0, 1, 2, 3 };
             for (float s = -Half + 3; s < Half - 3; s += 3.2f)
@@ -6173,7 +6182,7 @@ namespace Crulanda.World
             // apart, and the ridge behind them was bare).
             bool wooded = !mountain && !ash;
             float treeline = mountain ? 32 : ash ? 22 : 90;
-            foreach (float row in wooded ? new[] { 8f, 14, 22, 32, 43, 53, 64, 76, 86 } : new[] { 8f, 14, 22, 32, 43, 53, 64 })
+            foreach (float row in Zone.biome == "lowtowns" ? new float[0] : wooded ? new[] { 8f, 14, 22, 32, 43, 53, 64, 76, 86 } : new[] { 8f, 14, 22, 32, 43, 53, 64 })   // the Lowtowns: roofs, not woods (LowtownBackdrop)
             {
                 bool rock = row > treeline; if (rock && !mountain && !ash) break;
                 // keep: near rows leave the roads' way out open; further out the woods close across it (the road goes into cover).

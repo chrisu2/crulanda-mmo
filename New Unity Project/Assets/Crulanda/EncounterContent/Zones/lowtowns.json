@@ -1,0 +1,6532 @@
+{
+  "id": "zone.lowtowns",
+  "displayName": "The Lowtowns",
+  "subtitle": "The Lowtowns and the Rust Market, the shadowed districts at the foot of Argentis, where the poor burn shards for light",
+  "canonStatus": "CANON-EXPANDED",
+  "canonNote": "Canon (world_bible.md Geography; book1 ch.1, 3, 9, 13, 15-16, 20): Argentis is the capital, the Crown on the mountain white stone and gold, the Lowtowns at its base, sprawling and shadowed, filled with industry and poverty; the Rust Market, Sector 4, against the Forge District's walls under the smog of the High City's foundries, sells roasting skewered rat and cheap aether-spiced wine; the Rusty Spoon; the Iron Teeth; the Blind Seer's Antiquities; the Chemical River; red clay brick sewers; Weave-Eaters, against which salt and bone harpoons on amber rope serve and steel turns black and brittle; sparked children taken from the alleys; spent shards burned for light; Rule One of the Lowtowns. GAME-ONLY: every person, building, camp and quest here, the Holding House, the Shard-Burners' Yard and the reading that the shards are memory sifted from the slag (the Sludge-Tunnels' design). The game is set before Book 1: no purges, no Quarantine Wards, no burning of the Lowtowns; Seekers are only spoken of. Docs/ZONE_LOWTOWNS.md.",
+  "size": 480,
+  "levelMin": 15,
+  "levelMax": 20,
+  "biome": "lowtowns",
+  "weather": [
+    {
+      "kind": "overcast",
+      "weight": 2.5
+    },
+    {
+      "kind": "mist",
+      "weight": 2
+    },
+    {
+      "kind": "rain",
+      "weight": 3.5
+    },
+    {
+      "kind": "fair",
+      "weight": 1
+    },
+    {
+      "kind": "storm",
+      "weight": 0.8
+    }
+  ],
+  "worldMapPosition": {
+    "x": 0.49,
+    "y": 0.41
+  },
+  "worldMapNote": "At the foot of Argentis, just below the Crown, where the game map draws the capital at the centre of the land; the Lowtowns are not drawn on it, so the pin is provisional.",
+  "flatRadius": 400,
+  "hillHeight": 0,
+  "seed": 9161,
+  "lighting": {
+    "sunPitch": 30,
+    "sunYaw": -30,
+    "sunIntensity": 0.95,
+    "sunColor": "#E6C9A2",
+    "ambientSky": "#7E786C",
+    "ambientEquator": "#605850",
+    "ambientGround": "#2A2622",
+    "fogColor": "#837667",
+    "fogStart": 18,
+    "fogEnd": 150,
+    "skyTint": "#8E8476",
+    "skyExposure": 0.9,
+    "skyHaze": 2.2,
+    "nightClear": 0.6
+  },
+  "spawns": {
+    "player": {
+      "x": -226,
+      "y": 2
+    },
+    "playerFacing": 90,
+    "companion": {
+      "x": -182,
+      "y": -6
+    },
+    "recovery": {
+      "x": -180,
+      "y": -4
+    },
+    "leash": 28,
+    "enemies": []
+  },
+  "objectives": [
+    "Find Toll-Reeve Edda Holt at the Gate Ward",
+    "Learn where the warrant's children were taken"
+  ],
+  "exits": [
+    {
+      "to": "zone.oakhaven",
+      "name": "West road to Oakhaven",
+      "at": {
+        "x": -233,
+        "y": 2
+      },
+      "arrive": {
+        "x": 42,
+        "y": -269
+      },
+      "radius": 5
+    }
+  ],
+  "roads": [
+    {
+      "name": "Gate Street",
+      "width": 7,
+      "points": [
+        {
+          "x": -200,
+          "y": 0
+        },
+        {
+          "x": -170,
+          "y": 2
+        },
+        {
+          "x": -140,
+          "y": 4
+        },
+        {
+          "x": -110,
+          "y": 2
+        },
+        {
+          "x": -75,
+          "y": -6
+        },
+        {
+          "x": -40,
+          "y": -14
+        },
+        {
+          "x": -14,
+          "y": -18
+        },
+        {
+          "x": 14,
+          "y": -18
+        },
+        {
+          "x": 40,
+          "y": -12
+        },
+        {
+          "x": 75,
+          "y": -4
+        },
+        {
+          "x": 110,
+          "y": 2
+        },
+        {
+          "x": 150,
+          "y": 2
+        },
+        {
+          "x": 185,
+          "y": 0
+        },
+        {
+          "x": 203,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "name": "The Toll Road",
+      "width": 6,
+      "points": [
+        {
+          "x": -246,
+          "y": 2
+        },
+        {
+          "x": -200,
+          "y": 0
+        }
+      ]
+    },
+    {
+      "name": "Drain Lane",
+      "width": 5,
+      "points": [
+        {
+          "x": -140,
+          "y": 4
+        },
+        {
+          "x": -138,
+          "y": 40
+        },
+        {
+          "x": -134,
+          "y": 80
+        },
+        {
+          "x": -128,
+          "y": 120
+        },
+        {
+          "x": -124,
+          "y": 150
+        },
+        {
+          "x": -138,
+          "y": 186
+        }
+      ]
+    },
+    {
+      "name": "High Lane",
+      "width": 6,
+      "points": [
+        {
+          "x": -110,
+          "y": 2
+        },
+        {
+          "x": -90,
+          "y": 30
+        },
+        {
+          "x": -60,
+          "y": 60
+        },
+        {
+          "x": -30,
+          "y": 88
+        },
+        {
+          "x": -12,
+          "y": 96
+        },
+        {
+          "x": 22,
+          "y": 96
+        },
+        {
+          "x": 45,
+          "y": 92
+        },
+        {
+          "x": 70,
+          "y": 80
+        },
+        {
+          "x": 92,
+          "y": 62
+        }
+      ]
+    },
+    {
+      "name": "Wharf Walk",
+      "width": 5,
+      "points": [
+        {
+          "x": -27,
+          "y": -16
+        },
+        {
+          "x": -25,
+          "y": -50
+        },
+        {
+          "x": -25,
+          "y": -90
+        },
+        {
+          "x": -21,
+          "y": -130
+        },
+        {
+          "x": -16,
+          "y": -170
+        },
+        {
+          "x": -14,
+          "y": -205
+        }
+      ]
+    },
+    {
+      "name": "Rows Lane",
+      "width": 5,
+      "points": [
+        {
+          "x": -75,
+          "y": -6
+        },
+        {
+          "x": -80,
+          "y": -50
+        },
+        {
+          "x": -86,
+          "y": -100
+        },
+        {
+          "x": -90,
+          "y": -150
+        },
+        {
+          "x": -94,
+          "y": -205
+        }
+      ]
+    },
+    {
+      "name": "Cinder Row",
+      "width": 4,
+      "points": [
+        {
+          "x": -176,
+          "y": -80
+        },
+        {
+          "x": -130,
+          "y": -82
+        },
+        {
+          "x": -86,
+          "y": -80
+        },
+        {
+          "x": -27,
+          "y": -84
+        }
+      ]
+    },
+    {
+      "name": "Pell Row",
+      "width": 4,
+      "points": [
+        {
+          "x": -176,
+          "y": -142
+        },
+        {
+          "x": -130,
+          "y": -144
+        },
+        {
+          "x": -90,
+          "y": -150
+        },
+        {
+          "x": -50,
+          "y": -158
+        },
+        {
+          "x": -18,
+          "y": -164
+        }
+      ]
+    },
+    {
+      "name": "Market Lane",
+      "width": 6,
+      "points": [
+        {
+          "x": 75,
+          "y": -4
+        },
+        {
+          "x": 80,
+          "y": 30
+        },
+        {
+          "x": 84,
+          "y": 44
+        },
+        {
+          "x": 82,
+          "y": 80
+        },
+        {
+          "x": 86,
+          "y": 120
+        },
+        {
+          "x": 98,
+          "y": 170
+        }
+      ]
+    },
+    {
+      "name": "Teeth Lane",
+      "width": 4,
+      "points": [
+        {
+          "x": 150,
+          "y": 2
+        },
+        {
+          "x": 162,
+          "y": 60
+        },
+        {
+          "x": 172,
+          "y": 120
+        },
+        {
+          "x": 180,
+          "y": 160
+        }
+      ]
+    },
+    {
+      "name": "Skewer Lane",
+      "width": 5,
+      "points": [
+        {
+          "x": 24,
+          "y": 40
+        },
+        {
+          "x": 60,
+          "y": 44
+        },
+        {
+          "x": 86,
+          "y": 40
+        },
+        {
+          "x": 130,
+          "y": 44
+        },
+        {
+          "x": 160,
+          "y": 54
+        }
+      ]
+    },
+    {
+      "name": "Burners' Row",
+      "width": 5,
+      "points": [
+        {
+          "x": 110,
+          "y": 2
+        },
+        {
+          "x": 115,
+          "y": -50
+        },
+        {
+          "x": 122,
+          "y": -100
+        },
+        {
+          "x": 140,
+          "y": -140
+        },
+        {
+          "x": 168,
+          "y": -168
+        }
+      ]
+    },
+    {
+      "name": "Court Lane",
+      "width": 4,
+      "points": [
+        {
+          "x": -128,
+          "y": 120
+        },
+        {
+          "x": -108,
+          "y": 150
+        },
+        {
+          "x": -104,
+          "y": 178
+        }
+      ]
+    },
+    {
+      "name": "North Rows",
+      "width": 4,
+      "points": [
+        {
+          "x": -60,
+          "y": 60
+        },
+        {
+          "x": -70,
+          "y": 110
+        },
+        {
+          "x": -80,
+          "y": 160
+        },
+        {
+          "x": -88,
+          "y": 205
+        }
+      ]
+    },
+    {
+      "name": "Weir Lane",
+      "width": 4,
+      "points": [
+        {
+          "x": -30,
+          "y": 88
+        },
+        {
+          "x": -36,
+          "y": 130
+        },
+        {
+          "x": -40,
+          "y": 180
+        }
+      ]
+    },
+    {
+      "name": "Bridgefoot",
+      "width": 4,
+      "points": [
+        {
+          "x": 22,
+          "y": 96
+        },
+        {
+          "x": 30,
+          "y": 140
+        },
+        {
+          "x": 40,
+          "y": 190
+        }
+      ]
+    },
+    {
+      "name": "Gutter Alley",
+      "width": 3.5,
+      "points": [
+        {
+          "x": -176,
+          "y": -180
+        },
+        {
+          "x": -120,
+          "y": -176
+        },
+        {
+          "x": -96,
+          "y": -170
+        }
+      ]
+    },
+    {
+      "name": "Lamp Alley",
+      "width": 3.5,
+      "points": [
+        {
+          "x": -60,
+          "y": 60
+        },
+        {
+          "x": -34,
+          "y": 34
+        },
+        {
+          "x": -22,
+          "y": 22
+        }
+      ]
+    },
+    {
+      "name": "Weir Back",
+      "width": 3.5,
+      "points": [
+        {
+          "x": 40,
+          "y": 140
+        },
+        {
+          "x": 80,
+          "y": 132
+        },
+        {
+          "x": 120,
+          "y": 140
+        },
+        {
+          "x": 165,
+          "y": 150
+        }
+      ]
+    },
+    {
+      "name": "Cooper's Row",
+      "width": 3.5,
+      "points": [
+        {
+          "x": 115,
+          "y": -50
+        },
+        {
+          "x": 150,
+          "y": -48
+        },
+        {
+          "x": 190,
+          "y": -50
+        }
+      ]
+    },
+    {
+      "name": "Stair Alley",
+      "width": 3.5,
+      "points": [
+        {
+          "x": -176,
+          "y": -52
+        },
+        {
+          "x": -140,
+          "y": -54
+        },
+        {
+          "x": -112,
+          "y": -50
+        }
+      ]
+    },
+    {
+      "name": "Kettle Alley",
+      "width": 3.5,
+      "points": [
+        {
+          "x": -60,
+          "y": -40
+        },
+        {
+          "x": -50,
+          "y": -60
+        },
+        {
+          "x": -40,
+          "y": -84
+        }
+      ]
+    }
+  ],
+  "water": [
+    {
+      "name": "The Chemical River",
+      "width": 16,
+      "points": [
+        {
+          "x": -12,
+          "y": 245
+        },
+        {
+          "x": -6,
+          "y": 180
+        },
+        {
+          "x": 4,
+          "y": 120
+        },
+        {
+          "x": 8,
+          "y": 60
+        },
+        {
+          "x": 2,
+          "y": 0
+        },
+        {
+          "x": -4,
+          "y": -60
+        },
+        {
+          "x": 2,
+          "y": -120
+        },
+        {
+          "x": 10,
+          "y": -170
+        },
+        {
+          "x": 6,
+          "y": -215
+        },
+        {
+          "x": 0,
+          "y": -245
+        }
+      ],
+      "depth": 2.4
+    },
+    {
+      "name": "The Outfall run",
+      "width": 6,
+      "points": [
+        {
+          "x": 203,
+          "y": -205
+        },
+        {
+          "x": 160,
+          "y": -209
+        },
+        {
+          "x": 120,
+          "y": -212
+        },
+        {
+          "x": 70,
+          "y": -214
+        },
+        {
+          "x": 17,
+          "y": -214
+        }
+      ],
+      "depth": 1.2
+    }
+  ],
+  "waterTint": "#1B1A1E",
+  "waterReflect": 0.35,
+  "shapes": [
+    {
+      "name": "The burners' cellar",
+      "center": {
+        "x": 154,
+        "y": -150
+      },
+      "radius": 8,
+      "height": -3,
+      "blend": 7
+    }
+  ],
+  "landmarks": [
+    {
+      "name": "The Gate Ward",
+      "text": "Argentis's outer gate, standing open because nobody remembers how to shut it. The toll-house, the carters' yards, and the smell of the whole city coming the other way.",
+      "at": {
+        "x": -182,
+        "y": 4
+      },
+      "radius": 22,
+      "canonStatus": "CANON-EXPANDED: Argentis and its Lowtowns are CANON (world_bible.md Geography); the Gate Ward GAME-ONLY",
+      "view": {
+        "x": -214,
+        "y": -6
+      },
+      "viewPitch": 12,
+      "viewZoom": 16
+    },
+    {
+      "name": "The Holding House",
+      "text": "Grey stone, barred windows, a heavy door. Children taken by warrant were kept here a night before they went up. It is empty now, and guarded anyway.",
+      "at": {
+        "x": -172,
+        "y": 46
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY (the warrant's children: peaks.json, ashrim.json)",
+      "view": {
+        "x": -172,
+        "y": 22
+      },
+      "viewPitch": 14,
+      "viewZoom": 16
+    },
+    {
+      "name": "The Rusty Spoon",
+      "text": "A decrepit establishment known for watered-down ale and high-stakes games. The chairs are missing an inch on one leg, most of them.",
+      "at": {
+        "x": -125,
+        "y": 18
+      },
+      "radius": 10,
+      "canonStatus": "CANON: the Rusty Spoon (book1 ch.1:9); its rooms and people GAME-ONLY",
+      "view": {
+        "x": -125,
+        "y": -2
+      },
+      "viewPitch": 12,
+      "viewZoom": 15
+    },
+    {
+      "name": "The Tenement Rows",
+      "text": "Brick terraces four storeys high, washing across the lanes, stoops, and puddles of questionable origin. Most of the Lowtowns live here, a family a room.",
+      "at": {
+        "x": -100,
+        "y": -110
+      },
+      "radius": 40,
+      "canonStatus": "CANON-EXPANDED: the Lowtowns' poverty and puddles (world_bible.md; book1 ch.1:143); the Rows GAME-ONLY",
+      "view": {
+        "x": -86,
+        "y": -66
+      },
+      "viewPitch": 16,
+      "viewZoom": 18
+    },
+    {
+      "name": "The Soup-Hall",
+      "text": "A little chapel of no particular god, turned to feeding the Rows. The god's chair is gone; a copper stands in its place.",
+      "at": {
+        "x": -55,
+        "y": -122
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": -55,
+        "y": -146
+      },
+      "viewPitch": 14,
+      "viewZoom": 14
+    },
+    {
+      "name": "The Chemical River",
+      "text": "Black, slow and iridescent where the lamps catch it. Nothing natural lives in it. The barges are poled through it by people who try not to splash.",
+      "at": {
+        "x": 8,
+        "y": 40
+      },
+      "radius": 20,
+      "canonStatus": "CANON: the Chemical River through Argentis (book1 ch.15-16); its course here GAME-ONLY",
+      "view": {
+        "x": 24,
+        "y": 10
+      },
+      "viewPitch": 12,
+      "viewZoom": 16
+    },
+    {
+      "name": "The Sett Bridge",
+      "text": "A brick bridge over the black river, its setts worn to ridges by carts. The Ward-watch keeps its west end.",
+      "at": {
+        "x": 0.2,
+        "y": -18
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": -26,
+        "y": -30
+      },
+      "viewPitch": 12,
+      "viewZoom": 14
+    },
+    {
+      "name": "The Rag Bridge",
+      "text": "Rags hang off its parapets. Nobody hangs them and nobody takes them down.",
+      "at": {
+        "x": 5.6,
+        "y": 96
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 34,
+        "y": 86
+      },
+      "viewPitch": 12,
+      "viewZoom": 14
+    },
+    {
+      "name": "The Docks",
+      "text": "Honest labour: barges poled in and out, sacks and bales on backs, no cranes. The quays are timber, tarred black, and they creak.",
+      "at": {
+        "x": -22,
+        "y": -108
+      },
+      "radius": 30,
+      "canonStatus": "CANON: honest labour at the docks (book1 ch.3:17); the quays GAME-ONLY",
+      "view": {
+        "x": -40,
+        "y": -84
+      },
+      "viewPitch": 14,
+      "viewZoom": 18
+    },
+    {
+      "name": "The Drain Courts",
+      "text": "Closed courts round old drain mouths of red clay brick. By day they are quiet. By night something comes up out of them.",
+      "at": {
+        "x": -128,
+        "y": 165
+      },
+      "radius": 32,
+      "canonStatus": "CANON: the sewers' red clay brick (book1 ch.9:47) and the Weave-Eaters (book1 ch.1:251); the courts GAME-ONLY",
+      "view": {
+        "x": -118,
+        "y": 128
+      },
+      "viewPitch": 18,
+      "viewZoom": 18
+    },
+    {
+      "name": "The Rust Market",
+      "text": "Sector 4, under the Forge District's wall: covered stalls in a tangle of lanes, roasting skewered rat, cheap aether-spiced wine, and smog over everything. It does not sleep.",
+      "at": {
+        "x": 114,
+        "y": 66
+      },
+      "radius": 34,
+      "canonStatus": "CANON: the Rust Market, Sector 4 (book1 ch.3:3-9); its stalls and people GAME-ONLY",
+      "view": {
+        "x": 88,
+        "y": 66
+      },
+      "viewPitch": 14,
+      "viewZoom": 20
+    },
+    {
+      "name": "The Blind Seer's Antiquities",
+      "text": "A clean shopfront of old things. Everyone in the Lowtowns knows not to ask about the back room.",
+      "at": {
+        "x": 118,
+        "y": 101
+      },
+      "radius": 6,
+      "canonStatus": "CANON: the Blind Seer's Antiquities (book1 ch.3:13); its back room is not entered",
+      "view": {
+        "x": 118,
+        "y": 84
+      },
+      "viewPitch": 10,
+      "viewZoom": 12
+    },
+    {
+      "name": "The Iron Teeth's Warehouse",
+      "text": "A long brick warehouse with its doors shut. Up here the Iron Teeth are traders. What they are below is their own business.",
+      "at": {
+        "x": 182,
+        "y": 96
+      },
+      "radius": 12,
+      "canonStatus": "CANON: the Iron Teeth and their warehouse in the Rust Market (B1WB:26; book1 ch.7:21)",
+      "view": {
+        "x": 160,
+        "y": 96
+      },
+      "viewPitch": 12,
+      "viewZoom": 16
+    },
+    {
+      "name": "The Shard-Burners' Yard",
+      "text": "The Lowtowns' dead-house. The poor buy back a shard of their own here, a night's light at a time.",
+      "at": {
+        "x": 142,
+        "y": -114
+      },
+      "radius": 16,
+      "canonStatus": "GAME-ONLY reading (the shards as burned memory, DUNGEON_DESIGN.md); spent shards as light are CANON (book1 ch.3:133-137)",
+      "view": {
+        "x": 120,
+        "y": -100
+      },
+      "viewPitch": 14,
+      "viewZoom": 16
+    },
+    {
+      "name": "The Outfall",
+      "text": "Where the Forge District's drain comes out under the wall: a great arch of brick, an iron grating, and a smell like a hot coin. A sign says what everybody knows.",
+      "at": {
+        "x": 196,
+        "y": -205
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY (the Sludge-Tunnels' door, DUNGEON_DESIGN.md, not yet open)",
+      "view": {
+        "x": 176,
+        "y": -205
+      },
+      "viewPitch": 10,
+      "viewZoom": 14
+    },
+    {
+      "name": "The Forge District Gate",
+      "text": "Shut, barred from the far side. Smoke rolls over the wall from the chimney stacks beyond.",
+      "at": {
+        "x": 203,
+        "y": 0
+      },
+      "radius": 10,
+      "canonStatus": "CANON: the Forge District's walls (book1 ch.3:5); the gate shut until that zone opens (GAME-ONLY)",
+      "view": {
+        "x": 180,
+        "y": 0
+      },
+      "viewPitch": 16,
+      "viewZoom": 18
+    }
+  ],
+  "props": [
+    {
+      "kind": "town_wall",
+      "name": "Argentis's outer wall",
+      "at": {
+        "x": -200,
+        "y": 0
+      },
+      "rotation": 90,
+      "size": {
+        "x": 480,
+        "y": 10
+      },
+      "variant": 1
+    },
+    {
+      "kind": "town_wall",
+      "name": "The Forge District's wall",
+      "at": {
+        "x": 206,
+        "y": 0
+      },
+      "rotation": 90,
+      "size": {
+        "x": 480,
+        "y": 14
+      },
+      "variant": 2
+    },
+    {
+      "kind": "chimney_stack",
+      "name": "Foundry stack",
+      "at": {
+        "x": 222,
+        "y": 150
+      },
+      "size": {
+        "x": 0,
+        "y": 34
+      }
+    },
+    {
+      "kind": "chimney_stack",
+      "name": "Foundry stack",
+      "at": {
+        "x": 228,
+        "y": 70
+      },
+      "size": {
+        "x": 0,
+        "y": 40
+      },
+      "variant": 1
+    },
+    {
+      "kind": "chimney_stack",
+      "name": "Foundry stack",
+      "at": {
+        "x": 218,
+        "y": -20
+      },
+      "size": {
+        "x": 0,
+        "y": 30
+      },
+      "variant": 2
+    },
+    {
+      "kind": "chimney_stack",
+      "name": "Foundry stack",
+      "at": {
+        "x": 230,
+        "y": -90
+      },
+      "size": {
+        "x": 0,
+        "y": 38
+      }
+    },
+    {
+      "kind": "chimney_stack",
+      "name": "Foundry stack",
+      "at": {
+        "x": 221,
+        "y": -160
+      },
+      "size": {
+        "x": 0,
+        "y": 32
+      },
+      "variant": 1
+    },
+    {
+      "kind": "chimney_stack",
+      "name": "Foundry stack",
+      "at": {
+        "x": 226,
+        "y": 212
+      },
+      "size": {
+        "x": 0,
+        "y": 28
+      },
+      "variant": 2
+    },
+    {
+      "kind": "chimney_stack",
+      "name": "Foundry stack",
+      "at": {
+        "x": 232,
+        "y": 20
+      },
+      "size": {
+        "x": 0,
+        "y": 26
+      }
+    },
+    {
+      "kind": "toll_house",
+      "name": "The toll-house",
+      "at": {
+        "x": -188,
+        "y": 9.5
+      },
+      "size": {
+        "x": 5,
+        "y": 4
+      },
+      "interact": "Read the toll-book",
+      "item": "item.warrant_page",
+      "once": true
+    },
+    {
+      "kind": "holding_house",
+      "name": "The Holding House",
+      "at": {
+        "x": -172,
+        "y": 46
+      },
+      "size": {
+        "x": 14,
+        "y": 10
+      }
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Holding yard wall",
+      "at": {
+        "x": -180.5,
+        "y": 34
+      },
+      "rotation": 90,
+      "size": {
+        "x": 12,
+        "y": 2.8
+      }
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Holding yard wall",
+      "at": {
+        "x": -163.5,
+        "y": 34
+      },
+      "rotation": 90,
+      "size": {
+        "x": 12,
+        "y": 2.8
+      }
+    },
+    {
+      "kind": "cobbles",
+      "name": "Holding yard",
+      "at": {
+        "x": -172,
+        "y": 34
+      },
+      "size": {
+        "x": 16,
+        "y": 12
+      }
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Carters' yard wall",
+      "at": {
+        "x": -170,
+        "y": -15
+      },
+      "size": {
+        "x": 22,
+        "y": 2.6
+      },
+      "variant": 1
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Carters' yard wall",
+      "at": {
+        "x": -170,
+        "y": -37
+      },
+      "size": {
+        "x": 22,
+        "y": 2.6
+      }
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Carters' yard wall",
+      "at": {
+        "x": -181,
+        "y": -26
+      },
+      "rotation": 90,
+      "size": {
+        "x": 22,
+        "y": 2.6
+      }
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Carters' yard wall",
+      "at": {
+        "x": -159,
+        "y": -26
+      },
+      "rotation": 90,
+      "size": {
+        "x": 22,
+        "y": 2.6
+      }
+    },
+    {
+      "kind": "cobbles",
+      "name": "Carters' yard",
+      "at": {
+        "x": -170,
+        "y": -26
+      },
+      "size": {
+        "x": 21,
+        "y": 21
+      }
+    },
+    {
+      "kind": "cart",
+      "name": "Carter's cart",
+      "at": {
+        "x": -175,
+        "y": -21
+      },
+      "rotation": 30
+    },
+    {
+      "kind": "wagon",
+      "name": "Toll-road wagon",
+      "at": {
+        "x": -163,
+        "y": -30
+      },
+      "rotation": 80
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -177,
+        "y": -32
+      },
+      "variant": 2
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -164,
+        "y": -20
+      },
+      "variant": 1
+    },
+    {
+      "kind": "hitch",
+      "at": {
+        "x": -170,
+        "y": -34
+      }
+    },
+    {
+      "kind": "haystack",
+      "at": {
+        "x": -176,
+        "y": -27
+      }
+    },
+    {
+      "kind": "board",
+      "name": "Notice board",
+      "at": {
+        "x": -178,
+        "y": -6
+      },
+      "rotation": 180,
+      "interact": "Read the notices",
+      "canonStatus": "CANON-EXPANDED (the Council's men post the Seekers' wanted bills; the Lowtowners their bounties)"
+    },
+    {
+      "kind": "cobbles",
+      "name": "The Gate Ward square",
+      "at": {
+        "x": -184,
+        "y": 2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 18,
+        "y": 30
+      }
+    },
+    {
+      "kind": "inn",
+      "name": "The Rusty Spoon",
+      "at": {
+        "x": -125,
+        "y": 18
+      },
+      "size": {
+        "x": 14,
+        "y": 10
+      }
+    },
+    {
+      "kind": "kitchen",
+      "name": "The Spoon's kitchen",
+      "at": {
+        "x": -121.4,
+        "y": 24.65
+      },
+      "rotation": 180
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -133,
+        "y": 11.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -117,
+        "y": 11.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -134,
+        "y": 20
+      },
+      "rotation": 90,
+      "variant": 2
+    },
+    {
+      "kind": "brick_bridge",
+      "name": "The Sett Bridge",
+      "at": {
+        "x": 0.2,
+        "y": -18
+      },
+      "rotation": 90,
+      "size": {
+        "x": 26,
+        "y": 7.5
+      }
+    },
+    {
+      "kind": "brick_bridge",
+      "name": "The Rag Bridge",
+      "at": {
+        "x": 5.6,
+        "y": 96
+      },
+      "rotation": 90,
+      "size": {
+        "x": 26,
+        "y": 6.5
+      }
+    },
+    {
+      "kind": "brick_bridge",
+      "name": "The Outfall footbridge",
+      "at": {
+        "x": 120,
+        "y": -212
+      },
+      "size": {
+        "x": 12,
+        "y": 3.2
+      }
+    },
+    {
+      "kind": "dock",
+      "name": "Quay 1",
+      "at": {
+        "x": -12.7,
+        "y": -55
+      },
+      "rotation": 270,
+      "size": {
+        "x": 30,
+        "y": 5.5
+      },
+      "variant": 2
+    },
+    {
+      "kind": "dock",
+      "name": "Quay 2",
+      "at": {
+        "x": -8.7,
+        "y": -105
+      },
+      "rotation": 270,
+      "size": {
+        "x": 30,
+        "y": 5.5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "dock",
+      "name": "Quay 3",
+      "at": {
+        "x": -1.12,
+        "y": -158
+      },
+      "rotation": 270,
+      "size": {
+        "x": 30,
+        "y": 5.5
+      },
+      "variant": 3
+    },
+    {
+      "kind": "barge",
+      "name": "A barge on the river",
+      "at": {
+        "x": 6.33,
+        "y": -200
+      },
+      "rotation": 15,
+      "size": {
+        "x": 9,
+        "y": 0
+      },
+      "variant": 1
+    },
+    {
+      "kind": "barge",
+      "name": "A barge on the river",
+      "at": {
+        "x": 6.0,
+        "y": 20
+      },
+      "rotation": 200,
+      "size": {
+        "x": 9,
+        "y": 0
+      },
+      "variant": 1
+    },
+    {
+      "kind": "barge",
+      "name": "A barge on the river",
+      "at": {
+        "x": -1.0,
+        "y": 150
+      },
+      "rotation": 160,
+      "size": {
+        "x": 9,
+        "y": 0
+      },
+      "variant": 1
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -28,
+        "y": -62
+      },
+      "variant": 2
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -28,
+        "y": -112
+      },
+      "rotation": 90,
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -27,
+        "y": -150
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "name": "Pell's tenement",
+      "at": {
+        "x": -108,
+        "y": -134
+      },
+      "size": {
+        "x": 18,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "name": "Coke's tenement",
+      "at": {
+        "x": -150,
+        "y": -70
+      },
+      "rotation": 180,
+      "size": {
+        "x": 16,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "name": "Sump's tenement",
+      "at": {
+        "x": -110,
+        "y": -92
+      },
+      "size": {
+        "x": 16,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "name": "Barrow's tenement",
+      "at": {
+        "x": -60,
+        "y": -70
+      },
+      "rotation": 180,
+      "size": {
+        "x": 18,
+        "y": 8
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "name": "Tolley's tenement",
+      "at": {
+        "x": -150,
+        "y": -132
+      },
+      "size": {
+        "x": 16,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "name": "Rook's tenement",
+      "at": {
+        "x": -130,
+        "y": -36
+      },
+      "size": {
+        "x": 18,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "name": "Fenn's tenement",
+      "at": {
+        "x": -46,
+        "y": -96
+      },
+      "size": {
+        "x": 16,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "name": "Mallow's tenement",
+      "at": {
+        "x": -60,
+        "y": 40
+      },
+      "rotation": 45,
+      "size": {
+        "x": 16,
+        "y": 8
+      },
+      "variant": 7
+    },
+    {
+      "kind": "soup_hall",
+      "name": "The soup-hall",
+      "at": {
+        "x": -55,
+        "y": -122
+      },
+      "size": {
+        "x": 10,
+        "y": 16
+      }
+    },
+    {
+      "kind": "cobbles",
+      "name": "Soup-hall steps",
+      "at": {
+        "x": -55,
+        "y": -134
+      },
+      "size": {
+        "x": 12,
+        "y": 8
+      }
+    },
+    {
+      "kind": "oven",
+      "name": "Sump's bakehouse",
+      "at": {
+        "x": -98,
+        "y": -60
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "leathershop",
+      "name": "Mallow's leather shop",
+      "at": {
+        "x": -42,
+        "y": 20
+      },
+      "rotation": 200
+    },
+    {
+      "kind": "tannery",
+      "name": "The tanning yard",
+      "at": {
+        "x": -38,
+        "y": -136
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "dye_vat",
+      "name": "The dyer's vats",
+      "at": {
+        "x": -120,
+        "y": -112
+      }
+    },
+    {
+      "kind": "well",
+      "name": "Rows well",
+      "at": {
+        "x": -78,
+        "y": -96
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -82,
+        "y": -102
+      },
+      "size": {
+        "x": 1.6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -112,
+        "y": -146
+      },
+      "size": {
+        "x": 1.2,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cobbles",
+      "name": "The first court",
+      "at": {
+        "x": -150,
+        "y": 130
+      },
+      "size": {
+        "x": 30,
+        "y": 30
+      }
+    },
+    {
+      "kind": "cobbles",
+      "name": "The tanners' court",
+      "at": {
+        "x": -106,
+        "y": 160
+      },
+      "size": {
+        "x": 30,
+        "y": 30
+      }
+    },
+    {
+      "kind": "cobbles",
+      "name": "The deepest court",
+      "at": {
+        "x": -146,
+        "y": 198
+      },
+      "size": {
+        "x": 32,
+        "y": 32
+      }
+    },
+    {
+      "kind": "drain_mouth",
+      "name": "Drain mouth",
+      "at": {
+        "x": -150,
+        "y": 117
+      },
+      "size": {
+        "x": 3.6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "drain_mouth",
+      "name": "Drain mouth",
+      "at": {
+        "x": -163,
+        "y": 134
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "drain_mouth",
+      "name": "Drain mouth",
+      "at": {
+        "x": -106,
+        "y": 174
+      },
+      "rotation": 180,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "drain_mouth",
+      "name": "Drain mouth",
+      "at": {
+        "x": -93,
+        "y": 160
+      },
+      "rotation": 270,
+      "size": {
+        "x": 3.6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "drain_mouth",
+      "name": "Drain mouth",
+      "at": {
+        "x": -146,
+        "y": 213
+      },
+      "rotation": 180,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "drain_mouth",
+      "name": "Drain mouth",
+      "at": {
+        "x": -161,
+        "y": 202
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "drain_mouth",
+      "name": "Drain mouth",
+      "at": {
+        "x": -131,
+        "y": 188
+      },
+      "rotation": 270,
+      "size": {
+        "x": 3.6,
+        "y": 0
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -140,
+        "y": 124
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -116,
+        "y": 154
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -136,
+        "y": 206
+      }
+    },
+    {
+      "kind": "market_hall",
+      "name": "The long stalls",
+      "at": {
+        "x": 104,
+        "y": 22
+      },
+      "rotation": 180,
+      "size": {
+        "x": 27,
+        "y": 6
+      }
+    },
+    {
+      "kind": "market_hall",
+      "name": "The rag stalls",
+      "at": {
+        "x": 143,
+        "y": 70
+      },
+      "rotation": 270,
+      "size": {
+        "x": 24,
+        "y": 6
+      },
+      "variant": 2
+    },
+    {
+      "kind": "market_hall",
+      "name": "The skewer stalls",
+      "at": {
+        "x": 58,
+        "y": 54
+      },
+      "size": {
+        "x": 21,
+        "y": 6
+      },
+      "variant": 1
+    },
+    {
+      "kind": "forge",
+      "name": "The Rust Market hearth",
+      "at": {
+        "x": 72,
+        "y": 24
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "cobbles",
+      "name": "The Rust Market floor",
+      "at": {
+        "x": 114,
+        "y": 70
+      },
+      "size": {
+        "x": 52,
+        "y": 40
+      }
+    },
+    {
+      "kind": "stall",
+      "name": "Penny's stall",
+      "at": {
+        "x": 102,
+        "y": 60
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "stall",
+      "name": "Salt and sundries",
+      "at": {
+        "x": 126,
+        "y": 60
+      },
+      "rotation": 270,
+      "variant": 1
+    },
+    {
+      "kind": "stall",
+      "name": "Skewers",
+      "at": {
+        "x": 112,
+        "y": 84
+      },
+      "variant": 2
+    },
+    {
+      "kind": "stall",
+      "name": "Aether wine",
+      "at": {
+        "x": 100,
+        "y": 76
+      },
+      "rotation": 90
+    },
+    {
+      "kind": "well",
+      "name": "Market well",
+      "at": {
+        "x": 116,
+        "y": 70
+      }
+    },
+    {
+      "kind": "tenement",
+      "name": "The Blind Seer's Antiquities",
+      "at": {
+        "x": 118,
+        "y": 101
+      },
+      "size": {
+        "x": 12,
+        "y": 8
+      },
+      "variant": 2,
+      "style": "shop"
+    },
+    {
+      "kind": "warehouse",
+      "name": "The Iron Teeth's warehouse",
+      "at": {
+        "x": 182,
+        "y": 96
+      },
+      "rotation": 270,
+      "size": {
+        "x": 26,
+        "y": 14
+      },
+      "variant": 1
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 106,
+        "y": 66
+      },
+      "rotation": 22,
+      "variant": 2
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 122,
+        "y": 78
+      },
+      "rotation": 134,
+      "variant": 20
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 64,
+        "y": 34
+      },
+      "rotation": 88,
+      "variant": 11
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 132,
+        "y": 62
+      },
+      "rotation": 204,
+      "variant": 21
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 96,
+        "y": 86
+      },
+      "rotation": 312,
+      "variant": 27
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 136,
+        "y": 52
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 72,
+        "y": 36
+      },
+      "rotation": 30,
+      "variant": 1
+    },
+    {
+      "kind": "dead_house",
+      "name": "The dead-house",
+      "at": {
+        "x": 151,
+        "y": -112
+      },
+      "rotation": 270,
+      "size": {
+        "x": 16,
+        "y": 11
+      }
+    },
+    {
+      "kind": "cobbles",
+      "name": "The burners' yard",
+      "at": {
+        "x": 138,
+        "y": -112
+      },
+      "rotation": 90,
+      "size": {
+        "x": 22,
+        "y": 12
+      }
+    },
+    {
+      "kind": "shard_rack",
+      "name": "The burners' racks",
+      "at": {
+        "x": 139,
+        "y": -122
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3.2,
+        "y": 0
+      },
+      "interact": "Buy back a shard",
+      "item": "item.bought_shard"
+    },
+    {
+      "kind": "shard_rack",
+      "name": "The burners' racks",
+      "at": {
+        "x": 139,
+        "y": -102
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3.2,
+        "y": 0
+      },
+      "interact": "Buy back a shard",
+      "item": "item.bought_shard"
+    },
+    {
+      "kind": "brazier",
+      "at": {
+        "x": 136,
+        "y": -112
+      }
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Cellar wall",
+      "at": {
+        "x": 154,
+        "y": -161
+      },
+      "size": {
+        "x": 16,
+        "y": 2.4
+      }
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Cellar wall",
+      "at": {
+        "x": 165,
+        "y": -150
+      },
+      "rotation": 90,
+      "size": {
+        "x": 18,
+        "y": 2.4
+      }
+    },
+    {
+      "kind": "drain_mouth",
+      "name": "The Outfall",
+      "at": {
+        "x": 200.6,
+        "y": -205
+      },
+      "rotation": 90,
+      "size": {
+        "x": 3.6,
+        "y": 0
+      },
+      "variant": 1
+    },
+    {
+      "kind": "signpost",
+      "name": "The Outfall (dangerous, 18-20)",
+      "at": {
+        "x": 189,
+        "y": -196
+      },
+      "rotation": 250
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Smugglers' yard wall",
+      "at": {
+        "x": 165,
+        "y": -164
+      },
+      "size": {
+        "x": 16,
+        "y": 2.6
+      },
+      "variant": 1
+    },
+    {
+      "kind": "lane_wall",
+      "name": "Smugglers' yard wall",
+      "at": {
+        "x": 157,
+        "y": -172
+      },
+      "rotation": 90,
+      "size": {
+        "x": 16,
+        "y": 2.6
+      }
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 178,
+        "y": -174
+      },
+      "rotation": 20,
+      "variant": 2
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 168,
+        "y": -190
+      },
+      "variant": 2
+    },
+    {
+      "kind": "brazier",
+      "at": {
+        "x": 174,
+        "y": -184
+      }
+    },
+    {
+      "kind": "signpost",
+      "name": "The Forge District (shut)",
+      "at": {
+        "x": 192,
+        "y": 8
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 196,
+        "y": -6
+      },
+      "variant": 1
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -79.97,
+        "y": -49.72
+      },
+      "rotation": 6.5,
+      "size": {
+        "x": 11,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -83.54,
+        "y": -79.51
+      },
+      "rotation": 6.8,
+      "size": {
+        "x": 11,
+        "y": 7.0
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -86.75,
+        "y": -109.33
+      },
+      "rotation": 4.6,
+      "size": {
+        "x": 11,
+        "y": 7.6
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -89.14,
+        "y": -139.23
+      },
+      "rotation": 4.6,
+      "size": {
+        "x": 11,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -91.39,
+        "y": -169.15
+      },
+      "rotation": 4.2,
+      "size": {
+        "x": 11,
+        "y": 7.0
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -93.57,
+        "y": -199.07
+      },
+      "rotation": 4.2,
+      "size": {
+        "x": 11,
+        "y": 7.6
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -132.04,
+        "y": -81.91
+      },
+      "rotation": 272.5,
+      "size": {
+        "x": 10,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -102.07,
+        "y": -80.73
+      },
+      "rotation": 267.4,
+      "size": {
+        "x": 10,
+        "y": 7.0
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -72.12,
+        "y": -80.94
+      },
+      "rotation": 273.9,
+      "size": {
+        "x": 10,
+        "y": 7.6
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -42.19,
+        "y": -82.97
+      },
+      "rotation": 273.9,
+      "size": {
+        "x": 10,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -132.04,
+        "y": -143.91
+      },
+      "rotation": 272.5,
+      "size": {
+        "x": 10,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -102.35,
+        "y": -148.15
+      },
+      "rotation": 278.5,
+      "size": {
+        "x": 10,
+        "y": 7.0
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -72.83,
+        "y": -153.43
+      },
+      "rotation": 281.3,
+      "size": {
+        "x": 10,
+        "y": 7.6
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -43.4,
+        "y": -159.24
+      },
+      "rotation": 280.6,
+      "size": {
+        "x": 10,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -68.63,
+        "y": 103.15
+      },
+      "rotation": 168.7,
+      "size": {
+        "x": 10,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -74.51,
+        "y": 132.56
+      },
+      "rotation": 168.7,
+      "size": {
+        "x": 10,
+        "y": 7.0
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -80.35,
+        "y": 161.99
+      },
+      "rotation": 169.9,
+      "size": {
+        "x": 10,
+        "y": 7.6
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -85.6,
+        "y": 191.53
+      },
+      "rotation": 169.9,
+      "size": {
+        "x": 10,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "washing_line",
+      "at": {
+        "x": -106.88,
+        "y": 157.86
+      },
+      "rotation": 188.1,
+      "size": {
+        "x": 10,
+        "y": 6.4
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -158.0,
+        "y": 1.4
+      },
+      "size": {
+        "x": 1.51,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -121.27,
+        "y": 1.35
+      },
+      "size": {
+        "x": 1.83,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -85.16,
+        "y": -5.11
+      },
+      "size": {
+        "x": 1.88,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -49.09,
+        "y": -13.36
+      },
+      "size": {
+        "x": 1.51,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -12.31,
+        "y": -19.4
+      },
+      "size": {
+        "x": 2.0,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 24.73,
+        "y": -16.96
+      },
+      "size": {
+        "x": 1.57,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 60.79,
+        "y": -8.68
+      },
+      "size": {
+        "x": 1.23,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 97.02,
+        "y": -1.65
+      },
+      "size": {
+        "x": 1.7,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 133.59,
+        "y": 0.6
+      },
+      "size": {
+        "x": 1.89,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 170.48,
+        "y": -0.57
+      },
+      "size": {
+        "x": 1.05,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -80.74,
+        "y": -47.62
+      },
+      "size": {
+        "x": 1.53,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -85.13,
+        "y": -84.35
+      },
+      "size": {
+        "x": 1.58,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -88.7,
+        "y": -121.21
+      },
+      "size": {
+        "x": 1.02,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -91.59,
+        "y": -158.1
+      },
+      "size": {
+        "x": 1.13,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -94.28,
+        "y": -195.01
+      },
+      "size": {
+        "x": 1.81,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -134.07,
+        "y": -82.62
+      },
+      "size": {
+        "x": 1.1,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -97.04,
+        "y": -81.3
+      },
+      "size": {
+        "x": 1.11,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -60.2,
+        "y": -82.55
+      },
+      "size": {
+        "x": 1.04,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 83.25,
+        "y": 37.01
+      },
+      "size": {
+        "x": 1.49,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 83.53,
+        "y": 74.09
+      },
+      "size": {
+        "x": 1.48,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 86.28,
+        "y": 110.75
+      },
+      "size": {
+        "x": 1.43,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": 93.66,
+        "y": 146.77
+      },
+      "size": {
+        "x": 1.78,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -136.41,
+        "y": 45.82
+      },
+      "size": {
+        "x": 1.94,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -132.6,
+        "y": 82.57
+      },
+      "size": {
+        "x": 1.03,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -127.12,
+        "y": 119.16
+      },
+      "size": {
+        "x": 1.35,
+        "y": 0
+      }
+    },
+    {
+      "kind": "puddle",
+      "at": {
+        "x": -125.25,
+        "y": 155.98
+      },
+      "size": {
+        "x": 1.21,
+        "y": 0
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "name": "A snuffed lamp",
+      "at": {
+        "x": -71.5,
+        "y": 56
+      },
+      "variant": 2,
+      "interact": "Take the cold glass",
+      "item": "item.lamp_glass"
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -161.46,
+        "y": -6.85
+      },
+      "rotation": 176.2,
+      "size": {
+        "x": 13.9,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -130.85,
+        "y": -7.03
+      },
+      "rotation": 183.8,
+      "size": {
+        "x": 14.1,
+        "y": 10
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -104.71,
+        "y": -9.88
+      },
+      "rotation": 192.9,
+      "size": {
+        "x": 16.0,
+        "y": 10
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -61.6,
+        "y": -18.71
+      },
+      "rotation": 192.9,
+      "size": {
+        "x": 13.7,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -42.1,
+        "y": -23.16
+      },
+      "rotation": 192.9,
+      "size": {
+        "x": 18.4,
+        "y": 8
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 17.98,
+        "y": -27.75
+      },
+      "rotation": 167.0,
+      "size": {
+        "x": 13.1,
+        "y": 10
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 37.25,
+        "y": -22.28
+      },
+      "rotation": 167.0,
+      "size": {
+        "x": 13.5,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 56.95,
+        "y": -18.79
+      },
+      "rotation": 167.1,
+      "size": {
+        "x": 17.6,
+        "y": 10
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 83.59,
+        "y": -12.06
+      },
+      "rotation": 170.3,
+      "size": {
+        "x": 15.2,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 121.59,
+        "y": -7.4
+      },
+      "rotation": 180.0,
+      "size": {
+        "x": 13.1,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 141.59,
+        "y": -7.4
+      },
+      "rotation": 180.0,
+      "size": {
+        "x": 12.2,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 160.98,
+        "y": -9.04
+      },
+      "rotation": 183.3,
+      "size": {
+        "x": 12.3,
+        "y": 10
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 177.01,
+        "y": -8.96
+      },
+      "rotation": 183.3,
+      "size": {
+        "x": 14.2,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -170.69,
+        "y": 11.37
+      },
+      "rotation": 356.2,
+      "size": {
+        "x": 14.2,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -88.38,
+        "y": 7.73
+      },
+      "rotation": 12.9,
+      "size": {
+        "x": 12.1,
+        "y": 10
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -73.01,
+        "y": 3.19
+      },
+      "rotation": 12.9,
+      "size": {
+        "x": 13.8,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -53.51,
+        "y": -1.27
+      },
+      "rotation": 12.9,
+      "size": {
+        "x": 15.9,
+        "y": 8
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -30.67,
+        "y": -5.92
+      },
+      "rotation": 8.7,
+      "size": {
+        "x": 19.6,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 21.33,
+        "y": -6.66
+      },
+      "rotation": 347.0,
+      "size": {
+        "x": 18.0,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 40.84,
+        "y": -2.17
+      },
+      "rotation": 347.1,
+      "size": {
+        "x": 13.7,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 56.43,
+        "y": 1.4
+      },
+      "rotation": 347.1,
+      "size": {
+        "x": 14.1,
+        "y": 8
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 92.24,
+        "y": 8.49
+      },
+      "rotation": 350.3,
+      "size": {
+        "x": 12.8,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 113.59,
+        "y": 11.4
+      },
+      "size": {
+        "x": 19.4,
+        "y": 8
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 133.59,
+        "y": 11.4
+      },
+      "size": {
+        "x": 13.0,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 166.16,
+        "y": 11.49
+      },
+      "rotation": 3.3,
+      "size": {
+        "x": 16.7,
+        "y": 10
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 193.54,
+        "y": 9.4
+      },
+      "size": {
+        "x": 15.4,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -129.73,
+        "y": 37.48
+      },
+      "rotation": 93.2,
+      "size": {
+        "x": 12.4,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -127.86,
+        "y": 57.02
+      },
+      "rotation": 95.7,
+      "size": {
+        "x": 16.7,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -124.25,
+        "y": 88.39
+      },
+      "rotation": 98.5,
+      "size": {
+        "x": 14.8,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -121.28,
+        "y": 108.17
+      },
+      "rotation": 98.5,
+      "size": {
+        "x": 14.8,
+        "y": 8
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -147.61,
+        "y": 18.44
+      },
+      "rotation": 273.2,
+      "size": {
+        "x": 17.9,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -147.5,
+        "y": 38.47
+      },
+      "rotation": 273.2,
+      "size": {
+        "x": 15.1,
+        "y": 10
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -143.38,
+        "y": 70.63
+      },
+      "rotation": 275.7,
+      "size": {
+        "x": 15.8,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -140.86,
+        "y": 90.88
+      },
+      "rotation": 278.5,
+      "size": {
+        "x": 14.6,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -135.83,
+        "y": 157.24
+      },
+      "rotation": 248.7,
+      "size": {
+        "x": 18.1,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -77.63,
+        "y": 28.37
+      },
+      "rotation": 135.0,
+      "size": {
+        "x": 13.1,
+        "y": 10
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -44.3,
+        "y": 62.48
+      },
+      "rotation": 137.0,
+      "size": {
+        "x": 16.7,
+        "y": 8
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -29.68,
+        "y": 76.12
+      },
+      "rotation": 137.0,
+      "size": {
+        "x": 14.5,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 30.58,
+        "y": 84.46
+      },
+      "rotation": 189.9,
+      "size": {
+        "x": 17.7,
+        "y": 10
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 54.75,
+        "y": 77.45
+      },
+      "rotation": 205.6,
+      "size": {
+        "x": 15.1,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -106.78,
+        "y": 21.82
+      },
+      "rotation": 305.5,
+      "size": {
+        "x": 12.9,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -93.75,
+        "y": 38.83
+      },
+      "rotation": 315.0,
+      "size": {
+        "x": 17.7,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -51.28,
+        "y": 81.68
+      },
+      "rotation": 317.0,
+      "size": {
+        "x": 15.4,
+        "y": 10
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -19.28,
+        "y": 103.6
+      },
+      "rotation": 336.0,
+      "size": {
+        "x": 12.7,
+        "y": 10
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 37.74,
+        "y": 102.3
+      },
+      "rotation": 9.9,
+      "size": {
+        "x": 14.2,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 58.84,
+        "y": 95.23
+      },
+      "rotation": 25.6,
+      "size": {
+        "x": 13.5,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -33.86,
+        "y": -42.45
+      },
+      "rotation": 266.6,
+      "size": {
+        "x": 13.6,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -34.4,
+        "y": -57.94
+      },
+      "rotation": 270.0,
+      "size": {
+        "x": 13.1,
+        "y": 10
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -29.38,
+        "y": -130.58
+      },
+      "rotation": 264.3,
+      "size": {
+        "x": 12.7,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -27.38,
+        "y": -146.66
+      },
+      "rotation": 262.9,
+      "size": {
+        "x": 15.1,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -12.2,
+        "y": -132.67
+      },
+      "rotation": 82.9,
+      "size": {
+        "x": 19.1,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -84.93,
+        "y": -18.96
+      },
+      "rotation": 276.5,
+      "size": {
+        "x": 19.3,
+        "y": 8
+      },
+      "variant": 8
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -88.18,
+        "y": -38.72
+      },
+      "rotation": 276.5,
+      "size": {
+        "x": 14.2,
+        "y": 10
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -93.31,
+        "y": -90.42
+      },
+      "rotation": 276.8,
+      "size": {
+        "x": 13.1,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -94.96,
+        "y": -106.66
+      },
+      "rotation": 274.6,
+      "size": {
+        "x": 14.9,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -100.62,
+        "y": -166.47
+      },
+      "rotation": 274.2,
+      "size": {
+        "x": 19.1,
+        "y": 10
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -101.37,
+        "y": -190.48
+      },
+      "rotation": 274.2,
+      "size": {
+        "x": 18.5,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -70.04,
+        "y": -36.76
+      },
+      "rotation": 96.5,
+      "size": {
+        "x": 15.0,
+        "y": 8
+      },
+      "variant": 8
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -77.85,
+        "y": -116.06
+      },
+      "rotation": 94.6,
+      "size": {
+        "x": 13.1,
+        "y": 10
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -80.45,
+        "y": -135.92
+      },
+      "rotation": 94.6,
+      "size": {
+        "x": 15.9,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -82.87,
+        "y": -167.76
+      },
+      "rotation": 94.2,
+      "size": {
+        "x": 13.5,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -84.32,
+        "y": -187.71
+      },
+      "rotation": 94.2,
+      "size": {
+        "x": 14.7,
+        "y": 8
+      },
+      "variant": 8
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -170.35,
+        "y": -88.15
+      },
+      "rotation": 182.5,
+      "size": {
+        "x": 14.5,
+        "y": 8
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -150.37,
+        "y": -89.02
+      },
+      "rotation": 182.5,
+      "size": {
+        "x": 18.4,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -130.43,
+        "y": -90.89
+      },
+      "rotation": 182.5,
+      "size": {
+        "x": 15.9,
+        "y": 10
+      },
+      "variant": 8
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -169.62,
+        "y": -71.37
+      },
+      "rotation": 2.5,
+      "size": {
+        "x": 17.0,
+        "y": 10
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -122.41,
+        "y": -73.75
+      },
+      "rotation": 357.4,
+      "size": {
+        "x": 17.8,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -102.43,
+        "y": -72.84
+      },
+      "rotation": 357.4,
+      "size": {
+        "x": 16.6,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -170.35,
+        "y": -150.15
+      },
+      "rotation": 182.5,
+      "size": {
+        "x": 17.7,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -146.41,
+        "y": -152.19
+      },
+      "rotation": 182.5,
+      "size": {
+        "x": 19.5,
+        "y": 10
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -123.3,
+        "y": -152.99
+      },
+      "rotation": 188.5,
+      "size": {
+        "x": 18.7,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -64.57,
+        "y": -163.14
+      },
+      "rotation": 191.3,
+      "size": {
+        "x": 13.7,
+        "y": 8
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -48.97,
+        "y": -167.25
+      },
+      "rotation": 190.6,
+      "size": {
+        "x": 12.9,
+        "y": 10
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -169.62,
+        "y": -133.37
+      },
+      "rotation": 2.5,
+      "size": {
+        "x": 15.4,
+        "y": 10
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -129.7,
+        "y": -136.11
+      },
+      "rotation": 2.5,
+      "size": {
+        "x": 16.4,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -65.4,
+        "y": -146.86
+      },
+      "rotation": 11.3,
+      "size": {
+        "x": 14.7,
+        "y": 8
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -45.87,
+        "y": -150.74
+      },
+      "rotation": 10.6,
+      "size": {
+        "x": 19.0,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 91.75,
+        "y": 88.09
+      },
+      "rotation": 95.7,
+      "size": {
+        "x": 12.4,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 94.34,
+        "y": 103.91
+      },
+      "rotation": 95.7,
+      "size": {
+        "x": 15.3,
+        "y": 10
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 104.22,
+        "y": 153.49
+      },
+      "rotation": 103.5,
+      "size": {
+        "x": 16.3,
+        "y": 10
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 74.84,
+        "y": 97.82
+      },
+      "rotation": 275.7,
+      "size": {
+        "x": 17.2,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 75.83,
+        "y": 117.82
+      },
+      "rotation": 275.7,
+      "size": {
+        "x": 12.7,
+        "y": 10
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 84.07,
+        "y": 150.1
+      },
+      "rotation": 283.5,
+      "size": {
+        "x": 19.5,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 88.74,
+        "y": 169.55
+      },
+      "rotation": 283.5,
+      "size": {
+        "x": 13.4,
+        "y": 8
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 165.6,
+        "y": 33.49
+      },
+      "rotation": 101.7,
+      "size": {
+        "x": 13.4,
+        "y": 10
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 169.66,
+        "y": 53.08
+      },
+      "rotation": 101.7,
+      "size": {
+        "x": 14.2,
+        "y": 10
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 185.82,
+        "y": 143.69
+      },
+      "rotation": 101.3,
+      "size": {
+        "x": 15.3,
+        "y": 10
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 146.55,
+        "y": 29.26
+      },
+      "rotation": 281.7,
+      "size": {
+        "x": 17.4,
+        "y": 10
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 155.32,
+        "y": 67.98
+      },
+      "rotation": 279.5,
+      "size": {
+        "x": 16.4,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 159.92,
+        "y": 95.6
+      },
+      "rotation": 279.5,
+      "size": {
+        "x": 12.2,
+        "y": 8
+      },
+      "variant": 8
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 163.21,
+        "y": 115.33
+      },
+      "rotation": 279.5,
+      "size": {
+        "x": 17.4,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 166.99,
+        "y": 135.22
+      },
+      "rotation": 281.3,
+      "size": {
+        "x": 14.9,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 170.91,
+        "y": 154.83
+      },
+      "rotation": 281.3,
+      "size": {
+        "x": 18.6,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 30.89,
+        "y": 32.31
+      },
+      "rotation": 173.7,
+      "size": {
+        "x": 16.1,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 50.88,
+        "y": 33.53
+      },
+      "rotation": 173.7,
+      "size": {
+        "x": 14.6,
+        "y": 10
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 102.17,
+        "y": 33.04
+      },
+      "rotation": 174.8,
+      "size": {
+        "x": 12.4,
+        "y": 8
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 122.18,
+        "y": 33.85
+      },
+      "rotation": 174.8,
+      "size": {
+        "x": 12.1,
+        "y": 10
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 29.04,
+        "y": 49.01
+      },
+      "rotation": 353.7,
+      "size": {
+        "x": 16.0,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 103.36,
+        "y": -16.72
+      },
+      "rotation": 264.5,
+      "size": {
+        "x": 13.9,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 105.28,
+        "y": -36.63
+      },
+      "rotation": 264.5,
+      "size": {
+        "x": 12.7,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 106.93,
+        "y": -52.91
+      },
+      "rotation": 262.0,
+      "size": {
+        "x": 14.8,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 109.7,
+        "y": -72.71
+      },
+      "rotation": 262.0,
+      "size": {
+        "x": 12.0,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 111.92,
+        "y": -88.56
+      },
+      "rotation": 262.0,
+      "size": {
+        "x": 14.1,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 115.68,
+        "y": -106.43
+      },
+      "rotation": 245.8,
+      "size": {
+        "x": 14.5,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 123.89,
+        "y": -124.67
+      },
+      "rotation": 245.8,
+      "size": {
+        "x": 18.3,
+        "y": 8
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 132.1,
+        "y": -142.91
+      },
+      "rotation": 245.8,
+      "size": {
+        "x": 17.0,
+        "y": 8
+      },
+      "variant": 8
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 120.85,
+        "y": -23.08
+      },
+      "rotation": 84.5,
+      "size": {
+        "x": 13.4,
+        "y": 8
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 122.38,
+        "y": -39.0
+      },
+      "rotation": 84.5,
+      "size": {
+        "x": 13.3,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 125.23,
+        "y": -62.46
+      },
+      "rotation": 82.0,
+      "size": {
+        "x": 12.7,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 128.44,
+        "y": -78.17
+      },
+      "rotation": 82.0,
+      "size": {
+        "x": 13.6,
+        "y": 10
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -111.44,
+        "y": 130.59
+      },
+      "rotation": 123.7,
+      "size": {
+        "x": 15.5,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -59.71,
+        "y": 98.81
+      },
+      "rotation": 78.7,
+      "size": {
+        "x": 15.2,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -63.63,
+        "y": 118.42
+      },
+      "rotation": 78.7,
+      "size": {
+        "x": 16.4,
+        "y": 8
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -67.55,
+        "y": 138.03
+      },
+      "rotation": 78.7,
+      "size": {
+        "x": 12.7,
+        "y": 8
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -70.49,
+        "y": 157.84
+      },
+      "rotation": 78.7,
+      "size": {
+        "x": 18.5,
+        "y": 10
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -75.73,
+        "y": 181.09
+      },
+      "rotation": 79.9,
+      "size": {
+        "x": 19.3,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -79.93,
+        "y": 204.72
+      },
+      "rotation": 79.9,
+      "size": {
+        "x": 12.3,
+        "y": 8
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -70.69,
+        "y": 68.06
+      },
+      "rotation": 258.7,
+      "size": {
+        "x": 14.5,
+        "y": 10
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -74.61,
+        "y": 87.67
+      },
+      "rotation": 258.7,
+      "size": {
+        "x": 12.9,
+        "y": 10
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -77.55,
+        "y": 107.48
+      },
+      "rotation": 258.7,
+      "size": {
+        "x": 17.3,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -81.47,
+        "y": 127.09
+      },
+      "rotation": 258.7,
+      "size": {
+        "x": 17.7,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -91.98,
+        "y": 182.27
+      },
+      "rotation": 259.9,
+      "size": {
+        "x": 13.8,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -94.78,
+        "y": 198.02
+      },
+      "rotation": 259.9,
+      "size": {
+        "x": 12.2,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -26.99,
+        "y": 122.78
+      },
+      "rotation": 81.9,
+      "size": {
+        "x": 17.2,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -29.37,
+        "y": 146.15
+      },
+      "rotation": 85.4,
+      "size": {
+        "x": 19.2,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -30.96,
+        "y": 166.09
+      },
+      "rotation": 85.4,
+      "size": {
+        "x": 15.3,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -39.8,
+        "y": 100.74
+      },
+      "rotation": 261.9,
+      "size": {
+        "x": 14.7,
+        "y": 8
+      }
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -42.63,
+        "y": 120.54
+      },
+      "rotation": 261.9,
+      "size": {
+        "x": 12.9,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -44.8,
+        "y": 140.91
+      },
+      "rotation": 265.4,
+      "size": {
+        "x": 18.1,
+        "y": 8
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -47.39,
+        "y": 160.76
+      },
+      "rotation": 265.4,
+      "size": {
+        "x": 12.6,
+        "y": 10
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 36.12,
+        "y": 123.92
+      },
+      "rotation": 100.3,
+      "size": {
+        "x": 18.3,
+        "y": 10
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 46.82,
+        "y": 178.73
+      },
+      "rotation": 101.3,
+      "size": {
+        "x": 17.1,
+        "y": 10
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 20.31,
+        "y": 130.86
+      },
+      "rotation": 280.3,
+      "size": {
+        "x": 19.3,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 23.09,
+        "y": 150.84
+      },
+      "rotation": 281.3,
+      "size": {
+        "x": 15.2,
+        "y": 10
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 28.78,
+        "y": 174.18
+      },
+      "rotation": 281.3,
+      "size": {
+        "x": 13.3,
+        "y": 8
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 30.94,
+        "y": 190.07
+      },
+      "rotation": 281.3,
+      "size": {
+        "x": 14.0,
+        "y": 10
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -170.56,
+        "y": -171.94
+      },
+      "rotation": 355.9,
+      "size": {
+        "x": 18.8,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -33.38,
+        "y": 44.2
+      },
+      "rotation": 45.0,
+      "size": {
+        "x": 12.7,
+        "y": 8
+      },
+      "variant": 10
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -19.24,
+        "y": 30.05
+      },
+      "rotation": 45.0,
+      "size": {
+        "x": 16.0,
+        "y": 8
+      },
+      "variant": 11
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 55.95,
+        "y": 127.99
+      },
+      "rotation": 191.3,
+      "size": {
+        "x": 19.2,
+        "y": 10
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 102.3,
+        "y": 128.66
+      },
+      "rotation": 168.7,
+      "size": {
+        "x": 13.2,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 117.99,
+        "y": 131.8
+      },
+      "rotation": 168.7,
+      "size": {
+        "x": 12.3,
+        "y": 8
+      },
+      "variant": 7
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 137.68,
+        "y": 136.09
+      },
+      "rotation": 167.5,
+      "size": {
+        "x": 13.6,
+        "y": 8
+      },
+      "variant": 2
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 55.23,
+        "y": 144.76
+      },
+      "rotation": 11.3,
+      "size": {
+        "x": 19.1,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 122.65,
+        "y": 148.43
+      },
+      "rotation": 347.5,
+      "size": {
+        "x": 13.4,
+        "y": 8
+      },
+      "variant": 5
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 138.27,
+        "y": 151.9
+      },
+      "rotation": 347.5,
+      "size": {
+        "x": 14.4,
+        "y": 8
+      },
+      "variant": 9
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 141.39,
+        "y": -56.15
+      },
+      "rotation": 176.7,
+      "size": {
+        "x": 16.5,
+        "y": 8
+      },
+      "variant": 3
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 176.53,
+        "y": -56.99
+      },
+      "rotation": 182.9,
+      "size": {
+        "x": 13.2,
+        "y": 8
+      },
+      "variant": 4
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 140.52,
+        "y": -40.88
+      },
+      "rotation": 356.7,
+      "size": {
+        "x": 16.5,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 161.31,
+        "y": -40.91
+      },
+      "rotation": 2.9,
+      "size": {
+        "x": 18.5,
+        "y": 8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": 181.29,
+        "y": -41.9
+      },
+      "rotation": 2.9,
+      "size": {
+        "x": 15.4,
+        "y": 8
+      },
+      "variant": 6
+    },
+    {
+      "kind": "tenement",
+      "at": {
+        "x": -129.07,
+        "y": -60.17
+      },
+      "rotation": 171.9,
+      "size": {
+        "x": 15.8,
+        "y": 8
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -165.82,
+        "y": -1.58
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -142.38,
+        "y": 7.7
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -118.44,
+        "y": -1.3
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -72.06,
+        "y": -10.62
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -46.95,
+        "y": -8.46
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -24.78,
+        "y": -20.24
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 24.31,
+        "y": -19.57
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 45.97,
+        "y": -6.69
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 71.08,
+        "y": -8.84
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 93.18,
+        "y": 3.02
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 117.59,
+        "y": -1.85
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 141.59,
+        "y": 5.85
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 189.54,
+        "y": 3.85
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -87.51,
+        "y": 27.72
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -75.69,
+        "y": 49.05
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -53.94,
+        "y": 61.07
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -40.97,
+        "y": 82.35
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -17.56,
+        "y": 89.86
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 27.76,
+        "y": 91.6
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 52.84,
+        "y": 91.95
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 70.47,
+        "y": 75.28
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 93.29,
+        "y": 65.27
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 83.26,
+        "y": 29.15
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 80.15,
+        "y": 52.87
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 85.51,
+        "y": 77.21
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 80.76,
+        "y": 101.25
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 90.38,
+        "y": 123.9
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 89.47,
+        "y": 148.81
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 110.42,
+        "y": -32.12
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 118.62,
+        "y": -55.31
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 116.3,
+        "y": -79.87
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 125.94,
+        "y": -101.81
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 130.59,
+        "y": -126.04
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": 147.25,
+        "y": -143.22
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -78.8,
+        "y": -63.96
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -87.32,
+        "y": -87.11
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -91.66,
+        "y": -135.02
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -87.82,
+        "y": -159.38
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -95.25,
+        "y": -182.9
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -27.85,
+        "y": -50.11
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -22.15,
+        "y": -73.94
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -27.05,
+        "y": -98.19
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -18.99,
+        "y": -121.5
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -21.88,
+        "y": -145.97
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -13.24,
+        "y": -169.08
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -17.51,
+        "y": -193.55
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -135.27,
+        "y": 37.79
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -138.65,
+        "y": 62.12
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -130.33,
+        "y": 85.26
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -132.41,
+        "y": 109.84
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -123.42,
+        "y": 132.8
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -129.2,
+        "y": 155.52
+      }
+    },
+    {
+      "kind": "lane_lamp",
+      "at": {
+        "x": -132.59,
+        "y": 179.95
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "A fallen tenement",
+      "at": {
+        "x": -170,
+        "y": -190
+      },
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "A fallen tenement",
+      "at": {
+        "x": -60,
+        "y": -200
+      },
+      "rotation": 20,
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "A fallen tenement",
+      "at": {
+        "x": 60,
+        "y": -150
+      },
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "A fallen tenement",
+      "at": {
+        "x": 90,
+        "y": -190
+      },
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "A fallen tenement",
+      "at": {
+        "x": -170,
+        "y": 90
+      },
+      "rotation": 90,
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "A fallen tenement",
+      "at": {
+        "x": 40,
+        "y": 160
+      },
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "A fallen tenement",
+      "at": {
+        "x": 150,
+        "y": 190
+      },
+      "size": {
+        "x": 9,
+        "y": 0
+      }
+    }
+  ],
+  "camps": [
+    {
+      "name": "Gate Ward gutter-hounds",
+      "mob": "Gutter-hound",
+      "tag": "gutterhound",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -150,
+        "y": -52
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 15,
+      "levelMax": 16,
+      "respawn": 80
+    },
+    {
+      "name": "Rows gutter-hounds",
+      "mob": "Gutter-hound",
+      "tag": "gutterhound",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -140,
+        "y": -178
+      },
+      "radius": 10,
+      "count": 5,
+      "levelMin": 15,
+      "levelMax": 16,
+      "respawn": 80
+    },
+    {
+      "name": "Pell Row gutter-hounds",
+      "mob": "Gutter-hound",
+      "tag": "gutterhound",
+      "look": "wolf",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -60,
+        "y": -186
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 16,
+      "levelMax": 16,
+      "respawn": 80
+    },
+    {
+      "name": "Dock-rat cutters",
+      "mob": "Dock-rat cutter",
+      "tag": "dockrat",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -28,
+        "y": -194
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 16,
+      "levelMax": 17,
+      "respawn": 80
+    },
+    {
+      "name": "Dock-rat polers",
+      "mob": "Dock-rat poler",
+      "tag": "dockrat",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": -30,
+        "y": -176
+      },
+      "radius": 6,
+      "count": 3,
+      "levelMin": 17,
+      "levelMax": 17,
+      "respawn": 80
+    },
+    {
+      "name": "First court Weave-Eaters",
+      "mob": "Weave-Eater",
+      "tag": "weaveeater",
+      "look": "weaveeater",
+      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY",
+      "center": {
+        "x": -150,
+        "y": 132
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 17,
+      "levelMax": 18,
+      "respawn": 80,
+      "night": true
+    },
+    {
+      "name": "Tanners' court Weave-Eaters",
+      "mob": "Weave-Eater",
+      "tag": "weaveeater",
+      "look": "weaveeater",
+      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY",
+      "center": {
+        "x": -106,
+        "y": 160
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 17,
+      "levelMax": 18,
+      "respawn": 80,
+      "night": true
+    },
+    {
+      "name": "Deepest court Weave-Eaters",
+      "mob": "Weave-Eater",
+      "tag": "weaveeater",
+      "look": "weaveeater",
+      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY",
+      "center": {
+        "x": -150,
+        "y": 192
+      },
+      "radius": 6,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 80
+    },
+    {
+      "name": "Mother of Drains",
+      "mob": "Mother of Drains",
+      "tag": "drainmother",
+      "look": "weaveeater",
+      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY; the Mother of Drains GAME-ONLY",
+      "center": {
+        "x": -140,
+        "y": 202
+      },
+      "radius": 3,
+      "count": 1,
+      "levelMin": 20,
+      "levelMax": 20,
+      "respawn": 300,
+      "elite": true,
+      "night": true,
+      "guards": "Deepest court Weave-Eaters"
+    },
+    {
+      "name": "Iron Teeth runners",
+      "mob": "Iron Teeth runner",
+      "tag": "ironteeth",
+      "look": "deserter",
+      "canonStatus": "CANON faction (the Iron Teeth: B1WB:26; book1 ch.7:21); the camp GAME-ONLY",
+      "center": {
+        "x": 180,
+        "y": 124
+      },
+      "radius": 7,
+      "count": 4,
+      "levelMin": 17,
+      "levelMax": 18,
+      "respawn": 80
+    },
+    {
+      "name": "Iron Teeth sifters",
+      "mob": "Iron Teeth sifter",
+      "tag": "sifter",
+      "look": "deserter",
+      "canonStatus": "CANON faction (the Iron Teeth: B1WB:26; book1 ch.7:21); the camp GAME-ONLY",
+      "center": {
+        "x": 150,
+        "y": -184
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 18,
+      "levelMax": 19,
+      "respawn": 80
+    },
+    {
+      "name": "Brannoc's sifters",
+      "mob": "Iron Teeth sifter",
+      "tag": "sifter",
+      "look": "deserter",
+      "canonStatus": "CANON faction (the Iron Teeth: B1WB:26; book1 ch.7:21); the camp GAME-ONLY",
+      "center": {
+        "x": 174,
+        "y": -180
+      },
+      "radius": 3,
+      "count": 2,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 80
+    },
+    {
+      "name": "Knuckle Brannoc",
+      "mob": "Knuckle Brannoc",
+      "tag": "brannoc",
+      "look": "banditking",
+      "canonStatus": "CANON faction (the Iron Teeth: B1WB:26; book1 ch.7:21); the camp GAME-ONLY; Knuckle Brannoc GAME-ONLY",
+      "center": {
+        "x": 176,
+        "y": -186
+      },
+      "radius": 2,
+      "count": 1,
+      "levelMin": 20,
+      "levelMax": 20,
+      "respawn": 300,
+      "elite": true,
+      "guards": "Brannoc's sifters"
+    },
+    {
+      "name": "Holding House warders",
+      "mob": "Hired warder",
+      "tag": "warder",
+      "look": "warden",
+      "canonStatus": "CANON-EXPANDED: the Council's hired men (the Council is CANON, world_bible.md); Seekers are the Transit Hub's and are not here",
+      "center": {
+        "x": -172,
+        "y": 33
+      },
+      "radius": 5,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 19,
+      "respawn": 80
+    },
+    {
+      "name": "Holding House back warders",
+      "mob": "Hired warder",
+      "tag": "warder",
+      "look": "warden",
+      "canonStatus": "CANON-EXPANDED: the Council's hired men; GAME-ONLY post",
+      "center": {
+        "x": -150,
+        "y": 54
+      },
+      "radius": 4,
+      "count": 2,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 80
+    },
+    {
+      "name": "Grey-touched in the cellar",
+      "mob": "Grey-touched",
+      "tag": "greytouched",
+      "look": "hollow",
+      "canonStatus": "GAME-ONLY (the shards as burned memory: the Sludge-Tunnels' reading, DUNGEON_DESIGN.md)",
+      "center": {
+        "x": 154,
+        "y": -150
+      },
+      "radius": 6,
+      "count": 4,
+      "levelMin": 18,
+      "levelMax": 19,
+      "respawn": 80
+    },
+    {
+      "name": "The Lantern-Eater",
+      "mob": "The Lantern-Eater",
+      "tag": "lanterneater",
+      "look": "weaveeater",
+      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY; the Lantern-Eater GAME-ONLY",
+      "center": {
+        "x": -68,
+        "y": 52
+      },
+      "radius": 3,
+      "count": 1,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 600,
+      "elite": true,
+      "rare": 0.25,
+      "guards": "none"
+    }
+  ],
+  "life": {
+    "villagers": 16,
+    "mood": "wary",
+    "names": [
+      "Aldred Coke",
+      "Hild Barrow",
+      "Cuth Penny",
+      "Elga Sump",
+      "Brand Tolley",
+      "Wyn Garth",
+      "Osgar Rook",
+      "Tilda Grime",
+      "Edwy Larch",
+      "Mabb Soot",
+      "Leof Crane",
+      "Gisla Fenn",
+      "Ricca Stave",
+      "Wat Mallow",
+      "Duna Slake",
+      "Sigga Nail"
+    ],
+    "critters": [
+      {
+        "kind": "cat",
+        "center": {
+          "x": -110,
+          "y": -100
+        },
+        "radius": 20,
+        "count": 3
+      },
+      {
+        "kind": "cat",
+        "center": {
+          "x": 110,
+          "y": 66
+        },
+        "radius": 14,
+        "count": 2
+      },
+      {
+        "kind": "cat",
+        "center": {
+          "x": -140,
+          "y": 20
+        },
+        "radius": 12,
+        "count": 2
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": -140,
+          "y": 175
+        },
+        "radius": 22,
+        "count": 4
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 140,
+          "y": -118
+        },
+        "radius": 12,
+        "count": 3
+      },
+      {
+        "kind": "crow",
+        "center": {
+          "x": 30,
+          "y": 150
+        },
+        "radius": 20,
+        "count": 3
+      }
+    ],
+    "residents": [
+      {
+        "name": "Edda Holt",
+        "role": "stranger",
+        "title": "Toll-Reeve",
+        "at": {
+          "x": -188,
+          "y": 4.2
+        },
+        "stories": [
+          "Thirty years I've kept the toll-book. Carts, bales, pilgrims, a man with a bear once. You write what comes through the gate and you don't ask what it's for.",
+          "The warrant page I keep in the back of the book, where the Council's men can't see me reading it twice.",
+          "My mother said the gate used to shut at dusk. Now it never shuts. Nobody ever decided that. It just stopped closing."
+        ]
+      },
+      {
+        "name": "Ludo Brand",
+        "role": "stranger",
+        "title": "Carter",
+        "at": {
+          "x": -168,
+          "y": -23.5
+        },
+        "stories": [
+          "I've carted up the south-east road from Oakhaven every week since I could hold the reins. Grain up, rags and pots down. The road doesn't care which.",
+          "Somebody's been cutting bales off the barges at night and selling them back to me in the morning. My own bales. At a price."
+        ]
+      },
+      {
+        "name": "Mother Sall",
+        "role": "innkeeper",
+        "title": "Keeper of the Rusty Spoon",
+        "place": "bar",
+        "works": true,
+        "stories": [
+          "The ale's watered because the water's cheaper than the ale. Everybody knows. Nobody complains. That's the Spoon's whole secret.",
+          "Chairs get broken in here most nights. I keep a cellar of legs. Nobody's ever asked why there are so many legs.",
+          "I don't take sides at my tables. I take coin. The games are high and the stakes are other people's."
+        ]
+      },
+      {
+        "name": "Gorm Rock-Wall",
+        "role": "stranger",
+        "title": "Lowtown Muscle",
+        "place": "inn",
+        "look": "orc",
+        "stories": [
+          "The ale here tastes like rust. I drink it anyway. You get used to rust in the Lowtowns. You get used to most things.",
+          "My mother told me of a pier in the north where the water runs clear and you can just sit. One day I'll have a pier. And a fishing pole that isn't scrap wire.",
+          "Sap-root for a split knuckle. Chew it, spit it on, don't look at it. Orc remedy. Works on you lot too, mostly."
+        ]
+      },
+      {
+        "name": "Gytha Pell",
+        "role": "stranger",
+        "title": "Mother",
+        "at": {
+          "x": -106,
+          "y": -141.5
+        },
+        "stories": [
+          "My Ysa sparked over the washing. A little light in her hands, like a moth's. I told her to put it out. As if she could.",
+          "They came for her with a paper. A paper. I can't read, but I know a paper is worth more than a girl, up there.",
+          "I keep her cup on the sill. The neighbours think I'm mad. Let them. It's a cup. It's hers."
+        ]
+      },
+      {
+        "name": "Brother Aldo",
+        "role": "stranger",
+        "title": "Keeper of the Soup-Hall",
+        "at": {
+          "x": -51.5,
+          "y": -133.5
+        },
+        "stories": [
+          "This was a chapel once. Nobody remembers to what. I took the god's chair out and put a copper in its place. The copper does more good.",
+          "Bones, turnips and whatever the market throws out at closing. I call it soup. The Rows call it Thursday.",
+          "I counted the children at the tables before the warrant came. I count them now. I don't tell anyone the difference."
+        ]
+      },
+      {
+        "name": "Old Wulf",
+        "role": "stranger",
+        "title": "Former Militia Sergeant",
+        "at": {
+          "x": -74,
+          "y": -92
+        },
+        "stories": [
+          "Lowtown militia, twenty years. We had bucklers that rusted if you looked at them and spears we pulled off a scrap heap. We were the only ones who came when the drains rose.",
+          "Steel's no good on a Weave-Eater. Goes black and breaks like old glass. Salt's what you want. Salt, and something with a rope on it.",
+          "They disbanded us. Not enough coin for watchmen, the Council said. Then they hired warders for the Holding House out of the same coin."
+        ]
+      },
+      {
+        "name": "Tibb Marrow",
+        "role": "stranger",
+        "title": "Salt-Seller",
+        "at": {
+          "x": 124,
+          "y": 55.5
+        },
+        "stories": [
+          "Rock salt, sea salt, grey salt off the Ash-Walkers' carts. Throw it at what comes out of the drains and watch it go white. Two crowns a twist.",
+          "People laugh at a salt-seller till the lamps go out in their lane. Then they come to me in their nightshirts."
+        ]
+      },
+      {
+        "name": "Ketta Rune",
+        "role": "stranger",
+        "title": "Bone-Harpooner",
+        "at": {
+          "x": 106,
+          "y": 81
+        },
+        "stories": [
+          "Bone for the head, amber for the rope. The old craft. Steel goes through them; bone catches. Don't ask me why. My grandmother didn't know either.",
+          "I learned it off an Ash-Walker who came down to sell salt and stayed to drink. He paid his slate in lessons.",
+          "A good harpoon pins an Eater the way a nail pins a shadow. It shouldn't work. It does."
+        ]
+      },
+      {
+        "name": "Odo Sark",
+        "role": "stranger",
+        "title": "Clerk of the Antiquities",
+        "at": {
+          "x": 121,
+          "y": 94.5
+        },
+        "stories": [
+          "The Antiquities buys and sells old things. The back room is not for sale and not for looking at. That's the only rule. It's a good rule.",
+          "I keep the front of the shop very clean. Clean fronts are restful. People stop asking questions about clean fronts."
+        ]
+      },
+      {
+        "name": "Grimbold",
+        "role": "stranger",
+        "title": "Iron Teeth Factor",
+        "at": {
+          "x": 168,
+          "y": 86
+        },
+        "stories": [
+          "Up here in the market the Teeth are traders, friend. What we are below is our business. Buy something or move along.",
+          "Every lamp in the Lowtowns burns a shard, and every shard comes through somebody's hands. Mostly ours. Think on that when you light yours."
+        ]
+      },
+      {
+        "name": "Osric Fenn",
+        "role": "stranger",
+        "title": "Shard-Burner",
+        "at": {
+          "x": 134,
+          "y": -106
+        },
+        "stories": [
+          "A shard is a little light that used to be somebody. We buy them back for the families, when the families can pay. A night's light, a shard. Sometimes two.",
+          "Burn one wrong and what's left walks. We keep those in the cellar. I don't go down there after dark, and I'm the one with the key.",
+          "My mother keeps the old Fenn house in the Rows. She thinks I sell lamp-oil. Let her."
+        ]
+      },
+      {
+        "name": "Hale Dunning",
+        "role": "stranger",
+        "title": "Ward-Watch",
+        "at": {
+          "x": -16.5,
+          "y": -24
+        },
+        "stories": [
+          "The Ward-watch: two of us on the bridges, a lamp each and no pay worth the name. We watch. That's the job. We watch.",
+          "Old Wulf drills us when he's sober. He says the militia stood when the drains rose. I believe him. I've seen the drains."
+        ]
+      },
+      {
+        "name": "Ebba Strand",
+        "role": "stranger",
+        "title": "Ward-Watch",
+        "at": {
+          "x": 24.5,
+          "y": 101
+        },
+        "stories": [
+          "Rag Bridge's mine. Rags hang off it because the wind brings them. Nobody hangs them. Nobody takes them down.",
+          "At night I count the lamps on Weir Lane. When one goes out I don't go and look. I count again in the morning."
+        ]
+      },
+      {
+        "name": "Rudd Crake",
+        "role": "stranger",
+        "title": "Dock Ganger",
+        "at": {
+          "x": -25.5,
+          "y": -60
+        },
+        "stories": [
+          "Honest labour at the docks. Lift, carry, pole, sleep. The barges go down to the river towns and back with whatever's cheap.",
+          "No cranes on my quays. Backs and ropes. A crane's a thing that breaks and someone has to pay for. A back mends."
+        ]
+      },
+      {
+        "name": "Nan Tallow",
+        "role": "merchant",
+        "title": "Skewer-Seller",
+        "at": {
+          "x": 112,
+          "y": 87
+        },
+        "stories": [
+          "Roasting skewered rat, two a copper, three if you don't ask. They're rats. They're hot. That's the whole of the promise.",
+          "Smog makes the fat spit. I've a burn on every finger. My mother had the same burns. It's the family trade."
+        ]
+      },
+      {
+        "name": "Meg Brisk",
+        "role": "merchant",
+        "title": "Wine-Seller",
+        "at": {
+          "x": 97,
+          "y": 76
+        },
+        "stories": [
+          "Aether-spiced wine. It's cheap, it's hot, and nobody knows what the aether is. Don't drink the bottom of the jug.",
+          "The High City throws its old wine down the drains. Some of it ends up here, and some of that ends up in my jugs. Waste not."
+        ]
+      },
+      {
+        "name": "Wynn Madder",
+        "role": "stranger",
+        "title": "Dyer",
+        "at": {
+          "x": -116.5,
+          "y": -117
+        },
+        "stories": [
+          "Madder for red, woad for blue, weld for yellow, soot for everything else. The Lowtowns wear a lot of everything else.",
+          "My arms are blue to the elbow and red past it. The children call me the Flag."
+        ]
+      }
+    ],
+    "households": [
+      {
+        "name": "Coke",
+        "house": "Coke's tenement",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 3,
+        "needs": [
+          "bread",
+          "firewood"
+        ],
+        "members": [
+          {
+            "name": "Aldred Coke",
+            "kin": "head"
+          },
+          {
+            "name": "Tilda Grime",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "Barrow",
+        "house": "Barrow's tenement",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 3,
+        "needs": [
+          "bread",
+          "firewood"
+        ],
+        "members": [
+          {
+            "name": "Hild Barrow",
+            "kin": "head"
+          },
+          {
+            "name": "Leof Crane",
+            "kin": "husband"
+          },
+          {
+            "name": "Edwy Larch",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "Sump",
+        "house": "Sump's tenement",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 3,
+        "needs": [
+          "bread",
+          "firewood"
+        ],
+        "members": [
+          {
+            "name": "Elga Sump",
+            "kin": "head"
+          },
+          {
+            "name": "Duna Slake",
+            "kin": "sister"
+          }
+        ]
+      },
+      {
+        "name": "Tolley",
+        "house": "Tolley's tenement",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 3,
+        "needs": [
+          "bread",
+          "firewood"
+        ],
+        "members": [
+          {
+            "name": "Brand Tolley",
+            "kin": "head"
+          },
+          {
+            "name": "Sigga Nail",
+            "kin": "wife"
+          }
+        ]
+      },
+      {
+        "name": "Rook",
+        "house": "Rook's tenement",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 3,
+        "needs": [
+          "bread",
+          "firewood"
+        ],
+        "members": [
+          {
+            "name": "Osgar Rook",
+            "kin": "head"
+          },
+          {
+            "name": "Wyn Garth",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "Fenn",
+        "house": "Fenn's tenement",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 3,
+        "needs": [
+          "bread",
+          "firewood"
+        ],
+        "members": [
+          {
+            "name": "Gisla Fenn",
+            "kin": "head"
+          },
+          {
+            "name": "Ricca Stave",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "Mallow",
+        "house": "Mallow's tenement",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 3,
+        "needs": [
+          "bread",
+          "firewood"
+        ],
+        "members": [
+          {
+            "name": "Wat Mallow",
+            "kin": "head"
+          },
+          {
+            "name": "Mabb Soot",
+            "kin": "wife"
+          },
+          {
+            "name": "Cuth Penny",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "Pell",
+        "house": "Pell's tenement",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 3,
+        "needs": [
+          "bread",
+          "firewood"
+        ],
+        "members": [
+          {
+            "name": "Gytha Pell",
+            "kin": "head"
+          }
+        ]
+      }
+    ],
+    "workshops": [
+      {
+        "who": "Aldred Coke",
+        "prop": "The Rust Market hearth"
+      },
+      {
+        "who": "Elga Sump",
+        "prop": "Sump's bakehouse"
+      },
+      {
+        "who": "Cuth Penny",
+        "prop": "Penny's stall"
+      },
+      {
+        "who": "Wat Mallow",
+        "prop": "Mallow's leather shop"
+      },
+      {
+        "who": "Duna Slake",
+        "prop": "The tanning yard"
+      }
+    ],
+    "stories": [
+      {
+        "name": "Aldred Coke",
+        "lines": [
+          "The market hearth's bellows are my arms. No engine in the Lowtowns works as cheap as a smith who needs to eat.",
+          "Slag-iron. The foundries throw it out; I beat it into nails. Their waste, my bread."
+        ]
+      },
+      {
+        "name": "Hild Barrow",
+        "lines": [
+          "I was a field-hand once, out past the gate. Then the fields went to the Council's tenants. Now I drink in the Spoon and remember barley.",
+          "My Leof says we'll go back out one day. He's been saying it eleven years."
+        ]
+      },
+      {
+        "name": "Cuth Penny",
+        "lines": [
+          "Penny's stall: nails, buttons, string, knives, and whatever fell off a barge. Don't ask which is which.",
+          "I lodge at the Mallows'. Wat makes my purses. I sell them back to people who've had theirs cut."
+        ]
+      },
+      {
+        "name": "Elga Sump",
+        "lines": [
+          "The oven's lit at four. Smog bread: it rises grey and nobody minds. Flour comes up from Oakhaven on Ludo's cart.",
+          "My sister tans hides by the river. Between us we smell of the two best and worst things in the Lowtowns."
+        ]
+      },
+      {
+        "name": "Brand Tolley",
+        "lines": [
+          "You want to know who's sleeping with whose husband in the Rows? Three crowns. You want to know who's been taken? Free. Everybody knows.",
+          "Sigga says I talk too much. Sigga talks more. She just does it quieter."
+        ]
+      },
+      {
+        "name": "Wyn Garth",
+        "lines": [
+          "I used to run game down from the woods past Oakhaven. No woods here. I lodge with Osgar and drink his cider and wait for something to hunt.",
+          "Rats, if you're hungry. Gutter-hounds, if you're brave. I'm neither tonight."
+        ]
+      },
+      {
+        "name": "Osgar Rook",
+        "lines": [
+          "First cup's for the dead. Second's for the living. Third's for the Council, so it can choke on it.",
+          "I had a shop once, on Gate Street. A Seeker walked in looking for somebody. I've been drinking since. I don't remember the shop much."
+        ]
+      },
+      {
+        "name": "Tilda Grime",
+        "lines": [
+          "Lamp-tag! You touch a lamp-post and you're safe. If you're not touching one the Eaters get you. That's the rule.",
+          "My friend Ysa sparked. Her hands went bright. Then she went away. Mum says don't say her name."
+        ]
+      },
+      {
+        "name": "Edwy Larch",
+        "lines": [
+          "Cut timber in the north for a lumber-master till my back went. Now I pull cinder-beams out of the fallen terraces for burning. Same work, sadder trees.",
+          "The Barrows let me the cupboard under the stair. It's dry. In the Lowtowns that's a palace."
+        ]
+      },
+      {
+        "name": "Mabb Soot",
+        "lines": [
+          "Soot-wort grows where nothing should: in the gutters, on the ash heaps. It's good for a cough. Everybody here has a cough.",
+          "Lamp-lichen glows by the drains. Pick it at night and your hands shine till morning. Don't eat it."
+        ]
+      },
+      {
+        "name": "Leof Crane",
+        "lines": [
+          "Fields, Hild says. Barley, Hild says. Hild's never weeded a row in her life. I have. I'm happy with the Spoon.",
+          "My brother went for a watchman and they gave him a lamp and no pay. He gave the lamp back."
+        ]
+      },
+      {
+        "name": "Gisla Fenn",
+        "lines": [
+          "My Osric sells lamp-oil in the south of the market. Good boy. Always smells of smoke. I don't ask.",
+          "I've lived in the Rows seventy years. The terraces were new brick once. I remember the colour. Red, like a cheek."
+        ]
+      },
+      {
+        "name": "Ricca Stave",
+        "lines": [
+          "I worked the mills upriver till the mills stopped wanting people. Now I lodge with old Gisla and carry for anyone with a copper.",
+          "The river's black because the High City's sick, my father said. He said it like it was weather."
+        ]
+      },
+      {
+        "name": "Wat Mallow",
+        "lines": [
+          "Gutter-hound hide makes a good purse. Tough, and nobody wants to steal a thing that smells like that.",
+          "Mabb's my wife. She picks the weeds, I tan the hounds. We keep a clean house anyway."
+        ]
+      },
+      {
+        "name": "Duna Slake",
+        "lines": [
+          "The tanning yard's by the river because the river can't smell any worse. Neither can I.",
+          "Elga bakes, I tan. When we visit Mother we stand at opposite ends of the room."
+        ]
+      },
+      {
+        "name": "Sigga Nail",
+        "lines": [
+          "Brand talks. I listen. That's how we know everything between us.",
+          "The warders at the Holding House drink in the Spoon on their nights off. They don't talk about the children. They don't have to. They drink like men who don't."
+        ]
+      }
+    ]
+  },
+  "secrets": [
+    {
+      "id": "secret.lowtowns.rule-one",
+      "name": "Rule One, Chalked",
+      "kind": "note",
+      "at": {
+        "x": -19,
+        "y": -27
+      },
+      "prompt": "Read the chalk",
+      "text": "Chalked on the brick under the bridge's west end, in a dozen hands, the same line over and over, the oldest rubbed nearly away.",
+      "clue": "Under the west end of the sett-paved bridge, low on the brick where the watch can't see, somebody keeps chalking the same rule.",
+      "hint": "Hale Dunning says there's a line chalked under the west end of his bridge, low down. Every child in the Lowtowns learns it before their letters.",
+      "xp": 150,
+      "document": "doc.lowtowns.rule_one",
+      "radius": 2.5,
+      "canonStatus": "CANON: Rule One of the Lowtowns (book1 ch.1:257); the chalk GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.soup-slate",
+      "name": "The Soup-Hall Slate",
+      "kind": "read",
+      "at": {
+        "x": -61.5,
+        "y": -133
+      },
+      "prompt": "Read the slate",
+      "text": "A slate hung by the old chapel's door, chalked and rubbed and chalked again: who ate, who paid in turnips, who owes nothing because nobody could make them.",
+      "clue": "By the door of the chapel that feeds the Rows, a slate keeps count of who ate and who paid.",
+      "hint": "Brother Aldo keeps a slate by his door. He says if you want to know the Rows, read who ate this week. And who didn't come.",
+      "xp": 150,
+      "document": "doc.lowtowns.soup_slate",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.burners-tally",
+      "name": "The Burners' Tally",
+      "kind": "read",
+      "at": {
+        "x": 145,
+        "y": -97
+      },
+      "prompt": "Read the tally-board",
+      "text": "A board nailed up behind the racks: names, a date, a number of nights. The numbers are small. Some names have a second date, and nothing after.",
+      "clue": "Behind the racks where the shards glow, a board is nailed up: names, dates, and how many nights each bought.",
+      "hint": "Osric Fenn says the tally behind his racks is the truest book in the Lowtowns. Names and nights. He doesn't say whose nights.",
+      "xp": 150,
+      "document": "doc.lowtowns.burner_tally",
+      "canonStatus": "GAME-ONLY (the shards as burned memory: the Sludge-Tunnels' reading)"
+    },
+    {
+      "id": "secret.lowtowns.price-board",
+      "name": "The Price-Board",
+      "kind": "note",
+      "at": {
+        "x": 88.5,
+        "y": 28
+      },
+      "prompt": "Read the board",
+      "text": "A board leaned against a post, prices chalked and crossed out and chalked higher, a smear of soot over the lot.",
+      "clue": "Where the long stalls meet the lane, a chalked board of prices leans on a post, every price crossed out and written higher.",
+      "hint": "Nan Tallow says the price-board by the long stalls is a history of the Lowtowns. Read it top to bottom and you can watch everyone get poorer.",
+      "xp": 150,
+      "document": "doc.lowtowns.price_board",
+      "canonStatus": "CANON: skewered rat and aether-spiced wine sold in the Rust Market (book1 ch.3:7); the board GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.old-toll",
+      "name": "An Old Toll-Book Page",
+      "kind": "note",
+      "at": {
+        "x": -192,
+        "y": -13
+      },
+      "prompt": "Pull the page from the crack",
+      "text": "A page torn from a toll-book years ago and stuffed in a crack of the wall's inner face, the ink run, the hand neat and frightened.",
+      "clue": "Inside the city's wall, just south of the gate, a page from an old toll-book is stuffed in a crack of the brick.",
+      "hint": "Edda Holt says the reeve before her tore a page out of the book and hid it in the wall south of the gate. She has never gone to look. She says you might.",
+      "xp": 150,
+      "document": "doc.lowtowns.old_toll",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.drowned-docker",
+      "name": "A Docker in the Drain",
+      "kind": "remains",
+      "at": {
+        "x": -162,
+        "y": 190
+      },
+      "prompt": "Search the docker's apron",
+      "text": "Bones in a docker's leather apron, half in the black water by a drain mouth, one hand still closed round a twist of salt that did him no good. A note is buttoned in the apron.",
+      "clue": "In the deepest of the courts, by a drain's mouth, a docker lies half in the black water with salt in his fist.",
+      "hint": "Rudd Crake says one of his gang went into the far courts with a twist of salt to see what took his sister. He didn't come back to the quay.",
+      "xp": 180,
+      "document": "doc.lowtowns.drowned_docker",
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters and salt (book1 ch.20); the docker GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.militia-roll",
+      "name": "The Militia Roll",
+      "kind": "read",
+      "at": {
+        "x": -71,
+        "y": -103
+      },
+      "prompt": "Read the names",
+      "text": "A board of names cut with a knife into the wall by the well, the old militia's roll. Some names have a stroke through them. The last is Wulf's, with no stroke.",
+      "clue": "Cut into the brick by the well in the Rows, a roll of names, some struck through, the last not.",
+      "hint": "Old Wulf says the names by the well are the militia's. He cut them himself. He'll cut his own stroke when it's time, he says, not before.",
+      "xp": 150,
+      "document": "doc.lowtowns.militia_roll",
+      "canonStatus": "CANON: the former Lowtown militia (book1 ch.20:127); the roll GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.harpoon-count",
+      "name": "The Harpooner's Count",
+      "kind": "note",
+      "at": {
+        "x": 103,
+        "y": 84
+      },
+      "prompt": "Untie the strip and read it",
+      "text": "A strip of amber-dyed cloth tied to a stall post, knotted all along: a knot for every Eater pinned, the old way, and a few words stitched at the end.",
+      "clue": "On a stall post in the market's heart, a strip of amber cloth is knotted end to end.",
+      "hint": "Ketta Rune says her grandmother's count is tied to a post in the market where she can see it. A knot for every one pinned. She's added three.",
+      "xp": 150,
+      "document": "doc.lowtowns.harpoon_count",
+      "canonStatus": "CANON: bone harpoons on amber rope (book1 ch.20:177-191); the count GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.spoon-slate",
+      "name": "The Spoon's Slate",
+      "kind": "read",
+      "at": {
+        "x": -134.5,
+        "y": 21
+      },
+      "prompt": "Read the slate",
+      "text": "A slate on a nail round the side of the inn, by the cellar flap: the Spoon's debts, and a column headed BROKEN CHAIRS, very long.",
+      "clue": "Round the west side of the inn, by the cellar flap, a slate of debts hangs on a nail.",
+      "hint": "Mother Sall says her slate of debts hangs round the side by the cellar. Everybody owes. She says reading it is the best entertainment in the Lowtowns.",
+      "xp": 150,
+      "document": "doc.lowtowns.spoon_slate",
+      "canonStatus": "CANON-EXPANDED: the Rusty Spoon (book1 ch.1:9); the slate GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.warder",
+      "name": "A Warder Who Asked",
+      "kind": "remains",
+      "at": {
+        "x": -160,
+        "y": 68
+      },
+      "prompt": "Search the warder's glove",
+      "text": "A man in a warder's grey coat, face down behind the house where they hold people, a long time dead. Nobody moved him. His orders are folded in his glove.",
+      "clue": "Behind the grey stone house by the gate, where the warders don't walk, one of their own lies face down.",
+      "hint": "Sigga Nail says one of the warders asked a question about the children, and nobody saw him after. Behind the grey house, she says. Nobody goes round the back.",
+      "xp": 180,
+      "document": "doc.lowtowns.warder_orders",
+      "canonStatus": "CANON-EXPANDED: the Council's hired men; Seekers' warrants spoken of only; GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.smog-thin",
+      "name": "Where the Smog Thins",
+      "kind": "vista",
+      "at": {
+        "x": 58,
+        "y": 206
+      },
+      "text": "For a moment the smog thins and there it is, far up the mountain in the north-east: white stone and gold, towers and a dome and a spire like a needle. The Crown. It doesn't look real from down here. It isn't meant to.",
+      "clue": "In the far north of the town, past the river, there is a place the smog thins enough to see the High City.",
+      "hint": "Ebba Strand says if you go north past her bridge, to the open yards at the top of the town, the smog thins some days and you can see the Crown. She goes there when she's off. Just to look.",
+      "xp": 200,
+      "radius": 6,
+      "canonStatus": "CANON: the Crown, white stone and gold (world_bible.md Geography; book1 ch.3: the smog of the High City's foundries); the lookout GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.court-marks",
+      "name": "Marks on the Court Wall",
+      "kind": "carving",
+      "at": {
+        "x": -121,
+        "y": 150
+      },
+      "prompt": "Look at the marks",
+      "text": "Scratched into the brick at shoulder height: a row of strokes in fives, and over them, in a militia hand, NIGHTS WE HELD THE COURT.",
+      "clue": "In the court of the tanners' drains, someone cut a tally of nights into the brick at shoulder height.",
+      "hint": "Old Wulf says the militia held the tanners' court against the drains for a winter. They cut the nights in the wall. He can't bring himself to count them.",
+      "xp": 150,
+      "canonStatus": "CANON-EXPANDED: the former Lowtown militia (book1 ch.20:127); the marks GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.lamp-shrine",
+      "name": "The Lamp-Shrine",
+      "kind": "shrine",
+      "at": {
+        "x": -36,
+        "y": -120
+      },
+      "prompt": "Leave a copper by the lamp",
+      "text": "A niche in a quay-side wall with a lamp in it that somebody always keeps lit, and under it a dish of coppers and shard-dust. No god's face. Just the lamp.",
+      "clue": "On the riverside walk, in a niche in the wall, a lamp somebody always keeps lit sits over a dish of coppers.",
+      "hint": "Rudd Crake says the dockers keep a lamp lit in the wall along the quays. A copper in the dish for the river. He says it's not for any god. It's for the lamp.",
+      "xp": 60,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.lowtowns.grey-bell",
+      "name": "Grey-Bell",
+      "kind": "herb",
+      "at": {
+        "x": 162,
+        "y": -130
+      },
+      "prompt": "Pick the grey-bell",
+      "text": "In the ash behind the dead-house, where the burners tip the cinders, a few pale flowers hang their heads: grey bells, with a light in them like a held breath.",
+      "clue": "Behind the house where the dead are burned for light, pale flowers grow in the tipped cinders.",
+      "hint": "Mabb Soot says grey-bell grows only where the burners tip their cinders, behind the dead-house. She won't pick it. She says it remembers.",
+      "xp": 120,
+      "item": "herb.grey_bell",
+      "canonStatus": "GAME-ONLY: the trades' rare herb"
+    }
+  ],
+  "nodes": [
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -166,
+        "y": -186
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -55,
+        "y": -196
+      },
+      "rotation": 47
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 64,
+        "y": -146
+      },
+      "rotation": 94
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 86,
+        "y": -186
+      },
+      "rotation": 141
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -166,
+        "y": 94
+      },
+      "rotation": 188
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 44,
+        "y": 164
+      },
+      "rotation": 235
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 146,
+        "y": 192
+      },
+      "rotation": 282
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -30,
+        "y": -226
+      },
+      "rotation": 329
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 186,
+        "y": -150
+      },
+      "rotation": 16
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 60,
+        "y": -40
+      },
+      "rotation": 63
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -176,
+        "y": -194
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -64,
+        "y": -205
+      },
+      "rotation": 61
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": 56,
+        "y": -155
+      },
+      "rotation": 122
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": 94,
+        "y": -194
+      },
+      "rotation": 183
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -174,
+        "y": 86
+      },
+      "rotation": 244
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": 36,
+        "y": 156
+      },
+      "rotation": 305
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": 155,
+        "y": 187
+      },
+      "rotation": 6
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -150,
+        "y": -225
+      },
+      "rotation": 67
+    },
+    {
+      "node": "node.lamp_lichen",
+      "at": {
+        "x": -156,
+        "y": 140
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.lamp_lichen",
+      "at": {
+        "x": -114,
+        "y": 168
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.lamp_lichen",
+      "at": {
+        "x": -140,
+        "y": 208
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.lamp_lichen",
+      "at": {
+        "x": -98,
+        "y": 152
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.lamp_lichen",
+      "at": {
+        "x": -158,
+        "y": 122
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": -188,
+        "y": -60
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": -120,
+        "y": -200
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": 30,
+        "y": -100
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": 160,
+        "y": -60
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": -30,
+        "y": 200
+      },
+      "rotation": 0
+    }
+  ],
+  "stations": [
+    {
+      "kind": "bench",
+      "name": "Bench: the dyer's vats",
+      "at": {
+        "x": -120,
+        "y": -116.5
+      },
+      "rotation": 0,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "fire",
+      "name": "Brother Aldo's soup kettle",
+      "at": {
+        "x": -49,
+        "y": -136
+      },
+      "rotation": 200,
+      "canonStatus": "GAME-ONLY"
+    }
+  ]
+}

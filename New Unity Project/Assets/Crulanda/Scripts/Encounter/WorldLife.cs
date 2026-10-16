@@ -975,7 +975,7 @@ namespace Crulanda.Encounter
             v.agent.baseOffset = role == "child" ? .66f : 1; v.agent.avoidancePriority = 60;
             // A resident's own look (a Veridian Keeper): the body of the look, calm (an even variant), and no villager's outfit.
             v.Keeper = look == "keeper";
-            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper ? null : role);
+            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper ? null : role, look == "orc");   // an orc resident (Gorm Rock-Wall, the Lowtowns)
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop; v.Fold = fold;

@@ -44,6 +44,7 @@ namespace Crulanda.World
             { "zone.ashrim", new Set { day = new[] { "Music/Last/EchoesAfterFire", "Music/Last/ForgottenSouls", "Music/Eastern/DesertSunset" }, night = new[] { "Music/Last/ForgottenSouls" }, grey = new[] { "Music/Last/EchoesAfterFire" } } },
             { "zone.verdant", new Set { day = new[] { "Music/Eastern/Oasis", "Music/Last/LastHope" }, night = new[] { "Music/Eastern/RestlessNight" } } },
             { "zone.adit", new Set { day = DungeonTracks, combat = DungeonFight } },
+            { "zone.lowtowns", new Set { day = new[] { "Music/Last/RustAndSilence", "Music/Eastern/MysteriousCity" }, night = new[] { "Music/Dark/Cemetery", "Music/Eastern/RestlessNight" } } },   // the Lowtowns (Phase 9.1): rust and smog by day, the drains' night
         };
         /// <summary>A zone's set; a zone not in <see cref="Sets"/> gets Oakhaven's.</summary>
         public static Set SetFor(string zoneId) { Set s; return zoneId != null && Sets.TryGetValue(zoneId, out s) ? s : Sets["zone.oakhaven"]; }

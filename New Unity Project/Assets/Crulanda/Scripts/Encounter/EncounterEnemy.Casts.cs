@@ -74,6 +74,15 @@ namespace Crulanda.Encounter
             new MobCast { mob = "Pale watcher", name = "Unblinking Gaze", kind = "net", cc = "stun", seconds = 2, area = 0, cast = 1.8f, every = 16, first = 5, power = 0, reach = 15 },
             new MobCast { mob = "The Umbra Watcher", name = "Umbra-Fall", kind = "net", cc = "disorient", seconds = 2.5f, area = 4, cast = 2f, every = 15, first = 5, power = 0, reach = 12 },
             new MobCast { mob = "Weave-Eater", name = "Thread-Snare", kind = "net", cc = "root", seconds = 2, area = 3, cast = 1.2f, every = 15, first = 5, power = 0, reach = 8 },
+            // The Lowtowns (Phase 9.1, Docs/ZONE_LOWTOWNS.md section 4): the back yards' hounds, the river thieves, the Iron Teeth, the Council's
+            // hired warders and what the burners' cellar keeps.
+            new MobCast { mob = "Gutter-hound", name = "Hamstring", kind = "net", cc = "root", seconds = 1.5f, area = 0, cast = .8f, every = 15, first = 5, power = 0, reach = 3.5f },
+            new MobCast { mob = "Dock-rat cutter", name = "Thrown Knife", kind = "bolt", cast = 1.2f, every = 14, first = 4, power = 2f, reach = 10 },
+            new MobCast { mob = "Dock-rat poler", name = "Pole Sweep", kind = "blast", cast = 1.5f, every = 15, first = 6, power = 2f, reach = 3.5f, knock = 2.5f },
+            new MobCast { mob = "Iron Teeth runner", name = "Grit in the Eyes", kind = "net", cc = "disorient", seconds = 2, area = 0, cast = 1.1f, every = 15, first = 5, power = 0, reach = 5 },
+            new MobCast { mob = "Iron Teeth sifter", name = "Slag Toss", kind = "bolt", cast = 1.4f, every = 14, first = 4, power = 2.2f, reach = 12 },
+            new MobCast { mob = "Hired warder", name = "Cudgel to the Temple", kind = "net", cc = "stun", seconds = 1.5f, area = 0, cast = 1.3f, every = 16, first = 5, power = 0, reach = 4 },
+            new MobCast { mob = "Grey-touched", name = "The Forgetting", kind = "drain", cast = 2.2f, every = 15, first = 4, power = 1.8f, reach = 12 },
             new MobCast { mob = "Mist-walker", name = "Palemist Breath", kind = "net", cc = "disorient", seconds = 2, area = 4, cast = 1.6f, every = 16, first = 5, power = 0, reach = 8 },
             new MobCast { mob = "Void-Toucher", name = "Void Pulse", kind = "blast", cast = 1.8f, every = 15, first = 5, power = 2.2f, reach = 4 },
             new MobCast { mob = "Withered Keeper", name = "Grey Roots", kind = "net", cc = "root", seconds = 2.5f, area = 3, cast = 1.6f, every = 16, first = 5, power = 0, reach = 10 },

@@ -96,7 +96,7 @@ namespace Crulanda.Tests
         /// </summary>
         [UnityTest, Timeout(600000)] public IEnumerator In_every_zone_a_sim_rests_indoors()
         {
-            foreach (var id in new[] { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant" })
+            foreach (var id in new[] { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns" })
             {
                 ZoneBuilder.RequestedZoneId = id;
                 SceneManager.sceneLoaded += OnLoaded;

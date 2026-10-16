@@ -58,7 +58,7 @@ namespace Crulanda.Tests
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
-            Assert.AreEqual(5, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim and the Verdant Shore are registered.");
+            Assert.AreEqual(6, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim, the Verdant Shore and the Lowtowns are registered (the Lowtowns have no painted trees).");
             var problems = new List<string>(); int trees = 0, limbs = 0, giants = 0;
             foreach (var id in zones)
             {

@@ -1,0 +1,1170 @@
+{
+  "factions": [
+    {
+      "id": "lowtowners",
+      "name": "The Lowtowners",
+      "start": 0,
+      "canonStatus": "GAME-ONLY name for the people of the Lowtowns (CANON place, world_bible.md)",
+      "description": "The dockers, stall-keepers, tanners and families of the Lowtowns under the Crown. Nobody gives them anything, so they remember who does."
+    }
+  ],
+  "items": [
+    {
+      "id": "item.warrant_page",
+      "name": "The warrant page",
+      "description": "A page from the toll-book: a Seeker's warrant for two children, no toll, a night at the Holding House, and then a word: Up."
+    },
+    {
+      "id": "item.bought_shard",
+      "name": "A bought-back shard",
+      "description": "A sliver of pale stone the length of a finger, warm, with a light in it like a held breath. A night's light, and somebody's."
+    },
+    {
+      "id": "item.brannoc_ledger",
+      "name": "Knuckle Brannoc's ledger",
+      "description": "A greasy ledger of the Iron Teeth's yard: weights of shard in, sifters paid, and a counting-house below, named only as the Tally."
+    },
+    {
+      "id": "item.lamp_glass",
+      "name": "A snuffed lamp's glass",
+      "description": "The glass of a lane lamp, cold, and on the inside a frost of black, as if the dark had been drunk out of it the wrong way."
+    },
+    {
+      "id": "item.carter_bale",
+      "name": "One of Ludo's bales",
+      "description": "A bale of rags bound in Ludo Brand's knotted cord, which he swears no one else in the Lowtowns can tie."
+    },
+    {
+      "id": "item.seer_parcel",
+      "name": "A wrapped parcel",
+      "description": "Something small and heavy in oilcloth, sealed with wax and no mark. The clerk said not to shake it."
+    },
+    {
+      "id": "item.hound_bone",
+      "name": "Soup bones",
+      "description": "Gutter-hound bones, boiled once already by the look of them. Brother Aldo will boil them again."
+    },
+    {
+      "id": "item.eater_thread",
+      "name": "A Weave-Eater's thread",
+      "description": "A strand of something like black silk that was a Weave-Eater's edge. It pulls at your fingers, very slightly, toward the nearest light."
+    }
+  ],
+  "documents": [
+    {
+      "id": "doc.lowtowns.warrant_page",
+      "title": "The Warrant Page",
+      "text": "From the back of the toll-book at Argentis's outer gate, in Edda Holt's careful hand, copied from the paper the riders showed her:\n\nBy Seeker's warrant. No toll. Two children, from Oakhaven: a girl, Wren; a boy, a soldier's son, unnamed. To be held one night at the Holding House and taken up at first light.\n\nUnder it, in the same hand, smaller: They were quiet. The boy held her hand. Up is the only word on the paper I don't understand.",
+      "canonStatus": "GAME-ONLY (Wren and the soldier's boy: peaks.json, ashrim.json); Seekers' warrants CANON-EXPANDED (the Seekers are CANON, world_bible.md)"
+    },
+    {
+      "id": "doc.lowtowns.sparked",
+      "title": "What Old Wulf Saw",
+      "text": "Old Wulf's word, as he gave it on the steps of the soup-hall:\n\nSparked children. A light in the hands, a shimmer round the head. The Lowtowns have always had them, one or two a year. Twenty years in the militia I watched them taken out of the alleys and the gutters, a paper each time, a carriage each time. They don't come back down.\n\nWhere do they go? Up. Past the Low Stair, past the Crown. Nobody I ever knew went far enough up to see.",
+      "canonStatus": "CANON: sparked children taken from the dirty alleys and the gutters (book1 ch.13:143); Wulf and his words GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.salt_and_steel",
+      "title": "Salt and Steel",
+      "text": "Tibb Marrow's rhyme, as she sold it with every twist:\n\nSteel goes through and steel goes black,\nBone goes in and holds it back,\nSalt goes on and turns it white,\nAnd that's a drain that's shut tonight.\n\nUnder it, Old Wulf's addition: And mind the big one.",
+      "canonStatus": "CANON: steel turned black and brittle, bone harpoons, salt against Weave-Eaters (book1 ch.20:155-203); the rhyme GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.what_a_shard_is",
+      "title": "What a Shard Is",
+      "text": "Osric Fenn, at the racks, when you asked him straight:\n\nThe foundries up top make their fire from something. What's left goes down the Outfall as slag, and in the slag there are bits that glow. We sift them out. They're memory, friend. Somebody's. A face, a song, a morning. The poor buy them back to burn, a night's light at a time, and some of them buy back their own.\n\nBurn one wrong and what's left walks about grey. That's the cellar. Don't go in the cellar.",
+      "canonStatus": "GAME-ONLY reading (the shards as memory from the slag: the Sludge-Tunnels' design, DUNGEON_DESIGN.md); spent shards burned for light CANON (book1 ch.3:133-137)"
+    },
+    {
+      "id": "doc.lowtowns.brannoc_ledger",
+      "title": "Knuckle Brannoc's Ledger",
+      "text": "Pages from the Iron Teeth's yard ledger, greasy at the corners:\n\nShard in by the Outfall, weighed. Sifters paid by the weight. Weights sent down to the Tally, below, every seventh night, and a cut sent up the hill.\n\nOne line in another hand, not Brannoc's: The children from the Holding House are none of ours. They went up, not down. Leave it.\n\nThe last page: a map of the Outfall's first turn, and a door marked T.",
+      "canonStatus": "CANON faction (the Iron Teeth: B1WB:26); the ledger, the Tally and the hand-on to the Sludge-Tunnels GAME-ONLY (DUNGEON_DESIGN.md)"
+    },
+    {
+      "id": "doc.lowtowns.seer_receipt",
+      "title": "A Receipt from the Antiquities",
+      "text": "A slip in a clerk's clean hand: Received of Grimbold, factor, for the Antiquities: one parcel, delivered by a stranger, unopened. Paid in full. The back room thanks you for not asking.\n\nThe Antiquities' mark: a closed eye.",
+      "canonStatus": "CANON: the Blind Seer's Antiquities (book1 ch.3:13); the receipt GAME-ONLY. The back room is not entered."
+    },
+    {
+      "id": "doc.lowtowns.rule_one",
+      "kind": "lore",
+      "title": "Rule One",
+      "text": "Chalked under the bridge, over and over, in a dozen hands:\n\nRULE ONE OF THE LOWTOWNS: IF YOU SEE A SEEKER, EXIST SOMEWHERE ELSE.\n\nUnder the oldest, rubbed nearly away: Rule Two: see Rule One.",
+      "canonStatus": "CANON: Rule One of the Lowtowns (book1 ch.1:257); the chalk GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.soup_slate",
+      "kind": "lore",
+      "title": "The Soup-Hall Slate",
+      "text": "Ate: the Barrow lot, four. The Rook man. The Sump sisters (paid in loaves). Old Wulf (paid in sweeping). Gytha's girl, Ysa, with a second bowl for her hands, which were cold, she said, and bright.\n\nThe last line is rubbed out with a thumb. You can still read it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.burner_tally",
+      "kind": "lore",
+      "title": "The Burners' Tally",
+      "text": "Fenn, Ama: three nights. Crake, Jory: one night. Sump, the old man: five nights, two shards, bought back by the daughters. A name scratched out and three nights after it, paid.\n\nAt the bottom, a rule: never sell a family its own shard twice. Osric's hand.",
+      "canonStatus": "GAME-ONLY (the shards as burned memory: the Sludge-Tunnels' reading)"
+    },
+    {
+      "id": "doc.lowtowns.price_board",
+      "kind": "lore",
+      "title": "The Price-Board",
+      "text": "SKEWERED RAT: 1 copper (crossed out). 2 copper (crossed out). 2 copper, 3 if you ask.\nAETHER-SPICED WINE: half a crown the jug, don't drink the bottom.\nSALT: 2 crowns the twist. TIBB'S.\nLAMP-SHARD: ask at the yard.\nBREAD: Elga's, grey, 1 copper, when there's flour.\n\nAcross the bottom in soot: EVERYTHING DEARER.",
+      "canonStatus": "CANON: roasting skewered rat and cheap aether-spiced wine in the Rust Market (book1 ch.3:7); the board GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.old_toll",
+      "kind": "lore",
+      "title": "An Old Toll-Book Page",
+      "text": "A page from the toll-book of the reeve before Edda Holt:\n\nBy warrant, no toll: three children from the river towns. Held a night. Taken up. By warrant, no toll: one child, from the Rows, a girl, eight. Held a night. Taken up.\n\nAnd at the bottom, in a hand that shakes: I am not writing any more of these in the book. Let them write their own.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.drowned_docker",
+      "kind": "lore",
+      "title": "A Docker's Note",
+      "text": "Buttoned in the apron, a note in charcoal:\n\nIf I'm not back, it took me like it took Bessa. Salt's no good if your hand shakes. Tell Rudd I'm sorry about the shift. Tell nobody else anything.",
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters and salt (book1 ch.20); the docker GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.militia_roll",
+      "kind": "lore",
+      "title": "The Militia Roll",
+      "text": "Cut into the brick by the well: the Lowtown militia, the last roll. Twenty-two names, nineteen struck through. Brede. Hale (not the watchman: his father). Sorn. Each with a stroke, each stroke cut deep.\n\nThe last name, Wulf, with no stroke, and room left after it.",
+      "canonStatus": "CANON: the former Lowtown militia (book1 ch.20:127); the roll GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.harpoon_count",
+      "kind": "lore",
+      "title": "The Harpooner's Count",
+      "text": "A knot for every Weave-Eater pinned, the old way, on amber cloth: forty-one knots in a grandmother's hand, three in Ketta's.\n\nStitched at the end: Bone holds. Steel lies. Salt tells it the truth.",
+      "canonStatus": "CANON: bone harpoons on amber rope (book1 ch.20:177-191); the count GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.spoon_slate",
+      "kind": "lore",
+      "title": "The Spoon's Slate",
+      "text": "OWES: the Rook man, 3 crowns 2. The warders, 11 crowns (won't pay, won't be asked). Gorm, nothing (Gorm stops fights).\n\nBROKEN CHAIRS: a column of strokes down to the frame and onto the wall beside it.",
+      "canonStatus": "CANON-EXPANDED: the Rusty Spoon (book1 ch.1:9) and Gorm Rock-Wall (book1 ch.1:21); the slate GAME-ONLY"
+    },
+    {
+      "id": "doc.lowtowns.warder_orders",
+      "kind": "lore",
+      "title": "A Warder's Orders",
+      "text": "Folded in the glove, the Holding House's standing orders:\n\nA child brought by warrant is held one night and given up at first light to whoever shows the warrant's seal. The warders do not read the warrant. The warders do not ask the child's name. The warders do not ask where up is.\n\nIn pencil on the back, in a different hand: I asked.",
+      "canonStatus": "CANON-EXPANDED: the Council's hired men; Seekers' warrants (the Seekers are CANON, world_bible.md, and only spoken of here); GAME-ONLY"
+    }
+  ],
+  "quests": [
+    {
+      "id": "main.lowtowns.0",
+      "title": "The South-East Road",
+      "kind": "main",
+      "giver": "Corwin Ashby",
+      "turnIn": "Edda Holt",
+      "zone": "zone.oakhaven",
+      "level": 15,
+      "requires": [
+        "main.verdant.5"
+      ],
+      "canonStatus": "GAME-ONLY (Wren and the soldier's boy: peaks.json, ashrim.json); Argentis and its Lowtowns CANON (world_bible.md)",
+      "summary": "Corwin sends you down the south-east road to Argentis, after the trail of Wren and the soldier's boy. The toll-reeve at the outer gate keeps a book of everyone who passes.",
+      "offer": "Corwin is at his door, the Salt of the First Sea still on its shelf where he can see it. \"You've been to the edge of the world and back. I wouldn't ask you to go anywhere else.\" He asks anyway. \"Wren, and the soldier's boy. Taken by Seeker's warrant down the south-east road to Argentis. I said they were beyond us. For now, I said.\"\n\n\"It's later now. There's a toll-reeve at the city's outer gate. A woman called Holt. She writes down everyone who goes through, my brother says, even the ones the Council says she mustn't. Ask her.\"",
+      "progress": "\"Still here? The road's south of the village, then east. Mind the Lowtowns. They're not the Crown.\"",
+      "complete": "The toll-reeve looks up from her book at Corwin's name, and then down at it again. \"Oakhaven,\" she says. \"Two children from Oakhaven.\" She shuts the book on her finger. \"Not out here. Come into the toll-house.\"",
+      "steps": [
+        {
+          "text": "Take the south-east road to Argentis and find the toll-reeve at the outer gate.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Edda Holt",
+              "text": "Speak with Edda Holt at the Gate Ward"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 450,
+        "gold": 40
+      }
+    },
+    {
+      "id": "main.lowtowns.1",
+      "title": "No Toll by Warrant",
+      "kind": "main",
+      "giver": "Edda Holt",
+      "turnIn": "Edda Holt",
+      "zone": "zone.lowtowns",
+      "level": 15,
+      "requires": [
+        "main.lowtowns.0"
+      ],
+      "canonStatus": "GAME-ONLY (the Holding House); Seekers' warrants CANON-EXPANDED (the Seekers are CANON and only spoken of here)",
+      "summary": "Read the warrant page in the toll-book, go to the Holding House where the children were kept a night, and clear its warders.",
+      "offer": "Edda Holt opens the toll-book at the back. \"I'm not to show this to anyone. So I'm not showing you. I'm going to put it on the desk and go and stand at the gate for a bit.\"\n\n\"They were kept a night at the Holding House, up the lane. The Council's hired men keep it. They don't let anyone in. I'd like to know if there's anything left in there. A ribbon. Anything.\"",
+      "progress": "\"The Holding House is just north of the gate. Grey stone. You'll know it by how nobody stands near it.\"",
+      "complete": "Edda listens with her hand flat on the toll-book. \"Empty,\" she says. \"Up at first light. Up.\" She writes something in the margin and does not show you. \"There's a woman in the Rows whose girl went the same way, last month. Gytha Pell. She stands on her step every day. Go and see her. Tell her Edda sent you. She won't believe it, but tell her.\"",
+      "steps": [
+        {
+          "text": "Read the warrant page in the toll-book at the toll-house.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.lowtowns",
+              "target": "The toll-house",
+              "text": "The warrant page",
+              "item": "item.warrant_page",
+              "document": "doc.lowtowns.warrant_page",
+              "say": "The warrant is copied out in a careful hand. Two children from Oakhaven. No toll. One night. Up."
+            }
+          ]
+        },
+        {
+          "text": "Go to the Holding House and deal with its warders.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.lowtowns",
+              "text": "Look in at the Holding House",
+              "at": {
+                "x": -172,
+                "y": 38
+              },
+              "radius": 7,
+              "say": "The yard is swept. The door is barred from the inside, and the windows are barred from the outside. Somebody scratched a W into the doorstep, low down, where a child would sit."
+            },
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.warder.lowtowns*",
+              "count": 4,
+              "text": "Hired warders"
+            }
+          ]
+        },
+        {
+          "text": "Tell Edda Holt what you found.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Edda Holt",
+              "text": "Return to Edda Holt"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1400,
+        "gold": 90,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.lowtowns.2",
+      "title": "Gytha's Girl",
+      "kind": "main",
+      "giver": "Gytha Pell",
+      "turnIn": "Gytha Pell",
+      "zone": "zone.lowtowns",
+      "level": 16,
+      "requires": [
+        "main.lowtowns.1"
+      ],
+      "canonStatus": "CANON: sparked children taken from the alleys (book1 ch.13:143); Gytha, Ysa and the Rows GAME-ONLY",
+      "summary": "Gytha Pell's daughter Ysa sparked and was taken. Ask at the soup-hall, clear the hounds from the yards where she was last seen, and hear what Old Wulf knows.",
+      "offer": "Gytha Pell does not come down off her step. \"Edda sent you. Edda never sent anyone.\" She looks at your hands, as if checking them for light. \"My Ysa sparked over the washing. They had a paper. A carriage. I ran after it to the gate and the Council's men laughed and let me.\"\n\n\"Brother Aldo fed her every Thursday. Ask him. And the yards behind the Rows, where she played. The hounds have the yards now. And ask Old Wulf. He was militia. He knows where they go. He won't tell me.\"",
+      "progress": "\"Aldo first. Then the yards. Then Wulf. He'll be by the well, pretending not to drink.\"",
+      "complete": "Gytha listens to the whole of it on her step, and when you say up she nods as if she knew. \"Up,\" she says. \"The Crown, then. Where the lamps are white.\" She looks at the smog where the mountain is. \"I can't get up there. Nobody from down here can.\" Her hands are shaking. She puts them in her apron. \"But something down here knows. Somebody sells the carriages their wheels. Somebody keeps the drains from coming up in the Crown's cellars. Follow it down, and it goes up.\"",
+      "steps": [
+        {
+          "text": "Ask Brother Aldo at the soup-hall about Ysa.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Brother Aldo",
+              "text": "Ask Brother Aldo",
+              "say": "Brother Aldo wipes his hands. \"Thursdays. A second bowl, for her hands; they were cold, she said, and they shone. The Thursday after, she wasn't at the table. Nobody said anything. That's the Rows.\""
+            }
+          ]
+        },
+        {
+          "text": "Clear the gutter-hounds from the back yards of the Rows.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.gutterhound.lowtowns*",
+              "count": 6,
+              "text": "Gutter-hounds"
+            }
+          ]
+        },
+        {
+          "text": "Hear what Old Wulf knows.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Old Wulf",
+              "text": "Speak with Old Wulf by the well",
+              "document": "doc.lowtowns.sparked",
+              "say": "Old Wulf looks at the well a long while. \"Sparked children go up. Twenty years I watched. A paper, a carriage, up past the Low Stair. They don't come down. Don't tell her that. No. Tell her. She knows.\""
+            }
+          ]
+        },
+        {
+          "text": "Go back to Gytha Pell.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Gytha Pell",
+              "text": "Return to Gytha Pell"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1700,
+        "gold": 110,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 300
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.lowtowns.3",
+      "title": "What the Drains Keep",
+      "kind": "main",
+      "giver": "Old Wulf",
+      "turnIn": "Old Wulf",
+      "zone": "zone.lowtowns",
+      "level": 17,
+      "requires": [
+        "main.lowtowns.2"
+      ],
+      "canonStatus": "CANON: Weave-Eaters, salt and blackened steel (book1 ch.1:251, ch.20:155-203); the Drain Courts and the Mother of Drains GAME-ONLY",
+      "summary": "The Weave-Eaters come up in the Drain Courts at night, and something under them has been taking the Lowtowns' people too. Take salt from Tibb Marrow's stall, go into the courts after dark and bring down the Mother of Drains.",
+      "offer": "Old Wulf buttons his coat to the throat. \"Down's the other way, Gytha said. She's right. But down's where the Lowtowns lose people too, and nobody counts them, because nobody writes it in a book.\" He nods north-west. \"The Drain Courts. At night the Eaters come up. Something big under them. The militia called it the Mother of Drains. We never got her.\"\n\n\"Steel's no good. Goes black and brittle. Get salt from Tibb Marrow in the market and throw it when they come at you. A harpoon from Ketta, if you can carry one. Then go at night.\"",
+      "progress": "\"Salt. Night. The courts. And mind the big one.\"",
+      "complete": "Wulf hears you out and then cuts a stroke into the brick by the well, under the militia's names, and another beside it. \"For the courts,\" he says. \"And for you. You're on the roll now, if you want to be.\" He lowers his voice. \"The docker the Mother took last spring had a shard on a string round his neck. Not his. Bought. Ask the burners where a shard like that comes from. That's down, too.\"",
+      "steps": [
+        {
+          "text": "Get salt from Tibb Marrow at the Rust Market.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Tibb Marrow",
+              "text": "Speak with Tibb Marrow",
+              "document": "doc.lowtowns.salt_and_steel",
+              "say": "Tibb Marrow ties a twist of grey salt and holds it up. \"Two crowns, for anyone else. Throw it hard; it's no use in your pocket. White and still, they go, like a rock-pool at low tide.\""
+            }
+          ]
+        },
+        {
+          "text": "Go into the Drain Courts after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.lowtowns",
+              "text": "Stand in the first court at night",
+              "at": {
+                "x": -150,
+                "y": 132
+              },
+              "radius": 10,
+              "night": true,
+              "say": "The court is very quiet. Then the black water in front of the drain mouth stirs, though nothing has touched it."
+            }
+          ]
+        },
+        {
+          "text": "Put down the Weave-Eaters of the courts and the Mother of Drains.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.weaveeater.lowtowns*",
+              "count": 6,
+              "text": "Weave-Eaters"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.drainmother.lowtowns*",
+              "text": "The Mother of Drains",
+              "say": "The Mother of Drains comes apart like smoke in a draught, and for a moment every lamp in the courts burns brighter."
+            }
+          ]
+        },
+        {
+          "text": "Tell Old Wulf it is done.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Old Wulf",
+              "text": "Return to Old Wulf"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 2100,
+        "gold": 140,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 350
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.lowtowns.4",
+      "title": "A Shard of Her Own",
+      "kind": "main",
+      "giver": "Osric Fenn",
+      "turnIn": "Osric Fenn",
+      "zone": "zone.lowtowns",
+      "level": 18,
+      "requires": [
+        "main.lowtowns.3"
+      ],
+      "canonStatus": "GAME-ONLY reading (the shards as memory from the slag: the Sludge-Tunnels' design); the Iron Teeth CANON (B1WB:26)",
+      "summary": "Learn what a shard is at the Shard-Burners' Yard, buy one back, and see where the shards come from: the Iron Teeth's sifters by the Outfall, and the grey-touched in the burners' cellar.",
+      "offer": "Osric Fenn wipes soot off a sliver of pale stone and holds it to the light. \"You want to know where they come from. Everybody does, once.\" He puts the sliver in your palm. It is warm. \"Buy one back off the racks, and hold it, and you'll know what it is. Then go and look at who sifts them. The Iron Teeth, down by the Outfall. And if you've the stomach, my cellar. That's what's left when it's done wrong.\"",
+      "progress": "\"Buy one. Hold it. Then go and look.\"",
+      "complete": "Osric takes the shard back gently, the way you'd take a sleeping cat. \"It isn't hers. Gytha's girl went up, not down. But it's somebody's.\" He sets it on the rack. \"The Teeth's yard-boss by the Outfall is a man called Knuckle Brannoc. He keeps a ledger. Everything that comes up the Outfall's in it, and where it goes after. If anybody down here knows what goes up the hill, it's in that book.\"",
+      "steps": [
+        {
+          "text": "Buy back a shard at the burners' racks.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.lowtowns",
+              "target": "The burners' racks",
+              "text": "A bought-back shard",
+              "item": "item.bought_shard",
+              "document": "doc.lowtowns.what_a_shard_is",
+              "say": "You hold the shard. For a breath there is a kitchen in your head that is not yours, and a woman laughing at something, and then just the warm stone."
+            }
+          ]
+        },
+        {
+          "text": "See who sifts them: the Iron Teeth's sifters by the Outfall.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.sifter.lowtowns*",
+              "count": 5,
+              "text": "Iron Teeth sifters"
+            }
+          ]
+        },
+        {
+          "text": "Go down into the burners' cellar.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.greytouched.lowtowns*",
+              "count": 4,
+              "text": "The grey-touched"
+            }
+          ]
+        },
+        {
+          "text": "Go back to Osric Fenn.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Osric Fenn",
+              "text": "Return to Osric Fenn"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 2500,
+        "gold": 160,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 400
+          }
+        ]
+      }
+    },
+    {
+      "id": "main.lowtowns.5",
+      "title": "Down the Outfall",
+      "kind": "main",
+      "giver": "Osric Fenn",
+      "turnIn": "Gytha Pell",
+      "zone": "zone.lowtowns",
+      "level": 19,
+      "requires": [
+        "main.lowtowns.4"
+      ],
+      "canonStatus": "CANON faction (the Iron Teeth); Knuckle Brannoc, his ledger and the Tally GAME-ONLY; the hand-on to the Sludge-Tunnels (DUNGEON_DESIGN.md) and to the Transit Hub (25-28) PROVISIONAL",
+      "summary": "Take Knuckle Brannoc's ledger from him in the Iron Teeth's yard, look at the Outfall's grating, give the way down to Gorm Rock-Wall and take the word up to Gytha Pell.",
+      "offer": "\"Brannoc,\" Osric says, and spits into the brazier. \"He keeps the yard by the Outfall. Two sifters with him always. He won't give you the ledger. You'll have to take it.\"",
+      "progress": "\"The yard's by the Outfall, south-east, where the Forge District's drain comes out under the wall.\"",
+      "complete": "Gytha reads nothing, but she makes you read it to her twice: the line in another hand. They went up, not down. Leave it. She sits on her step a long time with the ledger in her lap.\n\n\"Up, then,\" she says at last. \"Past the Crown. Wherever that goes.\" She gives you back the ledger and keeps the page with the line on it, folded small. \"You'll go. One day. When there's a way. You'll go up and you'll look.\" It is not a question. \"Until then I'll keep her cup on the sill.\"",
+      "steps": [
+        {
+          "text": "Take Knuckle Brannoc's ledger.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.brannoc.lowtowns*",
+              "text": "Knuckle Brannoc",
+              "say": "Knuckle Brannoc goes down swinging, and keeps swinging after he's down."
+            },
+            {
+              "type": "collect",
+              "zone": "zone.lowtowns",
+              "target": "kill:mob.brannoc.lowtowns*",
+              "text": "Knuckle Brannoc's ledger",
+              "item": "item.brannoc_ledger",
+              "document": "doc.lowtowns.brannoc_ledger"
+            }
+          ]
+        },
+        {
+          "text": "Look at the Outfall's grating, where the ledger's map begins.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.lowtowns",
+              "text": "The Outfall's grating",
+              "at": {
+                "x": 190,
+                "y": -205
+              },
+              "radius": 8,
+              "say": "The grating is old iron, newer bolts. Past it the culvert turns and goes down, and a warm breath comes up it that smells of coin and smoke. The sign is right."
+            }
+          ]
+        },
+        {
+          "text": "Give the way down to Gorm Rock-Wall at the Rusty Spoon.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Gorm Rock-Wall",
+              "text": "Speak with Gorm Rock-Wall",
+              "say": "Gorm reads the ledger's last page with one finger under the words. \"The Tally. Below the Outfall.\" He folds his arms. \"That's a door I'll go through with you, when you're ready. Not before. Bring friends.\""
+            }
+          ]
+        },
+        {
+          "text": "Take the word up to Gytha Pell.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Gytha Pell",
+              "text": "Return to Gytha Pell"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 3000,
+        "gold": 220,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 500
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.gorm.docks",
+      "title": "Dock Work",
+      "kind": "side",
+      "giver": "Gorm Rock-Wall",
+      "turnIn": "Gorm Rock-Wall",
+      "zone": "zone.lowtowns",
+      "level": 16,
+      "requires": [
+        "main.lowtowns.1"
+      ],
+      "minLevel": 15,
+      "canonStatus": "CANON: Gorm Rock-Wall (book1 ch.1:21); the dock-rats GAME-ONLY",
+      "summary": "Gorm minds the quays for Rudd Crake's gang on his nights off. The dock-rats' crews have been at the barges at the south end. Thin them.",
+      "offer": "Gorm sets down his cup. \"Rudd's gang pays me in fish to keep the quays quiet. The fish is bad and the quays aren't quiet. Dock-rats. Crews of them on the barges at the south end, cutting bales and cutting purses.\" He cracks his knuckles, one at a time. \"I'd go, but Mother Sall needs me for the chairs. You go.\"",
+      "progress": "\"South end of the quays. They pole off when they see me. They won't know you.\"",
+      "complete": "\"Good.\" Gorm pushes a plate of something across the table. \"Fish. Rudd's. Don't eat it.\"",
+      "steps": [
+        {
+          "text": "Thin the dock-rats' crews at the south end of the quays.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.dockrat.lowtowns*",
+              "count": 7,
+              "text": "Dock-rats"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1100,
+        "gold": 80,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.aldo.hounds",
+      "title": "Bins and Teeth",
+      "kind": "side",
+      "giver": "Brother Aldo",
+      "turnIn": "Brother Aldo",
+      "zone": "zone.lowtowns",
+      "level": 15,
+      "requires": [
+        "main.lowtowns.1"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "The gutter-hounds have been into the soup-hall's bins and the Rows' children both. Brother Aldo wants them thinned.",
+      "offer": "\"The hounds got into the bins again. And Tilda Grime's arm, last week; she says it was a game, it wasn't.\" Brother Aldo sighs. \"I don't kill things. I feed them. But I'd like you to.\"",
+      "progress": "\"In the Gate Ward's back yards and the Rows. They run in packs. Don't stand still.\"",
+      "complete": "\"Thank you.\" He means it, and it seems to hurt him a little. \"There's soup.\"",
+      "steps": [
+        {
+          "text": "Thin the gutter-hounds.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.gutterhound.lowtowns*",
+              "count": 8,
+              "text": "Gutter-hounds"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1000,
+        "gold": 70,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.aldo.soup",
+      "title": "Brother Aldo's Soup",
+      "kind": "npc",
+      "giver": "Brother Aldo",
+      "turnIn": "Brother Aldo",
+      "zone": "zone.lowtowns",
+      "level": 16,
+      "requires": [
+        "side.aldo.hounds"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "Bring Brother Aldo soup bones from the gutter-hounds, and he will give you the cook's leaf he got from a Golden Cask man who drank in the Spoon.",
+      "offer": "\"Bones. A soup without bones is hot water and hope.\" Brother Aldo taps the copper. \"The hounds you've been putting down. They've bones. Don't look at me like that. Everything in the Lowtowns is somebody's soup in the end.\"",
+      "progress": "\"Four will do. Six would be a feast.\"",
+      "complete": "Aldo drops the bones in the copper and stirs. \"A cook from Oakhaven's inn left me his leaf for the stew, once, for a debt. I've had it by heart for years. Take it. The Rows don't need two of us.\"",
+      "steps": [
+        {
+          "text": "Bring soup bones from the gutter-hounds.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.lowtowns",
+              "target": "kill:mob.gutterhound.lowtowns*",
+              "count": 4,
+              "text": "Soup bones",
+              "item": "item.hound_bone"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 900,
+        "gold": 50,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 120
+          }
+        ],
+        "bagItems": [
+          "leaf.cask_stew"
+        ]
+      }
+    },
+    {
+      "id": "side.nan.lamp",
+      "title": "The Lost Lamp",
+      "kind": "side",
+      "giver": "Nan Tallow",
+      "turnIn": "Nan Tallow",
+      "zone": "zone.lowtowns",
+      "level": 18,
+      "requires": [
+        "main.lowtowns.2"
+      ],
+      "canonStatus": "CANON: Weave-Eaters (book1 ch.1:251); the Lantern-Eater GAME-ONLY",
+      "summary": "Every night a lamp goes out on the lane north of the Spoon, and the next night the one after it. Nan Tallow's brother lives at the end of that lane. Look at the snuffed lamps after dark.",
+      "offer": "\"Something's eating the lamps on the lane north of the Spoon,\" Nan Tallow says, turning a skewer. \"Not the oil. The light. One a night, coming up the lane, and my brother at the end of it.\" She hands you a skewer without asking. \"Go and look at night. Bring me a glass off a dead lamp, so I know I'm not mad.\"",
+      "progress": "\"North of the Spoon. After dark. The lamps that are out.\"",
+      "complete": "Nan turns the black-frosted glass in her greasy fingers. \"Drunk,\" she says. \"Like a cup.\" She puts it on the stall where the customers can see it. \"Folk will want salt now. Tibb'll thank me.\"",
+      "steps": [
+        {
+          "text": "Look at the snuffed lamps after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.lowtowns",
+              "text": "The dark end of the lane",
+              "at": {
+                "x": -68,
+                "y": 52
+              },
+              "radius": 12,
+              "night": true,
+              "say": "Three lamps in a row are cold, their glass frosted black on the inside. The fourth is guttering, and nobody is near it."
+            }
+          ]
+        },
+        {
+          "text": "Take the glass off a snuffed lamp.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.lowtowns",
+              "target": "A snuffed lamp",
+              "text": "A snuffed lamp's glass",
+              "item": "item.lamp_glass"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1300,
+        "gold": 90,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.wulf.drill",
+      "title": "Wulf's Drill",
+      "kind": "side",
+      "giver": "Old Wulf",
+      "turnIn": "Old Wulf",
+      "zone": "zone.lowtowns",
+      "level": 16,
+      "requires": [
+        "main.lowtowns.2"
+      ],
+      "canonStatus": "CANON: the former Lowtown militia (book1 ch.20:127); the drill GAME-ONLY",
+      "summary": "Old Wulf drills the Ward-watch when he's sober. He wants you to carry his orders to the two on the bridges, and show them what a drill is for.",
+      "offer": "\"Two of them on the bridges with a lamp each and no pay, and they think that's a watch.\" Wulf sniffs. \"Tell Hale on the Sett Bridge and Ebba on the Rag Bridge: drill at dawn, by the well. And go and put down some of those dock-rats so they see it can be done.\"",
+      "progress": "\"Hale on the Sett Bridge, Ebba on the Rag Bridge, and some rats for the lesson.\"",
+      "complete": "\"They came,\" Wulf says, surprised. \"Both of them. Hale brought a spear off a scrap heap.\" He almost smiles. \"That's how we started.\"",
+      "steps": [
+        {
+          "text": "Carry the drill to the Ward-watch on both bridges.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Hale Dunning",
+              "text": "Tell Hale Dunning"
+            },
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Ebba Strand",
+              "text": "Tell Ebba Strand"
+            }
+          ]
+        },
+        {
+          "text": "Show them it can be done: put down dock-rats.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.dockrat.lowtowns*",
+              "count": 4,
+              "text": "Dock-rats"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1150,
+        "gold": 70,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 200
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.ketta.harpoons",
+      "title": "Ketta's Harpoons",
+      "kind": "npc",
+      "giver": "Ketta Rune",
+      "turnIn": "Ketta Rune",
+      "zone": "zone.lowtowns",
+      "level": 17,
+      "requires": [
+        "main.lowtowns.2"
+      ],
+      "canonStatus": "CANON: bone harpoons on amber rope (book1 ch.20:177-191); the threads GAME-ONLY",
+      "summary": "Ketta Rune binds her harpoon-heads with Weave-Eater thread, the old way. Bring her the threads the Eaters leave.",
+      "offer": "\"A harpoon's only as good as its binding, and the best binding is a thread of the thing you're hunting.\" Ketta Rune holds up a bone head, bare. \"An Eater leaves a thread when it goes. Black, like silk. Bring me some, and I'll bind you a fair price into the bargain.\"",
+      "progress": "\"The courts, at night. When one comes apart, look on the ground.\"",
+      "complete": "Ketta winds the black thread round a bone head and it tightens of itself. \"See? It wants to go home.\" She grins. \"You'll get your price.\"",
+      "steps": [
+        {
+          "text": "Bring Weave-Eater threads from the Drain Courts.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.lowtowns",
+              "target": "kill:mob.weaveeater.lowtowns*",
+              "count": 3,
+              "text": "Weave-Eater threads",
+              "item": "item.eater_thread"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1300,
+        "gold": 110,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ludo.bales",
+      "title": "The Carter's Bales",
+      "kind": "side",
+      "giver": "Ludo Brand",
+      "turnIn": "Ludo Brand",
+      "zone": "zone.lowtowns",
+      "level": 16,
+      "requires": [
+        "main.lowtowns.1"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "The dock-rats have been cutting bales off Ludo Brand's barges and selling them back to him. Get his bales back.",
+      "offer": "\"My own bales, in my own knot, sold back to me in my own yard.\" Ludo Brand is very red. \"Dock-rats. They've a crew on the barges at the south end. Get my bales back off them. You'll know them by the knot.\"",
+      "progress": "\"South end of the quays. Look for the knot.\"",
+      "complete": "Ludo turns the bales over, checking every knot. \"Mine. Mine. Mine.\" He looks up. \"I'll cart for you for nothing, any day you like. Within reason.\"",
+      "steps": [
+        {
+          "text": "Take Ludo's bales back from the dock-rats.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.lowtowns",
+              "target": "kill:mob.dockrat.lowtowns*",
+              "count": 4,
+              "text": "Ludo's bales",
+              "item": "item.carter_bale"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1150,
+        "gold": 80,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.odo.parcel",
+      "title": "An Errand for the Antiquities",
+      "kind": "side",
+      "giver": "Odo Sark",
+      "turnIn": "Odo Sark",
+      "zone": "zone.lowtowns",
+      "level": 17,
+      "requires": [
+        "main.lowtowns.2"
+      ],
+      "giveOnAccept": [
+        "item.seer_parcel"
+      ],
+      "canonStatus": "CANON: the Blind Seer's Antiquities and the Iron Teeth (book1 ch.3:13, ch.7:21); the errand GAME-ONLY. The back room is not entered.",
+      "summary": "The Antiquities' clerk wants a parcel carried to Grimbold, the Iron Teeth's factor, by someone the Teeth don't know. Don't shake it.",
+      "offer": "Odo Sark smiles the way a clean window smiles. \"A small errand. A parcel for Grimbold, the Teeth's man by the warehouse. It wants carrying by someone nobody has a reason to stop.\" He sets it in your hands. It is heavier than it looks. \"Don't shake it. Don't open it. The back room would be disappointed.\"",
+      "progress": "\"Grimbold. The warehouse. Gently.\"",
+      "complete": "Odo Sark takes the receipt without reading it and puts it in a drawer. \"The back room thanks you for not asking,\" he says. \"That's a phrase we use. You'll hear it again, if you're lucky. Or if you aren't.\"",
+      "steps": [
+        {
+          "text": "Take the parcel to Grimbold at the Iron Teeth's warehouse.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.lowtowns",
+              "target": "Grimbold",
+              "text": "Give Grimbold the parcel",
+              "item": "item.seer_parcel",
+              "say": "Grimbold weighs the parcel in his hand, does not shake it, and writes a receipt. \"Tell the clerk paid in full.\""
+            }
+          ]
+        },
+        {
+          "text": "Bring the receipt back to Odo Sark.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.lowtowns",
+              "target": "Odo Sark",
+              "text": "Return to Odo Sark"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1050,
+        "gold": 60,
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 100
+          }
+        ],
+        "documents": [
+          "doc.lowtowns.seer_receipt"
+        ]
+      }
+    },
+    {
+      "id": "bounty.lowtowns.hounds",
+      "title": "Hounds in the Yards",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.lowtowns",
+      "level": 15,
+      "canonStatus": "GAME-ONLY bounty",
+      "summary": "The Rows want six gutter-hounds fewer.",
+      "offer": "Chalked on a slate and nailed up: SIX HOUNDS, FIFTY CROWNS, the Rows pay. Somebody has drawn teeth.",
+      "complete": "Fifty crowns in a twist of rag, from the Rows. Somebody has written THANKS on the rag in charcoal.",
+      "steps": [
+        {
+          "text": "Kill six gutter-hounds.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.gutterhound.lowtowns.*",
+              "count": 6,
+              "text": "Gutter-hounds"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 320,
+        "gold": 50
+      },
+      "poster": "lowtowns"
+    },
+    {
+      "id": "bounty.lowtowns.dockrats",
+      "title": "Rats on the Barges",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.lowtowns",
+      "level": 16,
+      "canonStatus": "GAME-ONLY bounty",
+      "summary": "Rudd Crake's gang posts for five dock-rats.",
+      "offer": "DOCK-RATS, FIVE, SIXTY CROWNS. Rudd Crake's mark, an anchor with a bite out of it.",
+      "complete": "Sixty crowns, smelling of the river.",
+      "steps": [
+        {
+          "text": "Kill five dock-rats.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.dockrat.lowtowns.*",
+              "count": 5,
+              "text": "Dock-rats"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 360,
+        "gold": 60
+      },
+      "poster": "lowtowns"
+    },
+    {
+      "id": "bounty.lowtowns.sifters",
+      "title": "Sifters by the Outfall",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.lowtowns",
+      "level": 18,
+      "canonStatus": "CANON faction (the Iron Teeth); GAME-ONLY bounty",
+      "summary": "Somebody without a name posts for the Iron Teeth's sifters.",
+      "offer": "No mark, a fine hand: FOUR SIFTERS BY THE OUTFALL. EIGHTY CROWNS. Asked by someone who would rather not be.",
+      "complete": "Eighty crowns under the board in clean paper. No name on it.",
+      "steps": [
+        {
+          "text": "Kill four Iron Teeth sifters.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.sifter.lowtowns.*",
+              "count": 4,
+              "text": "Iron Teeth sifters"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 420,
+        "gold": 80
+      },
+      "poster": "lowtowns"
+    },
+    {
+      "id": "bounty.lowtowns.courts",
+      "title": "A Night in the Courts",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.lowtowns",
+      "level": 17,
+      "canonStatus": "GAME-ONLY bounty",
+      "summary": "The Ward-watch posts for someone to walk the Drain Courts after dark.",
+      "offer": "THE COURTS AT NIGHT. WALK THEM. SEVENTY CROWNS. The Ward-watch's lamp drawn under it, and under that, in another hand: rather you than us.",
+      "complete": "Seventy crowns from Ebba Strand, who counts them twice and gives you one more.",
+      "steps": [
+        {
+          "text": "Walk the Drain Courts after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.lowtowns",
+              "text": "The courts after dark",
+              "at": {
+                "x": -128,
+                "y": 165
+              },
+              "radius": 14,
+              "night": true
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 380,
+        "gold": 70
+      },
+      "poster": "lowtowns"
+    },
+    {
+      "id": "bounty.lowtowns.courier",
+      "title": "A Bureau Courier at the Gate",
+      "kind": "bounty",
+      "giver": "board",
+      "turnIn": "board",
+      "zone": "zone.lowtowns",
+      "level": 19,
+      "canonStatus": "CANON-EXPANDED (the Investigation Bureau; Aether-Geodes)",
+      "summary": "A rare posting. A Bureau courier comes in by Gate Street with an Aether-Geode shard. Take it; slag-iron under the board.",
+      "offer": "A dock-rope knot pinning a scrap: A BUREAU COURIER on Gate Street tonight, a lead box, a STONE THAT HUMS. Somebody's memory, cut for the Crown's lamps. Take it from him. Slag-iron under the board.",
+      "complete": "The shard hums in your hand; under the board, three bars of slag-iron in sacking.",
+      "steps": [
+        {
+          "text": "Kill the Bureau courier and take the Aether-Geode shard.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.lowtowns",
+              "target": "mob.courier.lowtowns.*",
+              "text": "The Bureau courier",
+              "say": "The courier falls on the setts, the lead box humming in his arms."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 600,
+        "gold": 160,
+        "bagItems": [
+          "mat.geode_shard",
+          "mat.slagiron_bar",
+          "mat.slagiron_bar",
+          "mat.slagiron_bar"
+        ],
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 100
+          }
+        ]
+      },
+      "poster": "saltmenders",
+      "rare": true
+    }
+  ]
+}

@@ -43,6 +43,9 @@ namespace Crulanda.Encounter
         public string pool; public int restore;
         /// <summary>A cure: it lifts the harmful workings on the drinker (poisons, bleeds, the grey; StatusEffectRuntime.RemoveHarmful).</summary>
         public bool cure;
+        /// <summary>A consumable thrown at the target instead of taken (the Lowtowns, Phase 9.1; WeaveEaterRules): "salt" (calcifies a
+        /// Weave-Eater) or "harpoon" (a bone harpoon on amber rope: pins a spirit). Empty for anything else.</summary>
+        public string thrown;
     }
     /// <summary>What a merchant sells: by NPC name, or by role (merchant, blacksmith, baker, herbalist...) for anyone of that trade.</summary>
     [Serializable] public sealed class VendorDef { public string npc, role; public string[] items = new string[0]; public bool gearForZone; }

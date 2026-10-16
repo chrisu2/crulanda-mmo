@@ -27,7 +27,7 @@ namespace Crulanda.Tests
         [Test] public void Every_zone_is_read()
         {
             var ids = zones.Select(z => z.id).ToList();
-            foreach (var id in new[] { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.adit" }) CollectionAssert.Contains(ids, id);
+            foreach (var id in new[] { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.adit", "zone.lowtowns" }) CollectionAssert.Contains(ids, id);
         }
         [Test] public void Every_ordinary_camp_mob_has_exactly_one_move()
         {

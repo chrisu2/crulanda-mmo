@@ -135,6 +135,7 @@ namespace Crulanda.Encounter
         public static string KindWord(ItemDef d)
         {
             if (d == null) return "Potion";
+            if (!string.IsNullOrEmpty(d.thrown)) return "Thrown";   // salt and the bone harpoon (the Lowtowns, WeaveEaterRules)
             if (d.food) return "Food";
             if (HasBuff(d)) return d.buff.kind == "salve" ? "Salve" : "Tincture";
             return (d.restore > 0 || d.cure) && d.heal <= 0 ? "Draught" : "Potion";

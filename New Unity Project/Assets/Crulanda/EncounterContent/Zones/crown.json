@@ -1827,9 +1827,12 @@
         "title": "High Councilor",
         "at": {
           "x": 0,
-          "y": 127.6
+          "y": 129.5
         },
-        "canonStatus": "CANON: High Councilor Aethelgard, the face of the Council (world_bible.md; b1 ch.12). His lines are GAME-ONLY; he is visited, never fought.",
+        "seated": true,
+        "facing": 180,
+        "look": "councilor",
+        "canonStatus": "CANON: High Councilor Aethelgard, the face of the Council (world_bible.md; b1 ch.12). His lines are GAME-ONLY; he is visited, never fought. His look: CANON, ancient, pale skin tight on the skull, robes of white silk worked in geometric patterns (b1 ch.12:365); GAME-ONLY, the gold trim, the high collar, the chain of office, the rings and the throne he sits on (2026-10-16).",
         "stories": [
           "The Greater Good is not a slogan, traveller. It is arithmetic. Some sums are simply larger than others.",
           "The east greys a little more each season. The Council has the matter in hand. The Council always has the matter in hand.",
@@ -1840,9 +1843,10 @@
         "name": "Clerk Odo Vantry",
         "role": "council-clerk",
         "title": "Clerk of the Council",
+        "look": "scholar",
         "at": {
-          "x": 2.2,
-          "y": 126.6
+          "x": 2,
+          "y": 128.6
         },
         "canonStatus": "GAME-ONLY",
         "stories": [

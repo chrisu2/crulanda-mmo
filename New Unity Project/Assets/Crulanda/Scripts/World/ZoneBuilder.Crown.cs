@@ -415,6 +415,7 @@ namespace Crulanda.World
         {
             const float th = .5f;
             Part(PrimitiveType.Cube, t, new Vector3(0, .025f, 0), new Vector3(w - th, .05f, d - th), Marble);
+            HallFloor(t, w - th, d - th, .05f);
             GameObject Piece(Vector3 at, Vector3 size) { var o = BoxPart(t, at, size, wall); o.AddComponent<BoxCollider>(); o.AddComponent<NavBlocker>(); return o; }
             Piece(new Vector3(0, wallH / 2, d / 2), new Vector3(w, wallH, th));
             foreach (int s in new[] { -1, 1 }) Piece(new Vector3(s * w / 2, wallH / 2, 0), new Vector3(th, wallH, d));
@@ -443,6 +444,16 @@ namespace Crulanda.World
             foreach (int s in new[] { -1, 1 }) for (float x = doorW / 2 + 2.2f; x <= w / 2 - 2f; x += 3.4f) CityWindow(t, new Vector3(s * x, wy, -d / 2), 0, 1.1f, wh, th);
             HallLight(t, new Vector3(0, H - 1.2f, 0), Mathf.Max(w, d) * .75f, 1.3f);
             if (w * d > 300) foreach (int s in new[] { -1, 1 }) HallLight(t, new Vector3(0, H - 1.2f, s * d / 4), Mathf.Max(w, d) * .5f, .8f);
+        }
+        /// <summary>
+        /// A hall's floor made solid (2026-10-16, Chris in the audience hall: "falling through the floor"): a box collider over the whole
+        /// room inside the walls, from a metre under the ground up to the floor's top, so you stand on the floor you see and not sunk in it
+        /// on the ground under it. Not cut from the navmesh (the ground under it is walked); the inn's floor has one too (ZoneBuilder.Inn).
+        /// </summary>
+        void HallFloor(Transform t, float w, float d, float top)
+        {
+            var o = new GameObject("Floor"); o.transform.SetParent(t, false);
+            var box = o.AddComponent<BoxCollider>(); box.center = new Vector3(0, top - .5f, 0); box.size = new Vector3(w, 1, d);
         }
         /// <summary>A gable roof of blue-grey slate (or gilt tiles) over a hall, ridge along x, closed at its ends, a gilt ridge.</summary>
         void HallRoof(Transform t, float w, float d, float wallH, float roofH, Material roofMat)
@@ -473,8 +484,8 @@ namespace Crulanda.World
         /// The Council Keep (GAME-ONLY name; the Council in the Crown is CANON): the castle at the north-centre, the city's central point. A
         /// white block four towers at its corners, crenellated, gilt pyramids on them; from its back rises the great tower to 46 m with a
         /// pinnacle at each corner and the tall gilt spire, its tip about 73 m up. Inside, the audience hall: columns down both sides, a
-        /// white and gold runner to a dais, the throne of white stone and gilt at the back (where High Councilor Aethelgard stands before
-        /// it, ZoneLife), Council banners on the walls and chandeliers. Door to the south (-Z).
+        /// white and gold runner to the stepped dais, the throne of white stone and gilt on it (where High Councilor Aethelgard sits, a
+        /// seated post in ZoneLife: <see cref="ThroneDais"/>), Council banners on the walls and chandeliers. Door to the south (-Z).
         /// </summary>
         void CouncilKeep(Transform t, Vector2 size)
         {
@@ -523,21 +534,15 @@ namespace Crulanda.World
                 Solidify(Part(PrimitiveType.Cylinder, t, at + Vector3.up * H / 2, new Vector3(1.1f, H / 2, 1.1f), Marble));
                 Part(PrimitiveType.Cube, t, at + Vector3.up * .25f, new Vector3(1.6f, .5f, 1.6f), CityShade); Part(PrimitiveType.Cube, t, at + Vector3.up * (H - .3f), new Vector3(1.5f, .6f, 1.5f), Gilt);
             }
-            Part(PrimitiveType.Cube, t, new Vector3(0, .07f, -2.6f), new Vector3(3, .03f, d - 6.4f), CouncilCloth);
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.45f, .08f, -2.6f), new Vector3(.18f, .03f, d - 6.4f), CouncilGold);
-            Part(PrimitiveType.Cube, t, new Vector3(0, .08f, d / 2 - 2.85f), new Vector3(12, .16f, 5.2f), Marble);   // the dais: a low step, walked onto
-            Part(PrimitiveType.Cube, t, new Vector3(0, .17f, d / 2 - 5.45f), new Vector3(12, .04f, .12f), Gilt);
-            var throne = new Vector3(0, .16f, d / 2 - 1.6f);
-            BoxPart(t, throne + new Vector3(0, .5f, 0), new Vector3(1.8f, 1, 1.3f), Marble);
-            BoxPart(t, throne + new Vector3(0, 2.1f, .5f), new Vector3(1.8f, 3.2f, .35f), Marble);
-            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, throne + new Vector3(s * .95f, 1.25f, 0), new Vector3(.22f, .7f, 1.2f), Gilt);
-            Part(PrimitiveType.Cube, t, throne + new Vector3(0, 1.08f, -.05f), new Vector3(1.4f, .12f, 1.1f), CouncilCloth);
-            CrownDevice(t, throne + new Vector3(0, 3.4f, .3f), 0, 1, Gilt);
-            Blocker(t, throne + new Vector3(0, 1.8f, .1f), new Vector3(2.2f, 3.6f, 1.8f));
+            // The runner from the door to the dais's first step (ThroneDais carries it on up the steps).
+            float runFrom = -d / 2 + .6f, runTo = DaisFront(d);
+            Part(PrimitiveType.Cube, t, new Vector3(0, .07f, (runFrom + runTo) / 2), new Vector3(3, .03f, runTo - runFrom), CouncilCloth);
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.45f, .08f, (runFrom + runTo) / 2), new Vector3(.18f, .03f, runTo - runFrom), CouncilGold);
+            ThroneDais(t, d);
             foreach (int s in new[] { -1, 1 }) for (int k = 0; k < 2; k++) CouncilBanner(t, new Vector3(s * (w / 2 - .3f), 9.5f, -5 + k * 8), s < 0 ? 270 : 90, 1.8f, 5);
             CouncilBanner(t, new Vector3(-5, 9.5f, d / 2 - .3f), 0, 1.8f, 5); CouncilBanner(t, new Vector3(5, 9.5f, d / 2 - .3f), 0, 1.8f, 5);   // on the back wall, facing the door
             foreach (float z in new[] { -5f, 3f }) ModelProp(t, "Fantasy/Chandelier", new Vector3(0, H - 2.2f, z), 0, 1.4f);
-            foreach (int s in new[] { -1, 1 }) { Brazier(t, new Vector3(s * 5.4f, .16f, d / 2 - 1.6f), Gilt); Glow(t, new Vector3(s * 5.4f, 1.6f, d / 2 - 1.6f), 7, 1.1f, new Color(1, .7f, .4f), 1.6f); }
+            foreach (int s in new[] { -1, 1 }) { Brazier(t, new Vector3(s * 4.2f, DaisTop, d / 2 - 1.2f), Gilt); Glow(t, new Vector3(s * 4.2f, DaisTop + 1.45f, d / 2 - 1.2f), 7, 1.1f, new Color(1, .7f, .4f), 1.6f); }
             // The Council's clerks' desks down the side aisles, against the walls (p9-cityinn): a sloped desk of dark oak with its papers
             // and a candle, solid; a clerk writes at each, and the pages and water-carriers come in by the door (the city's "keep").
             foreach (int s in new[] { -1, 1 })
@@ -551,6 +556,87 @@ namespace Crulanda.World
                     Workplace(t, "keep", desk + new Vector3(-s * 1.55f, 0, 0), desk + new Vector3(0, 1, 0));
                 }
             foreach (int s in new[] { -1, 1 }) Workplace(t, "keep", new Vector3(s * 3, 0, -d / 2 + 3), new Vector3(0, 1, 0));
+            _ = r;
+        }
+        /// <summary>The audience hall's dais (in the keep's frame, its depth <paramref name="d"/>): three steps, each <see cref="DaisRise"/>
+        /// up and <see cref="DaisTread"/> deep, the first step's front <see cref="DaisFront"/>, the top <see cref="DaisTop"/> over the floor.</summary>
+        public const float DaisRise = .2f, DaisTread = .4f, DaisTop = DaisSteps * DaisRise; public const int DaisSteps = 3;
+        public static float DaisFront(float d) { return d / 2 - 5.2f; }
+        /// <summary>The throne's seat on the dais (the keep's frame): where the High Councilor's seated post is (his hips; the sitting clip
+        /// puts them over the post, ActorVisual.SitShift), the cushion <see cref="ThroneSeatHeight"/> over the dais, the back behind it.</summary>
+        public static Vector3 ThroneSeat(float d) { return new Vector3(0, DaisTop, d / 2 - 2.5f); }
+        public const float ThroneSeatHeight = .46f;
+        /// <summary>
+        /// The dais at the head of the audience hall and the throne on it (GAME-ONLY; 2026-10-16, Chris: "he needs more regal attire and
+        /// sitting on a throne"). Three steps of white marble, each narrower than the one below, each solid (a box collider from under the
+        /// floor up to its tread, so nobody sinks into it as they did the old 16 cm step) and walked on (in the navmesh), a gilt nosing on
+        /// each and the runner carried up them. The throne: a seat of white stone with a cushion at a stool's height (the inn's sitting), arms
+        /// capped in gilt, a high carved back with a pointed crest, gilt finials and the Council's crown device; solid to you, but not cut
+        /// from the navmesh (the High Councilor's post is on its seat). Behind it on the wall, a cloth of estate in white and gold under a
+        /// canopy with a gilt valance; the hall's banners either side. Its foot is in talk reach of the seat (the first step about 2.7 m
+        /// in front of it).
+        /// </summary>
+        void ThroneDais(Transform t, float d)
+        {
+            float back = d / 2 - .25f, front = DaisFront(d); var seat = ThroneSeat(d); float top = seat.y, sz = seat.z;
+            for (int k = 0; k < DaisSteps; k++)
+            {
+                float z0 = front + k * DaisTread, tread = (k + 1) * DaisRise, wide = 12 - k * .8f;
+                var step = BoxPart(t, new Vector3(0, (tread - .3f) / 2, (z0 + back) / 2), new Vector3(wide, tread + .3f, back - z0), Marble);
+                step.name = "Dais step " + (k + 1); step.AddComponent<BoxCollider>(); step.AddComponent<NavWalkable>();
+                Part(PrimitiveType.Cube, t, new Vector3(0, tread - .02f, z0 + .03f), new Vector3(wide + .02f, .05f, .08f), Gilt).name = "Nosing";
+                // The runner on up: each tread, and on the top as far as the throne's foot.
+                float runEnd = k < DaisSteps - 1 ? z0 + DaisTread : sz - .3f;
+                Part(PrimitiveType.Cube, t, new Vector3(0, tread + .015f, (z0 + .08f + runEnd) / 2), new Vector3(3, .03f, runEnd - z0 - .08f), CouncilCloth);
+                foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.45f, tread + .025f, (z0 + .08f + runEnd) / 2), new Vector3(.18f, .03f, runEnd - z0 - .08f), CouncilGold);
+            }
+            // The throne. The seat: white stone to a stool's height under a white cushion, a gilt band along its front.
+            var throne = new GameObject("Throne").transform; throne.SetParent(t, false); throne.localPosition = new Vector3(0, top, sz);
+            GameObject Stone(Vector3 at, Vector3 size, Material m) { var o = BoxPart(throne, at, size, m); o.AddComponent<BoxCollider>(); return o; }
+            Stone(new Vector3(0, .19f, 0), new Vector3(1.5f, .38f, .5f), Marble).name = "Throne seat";
+            Part(PrimitiveType.Cube, throne, new Vector3(0, ThroneSeatHeight - .045f, -.01f), new Vector3(1.24f, .09f, .5f), CouncilCloth);
+            Part(PrimitiveType.Cube, throne, new Vector3(0, .3f, -.255f), new Vector3(1.54f, .06f, .02f), Gilt);
+            Part(PrimitiveType.Cube, throne, new Vector3(0, .04f, -.26f), new Vector3(1.6f, .08f, .06f), Gilt);   // the plinth's gilt foot
+            // The arms: white stone capped in gilt, a gilt ball at each front.
+            foreach (int s in new[] { -1, 1 })
+            {
+                Stone(new Vector3(s * .86f, .4f, .02f), new Vector3(.22f, .8f, .56f), Marble).name = "Throne arm";
+                Part(PrimitiveType.Cube, throne, new Vector3(s * .86f, .82f, .02f), new Vector3(.27f, .05f, .6f), Gilt);
+                Part(PrimitiveType.Sphere, throne, new Vector3(s * .86f, .92f, -.25f), Vector3.one * .15f, Gilt);
+                Part(PrimitiveType.Cube, throne, new Vector3(s * .86f, .45f, -.27f), new Vector3(.24f, .06f, .02f), Gilt);
+            }
+            // The back: high white stone, a white padded panel in a gilt frame, the crown device over it, a pointed crest edged in gilt,
+            // gilt finials at its shoulders and its point.
+            Stone(new Vector3(0, 1.8f, .42f), new Vector3(1.7f, 3.6f, .35f), Marble).name = "Throne back";
+            Part(PrimitiveType.Cube, throne, new Vector3(0, 1.25f, .23f), new Vector3(1.1f, 1.5f, .06f), CouncilCloth);
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cube, throne, new Vector3(s * .59f, 1.25f, .23f), new Vector3(.06f, 1.62f, .08f), Gilt);
+                Part(PrimitiveType.Cube, throne, new Vector3(0, 1.25f + s * .78f, .23f), new Vector3(1.24f, .06f, .08f), Gilt);
+                Part(PrimitiveType.Cube, throne, new Vector3(s * .86f, 1.9f, .25f), new Vector3(.05f, 3.4f, .05f), Gilt);   // the back's gilt edges
+                Part(PrimitiveType.Cylinder, throne, new Vector3(s * .85f, 3.72f, .42f), new Vector3(.16f, .12f, .16f), Gilt);
+                Part(PrimitiveType.Sphere, throne, new Vector3(s * .85f, 3.92f, .42f), Vector3.one * .2f, Gilt);
+            }
+            CrownDevice(throne, new Vector3(0, 2.75f, .22f), 0, .85f, Gilt);
+            Part(PrimitiveType.Cube, throne, new Vector3(0, 3.6f, .42f), new Vector3(1.1f, 1.1f, .33f), Marble, Quaternion.Euler(0, 0, 45));   // the crest
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, throne, new Vector3(s * .39f, 3.99f, .24f), new Vector3(1.1f, .06f, .05f), Gilt, Quaternion.Euler(0, 0, -s * 45));
+            Part(PrimitiveType.Sphere, throne, new Vector3(0, 4.42f, .42f), Vector3.one * .24f, Gilt);
+            Part(PrimitiveType.Cylinder, throne, new Vector3(0, 4.66f, .42f), new Vector3(.05f, .14f, .05f), Gilt);
+            // The cloth of estate on the wall behind (white, a gold hem and edges, the crown on it) under a canopy with a gilt valance.
+            var cloth = new Vector3(0, top + 2.9f, back - .04f);
+            Part(PrimitiveType.Cube, t, cloth, new Vector3(3.2f, 5.6f, .04f), CouncilCloth);
+            Part(PrimitiveType.Cube, t, cloth + new Vector3(0, -2.75f, -.02f), new Vector3(3.24f, .18f, .05f), CouncilGold);
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, cloth + new Vector3(s * 1.56f, 0, -.02f), new Vector3(.14f, 5.6f, .05f), CouncilGold);
+            CrownDevice(t, cloth + new Vector3(0, 2.5f, -.05f), 0, 1.1f, Gilt);   // over the throne's crest
+            float canopyZ = back - 1.3f, canopyY = top + 5.75f;
+            Part(PrimitiveType.Cube, t, new Vector3(0, canopyY, canopyZ), new Vector3(3.6f, .22f, 2.6f), CouncilCloth);
+            Part(PrimitiveType.Cube, t, new Vector3(0, canopyY - .28f, canopyZ - 1.3f), new Vector3(3.64f, .5f, .04f), CouncilGold);
+            foreach (int s in new[] { -1, 1 })
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(s * 1.8f, canopyY - .28f, canopyZ), new Vector3(.04f, .5f, 2.6f), CouncilGold);
+                Part(PrimitiveType.Cylinder, t, new Vector3(s * 1.75f, canopyY + .92f, canopyZ), new Vector3(.04f, 1.6f, .04f), Gilt, Quaternion.Euler(54.6f, 0, 0));   // a gilt rod from its front corner up to the wall
+            }
+            Part(PrimitiveType.Cube, t, new Vector3(0, canopyY + .14f, canopyZ - 1.3f), new Vector3(3.7f, .08f, .08f), Gilt);
         }
 
         // ---------- the Council Hall ----------

@@ -139,8 +139,10 @@ namespace Crulanda.World
     /// canon (GAME-ONLY lines about CANON things), said one time in three when spoken to (ZoneLore.Story).
     /// </summary>
     /// look: a resident's own body ("keeper", a Veridian Keeper; "concord", the Concord's warden look, friendly: the Council's wardens
-    /// in the Crown). canonStatus (optional): the lore status of the person and their lines (High Councilor Aethelgard is CANON).
-    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look, canonStatus; public Vector2 at; public bool works; public string[] stories = new string[0]; }
+    /// in the Crown; "councilor", the High Councilor's white and gold robes of state; "scholar", a clerk's dark robe). canonStatus
+    /// (optional): the lore status of the person and their lines (High Councilor Aethelgard is CANON). seated: a post kept sitting, never
+    /// standing (the High Councilor on his throne), facing <c>facing</c> (a yaw in degrees: 0 north, +Z; 180 south), even when spoken to.
+    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look, canonStatus; public Vector2 at; public bool works, seated; public float facing; public string[] stories = new string[0]; }
     /// <summary>A named person's stories (<see cref="ZoneLife.stories"/>): name as the villager is named, and their lines.</summary>
     [Serializable] public sealed class ZoneStory { public string name; public string[] lines = new string[0]; }
     /// <summary>

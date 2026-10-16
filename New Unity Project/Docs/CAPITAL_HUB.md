@@ -161,3 +161,17 @@ Chris (verbatim): "dont need the same exact inn in the castle. needs a redesign"
 - **Frames**: "The Crown of Argentis" from a free camera 110 m over the south-east (`viewHeight`/`viewAim` on a landmark); the Council Hall from over the colonnade; the Lantern's front.
 - **Oakhaven's skyline**: the Crown on its mountain to the north (`skyline` in the zone file, `DistantSkyline.cs`; the forest ring dips for it), capture `oakhaven-83-skyline-crown.png`.
 - To run: EditMode `CrownZoneTests`; PlayMode `CrownLifeTests`, `CrownZonePlayTests`, `BuildingGroundTests`; the world capture of zone.crown and of zone.oakhaven.
+## Status (p9-throne, 2026-10-16)
+Written, compile-checked, not yet run in Unity (EditMode `CrownThroneTests`, PlayMode `CrownThronePlayTests` to run; captures of the
+audience hall front, side and from the door to take). Chris: "falling through the floor. he needs more regal attire and sitting on a throne".
+- **The floor:** the halls' floors were a 5 cm marble slab with no collider over the ground, and the keep's dais a 16 cm step with none:
+  you (and Aethelgard) stood sunk in them. Every hall's floor now has a solid box under it at its top (`HallFloor`; the inn's too); the
+  ground under every hall was checked level with its foot (it is: all inside the terraces).
+- **The throne (GAME-ONLY):** a dais of three solid, walkable steps (in the navmesh), the runner carried up them; the throne of white stone
+  and gilt, a cushion at a stool's height, gilt-capped arms, a high back with the Council's crown, a pointed crest and finials; a cloth of
+  estate behind under a canopy with a gilt valance (`ZoneBuilder.ThroneDais`).
+- **Aethelgard seated:** a seated post (`seated`, `facing` on a resident): the inn's sitting on the throne's seat, facing the hall, still
+  seated and facing the hall when spoken to; spoken to from the foot of the dais. His clerk now stands at his right hand on the dais.
+- **Robes of state** (look `councilor`; CANON: ancient, pale, white silk worked in geometric patterns, b1 ch.12:365; GAME-ONLY: the
+  gold, the high collar, the chain of office, the rings; no crown). The clerk's look `scholar`: a dark robe, bands, a ledger. The wardens
+  keep the Concord look.

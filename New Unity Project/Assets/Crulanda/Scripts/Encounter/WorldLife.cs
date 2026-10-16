@@ -138,7 +138,7 @@ namespace Crulanda.Encounter
                     string place = r.place ?? "green";
                     if (r.at != Vector2.zero) { place = "post:" + r.name; Places[place] = new List<Vector3>(); AddPlace(place, r.at); }   // a fixed post
                     var start = RandomPlace(place) ?? Zone.Ground(r.at != Vector2.zero ? r.at : z.spawns.recovery);
-                    Settle(Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, null, start, null, place, r.title, r.look), household);
+                    Settle(Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, null, start, null, place, r.title, r.look, null, r.seated, r.facing), household);
                 }
             // One hen-wife per coop, living in her household's house (without households, the house nearest her coop). The coop
             // starts open or shut for the hour.
@@ -1007,6 +1007,10 @@ namespace Crulanda.Encounter
         public bool Resident { get { return fixedPlace != null; } }
         /// <summary>A Veridian Keeper (the Verdant Shore's wood-folk): their own body and their own lines.</summary>
         public bool Keeper { get; private set; }
+        /// <summary>A post kept sitting (the High Councilor on his throne, ZoneResident.seated): seated there, never standing, facing
+        /// <see cref="SeatYaw"/> even when spoken to; the talk is from the foot of his dais.</summary>
+        public bool Seated { get; private set; }
+        public float SeatYaw { get; private set; }
         /// <summary>Trade shown under the name (&lt;Blacksmith&gt;), or null.</summary>
         public string Title { get; private set; }
         /// <summary>A day hand in the fields (VillageLife.SpawnFarmhands): housed, but of no household.</summary>
@@ -1050,7 +1054,7 @@ namespace Crulanda.Encounter
         /// <summary>When a hunter who lives at a lodge sets off for bed: Oakhaven's is about a game hour's walk from the green.</summary>
         public const float HunterBed = 19.8f;
 
-        public static Villager Spawn(VillageLife life, string name, string role, int index, ZoneDoor home, Vector3 at, ZoneCoop coop = null, string fixedPlace = null, string title = null, string look = null, ZoneFold fold = null)
+        public static Villager Spawn(VillageLife life, string name, string role, int index, ZoneDoor home, Vector3 at, ZoneCoop coop = null, string fixedPlace = null, string title = null, string look = null, ZoneFold fold = null, bool seated = false, float seatYaw = 0)
         {
             var go = new GameObject(name); go.SetActive(false); go.transform.position = at + Vector3.up;
             go.transform.SetParent(life.transform, false); go.transform.position = at + Vector3.up;
@@ -1064,9 +1068,11 @@ namespace Crulanda.Encounter
             v.Keeper = look == "keeper";
             // A Council warden of the Crown (look "concord"): the Concord's warden in its white tabard, friendly (ZoneBuilder.Crown; GAME-ONLY).
             bool concord = look == "concord";
-            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper || concord ? null : VillageWork.OutfitOf(role));
+            // A costume of the Crown (ActorVisual.Dress): "councilor", the High Councilor's robes of state; "scholar", a clerk's dark robe.
+            string dress = look == "councilor" || look == "scholar" ? look : VillageWork.OutfitOf(role);
+            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper || concord ? null : dress);
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
-            v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
+            v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace; v.Seated = seated && fixedPlace != null; v.SeatYaw = seatYaw;
             v.Coop = coop; v.Fold = fold;
             // Bed and rising: the baker is up before dawn for the first loaves, the drinkers last to bed and last up, children early to bed;
             // the hunter early too where he has a lodge, for the long walk out to it; the innkeeper up at first light and last to bed
@@ -1088,7 +1094,7 @@ namespace Crulanda.Encounter
         public void FacePlayer()
         {
             var to = life.Session.Player.transform.position - transform.position; to.y = 0;
-            if (to.sqrMagnitude > .01f) transform.rotation = Quaternion.LookRotation(to);
+            if (to.sqrMagnitude > .01f && !Seated) transform.rotation = Quaternion.LookRotation(to);   // seated: he faces the hall
             until = Mathf.Max(until, Time.time + 4);
             Hold(6);
         }
@@ -1177,7 +1183,14 @@ namespace Crulanda.Encounter
                 if (bed.HasValue) Go(bed.Value); else { state = State.Activity; until = Time.time + 30; }
                 return;
             }
-            if (fixedPlace != null) { activity = fixedPlace; var spot = life.RandomPlace(fixedPlace); if (spot.HasValue) Go(spot.Value); else { state = State.Activity; until = Time.time + 20; } return; }
+            if (fixedPlace != null)
+            {
+                activity = fixedPlace; var spot = life.RandomPlace(fixedPlace);
+                // Seated and in the seat already: stay sat (a walk of no distance would stand him up and sit him down again).
+                if (spot.HasValue && Seated && new Vector2(spot.Value.x - transform.position.x, spot.Value.z - transform.position.z).sqrMagnitude < .36f) { StartActivity(); return; }
+                if (spot.HasValue) Go(spot.Value); else { state = State.Activity; until = Time.time + 20; }
+                return;
+            }
             if (Role == "drinker" && DrinkerNext()) return;
             if (StartErrand()) return;
             var shift = VillageWork.ShiftFor(Role, WorldClock.Hour);
@@ -1209,6 +1222,7 @@ namespace Crulanda.Encounter
             // their back (2026-10-16, Chris in the Crown's Hall of Arms: "all trainers standing backwards").
             if (look.HasValue && fixedPlace != null && life.Zone != null && life.Zone.Zone != null && life.Zone.Zone.city) { var back = transform.position - look.Value; back.y = 0; if (back.sqrMagnitude > .01f) Face(transform.position + back); }
             else if (look.HasValue) Face(look.Value);
+            if (Seated && activity == fixedPlace) transform.rotation = Quaternion.Euler(0, SeatYaw, 0);   // on his throne, facing the hall
             if (activity == "field") FaceRow();
             if (Coop != null) KeeperStart();
             if ((activity == "home" || activity == "sleep") && home != null) Hide();
@@ -1413,6 +1427,7 @@ namespace Crulanda.Encounter
         /// <summary>What working looks like for this trade at this place.</summary>
         ActorPose PoseFor(string place)
         {
+            if (Seated && place == fixedPlace) return ActorPose.Sit;   // the inn's sitting, on a throne
             switch (place)
             {
                 case "field":
@@ -1662,11 +1677,11 @@ namespace Crulanda.Encounter
             if (Attending && !PassedOut)
             {
                 var to = life.Session.Player.transform.position - transform.position; to.y = 0;
-                if (to.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(to), Time.deltaTime * 6);
+                if (to.sqrMagnitude > .01f && !Seated) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(to), Time.deltaTime * 6);
                 if (!held)
                 {
-                    // Stop dead: drop the path (kept to resume) so the agent doesn't coast on.
-                    held = true; heldPose = visual.Pose; visual.Pose = ActorPose.Talk;
+                    // Stop dead: drop the path (kept to resume) so the agent doesn't coast on. Seated, he talks from his seat.
+                    held = true; heldPose = visual.Pose; visual.Pose = Seated && heldPose == ActorPose.Sit ? ActorPose.Sit : ActorPose.Talk;
                     heldDestination = agent.isOnNavMesh && agent.hasPath ? agent.destination : (Vector3?)null;
                     if (agent.isOnNavMesh) { agent.isStopped = true; agent.ResetPath(); agent.velocity = Vector3.zero; }
                 }

@@ -8,6 +8,50 @@
       "description": "The Council's court in the Crown of Argentis, whose face is High Councilor Aethelgard: \"the Greater Good\". Its clerks' errands raise its regard; refusing them lowers it."
     }
   ],
+  "documents": [
+    {
+      "id": "doc.crown.sky_bastion",
+      "kind": "lore",
+      "title": "Argentis, the Sky Bastion",
+      "text": "A primer for the Council's pages, chained at the head of the climb so that no page can say he was never told:\n\nArgentis stands at the centre of the land, and the old maps call it the Sky Bastion, for it is the highest walled place there is.\n\nThe Crown is its highest tier. It is built of white stone and gold, and it houses the Council and those the Council favours. A page keeps the stone white and the gold bright. Both show dirt.\n\nBelow the Crown lie the Lowtowns, at the foot of the mountain, where the work is done. A page does not go down to them. A page does not need to.\n\nBelow the south wall stands the Spire, in its collar of cloud. A page does not ask what it is for.\n\nThe two Founders at the head of the climb raised the first wall. Their names were cut on this plinth, and were cut off it again by order. The Council is the Founders now.",
+      "canonStatus": "CANON-EXPANDED: Argentis, the Sky Bastion, at the centre of the land (the overworld map); the Crown, the highest tier, of white stone and gold, housing the Council and the wealthy, and the Lowtowns at the mountain's base (world_bible.md); the Spire below the south wall (the city map). The primer, the pages and the Founders' cut names are GAME-ONLY."
+    },
+    {
+      "id": "doc.crown.greater_good",
+      "kind": "lore",
+      "title": "The Councilor's Words",
+      "text": "A fair copy in Clerk Odo Vantry's hand, set out for petitioners to read while they wait:\n\nTHE MOTTO OF THE HIGH COUNCIL: EFFICIENCY.\n\nAnd the High Councilor's words upon it, as given in the Audience Hall to a deputation from the east:\n\n\"You ask why the tithe rises while your harvest falls. Because the sum is not your village. The sum is the land. A field that yields nothing is a field that costs. A Council that feeds what costs is no Council at all.\n\nI do not ask you to love this. I ask you to understand it. Efficiency is not cruelty. Efficiency is the only kindness that still works at this scale. Some will be spent so that more are kept. That is the Greater Good, and it is arithmetic, not opinion.\n\nGo home. Pay what is owed. The Council has the matter in hand.\"\n\nUnder it, in pencil, smaller: The deputation went home. Two of them did not arrive.",
+      "canonStatus": "CANON (book1 ch.12:31): the High Council's motto of efficiency above all, and Aethelgard calling it 'the Greater Good'. The copy, the speech's words, the deputation and the pencilled line are GAME-ONLY."
+    },
+    {
+      "id": "doc.crown.catalogue",
+      "kind": "lore",
+      "title": "The Catalogue's First Leaf",
+      "text": "The first leaf of the Archive's catalogue, recopied by Archivist Mirelle Dow, who adds a line to it most years and finishes it never:\n\nThe presses run west to east, as the light comes.\nPress the first: the west wood, Oakhaven and its old oak.\nPress the second: Khaven, the grey wood and its dead.\nPress the third: the Shattered Peaks and the roads over them.\nPress the fourth: the Ashland Rim and its salt.\nPress the fifth: the Verdant Shore.\nPress the sixth: the Lowtowns. (Empty. Nobody brings us anything from below.)\nPress the seventh: the Council's own registers. Not to be lent.\nPress the eighth: the east. Thinner every year.\n\nThe oldest stacks still carry their first shelf-marks, little cut signs in a goblin hand from the days the goblins catalogued every light in the High City. Nobody here reads the marks now. I do not move those books, the archivist writes; they are where they were put, and they know it.\n\nThe Silent Pilgrims of the south ask again for copies. Answer: none.",
+      "canonStatus": "CANON-EXPANDED: the High City's archives (world_bible.md); the goblins as the High City's record-keepers and light-catalogers, and the Archive of Silence's Silent Pilgrims (world_bible.md). The catalogue, its presses and the archivist are GAME-ONLY."
+    },
+    {
+      "id": "doc.crown.exchange_charter",
+      "kind": "lore",
+      "title": "The Charter of the Exchange",
+      "text": "A copy of the Exchange's charter, in the Council's hand with a factor's seal beside the Council's crown:\n\nBy leave of the High Council, the Exchange of the Crown is opened to every honest trader, and to the factors of Port Caelum before all others.\n\nOne. Every lot is listed under the clerk's eye and sold at the price on its ticket, or not at all.\n\nTwo. The Exchange keeps a fee of every lot sold. Of that fee the Council takes its tenth, and the clerk his, and the rest is the Exchange's.\n\nThree. The Trade Princes of Port Caelum may keep a factor at this Exchange in perpetuity, at no rent, for so long as their glass ships carry the Council's cargoes first.\n\nFour. No lot is listed that the Council has named forbidden. The list of forbidden things is kept by the Council and is not published.\n\nIn the margin, in a smaller and more elegant hand: Read clause three again, and then ask who is doing whom the favour. S.V.",
+      "canonStatus": "CANON-EXPANDED: Port Caelum, the largest trading port, its glass ships, and the Trade Princes who sit with the High Council (world_bible.md; book1 ch.2). The charter and its clauses, the Exchange and Serafine Vael's note are GAME-ONLY."
+    },
+    {
+      "id": "doc.crown.guild_rolls",
+      "kind": "lore",
+      "title": "The Rolls of the Four",
+      "text": "The guilds' rolls, kept on one stand by Council order so that each hall can see the others' and none can say it was not told:\n\nTHE LANTERN WATCH. Master: Bertram Lisle. Takes anyone who will come back for the next one. A lantern in the hall window for every member on the road.\n\nOAK AND EMBER. Master: Hazel Cotter. Crafters first, and those who protect them. The hall smells of oak, of the forge and of supper.\n\nTHE LONG ROAD. Master: Rafe Marrick. Runs the deep caves nightly. A tally of every run in chalk on the back wall.\n\nTHE SCREE HOUNDS. Master: Jessa Kell. The hard camps first. Every Hound carries a scar from the Peaks.\n\nEach guild is chartered by the Council and answers to it. A guild's hall is held at the Council's pleasure. A guild may not keep arms beyond its members' own, nor meet after the evening bell in more than twenty.\n\nAt the foot, struck through, a fifth name. The ink is too well scraped to read.",
+      "canonStatus": "GAME-ONLY: the four guilds, their masters, their rolls and the struck fifth name. The High Council is CANON (world_bible.md)."
+    },
+    {
+      "id": "doc.crown.low_stair",
+      "kind": "lore",
+      "title": "A Warning, Posted Low",
+      "text": "Posted by the yard at the head of the way down, under the Council's crown:\n\nBY ORDER OF THE HIGH COUNCIL.\n\nThe Low Stair is shut from the evening bell to the morning bell. The wardens are not to open it for anyone, for any reason, and will not.\n\nThose who go down by day go at their own charge. The Council does not answer for what is below: the smoke, the sickness, the Warrens, or the people.\n\nNo person, parcel or animal comes up the Low Stair without the wardens' search.\n\nThose who live below are reminded that the Crown is not theirs to walk in, and that the tithe falls due on the first of the month whatever the harvest.\n\nUnder it, scratched into the board with a knife: They tell their children the Weave-Eaters come from up here. Ask yourself why.",
+      "canonStatus": "CANON-EXPANDED: the Lowtowns at the mountain's base, filled with industry and poverty (world_bible.md), the Warrens (the city map), and the Lowtowns' folklore of the Weave-Eaters born of the High City (book1 ch.1). The Low Stair, the order and the scratched line are GAME-ONLY."
+    }
+  ],
   "quests": [
     {
       "id": "errand.council.tithe",

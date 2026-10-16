@@ -2050,6 +2050,108 @@
       "hint": "Rollo Tamsworth swears a clerk stuffed a paper behind something at the west end of the terrace gardens and ran. He'd have looked, but a warden was watching.",
       "xp": 45,
       "canonStatus": "GAME-ONLY page; the Council's resonance candidates are CANON (Oakhaven's canon: the Council's abduction of resonance candidates)."
+    },
+    {
+      "id": "secret.crown.founders-plinth",
+      "name": "The Founders' Primer",
+      "kind": "read",
+      "prompt": "Read the book chained to the plinth",
+      "at": {
+        "x": -17,
+        "y": 60.5
+      },
+      "rotation": 90,
+      "text": "A book on a chain at the western founder's plinth: the primer the Council's pages learn by heart, with two names cut off the stone above it.",
+      "clue": "At the head of the long climb, beside the western of the two stone founders, a book on a chain tells the pages what the city is.",
+      "hint": "Warden Dorian Hask says the pages have a book chained by the western founder at the head of the climb. They learn it by heart. He never has.",
+      "document": "doc.crown.sky_bastion",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: Argentis, the Sky Bastion, and the Crown of white stone and gold are CANON (the overworld map; world_bible.md); the primer is GAME-ONLY."
+    },
+    {
+      "id": "secret.crown.motto-copy",
+      "name": "The Councilor's Fair Copy",
+      "kind": "read",
+      "prompt": "Read the copy on the lectern",
+      "at": {
+        "x": -18,
+        "y": 103
+      },
+      "rotation": 90,
+      "text": "A lectern west of the castle doors with a fair copy pinned to it: the Council's motto, and the High Councilor's words upon it. Someone has written under it in pencil.",
+      "clue": "West of the castle doors, past the white-and-gold banner, petitioners read a fair copy of the High Councilor's words while they wait.",
+      "hint": "Herald Pell Corvane says the clerk sets out a fair copy of the High Councilor's words west of the castle doors, for those who queue. Read the pencil at the bottom, he says. He didn't write it.",
+      "document": "doc.crown.greater_good",
+      "xp": 70,
+      "canonStatus": "CANON (book1 ch.12:31): the High Council's motto and Aethelgard's 'Greater Good'; the copy is GAME-ONLY."
+    },
+    {
+      "id": "secret.crown.catalogue-leaf",
+      "name": "The Catalogue's First Leaf",
+      "kind": "read",
+      "prompt": "Read the leaf on the stand",
+      "at": {
+        "x": -36,
+        "y": 105.5
+      },
+      "rotation": 0,
+      "text": "A stand by the library's east corner with the first leaf of its catalogue under a weight: the presses west to east, and one press empty.",
+      "clue": "Outside the many-towered library's east corner, a stand holds the first leaf of a catalogue nobody has finished.",
+      "hint": "Archivist Mirelle Dow says she put the catalogue's first leaf out on a stand by the east corner, so people stop asking her. They still ask her.",
+      "document": "doc.crown.catalogue",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: the High City's archives and the goblins as its record-keepers (world_bible.md); the catalogue is GAME-ONLY."
+    },
+    {
+      "id": "secret.crown.charter-copy",
+      "name": "The Factors' Charter",
+      "kind": "read",
+      "prompt": "Read the charter on the stand",
+      "at": {
+        "x": -42,
+        "y": 94
+      },
+      "rotation": 0,
+      "text": "A stand behind the market hall's north-east corner with its charter copied fair, and a note in the margin in a smaller, more elegant hand.",
+      "clue": "Behind the market hall's north-east corner, where the west colonnade ends, the coast's charter waits on a stand for traders who never read it.",
+      "hint": "Serafine Vael says the charter stands behind the hall's north-east corner, for anyone who reads before they sign. She has added a note. She says it is the only part worth reading.",
+      "document": "doc.crown.exchange_charter",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: Port Caelum and the Trade Princes (world_bible.md; book1 ch.2); the charter is GAME-ONLY."
+    },
+    {
+      "id": "secret.crown.guild-rolls",
+      "name": "The Rolls of the Four",
+      "kind": "read",
+      "prompt": "Read the rolls on the stand",
+      "at": {
+        "x": -60,
+        "y": 51.5
+      },
+      "rotation": 180,
+      "text": "One stand at the north end of the guilds' garden with all four guilds' rolls on it, and a fifth name scraped off the foot.",
+      "clue": "At the north end of the long garden between the four bannered halls, under the terrace wall, their rolls share one stand, where each can watch the others'.",
+      "hint": "Bertram Lisle says the four rolls stand together at the north end of the long garden between the halls, by order. There used to be five names on it, he says, and then he changes the subject.",
+      "document": "doc.crown.guild_rolls",
+      "xp": 60,
+      "canonStatus": "GAME-ONLY: the guilds and their rolls."
+    },
+    {
+      "id": "secret.crown.stair-warning",
+      "name": "A Warning, Posted Low",
+      "kind": "read",
+      "prompt": "Read the warning on the stand",
+      "at": {
+        "x": -46.5,
+        "y": -23.5
+      },
+      "rotation": 180,
+      "text": "A Council order on a stand in the yard at the head of the way down, the Council's crown above it, and a line scratched under it with a knife.",
+      "clue": "In the south-west yard, where the wall opens on the way down, the Council's warning stands on a lectern for anyone fool enough to need it.",
+      "hint": "Warden Garth Ollery says there's a warning posted in the yard by the way down, and somebody from below has scratched an answer on it. He's been told to scrape it off. He hasn't.",
+      "document": "doc.crown.low_stair",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: the Lowtowns below the Crown (world_bible.md) and the Weave-Eaters of their folklore (book1 ch.1); the order is GAME-ONLY."
     }
   ],
   "life": {

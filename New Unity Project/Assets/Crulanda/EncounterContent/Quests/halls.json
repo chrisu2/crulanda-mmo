@@ -1,0 +1,387 @@
+{
+  "factions": [
+    {
+      "id": "council",
+      "name": "The High Council",
+      "start": 200,
+      "canonStatus": "CANON: the High Council in the Crown of Argentis (world_bible.md); the court's standing, apart from the Concord's collectors in the field (concord, fixed), is GAME-ONLY",
+      "description": "The Council's court in the Crown of Argentis, whose face is High Councilor Aethelgard: \"the Greater Good\". Its clerks' errands raise its regard; refusing them lowers it."
+    }
+  ],
+  "quests": [
+    {
+      "id": "errand.council.tithe",
+      "title": "The Ore Tithe",
+      "kind": "bounty",
+      "giver": "Clerk Odo Vantry",
+      "turnIn": "Clerk Odo Vantry",
+      "level": 2,
+      "minLevel": 1,
+      "poster": "council",
+      "canonStatus": "GAME-ONLY: the Council's errands in the Crown (the High Council is CANON, world_bible.md); repeatable, once a game day",
+      "summary": "Bring five lumps of copper ore to the Council's clerk: the Crown's tithe of the eastern hills.",
+      "offer": "The clerk does not look up. \"Copper. Five lumps of ore, for the Crown's tithe of the eastern hills. The miners owe it; somebody has to carry it. The Council remembers who does.\"",
+      "complete": "He weighs each lump in his palm and writes a figure. \"Tithe received. The Council thanks you. That is to say, I have written that it does.\"",
+      "steps": [
+        {
+          "text": "Bring five lumps of copper ore to the Council's clerk.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "Clerk Odo Vantry",
+              "item": "mat.copper_ore",
+              "count": 5,
+              "text": "Copper ore for the tithe"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 80,
+        "gold": 20,
+        "reputation": [
+          {
+            "faction": "council",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "errand.council.deserters",
+      "title": "The Council's Peace",
+      "kind": "bounty",
+      "giver": "Clerk Odo Vantry",
+      "turnIn": "Clerk Odo Vantry",
+      "level": 6,
+      "minLevel": 4,
+      "poster": "council",
+      "canonStatus": "GAME-ONLY: the Council's errands in the Crown (the High Council is CANON, world_bible.md); repeatable, once a game day",
+      "summary": "Deserters from the Concord's levies hide in Oakhaven's woods. The Council wants five of them answered for.",
+      "offer": "\"Levy-men who walked away from their posts are living in the woods above Oakhaven, robbing the carts. The Council does not ask why they ran. It asks that five of them answer for it.\"",
+      "complete": "\"Five. Noted.\" The clerk blots the line. \"The roads are a little quieter. Order is a thing you keep, not a thing you have.\"",
+      "steps": [
+        {
+          "text": "Defeat five deserters in Oakhaven's woods.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.deserter.oakhaven.*",
+              "count": 5,
+              "text": "Deserters"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 220,
+        "gold": 45,
+        "reputation": [
+          {
+            "faction": "council",
+            "amount": 250
+          }
+        ]
+      },
+      "requiresFaction": "council",
+      "requiresStanding": 0
+    },
+    {
+      "id": "errand.council.hollow",
+      "title": "Hollow Men on the Khaven Road",
+      "kind": "bounty",
+      "giver": "Clerk Odo Vantry",
+      "turnIn": "Clerk Odo Vantry",
+      "level": 8,
+      "minLevel": 6,
+      "poster": "council",
+      "canonStatus": "GAME-ONLY: the Council's errands in the Crown (the High Council is CANON, world_bible.md); repeatable, once a game day",
+      "summary": "The Hollow Men walk the Khaven road. The Council wants six of them put down before the next tithe-wagon passes.",
+      "offer": "\"The tithe-wagon goes through Khaven at the turn of the month, and the Hollow Men walk that road now. Six of them, put down. The wagon does not stop for the dead, and neither does the Council.\"",
+      "complete": "\"Six.\" He does not ask what they were like. \"The wagon will pass. The Council has noted your usefulness. It is not a small thing to be noted.\"",
+      "steps": [
+        {
+          "text": "Put down six Hollow Men in Khaven.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.hollow.khaven.*",
+              "count": 6,
+              "text": "Hollow Men"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 320,
+        "gold": 60,
+        "reputation": [
+          {
+            "faction": "council",
+            "amount": 300
+          }
+        ]
+      },
+      "requiresFaction": "council",
+      "requiresStanding": 0
+    },
+    {
+      "id": "ask.lantern-watch.wolves",
+      "title": "Wolves for the New Ones",
+      "kind": "bounty",
+      "giver": "The Lantern Watch notice board",
+      "turnIn": "The Lantern Watch notice board",
+      "level": 2,
+      "minLevel": 1,
+      "poster": "guild:lantern-watch",
+      "canonStatus": "GAME-ONLY: a guild's ask on its notice board in the Guild Row (the guilds of round 27); repeatable, once a game day",
+      "summary": "Thin out the grey wolves of the Mastwood so the Watch's new members can get to their first camps.",
+      "offer": "Pinned with a lantern-shaped pin: WOLVES in the Mastwood again. Our new ones keep getting dragged off the road. Six fewer wolves and they'll make it to their first camp. Thanks, all. - the Watch",
+      "complete": "A note pinned under the first: \"Six! The new ones say thank you. One of them cried. Here's something for your trouble.\"",
+      "steps": [
+        {
+          "text": "Kill six grey wolves in Oakhaven's Mastwood.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.oakhaven",
+              "target": "mob.wolf.oakhaven.*",
+              "count": 6,
+              "text": "Grey wolves"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 90,
+        "gold": 15
+      }
+    },
+    {
+      "id": "ask.lantern-watch.yarrow",
+      "title": "Yarrow for the Watch's Kits",
+      "kind": "bounty",
+      "giver": "The Lantern Watch notice board",
+      "turnIn": "The Lantern Watch notice board",
+      "level": 1,
+      "minLevel": 1,
+      "poster": "guild:lantern-watch",
+      "canonStatus": "GAME-ONLY: a guild's ask on its notice board in the Guild Row (the guilds of round 27); repeatable, once a game day",
+      "summary": "The Watch makes up kits for new adventurers: six sprigs of yarrow for the bandages.",
+      "offer": "In a round, careful hand: Making up kits for the new ones again. Yarrow stops bleeding; we need six sprigs for the bandages. Leave them on the board.",
+      "complete": "The yarrow is gone from the board, and twelve crowns are pinned in its place with a drawing of a lantern.",
+      "steps": [
+        {
+          "text": "Bring six sprigs of yarrow to the Watch's board.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "The Lantern Watch notice board",
+              "item": "mat.yarrow",
+              "count": 6,
+              "text": "Yarrow on the board"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 60,
+        "gold": 12
+      }
+    },
+    {
+      "id": "ask.oak-and-ember.copper",
+      "title": "Copper for the Ember Forge",
+      "kind": "bounty",
+      "giver": "Oak and Ember notice board",
+      "turnIn": "Oak and Ember notice board",
+      "level": 3,
+      "minLevel": 1,
+      "poster": "guild:oak-and-ember",
+      "canonStatus": "GAME-ONLY: a guild's ask on its notice board in the Guild Row (the guilds of round 27); repeatable, once a game day",
+      "summary": "Oak and Ember's smiths want eight lumps of copper ore for the guild forge.",
+      "offer": "Scratched in charcoal: FORGE IS COLD. Eight lumps of copper ore and we'll have it singing again. Members get first pick of what comes off the anvil. - Oak and Ember",
+      "complete": "Someone has written \"BLESS YOU\" across the notice, and a little purse hangs from the pin.",
+      "steps": [
+        {
+          "text": "Bring eight lumps of copper ore to Oak and Ember's board.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "Oak and Ember notice board",
+              "item": "mat.copper_ore",
+              "count": 8,
+              "text": "Copper ore on the board"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 100,
+        "gold": 20
+      }
+    },
+    {
+      "id": "ask.oak-and-ember.oak",
+      "title": "Oak for the Hall's Benches",
+      "kind": "bounty",
+      "giver": "Oak and Ember notice board",
+      "turnIn": "Oak and Ember notice board",
+      "level": 2,
+      "minLevel": 1,
+      "poster": "guild:oak-and-ember",
+      "canonStatus": "GAME-ONLY: a guild's ask on its notice board in the Guild Row (the guilds of round 27); repeatable, once a game day",
+      "summary": "The hall's benches are breaking; Oak and Ember want six oak logs to make new ones.",
+      "offer": "Benches in the hall are firewood, near enough. Six good oak logs and we'll make new ones. Sit down for once in your life. - Oak and Ember",
+      "complete": "\"Good oak! The benches will outlast all of us.\" A purse, and an invitation to sit.",
+      "steps": [
+        {
+          "text": "Bring six oak logs to Oak and Ember's board.",
+          "objectives": [
+            {
+              "type": "bring",
+              "target": "Oak and Ember notice board",
+              "item": "mat.oak_log",
+              "count": 6,
+              "text": "Oak logs on the board"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 80,
+        "gold": 16
+      }
+    },
+    {
+      "id": "ask.long-road.hollows",
+      "title": "A Run Through Khaven's Hollows",
+      "kind": "bounty",
+      "giver": "The Long Road notice board",
+      "turnIn": "The Long Road notice board",
+      "level": 7,
+      "minLevel": 5,
+      "poster": "guild:long-road",
+      "canonStatus": "GAME-ONLY: a guild's ask on its notice board in the Guild Row (the guilds of round 27); repeatable, once a game day",
+      "summary": "The Long Road levels hard: a run through Khaven, eight Hollow Men down.",
+      "offer": "Tonight's run: Khaven. Eight Hollow Men, no stopping, no complaining. Whoever does it first gets the guild's purse. - the Long Road",
+      "complete": "\"Eight. Not bad. Not our record either.\" The purse is yours.",
+      "steps": [
+        {
+          "text": "Defeat eight Hollow Men in Khaven.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.khaven",
+              "target": "mob.hollow.khaven.*",
+              "count": 8,
+              "text": "Hollow Men"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 300,
+        "gold": 40
+      }
+    },
+    {
+      "id": "ask.long-road.pale",
+      "title": "The Pale Things of the Peaks",
+      "kind": "bounty",
+      "giver": "The Long Road notice board",
+      "turnIn": "The Long Road notice board",
+      "level": 11,
+      "minLevel": 9,
+      "poster": "guild:long-road",
+      "canonStatus": "GAME-ONLY: a guild's ask on its notice board in the Guild Row (the guilds of round 27); repeatable, once a game day",
+      "summary": "A Long Road run in the Peaks: six of the Pale Things.",
+      "offer": "Peaks run, level eleven and up only. Six Pale Things. Bring a healer; bring two. - the Long Road",
+      "complete": "\"Six Pale Things and you're still standing? You're one of us.\"",
+      "steps": [
+        {
+          "text": "Defeat six Pale Things in the Peaks.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.pale.peaks*",
+              "count": 6,
+              "text": "Pale Things"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 450,
+        "gold": 60
+      }
+    },
+    {
+      "id": "ask.scree-hounds.outriders",
+      "title": "Outriders of the Peaks",
+      "kind": "bounty",
+      "giver": "Scree Hounds notice board",
+      "turnIn": "Scree Hounds notice board",
+      "level": 9,
+      "minLevel": 8,
+      "poster": "guild:scree-hounds",
+      "canonStatus": "GAME-ONLY: a guild's ask on its notice board in the Guild Row (the guilds of round 27); repeatable, once a game day",
+      "summary": "The Scree Hounds take the hard camps first: six outriders in the Peaks.",
+      "offer": "HARD CAMPS FIRST. Six outriders in the Peaks, and don't come back limping. - the Hounds",
+      "complete": "\"Six. Good. Next time do it with one hand.\"",
+      "steps": [
+        {
+          "text": "Defeat six outriders in the Peaks.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.peaks",
+              "target": "mob.outrider.peaks*",
+              "count": 6,
+              "text": "Outriders"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 380,
+        "gold": 50
+      }
+    },
+    {
+      "id": "ask.scree-hounds.hounds",
+      "title": "Hounds of the Ashrim",
+      "kind": "bounty",
+      "giver": "Scree Hounds notice board",
+      "turnIn": "Scree Hounds notice board",
+      "level": 13,
+      "minLevel": 11,
+      "poster": "guild:scree-hounds",
+      "canonStatus": "GAME-ONLY: a guild's ask on its notice board in the Guild Row (the guilds of round 27); repeatable, once a game day",
+      "summary": "A Scree Hounds ask: six of the ash-hounds of the Ashrim, our namesakes' wilder cousins.",
+      "offer": "Six ash-hounds in the Ashrim. They're named after us, not the other way about. Go and prove it. - the Hounds",
+      "complete": "\"Six hounds down. The name's earned another season.\"",
+      "steps": [
+        {
+          "text": "Defeat six ash-hounds in the Ashrim.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.ashrim",
+              "target": "mob.hound.ashrim*",
+              "count": 6,
+              "text": "Ash-hounds"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 520,
+        "gold": 70
+      }
+    }
+  ]
+}

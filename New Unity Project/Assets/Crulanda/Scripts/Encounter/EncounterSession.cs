@@ -229,6 +229,7 @@ namespace Crulanda.Encounter
             var list = Quests.For(npc, Zone.Zone.id, Progress.Level);
             // Merchants open on the list (so "Browse wares" is always one click away); others go straight to a single quest.
             bool shop = IsVendor(VillageLife.Active?.Find(npc));
+            CouncilErrands.Filter(list, Progress);   // an errand of the halls handed in today waits for tomorrow (EncounterSession.Halls)
             if (list.Count > 0) { Conversation = new QuestConversation { npc = npc, entries = list, selected = list.Count == 1 && !shop ? list[0].quest : null, where = where }; return true; }
             return handled;
         }
@@ -248,8 +249,9 @@ namespace Crulanda.Encounter
             var bagItems = q.rewards?.bagItems; int worth = 0;
             if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null && !(d.kind == "bag" && Inventory.Owns(Progress, id))) worth += Inventory.Price(d); }
             if (!Quests.TurnIn(q, out _, choice)) return;
-            if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
-            if (q.kind == "bounty") { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
+            if (HallQuest(q)) CouncilErrands.MarkDone(Progress, q.id);   // the Council's errands and the guilds' asks: once a day, not the board's (EncounterSession.Halls)
+            else if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
+            if (q.kind == "bounty" && !HallQuest(q)) { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
             if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             ReconcileQuests(); Save(false); ReopenConversation();
@@ -258,6 +260,7 @@ namespace Crulanda.Encounter
         {
             if (Conversation == null) return;
             var list = Conversation.npc == Bounties.BoardName && Boards != null ? Boards.Entries(ZoneId, Progress.Level) : Quests.For(Conversation.npc, ZoneId, Progress.Level);
+            CouncilErrands.Filter(list, Progress);
             if (list.Count == 0) { Conversation = null; return; }
             Conversation.entries = list; Conversation.selected = list.Count == 1 ? list[0].quest : null;
         }
@@ -779,7 +782,7 @@ namespace Crulanda.Encounter
             if (!Professions.CanLearn(id, out why)) return false;
             var d = Professions.Db.Profession(id);
             foreach (var kind in ProfessionDatabase.Stations(d.station)) if (StationNear(kind) != null) return true;
-            if (TradeNpcNear(d.trainerRole, TrainerRange) != null) return true;
+            if (TradeNpcNear(d.trainerRole, TrainerRange) != null || HallTradeTrainerNear(id) != null) return true;   // or its trainer in the Crown (EncounterSession.Halls)
             why = d.name + " is taken up at " + ProfessionLog.StationWords(d.station) + (string.IsNullOrEmpty(d.trainerRole) ? "." : ", or from a " + d.trainerRole + ".");
             return false;
         }
@@ -1342,6 +1345,7 @@ namespace Crulanda.Encounter
             if (SpellbookOpen && !Paused) { SpellbookOpen = false; BookPick = null; }
             else if (LootOpen && !Paused) CloseLoot();
             else if (Conversation != null && !Paused) Conversation = null;
+            else if (Hall != null && !Paused) Hall = null;
             else if (VendorNpc != null && !Paused) CloseVendor();
             else if (TradesOpen && !Paused) TradesOpen = false;
             else if (WhoOpen && !Paused) WhoOpen = false;
@@ -2126,6 +2130,7 @@ namespace Crulanda.Encounter
                 SelectFriendly(talkTo, false);
                 NoteMet(talkTo.Name);   // the book of lore's People
                 if (QuestTalk(talkTo.Name, talkTo.transform.position)) talkTo.FacePlayer();
+                else if (HallTalk(talkTo)) talkTo.FacePlayer();   // the capital's halls: the audience, the Archive, a guild, a trainer (EncounterSession.Halls)
                 else if (IsVendor(talkTo)) { OpenVendor(talkTo); talkTo.FacePlayer(); }
                 else VillageLife.Active.Talk(talkTo);
                 return;

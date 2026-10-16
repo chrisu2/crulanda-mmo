@@ -52,7 +52,7 @@ namespace Crulanda.Encounter
                 case "farmer": return "Farmer"; case "hunter": return "Hunter"; case "leatherworker": return "Leatherworker"; case "skinner": return "Skinner";
                 case "lumberjack": return "Woodcutter"; case "herbalist": return "Herbalist"; case "miller": return "Miller"; case "elder": return "Village Elder";
                 case "innkeeper": return "Innkeeper";
-                default: return null;
+                default: return HallRoles.Title(role);   // the capital's hall people (CapitalHalls.cs), or null
             }
         }
         readonly Dictionary<Vector3, Vector3> faceAt = new Dictionary<Vector3, Vector3>();

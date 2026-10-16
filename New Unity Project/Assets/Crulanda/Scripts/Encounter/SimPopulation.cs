@@ -161,6 +161,8 @@ namespace Crulanda.Encounter
         /// <summary>A place to stand in this zone: near one of its named places (a landmark), on the NavMesh.</summary>
         public Vector3 Spot(SimAdventurer s, int pick)
         {
+            // A guild's member idles in its hall where this zone has one (the capital's Guild Row; EncounterSession.HallSpots), two times in three.
+            if (Session != null && !string.IsNullOrEmpty(s.guild) && pick % 3 != 2) { var hall = Session.HallSpots(s.guild); if (hall.Count > 0) return hall[Mathf.Abs(s.variant + pick) % hall.Count]; }
             var zb = Session.Zone; var marks = zb != null ? zb.Zone.landmarks : null;
             Vector2 at = marks != null && marks.Length > 0 ? marks[Mathf.Abs(s.variant * 7 + pick) % marks.Length].at : Vector2.zero;
             var r = new Crulanda.Core.SeededRandom(s.variant * 31 + pick);

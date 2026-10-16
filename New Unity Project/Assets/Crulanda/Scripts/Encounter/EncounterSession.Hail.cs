@@ -59,6 +59,7 @@ namespace Crulanda.Encounter
         }
         string VillagerHail(Villager v)
         {
+            var hall = HallHail(v); if (hall != null) return hall;   // the capital's halls (EncounterSession.Halls)
             switch (v.Role)
             {
                 case "farmer": return Pick(new[] { "Morning. Mind the furrows.", "Hail. Fine weather for the barley.", "Aye, hello. Can't stop, the field won't hoe itself." });

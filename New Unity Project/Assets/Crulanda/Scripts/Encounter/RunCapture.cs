@@ -141,6 +141,10 @@ namespace Crulanda.Encounter
                     if (e.Victim != s.Player && Time.time - since < 2.5f) continue;
                     float d = Vector3.Distance(e.transform.position, me); if (d < best) { best = d; foe = e; }
                 }
+                // Assist the tank (2026-10-15): what it holds before the nearest (the bot went for Nix while he was free and died at 15 s,
+                // every fight); a held mob is still left alone.
+                { var tank = s.PartySims.Find(c => c != null && c.actor.IsAlive && c.Role == SimCompanion.PartyRole.Tank);
+                  if (tank != null) { var held = s.Enemies.Find(e => e != null && e.actor.IsAlive && !e.Hidden && e.Victim == tank.actor && !SimCompanion.Held(e) && Vector3.Distance(e.transform.position, me) < 30); if (held != null) foe = held; } }
                 // Nothing on you: search the bodies (Chris, 2026-10-11: "they need to loot to test the loot db"), the nearest with anything on
                 // it within 12 m, before going on; each thing taken is logged.
                 EncounterEnemy corpse = null;

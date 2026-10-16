@@ -2284,7 +2284,13 @@ namespace Crulanda.Encounter
                 Companion.actor.Health.ApplyHealing(1000); Companion.actor.Resource.Pool.Fill();
                 Companion.GetComponent<NavMeshAgent>().Warp(RecoveryPoint + Vector3.right * 2.5f - Vector3.up * .1f);
             }
+            // Whoever gets up at the stone has left the fight: off every mob's list, so a mob turns to the party still at it rather than
+            // chasing the revived tank across the dungeon past its leash and resetting (R154: Nix at 426 with three sims on him).
+            var gone = new List<string> { Player.EntityId.Value };
+            foreach (var c in PartySims) if (c != null && !c.actor.IsAlive) gone.Add(c.actor.EntityId.Value);
+            if (Companion != null && !Companion.actor.IsAlive) gone.Add(Companion.actor.EntityId.Value);
             HealPartySimsAfterRecover(fighting);
+            foreach (var e in Enemies) if (e != null) foreach (var id in gone) e.threat.Remove(id);
             foreach (var e in Enemies)
                 if (e != null && (!fighting || !InIt(e))) e.ResetFight();
                 else if (e != null && e.Victim == Player) e.threat.Remove(Player.EntityId.Value);   // it turns to the party still at it

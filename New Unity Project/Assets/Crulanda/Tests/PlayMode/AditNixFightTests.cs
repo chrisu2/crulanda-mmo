@@ -151,7 +151,7 @@ namespace Crulanda.Tests
                 var engagedAt = new Dictionary<EncounterEnemy, float>();
                 string Who(Crulanda.Gameplay.Actor a) { if (a == null) return "nobody"; var m = members.Find(x => x.actor == a); return m.actor != null ? m.name : a.DisplayName; }
                 string Hp(Crulanda.Gameplay.Actor a) { return a == null ? "-" : !a.IsAlive ? "dead" : a.Health.Pool.Current + "/" + a.Health.Pool.Max; }
-                float deadSince = -1, upAt = -1; int getUps = 0; bool repull = false; float t = 0, nextLog = 0, nextSwing = 0, pathAt = 0, stuckAt = 0, pulledAt = -1, beastDiedAt = -1, nixDiedAt = -1; Vector3 stuckFrom = s.Player.transform.position, pathGoal = Vector3.zero; NavMeshPath path = null; bool pulledByYou = false;
+                Vector3 fellAt = Vector3.zero; float deadSince = -1, upAt = -1; int getUps = 0; bool repull = false; float t = 0, nextLog = 0, nextSwing = 0, pathAt = 0, stuckAt = 0, pulledAt = -1, beastDiedAt = -1, nixDiedAt = -1; Vector3 stuckFrom = s.Player.transform.position, pathGoal = Vector3.zero; NavMeshPath path = null; bool pulledByYou = false;
                 AdventurerMotor.Running = true; Time.timeScale = Speed;
                 void Line() { Log(t.ToString("0") + "s: " + string.Join(", ", members.Select(m => m.name + " " + Hp(m.actor))) + " | beast " + Hp(beast.actor) + " on " + (beast.actor.IsAlive ? Who(beast.Victim) : "-") + ", Nix " + Hp(nix.actor) + (nix.Inside != null ? " (in the saddle)" : " on " + (nix.actor.IsAlive ? Who(nix.Victim) : "-")) + " | " + (s.DuoState ?? "no duo") + " | healer " + (healer == null ? "none" : healer.actor.IsAlive ? (healer.Activity ?? "-") : "dead") + " | guards up " + s.Enemies.Count(e => e != null && e.Camp && e.CampIndex == nixCamp && e != beast && e != nix && e.actor.IsAlive) + " | leader " + (leader.Activity ?? "-") + " (" + leader.LeadingName + ")" + " | you on " + (s.Target != null ? s.Target.Name : "nothing")); }
                 while (t < Limit)
@@ -170,14 +170,14 @@ namespace Crulanda.Tests
                     if (!s.Player.IsAlive)
                     {
                         EncounterInput.Scripted = Vector2.zero;
-                        if (deadSince < 0) deadSince = t;
+                        if (deadSince < 0) { deadSince = t; fellAt = s.Player.transform.position; }
                         else if (t - deadSince > 4)
                         {
                             s.Recover(); deadSince = -1; getUps++;
-                            var back = leader != null ? leader.transform.position - leader.transform.forward * 2.5f : campHit.position;
+                            var back = fellAt;   // where you fell (the walk back the run makes); the leader may be up at the stone
                             if (NavMesh.SamplePosition(back, out var bh, 6, NavMesh.AllAreas)) s.Player.GetComponent<AdventurerMotor>().Teleport(bh.position + Vector3.up * 1.05f);
                             s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max);
-                            upAt = t; Log(t.ToString("0") + "s: you get up (" + getUps + ") and are back beside " + leader.sim.name);
+                            upAt = t; Log(t.ToString("0") + "s: you get up (" + getUps + ") and are back where you fell");
                         }
                         t += Time.deltaTime; yield return null; continue;
                     }
@@ -194,6 +194,10 @@ namespace Crulanda.Tests
                         if (e.Victim != s.Player && Time.time - since < 2.5f) continue;
                         float d = Vector3.Distance(e.transform.position, me); if (d < best) { best = d; foe = e; }
                     }
+                    // Assist the tank (2026-10-15): what it holds before the nearest (the bot went for Nix while he was free and died at 15 s,
+                    // every fight); a held mob is still left alone.
+                    { var tank = s.PartySims.Find(c => c != null && c.actor.IsAlive && c.Role == SimCompanion.PartyRole.Tank);
+                      if (tank != null) { var held = s.Enemies.Find(e => e != null && e.actor.IsAlive && !e.Hidden && e.Victim == tank.actor && !SimCompanion.Held(e) && Vector3.Distance(e.transform.position, me) < 30); if (held != null) foe = held; } }
                     if (foe == null && pulledByYou && pulledAt < 0) foe = beast;
                     if (repull) { if (foe != null) repull = false; else foe = beast.actor.IsAlive ? beast : nix; }
                     Vector3 goal = foe != null ? foe.transform.position : leader.actor.IsAlive ? leader.transform.position : campHit.position; float reach = foe != null ? 2.6f : 4.5f;

@@ -123,7 +123,8 @@ namespace Crulanda.World
     /// </summary>
     public sealed class ZoneInn
     {
-        /// <summary>"tavern" (a bar, a cask and an innkeeper: the Golden Cask, the Cracked Hearth), "waystation" (one storey, a long table
+        /// <summary>"tavern" (a bar, a cask and an innkeeper: the Golden Cask, the Cracked Hearth), "city" (the same, in white stone round a
+        /// galleried taproom: the Crown's Gilded Lantern, inn variant 3), "waystation" (one storey, a long table
         /// and bunks: Pilgrims' Rest, Wain's Rest) or "hearth" (the Keepers' hearth-house in the Hearth-Tree).</summary>
         public string name, style;
         public ZoneDoor door;
@@ -133,7 +134,7 @@ namespace Crulanda.World
         /// <summary>Where the house's lodgers sleep (a waystation's bunks), or null.</summary>
         public ZoneDoor bunks;
         /// <summary>A bar, a cask and someone to keep them: the inn's news, its ale and its drinkers.</summary>
-        public bool Staffed { get { return style == "tavern"; } }
+        public bool Staffed { get { return style == "tavern" || style == "city"; } }
         /// <summary>Whether a point stands inside the walls (<paramref name="margin"/> metres in from them).</summary>
         public bool Contains(Vector3 world, float margin = 0)
         {

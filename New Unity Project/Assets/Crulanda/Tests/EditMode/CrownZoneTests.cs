@@ -180,6 +180,182 @@ namespace Crulanda.Tests
             foreach (var s in crown.secrets) Assert.IsTrue(Labelled(s.canonStatus), s.id + " is labelled.");
         }
 
+        // ---------- the city inn and the city's people (p9-cityinn; Chris, 2026-10-16: "dont need the same exact inn in the castle. needs a
+        // redesign", "will need lots more npcs in the castle with real jobs like in oakhaven") ----------
+        /// <summary>A point of a prop's own frame (x across, z its front to back) in the world.</summary>
+        static Vector2 World(ZoneProp p, Vector2 local)
+        {
+            float r = p.rotation * Mathf.Deg2Rad; return p.at + new Vector2(Mathf.Cos(r), -Mathf.Sin(r)) * local.x + new Vector2(Mathf.Sin(r), Mathf.Cos(r)) * local.y;
+        }
+        static float Outside(Vector2 p, Vector2 at, Vector2 half) { return new Vector2(Mathf.Max(0, Mathf.Abs(p.x - at.x) - half.x), Mathf.Max(0, Mathf.Abs(p.y - at.y) - half.y)).magnitude; }
+
+        [Test] public void The_Gilded_Lantern_is_a_city_inn_laid_out_inside_its_walls()
+        {
+            var inn = Prop("The Gilded Lantern"); Assert.AreEqual("inn", inn.kind); Assert.AreEqual(3, inn.variant, "The city inn (variant 3), not the village's timber inn.");
+            Assert.GreaterOrEqual(inn.size.x, 20); Assert.GreaterOrEqual(inn.size.y, 14, "A city inn: two storeys round a galleried taproom, 22 x 16.");
+            var plan = ZoneBuilder.InnPlan.For(inn.size, inn.variant); var inner = plan.Inner; var door = plan.DoorZone; const float body = .3f;
+            Assert.IsTrue(plan.city && !plan.waystation);
+            Assert.AreEqual(ZoneBuilder.CityDoorW, plan.doorW, 1e-4f, "The grand double door."); Assert.Greater(plan.NavGap, 2, "Two pass through it with room to spare.");
+            Assert.Greater(plan.galleryY, 3, "A gallery a storey up."); Assert.GreaterOrEqual(plan.columns.Count, 4, "On columns.");
+            Assert.Greater(plan.stairSize.x, 4.5f, "A stair up to it"); Assert.Less(Mathf.Atan2(plan.galleryY, plan.stairSize.x) * Mathf.Rad2Deg, 40, "that can be walked (under 40 degrees).");
+            Assert.GreaterOrEqual(plan.seats.Count, 28, "Booths and round tables."); Assert.AreEqual(12, plan.seats.Count(s => s.at.x < -inner.x + 2), "Three booths of four along the -x end.");
+            Assert.GreaterOrEqual(plan.stools.Count, 6, "A long bar with its stools."); Assert.Greater(plan.barSize.x, 8, "The long polished bar.");
+            Assert.AreEqual(2, plan.benchSeats.Count, "The bench before the hearth.");
+            Assert.GreaterOrEqual(plan.serve.Count, 2, "Places for the servers to wait.");
+            var problems = new List<string>(); var furniture = plan.Furniture();
+            for (int i = 0; i < furniture.Count; i++)
+            {
+                var (what, at, half) = furniture[i];
+                if (Mathf.Abs(at.x) + half.x > inner.x + .01f || Mathf.Abs(at.y) + half.y > inner.y + .01f) problems.Add(what + " goes through the walls");
+                if (Rect.MinMaxRect(at.x - half.x, at.y - half.y, at.x + half.x, at.y + half.y).Overlaps(door)) problems.Add(what + " stands in the doorway");
+                for (int j = i + 1; j < furniture.Count; j++) { var (o, oat, oh) = furniture[j]; if (Mathf.Abs(at.x - oat.x) < half.x + oh.x && Mathf.Abs(at.y - oat.y) < half.y + oh.y) problems.Add(what + " and " + o + " overlap"); }
+            }
+            var seats = plan.seats.Concat(plan.stools).Concat(plan.benchSeats).ToList();
+            for (int i = 0; i < seats.Count; i++)
+            {
+                var (at, face) = seats[i]; string s = "the seat at " + at + " ";
+                if (Mathf.Abs(at.x) > inner.x - body - .05f || Mathf.Abs(at.y) > inner.y - body - .05f) problems.Add(s + "is in the wall");
+                if (door.Contains(at)) problems.Add(s + "is in the doorway");
+                foreach (var (what, fat, half) in furniture)
+                {
+                    bool own = Vector2.Distance(face, fat) < .05f || what == "the bar" && Mathf.Abs(face.y - fat.y) < .05f; float clear = Outside(at, fat, half);
+                    if (clear <= 0) problems.Add(s + "is in " + what); else if (!own && clear < body) problems.Add(s + "is " + clear.ToString("0.00") + " m from " + what);
+                }
+                for (int j = i + 1; j < seats.Count; j++) if (Vector2.Distance(at, seats[j].at) < 2 * body - .02f) problems.Add(s + "is in the lap of the seat at " + seats[j].at);
+            }
+            foreach (var (what, at) in new[] { ("the innkeeper's place", plan.stand), ("the cook's place", plan.cook), ("the hatch", plan.hatch) }.Concat(plan.serve.Select(s => ("a server's place", s))))
+            {
+                if (Mathf.Abs(at.x) > inner.x - body || Mathf.Abs(at.y) > inner.y - body) problems.Add(what + " is in the wall");
+                foreach (var (f, fat, half) in furniture) if (Outside(at, fat, half) < .5f) problems.Add(what + " is in " + f);
+                if (door.Contains(at)) problems.Add(what + " is in the doorway");
+            }
+            Assert.Greater(plan.stand.x, plan.bar.x + plan.barSize.x / 2, "The innkeeper stands past the bar's end.");
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+            // The innkeeper keeps the bar where the plan has him; the inn clear of every building and road round it.
+            Assert.Less(Vector2.Distance(Role("innkeeper").at, World(inn, plan.stand)), .3f, "Corin Bellweather at the bar's open end.");
+            foreach (var o in crown.props.Where(o => o != null && o != inn && Vector2.Distance(o.at, inn.at) < 40))
+            {
+                var size = ZoneBuilder.CitySize(o); if (size.x <= 0) continue;
+                Assert.Greater(Mathf.Max(Mathf.Abs(o.at.x - inn.at.x) - (size.x + inn.size.x) / 2, Mathf.Abs(o.at.y - inn.at.y) - (size.y + inn.size.y) / 2), 1, "The Lantern clear of " + o.name + ".");
+            }
+            foreach (var r in crown.roads) for (float u = -1; u <= 1.01f; u += .1f)
+                foreach (var local in new[] { new Vector2(u * inn.size.x / 2, -inn.size.y / 2 - 2.6f), new Vector2(u * inn.size.x / 2, inn.size.y / 2) })
+                {
+                    var w = World(inn, local); float d = float.MaxValue;
+                    for (int i = 0; i + 1 < r.points.Length; i++) { Vector2 a = r.points[i], ab = r.points[i + 1] - a; d = Mathf.Min(d, Vector2.Distance(w, a + ab * Mathf.Clamp01(Vector2.Dot(w - a, ab) / Mathf.Max(1e-4f, ab.sqrMagnitude)))); }
+                    Assert.Greater(d, r.width / 2, "The Lantern and its portico out of " + r.name + ".");
+                }
+        }
+
+        static IEnumerable<ZoneResident> Workers { get { return crown.life.residents.Where(r => r != null && r.works && VillageWork.CityRoles.Contains(r.role)); } }
+
+        [Test] public void At_least_thirty_of_the_Crowns_people_have_real_jobs_and_homes()
+        {
+            var workers = Workers.ToList();
+            Assert.GreaterOrEqual(workers.Count, 30, "Lots more people with real jobs, as in Oakhaven.");
+            foreach (var role in new[] { "clerk", "scribe", "page", "lamplighter", "gardener", "sweeper", "watercarrier", "cook", "server", "potboy", "porter", "vaultguard", "nightguard", "steward", "trader", "patron", "noble", "servant" })
+                Assert.IsTrue(workers.Any(w => w.role == role), "Someone is a " + role + ".");
+            var problems = new List<string>();
+            foreach (var w in workers)
+            {
+                if (VillageWork.DayFor(w.role) == null) problems.Add(w.name + " (" + w.role + ") has no working day");
+                if (w.at != Vector2.zero) problems.Add(w.name + " keeps a post, not a working day");
+                if (string.IsNullOrEmpty(w.title)) problems.Add(w.name + " has no title");
+                if (!Labelled(w.canonStatus)) problems.Add(w.name + " is not labelled");
+                if (w.name == "Aethelgard" || w.name.Contains("Lysara") || w.name.Contains("Kaelen")) problems.Add(w.name + " is from the books");
+                var home = crown.life.households.FirstOrDefault(h => h.members.Any(m => m.name == w.name));
+                if (home == null) { problems.Add(w.name + " has no household"); continue; }
+                var house = Prop(home.house);
+                if (house == null || (house.kind != "gilt_house" && house.kind != "inn")) problems.Add(w.name + "'s home '" + home.house + "' is not a gilt house or the inn");
+            }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+            Assert.AreEqual(crown.life.households.Length, crown.life.households.Select(h => h.house).Distinct().Count(), "A household a house.");
+            // The carriers carry visible loads, as Oakhaven's do: papers, crates, buckets, the besom, the lamplighter's pole.
+            var loads = workers.Select(w => w.role).Distinct().SelectMany(r => VillageWork.DayFor(r).errands).Select(e => e.load).Distinct().ToList();
+            foreach (var l in new[] { Crulanda.Encounter.Load.Papers, Crulanda.Encounter.Load.Goods, Crulanda.Encounter.Load.Bucket, Crulanda.Encounter.Load.Broom, Crulanda.Encounter.Load.Pole }) CollectionAssert.Contains(loads, l, "Someone carries " + l + ".");
+            // Night: most go home (to the gilt houses) or to the inn; the night guard keeps the vault, the lamplighter lights the lamps at dusk.
+            Assert.IsNotNull(VillageWork.ShiftFor("nightguard", 23)); CollectionAssert.Contains(VillageWork.ShiftFor("nightguard", 23).places, "treasury");
+            Assert.IsNotNull(VillageWork.HoursOf("nightguard")); Assert.That(VillageWork.HoursOf("nightguard").Value.x, Is.InRange(6f, 12f), "The night guard sleeps by day.");
+            CollectionAssert.Contains(VillageWork.ShiftFor("lamplighter", 19.5f).places, "lamp", "The lamplighter at the lamps at dusk.");
+            foreach (var role in new[] { "clerk", "scribe", "gardener", "sweeper", "porter", "trader", "steward" })
+                Assert.IsTrue(VillageWork.ShiftFor(role, 19).places.All(p => p == "inn" || p == "home" || p == "green" || p == "guildhall"), role + " is done with work in the evening.");
+        }
+
+        /// <summary>The prop kinds (and other parts of the zone's data) a city's place of each kind comes from (ZoneBuilder.Crown's
+        /// Workplaces, VillageLife.FindPlaces).</summary>
+        static bool Supplied(string place)
+        {
+            bool Has(Func<ZoneProp, bool> f) { return crown.props.Any(p => p != null && f(p)); }
+            switch (place)
+            {
+                case "keep": return Has(p => p.kind == "council_keep");
+                case "councilhall": return Has(p => p.kind == "dome_hall");
+                case "archive": return Has(p => p.kind == "archive");
+                case "exchange": return Has(p => p.kind == "mansion" && p.variant == 0);
+                case "treasury": return Has(p => p.kind == "mansion" && p.variant == 1);
+                case "guildhall": return Has(p => p.kind == "guild_hall");
+                case "gate": return Has(p => p.kind == "city_gate" && p.variant == 0);
+                case "lamp": return Has(p => p.kind == "city_lamp");
+                case "garden": return Has(p => p.kind == "parterre");
+                case "well": return Has(p => p.kind == "fountain");
+                case "street": case "wander": return crown.roads.Any(r => r != null && r.points.Length > 1);
+                case "green": return crown.clearings.Length > 0;
+                case "inn": case "bar": case "kitchen": case "kitchendoor": case "serve": return Has(p => p.kind == "inn" && p.variant == 3);
+                default: return false;
+            }
+        }
+
+        [Test] public void Every_job_has_a_workplace_in_the_Crown()
+        {
+            var problems = new List<string>();
+            foreach (var role in Workers.Select(w => w.role).Distinct())
+                foreach (var place in VillageWork.PlacesOf(role))
+                    if (!Supplied(place)) problems.Add(role + " is sent to '" + place + "', which the Crown has none of");
+            foreach (var place in VillageLife.CityPlaces) if (!Supplied(place)) problems.Add("the city's place kind '" + place + "' has no source in the Crown");
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
+        /// <summary>The ground's level at a point from the terraces (a later one over an earlier; their edges' blend left out).</summary>
+        static float Level(Vector2 p)
+        {
+            float h = 0;
+            foreach (var t in crown.terraces)
+            {
+                float r = t.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), s = Mathf.Sin(r), dx = p.x - t.center.x, dz = p.y - t.center.y, lx = dx * c - dz * s, lz = dx * s + dz * c;
+                if (Mathf.Abs(lx) <= t.size.x / 2 && Mathf.Abs(lz) <= t.size.y / 2) h = ZoneBuilder.TerraceLevel(t, lz);
+            }
+            return h;
+        }
+        /// <summary>Whether a point is in a landmark's high frame: within the camera's half-angles (a 60 degree lens at 16:9) of its line of sight.</summary>
+        static bool InFrame(ZoneLabel l, Vector3 p)
+        {
+            var cam = new Vector3(l.view.x, Level(l.view) + l.viewHeight, l.view.y); var aim = new Vector3(l.at.x, Level(l.at) + l.viewAim, l.at.y);
+            var look = Quaternion.LookRotation(aim - cam); var local = Quaternion.Inverse(look) * (p - cam);
+            if (local.z <= 0) return false;
+            return Mathf.Abs(Mathf.Atan2(local.x, local.z)) * Mathf.Rad2Deg < 44 && Mathf.Abs(Mathf.Atan2(local.y, local.z)) * Mathf.Rad2Deg < 27;
+        }
+
+        [Test] public void The_map_view_frames_the_whole_High_City_and_the_dome_and_the_inn_their_own()
+        {
+            var whole = crown.landmarks.Single(l => l.name == "The Crown of Argentis");
+            Assert.Greater(whole.viewHeight, 60, "From high over the south-east (crown-19 was a grass corner under the wall).");
+            Vector2 keep = Prop("The Council Keep").at, dome = Prop("The Council Hall").at, archive = Prop("The Archive").at;
+            foreach (var (what, p) in new[] { ("the keep's spire", new Vector3(keep.x, 14 + 73, keep.y + 3)), ("the keep's door", new Vector3(keep.x, 16, keep.y - 12)), ("the dome", new Vector3(dome.x, 14 + 25, dome.y)),
+                ("the Archive's spires", new Vector3(archive.x, 14 + 40, archive.y - 7)), ("the Crown Square", new Vector3(0, 14, 80)), ("the Gilt Gate", new Vector3(110.5f, 12, 10)) })
+                Assert.IsTrue(InFrame(whole, p), what + " is in the frame of " + whole.name + ".");
+            var hall = crown.landmarks.Single(l => l.name == "The Council Hall");
+            Assert.Greater(hall.viewHeight, 7, "Over the colonnade's roof, not under it (crown-08).");
+            Assert.IsTrue(InFrame(hall, new Vector3(dome.x, 14 + 22, dome.y)), "The dome is in its frame.");
+            var lantern = crown.landmarks.Single(l => l.name == "The Gilded Lantern"); var inn = Prop("The Gilded Lantern");
+            Assert.Less(Vector2.Distance(lantern.at, inn.at), 3, "The landmark on the inn.");
+            Assert.Less(lantern.view.y, inn.at.y - inn.size.y / 2 - 6, "Its frame from before its front.");
+            foreach (var (what, local) in new[] { ("its door", new Vector3(0, 2, -inn.size.y / 2)), ("its left corner", new Vector3(-inn.size.x / 2, 6, -inn.size.y / 2)), ("its right corner", new Vector3(inn.size.x / 2, 6, -inn.size.y / 2)) })
+            {
+                var w = World(inn, new Vector2(local.x, local.z));
+                Assert.IsTrue(InFrame(lantern, new Vector3(w.x, Level(inn.at) + local.y, w.y)), what + " is in the Lantern's frame.");
+            }
+        }
+
         [Test] public void No_machines_and_no_borrowed_names()
         {
             var text = File.ReadAllText(Path.Combine(Zones, "crown.json")).ToLowerInvariant();

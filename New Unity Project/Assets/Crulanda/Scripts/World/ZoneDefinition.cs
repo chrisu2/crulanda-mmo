@@ -35,6 +35,9 @@ namespace Crulanda.World
         public ZoneProp[] props = new ZoneProp[0];
         public ZoneWasting wasting;         // only when the JSON has a "wasting" block (ZoneBuilder.ParseZone)
         public ZoneLabel[] landmarks = new ZoneLabel[0];
+        /// <summary>Far places drawn on the skyline past the world's edge (DistantSkyline; Chris, 2026-10-16: "maybe see a castle off in
+        /// the distance when looking north"): Oakhaven's view of the Crown of Argentis up its North road. Empty: none.</summary>
+        public ZoneSkyline[] skyline = new ZoneSkyline[0];
         public string[] objectives = new string[0];
         public ZoneExit[] exits = new ZoneExit[0];
         public ZoneGrove[] groves = new ZoneGrove[0];
@@ -492,7 +495,15 @@ namespace Crulanda.World
     /// (unset: from its south-west); viewPitch and viewZoom set that shot's camera (0: 17 degrees, 11 m). ground (optional):
     /// "licked" paints the place's ground smooth and uncracked in an ash zone (the Unwoven Flats); paint only.
     /// </summary>
-    [Serializable] public sealed class ZoneLabel { public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; public string ground; }   // canonStatus: CANON / CANON-EXPANDED / GAME-ONLY / PROVISIONAL
+    /// viewHeight (optional, p9-cityinn): the shot is taken from a free camera that many metres over the ground at view, aimed at the
+    /// landmark viewAim metres over its ground (a city seen whole from high over its walls), not from the player's orbit camera.
+    [Serializable] public sealed class ZoneLabel { public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; public string ground; public float viewHeight, viewAim; }
+    /// <summary>
+    /// A far place on the skyline (DistantSkyline): kind ("crown": the Crown of Argentis on its mountain), bearing from the zone's middle
+    /// in degrees (0 north, 90 east), distance in reaches past the zone's middle (the zone's half plus its backdrop; 0: 1.75, past the
+    /// forest ring and in front of the far ranges), scale (0: 1), name and canonStatus for the record. Never reached; nothing solid.
+    /// </summary>
+    [Serializable] public sealed class ZoneSkyline { public string kind, name, canonStatus; public float bearing, distance, scale; }   // canonStatus: CANON / CANON-EXPANDED / GAME-ONLY / PROVISIONAL
 
     public static class ZoneColors
     {

@@ -481,6 +481,9 @@ namespace Crulanda.Encounter
                 case "woods": return "in the woods"; case "meadow": return "out on the hill gathering"; case "green": return "on the green";
                 case "well": return "at the well"; case "inn": case "bar": case "kitchen": case "kitchendoor": case "passedout": return "at the inn";
                 case "yard": case "herd": return "with the hens";
+                case "keep": return "at the Keep"; case "councilhall": return "at the Council Hall"; case "archive": return "in the Archive";
+                case "exchange": return "at the Exchange"; case "treasury": return "at the Treasury"; case "guildhall": return "at the guild hall";
+                case "gate": return "at the gate"; case "garden": return "in the gardens"; case "street": case "lamp": return "about the streets"; case "serve": return "at the inn";
                 default: return null;
             }
         }
@@ -529,7 +532,7 @@ namespace Crulanda.Encounter
             int space = name.IndexOf(' ');
             if (space < 0) return name;
             string first = name.Substring(0, space);
-            return first == "Old" || first == "Goody" || first == "Warden" || first == "Sister" ? name : first;
+            return first == "Old" || first == "Goody" || first == "Warden" || first == "Sister" || first == "Lord" || first == "Lady" ? name : first;   // the Crown's lords and ladies go by their whole name
         }
         /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn. The water pan dries out. The
         /// purses keep their day (<see cref="Purses"/>).</summary>
@@ -575,6 +578,9 @@ namespace Crulanda.Encounter
         {
             var z = Zone.Zone;
             foreach (var key in new[] { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow", "leathershop", "dryhut", "kitchen", "kitchendoor", "bar", "lodge", "bench" }) Places[key] = new List<Vector3>();
+            // A city's places (the Crown, p9-cityinn): the halls' desks and floors, the gate's yard, the lamps and the parterres are
+            // registered by the builder (ZoneBuilder.Crown); the streets are drawn from the roads below and the fountains are its wells.
+            foreach (var key in CityPlaces) Places[key] = new List<Vector3>();
             // Trade workplaces (exact stand points, with where to look while working, and whose place it is).
             foreach (var w in Zone.Workplaces)
                 if (NavMesh.SamplePosition(w.stand, out var wh, 1.5f, NavMesh.AllAreas)) { Places[w.kind].Add(wh.position); faceAt[wh.position] = w.look; placeName[wh.position] = w.name; }
@@ -616,7 +622,10 @@ namespace Crulanda.Encounter
                 if (prop == null) continue;
                 if (prop.kind == "well") for (int i = 0; i < 3; i++) { float a = i * 2.1f; AddPlace("well", prop.at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 2.3f); }
                 if (prop.kind == "mill") AddPlace("mill", prop.at + new Vector2(0, -(prop.size.y > 0 ? prop.size.y : 6) / 2 - 2));
+                // A city's fountain is its well: four places round the basin's rim (ZoneBuilder.Fountain: 4.6 m for the Crown Square's, else 3).
+                if (prop.kind == "fountain") for (int i = 0; i < 4; i++) { float a = (i + .5f) * Mathf.PI / 2; AddPlace("well", prop.at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * ((prop.variant == 1 ? 4.6f : 3) + 1.3f)); }
             }
+            if (z.city) Streets(z);
             if (z.clearings.Length > 0)
             {
                 var green = z.clearings[0];
@@ -633,7 +642,30 @@ namespace Crulanda.Encounter
                         AddPlace("inn", seat.at, true);
                         if (Places["inn"].Count > had) faceAt[Places["inn"][had]] = seat.face;
                     }
-            for (int i = 0; i < 24; i++) AddPlace("wander", new Vector2((R01 - .5f) * z.flatRadius * 1.6f, (R01 - .5f) * z.flatRadius * 1.6f));
+            // A city's folk wander its streets and squares: points thrown over the whole flat would land below the walls, where nobody
+            // can walk to them (the Crown stands on its plateau over the Lowtowns).
+            if (z.city) { Places["wander"].AddRange(Places["street"]); Places["wander"].AddRange(Places["green"]); }
+            else for (int i = 0; i < 24; i++) AddPlace("wander", new Vector2((R01 - .5f) * z.flatRadius * 1.6f, (R01 - .5f) * z.flatRadius * 1.6f));
+        }
+        /// <summary>The kinds of place a city adds (see <see cref="VillageWork"/>'s Crown trades).</summary>
+        public static readonly string[] CityPlaces = { "keep", "councilhall", "archive", "exchange", "treasury", "guildhall", "gate", "lamp", "garden", "street", "serve" };
+        /// <summary>A city's streets: a place every 12 m along each road, on alternate sides a metre in from its edge (the sweepers' beat,
+        /// the pages' and the nobles' strolls). Draws nothing random.</summary>
+        void Streets(ZoneDefinition z)
+        {
+            int n = 0;
+            foreach (var r in z.roads)
+            {
+                if (r == null || r.points == null || r.points.Length < 2) continue;
+                float carry = 6;
+                for (int i = 0; i + 1 < r.points.Length; i++)
+                {
+                    Vector2 a = r.points[i], b = r.points[i + 1], d = b - a; float len = d.magnitude; if (len < .1f) continue; d /= len;
+                    var side = new Vector2(-d.y, d.x);
+                    for (float s = carry; s < len; s += 12, n++) AddPlace("street", a + d * s + side * (n % 2 == 0 ? 1 : -1) * Mathf.Max(0, r.width / 2 - 1));
+                    carry = Mathf.Repeat(carry - len, 12);
+                }
+            }
         }
         /// <summary>How far from the village's middle its people go to work the fields, cut wood or walk the meadows: the farms and
         /// woods past it (a grown zone's outer ring) are the wild's, not a day's errand.</summary>
@@ -1032,7 +1064,7 @@ namespace Crulanda.Encounter
             v.Keeper = look == "keeper";
             // A Council warden of the Crown (look "concord"): the Concord's warden in its white tabard, friendly (ZoneBuilder.Crown; GAME-ONLY).
             bool concord = look == "concord";
-            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper || concord ? null : role);
+            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper || concord ? null : VillageWork.OutfitOf(role));
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop; v.Fold = fold;
@@ -1041,6 +1073,7 @@ namespace Crulanda.Encounter
             // but the drinkers.
             v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : role == "hunter" && life.Places["lodge"].Count > 0 ? HunterBed : role == "innkeeper" ? VillageWork.InnkeeperBed : 20.2f + (index % 5) * .25f;
             v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : role == "baker" ? 4.6f : role == "innkeeper" ? VillageWork.InnkeeperUp : 5.8f + (index % 5) * .3f;
+            var hours = VillageWork.HoursOf(role); if (hours.HasValue) { v.bedAt = hours.Value.x; v.wakeAt = hours.Value.y; }   // the Crown's late and night trades
             if (fixedPlace != null) v.bedAt = v.wakeAt = 0;   // residents keep their post day and night
             v.lastHour = WorldClock.Hour; v.index = index; v.tolerance = .85f + (index % 5) * .18f;
             go.SetActive(true);
@@ -1333,7 +1366,7 @@ namespace Crulanda.Encounter
         void Carry(Load what, int count)
         {
             DropLoad(); loadKind = what; loadCount = count; load = LoadProps.Build(transform, what, count);
-            if (visual != null) visual.Carry = what == Load.Bread || what == Load.Goods ? ActorVisual.Carrying.Front : what == Load.Grain || what == Load.Flour || what == Load.Logs ? ActorVisual.Carrying.Shoulder : ActorVisual.Carrying.Side;
+            if (visual != null) visual.Carry = what == Load.Bread || what == Load.Goods || what == Load.Papers ? ActorVisual.Carrying.Front : what == Load.Grain || what == Load.Flour || what == Load.Logs ? ActorVisual.Carrying.Shoulder : ActorVisual.Carrying.Side;
         }
         /// <summary>Puts down whatever is carried (the capture tools' farmer frames: a load puts the trade's tool away).</summary>
         public void PutDownLoad() { DropLoad(); }
@@ -1399,6 +1432,16 @@ namespace Crulanda.Encounter
                 case "woodpile": return ActorPose.Chop;
                 case "woods": return Role == "lumberjack" ? ActorPose.Chop : Role == "hunter" || Role == "warden" ? ActorPose.None : ActorPose.Gather;
                 case "meadow": return Role == "hunter" ? ActorPose.None : ActorPose.Gather;
+                // The Crown's (p9-cityinn): at a desk, the clerks and scribes write; at the gate and the Exchange the porters lift; the
+                // guards stand their watch; the gardeners kneel at the beds, the sweepers sweep, the lamplighter reaches up to a lamp.
+                case "archive": return ActorPose.Knead;
+                case "keep": return Role == "clerk" || Role == "scribe" ? ActorPose.Knead : ActorPose.Talk;
+                case "councilhall": case "guildhall": case "serve": return ActorPose.Talk;
+                case "exchange": case "gate": return Role == "porter" ? ActorPose.Work : ActorPose.Talk;
+                case "treasury": return Role == "porter" ? ActorPose.Work : Role == "vaultguard" || Role == "nightguard" ? ActorPose.None : ActorPose.Talk;
+                case "garden": return Role == "gardener" ? ActorPose.Gather : ActorPose.None;
+                case "street": return Role == "sweeper" ? ActorPose.Work : ActorPose.None;
+                case "lamp": return Role == "lamplighter" ? ActorPose.Work : ActorPose.None;
                 default: return ActorPose.None;
             }
         }

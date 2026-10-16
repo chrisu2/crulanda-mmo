@@ -98,7 +98,7 @@ namespace Crulanda.World
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); Lap("prepare");
             BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildPaving(); BuildCaveWorks(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
-            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
+            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); DistantSkyline.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");
             if (art.grass != null && art.grass.Length > 0)
             {
                 // Gloom: the tufts are dry, greyed straw and no wildflowers bloom.
@@ -1170,7 +1170,7 @@ namespace Crulanda.World
                 switch (p.kind)
                 {
                     case "house": House(t, p.size.x > 0 ? p.size : new Vector2(7, 5), 3f, p.variant, false); break;
-                    case "inn": if (p.variant == 2) Waystation(t, p.size.x > 0 ? p.size : new Vector2(8, 6), p); else Inn(t, p.size.x > 0 ? p.size : new Vector2(12, 8), p.variant); break;
+                    case "inn": if (p.variant == 2) Waystation(t, p.size.x > 0 ? p.size : new Vector2(8, 6), p); else if (p.variant == 3) CityInn(t, p.size.x > 0 ? p.size : new Vector2(22, 16)); else Inn(t, p.size.x > 0 ? p.size : new Vector2(12, 8), p.variant); break;
                     case "barn": Barn(t, p.size.x > 0 ? p.size : new Vector2(12, 8)); break;
                     case "mill": Mill(t, p.size.x > 0 ? p.size : new Vector2(7, 6)); break;
                     case "well": Well(t, p.variant); break;

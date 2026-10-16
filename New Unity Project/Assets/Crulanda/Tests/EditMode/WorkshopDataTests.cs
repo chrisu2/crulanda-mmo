@@ -122,7 +122,8 @@ namespace Crulanda.Tests
         {
             var dir = Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Items");
             var db = Crulanda.Encounter.ItemDatabase.Parse(Directory.GetFiles(dir, "*.json").Select(File.ReadAllText).ToList());
-            CollectionAssert.AreEquivalent(new[] { "food.brown_loaf", "food.harrow_cheese" }, db.StockFor("Hob Linden", "innkeeper", 2), "Hob sells bread and cheese.");
+            // And two cook's leaves (trades.json's vendors, the crafting branch): the trainers and vendors sell recipe leaves by design.
+            CollectionAssert.AreEquivalent(new[] { "food.brown_loaf", "food.harrow_cheese", "leaf.cask_stew", "leaf.harvest_feast" }, db.StockFor("Hob Linden", "innkeeper", 2), "Hob sells bread and cheese, and two cook's leaves.");
             foreach (var id in new[] { "food.brown_loaf", "food.harrow_cheese" }) Assert.IsNotNull(db.Get(id), id + " is an item.");
         }
 

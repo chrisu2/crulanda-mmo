@@ -45,8 +45,9 @@ namespace Crulanda.Tests
             { "warden", SocialKind.Call },   // the grey picket (2026-10-15): Concord wardens, people: they call
             { "forager", SocialKind.Call },   // the foragers' camp (2026-10-15): deserters living rough; its data says call
             // The Lowtowns (Phase 9.1): the gutter-hounds and the drains' Weave-Eaters pack; the river thieves, the Iron Teeth, the hired
-            // warders and the grey-touched call (people, and what was people).
-            { "gutterhound", SocialKind.Pack }, { "drainmother", SocialKind.Pack }, { "lanterneater", SocialKind.Pack },
+            // warders and the grey-touched call (people, and what was people). The rare Lantern-Eater roams its lane alone and calls
+            // nobody (its data says solitary, 2026-10-16).
+            { "gutterhound", SocialKind.Pack }, { "drainmother", SocialKind.Pack }, { "lanterneater", SocialKind.Solitary },
             { "dockrat", SocialKind.Call }, { "ironteeth", SocialKind.Call }, { "sifter", SocialKind.Call }, { "brannoc", SocialKind.Call }, { "warder", SocialKind.Call }, { "greytouched", SocialKind.Call },
             // Hallow's Creek (Docs/DUNGEON2_DESIGN.md, 2026-10-16): the Bureau's people, the Iron Pact, the Hollow and the ringers call; the Old
             // Ram, the Grey Carter, the Fallen Mason, the Lamplighter, the Long Shadow and the Reader keep to themselves.
@@ -146,7 +147,9 @@ namespace Crulanda.Tests
                 // Hallow's Creek (2026-10-16): every calling elite names its guards.
                 "Road-Captain Everard Hurst <- Hurst's carters", "Sergeant Wymond Tredway <- Tredway's shield-line", "Assessor Piers Upcott <- Upcott's chalk-men",
                 "Picker-Master Fulke Yelland <- The Picker-Master's sorters", "Gil Coldwell, the Loft Watch <- Coldwell's netters", "First-Cut <- First-Cut's kin",
-                "Registrar Dunstan Pardew <- Pardew's copyists", "Pact-Captain Rowena Kersey <- Kersey's line", "Bureau Examiner Thurstan Vowell <- The Examiner's clerks" }, pairs,
+                "Registrar Dunstan Pardew <- Pardew's copyists", "Pact-Captain Rowena Kersey <- Kersey's line", "Bureau Examiner Thurstan Vowell <- The Examiner's clerks",
+                // The Lowtowns (Phase 9.1): the Mother of Drains and Knuckle Brannoc name theirs; the rare Lantern-Eater has none.
+                "Mother of Drains <- Deepest court Weave-Eaters", "Knuckle Brannoc <- Brannoc's sifters" }, pairs,
                 "If a camp moved, pair it in the data: \"guards\" on the elite's camp names its guard camps.");
         }
 

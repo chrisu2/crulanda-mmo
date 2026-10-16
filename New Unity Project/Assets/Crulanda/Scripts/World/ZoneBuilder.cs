@@ -123,7 +123,10 @@ namespace Crulanda.World
             var view = Camera.main;
             if (view != null && art.post != null && view.GetComponent<ZonePost>() == null) view.gameObject.AddComponent<ZonePost>().Init(art.post, Zone, sunLight);
             int before = MergeStatics();
-            if (!NoStaticBatching) try { StaticBatchingUtility.Combine(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
+            // The walked decks (NavWalkable) stay out of the batch: batching swaps their MeshFilter's mesh for the root's combined one, which is
+            // not readable, and the navmesh is built from them afterwards (EncounterNavigation: "Source mesh Combined Mesh ... does not
+            // allow read access", the Lowtowns' bridges, 2026-10-16). Each game object is batched on its own MeshFilter.
+            if (!NoStaticBatching) try { StaticBatchingUtility.Combine(statics.GetComponentsInChildren<MeshFilter>(true).Where(f => f.GetComponent<NavWalkable>() == null).Select(f => f.gameObject).ToArray(), statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             Debug.Log("Static scenery merged: " + before + " renderers into " + statics.GetComponentsInChildren<MeshRenderer>().Length + ".");
             Lap("batching");
             // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).

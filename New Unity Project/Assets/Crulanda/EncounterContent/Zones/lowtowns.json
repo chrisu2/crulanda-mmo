@@ -5422,6 +5422,7 @@
       "mob": "The Lantern-Eater",
       "tag": "lanterneater",
       "look": "weaveeater",
+      "social": "solitary",
       "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY; the Lantern-Eater GAME-ONLY",
       "center": {
         "x": -68,

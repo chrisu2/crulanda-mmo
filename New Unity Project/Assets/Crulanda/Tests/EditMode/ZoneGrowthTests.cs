@@ -127,7 +127,9 @@ namespace Crulanda.Tests
                 foreach (var e in z.exits)
                 {
                     string name = z.id + ": '" + e.name + "'";
-                    var to = zones.Single(t => t.id == e.to);
+                    // Oakhaven's road up to the Crown leads out of these files (a city of 320 m: CrownZoneTests has its exit and arrival).
+                    var to = zones.SingleOrDefault(t => t.id == e.to); if (to == null && e.to == "zone.crown") continue;
+                    Assert.IsNotNull(to, name + " leads to " + e.to + ", a zone of this test's files.");
                     if (!to.dungeon && (Cheb(e.at) < half - 12 || Cheb(e.at) > half - 5)) problems.Add(name + " at " + e.at + " is not at the edge");   // a dungeon's door stands where it is dug
                     if (!z.roads.Any(r => ToPath(e.at, r.points) < r.width / 2)) problems.Add(name + " at " + e.at + " is off its road");
                     if (!to.roads.Any(r => ToPath(e.arrive, r.points) < r.width / 2)) problems.Add(name + ": the arrival at " + e.arrive + " is off the road");

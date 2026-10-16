@@ -177,8 +177,10 @@ namespace Crulanda.Encounter
             new EliteMove { mob = "Knuckle Brannoc", name = "Iron Knuckles", windup = 1.7f, blow = 3.9f, reach = 3.5f, every = 10, callReach = 34, callMost = 2, knock = 3,
                 call = "Brannoc bangs his iron knuckles together: \"Teeth! Yard!\"", callShort = "Teeth! Yard!",
                 enrage = "Brannoc spits out a tooth and grins with the rest." },
-            // The rare (one visit in four): a Weave-Eater that drinks the lamps of one lane dark as it goes.
-            new EliteMove { mob = "The Lantern-Eater", name = "Lamp-Drinker", windup = 2, blow = 3.8f, reach = 4, every = 11,
+            // The rare (one visit in four): a Weave-Eater that drinks the lamps of one lane dark as it goes. A beast's health, so it
+            // turns early and fast when the lamps go out (enraged at 40%, swings at 0.55): a careful Barkhide two levels under won
+            // with 1% left on the old 30%/0.65 (EliteBalanceTests, 2026-10-16), and an elite two levels above is no solo kill.
+            new EliteMove { mob = "The Lantern-Eater", name = "Lamp-Drinker", windup = 2, blow = 3.8f, reach = 4, every = 11, enrageAt = .4f, enrageHaste = .55f,
                 cc = "disorient", ccName = "Snuffed", ccSeconds = 3, ccEvery = 17, ccReach = 6, ccText = "The Lantern-Eater drinks the light out of your eyes.",
                 enrage = "Every lamp in the lane goes out at once." },
             new EliteMove { mob = "Old Kettle, the pitch-boiler", name = "Ladle", windup = 2, blow = 4, reach = 3.6f, every = 11, ringEvery = 14, ringReach = 4.5f, ringName = "Hot Pitch",

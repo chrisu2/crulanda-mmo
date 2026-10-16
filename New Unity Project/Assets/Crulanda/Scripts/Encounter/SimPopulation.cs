@@ -128,11 +128,12 @@ namespace Crulanda.Encounter
                     string trade = SimEconomy.GatherTrade(s.classId); string mat = trade == "mining" ? "mat.copper_ore" : trade == "woodcutting" ? "mat.oak_log" : "mat.yarrow";
                     SimEconomy.Add(s, mat, 2 + r.NextInt(0, 4));
                 }
-                if (SimEconomy.GoodsCount(s) >= 8 && r.NextFloat() < .5f)
+                if (SimEconomy.SellableCount(s, items) >= 8 && r.NextFloat() < .5f)
                 {
                     var recipe = SimEconomy.Craftable(s, db, items);
                     if (recipe != null) SimEconomy.Craft(s, recipe, items); else SimEconomy.SellAll(s, items);
                     SimEconomy.Upgrade(s);
+                    SimEconomy.Stock(s, items);   // its pack for the bosses (BossBuffs)
                 }
             }
         }

@@ -65,6 +65,10 @@ namespace Crulanda.Encounter
                 if (!abilities.ContainsKey(id) || !unlocks.ContainsKey(id)) throw new ArgumentException("Paladin ability '" + id + "' is missing from content or unlocks.");
         }
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
+        /// <summary>Its standing party buff at a buff-up before a boss (Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"; GAME-ONLY):
+        /// the Vanguard's oath taken under the standard before the fight: every one of the party a little harder to cut. Half an hour, +3% armour on everyone (BossBuffs).</summary>
+        public static readonly ClassBuff Standing = new ClassBuff("class.paladin", "Sworn to the Colours", Crulanda.Core.StatType.Armor);
+        public override ClassBuff PartyBuff { get { return Standing; } }
         int R(string id) { return s.TalentRank(id); }
         float Now { get { return Time.time; } }
         int Level { get { return s.Player.Level; } }

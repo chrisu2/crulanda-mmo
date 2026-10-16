@@ -110,3 +110,17 @@ a bank; "etc more as we come up with it".
 **Decisions answered (2026-10-15 ~22:45, the question prompt, verbatim):** the bank "Shared by all (Recommended)": the vault lives in
 the profile save (profile.save.json, beside the characters), not on a character, so the character format is untouched by it (the
 profile's format goes up one, Chris's saves backed up first); the Exchange "Sims list and buy (Recommended)".
+
+## Status (p9-exchange, 2026-10-15)
+Written, compile-checked, not yet run in Unity (EditMode `BankTests`, `ExchangeTests` to run; Chris's saves backed up first):
+- **The Treasury Vault** (`TreasuryVault.cs`, `CharacterProfile.cs`): 48 slots shared by every character in profile.save.json
+  (format 2), four more rows of 12 at 100, 250, 600 and 1,500 crowns; right-click or drag between the bags and the vault, stacks
+  merge, quest items refused. Opened by a resident with role `banker`, or `/bank` where you stand.
+- **The Exchange** (`Exchange.cs`; the world save, format 2): your lots from the bags for 12/24/48 world-hours with a buyout, an
+  optional starting bid and a deposit (a tenth of value per 12 hours, back on sale); the sims list their goods at value times a
+  markup by quality (1.5x poor to 5x legendary), buy your fair lots (more often the more are online; never at 2.5x fair), bid on lots
+  with a starting bid, and now and then outbid you; coin, returns and lots won wait at the clerk (Collect). It runs each world-hour
+  wherever you are and for the time away (two world days at most). Window: Browse (name, slot, level range, quality), My lots,
+  Collect. Opened by a resident with role `auctioneer`, or `/exchange`.
+- Not yet: the clerks placed in the castle (the zone step), sims buying gear or each other's lots, a listing's own bid amount typed in
+  (Bid places the least next bid).

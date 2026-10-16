@@ -85,6 +85,7 @@ namespace Crulanda.Encounter
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
             mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
+            bankVisible = session.BankOpen; exchangeVisible = session.ExchangeOpen;
             GUI.matrix = CanvasMatrix;   // even and centred (playtest note 94; EncounterHud.Display)
             GUI.color = Color.white;
             using (mWorld.Auto()) DrawWorldLabels();
@@ -95,6 +96,8 @@ namespace Crulanda.Encounter
             var windows = mWindows.Auto();
             if (session.CharacterOpen) DrawCharacter();
             if (session.VendorNpc != null) DrawVendor();
+            if (session.BankOpen) DrawBank();   // the capital's counters (EncounterHud.Capital.cs)
+            if (session.ExchangeOpen) DrawExchange();
             if (session.InventoryOpen) DrawBags();
             if (session.TradesOpen) DrawTrades();
             if (session.BuildOpen) DrawBuild();
@@ -113,7 +116,7 @@ namespace Crulanda.Encounter
                 GUI.Label(new Rect(530, 375, 400, 40), "YOU HAVE FALLEN", heading);
                 if (GUI.Button(new Rect(535, 433, 370, 44), "Recover [R]", button)) session.Recover();
             }
-            if (session.InventoryOpen || session.CharacterOpen || session.VendorNpc != null) DrawDragAndConfirm();
+            if (session.InventoryOpen || session.CharacterOpen || session.VendorNpc != null || session.BankOpen || session.ExchangeOpen) DrawDragAndConfirm();
             if (session.Paused) DrawPause();
             windows.Dispose();
         }

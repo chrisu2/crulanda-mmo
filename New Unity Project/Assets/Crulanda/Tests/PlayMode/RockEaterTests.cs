@@ -90,6 +90,9 @@ namespace Crulanda.Tests
             machine.RespawnSeconds = nix.RespawnSeconds = 1;
             Kill(machine); yield return Frames(2); Kill(nix); yield return Frames(2);
             Assert.IsFalse(machine.actor.IsAlive); Assert.IsFalse(nix.actor.IsAlive);
+            // Both are locked for you now (Lockouts, 2026-10-15: a boss stays down until its lockout resets): the reset comes, then the camp.
+            Assert.IsTrue(session.LockedFor(nix) && session.LockedFor(machine), "locked by the kill");
+            session.Progress.lockouts.Clear();
             yield return new WaitForSeconds(2.5f);
             Assert.IsTrue(machine.actor.IsAlive, "the engine is back"); Assert.IsTrue(nix.actor.IsAlive, "and so is Nix");
             Assert.AreSame(machine, nix.Inside, "in the saddle again"); Assert.IsTrue(nix.Hidden); Assert.IsTrue(Visible(nix));

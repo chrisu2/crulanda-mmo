@@ -390,6 +390,7 @@ namespace Crulanda.Encounter
         }
         void OnDeath(Health health)
         {
+            if (layingAway) return;   // put away by its lockout (EncounterEnemy.Lockout): no call, no kill, no body
             RaidMarked = RaidMark.None;   // the mark dies with it (Chris, 2026-10-11: "once the mob that was cc dies. take off the icon")
             ClearFight();   // before the death pose: a blow half drawn leaves the body leaning
             Victim = null;
@@ -405,6 +406,9 @@ namespace Crulanda.Encounter
         /// <summary>Camp mobs come back somewhere in their camp, whole, forgetting the fight.</summary>
         void Respawn()
         {
+            // A boss or elite still locked for you does not come back (Chris, 2026-10-15: "bosses/elites will not respawn"): its body goes
+            // where it would have stood up again, until the lockout resets (EncounterSession.KeptAway; EncounterEnemy.Lockout).
+            if (session.KeptAway(this)) { PutAway(); return; }
             respawnAt = float.MaxValue;
             var at = session.Zone != null ? session.Zone.StandAt(CampCenter + Random.insideUnitCircle * CampRadius * (Ambusher ? AmbushSpread(CampRadius) : 1), home.y) : home;   // a cave camp respawns on its floor
             for (int k = 0; k < 5 && session.Zone != null && !ClearOfCamp(at); k++) at = session.Zone.StandAt(CampCenter + Random.insideUnitCircle * Mathf.Max(CampRadius, Gap), home.y);   // not on top of another (note 131)
@@ -417,7 +421,7 @@ namespace Crulanda.Encounter
             UnscaleFromGroup(); TappedBy = null; actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             ClearFight(); evadeUntil = 0;
             threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0; ResetFlee();
-            Drops = null; Coins = 0; LootBeacon.Clear(this);
+            Drops = null; Coins = 0; NoLoot = false; LootBeacon.Clear(this);
             if (agent.isOnNavMesh) agent.isStopped = false;
             if (Game) GetComponent<GameAnimal>()?.Stand();
             if (Ambusher) Hide();

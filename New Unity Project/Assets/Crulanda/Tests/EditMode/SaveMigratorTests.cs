@@ -566,11 +566,14 @@ namespace Crulanda.Tests
             Assert.AreEqual(10, step.FromVersion); Assert.AreEqual(11, step.ToVersion); Assert.AreEqual(11, EncounterSave.FormatVersion);
             // The owner's evening save, brought to format 10 by the steps before this one, is a format-10 payload.
             string v10 = new SteeperCurveMigration().Migrate(new AddArmouryMigration().Migrate(OwnerSaveFixtures.V8Payload)), v11 = step.Migrate(v10);
-            Assert.AreEqual(v10.Substring(0, v10.Length - 1) + ",\"recipes\":[]}", v11, "Every character of the v10 payload is kept; the list goes in before the closing brace.");
-            Assert.AreEqual(v11, step.Migrate(v11), "A payload that has the list is left alone.");
-            Assert.AreEqual("{\"recipes\":[]}", step.Migrate("{}"));
-            Assert.AreEqual("{ \"a\" : 1,\"recipes\":[]}", step.Migrate("  { \"a\" : 1 }\n"));
-            Assert.AreEqual("{\"recipes\" : [\"recipe.cordial_ox\"]}", step.Migrate("{\"recipes\" : [\"recipe.cordial_ox\"]}"));
+            // The same step adds the lockouts after the recipes (2026-10-15, branch p86-lockout: one format for both), each only when missing.
+            Assert.AreEqual(v10.Substring(0, v10.Length - 1) + ",\"recipes\":[],\"lockouts\":[]}", v11, "Every character of the v10 payload is kept; the two lists go in before the closing brace.");
+            Assert.AreEqual(v11, step.Migrate(v11), "A payload that has both lists is left alone.");
+            Assert.AreEqual("{\"recipes\":[],\"lockouts\":[]}", step.Migrate("{}"));
+            Assert.AreEqual("{ \"a\" : 1,\"recipes\":[],\"lockouts\":[]}", step.Migrate("  { \"a\" : 1 }\n"));
+            Assert.AreEqual("{\"recipes\" : [\"recipe.cordial_ox\"],\"lockouts\":[]}", step.Migrate("{\"recipes\" : [\"recipe.cordial_ox\"]}"), "Only the missing list is added.");
+            Assert.AreEqual("{\"lockouts\":[{\"id\":\"mob.x.adit.5\",\"until\":1}],\"recipes\":[]}", step.Migrate("{\"lockouts\":[{\"id\":\"mob.x.adit.5\",\"until\":1}]}"), "Only the missing list is added.");
+            Assert.AreEqual("{\"recipes\":[],\"lockouts\":[]}", step.Migrate("{\"recipes\":[],\"lockouts\":[]}"));
             Assert.Throws<SaveMigrationException>(() => step.Migrate("[1,2]"));
             Assert.Throws<SaveMigrationException>(() => step.Migrate(""));
             Assert.Throws<SaveMigrationException>(() => step.Migrate(null));
@@ -578,7 +581,7 @@ namespace Crulanda.Tests
             // The whole chain, from the owner's morning (format 6): all five steps, and the list at the end.
             var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); m.Register(new SteeperCurveMigration()); m.Register(step);
             var from6 = m.MigrateToVersion(new SaveEnvelope { formatVersion = 6, payloadType = "CrulandaEncounter", payloadJson = OwnerSaveFixtures.V6Payload }, EncounterSave.FormatVersion);
-            Assert.AreEqual(11, from6.formatVersion); StringAssert.EndsWith(Then9(Tail8).Substring(0, Then9(Tail8).Length - 1) + ",\"recipes\":[]}", from6.payloadJson);
+            Assert.AreEqual(11, from6.formatVersion); StringAssert.EndsWith(Then9(Tail8).Substring(0, Then9(Tail8).Length - 1) + ",\"recipes\":[],\"lockouts\":[]}", from6.payloadJson);
             var input = new SaveEnvelope { formatVersion = 10, payloadType = "CrulandaEncounter", payloadJson = v10 };
             var from10 = m.MigrateToVersion(input, EncounterSave.FormatVersion);
             Assert.AreEqual(11, from10.formatVersion); Assert.AreEqual(v11, from10.payloadJson);

@@ -227,3 +227,28 @@ One new list, for the found recipes (Docs/PHASE8_6_LIVING_WORLD.md 3c; one forma
   fall or a zone change starts the character without them.
 - An older build refuses a format-11 save (its version is above theirs) and leaves the file alone.
 - As before, migration happens in memory on read. The file is written as format 11 on the next save.
+
+### Also format 11 (2026-10-15, branch p86-lockout): lockouts
+Chris, 2026-10-15: "bosses/elites will not respawn so no one is trying to exploit the gear/loot drops" ("Until a lockout resets",
+"Everywhere"; "every 2 days for loot"; "open world boss is once per week"; "raids once per week"). One more list, in the same format
+and the same step as the recipes (no format 12):
+- `lockouts`: `List<Lockout>` (`id`, `until`): each boss or elite this character's party has killed and may not loot again yet.
+  - `id` is the camp's key, the mob's id without its last part (`mob.captain.peaks.3` from `mob.captain.peaks.3.0`; the Rock-Eater's
+    own `mob.rockeater.adit.m21`), as the deeds' `elitesSlain` keys are. `until` is when the lockout ends, as UTC ticks
+    (`DateTime.Ticks`).
+  - How long (`Lockouts.Kinds`): a raid zone's (`ZoneDefinition.raid`, none built yet) and an open-world boss's (an elite with a boss's
+    move) a week, a dungeon's bosses and elites two days, any other open-world elite a day; each ends at 06:00 local time (the first
+    six o'clock after the kill, then a day for each further day). A kill inside a lockout does not push it back.
+  - On load (`EncounterSave.Read`, `Lockouts.Normalize`): a blank id, an `until` of zero or less, and a later entry for an id already
+    listed are dropped (the first is kept). A lockout that has run out is kept until the session prunes it (on each zone's load and
+    every few seconds while playing). An id this build's content doesn't know is kept.
+  - Where it sits: `EncounterProgress` declares it after `usedInteractables` and before `recipes`, so a written payload still has
+    `"recipes":[...],"discoveries":[...]` together and still ends `...,"lootLuck":[...]}`.
+- Migration 10 → 11 (`AddRecipesMigration`) now inserts `"recipes":[]` and then `"lockouts":[]` before the payload's closing brace, each
+  only when it is missing (as `AddArmouryMigration` does for its three), and leaves every other character as it was. A payload with both
+  is left alone. `SaveMigratorTests.V10Payload_MigratesTo11_...` and `LockoutTests` check it.
+- What to expect on Chris's save: `lockouts` appears, empty, next to `recipes`; nothing else changes. The same backup as for the recipes
+  (`<date>-pre-format-11`) covers it.
+- Formats 1-10 load with the list empty. A format-11 save written by the p86-craft build (recipes, no lockouts) also loads with it empty.
+- Not saved: the dungeon queue's run (which dungeon, which sims it brought: kept in memory across the dungeon's load only) and which
+  bosses are put away this visit (that follows from the list).

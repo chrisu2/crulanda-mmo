@@ -154,6 +154,7 @@ namespace Crulanda.Encounter
         public void RollCorpse(EncounterEnemy corpse)
         {
             if (corpse == null) return;
+            if (corpse.NoLoot) { PutLoot(corpse, 0, null); return; }   // a boss or elite killed under its lockout: nothing, not even coin (Lockouts.RollsLoot)
             int coins = 1 + corpse.actor.Level * 2 + Random.Range(0, corpse.actor.Level + 2);
             if (corpse.Elite) coins *= 3;
             if (GearFx.coins > 0) coins = Mathf.RoundToInt(coins * (1 + GearFx.coins));

@@ -16,7 +16,7 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed class EncounterSave
     {
-        public const int FormatVersion = 11;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck). 10: the cap-15 curve (experience migrated again, round 29). 11: found recipes (recipes, Phase 8.6)
+        public const int FormatVersion = 11;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck). 10: the cap-15 curve (experience migrated again, round 29). 11: found recipes and lockouts (recipes, Phase 8.6; lockouts, 2026-10-15)
         /// <summary>The most trade bags a save may list as worn.</summary>
         public const int MaxPouches = 8;
         /// <summary>The payload steps from format 6 on. Formats 1-5 are older than this chain and are upgraded in memory in Read.</summary>
@@ -120,6 +120,9 @@ namespace Crulanda.Encounter
                 // Format 11: the found recipes learned from leaves. Formats 1-10 have none. A blank id and a repeat are dropped; an id this
                 // content doesn't know is kept (ProfessionLog ignores it), so content can change.
                 if (p.recipes == null) p.recipes = new List<string>();
+                // Format 11 too: the lockouts (Lockouts). Formats 1-10 have none. A blank key, an expiry of zero or less and a repeat are
+                // dropped; one that has run out is kept until the session prunes it; a key this content doesn't know is kept.
+                Lockouts.Normalize(p);
                 foreach (var list in new[] { p.armoury, p.looks, p.keys, p.spiritStones, p.recipes }) { list.RemoveAll(string.IsNullOrEmpty); var once = new HashSet<string>(StringComparer.Ordinal); list.RemoveAll(id => !once.Add(id)); }
                 p.lootLuck.RemoveAll(l => l == null || string.IsNullOrEmpty(l.source));
                 foreach (var l in p.lootLuck) if (l.kills < 0 || l.dry < 0) throw new InvalidOperationException("Invalid loot data.");
@@ -267,19 +270,24 @@ namespace Crulanda.Encounter
     /// brace and every other character of the format-10 payload stays exactly as it was. A payload that already has the list is left
     /// alone; one that isn't a JSON object is refused (the save is then not loaded, not changed). A save written afterwards carries the
     /// list before <c>discoveries</c> (where EncounterProgress declares it); the order of a JSON object's fields means nothing to the read.
+    /// The same step adds an empty <c>lockouts</c> list after it (the bosses and elites killed and locked, Lockouts; 2026-10-15, branch
+    /// p86-lockout: one format for both, not a twelfth), each only when it is missing, as <see cref="AddArmouryMigration"/> does.
     /// </summary>
     public sealed class AddRecipesMigration : ISaveMigration
     {
         public int FromVersion { get { return 10; } }
         public int ToVersion { get { return 11; } }
-        static readonly Regex HasList = new Regex("\"recipes\"\\s*:");
+        static readonly string[] Lists = { "recipes", "lockouts" };
+        static readonly Regex[] Has = { new Regex("\"recipes\"\\s*:"), new Regex("\"lockouts\"\\s*:") };
         public string Migrate(string payloadJson)
         {
             string json = (payloadJson ?? "").Trim();
             if (json.Length < 2 || json[0] != '{' || json[json.Length - 1] != '}') throw new SaveMigrationException("The save's payload is not a JSON object.");
-            if (HasList.IsMatch(json)) return payloadJson;
+            bool all = true; foreach (var h in Has) all &= h.IsMatch(json);
+            if (all) return payloadJson;
             string body = json.Substring(0, json.Length - 1).TrimEnd();
-            return body + (body.EndsWith("{") ? "" : ",") + "\"recipes\":[]}";
+            for (int i = 0; i < Lists.Length; i++) if (!Has[i].IsMatch(json)) body += (body.EndsWith("{") ? "" : ",") + "\"" + Lists[i] + "\":[]";
+            return body + "}";
         }
     }
     /// <summary>Talent paths reworked (2026-10-12, Chris: "Rework existing paths into the new builds"): the Mage's Cinderwright became the

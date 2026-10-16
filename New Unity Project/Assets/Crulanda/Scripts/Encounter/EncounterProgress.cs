@@ -75,6 +75,10 @@ namespace Crulanda.Encounter
         public List<string> questItems = new List<string>();
         /// <summary>One-shot interactables already emptied ("zone|name|x|z"), e.g. a crate you took the iron from.</summary>
         public List<string> usedInteractables = new List<string>();
+        // ---------- lockouts (save format 11, with the found recipes; older saves load with this empty; here, not at the end, so payloads still end as they did) ----------
+        /// <summary>The bosses and elites killed and not yet to be looted again (Chris, 2026-10-15: "bosses/elites will not respawn"): each
+        /// one's key and when its lockout ends, as UTC ticks (Lockouts; run-out ones are dropped as the session goes).</summary>
+        public List<Lockout> lockouts = new List<Lockout>();
         // ---------- found recipes (save format 11; older saves load with this empty; here, not at the end, so payloads still end as they did) ----------
         /// <summary>The found recipes learned from a leaf, by recipe id, in the order learned (Phase 8.6 step 5). Taught recipes are not
         /// listed: they follow from the skill. See ProfessionLog.UseLeaf.</summary>

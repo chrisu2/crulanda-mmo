@@ -2466,6 +2466,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 828c5e19186c4397a85b26734a4ae70a, type: 3}
   - {fileID: 4900000, guid: 8551b0a84e6e40eabece9e15ae762d17, type: 3}
   - {fileID: 4900000, guid: 09624b8f2d254830aac358cd2c9554c3, type: 3}
+  - {fileID: 4900000, guid: 40f5f23a51b24db1b0c96d2f90139115, type: 3}
   professionFiles:
   - {fileID: 4900000, guid: 3ed5b143fd404108b1209da3f52c5162, type: 3}
   playerStats:

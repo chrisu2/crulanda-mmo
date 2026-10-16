@@ -49,7 +49,7 @@ namespace Crulanda.Encounter
                     case Doing.Hunt: return Quarry != null ? "fighting " + Quarry.actor.DisplayName : "hunting";
                     case Doing.Gather: return "gathering"; case Doing.Inn: return "at the inn"; case Doing.Down: return "fallen"; case Doing.CorpseRun: return "running back";
                     case Doing.Travel: return Exit != null ? "off to " + Session.ZoneName(Exit.to) : "travelling"; case Doing.Trade: return "trading";
-                    case Doing.Practice: return "practising at the yard"; case Doing.Craft: return Recipe != null && Recipe.profession == "alchemy" ? "brewing" : "at the forge";
+                    case Doing.Practice: return "practising at the yard"; case Doing.Craft: return Recipe == null ? "at the forge" : Recipe.profession == "alchemy" ? "brewing" : Recipe.profession == "leatherworking" ? "working leather" : Recipe.profession == "weaving" ? "weaving" : "at the forge";
                     default: return "about";
                 }
             }
@@ -146,7 +146,7 @@ namespace Crulanda.Encounter
             float gather = node != null ? .3f + .5f * (1 - sim.bold) + Noise() : -1;
             float rest = inn != null ? (health < .6f ? 1.2f : .12f + .2f * sim.chatty) + Noise() : -1;
             float trade = (goods >= 6 || SimEconomy.CanUpgrade(sim)) && Place("stall") != null ? .5f + goods * .04f + Noise() : -1;
-            float craft = recipe != null && Place(recipe.profession == "alchemy" ? "bench" : "forge") != null ? .75f + Noise() : -1;
+            float craft = recipe != null && Place(SimEconomy.Workplace(recipe)) != null ? .75f + Noise() : -1;
             int fit = SimPopulation.Suits(Session.ZoneId, sim.level);
             float travel = exit != null && Time.time - lastTrade > 60 ? (fit < 0 ? .9f : .05f + .1f * sim.bold) + Noise() * .5f : -1;
             float loiter = .25f + .45f * sim.chatty + Noise();
@@ -172,7 +172,7 @@ namespace Crulanda.Encounter
                 case Doing.Gather: goal = 1 + Mathf.Abs(sim.gearSeed / 7) % 3; until = Time.time + 200; if (node == null) Node = FindNode(); if (Node == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(Node.position); break;
                 case Doing.Inn: { var inn = Inn; until = Time.time + 150; if (inn == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(inn.position); break; }
                 case Doing.Trade: { var at = Place("stall"); until = Time.time + 120; if (at == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(at.Value); break; }
-                case Doing.Craft: { if (Recipe == null) Recipe = SimEconomy.Craftable(sim, Session.Professions?.Db, Session.Items); var at = Recipe != null ? Place(Recipe.profession == "alchemy" ? "bench" : "forge") : null; until = Time.time + 120; if (at == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(at.Value); break; }
+                case Doing.Craft: { if (Recipe == null) Recipe = SimEconomy.Craftable(sim, Session.Professions?.Db, Session.Items); var at = Recipe != null ? Place(SimEconomy.Workplace(Recipe)) : null; until = Time.time + 120; if (at == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(at.Value); break; }
                 case Doing.Travel: { if (Exit == null) Exit = FindExit(); until = Time.time + 300; if (Exit == null) { Activity = Doing.Loiter; until = Time.time + 20; } else { Go(Session.Zone.Ground(Exit.at)); SimChatter.Active?.Leaving(sim, Exit); } break; }
                 case Doing.CorpseRun: until = Time.time + 180; Go(CorpseAt); break;
                 case Doing.Practice: if (Mark == null) Mark = FindMark(); until = Time.time + 240; if (Mark == null) { Activity = Doing.Loiter; until = Time.time + 20; } else Go(Mark.stand); break;
@@ -228,7 +228,16 @@ namespace Crulanda.Encounter
             var q = Quarry;
             if (q == null || !q.actor.IsAlive)
             {
-                if (q != null && !q.actor.IsAlive && q.TappedBy == sim.id) { Kills++; GainXp(EncounterProgress.KillXp(q.actor.Level, sim.level, q.Elite)); }
+                if (q != null && !q.actor.IsAlive && q.TappedBy == sim.id)
+                {
+                    Kills++; GainXp(EncounterProgress.KillXp(q.actor.Level, sim.level, q.Elite));
+                    // A leatherworker skins what it kills (Phase 8.6): the beast's hide goes in its goods for the bench.
+                    if (SimEconomy.CraftTrade(sim.classId) == "leatherworking")
+                    {
+                        var parts = (q.persistentId ?? "").Split('.'); string hide = parts.Length > 1 ? SimEconomy.HideFrom(Session.Items, parts[1], q.actor.Level) : null;
+                        if (hide != null) SimEconomy.Add(sim, hide, 1);
+                    }
+                }
                 if (q != null) goal--;
                 Quarry = null;
                 // Another, while it has the health and the will; then a rest.
@@ -343,7 +352,7 @@ namespace Crulanda.Encounter
         void Craft()
         {
             var r = Recipe; if (r == null || Time.time >= until) { Choose(); return; }
-            var at = Place(r.profession == "alchemy" ? "bench" : "forge"); if (at == null) { Choose(); return; }
+            var at = Place(SimEconomy.Workplace(r)); if (at == null) { Choose(); return; }
             if (workUntil > 0)
             {
                 if (Time.time < workUntil) return;
@@ -357,7 +366,7 @@ namespace Crulanda.Encounter
             }
             if (!Near(at.Value, 2.2f)) { if (!Walking && Time.time - stuckSince > 1) Go(at.Value); return; }
             agent.isStopped = true; Face(at.Value);
-            visual.Pose = r.profession == "alchemy" ? ActorPose.Work : ActorPose.Hammer; workUntil = Time.time + 5;
+            visual.Pose = SimEconomy.Workplace(r) == "forge" ? ActorPose.Hammer : ActorPose.Work; workUntil = Time.time + 5;
         }
         void Travel()
         {

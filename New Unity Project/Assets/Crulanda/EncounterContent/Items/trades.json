@@ -1,0 +1,2288 @@
+{
+  "items": [
+    {
+      "id": "mat.geode_chip",
+      "name": "Aether-Geode chip",
+      "kind": "material",
+      "quality": 1,
+      "value": 7,
+      "stack": 20,
+      "trade": "forge.ore",
+      "pouch": "ore",
+      "description": "A cut chip of an Aether-Geode shard. It hums against the teeth when held close. GAME-ONLY cutting; CANON stone (book1 ch.3).",
+      "canonStatus": "GAME-ONLY (aether-geodes are CANON, book1 ch.3)"
+    },
+    {
+      "id": "craft.copper_hide_jerkin",
+      "name": "Boar-hide jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 1,
+      "value": 6,
+      "armor": 9,
+      "stamina": 2,
+      "agility": 4,
+      "description": "Cut and stitched in a Harrow kitchen, salted the day the beast came down.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_hide_gloves",
+      "name": "Coney-skin gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 2,
+      "level": 1,
+      "value": 6,
+      "armor": 6,
+      "stamina": 2,
+      "agility": 4,
+      "description": "Cut and stitched in a Harrow kitchen, salted the day the beast came down.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_hide_leggings",
+      "name": "Wolf-pelt leggings",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 4,
+      "value": 12,
+      "armor": 18,
+      "stamina": 4,
+      "agility": 6,
+      "description": "Cut and stitched in a Harrow kitchen, salted the day the beast came down.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_hide_boots",
+      "name": "Boar-hide boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 2,
+      "level": 4,
+      "value": 7,
+      "armor": 11,
+      "stamina": 4,
+      "agility": 6,
+      "description": "Cut and stitched in a Harrow kitchen, salted the day the beast came down.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_wool_hood",
+      "name": "Homespun hood",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "armor": 6,
+      "intellect": 4,
+      "spirit": 2,
+      "description": "Spun on a winter evening by the fire and dyed in a yarrow pot.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_wool_mantle",
+      "name": "Homespun shawl",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 2,
+      "level": 1,
+      "value": 6,
+      "armor": 6,
+      "intellect": 4,
+      "spirit": 2,
+      "description": "Spun on a winter evening by the fire and dyed in a yarrow pot.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_wool_robe",
+      "name": "Yarrow-dyed robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 4,
+      "value": 10,
+      "armor": 18,
+      "intellect": 6,
+      "spirit": 4,
+      "description": "Spun on a winter evening by the fire and dyed in a yarrow pot.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_wool_breeches",
+      "name": "Homespun breeches",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 4,
+      "value": 6,
+      "armor": 18,
+      "intellect": 6,
+      "spirit": 4,
+      "description": "Spun on a winter evening by the fire and dyed in a yarrow pot.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_bow",
+      "name": "Oak short bow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 7,
+      "weaponDamage": 9,
+      "stamina": 2,
+      "agility": 4,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Strung with gut and waxed.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_staff",
+      "name": "Oak staff",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 4,
+      "value": 6,
+      "weaponDamage": 16,
+      "intellect": 6,
+      "spirit": 4,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Wound at the grip with a dyed cord.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.copper_torc",
+      "name": "Copper geode torc",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 2,
+      "level": 4,
+      "value": 15,
+      "stamina": 5,
+      "strength": 5,
+      "description": "A chip of Aether-Geode set in copper. It warms against the throat. GAME-ONLY cutting; CANON stone (book1 ch.3).",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_hide_jerkin",
+      "name": "Grey-pelt jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 8,
+      "value": 13,
+      "armor": 30,
+      "stamina": 6,
+      "agility": 11,
+      "description": "Grey at the edges, like everything that comes out of Khaven. It keeps the rain off.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_hide_gloves",
+      "name": "Deerskin gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 2,
+      "level": 8,
+      "value": 10,
+      "armor": 19,
+      "stamina": 6,
+      "agility": 11,
+      "description": "Grey at the edges, like everything that comes out of Khaven. It keeps the rain off.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_hide_leggings",
+      "name": "Bristle-hide leggings",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 8,
+      "value": 13,
+      "armor": 30,
+      "stamina": 6,
+      "agility": 11,
+      "description": "Grey at the edges, like everything that comes out of Khaven. It keeps the rain off.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_hide_boots",
+      "name": "Deerskin boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 2,
+      "level": 8,
+      "value": 12,
+      "armor": 19,
+      "stamina": 6,
+      "agility": 11,
+      "description": "Grey at the edges, like everything that comes out of Khaven. It keeps the rain off.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_wool_hood",
+      "name": "Mourning-grey hood",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 2,
+      "level": 8,
+      "value": 6,
+      "armor": 19,
+      "intellect": 10,
+      "spirit": 7,
+      "description": "Dyed in mourner's cap. Every second house in Khaven owns a length of it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_wool_mantle",
+      "name": "Mourning-grey mantle",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 2,
+      "level": 8,
+      "value": 7,
+      "armor": 19,
+      "intellect": 10,
+      "spirit": 7,
+      "description": "Dyed in mourner's cap. Every second house in Khaven owns a length of it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_wool_robe",
+      "name": "Bog-dyed robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 8,
+      "value": 16,
+      "armor": 30,
+      "intellect": 10,
+      "spirit": 7,
+      "description": "Dyed in mourner's cap. Every second house in Khaven owns a length of it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_wool_breeches",
+      "name": "Grey wool breeches",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 8,
+      "value": 7,
+      "armor": 30,
+      "intellect": 10,
+      "spirit": 7,
+      "description": "Dyed in mourner's cap. Every second house in Khaven owns a length of it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_bow",
+      "name": "Black pine bow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 8,
+      "value": 12,
+      "weaponDamage": 25,
+      "stamina": 6,
+      "agility": 11,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Strung with gut and waxed.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_staff",
+      "name": "Black pine staff",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 8,
+      "value": 12,
+      "weaponDamage": 25,
+      "intellect": 11,
+      "spirit": 6,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Wound at the grip with a dyed cord.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_torc",
+      "name": "Bog-iron geode pendant",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 2,
+      "level": 8,
+      "value": 27,
+      "stamina": 9,
+      "intellect": 8,
+      "description": "A chip of Aether-Geode set in bog-iron. It warms against the throat. GAME-ONLY cutting; CANON stone (book1 ch.3).",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_hide_jerkin",
+      "name": "Bearskin jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 11,
+      "value": 24,
+      "armor": 39,
+      "stamina": 8,
+      "agility": 14,
+      "description": "Heavy hide for the high passes, oiled against the sleet.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_hide_gloves",
+      "name": "Fell-deer gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 2,
+      "level": 11,
+      "value": 10,
+      "armor": 25,
+      "stamina": 8,
+      "agility": 14,
+      "description": "Heavy hide for the high passes, oiled against the sleet.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_hide_leggings",
+      "name": "Bearskin leggings",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 11,
+      "value": 21,
+      "armor": 39,
+      "stamina": 8,
+      "agility": 14,
+      "description": "Heavy hide for the high passes, oiled against the sleet.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_hide_boots",
+      "name": "Bear-pad boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 2,
+      "level": 11,
+      "value": 19,
+      "armor": 25,
+      "stamina": 8,
+      "agility": 14,
+      "description": "Heavy hide for the high passes, oiled against the sleet.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_wool_hood",
+      "name": "Tarn-blue hood",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 2,
+      "level": 11,
+      "value": 7,
+      "armor": 25,
+      "intellect": 13,
+      "spirit": 9,
+      "description": "Tarnwort blue, the colour the pilgrims wear on the pass.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_wool_mantle",
+      "name": "Tarn-blue mantle",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 2,
+      "level": 11,
+      "value": 9,
+      "armor": 25,
+      "intellect": 13,
+      "spirit": 9,
+      "description": "Tarnwort blue, the colour the pilgrims wear on the pass.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_wool_robe",
+      "name": "Pilgrim-blue robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 11,
+      "value": 21,
+      "armor": 39,
+      "intellect": 13,
+      "spirit": 9,
+      "description": "Tarnwort blue, the colour the pilgrims wear on the pass.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_wool_breeches",
+      "name": "Tarn-blue breeches",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 11,
+      "value": 9,
+      "armor": 39,
+      "intellect": 13,
+      "spirit": 9,
+      "description": "Tarnwort blue, the colour the pilgrims wear on the pass.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_bow",
+      "name": "Stone-pine longbow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 11,
+      "value": 16,
+      "weaponDamage": 31,
+      "stamina": 8,
+      "agility": 14,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Strung with gut and waxed.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_staff",
+      "name": "Stone-pine staff",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 11,
+      "value": 18,
+      "weaponDamage": 31,
+      "intellect": 14,
+      "spirit": 8,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Wound at the grip with a dyed cord.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ridgesteel_torc",
+      "name": "Ridge-steel geode torc",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 2,
+      "level": 11,
+      "value": 36,
+      "stamina": 11,
+      "agility": 11,
+      "description": "A chip of Aether-Geode set in ridge-steel. It warms against the throat. GAME-ONLY cutting; CANON stone (book1 ch.3).",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_hide_jerkin",
+      "name": "Ash-hide jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 14,
+      "value": 30,
+      "armor": 48,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Ash gets into the grain and never leaves. It smells of the Rim's fires.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_hide_gloves",
+      "name": "Ash-hide gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 2,
+      "level": 14,
+      "value": 16,
+      "armor": 30,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Ash gets into the grain and never leaves. It smells of the Rim's fires.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_hide_leggings",
+      "name": "Ash-hide leggings",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 14,
+      "value": 30,
+      "armor": 48,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Ash gets into the grain and never leaves. It smells of the Rim's fires.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_hide_boots",
+      "name": "Bear-hide fell boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 2,
+      "level": 14,
+      "value": 21,
+      "armor": 30,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Ash gets into the grain and never leaves. It smells of the Rim's fires.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_wool_hood",
+      "name": "Thistle-red hood",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 2,
+      "level": 14,
+      "value": 9,
+      "armor": 30,
+      "intellect": 15,
+      "spirit": 12,
+      "description": "Thistle-red, set with cinder ore so it never runs.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_wool_mantle",
+      "name": "Thistle-red mantle",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 2,
+      "level": 14,
+      "value": 10,
+      "armor": 30,
+      "intellect": 15,
+      "spirit": 12,
+      "description": "Thistle-red, set with cinder ore so it never runs.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_wool_robe",
+      "name": "Cinder-dyed robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 14,
+      "value": 24,
+      "armor": 48,
+      "intellect": 15,
+      "spirit": 12,
+      "description": "Thistle-red, set with cinder ore so it never runs.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_wool_breeches",
+      "name": "Thistle-red breeches",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 14,
+      "value": 10,
+      "armor": 48,
+      "intellect": 15,
+      "spirit": 12,
+      "description": "Thistle-red, set with cinder ore so it never runs.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_bow",
+      "name": "Snag-wood bow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 14,
+      "value": 25,
+      "weaponDamage": 38,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Strung with gut and waxed.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_staff",
+      "name": "Snag-wood staff",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 14,
+      "value": 24,
+      "weaponDamage": 38,
+      "intellect": 17,
+      "spirit": 10,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Wound at the grip with a dyed cord.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_torc",
+      "name": "Ash-steel geode pendant",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 2,
+      "level": 14,
+      "value": 45,
+      "stamina": 14,
+      "spirit": 13,
+      "description": "A chip of Aether-Geode set in ash-steel. It warms against the throat. GAME-ONLY cutting; CANON stone (book1 ch.3).",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_hide_jerkin",
+      "name": "Moss-hide jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 14,
+      "value": 42,
+      "armor": 48,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Soft as moss and nearly as green. The Shore's hides take a dye without being asked.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_hide_gloves",
+      "name": "Dappled-skin gloves",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 2,
+      "level": 14,
+      "value": 25,
+      "armor": 30,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Soft as moss and nearly as green. The Shore's hides take a dye without being asked.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_hide_leggings",
+      "name": "Moss-hide leggings",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 14,
+      "value": 42,
+      "armor": 48,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Soft as moss and nearly as green. The Shore's hides take a dye without being asked.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_hide_boots",
+      "name": "Dappled stag boots",
+      "kind": "gear",
+      "slot": "feet",
+      "quality": 2,
+      "level": 14,
+      "value": 33,
+      "armor": 30,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Soft as moss and nearly as green. The Shore's hides take a dye without being asked.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_wool_hood",
+      "name": "Fern-green hood",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 2,
+      "level": 14,
+      "value": 12,
+      "armor": 30,
+      "intellect": 15,
+      "spirit": 12,
+      "description": "Dewfern green, dyed fast in ghost-oak ash. It smells of rain.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_wool_mantle",
+      "name": "Fern-green mantle",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 2,
+      "level": 14,
+      "value": 13,
+      "armor": 30,
+      "intellect": 15,
+      "spirit": 12,
+      "description": "Dewfern green, dyed fast in ghost-oak ash. It smells of rain.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_wool_robe",
+      "name": "Dewfern robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 2,
+      "level": 14,
+      "value": 33,
+      "armor": 48,
+      "intellect": 15,
+      "spirit": 12,
+      "description": "Dewfern green, dyed fast in ghost-oak ash. It smells of rain.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_wool_breeches",
+      "name": "Fern-green breeches",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 2,
+      "level": 14,
+      "value": 13,
+      "armor": 48,
+      "intellect": 15,
+      "spirit": 12,
+      "description": "Dewfern green, dyed fast in ghost-oak ash. It smells of rain.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_bow",
+      "name": "Ghost-oak longbow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 14,
+      "value": 39,
+      "weaponDamage": 38,
+      "stamina": 10,
+      "agility": 17,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Strung with gut and waxed.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_staff",
+      "name": "Ghost-oak staff",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 14,
+      "value": 36,
+      "weaponDamage": 38,
+      "intellect": 17,
+      "spirit": 10,
+      "description": "Whittled from a windfall's heart and seasoned a winter. Wound at the grip with a dyed cord.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.veridian_torc",
+      "name": "Veridian geode torc",
+      "kind": "gear",
+      "slot": "neck",
+      "quality": 2,
+      "level": 14,
+      "value": 45,
+      "stamina": 14,
+      "strength": 13,
+      "description": "A chip of Aether-Geode set in veridian. It warms against the throat. GAME-ONLY cutting; CANON stone (book1 ch.3).",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.bogiron_targe",
+      "name": "Bog-iron targe",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 2,
+      "level": 8,
+      "value": 27,
+      "armor": 35,
+      "stamina": 6,
+      "strength": 11,
+      "description": "Bars beaten thin over a board frame. It turns a blade as well as anything you'll buy.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "craft.ashsteel_heater",
+      "name": "Ash-steel heater",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 2,
+      "level": 14,
+      "value": 45,
+      "armor": 56,
+      "stamina": 10,
+      "strength": 17,
+      "description": "Bars beaten thin over a board frame. It turns a blade as well as anything you'll buy.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.copper_leather",
+      "name": "Mastered boar-hide jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 4,
+      "value": 20,
+      "armor": 19,
+      "stamina": 5,
+      "agility": 8,
+      "description": "A tanner's best work, cut to the wearer and stitched with a geode-dust wax that never cracks. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.copper_cloth",
+      "name": "Fine-woven yarrow robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 4,
+      "value": 20,
+      "armor": 19,
+      "intellect": 8,
+      "spirit": 5,
+      "description": "Woven so fine the light comes through it, and dyed twice. A thread of geode-dust runs in the hem. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.copper_bow",
+      "name": "Seasoned oak bow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 4,
+      "value": 28,
+      "weaponDamage": 17,
+      "stamina": 5,
+      "agility": 8,
+      "description": "Seasoned three winters and backed with horn. The nocks are set with geode chips that hum when it is drawn. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.copper_cap",
+      "name": "Resonance-tempered cap",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 4,
+      "value": 20,
+      "armor": 12,
+      "stamina": 5,
+      "strength": 8,
+      "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.bogiron_leather",
+      "name": "Mastered grey-pelt jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 8,
+      "value": 36,
+      "armor": 34,
+      "stamina": 9,
+      "agility": 14,
+      "description": "A tanner's best work, cut to the wearer and stitched with a geode-dust wax that never cracks. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.bogiron_cloth",
+      "name": "Fine-woven mourning robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 8,
+      "value": 36,
+      "armor": 34,
+      "intellect": 13,
+      "spirit": 10,
+      "description": "Woven so fine the light comes through it, and dyed twice. A thread of geode-dust runs in the hem. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.bogiron_bow",
+      "name": "Seasoned black pine bow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 8,
+      "value": 50,
+      "weaponDamage": 27,
+      "stamina": 9,
+      "agility": 14,
+      "description": "Seasoned three winters and backed with horn. The nocks are set with geode chips that hum when it is drawn. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.bogiron_pauldrons",
+      "name": "Resonance-tempered pauldrons",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 3,
+      "level": 8,
+      "value": 36,
+      "armor": 21,
+      "stamina": 9,
+      "strength": 14,
+      "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.ridgesteel_leather",
+      "name": "Mastered bearskin jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 45,
+      "stamina": 12,
+      "agility": 19,
+      "description": "A tanner's best work, cut to the wearer and stitched with a geode-dust wax that never cracks. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.ridgesteel_cloth",
+      "name": "Fine-woven pilgrim robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 45,
+      "intellect": 18,
+      "spirit": 13,
+      "description": "Woven so fine the light comes through it, and dyed twice. A thread of geode-dust runs in the hem. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.ridgesteel_bow",
+      "name": "Seasoned stone-pine longbow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 11,
+      "value": 67,
+      "weaponDamage": 36,
+      "stamina": 12,
+      "agility": 19,
+      "description": "Seasoned three winters and backed with horn. The nocks are set with geode chips that hum when it is drawn. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.ridgesteel_greaves",
+      "name": "Resonance-tempered greaves",
+      "kind": "gear",
+      "slot": "legs",
+      "quality": 3,
+      "level": 11,
+      "value": 48,
+      "armor": 45,
+      "stamina": 12,
+      "strength": 19,
+      "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.ashsteel_leather",
+      "name": "Mastered ash-hide jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 14,
+      "value": 60,
+      "armor": 56,
+      "stamina": 15,
+      "agility": 23,
+      "description": "A tanner's best work, cut to the wearer and stitched with a geode-dust wax that never cracks. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.ashsteel_cloth",
+      "name": "Fine-woven cinder robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 14,
+      "value": 60,
+      "armor": 56,
+      "intellect": 21,
+      "spirit": 17,
+      "description": "Woven so fine the light comes through it, and dyed twice. A thread of geode-dust runs in the hem. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.ashsteel_bow",
+      "name": "Seasoned snag-wood bow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 14,
+      "value": 84,
+      "weaponDamage": 44,
+      "stamina": 15,
+      "agility": 23,
+      "description": "Seasoned three winters and backed with horn. The nocks are set with geode chips that hum when it is drawn. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.ashsteel_gauntlets",
+      "name": "Resonance-tempered gauntlets",
+      "kind": "gear",
+      "slot": "hands",
+      "quality": 3,
+      "level": 14,
+      "value": 60,
+      "armor": 36,
+      "stamina": 15,
+      "strength": 23,
+      "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.veridian_leather",
+      "name": "Mastered moss-hide jerkin",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 14,
+      "value": 60,
+      "armor": 56,
+      "stamina": 15,
+      "agility": 23,
+      "description": "A tanner's best work, cut to the wearer and stitched with a geode-dust wax that never cracks. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.veridian_cloth",
+      "name": "Fine-woven dewfern robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 3,
+      "level": 14,
+      "value": 60,
+      "armor": 56,
+      "intellect": 21,
+      "spirit": 17,
+      "description": "Woven so fine the light comes through it, and dyed twice. A thread of geode-dust runs in the hem. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.veridian_bow",
+      "name": "Seasoned ghost-oak longbow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 3,
+      "level": 14,
+      "value": 84,
+      "weaponDamage": 44,
+      "stamina": 15,
+      "agility": 23,
+      "description": "Seasoned three winters and backed with horn. The nocks are set with geode chips that hum when it is drawn. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "temper.veridian_helm",
+      "name": "Resonance-tempered helm",
+      "kind": "gear",
+      "slot": "head",
+      "quality": 3,
+      "level": 14,
+      "value": 60,
+      "armor": 36,
+      "stamina": 15,
+      "strength": 23,
+      "description": "Forged on the hum of an Aether-Geode shard. It rings a half-tone off true, and keeps ringing after the blow. GAME-ONLY smithing; CANON stone.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "master.copper_mantle",
+      "name": "Harrow festival mantle",
+      "kind": "gear",
+      "slot": "shoulders",
+      "quality": 4,
+      "level": 4,
+      "value": 25,
+      "armor": 15,
+      "intellect": 9,
+      "spirit": 7,
+      "description": "Woven for a Harvest Home and worn once a year since, by whoever danced longest. The yarrow in it still smells of summer. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "master.bogiron_coat",
+      "name": "Mourning-black coat",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 4,
+      "level": 8,
+      "value": 45,
+      "armor": 42,
+      "stamina": 11,
+      "agility": 17,
+      "description": "Black as Khaven's bell-rope, and cut long enough to kneel in. Nobody stops a man who wears one. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "master.ridgesteel_bow",
+      "name": "Eyrie war-bow",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 4,
+      "level": 11,
+      "value": 84,
+      "weaponDamage": 43,
+      "stamina": 15,
+      "agility": 23,
+      "description": "A pass-warden's bow from the old toll-days, made again from the leaf. It throws an arrow from the eyrie to the road. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "master.ashsteel_axe",
+      "name": "Ember-quenched axe",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 4,
+      "level": 14,
+      "value": 105,
+      "weaponDamage": 53,
+      "stamina": 18,
+      "strength": 29,
+      "description": "Quenched in the embers of a cinder vent, not in water, the way the Ash-Walkers' bone-smiths say it was once done. It never quite cools. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "master.veridian_robe",
+      "name": "Root-dyed vigil robe",
+      "kind": "gear",
+      "slot": "chest",
+      "quality": 4,
+      "level": 14,
+      "value": 75,
+      "armor": 69,
+      "intellect": 26,
+      "spirit": 21,
+      "description": "Dyed in a pit of root-water under the Shore's oldest trees and worn at the vigils for the laid-down. It is warm in any weather. GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.tincture_ox",
+      "name": "Ox-root tincture",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 4,
+      "value": 5,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Strength",
+        "name": "Ox-root",
+        "amount": 6,
+        "seconds": 1800
+      },
+      "description": "A thumb's depth of ox-root steeped in spirit. Bitter, and good for half an hour. The village's simples; not the Council's alchemy.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.cordial_ox",
+      "name": "Ox-root cordial",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 11,
+      "value": 12,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Strength",
+        "name": "Ox-root",
+        "amount": 12,
+        "seconds": 1800
+      },
+      "description": "The tincture's stronger sister, cut with salt and kept a season. Half an hour of strength in a mouthful.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.tincture_hare",
+      "name": "Hare's-foot tincture",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 4,
+      "value": 5,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Agility",
+        "name": "Hare's-foot",
+        "amount": 6,
+        "seconds": 1800
+      },
+      "description": "A thumb's depth of hare's-foot steeped in spirit. Bitter, and good for half an hour. The village's simples; not the Council's alchemy.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.cordial_hare",
+      "name": "Hare's-foot cordial",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 11,
+      "value": 12,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Agility",
+        "name": "Hare's-foot",
+        "amount": 12,
+        "seconds": 1800
+      },
+      "description": "The tincture's stronger sister, cut with salt and kept a season. Half an hour of agility in a mouthful.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.tincture_owl",
+      "name": "Owl-light tincture",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 4,
+      "value": 5,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Intellect",
+        "name": "Owl-light",
+        "amount": 6,
+        "seconds": 1800
+      },
+      "description": "A thumb's depth of owl-light steeped in spirit. Bitter, and good for half an hour. The village's simples; not the Council's alchemy.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.cordial_owl",
+      "name": "Owl-light cordial",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 11,
+      "value": 12,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Intellect",
+        "name": "Owl-light",
+        "amount": 12,
+        "seconds": 1800
+      },
+      "description": "The tincture's stronger sister, cut with salt and kept a season. Half an hour of intellect in a mouthful.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.tincture_hearth",
+      "name": "Hearth-ease tincture",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 4,
+      "value": 5,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Spirit",
+        "name": "Hearth-ease",
+        "amount": 6,
+        "seconds": 1800
+      },
+      "description": "A thumb's depth of hearth-ease steeped in spirit. Bitter, and good for half an hour. The village's simples; not the Council's alchemy.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.cordial_hearth",
+      "name": "Hearth-ease cordial",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 11,
+      "value": 12,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Spirit",
+        "name": "Hearth-ease",
+        "amount": 12,
+        "seconds": 1800
+      },
+      "description": "The tincture's stronger sister, cut with salt and kept a season. Half an hour of spirit in a mouthful.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.tincture_bear",
+      "name": "Bear's-wort tincture",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 4,
+      "value": 5,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Stamina",
+        "name": "Bear's-wort",
+        "amount": 6,
+        "seconds": 1800
+      },
+      "description": "A thumb's depth of bear's-wort steeped in spirit. Bitter, and good for half an hour. The village's simples; not the Council's alchemy.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.cordial_bear",
+      "name": "Bear's-wort cordial",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 11,
+      "value": 12,
+      "stack": 10,
+      "buff": {
+        "kind": "elixir",
+        "stat": "Stamina",
+        "name": "Bear's-wort",
+        "amount": 12,
+        "seconds": 1800
+      },
+      "description": "The tincture's stronger sister, cut with salt and kept a season. Half an hour of stamina in a mouthful.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.draught_mana",
+      "name": "Clear-head draught",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 1,
+      "value": 3,
+      "stack": 10,
+      "pool": "mana",
+      "restore": 40,
+      "description": "Clears the head and fills what a caster spends.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.draught_vigor",
+      "name": "Second-wind draught",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 1,
+      "value": 3,
+      "stack": 10,
+      "pool": "vigor",
+      "restore": 40,
+      "description": "A fighter's swig: the fire comes back into the arm.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.draught_focus",
+      "name": "Steady-hand draught",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 1,
+      "value": 3,
+      "stack": 10,
+      "pool": "focus",
+      "restore": 40,
+      "description": "The hand steadies and the eye with it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.draught_nerve",
+      "name": "Bold-heart draught",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 1,
+      "value": 3,
+      "stack": 10,
+      "pool": "nerve",
+      "restore": 40,
+      "description": "One swallow and the next wager seems a sure thing.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.draught_breath",
+      "name": "Deep-breath draught",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 1,
+      "value": 3,
+      "stack": 10,
+      "pool": "breath",
+      "restore": 40,
+      "description": "The breath comes long and slow, the way a beast's does.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.draught_salt",
+      "name": "Brine draught",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 1,
+      "value": 3,
+      "stack": 10,
+      "pool": "salt",
+      "restore": 40,
+      "description": "Sea-salt and yarrow: the Salt-Menders' thread runs easier after it. GAME-ONLY simple; the Salt-Menders are CANON.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "potion.clean_blood",
+      "name": "Clean-blood draught",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 1,
+      "value": 4,
+      "stack": 10,
+      "cure": true,
+      "description": "It burns going down, and takes poisons, bleeds and the grey with it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "salve.tallow",
+      "name": "Tallow salve",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 4,
+      "value": 4,
+      "stack": 10,
+      "buff": {
+        "kind": "salve",
+        "stat": "Armor",
+        "name": "Tallow salve",
+        "amount": 30,
+        "seconds": 1800
+      },
+      "description": "Boar tallow and yarrow, rubbed into the skin. Blows slide off it for half an hour.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "salve.scree",
+      "name": "Scree salve",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 11,
+      "value": 14,
+      "stack": 10,
+      "buff": {
+        "kind": "salve",
+        "stat": "Armor",
+        "name": "Scree salve",
+        "amount": 70,
+        "seconds": 1800
+      },
+      "description": "Bear fat and cinder-thistle ground with grit from the scree. The skin takes a blow like a hide does.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.cask_stew",
+      "name": "Golden Cask stew",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 5,
+      "value": 6,
+      "stack": 20,
+      "heal": 360,
+      "food": true,
+      "buff": {
+        "kind": "food",
+        "stat": "Strength",
+        "amount": 4,
+        "stamina": 5,
+        "seconds": 1800
+      },
+      "description": "Hob Linden's stew, from the receipt in the Cask's kitchen book. He says the secret is patience. It is the yarrow.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.harvest_feast",
+      "name": "Harrow harvest feast",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 6,
+      "value": 9,
+      "stack": 20,
+      "heal": 420,
+      "food": true,
+      "buff": {
+        "kind": "food",
+        "stat": "Spirit",
+        "amount": 4,
+        "stamina": 5,
+        "seconds": 1800,
+        "party": true
+      },
+      "description": "A Harvest Home board: boar, cheese and bread enough for five, laid out on a cloth. Nobody goes away hungry.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.bear_broth",
+      "name": "Bear-haunch broth",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 9,
+      "value": 9,
+      "stack": 20,
+      "heal": 560,
+      "food": true,
+      "buff": {
+        "kind": "food",
+        "stat": "Spirit",
+        "amount": 6,
+        "stamina": 7,
+        "seconds": 1800
+      },
+      "description": "Boiled all day in a pilgrims' pot on the pass. It sticks to the ribs and stays there.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.passfire_feast",
+      "name": "Pass-fire feast",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 11,
+      "value": 18,
+      "stack": 20,
+      "heal": 660,
+      "food": true,
+      "buff": {
+        "kind": "food",
+        "stat": "Spirit",
+        "amount": 6,
+        "stamina": 8,
+        "seconds": 1800,
+        "party": true
+      },
+      "description": "Meat on the coals for a whole camp, the way the toll-wardens ate on the long nights. Five can share it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.sap_venison",
+      "name": "Sap-glazed venison",
+      "kind": "consumable",
+      "quality": 1,
+      "level": 14,
+      "value": 18,
+      "stack": 20,
+      "heal": 940,
+      "food": true,
+      "buff": {
+        "kind": "food",
+        "stat": "Intellect",
+        "amount": 8,
+        "stamina": 11,
+        "seconds": 1800
+      },
+      "description": "Venison glazed with the tapper's sap and roasted slow. Veridian sap is CANON (book3 ch.4); the glaze is GAME-ONLY.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "food.shore_feast",
+      "name": "Shore feast",
+      "kind": "consumable",
+      "quality": 2,
+      "level": 14,
+      "value": 28,
+      "stack": 20,
+      "heal": 960,
+      "food": true,
+      "buff": {
+        "kind": "food",
+        "stat": "Spirit",
+        "amount": 8,
+        "stamina": 11,
+        "seconds": 1800,
+        "party": true
+      },
+      "description": "A Shore board: venison, mossback and fern-bread on broad leaves, for the whole party round the fire.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_copper_leather",
+      "name": "a tanner's leaf: Mastered boar-hide jerkin",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_copper_leather",
+      "description": "A leaf torn from a tanner's book of cuts, pricked through with an awl. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_copper_cloth",
+      "name": "a weaver's leaf: Fine-woven yarrow robe",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_copper_cloth",
+      "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_copper_bow",
+      "name": "a bowyer's leaf: Seasoned oak bow",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_copper_bow",
+      "description": "A leaf torn from a bowyer's notebook, the measures cut into the cover. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_copper_cap",
+      "name": "a smith's leaf: Resonance-tempered cap",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_copper_cap",
+      "description": "A leaf torn from a smith's daybook, the margins black with thumbprints. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_bogiron_leather",
+      "name": "a tanner's leaf: Mastered grey-pelt jerkin",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_bogiron_leather",
+      "description": "A leaf torn from a tanner's book of cuts, pricked through with an awl. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_bogiron_cloth",
+      "name": "a weaver's leaf: Fine-woven mourning robe",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_bogiron_cloth",
+      "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_bogiron_bow",
+      "name": "a bowyer's leaf: Seasoned black pine bow",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_bogiron_bow",
+      "description": "A leaf torn from a bowyer's notebook, the measures cut into the cover. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_bogiron_pauldrons",
+      "name": "a smith's leaf: Resonance-tempered pauldrons",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_bogiron_pauldrons",
+      "description": "A leaf torn from a smith's daybook, the margins black with thumbprints. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_ridgesteel_leather",
+      "name": "a tanner's leaf: Mastered bearskin jerkin",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_ridgesteel_leather",
+      "description": "A leaf torn from a tanner's book of cuts, pricked through with an awl. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_ridgesteel_cloth",
+      "name": "a weaver's leaf: Fine-woven pilgrim robe",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_ridgesteel_cloth",
+      "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_ridgesteel_bow",
+      "name": "a bowyer's leaf: Seasoned stone-pine longbow",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_ridgesteel_bow",
+      "description": "A leaf torn from a bowyer's notebook, the measures cut into the cover. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_ridgesteel_greaves",
+      "name": "a smith's leaf: Resonance-tempered greaves",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_ridgesteel_greaves",
+      "description": "A leaf torn from a smith's daybook, the margins black with thumbprints. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_ashsteel_leather",
+      "name": "a tanner's leaf: Mastered ash-hide jerkin",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_ashsteel_leather",
+      "description": "A leaf torn from a tanner's book of cuts, pricked through with an awl. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_ashsteel_cloth",
+      "name": "a weaver's leaf: Fine-woven cinder robe",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_ashsteel_cloth",
+      "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_ashsteel_bow",
+      "name": "a bowyer's leaf: Seasoned snag-wood bow",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_ashsteel_bow",
+      "description": "A leaf torn from a bowyer's notebook, the measures cut into the cover. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_ashsteel_gauntlets",
+      "name": "a smith's leaf: Resonance-tempered gauntlets",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_ashsteel_gauntlets",
+      "description": "A leaf torn from a smith's daybook, the margins black with thumbprints. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_veridian_leather",
+      "name": "a tanner's leaf: Mastered moss-hide jerkin",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_veridian_leather",
+      "description": "A leaf torn from a tanner's book of cuts, pricked through with an awl. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_veridian_cloth",
+      "name": "a weaver's leaf: Fine-woven dewfern robe",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_veridian_cloth",
+      "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_veridian_bow",
+      "name": "a bowyer's leaf: Seasoned ghost-oak longbow",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_veridian_bow",
+      "description": "A leaf torn from a bowyer's notebook, the measures cut into the cover. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.tempered_veridian_helm",
+      "name": "a smith's leaf: Resonance-tempered helm",
+      "kind": "recipe",
+      "quality": 3,
+      "level": 1,
+      "value": 10,
+      "teaches": "recipe.tempered_veridian_helm",
+      "description": "A leaf torn from a smith's daybook, the margins black with thumbprints. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.master_copper_mantle",
+      "name": "a weaver's leaf: Harrow festival mantle",
+      "kind": "recipe",
+      "quality": 4,
+      "level": 1,
+      "value": 15,
+      "teaches": "recipe.master_copper_mantle",
+      "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.master_bogiron_coat",
+      "name": "a tanner's leaf: Mourning-black coat",
+      "kind": "recipe",
+      "quality": 4,
+      "level": 1,
+      "value": 15,
+      "teaches": "recipe.master_bogiron_coat",
+      "description": "A leaf torn from a tanner's book of cuts, pricked through with an awl. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.master_ridgesteel_bow",
+      "name": "a bowyer's leaf: Eyrie war-bow",
+      "kind": "recipe",
+      "quality": 4,
+      "level": 1,
+      "value": 15,
+      "teaches": "recipe.master_ridgesteel_bow",
+      "description": "A leaf torn from a bowyer's notebook, the measures cut into the cover. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.master_ashsteel_axe",
+      "name": "a smith's leaf: Ember-quenched axe",
+      "kind": "recipe",
+      "quality": 4,
+      "level": 1,
+      "value": 15,
+      "teaches": "recipe.master_ashsteel_axe",
+      "description": "A leaf torn from a smith's daybook, the margins black with thumbprints. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.master_veridian_robe",
+      "name": "a weaver's leaf: Root-dyed vigil robe",
+      "kind": "recipe",
+      "quality": 4,
+      "level": 1,
+      "value": 15,
+      "teaches": "recipe.master_veridian_robe",
+      "description": "A leaf torn from a weaver's book of counts and dyes. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.cordial_ox",
+      "name": "a herbalist's leaf: Ox-root cordial",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.cordial_ox",
+      "description": "A leaf torn from a herbalist's book, pressed leaves still between the pages. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.cordial_hare",
+      "name": "a herbalist's leaf: Hare's-foot cordial",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.cordial_hare",
+      "description": "A leaf torn from a herbalist's book, pressed leaves still between the pages. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.cordial_owl",
+      "name": "a herbalist's leaf: Owl-light cordial",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.cordial_owl",
+      "description": "A leaf torn from a herbalist's book, pressed leaves still between the pages. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.cordial_hearth",
+      "name": "a herbalist's leaf: Hearth-ease cordial",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.cordial_hearth",
+      "description": "A leaf torn from a herbalist's book, pressed leaves still between the pages. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.cordial_bear",
+      "name": "a herbalist's leaf: Bear's-wort cordial",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.cordial_bear",
+      "description": "A leaf torn from a herbalist's book, pressed leaves still between the pages. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.salve_scree",
+      "name": "a herbalist's leaf: Scree salve",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.salve_scree",
+      "description": "A leaf torn from a herbalist's book, pressed leaves still between the pages. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.cask_stew",
+      "name": "a cook's leaf: Golden Cask stew",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.cask_stew",
+      "description": "A leaf torn from a kitchen book, spotted with fat. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.harvest_feast",
+      "name": "a cook's leaf: Harrow harvest feast",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.harvest_feast",
+      "description": "A leaf torn from a kitchen book, spotted with fat. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.bear_broth",
+      "name": "a cook's leaf: Bear-haunch broth",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.bear_broth",
+      "description": "A leaf torn from a kitchen book, spotted with fat. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.passfire_feast",
+      "name": "a cook's leaf: Pass-fire feast",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.passfire_feast",
+      "description": "A leaf torn from a kitchen book, spotted with fat. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.sap_venison",
+      "name": "a cook's leaf: Sap-glazed venison",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.sap_venison",
+      "description": "A leaf torn from a kitchen book, spotted with fat. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "leaf.shore_feast",
+      "name": "a cook's leaf: Shore feast",
+      "kind": "recipe",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "teaches": "recipe.shore_feast",
+      "description": "A leaf torn from a kitchen book, spotted with fat. Read it and the making is yours.",
+      "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "vendors": [
+    {
+      "npc": "Hob Linden",
+      "items": [
+        "leaf.cask_stew",
+        "leaf.harvest_feast"
+      ]
+    },
+    {
+      "npc": "Brannoc Vell",
+      "items": [
+        "leaf.tempered_copper_cap",
+        "leaf.tempered_bogiron_pauldrons"
+      ]
+    },
+    {
+      "npc": "Wenna Coyle",
+      "items": [
+        "leaf.cordial_ox",
+        "leaf.cordial_hare"
+      ]
+    },
+    {
+      "npc": "Yara Quell",
+      "items": [
+        "leaf.tempered_ridgesteel_bow",
+        "leaf.bear_broth"
+      ]
+    },
+    {
+      "npc": "Mother Vane",
+      "items": [
+        "leaf.cordial_owl",
+        "leaf.cordial_hearth"
+      ]
+    },
+    {
+      "npc": "Oska",
+      "items": [
+        "leaf.tempered_ashsteel_gauntlets",
+        "leaf.tempered_ridgesteel_greaves"
+      ]
+    },
+    {
+      "npc": "Moss-Lantern",
+      "items": [
+        "leaf.sap_venison",
+        "leaf.shore_feast"
+      ]
+    },
+    {
+      "npc": "Alder-Knot",
+      "items": [
+        "leaf.tempered_veridian_helm",
+        "leaf.tempered_veridian_bow"
+      ]
+    }
+  ],
+  "loot": [
+    {
+      "tag": "quartermaster",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_copper_leather",
+          "chance": 0.35
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "banditking",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_copper_cloth",
+          "chance": 0.35
+        },
+        {
+          "item": "leaf.master_copper_mantle",
+          "chance": 0.06
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "sexton",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_bogiron_cloth",
+          "chance": 0.35
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "pale",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_bogiron_bow",
+          "chance": 0.35
+        },
+        {
+          "item": "leaf.master_bogiron_coat",
+          "chance": 0.06
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "captain",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_ridgesteel_leather",
+          "chance": 0.35
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "railcaptain",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.master_ridgesteel_bow",
+          "chance": 0.1
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "gangboss",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_ridgesteel_greaves",
+          "chance": 0.3
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "ysolt",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.salve_scree",
+          "chance": 0.3
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "brood",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_ashsteel_leather",
+          "chance": 0.35
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "deacon",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_ashsteel_cloth",
+          "chance": 0.35
+        },
+        {
+          "item": "leaf.master_ashsteel_axe",
+          "chance": 0.06
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "ninebranch",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.tempered_veridian_leather",
+          "chance": 0.35
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "greyheart",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.cordial_bear",
+          "chance": 0.35
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    },
+    {
+      "tag": "rootwarden",
+      "levelMin": 1,
+      "levelMax": 15,
+      "elite": true,
+      "gearChance": 0,
+      "entries": [
+        {
+          "item": "leaf.master_veridian_robe",
+          "chance": 0.1
+        },
+        {
+          "item": "mat.geode_shard",
+          "chance": 0.2
+        }
+      ]
+    }
+  ]
+}

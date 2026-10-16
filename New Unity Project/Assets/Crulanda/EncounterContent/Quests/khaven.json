@@ -1002,7 +1002,10 @@
       ],
       "rewards": {
         "xp": 110,
-        "gold": 18
+        "gold": 18,
+        "bagItems": [
+          "leaf.tempered_bogiron_leather"
+        ]
       }
     },
     {

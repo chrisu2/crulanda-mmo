@@ -75,6 +75,10 @@ namespace Crulanda.Encounter
         public List<string> questItems = new List<string>();
         /// <summary>One-shot interactables already emptied ("zone|name|x|z"), e.g. a crate you took the iron from.</summary>
         public List<string> usedInteractables = new List<string>();
+        // ---------- found recipes (save format 11; older saves load with this empty; here, not at the end, so payloads still end as they did) ----------
+        /// <summary>The found recipes learned from a leaf, by recipe id, in the order learned (Phase 8.6 step 5). Taught recipes are not
+        /// listed: they follow from the skill. See ProfessionLog.UseLeaf.</summary>
+        public List<string> recipes = new List<string>();
         // ---------- discoveries (save format 7; older saves load with this empty) ----------
         /// <summary>Hidden finds already found, by id ("secret.&lt;zone&gt;.&lt;slug&gt;"): each pays out once, ever. See DiscoveryLog.</summary>
         public List<string> discoveries = new List<string>();

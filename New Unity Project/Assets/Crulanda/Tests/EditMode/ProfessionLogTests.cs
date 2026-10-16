@@ -372,18 +372,16 @@ namespace Crulanda.Tests
             Assert.AreEqual(5, Inventory.Count(p, "mat.charcoal"), "A ghost-oak log makes five.");
         }
 
-        // ---------- crafts: two at most, taken up and forgotten (DESIGN 4; BUILD_PLAN step 12) ----------
+        // ---------- crafts: three at most (Phase 8.6, decision 3; two until then), taken up and forgotten (DESIGN 4; BUILD_PLAN step 12) ----------
         /// <summary>
-        /// The owner's rule: two crafts at once. With a third craft in the content (Tanning, made up for the test), Blacksmithing and
-        /// Alchemy taken up leave no slot, so the third is refused and nothing changes; forgetting one frees the slot for it. A trade
-        /// that is not a craft is never taken up: Cooking and Herbalism are everyone's, Mining comes with its pick.
+        /// The owner's rule: three crafts at once since Phase 8.6 (decision 3: "Three craft slots"; it was two). Blacksmithing, Simpling
+        /// (Alchemy's id) and Leatherworking taken up leave no slot, so Weaving is refused and nothing changes; forgetting one frees the slot
+        /// for it. A trade that is not a craft is never taken up: Cooking and Herbalism are everyone's, Mining comes with its pick.
         /// </summary>
-        [Test] public void ThirdCraft_IsRefused()
+        [Test] public void FourthCraft_IsRefused()
         {
-            var items = ProfessionDataTests.Items();
-            var texts = ProfessionDataTests.Texts("Professions");
-            texts.Add("{ \"professions\": [ { \"id\": \"tanning\", \"name\": \"Tanning\", \"kind\": \"craft\", \"station\": \"bench\", \"trainerRole\": \"leatherworker\" } ] }");
-            var db = ProfessionDatabase.Parse(texts, items); Assert.AreEqual(2, db.CraftSlots); Assert.AreEqual("craft", db.Profession("tanning").kind);
+            var items = ProfessionDataTests.Items(); var db = ProfessionDataTests.Db(items);
+            Assert.AreEqual(3, db.CraftSlots); Assert.AreEqual("craft", db.Profession("leatherworking").kind); Assert.AreEqual("craft", db.Profession("weaving").kind);
             var log = new ProfessionLog(db, items, EncounterSession.FreshProgress()); var said = new List<string>(); log.Say = said.Add;
             Assert.AreEqual(0, log.CraftSlotsUsed);
             Assert.IsTrue(log.CanLearn("blacksmithing", out var why), why); Assert.IsNull(why);
@@ -392,11 +390,12 @@ namespace Crulanda.Tests
             Assert.IsFalse(log.Learn("blacksmithing", out why)); Assert.AreEqual("You have taken up Blacksmithing already.", why);
             Assert.AreEqual(1, log.Progress.professions.FindAll(s => s.id == "blacksmithing").Count, "Taken up once.");
             Assert.IsTrue(log.Learn("alchemy", out why), why); Assert.AreEqual(2, log.CraftSlotsUsed);
-            // Both slots used: the third is refused, and nothing changes.
+            Assert.IsTrue(log.Learn("leatherworking", out why), why); Assert.AreEqual(3, log.CraftSlotsUsed);
+            // Every slot used: the fourth is refused, and nothing changes.
             string before = Snapshot(log.Progress);
-            Assert.IsFalse(log.CanLearn("tanning", out why)); Assert.AreEqual("Two crafts already. Forget one first.", why); Assert.AreEqual(log.CraftsFullLine, why);
-            Assert.IsFalse(log.Learn("tanning", out why)); Assert.AreEqual("Two crafts already. Forget one first.", why);
-            Assert.AreEqual(before, Snapshot(log.Progress)); Assert.IsFalse(log.Has("tanning")); Assert.AreEqual(0, log.Skill("tanning"));
+            Assert.IsFalse(log.CanLearn("weaving", out why)); Assert.AreEqual("Three crafts already. Forget one first.", why); Assert.AreEqual(log.CraftsFullLine, why);
+            Assert.IsFalse(log.Learn("weaving", out why)); Assert.AreEqual("Three crafts already. Forget one first.", why);
+            Assert.AreEqual(before, Snapshot(log.Progress)); Assert.IsFalse(log.Has("weaving")); Assert.AreEqual(0, log.Skill("weaving"));
             // Not crafts: never taken up.
             Assert.IsFalse(log.CanLearn("cooking", out why)); Assert.AreEqual("Everyone knows Cooking from the start.", why);
             Assert.IsFalse(log.CanLearn("herbalism", out why)); Assert.AreEqual("Everyone knows Herbalism from the start.", why);
@@ -404,10 +403,10 @@ namespace Crulanda.Tests
             Assert.IsFalse(log.CanLearn("fletching", out why)); Assert.AreEqual("There is no such trade.", why);
             Assert.IsFalse(log.CanLearn(null, out why)); Assert.IsNotNull(why);
             Assert.AreEqual(before, Snapshot(log.Progress));
-            // Forgetting one frees its slot, and the third can be taken up.
-            Assert.IsTrue(log.Forget("alchemy")); Assert.AreEqual(1, log.CraftSlotsUsed);
-            Assert.IsTrue(log.Learn("tanning", out why), why); Assert.AreEqual(2, log.CraftSlotsUsed); Assert.IsTrue(log.Has("tanning"));
-            Assert.IsFalse(log.CanLearn("alchemy", out why)); Assert.AreEqual("Two crafts already. Forget one first.", why);
+            // Forgetting one frees its slot, and the fourth can be taken up.
+            Assert.IsTrue(log.Forget("alchemy")); Assert.AreEqual(2, log.CraftSlotsUsed);
+            Assert.IsTrue(log.Learn("weaving", out why), why); Assert.AreEqual(3, log.CraftSlotsUsed); Assert.IsTrue(log.Has("weaving"));
+            Assert.IsFalse(log.CanLearn("alchemy", out why)); Assert.AreEqual("Three crafts already. Forget one first.", why);
             Assert.IsEmpty(said, "The log says nothing; the session speaks for the trainer.");
         }
 
@@ -451,7 +450,7 @@ namespace Crulanda.Tests
             Assert.IsFalse(log.Forget("cooking")); Assert.AreEqual(30, log.Skill("cooking"));
             Assert.IsFalse(log.CanForget("herbalism", out why)); Assert.AreEqual("Herbalism stays with you. It can't be forgotten.", why); Assert.IsFalse(log.Forget("herbalism"));
             Assert.IsFalse(log.Forget("mining")); Assert.AreEqual(12, log.Skill("mining"), "The pick stays at the belt.");
-            Assert.IsFalse(log.CanForget("alchemy", out why)); Assert.AreEqual("You have not taken up Alchemy.", why); Assert.IsFalse(log.Forget("alchemy"));
+            Assert.IsFalse(log.CanForget("alchemy", out why)); Assert.AreEqual("You have not taken up Simpling.", why); Assert.IsFalse(log.Forget("alchemy"));
             Assert.IsFalse(log.Forget("fletching")); Assert.IsFalse(log.Forget(null));
             Assert.AreEqual(before, Snapshot(p), "Nothing changed.");
         }
@@ -486,7 +485,7 @@ namespace Crulanda.Tests
             Assert.Less(Slot(p, "craft.copper_cudgel"), Inventory.BagSize, "Gear goes in the ordinary bags.");
             Assert.AreEqual(6, log.Skill("blacksmithing"));
             var d = log.Items.Get("craft.copper_cudgel");
-            Assert.IsTrue(Inventory.CanEquip(d, 1, out why), why); Assert.AreEqual("mainhand", d.slot); Assert.AreEqual(7, d.weaponDamage);
+            Assert.IsTrue(Inventory.CanEquip(d, 1, out why), why); Assert.AreEqual("mainhand", d.slot); Assert.AreEqual(9, d.weaponDamage, "Re-cut a step over the generated uncommon (Phase 8.6; it was 7).");
         }
 
         /// <summary>Alchemy (BUILD_PLAN step 13): taken up, two yarrow and a vial make a Minor healing draught at a herbalist's bench and
@@ -495,14 +494,109 @@ namespace Crulanda.Tests
         {
             var log = Fresh(out _); var p = log.Progress; var minor = log.Db.Recipe("recipe.potion_minor"); var tarn = log.Db.Recipe("recipe.potion_tarn");
             Inventory.Add(p, log.Items, "mat.yarrow", 5); Inventory.Add(p, log.Items, "mat.vial", 2);
-            Assert.IsFalse(log.CanCraft(minor, k => k == "bench", out var why)); Assert.AreEqual("You have not taken up Alchemy.", why);
+            Assert.IsFalse(log.CanCraft(minor, k => k == "bench", out var why)); Assert.AreEqual("You have not taken up Simpling.", why);   // Alchemy's name since Phase 8.6 (decision 5)
             Assert.IsTrue(log.Learn("alchemy", out why), why);
             Assert.AreEqual(2, log.CanMake(minor), "Five yarrow and two vials: two draughts.");
             Assert.IsFalse(log.Craft(minor, AtForge, new System.Random(1), out why)); Assert.AreEqual("You need a herbalist's bench nearby.", why);
             Assert.IsTrue(log.Craft(minor, k => k == "bench", new System.Random(1), out why), why);
             Assert.AreEqual(1, Inventory.Count(p, "potion.minor")); Assert.AreEqual(3, Inventory.Count(p, "mat.yarrow")); Assert.AreEqual(1, Inventory.Count(p, "mat.vial"));
             Assert.AreEqual(2, log.Skill("alchemy"));
-            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(tarn)); Assert.IsFalse(log.CanCraft(tarn, k => k == "bench", out why)); Assert.AreEqual("That wants Alchemy 40.", why);
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(tarn)); Assert.IsFalse(log.CanCraft(tarn, k => k == "bench", out why)); Assert.AreEqual("That wants Simpling 40.", why);
+        }
+
+        // ---------- found recipes: leaves (Phase 8.6 step 5; save format 11) ----------
+        /// <summary>
+        /// A found recipe is unknown until its leaf is read, and learned once: Ox-root cordial (Simpling 52) is locked and refused ("You have
+        /// not learned that. A leaf teaches it.") even at the skill and with the makings in the bags; the herbalist's leaf, used from the
+        /// bags, teaches it (into Progress.recipes, the leaf used up, "You learn Ox-root cordial.") and it is made; a second leaf is refused
+        /// and kept ("You know that one already."). A taught recipe needs no leaf.
+        /// </summary>
+        [Test] public void A_found_recipe_is_unknown_until_its_leaf_is_read_and_learned_once()
+        {
+            var log = Fresh(out var said); var p = log.Progress; var cordial = log.Db.Recipe("recipe.cordial_ox"); var learned = new List<string>(); log.Learned = r => learned.Add(r.id);
+            Assert.NotNull(cordial); Assert.IsTrue(cordial.found, "The Ox-root cordial is a found recipe.");
+            var leafDef = ProfessionDatabase.LeafFor(log.Items, cordial); Assert.NotNull(leafDef); Assert.AreEqual("leaf.cordial_ox", leafDef.id);
+            Assert.AreEqual("recipe", leafDef.kind); Assert.AreEqual("a herbalist's leaf: Ox-root cordial", leafDef.name, "Decision 9: \"a smith's leaf / a cook's leaf\".");
+            Assert.IsTrue(log.Learn("alchemy", out var why), why); Entry(log, "alchemy").skill = 60;
+            foreach (var i in cordial.inputs) Inventory.Add(p, log.Items, i.item, i.count * 2);
+            Assert.IsFalse(log.Knows(cordial)); Assert.IsTrue(log.Knows(log.Db.Recipe("recipe.potion_minor")), "A taught recipe is known by the skill.");
+            Assert.AreEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(cordial), "Unknown: shown as a grey ? in the list, and locked.");
+            Assert.IsFalse(log.CanCraft(cordial, k => k == "bench", out why)); Assert.AreEqual(ProfessionLog.UnknownLine, why);
+            string before = Snapshot(p);
+            Assert.IsFalse(log.Craft(cordial, k => k == "bench", new System.Random(1), out why)); Assert.AreEqual(before, Snapshot(p), "Nothing made, nothing spent.");
+            // The leaf, from the bags.
+            Inventory.Add(p, log.Items, leafDef.id, 2); int slot = Slot(p, leafDef.id); Assert.GreaterOrEqual(slot, 0);
+            Assert.IsTrue(log.UseLeaf(slot, out why), why); Assert.IsNull(why);
+            CollectionAssert.AreEqual(new[] { "recipe.cordial_ox" }, p.recipes, "Learned, in the save's list.");
+            Assert.AreEqual(1, Inventory.Count(p, leafDef.id), "One leaf is used up.");
+            Assert.Contains("You learn Ox-root cordial.", said); CollectionAssert.AreEqual(new[] { "recipe.cordial_ox" }, learned, "The session hears of it (a toast).");
+            Assert.IsTrue(log.Knows(cordial)); Assert.AreNotEqual(ProfessionLog.Difficulty.Locked, log.DifficultyOf(cordial));
+            Assert.IsTrue(log.Craft(cordial, k => k == "bench", new System.Random(1), out why), why);
+            Assert.AreEqual(1, Inventory.Count(p, "potion.cordial_ox"));
+            // A second leaf is refused and kept; learned once.
+            before = Snapshot(p);
+            Assert.IsFalse(log.UseLeaf(Slot(p, leafDef.id), out why)); Assert.AreEqual(ProfessionLog.AlreadyKnownLine, why); Assert.AreEqual("You know that one already.", why);
+            Assert.AreEqual(before, Snapshot(p)); Assert.AreEqual(1, p.recipes.Count);
+            // Not a leaf.
+            Inventory.Add(p, log.Items, "potion.minor", 1);
+            Assert.IsFalse(log.UseLeaf(Slot(p, "potion.minor"), out why)); Assert.AreEqual(ProfessionLog.NotALeafLine, why);
+            Assert.IsFalse(log.UseLeaf(-1, out why)); Assert.IsFalse(log.UseLeaf((ItemDef)null, out why));
+        }
+
+        /// <summary>
+        /// A leaf wants its trade: a smith's leaf is refused, and kept, without Blacksmithing ("That is Blacksmithing's work. Take up
+        /// Blacksmithing to learn it."); a bowyer's leaf without a hatchet names the tool. The skill is not asked: a leaf learned at 1 shows
+        /// its recipe red ("That wants Blacksmithing 17.") until the skill reaches it. Forgetting the craft keeps the leaf learned, and a
+        /// reload (Bind) keeps the list, dropping blanks and repeats and keeping an id this content does not have.
+        /// </summary>
+        [Test] public void A_leaf_wants_its_trade_and_stays_learned()
+        {
+            var log = Fresh(out _); var p = log.Progress; var cap = log.Db.Recipe("recipe.tempered_copper_cap"); var leafDef = ProfessionDatabase.LeafFor(log.Items, cap);
+            Assert.NotNull(leafDef); Assert.AreEqual("a smith's leaf: Resonance-tempered cap", leafDef.name);
+            Assert.IsFalse(log.UseLeaf(leafDef, out var why)); Assert.AreEqual("That is Blacksmithing's work. Take up Blacksmithing to learn it.", why);
+            var bow = ProfessionDatabase.LeafFor(log.Items, log.Db.Recipe("recipe.tempered_copper_bow")); Assert.AreEqual("a bowyer's leaf: Seasoned oak bow", bow.name);
+            Assert.IsFalse(log.UseLeaf(bow, out why)); Assert.AreEqual("You need a woodcutter's hatchet. Merchants sell them.", why);
+            Assert.IsEmpty(p.recipes);
+            Assert.IsTrue(log.Learn("blacksmithing", out why), why);
+            Assert.IsTrue(log.UseLeaf(leafDef, out why), why); Assert.IsTrue(log.Knows(cap));
+            Assert.IsFalse(log.CanCraft(cap, AtForge, out why)); Assert.AreEqual("That wants Blacksmithing " + cap.skill + ".", why, "Known, but the skill comes first.");
+            Assert.IsTrue(log.Forget("blacksmithing")); Assert.IsTrue(log.Knows(cap), "The page stays read when the hand is put aside.");
+            p.recipes.Add(""); p.recipes.Add("recipe.tempered_copper_cap"); p.recipes.Add("recipe.gone_from_this_build");
+            var copy = UnityEngine.JsonUtility.FromJson<EncounterProgress>(Snapshot(p)); log.Bind(copy);
+            CollectionAssert.AreEqual(new[] { "recipe.tempered_copper_cap", "recipe.gone_from_this_build" }, copy.recipes, "Blanks and repeats dropped, an unknown id kept.");
+            Assert.IsTrue(log.Knows(cap));
+        }
+
+        /// <summary>Every found recipe has exactly one leaf, named for its trade in the village's words (decision 9; never "pattern",
+        /// "formula", "plans" or "schematic"), coloured by what it teaches, and labelled GAME-ONLY; 30-40 of them (the plan's six to eight a zone).</summary>
+        [Test] public void Every_found_recipe_has_one_leaf_in_the_village_words()
+        {
+            var items = ProfessionDataTests.Items(); var db = ProfessionDataTests.Db(items);
+            var words = new Dictionary<string, string> { { "blacksmithing", "a smith's leaf: " }, { "leatherworking", "a tanner's leaf: " }, { "weaving", "a weaver's leaf: " },
+                { "woodcutting", "a bowyer's leaf: " }, { "alchemy", "a herbalist's leaf: " }, { "cooking", "a cook's leaf: " } };
+            var found = db.Recipes.FindAll(r => r.found);
+            Assert.That(found.Count, Is.InRange(30, 40), "30-40 found recipes (" + found.Count + ").");
+            foreach (var r in found)
+            {
+                var leaves = new List<ItemDef>(); foreach (var d in items.Items.Values) if (d.kind == "recipe" && d.teaches == r.id) leaves.Add(d);
+                Assert.AreEqual(1, leaves.Count, r.id + " has one leaf.");
+                var l = leaves[0];
+                Assert.AreEqual(words[r.profession] + r.name, l.name, r.id);
+                foreach (var bad in new[] { "pattern", "formula", "plans", "schematic", "recipe:" }) StringAssert.DoesNotContain(bad, l.name.ToLowerInvariant(), r.id);
+                Assert.AreEqual(System.Math.Max(2, items.Get(r.output).quality), l.quality, r.id + ": the leaf's colour is what it teaches.");
+                Assert.AreEqual("GAME-ONLY", l.canonStatus, r.id); Assert.IsFalse(string.IsNullOrEmpty(l.description), r.id);
+                Assert.AreEqual(1, l.stack, r.id);
+            }
+            foreach (var r in db.Recipes) if (!r.found) Assert.IsNull(ProfessionDatabase.LeafFor(items, r), r.id + " is taught: no leaf.");
+            // A leaf that teaches nothing, or a taught recipe, and a found recipe without a leaf, are refused.
+            string bad1 = "{ \"items\": [ { \"id\": \"leaf.x\", \"name\": \"a smith's leaf: X\", \"kind\": \"recipe\", \"teaches\": \"recipe.copper_bar\" }, { \"id\": \"leaf.y\", \"name\": \"Y\", \"kind\": \"recipe\", \"teaches\": \"recipe.none\" } ] }";
+            var texts = ProfessionDataTests.Texts("Items"); texts.Add(bad1);
+            var trades = ProfessionDataTests.Texts("Professions");
+            trades.Add("{ \"recipes\": [ { \"id\": \"recipe.z\", \"name\": \"Z\", \"profession\": \"cooking\", \"station\": \"fire\", \"output\": \"food.boar_stew\", \"found\": true, \"inputs\": [ { \"item\": \"junk.boar_meat\" } ] } ] }");
+            var e = Assert.Throws<System.ArgumentException>(() => ProfessionDatabase.Parse(trades, ItemDatabase.Parse(texts)));
+            StringAssert.Contains("Leaf 'leaf.x' teaches 'recipe.copper_bar', which is taught by the skill, not found.", e.Message);
+            StringAssert.Contains("Leaf 'leaf.y' teaches unknown recipe 'recipe.none'.", e.Message);
+            StringAssert.Contains("Recipe 'recipe.z': found, but no leaf teaches it.", e.Message);
         }
     }
 }

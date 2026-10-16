@@ -193,6 +193,16 @@ world; 9 waits on 8.5. Each step: fix, targeted tests, build, capture, commit, p
 Labels: the metals, herbs, dishes, recipes, inns, villagers: GAME-ONLY; aether-geodes, Veridian sap, salt, the Silent Pilgrims, the
 Sandthrone, the Ash-Walkers: CANON where cited; lore entries labelled one by one; this whole plan PROVISIONAL.
 
+**Status (p86-craft, 2026-10-15): steps 4-6 written, compiled, not yet run (no Unity on that branch).** Step 4: `Consumables.cs`
+(`buff` on ItemDef: well fed from the seven dishes of Cooking 20+, three found dishes and three party feasts; five tinctures and five
+cordials, two salves, a draught for each pool (mana, vigor, focus, nerve, breath, salt), the Clean-blood cure; the buff row names
+them). Step 5: the `recipe` item kind (37 leaves: "a smith's / tanner's / weaver's / bowyer's / herbalist's / cook's leaf: ..."),
+`Progress.recipes`, save format 11 (`AddRecipesMigration`), the grey "?" rows, sources in `Items/trades.json` (vendors, boss-only
+tables) and six quests. Step 6: three craft slots, Leatherworking and Weaving, Alchemy shown as Simpling, 57 plain pieces (nine slots
+a tier), 20 found rares, five found epics, the plain pieces re-cut a step over the generated uncommon, the sims' new crafts. Tests:
+`ConsumableBuffTests`, `ProfessionLogTests`, `SaveMigratorTests`, `LootDataTests`, `ProfessionDataTests`, `SimEconomyTests`. Open:
+the rare-herb flasks (wait on 8's regrowing herbs), leaves in secrets (`LootDataTests.SecretLeaves`), the inn kitchens' own dish.
+
 ## 5. Open decisions for Chris (one line each)
 1. **Place:** 8.6 straight after Phase 8 (his 23:25 "work on phase 8"), before or after the talents' fourth paths and 8.5?
 2. **8.5 and 8.6 together** as one gear phase, or 8.6's looks (3f, step 9) alone waiting on 8.5's rig choice?

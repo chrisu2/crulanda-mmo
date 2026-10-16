@@ -175,3 +175,8 @@ furnace); the Raid Bell (Book 1's rising).
 3. **The Council's hired warders** at the Holding House as enemies: yes.
 4. **Grey-touched in the dead-house cellar:** yes.
 5. **The Crown on the skyline**, never reached (not asked; the recommended answer).
+
+## Levels 15-20 (Chris, 2026-10-16)
+"after this work on next dungeon and raise top level to 20. make sure there is a zone for 15-20 and a dungeon for the same range";
+then "Lowtowns + Hallow's Creek (Recommended)". The zone is 15-20 (not 16-19): its camps spread 15 to 20, the two elites 20, the cap 20
+(talent points 21 at 20: a tier-4 node is reachable with the 21st point).

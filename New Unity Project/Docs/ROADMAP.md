@@ -149,3 +149,6 @@ open the next round.
   drain faster (a water supply to keep up). Winter: snow on the ground in the high and northern places; the cold takes health and
   stops it coming back until you are warm (a fire, an inn, warm clothes). Builds on the crops' round (CropField), WorldWeather and
   WorldClock.
+
+**Asked (the question prompt, 2026-10-16 ~14:55, verbatim): "Lowtowns + Hallow's Creek (Recommended)".** The cap is 20; the Lowtowns & Rust
+Market zone is stretched to 15-20 (ZONE_LOWTOWNS.md) and Hallow's Creek to 15-20 (DUNGEON2_DESIGN.md), its door at Oakhaven's Road's End.

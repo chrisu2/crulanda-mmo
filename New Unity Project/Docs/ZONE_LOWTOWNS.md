@@ -1,6 +1,6 @@
 # The Lowtowns and the Rust Market (Phase 9.1, the first new zone; levels 16-19; PROVISIONAL)
 
-Written 2026-10-15 ~22:30. Nothing here is built. It follows the shared rules of DUNGEON_DESIGN.md section 0 (the game is set before
+Written 2026-10-15 ~22:10. Nothing here is built. It follows the shared rules of DUNGEON_DESIGN.md section 0 (the game is set before
 Book 1 and near it; no machines; no canon person dies; Seekers, Inquisitors, Redaction and the Silencers belong to the Transit Hub;
 the Copper-Tithe are never enemies; Lowtown names are short, with Anglo-Saxon or Germanic roots) and labels every line CANON,
 CANON-EXPANDED, GAME-ONLY or PROVISIONAL.
@@ -9,7 +9,7 @@ CANON-EXPANDED, GAME-ONLY or PROVISIONAL.
 - 2026-10-15 ~22:00, the question prompt: "Lowtowns & Rust Market 16-19 (Recommended)"; with "keep going finish phase 8" and "them move to 9".
 - 2026-10-07 (side chat, ROADMAP "The 16-30 road"): levels 16-30 use places already on the world map: "the Lowtowns and the Rust Market
   (16-19), the Forge District (19-22), the Warrens with the Deep Veins dungeon (22-25), the Crown and the Transit Hub (25-28), the Spire (28-30)."
-- 2026-10-15 ~22:40, the question prompt on this design: arrival "Oakhaven's south road"; Gorm "Yes, Gorm himself (Recommended)";
+- 2026-10-15 ~22:12, the question prompt on this design: arrival "Oakhaven's south road"; Gorm "Yes, Gorm himself (Recommended)";
   the Council's warders "Yes, hired warders (Recommended)"; the dead-house cellar "Yes, add them (Recommended)". The skyline (decision 5)
   was not asked: the Crown on the skyline, never reached (the recommended answer).
 - 2026-10-07: the cap "30 in the end, 15 now; difficult and slow leveling, grind it out"; breadcrumbs from each zone's last main quest.
@@ -169,7 +169,7 @@ furnace); the Raid Bell (Book 1's rising).
 | 7 | Quests, Chronicle and Lore pages, the faction, bounties | L | QuestDataTests, ZoneLoreTests |
 | 8 | Captures and a played run (sims at 16-19 included) | M | the zone tour; a group run of the two elites |
 
-## 11. Decisions (answered 2026-10-15 ~22:40; section 0)
+## 11. Decisions (answered 2026-10-15 ~22:12; section 0)
 1. **The arrival:** Oakhaven's south road (Chris's pick over the Shore's road).
 2. **Gorm Rock-Wall** at the Rusty Spoon: yes (also the Sludge's decision 2).
 3. **The Council's hired warders** at the Holding House as enemies: yes.

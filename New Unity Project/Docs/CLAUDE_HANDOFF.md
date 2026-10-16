@@ -2,7 +2,7 @@
 
 ## Start here
 
-**Night of 2026-10-15 (~22:45): Chris: "keep going finish phase 8" then "them move to 9".** His answers tonight (question prompts,
+**Night of 2026-10-15 (~22:15): Chris: "keep going finish phase 8" then "them move to 9".** His answers tonight (question prompts,
 verbatim in the docs): Phase 8.6 on my defaults (PHASE8_6_LIVING_WORLD.md, end); Phase 8.5 by route (a), the hero pack's body (ROADMAP;
 **blocked until Chris downloads "Modular Hero" (CHOSAN) in the Package Manager's My Assets**: it is not on disk); Phase 9's first zone
 the Lowtowns & Rust Market 16-19 (ZONE_LOWTOWNS.md: arrival by Oakhaven's south road, Gorm himself, the Council's warders, the

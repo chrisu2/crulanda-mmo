@@ -68,20 +68,22 @@ namespace Crulanda.Tests
             Assert.AreEqual(0, Mathf.DeltaAngle(kitchen.rotation, inn.rotation + 180), 1, "The kitchen faces away from the inn.");
             Assert.LessOrEqual(Mathf.Abs(local.x) + ZoneBuilder.KitchenSize.x / 2, w / 2 - .17f, "The lean-to stays between the inn's corner posts.");
             // The ground-floor windows on the back wall (x as ZoneBuilder.Inn lays them out): the kitchen takes the place of the
-            // ones its lean-to would cover, and only those (two, at 0.7 and 3.3).
+            // ones its lean-to would cover, and only those (two: at 0.7 and 3.3 in the 12 m Cask; at 2.3 and 4.9 since it grew to
+            // 14 m, Phase 8.6, 2026-10-15, the kitchen moved with its back wall).
             var windows = new List<float>(); for (float x = -w / 2 + 1.5f; x < w / 2 - .8f; x += 2.6f) windows.Add(x);
             var covered = windows.Where(x => Mathf.Abs(x - local.x) < ZoneBuilder.KitchenSize.x / 2 + .85f).ToList();
-            CollectionAssert.AreEqual(new[] { .7f, 3.3f }, covered.Select(x => Mathf.Round(x * 10) / 10).ToArray(), "The kitchen covers the two back windows the plan gives up, no others.");
+            CollectionAssert.AreEqual(new[] { 2.3f, 4.9f }, covered.Select(x => Mathf.Round(x * 10) / 10).ToArray(), "The kitchen covers the two back windows the plan gives up, no others.");
             // The doors on the inner back wall: the rooms door and the kitchen's door, each clear of the other, of every window
             // left, of the bar top and of the hearth.
-            float rooms = -w / 2 + 5.4f, kitchenDoor = local.x - ZoneBuilder.KitchenDoorX, jamb = .52f, glass = .53f;
+            var plan = ZoneBuilder.InnPlan.For(inn.size, inn.variant);   // the taproom as the builder lays it out (Phase 8.6)
+            float rooms = plan.roomsX, kitchenDoor = local.x - ZoneBuilder.KitchenDoorX, jamb = .52f, glass = .53f;
             Assert.Greater(Mathf.Abs(kitchenDoor - rooms), 2 * jamb, "The rooms door and the kitchen door stand apart.");
             foreach (var x in windows.Except(covered))
             {
                 Assert.Greater(Mathf.Abs(x - rooms), jamb + glass, "The rooms door clears the window at " + x);
                 Assert.Greater(Mathf.Abs(x - kitchenDoor), jamb + glass, "The kitchen door clears the window at " + x);
             }
-            Assert.Greater(rooms - jamb, -w / 2 + 2.6f + 2.1f, "The rooms door clears the bar top.");
+            Assert.Greater(rooms - jamb, plan.bar.x + .05f + (plan.barSize.x + .2f) / 2, "The rooms door clears the bar top.");
             Assert.Less(kitchenDoor + jamb, w / 2 - 1.05f, "The kitchen door clears the hearth.");
         }
 
@@ -134,8 +136,14 @@ namespace Crulanda.Tests
             int first = Array.FindIndex(z.props, p => p != null && p.name == NewProps[0]);
             var block = z.props.Skip(first).Take(NewProps.Length).Select(p => p.name).ToArray();
             CollectionAssert.AreEqual(NewProps, block, "The new props are appended together, in order.");
-            Assert.IsTrue(z.props.Skip(first + NewProps.Length).All(p => p != null && (p.kind == "training_yard" || p.kind == "training_dummy" || p.kind == "mending_dummy")),
-                "After them only what was appended later: the training yard and its dummies.");
+            // Straight after them the training field; after that only rounds appended later still (the open ground's places and
+            // the market pieces, 87e0ff83 and 402427bc): none of those is a name from before the trades or from the six.
+            var later = z.props.Skip(first + NewProps.Length).ToArray();
+            CollectionAssert.AreEqual(new[] { "training_yard", "training_dummy", "mending_dummy" }, later.Take(3).Select(p => p != null ? p.kind : null).ToArray(),
+                "After them only what was appended later: the training yard and its dummies first.");
+            var before = new HashSet<string>(z.props.Take(first).Where(p => p != null && !string.IsNullOrEmpty(p.name)).Select(p => p.name).Concat(NewProps));
+            Assert.IsTrue(later.All(p => p != null && (string.IsNullOrEmpty(p.name) || !before.Contains(p.name))),
+                "Nothing after them is a prop from before them, moved down the list.");
             foreach (var p in added)
             {
                 string q = p.name + ": "; float half = Mathf.Max(p.size.x, p.size.y) / 2, reach = Reach(p);

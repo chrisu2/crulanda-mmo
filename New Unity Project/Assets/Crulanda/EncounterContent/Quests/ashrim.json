@@ -48,6 +48,13 @@
   ],
   "documents": [
     {
+      "id": "doc.ashrim.salt_slates",
+      "kind": "lore",
+      "title": "The Walkers' Slates",
+      "text": "Chalked on slates by the harpoon rack, wiped and chalked again, the oldest lines rubbed nearly away. The Ash-Walkers' tally:\n\nBound: two Eaters at the brood's edge. Salt: the gap relaid, forty paces. By: Grohl, Oska.\nBound: one, a big one, at the ribs. Salt: none; singing was enough. By: Vane.\nLost: Teo, where the grey licks in behind the Ridge. Salt on his tongue. We sang him over.\nBound: none. Salt: the north line, the whole of it, in a squall. By: everyone who could stand.\nBound: three. Salt: the gap again; the grey had licked half of it away in a night. By: Grohl, Sefa, Oska.\n\nAt the foot of the last slate, in a hand that is neither Grohl's nor Vane's: The line holds because we walk it. Not because it is salt.",
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers binding the Weave-Eaters with salt and song are CANON (book1 ch.20); the slates, their names and their tally are GAME-ONLY."
+    },
+    {
       "id": "doc.ashrim.litany",
       "title": "The Tear-Marked Litany",
       "text": "Kneel in the ash, for the ash is honest.\nThe Weave was a lie told by the Makers, and the grey is the truth coming home.\nWear the bone, that the Kings may know you for theirs.\nMark the tear, that the Kings may find you in the dark.\nThe eternal Void hungers for the light.\nGive it the light.\n\n(In the margin, another hand: 'Salt from the Ridge caves, three casks. The Patriarch says: no salt, no binding. Let them see what walks when there is no salt.')",
@@ -416,6 +423,9 @@
             "faction": "ashwalkers",
             "amount": 250
           }
+        ],
+        "bagItems": [
+          "leaf.tempered_ashsteel_bow"
         ]
       }
     },
@@ -1157,6 +1167,9 @@
             "faction": "ashwalkers",
             "amount": 250
           }
+        ],
+        "bagItems": [
+          "leaf.passfire_feast"
         ]
       }
     },

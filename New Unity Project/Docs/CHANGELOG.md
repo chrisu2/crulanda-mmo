@@ -1,5 +1,18 @@
 # Changelog
 
+## 2026-10-15 22:00 to 2026-10-16 01:45: Phase 8 to finish, the castle, lockouts (Chris: "keep going finish phase 8", "them move to 9")
+The full record is CLAUDE_HANDOFF.md's Start here (branches, tests, Chris's words, what is next). In short:
+- **Into the working branch and published 01:23:** the Adit run's fixes (the bot on the grass over the tank, in the chute's pool; sims
+  with no path; the Rogue's Moon on Lusk; a boss camp open while he lives), Chris's CC rule for elites (half as long, each kind once a
+  fight), every mob's signature move and the sims' holds (cc-pack), birds that walk, the talent window's role tags.
+- **Merged after the publish (save format 11, back up first):** Phase 8.6's crafting (buffs, found leaves, Leatherworking, Weaving),
+  the buff-up before bosses, the lockouts and the dungeon queue.
+- **On their own branches, with reds:** the inns and doorways (p86-inns), the book of lore and 91 secrets (p86-lore), the castle
+  (p9-capital: the Crown of Argentis after the city map, the halls, Aethelgard on his throne, the bank in two parts, the Exchange, the
+  Gilded Lantern, 39 townsfolk, ivy, iron and gardens, the Crown on Oakhaven's skyline; preview build with its own saves).
+- **Designs written:** ZONE_LOWTOWNS.md (Phase 9.1), CAPITAL_HUB.md, the lockouts (ADIT_REWORK.md top); the cap 15 to 19 on p9-lowtowns;
+  the Modular Hero body in on p85-hero.
+
 ## 2026-10-15, 20:00-22:10: the full run's falls, warps and stalls (Chris watching: "warrior fell off again", "outside again"; all OPEN)
 - **The Warrior fell off every run:** a knockback picked the nearest floor, which on a catwalk could be the hall below. A knockback now starts
   from the floor under the victim and lands on that same floor or not at all (`EncounterEnemy.Boss` Knock, `AditSwingLoad` KnockAlong).

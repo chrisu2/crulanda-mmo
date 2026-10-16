@@ -13,6 +13,9 @@ namespace Crulanda.World
         public string id, displayName, subtitle, canonStatus, canonNote;
         /// <summary>A dungeon (the Sealed Adit): a zone of caves you go into from another zone; the sims never wander into it on their own.</summary>
         public bool dungeon;
+        /// <summary>A raid (none built yet; Chris, 2026-10-15: "raids once per week"): its bosses and elites lock for a week (the lockout
+        /// table, Encounter.Lockouts), not a dungeon's two days.</summary>
+        public bool raid;
         /// <summary>A group zone (the Verdant Shore, round 29; Chris: "all epic mobs, group required"): every camp mob has an elite's
         /// health and blows (EncounterEnemy.Tough), though only the named ones are elites.</summary>
         public bool groupZone;
@@ -198,6 +201,9 @@ namespace Crulanda.World
     /// - vista: a lookout, found by walking within radius (a cairn or nothing at all);
     /// - cache: a hidden box or bundle; note: a page or scrap tucked away; herb: a rare plant; chest: a locked chest;
     ///   key: a key hidden somewhere else, for a chest that names it in needs. These are found by searching (E, prompt).
+    /// - (Phase 8.6) carving: marks cut in a stone, a post or a cave wall (a line in the book of lore); read: a book, a cairn's book
+    ///   or slates (a page); grave: a named stone (a line in the book); remains: a dead adventurer (gear and a page); shrine: a
+    ///   wayshrine (its blessing; after the find, for a crown). A found herb grows back a game day after it is picked.
     /// Rewards: xp, gold, an item id, a document id (a readable page, as quests give). height lifts the prop off the ground
     /// (something tucked up under a bridge or in a tree); rotation turns it. canonStatus as everywhere.
     /// clue: the Discoveries tab's line for it while it is not found, a riddle in the book's voice that points at the region and
@@ -291,7 +297,8 @@ namespace Crulanda.World
     /// spine (size: length, height), shrine (the Cult of Ash's), idol, cavern (a walk-in cave in a rocky knoll, its mouth at
     /// the prop facing -Z; variant 0 is Crowsfoot Hollow's plan; give it a level ZoneShape pad under its floor, see Hollow).
     /// rotation in degrees (0 = door faces south). variant picks colour/size variations; some are looks of their own:
-    /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), crypt 1 a turfed barrow, grave 1 heaved over.
+    /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), inn 2 a waystation (one storey, a long table and bunks),
+    /// crypt 1 a turfed barrow, grave 1 heaved over.
     /// </summary>
     [Serializable] public sealed class ZoneProp
     {
@@ -324,8 +331,13 @@ namespace Crulanda.World
         public string joins;
         /// <summary>How the Sealed Adit dresses a cavern of variant 2 (ZoneBuilder.Adit): "main" (the Workings, the Gallery, the stair and
         /// the Rail Hall), "geode", "vent", "breach", or any other word for a plain cave of lamps and rubble. Empty: by its name, as the
-        /// first Adit's caves were.</summary>
+        /// first Adit's caves were. A treehouse of style "inn" is walked into: its round house has a double door and seats (the Shore's
+        /// Hearth-Tree, Phase 8.6, 2026-10-15).</summary>
         public string style;
+        /// <summary>The kind of prop that stood here before it was raised again (2026-10-15: "ruined_house", Wain's Rest as a waystation):
+        /// it takes that kind's draws from the zone's stream and counts as that kind did for the camps' ground (ZoneBuilder.MobGround),
+        /// so nothing else in the zone moves.</summary>
+        public string was;
     }
     /// <summary>
     /// A deck in a cave (GAME-ONLY; the Adit rework, ZoneBuilder.AditDecks): a walkable way of planks, cut stone, rope or scree, running

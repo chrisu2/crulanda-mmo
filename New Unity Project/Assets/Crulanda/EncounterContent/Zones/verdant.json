@@ -940,7 +940,8 @@
       "size": {
         "x": 14,
         "y": 14
-      }
+      },
+      "style": "inn"
     },
     {
       "kind": "treehouse",
@@ -3227,6 +3228,115 @@
       "document": "doc.verdant.falls_remember",
       "xp": 60,
       "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother, the river to the sea and the survivors who crest the Ridge of Long Shadows are CANON (book3 ch.1-4, 7); Willow-Whisper's leaf is GAME-ONLY."
+    },
+    {
+      "id": "secret.verdant.tale-book",
+      "name": "The Tale-Book on Its Stand",
+      "kind": "read",
+      "prompt": "Read the book on the root-stand",
+      "at": {
+        "x": 36,
+        "y": 76
+      },
+      "rotation": 90,
+      "text": "A stand of grown root by the glade path, and on it a book the Keepers bring out of the Hearth-Tree at dusk to read to whoever sits: the tales of the bower, in a dozen hands.",
+      "clue": "Between the guest-trees and the glowing caps, a stand of grown root holds a book the Keepers read aloud at dusk.",
+      "hint": "Moss-Lantern says the tale-book sits on its root-stand by the path north of the hearth-tree, out of the rain. Read it by day, she says. At dusk somebody will read it to you, whether you like it or not.",
+      "document": "doc.verdant.tale_book",
+      "xp": 200,
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers and their bower are CANON (book3 ch.1-7); the book and its tales are GAME-ONLY."
+    },
+    {
+      "id": "secret.verdant.tide-post",
+      "name": "The Tide-Post",
+      "kind": "carving",
+      "prompt": "Look at the notches on the driftwood post",
+      "at": {
+        "x": -146,
+        "y": -46
+      },
+      "rotation": 270,
+      "text": "A driftwood post sunk in the salt-crust, notched up its side: one cut for every year the salt came further in, and a name by some of them. The Salt-Menders' count, older than the ships.",
+      "clue": "Where the forest gives up at last and the ground is salt, a driftwood post counts the years the salt came further in.",
+      "hint": "Ondine Varro says the Salt-Menders' tide-post stands out on the white ground west of here. A notch a year. She says the ships are younger than the notches, and that's the point of it.",
+      "xp": 190,
+      "canonStatus": "CANON-EXPANDED: salt and the Salt-Menders are CANON (LORE_AUDIT.md: the game's are the forerunners of book 3's); the post and its count are GAME-ONLY."
+    },
+    {
+      "id": "secret.verdant.moss-saint",
+      "name": "The Moss-Saint's Shrine",
+      "kind": "shrine",
+      "prompt": "Kneel at the little shrine",
+      "at": {
+        "x": 46,
+        "y": 92
+      },
+      "rotation": 90,
+      "text": "A wayshrine grown over with moss, its saint a carved Keeper with a lantern, and a dish of crowns that nobody here would take. Travellers leave one for the road west.",
+      "clue": "East of where the caps glow at dusk, a little mossed shrine keeps a dish of crowns no Keeper would take.",
+      "hint": "Sister Iselle says there's a little shrine east of the glowing caps, grown over with moss. Leave a crown, she says, for the road. She doesn't say which road.",
+      "xp": 180,
+      "canonStatus": "GAME-ONLY: the shrine and its saint. The Veridian Keepers are CANON (book3 ch.1-7)."
+    },
+    {
+      "id": "secret.verdant.deep-ore-hunter",
+      "name": "An Ore-Hunter in the Root",
+      "kind": "remains",
+      "prompt": "Search the dead man's sack",
+      "cave": "The Root-Mother's Deep",
+      "along": 30,
+      "aside": -4.0,
+      "at": {
+        "x": -116.0,
+        "y": 158.7
+      },
+      "rotation": 0,
+      "text": "Against the root wall of the hall of columns: bones in rotten leathers, a pick across the knees, a sack of green ore he never carried out, and the green-bronze legplates he had made from his first haul. The root has grown over his boots.",
+      "clue": "In the hall of root columns below the stair, someone came down for the green ore and sat against the wall with his sack full. The root has his boots.",
+      "hint": "Oak-Bane says a man went down under the temple for the green ore two winters back, with a pick and a sack. He's still down there in the hall of root columns. The root has his boots now.",
+      "item": "craft.veridian_legplates",
+      "document": "doc.verdant.ore_hunter",
+      "xp": 220,
+      "gold": 40,
+      "canonStatus": "GAME-ONLY: the ore-hunter and his reckoning. The Root-Mother is CANON (book3); the cold in the root is PROVISIONAL foreshadowing."
+    },
+    {
+      "id": "secret.verdant.deep-count",
+      "name": "The Count by the Sap",
+      "kind": "carving",
+      "prompt": "Look at the count cut in the root wall",
+      "cave": "The Root-Mother's Deep",
+      "along": 68,
+      "aside": -3.8,
+      "at": {
+        "x": -100.57,
+        "y": 189.55
+      },
+      "rotation": 0,
+      "text": "Cut in the root wall across from the glowing pool, notches by the hundred in rows of five: the Keepers who came down to sit with the Root-Mother, one cut each, the oldest grown over with bark.",
+      "clue": "Down where the sap pools and glows, the root wall across from it is cut with a count in fives, the oldest grown over.",
+      "hint": "Willow-Whisper says every Keeper who goes down to sit with the Root-Mother cuts one mark by the sap pool. There are more marks than Keepers now. Nobody says that part aloud.",
+      "xp": 210,
+      "canonStatus": "CANON-EXPANDED: the Root-Mother and the Veridian Keepers are CANON (book3); the count is GAME-ONLY."
+    },
+    {
+      "id": "secret.verdant.deep-sleeper",
+      "name": "Where Lichen-Still Sleeps",
+      "kind": "grave",
+      "prompt": "Read the stone in the root",
+      "cave": "The Root-Mother's Deep",
+      "along": 94,
+      "aside": 5.5,
+      "at": {
+        "x": -107.09,
+        "y": 211.36
+      },
+      "rotation": 90,
+      "text": "On the east side of the deepest chamber, a stone set into the root and the root grown round it like a hand: LICHEN-STILL, WHO STAYED WHEN THE COLD CAME IN. Moss-lamps have been left on it, and one is still lit.",
+      "clue": "At the very bottom, where the great root sits, a stone has been taken into the root like a hand closing. One lamp on it is still lit.",
+      "hint": "Reed-Song says Lichen-Still stayed down at the bottom with the Root-Mother when the cold first came into the root. The root took the stone in. Somebody still leaves lamps.",
+      "xp": 230,
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother and the cold in the root (book3 ch.6-7); Lichen-Still and the stone are GAME-ONLY."
     }
   ],
   "nodes": [

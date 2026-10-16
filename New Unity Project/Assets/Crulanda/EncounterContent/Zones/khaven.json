@@ -1454,13 +1454,13 @@
       "kind": "inn",
       "name": "The Cracked Hearth",
       "at": {
-        "x": -12,
-        "y": 15
+        "x": -12.63,
+        "y": 15.78
       },
       "rotation": 321,
       "size": {
-        "x": 11,
-        "y": 7
+        "x": 13,
+        "y": 9
       },
       "variant": 1
     },
@@ -1668,8 +1668,8 @@
     {
       "kind": "barrels",
       "at": {
-        "x": -7,
-        "y": 12
+        "x": -4.74,
+        "y": 12.39
       },
       "variant": 2
     },
@@ -3853,6 +3853,57 @@
       "document": "doc.khaven.crow_count",
       "xp": 55,
       "canonStatus": "CANON-EXPANDED: the Pale Things as cosmic auditors are CANON (world_bible.md), and so are the Carrion Cliffs (the Khaven village map); Old Kestrel, the Reckoner and the tin are GAME-ONLY."
+    },
+    {
+      "id": "secret.khaven.fever-nurse",
+      "name": "The Fever-Nurse's Stone",
+      "kind": "grave",
+      "prompt": "Read the headstone",
+      "at": {
+        "x": -44,
+        "y": -124
+      },
+      "rotation": 319,
+      "text": "A headstone on its own, a long stone's throw from the fever pit, kept clear of moss when nothing round it is. Cut in it: MAEL COYLE. SHE NURSED THEM. Fresh pebbles on its top.",
+      "clue": "One stone stands apart from the fever's dead, south of the walls, kept clean when nothing round it is. Somebody still leaves pebbles.",
+      "hint": "Wenna Coyle says her mother's stone stands apart from the fever's dead, out past the south gate. She keeps it clean. She'd like somebody else to read it, once.",
+      "xp": 60,
+      "canonStatus": "GAME-ONLY: Mael Coyle and her stone. Khaven's fever year is the game's."
+    },
+    {
+      "id": "secret.khaven.picket-in-the-wood",
+      "name": "A Picket-Man Who Ran",
+      "kind": "remains",
+      "prompt": "Search the dead man's satchel",
+      "at": {
+        "x": -118,
+        "y": 36
+      },
+      "rotation": 90,
+      "text": "Bones in a Sandthrone coat gone grey, sitting with his back to a trunk as if he had only stopped for breath. His satchel is still buckled, and his helm lies where it rolled.",
+      "clue": "West of the walls, where the grey trunks crowd, a deserter sat down against a tree and never got up. His satchel is still buckled.",
+      "hint": "Ansel Morrow says one of the Sandthrone pickets ran into the grey wood west of the walls last winter and never came out. The crypt-keeper doesn't go after the ones who don't want burying.",
+      "item": "craft.bogiron_helm",
+      "document": "doc.khaven.deserters_leaf",
+      "xp": 70,
+      "gold": 14,
+      "canonStatus": "GAME-ONLY: the deserter and his leaf. The Sandthrone are a CANON mercenary company (world_bible.md)."
+    },
+    {
+      "id": "secret.khaven.bearers-shrine",
+      "name": "The Bearers' Shrine",
+      "kind": "shrine",
+      "prompt": "Kneel at the bearers' shrine",
+      "at": {
+        "x": -140,
+        "y": -64
+      },
+      "rotation": 270,
+      "text": "A wayshrine where the coffin-bearers set their load down: a crown in the dish for the road, and the bearers' small saint in his niche, his face worn smooth by thumbs.",
+      "clue": "Where the bearers rested the dead on their way out of the woods, a little roofed saint still takes a crown for the road.",
+      "hint": "Hollis Grane says the bearers always left a crown at their saint where they set the coffins down, out west by the woods. Thirty years he left one. For the road, he says. He doesn't say whose.",
+      "xp": 50,
+      "canonStatus": "GAME-ONLY: the bearers, their saint and his shrine."
     }
   ],
   "nodes": [

@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         {
             var p = ScreenToCanvas(point.x, point.y);
             Vector2 fr = p - PanelOffset("frames"), mm = p - PanelOffset("minimap"), tr = p - PanelOffset("tracker"), br = p - PanelOffset("bar");   // each panel where it was put
-            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
+            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || QueueUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(fr)) || new Rect(1215, 0, 225, 240).Contains(mm) ||
                 (partySims > 0 && new Rect(10, 196, 400, 46 * partySims).Contains(fr)) || chatRect.Contains(p) ||   // the chat
                 new Rect(1110, 236, 330, 200).Contains(tr) || false;
@@ -83,7 +83,7 @@ namespace Crulanda.Encounter
             if (Hidden || session == null || session.Player == null) return;
             Styles();
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
-            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
+            mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; queueVisible = session.QueueOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null;
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
             GUI.matrix = CanvasMatrix;   // even and centred (playtest note 94; EncounterHud.Display)
             GUI.color = Color.white;
@@ -101,6 +101,7 @@ namespace Crulanda.Encounter
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
             if (session.WhoOpen) DrawWho();
+            if (session.QueueOpen) DrawQueue();   // the dungeon queue (Gather a Party, J)
             if (session.MeterOpen && !BigWindowOpen) { At("meter"); DrawMeter(); At(null); }   // not over a big window (Chris, 2026-10-13: it lay over the talents)
             if (session.ScorecardOpen) DrawScorecard();
             if (session.Conversation != null) DrawConversation();
@@ -589,6 +590,7 @@ namespace Crulanda.Encounter
             if (session.Professions != null) items.Add(("Trades   [K]", () => session.ShowTrades(!session.TradesOpen)));
             items.Add(("Map   [M]", () => session.MapOpen = !session.MapOpen));
             if (SimPopulation.Active != null) items.Add(("Who   [" + KeyBindings.Label(GameKey.Who) + "]", () => session.WhoOpen = !session.WhoOpen));   // 2026-10-10: Chris found no way to it
+            if (SimPopulation.Active != null) items.Add(("Dungeons   [" + KeyBindings.Label(GameKey.Queue) + "]", () => session.QueueOpen = !session.QueueOpen));   // the dungeon queue (Gather a Party)
             items.Add(("Save", () => session.Save()));
             items.Add(("Load", () => session.Load()));
             float w = 170, h = 32, top = button.y - 6 - items.Count * (h + 2);
@@ -691,6 +693,11 @@ namespace Crulanda.Encounter
                 GUI.color = new Color(1, 1, 1, .05f); GUI.DrawTexture(new Rect(x - 6, 180, TreeWidth, 520), Texture2D.whiteTexture); GUI.color = Color.white;
                 GUI.contentColor = gold;
                 GUI.Label(new Rect(x, 184, 240, 26), branch.name.ToUpperInvariant() + "   " + tree.SpentIn(p, branch), text);
+                // Its part in a group, on a coloured tag at the header's right (2026-10-16, Chris: "in the talent tree you need to
+                // designate their distinction like tank/healer/dps/support").
+                { var (word, tint) = RoleTag(branch.role); var tag = new Rect(x + TreeWidth - 96, 186, 84, 20);
+                  GUI.color = new Color(tint.r, tint.g, tint.b, .85f); GUI.DrawTexture(tag, Texture2D.whiteTexture); GUI.color = Color.white;
+                  GUI.contentColor = Color.white; var c = new GUIStyle(tiny) { alignment = TextAnchor.MiddleCenter, fontStyle = FontStyle.Bold }; GUI.Label(tag, word, c); }
                 GUI.contentColor = Color.white;
                 GUI.Label(new Rect(x, 208, TreeWidth - 12, 60), branch.loop, tiny);
                 foreach (var n in branch.nodes)
@@ -1153,6 +1160,20 @@ namespace Crulanda.Encounter
             GUI.color = color; GUI.DrawTexture(new Rect(r.x,r.y,r.width * Mathf.Clamp01(fill),r.height), Texture2D.whiteTexture);
             GUI.color = Color.white;
             if (label.Length > 0) GUI.Label(new Rect(r.x+5,r.y-1,r.width,r.height+8), label, small);
+        }
+        /// <summary>A talent branch's part in a group, as its tag says it (the branch's role in the talent file).</summary>
+        static (string, Color) RoleTag(string role)
+        {
+            switch ((role ?? "").ToLowerInvariant())
+            {
+                case "tank": return ("TANK", new Color(.25f, .45f, .85f));
+                case "healer": return ("HEALER", new Color(.2f, .65f, .3f));
+                case "dps": return ("DPS", new Color(.75f, .22f, .2f));
+                case "pet": return ("DPS · PET", new Color(.75f, .22f, .2f));
+                case "control": return ("CONTROL", new Color(.55f, .3f, .75f));
+                case "utility": case "support": return ("SUPPORT", new Color(.8f, .6f, .15f));
+                default: return (string.IsNullOrEmpty(role) ? "" : role.ToUpperInvariant(), new Color(.4f, .4f, .4f));
+            }
         }
     }
 }

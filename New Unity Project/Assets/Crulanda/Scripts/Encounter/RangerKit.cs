@@ -51,6 +51,10 @@ namespace Crulanda.Encounter
                 if (!abilities.ContainsKey(id) || !unlocks.ContainsKey(id)) throw new ArgumentException("Ranger ability '" + id + "' is missing from content or unlocks.");
         }
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
+        /// <summary>Its standing party buff at a buff-up before a boss (Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"; GAME-ONLY):
+        /// the hunter's way of moving, shown the party before a stalk. Half an hour, +3% Agility on everyone (BossBuffs).</summary>
+        public static readonly ClassBuff Standing = new ClassBuff("class.ranger", "Trail-Sense", Crulanda.Core.StatType.Agility);
+        public override ClassBuff PartyBuff { get { return Standing; } }
         int R(string id) { return s.TalentRank(id); }
         float Now { get { return Time.time; } }
         int Level { get { return s.Player.Level; } }

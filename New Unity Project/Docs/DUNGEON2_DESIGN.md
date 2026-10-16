@@ -255,3 +255,7 @@ the merged builder and not on a branch of a branch.
 levels 16-18; the door at Oakhaven's Road's End by the milestone; a painted dial a minute short of noon; the cutters shown at work;
 Vala Solari named once on the Warden's papers; the red door seen, never reached; Gable on the baker's sign; time-squalls as dressing
 only; the wagon ride home; no respawns inside; no Hollow children placed; the Preservationists' second quest line here: yes.
+
+## Levels 15-20 (Chris, 2026-10-16)
+"make sure there is a zone for 15-20 and a dungeon for the same range"; then "Lowtowns + Hallow's Creek (Recommended)". Hallow's Creek is
+15-20 (not 16-18): its wings stepped 15-17, 17-19 and the last bosses 20, its door at Oakhaven's Road's End as answered.

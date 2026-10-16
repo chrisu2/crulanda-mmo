@@ -43,6 +43,20 @@
   ],
   "documents": [
     {
+      "id": "doc.peaks.cairn_book",
+      "kind": "lore",
+      "title": "The Cairn-Book",
+      "text": "An oilcloth book from the top of the pilgrims' cairn above the tarn. A line for every crossing, in a dozen careful hands: the Silent Pilgrims write what they will not say.\n\nSouth, in spring. Jars empty. The pass held its note.\nNorth, at harvest. Three jars full. One cracked on the scree; what was in it is the mountain's now.\nSouth. The new masters at the gate took a sovereign each. We paid. Silence is not the same as quarrel.\nNorth. Snow in summer. The tarn sang once after dark, very clear.\nSouth. One of us, alone, carrying the others' jars. Do not ask.\nNorth. Nothing heard at the scarp's foot. Nothing at all. Write it down anyway.\n\nThe last line is in a hand unlike the others: WHO READS THIS, ADD YOURS. Below it the page is empty.",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, their silence and their echo-jars are CANON (world_bible.md); the cairn, its book and its lines are GAME-ONLY."
+    },
+    {
+      "id": "doc.peaks.runners_reckoning",
+      "kind": "lore",
+      "title": "The Toll-Runner's Reckoning",
+      "text": "A greasy page from a runner's satchel, figures down one side and a plan down the other:\n\nOwed at the gate if I go through: one in ten of the salt, a sovereign for me and a sovereign for the mule.\nOwed if I go round: nothing.\n\nThe way round: up past the crag, over the shoulder where the old slide came down, along the scree and back to the road below the gate. Two hours. Goats do it.\n\nThe Sandthrone don't watch the slide. Nothing comes down it twice, they say.\n\nThe last figure is a sum with a line drawn under it, and nothing written after the line.",
+      "canonStatus": "GAME-ONLY: the runner and his reckoning. The Sandthrone toll on the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
+    },
+    {
       "id": "doc.peaks.toll_book",
       "title": "The Toll-Book",
       "text": "SANDTHRONE TOLL - HIGH GATE\nkept by the toll-master's hand\n\n14th day. Salt-carter, two mules. 3 sovereigns. Paid.\n15th day. Pilgrims, six, for the south. 1 sovereign each. Four paid; two held till paid.\n17th day. Oakhaven run, by Khaven. Two, small. Received from our riders.\n    Handed on at the gate to the Concord escort: four horse, one closed cart. Road to Argentis.\n    TOLL: none. By Seeker's warrant. Captain has the paper.\n18th day. Iron, four carts, north road. 12 sovereigns. Paid.\n19th day. Goatherd. Took two goats.",
@@ -989,7 +1003,10 @@
       ],
       "rewards": {
         "xp": 200,
-        "gold": 40
+        "gold": 40,
+        "bagItems": [
+          "leaf.tempered_ridgesteel_cloth"
+        ]
       }
     },
     {

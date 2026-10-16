@@ -193,6 +193,43 @@ world; 9 waits on 8.5. Each step: fix, targeted tests, build, capture, commit, p
 Labels: the metals, herbs, dishes, recipes, inns, villagers: GAME-ONLY; aether-geodes, Veridian sap, salt, the Silent Pilgrims, the
 Sandthrone, the Ash-Walkers: CANON where cited; lore entries labelled one by one; this whole plan PROVISIONAL.
 
+**Status (p86-craft, 2026-10-15): steps 4-6 written, compiled, not yet run (no Unity on that branch).** Step 4: `Consumables.cs`
+(`buff` on ItemDef: well fed from the seven dishes of Cooking 20+, three found dishes and three party feasts; five tinctures and five
+cordials, two salves, a draught for each pool (mana, vigor, focus, nerve, breath, salt), the Clean-blood cure; the buff row names
+them). Step 5: the `recipe` item kind (37 leaves: "a smith's / tanner's / weaver's / bowyer's / herbalist's / cook's leaf: ..."),
+`Progress.recipes`, save format 11 (`AddRecipesMigration`), the grey "?" rows, sources in `Items/trades.json` (vendors, boss-only
+tables) and six quests. Step 6: three craft slots, Leatherworking and Weaving, Alchemy shown as Simpling, 57 plain pieces (nine slots
+a tier), 20 found rares, five found epics, the plain pieces re-cut a step over the generated uncommon, the sims' new crafts. Tests:
+`ConsumableBuffTests`, `ProfessionLogTests`, `SaveMigratorTests`, `LootDataTests`, `ProfessionDataTests`, `SimEconomyTests`. Open:
+the rare-herb flasks (wait on 8's regrowing herbs), leaves in secrets (`LootDataTests.SecretLeaves`), the inn kitchens' own dish.
+**Status (p86-lore), 2026-10-15, steps 7 and 8, a helper's pass on branch `p86-lore`: written and compile-checked (Roslyn), not yet run in Unity; OPEN.**
+- Step 7, the book of lore: `LoreBook.cs` (data `EncounterContent/Lore/<zone>.json`, one a zone, 160 entries, each labelled; registered as
+  `EncounterContent.loreFiles` in Encounter.asset and by Build Oakhaven). The Lore tab (`EncounterHud.Lore.cs`) has its seven chapters: Places
+  (every landmark, its line and the zone's canonNote), People (named folk spoken to, with their stories; adventurers hailed), Creatures (kinds
+  killed: camps, levels, drops), Herbs and Ores (nodes worked, rare herbs found: trade, ground, makings), Factions, Pages (the 2026-10-15 book)
+  and Leaves (a hook for step 5: `EncounterSession.LoreLeaves`). A better half unlocks with its page or its find: 6 to 15 a zone. A zone's
+  chapter filled gives "The Book of <zone>" and the title "Chronicler of <zone>"; all of them "the Rememberer". What doing records is kept in
+  `EncounterProgress.explored` under keys of its own (`lore|met|...`, `lore|slain|...`, `lore|worked|...`, `lore|sim|...`): no new field, the
+  save format stays 10. The `read` kind is a hidden find (a lectern, a cairn's book, slates); shelves inside the inns wait for step 1's `ZoneInn`.
+- Step 8, secrets: 76 to 91 (Khaven 10 to 13, the Peaks 10 to 13, the Rim 10 to 13, the Shore 8 to 14 with three in the Root-Mother's Deep;
+  Oakhaven 25 and the Adit 13 kept, Crowsfoot Hollow's two kept). New kinds carving, read, grave, remains, shrine (`ZoneBuilder.SecretLooks.cs`);
+  the Adit's 13 got their clues and hints (`Resources/Lore/adit.json`); six new lore pages. The Discoveries tab counts the hidden by the zone's
+  great places ("3 hidden about the Mastwood"). A found rare herb grows back a game day after it is picked (Herbalism 10-75 by the herb); a
+  wayshrine blesses (3% less taken, 10 minutes) when found, then for a crown. Tests: `LoreBookTests` (new), `DiscoveryLogTests`,
+  `ZoneLoreTests` (EditMode); `SecretPlacementTests`, `DiscoveryTests` (PlayMode).
+**Status (p86-inns, 2026-10-15): steps 1-3 and decisions 12-14 written, compiled, not yet run in Unity.** Double doors on every inn
+(`ZoneBuilder.InnDoorW` 2.6 m, nav gap 1.6; `ZoneDoor.hinge2`, `SetHalfShut` after `InnkeeperBed`); the Cask 14 x 10 and the Hearth
+13 x 9 laid out by one plan (`ZoneBuilder.InnPlan`: five tables of three, a 4.4 m bar with two stools, the hearth bench) and registered
+(`ZoneInn`, `ZoneBuilder.Inns`; WorldLife reads its seats from it); neighbours moved in oakhaven.json (the Cask's centre, kitchen, log
+store, hitch, hand cart, board, yard table, hedge shortened, Mira's spawn) and khaven.json (the Hearth's centre, the barrels). The
+doorway lanes and queue (`ZoneDoorway`, `DoorwayRoute` in Encounter/Doorways.cs; carrier and innkeeper, villager, sim, idler, a
+place up for every 2 s waited), the stuck watchdog (`Headway`, villagers and the sims' "jammed"), stopped figures out of the crowd's
+pushing. Pilgrims' Rest and Wain's Rest are waystations (`kind: inn`, variant 2; Wain's Rest `was: ruined_house` keeps the ruin's 48
+draws, canvas-roofed over its burnt rafters: GAME-ONLY, PROVISIONAL; its pad's radius 11 to 14); the Hearth-Tree has a walk-in
+hearth-house (`style: inn`). Decision 13: stepping aside for you and your party, shelter in the rain (`GiveWay`). Tests to run:
+EditMode `InnLayoutTests`, `DoorwayTests`, `WorkshopDataTests`, `ZoneGrowthTests`; PlayMode `VillageDoorTests`, `SimLifeTests`,
+`VillageSupplyTests`, `BuildingGroundTests`, `ZoneContentTests`. Not done: the waystations' hearths are not cooking stations.
+
 ## 5. Open decisions for Chris (one line each)
 1. **Place:** 8.6 straight after Phase 8 (his 23:25 "work on phase 8"), before or after the talents' fourth paths and 8.5?
 2. **8.5 and 8.6 together** as one gear phase, or 8.6's looks (3f, step 9) alone waiting on 8.5's rig choice?
@@ -221,3 +258,24 @@ count by region; the Lore tab in the quest book; villagers step aside and shelte
    10. Well-fed and elixirs 30 minutes, one stat; a draught for each class's pool. 11. Coin only. 12. Taprooms for the Peaks, the Rim
    and the Shore. 13. Stepping aside for you and the party, and shelter under a roof in rain. 14. The Cask 14x10, the Hearth 13x9,
    fifteen seats.
+
+## Buffs to beat the bosses (Chris, 2026-10-15 ~23:25, verbatim)
+"we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses"
+**The plan (PROVISIONAL):** before a boss or an elite camp the leader stops short of the pull ("buff up"): every sim eats (a party feast
+when one is carried, else its own well-fed dish), drinks the elixir for its role (a tank's armour salve or stamina, a healer's cordial,
+damage-dealers' tinctures) and its class draught when low; each class casts its party buff on everyone (the Paladin's oath/standard, the
+Druid's, the Archivist's songs, the Shaman's and the Cleric's blessings, whichever exists; a class with none gets one, small); the run bot
+(you) does the same from the bags; then the pull. Sims carry what they craft and buy (SimEconomy), so a richer sim party is better
+buffed. Bosses are then tuned for a buffed party (the buffs worth about 10-15% of the party's damage and survival), so going in unbuffed
+is harder, not impossible. Lands on top of step 4 (the consumables, branch p86-craft) once its tests pass.
+- Wain's Rest's roof of salt-cart canvas (the inns helper's PROVISIONAL choice, the Deacon's Tally saying its rafters were burnt): Chris,
+  2026-10-15 ~23:30, verbatim: "canvas roof is fine. i really want the castle done asap so double down on it".
+## Status (p86-buffs, 2026-10-15): buffs to beat the bosses, written, not yet run in Unity
+Chris's brief (verbatim): "we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses" (the plan is on main). Built on p86-craft:
+the party's leader stops 25-30 m short of a boss or an elite camp (not trash), says "buff up" in Party and waits until every living member has
+buffed or 12 s pass, then pulls. Each sim eats (a party feast when a sim near carries one, else its dish), drinks its part's elixir (tank: salve,
+else Bear's-wort; healer: Hearth-ease; damage: its main stat's tincture), its draught under 60% of its pool, and lays its class's standing buff
+on the party. Every class has one in its kit (half an hour, +3% of one stat, GAME-ONLY names, icons from tools/art/make_icons.py). Sims keep
+a pack (made or bought at twice the value; a feast only when rich) that the stall never takes. /buff does yours; the run bot buffs from its
+bags (given a few of its tier) and logs "buffed:" lines. On a sim, the buffs' stat points become a share of its blow, mend and health (at
+most 15% a stat). Mira has no buff of her own yet. Code: BossBuffs.cs, EncounterSession.Buffs.cs. Tests: BuffUpRulesTests, BossBuffTests.

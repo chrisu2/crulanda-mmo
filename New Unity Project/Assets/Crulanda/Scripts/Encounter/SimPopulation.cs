@@ -46,7 +46,10 @@ namespace Crulanda.Encounter
             foreach (var id in new List<string>(ids))
             {
                 var s = World.sims.Find(x => x.id == id); if (s == null || Session.InParty(id)) continue;
-                if (!s.IsOnlineAt(hour)) { Session.Message(s.name + " has logged off since."); continue; }
+                // A sim the dungeon queue brought (EncounterSession.Queue): it comes into the run's dungeon online or not, and anywhere else
+                // the run is over, so it goes back where it came from.
+                if (Session.QueueSim(id) && Session.QueueRunZone != ZoneId) { Session.SendQueueSimHome(s); continue; }
+                if (!s.IsOnlineAt(hour) && !Session.QueueSim(id)) { Session.Message(s.name + " has logged off since."); continue; }
                 var at = Session.Player.transform.position - Session.Player.transform.forward * (2 + k) + Session.Player.transform.right * (k % 2 == 0 ? 1.5f : -1.5f); k++;
                 s.zone = ZoneId; s.x = at.x; s.z = at.z; Refresh();
                 if (Session.Invite(id, true)) back.Add(s.name);
@@ -100,8 +103,8 @@ namespace Crulanda.Encounter
         /// <summary>
         /// The unseen living on (5.4, 2026-10-07): each world-clock hour a sim in another zone and online hunts, gathers and trades
         /// in the rough, by its personality: the bold take experience as from a few kills of their level (a level when it adds
-        /// up: no ding is heard from another zone), the careful gather their trade's first material and sell it now and then,
-        /// coin buys the gear upgrades (SimEconomy), and the smiths forge what they can. Nothing happens while offline, and a
+        /// up: no ding is heard from another zone; a leatherworker brings home a hide or two), the careful gather their trade's first
+        /// material and sell it now and then, coin buys the gear upgrades (SimEconomy), and the crafters make what they can. Nothing happens while offline, and a
         /// sim here, seen, lives for real instead. Called from <see cref="Refresh"/>.
         /// </summary>
         public static void LiveAway(SimAdventurer s, float hour, ItemDatabase items, ProfessionDatabase db)
@@ -121,17 +124,19 @@ namespace Crulanda.Encounter
                         s.experience = Mathf.Max(s.experience, EncounterProgress.XpForLevel(s.level)) + kills * EncounterProgress.KillXp(s.level, s.level, false) / 2;
                         while (s.level < EncounterProgress.LevelCap && s.experience >= EncounterProgress.XpForLevel(s.level + 1)) s.level++;
                     }
+                    if (SimEconomy.CraftTrade(s.classId) == "leatherworking") SimEconomy.Add(s, SimEconomy.HideFor(s.level), 1 + r.NextInt(0, 2));   // skinned (Phase 8.6)
                 }
                 else
                 {
                     string trade = SimEconomy.GatherTrade(s.classId); string mat = trade == "mining" ? "mat.copper_ore" : trade == "woodcutting" ? "mat.oak_log" : "mat.yarrow";
                     SimEconomy.Add(s, mat, 2 + r.NextInt(0, 4));
                 }
-                if (SimEconomy.GoodsCount(s) >= 8 && r.NextFloat() < .5f)
+                if (SimEconomy.SellableCount(s, items) >= 8 && r.NextFloat() < .5f)
                 {
                     var recipe = SimEconomy.Craftable(s, db, items);
                     if (recipe != null) SimEconomy.Craft(s, recipe, items); else SimEconomy.SellAll(s, items);
                     SimEconomy.Upgrade(s);
+                    SimEconomy.Stock(s, items);   // its pack for the bosses (BossBuffs)
                 }
             }
         }
@@ -143,7 +148,7 @@ namespace Crulanda.Encounter
             if (Lively) foreach (var s in World.sims) if (s.zone != zone && s.IsOnlineAt(hour)) { LiveAway(s, hour, Session.Items, Session.Professions?.Db); TickAway(s, hour); }
             foreach (var s in World.sims)
             {
-                bool here = s.zone == zone && s.IsOnlineAt(hour) && !Session.InParty(s.id);   // one in your party is with you, not standing about
+                bool here = s.zone == zone && (s.IsOnlineAt(hour) || Session.QueueSim(s.id)) && !Session.InParty(s.id);   // one in your party is with you, not standing about; a queued sim is summoned, online or not
                 var f = Find(s.id);
                 if (here && f == null) { Figures.Add(SimFigure.Spawn(this, s)); SimChatter.Active?.Arrived(s); }
                 else if (!here && f != null) { if (!s.IsOnlineAt(hour)) SimChatter.Active?.LoggedOff(s); Figures.Remove(f); Destroy(f.gameObject); }

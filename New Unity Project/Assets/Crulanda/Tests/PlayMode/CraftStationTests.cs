@@ -357,7 +357,7 @@ namespace Crulanda.Tests
             var away = Away(zone, anvil.stand, 12); Assert.IsTrue(away.HasValue, "Walkable ground twelve metres from the smithy, out of reach of every station.");
             yield return StandAt(s, away.Value);
             Assert.IsNull(s.TradeNpcNear("herbalist", EncounterSession.TrainerRange));
-            Assert.IsFalse(s.CanTakeUp("alchemy", out why)); Assert.AreEqual("Alchemy is taken up at a herbalist's bench, or from a herbalist.", why);
+            Assert.IsFalse(s.CanTakeUp("alchemy", out why)); Assert.AreEqual("Simpling is taken up at a herbalist's bench, or from a herbalist.", why);   // Alchemy shown as Simpling (Phase 8.6, decision 5)
             Assert.IsFalse(s.LearnCraft("alchemy")); Assert.IsFalse(s.Professions.Has("alchemy")); Assert.Contains(why, s.Messages);
             // Forget: the slot is free and the skill lost, in the save too; what was made stays made.
             Assert.IsTrue(s.ForgetCraft("blacksmithing"));
@@ -439,8 +439,8 @@ namespace Crulanda.Tests
             Assert.AreEqual(potions + 2, Inventory.Count(p, "potion.minor")); Assert.AreEqual(0, Inventory.Count(p, "mat.yarrow")); Assert.AreEqual(0, Inventory.Count(p, "mat.vial"));
             Assert.Contains("You make Minor healing draught.", s.Messages); Assert.AreEqual(3, s.Professions.Skill("alchemy"));
             StringAssert.Contains("{\\\"id\\\":\\\"alchemy\\\",\\\"skill\\\":3}", Saved(s));
-            // Both crafts taken (Blacksmithing as if at a forge): every slot is used, and the bench still opens on Alchemy. The content
-            // has two crafts, so a third is refused in ProfessionLogTests.ThirdCraft_IsRefused.
+            // Two crafts taken (Blacksmithing as if at a forge), and the bench still opens on Alchemy (Simpling). Three slots since Phase 8.6:
+            // a fourth is refused in ProfessionLogTests.FourthCraft_IsRefused.
             Assert.IsTrue(s.Professions.Learn("blacksmithing", out why), why);
             Assert.AreEqual(2, s.Professions.CraftSlotsUsed); Assert.AreEqual("alchemy", s.StationTrade("bench").id);
         }

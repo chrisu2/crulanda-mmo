@@ -2466,8 +2466,16 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 828c5e19186c4397a85b26734a4ae70a, type: 3}
   - {fileID: 4900000, guid: 8551b0a84e6e40eabece9e15ae762d17, type: 3}
   - {fileID: 4900000, guid: 09624b8f2d254830aac358cd2c9554c3, type: 3}
+  - {fileID: 4900000, guid: 40f5f23a51b24db1b0c96d2f90139115, type: 3}
   professionFiles:
   - {fileID: 4900000, guid: 3ed5b143fd404108b1209da3f52c5162, type: 3}
+  loreFiles:
+  - {fileID: 4900000, guid: d0c95097d6984e9fad364af3fbd5f4a0, type: 3}
+  - {fileID: 4900000, guid: a6c3a91266ba4b8390835ae6882d3a9c, type: 3}
+  - {fileID: 4900000, guid: f8642b0faac340c6bd31c0891e1d52b4, type: 3}
+  - {fileID: 4900000, guid: 3ed78fc4f8b24eb19a6980e00016799a, type: 3}
+  - {fileID: 4900000, guid: f3fdf6dbffdf40428ecfe0103735b50d, type: 3}
+  - {fileID: 4900000, guid: b8126f3a4d2e4577b07f8dfa311fe007, type: 3}
   playerStats:
     baseHealth: 180
     healthPerLevel: 25

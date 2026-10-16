@@ -93,7 +93,8 @@ namespace Crulanda.Tests
             session.Kit.ApplyStats();
             Assert.IsNull(session.Kit.ActionLockLabel(net), "the Net learnt");
             var jailer = (WarriorKit)session.Kit; var motor = session.Player.GetComponent<AdventurerMotor>();
-            var e = Mob(); motor.Teleport(e.transform.position + Vector3.back * 2); session.Select(e); yield return null;
+            var e = Mob(); e.Cast = null;   // the Jailer's own numbers: the mob's signature move (2026-10-15) would land a hit and its Vigor
+            motor.Teleport(e.transform.position + Vector3.back * 2); session.Select(e); yield return null;
             Assert.AreEqual(1f, session.Kit.PartyDamageMultiplier(e), 1e-4f, "nothing held yet");
             Assert.IsTrue(session.UseAbility(cut), "Hock Cut"); yield return null;
             Assert.IsTrue(e.Slowed, "slowed"); Assert.IsTrue(jailer.Holds(e)); Assert.IsFalse(jailer.Binds(e), "a slow is a hold, not a binding");
@@ -134,13 +135,22 @@ namespace Crulanda.Tests
             while (t < 9 && o.actor.Health.Pool.Current <= hurt) { m.threat.Add(me, 1); o.threat.Add(me, 1); session.Player.Health.ApplyHealing(999); t += Time.deltaTime; yield return null; }
             Assert.Greater(o.actor.Health.Pool.Current, hurt, "Ember Mend lands on the hurt one");
         }
-        [UnityTest] public IEnumerator A_boss_takes_no_hold()
+        /// <summary>Chris's rule (2026-10-15, CC_DESIGN.md): on an elite or a boss each kind of hold lands once a fight, for half its time;
+        /// an interrupt is not a hold; a reset fight forgets.</summary>
+        [UnityTest] public IEnumerator A_boss_takes_each_hold_once_for_half()
         {
             yield return null;
             var king = session.Enemies.FirstOrDefault(x => x != null && x.Elite && x.actor.DisplayName.Contains("Caddock"));
             Assert.NotNull(king, "Caddock is in Crowsfoot Hollow");
-            Assert.AreEqual("Immune", king.Apply("incap", session.Player, 20)); Assert.AreEqual("Immune", king.Apply("fear", session.Player, 8));
-            Assert.IsNull(king.Apply("stun", session.Player, 3), "a stun works on a boss");
+            Assert.IsNull(king.Apply("incap", session.Player, 20), "held once"); Assert.That(king.ControlSecondsLeft, Is.InRange(9f, 10.01f), "for half the time");
+            king.Release();
+            Assert.AreEqual("Immune (once a fight)", king.Apply("incap", session.Player, 20), "never a second time");
+            Assert.IsNull(king.Apply("stun", session.Player, 4), "another kind still lands once");
+            Assert.AreEqual("Immune (once a fight)", king.Apply("stun", session.Player, 4));
+            Assert.IsNull(king.Apply("silence", session.Player, 3), "an interrupt is not a hold");
+            Assert.IsNull(king.Apply("silence", session.Player, 3), "and works again");
+            king.ResetFight(); yield return null;
+            Assert.IsNull(king.Apply("stun", session.Player, 4), "a new fight, a new stun");
         }
     }
 }

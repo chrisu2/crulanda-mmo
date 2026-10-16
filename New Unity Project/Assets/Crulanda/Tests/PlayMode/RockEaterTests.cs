@@ -71,8 +71,9 @@ namespace Crulanda.Tests
             Assert.AreEqual(RaidMark.Moon, nix.RaidMarked, "marked for the party to hold");
             Assert.AreEqual(EncounterSession.GoadedBlows, machine.BlowScale, 1e-3f, "goaded: the beast's blows half again while Nix is free");
             Assert.IsTrue(session.RockEaterDriven);
-            Assert.IsNull(nix.Apply("incap", session.Player, 12), "Nix can be held"); Assert.Greater(nix.ControlSecondsLeft, 11, "for the full time, no diminishing");
-            Assert.IsNull(nix.Apply("incap", session.Player, 12), "and again, at once"); Assert.Greater(nix.ControlSecondsLeft, 11, "no immunity for being held too soon");
+            // Chris, 2026-10-15, of the duo: "CC duration cut in half and can only have one cc type one time" (CC_DESIGN.md).
+            Assert.IsNull(nix.Apply("incap", session.Player, 12), "Nix can be held once"); Assert.That(nix.ControlSecondsLeft, Is.InRange(5f, 6.01f), "for half the time");
+            Assert.AreEqual("Immune (once a fight)", nix.Apply("incap", session.Player, 12), "not twice");
             yield return Frames(2);
             Assert.AreEqual(1f, machine.BlowScale, 1e-3f, "held, the beast is calm");
             Assert.IsFalse(session.Progress.keys.Contains("sigil.amber"), "the sigil is Nix's, not the beast's");
@@ -90,6 +91,9 @@ namespace Crulanda.Tests
             machine.RespawnSeconds = nix.RespawnSeconds = 1;
             Kill(machine); yield return Frames(2); Kill(nix); yield return Frames(2);
             Assert.IsFalse(machine.actor.IsAlive); Assert.IsFalse(nix.actor.IsAlive);
+            // Both are locked for you now (Lockouts, 2026-10-15: a boss stays down until its lockout resets): the reset comes, then the camp.
+            Assert.IsTrue(session.LockedFor(nix) && session.LockedFor(machine), "locked by the kill");
+            session.Progress.lockouts.Clear();
             yield return new WaitForSeconds(2.5f);
             Assert.IsTrue(machine.actor.IsAlive, "the engine is back"); Assert.IsTrue(nix.actor.IsAlive, "and so is Nix");
             Assert.AreSame(machine, nix.Inside, "in the saddle again"); Assert.IsTrue(nix.Hidden); Assert.IsTrue(Visible(nix));

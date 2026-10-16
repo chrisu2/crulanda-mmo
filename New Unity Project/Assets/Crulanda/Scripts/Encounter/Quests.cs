@@ -154,7 +154,8 @@ namespace Crulanda.Encounter
         public string ItemName(string id) { return id != null && Items.TryGetValue(id, out var i) ? i.name : id; }
         /// <summary>
         /// What the quests name from the item database, checked against it (the quest files cannot see it): every bring objective's
-        /// item, every bagItems reward and every unlessWorn must be a real item, and the last two a trade bag. The problems found.
+        /// item, every bagItems reward and every unlessWorn must be a real item, the bag rewards a trade bag, a material or a leaf (a found
+        /// recipe's, Phase 8.6), and unlessWorn a trade bag. The problems found.
         /// </summary>
         public List<string> CheckItems(ItemDatabase items)
         {
@@ -165,7 +166,7 @@ namespace Crulanda.Encounter
                 foreach (var step in q.steps ?? new QuestStepDef[0])
                     foreach (var o in step?.objectives ?? new QuestObjectiveDef[0])
                         if (o != null && o.type == "bring" && items.Get(o.item) == null) errors.Add(p + "brings unknown item '" + o.item + "'.");
-                foreach (var b in (q.rewards ?? new QuestRewardDef()).bagItems ?? new string[0]) if (items.Get(b)?.kind != "bag" && items.Get(b)?.kind != "material") errors.Add(p + "gives '" + b + "', which is not a trade bag or a material.");
+                foreach (var b in (q.rewards ?? new QuestRewardDef()).bagItems ?? new string[0]) { var k = items.Get(b)?.kind; if (k != "bag" && k != "material" && k != "recipe") errors.Add(p + "gives '" + b + "', which is not a trade bag, a material or a leaf."); }
                 if (!string.IsNullOrEmpty(q.unlessWorn) && items.Get(q.unlessWorn)?.kind != "bag") errors.Add(p + "unlessWorn '" + q.unlessWorn + "' is not a trade bag.");
             }
             return errors;
@@ -345,7 +346,7 @@ namespace Crulanda.Encounter
             foreach (var d in bags) Inventory.Add(Progress, Items, d.id, 1);
             foreach (var d in r.documents) Reveal(d);
             Say((q.IsMain ? "Chronicle complete: " : q.kind == "bounty" ? "Bounty paid: " : "Quest complete: ") + q.title + (r.xp > 0 ? "  +" + r.xp + " XP" : "") + (r.gold > 0 ? "  +" + r.gold + " crowns" : ""), null);
-            foreach (var d in bags) Say("Received: " + d.name + "." + (d.kind == "bag" ? " Use it from your bags [I] to wear it." : d.kind == "gear" ? " Right-click it in your bags [I] to wear it." : ""), null);
+            foreach (var d in bags) Say("Received: " + d.name + "." + (d.kind == "bag" ? " Use it from your bags [I] to wear it." : d.kind == "gear" ? " Right-click it in your bags [I] to wear it." : d.kind == "recipe" ? " Use it from your bags [I] to learn it." : ""), null);
             if (coin > 0) { Say(HaveOneLine, q.turnIn == "auto" ? null : q.turnIn); Say("Received " + coin + " crowns.", null); }
             foreach (var c in r.reputation) ChangeStanding(c.faction, c.amount);
             return true;
@@ -447,6 +448,30 @@ namespace Crulanda.Encounter
                 var step = CurrentStep(s); if (step == null) continue;
                 foreach (var o in step.objectives)
                     if (o.type == "collect" && o.item == item && ItemCount(item) < o.count && (string.IsNullOrEmpty(o.target) || Matches(o.target, source))) return true;
+            }
+            return false;
+        }
+        /// <summary>
+        /// Whether a quest you hold still needs this enemy killed (the lockouts' quest exception, 2026-10-15): a kill objective that names it
+        /// and is not yet met, or a "collect ... from kill:" objective for it whose item you lack, in the current step; or any such objective
+        /// in a step still to come. A quest done or handed in needs nothing.
+        /// </summary>
+        public bool StillNeedsKill(string enemyId)
+        {
+            if (string.IsNullOrEmpty(enemyId)) return false;
+            foreach (var (q, s) in Active())
+            {
+                if (q.steps == null) continue;
+                for (int k = s.step; k < q.steps.Length; k++)
+                {
+                    var step = q.steps[k]; if (step == null || step.objectives == null) continue;
+                    for (int i = 0; i < step.objectives.Length; i++)
+                    {
+                        var o = step.objectives[i]; bool now = k == s.step;
+                        if (o.type == "kill" && Matches(o.target, enemyId) && (!now || Count(s, i) < o.count)) return true;
+                        if (o.type == "collect" && o.target != null && o.target.StartsWith("kill:") && Matches(o.target.Substring(5), enemyId) && ItemCount(o.item) < o.count) return true;
+                    }
+                }
             }
             return false;
         }

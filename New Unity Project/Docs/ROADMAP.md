@@ -93,6 +93,11 @@ Each step is its own set of rounds; Chris picks the first zone, class and race w
 **The first zone (Chris, 2026-10-15 ~22:00, the question prompt, verbatim): "Lowtowns & Rust Market 16-19 (Recommended)"**, the 16-30
 road's first band, east through Argentis's gate from the Shore. Hallow's Creek (DUNGEON2_DESIGN.md, 16-18) takes its recommended answers.
 Chris's order with it: "keep going finish phase 8" then "them move to 9".
+**Chris, 2026-10-16 ~14:50 (verbatim): "after this work on next dungeon and raise top level to 20. make sure there is a zone for 15-20 and a
+dungeon for the same range".** The cap goes to 20 (not 19), with a zone and a dungeon for 15-20.
+**Before it, the capital (Chris, 2026-10-15 ~22:25, verbatim):** "we need to implement a castle (central point) for auction house, library
+(lore), leader of crulanda (canon lore), guild halls, bank, etc more as we come up with it. check maps for location it should be located".
+His answers: the Crown of Argentis, open to everyone from level 1, High Councilor Aethelgard, castle first. CAPITAL_HUB.md.
 
 **The 16-30 road (Chris, side chat 2026-10-07; PROVISIONAL, mostly Book 1):** levels 16-30 use places already on the world map:
 the Lowtowns and the Rust Market (16-19), the Forge District (19-22), the Warrens with the Deep Veins dungeon (22-25), the Crown and
@@ -144,3 +149,6 @@ open the next round.
   drain faster (a water supply to keep up). Winter: snow on the ground in the high and northern places; the cold takes health and
   stops it coming back until you are warm (a fire, an inn, warm clothes). Builds on the crops' round (CropField), WorldWeather and
   WorldClock.
+
+**Asked (the question prompt, 2026-10-16 ~14:55, verbatim): "Lowtowns + Hallow's Creek (Recommended)".** The cap is 20; the Lowtowns & Rust
+Market zone is stretched to 15-20 (ZONE_LOWTOWNS.md) and Hallow's Creek to 15-20 (DUNGEON2_DESIGN.md), its door at Oakhaven's Road's End.

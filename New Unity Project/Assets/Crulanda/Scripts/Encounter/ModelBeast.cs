@@ -355,7 +355,10 @@ namespace Crulanda.Encounter
         /// and the head-low idle loop; walk and gallop loop with the ground; the rest are one-shots.</summary>
         static readonly (string slot, string[] clips, bool loop)[] Motions = {
             ("idle", new[] { "Idle", "idle", "watch01" }, true), ("idle2", new[] { "Idle_2", "Idle2", "preen", "watch02" }, true), ("headlow", new[] { "Idle_2_HeadLow", "Idle_Headlow" }, true),
-            ("eat", new[] { "Eating", "Eat", "peck" }, true), ("walk", new[] { "Walk", "Walking", "WalkForward", "Run", "move_slow", "hopForward", "Running" }, true),
+            ("eat", new[] { "Eating", "Eat", "peck" }, true), ("walk", new[] { "Walk", "Walking", "WalkForward", "Run", "move_slow", "Running" }, true),
+            // The Living Birds have no walk, only hops (2026-10-16, Chris: "birds still hoppy/jumpy. they need to walk normal and maybe hop
+            // occasionally"): their hop is a one-shot now, and their walk a step done by CritterBody.Stride on the standing clip.
+            ("hop", new[] { "hopForward" }, false),
             ("run", new[] { "Gallop", "RunForward", "move_fast", "Run", "Running", "flyStraight" }, true),   // (2026-10-13: the wild boar, the squirrel, the Living Birds)
             ("attack", new[] { "Attack", "Attack_Headbutt", "Attack_1", "Attack1", "attack_01", "Attack01", "Attack_Charge_Gore" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
             ("attack2", new[] { "Attack2", "Attack02", "Attack_Bite_Forward_Lunge_Tear" }, false), ("attack3", new[] { "Attack3", "Attack03" }, false),

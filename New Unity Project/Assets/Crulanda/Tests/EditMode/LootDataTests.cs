@@ -363,12 +363,15 @@ namespace Crulanda.Tests
             Assert.IsTrue(carriers.All(c => items.Get(c.id).quality >= 3), "Only rares and epics carry effects.");
         }
 
+        /// <summary>The plain crafted pieces (craft.*) stay under the named rares of their band. A luck charm (the Harrow Wood Luck-Knot) is
+        /// worth its luck, not its stats, so it is not a measure (Phase 8.6: the copper torc beats a generated uncommon by a step and
+        /// carries more points than the knot's four).</summary>
         [Test] public void Crafted_gear_stays_under_named_rares_of_its_band()
         {
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items);
             var crafted = items.Items.Values.Where(d => d.id.StartsWith("craft.", StringComparison.Ordinal) && d.kind == "gear").ToList();
             if (crafted.Count == 0) Assert.Ignore("No crafted gear yet (the professions work adds it).");
-            var rares = loot.GearOrder.Where(g => !g.legacy).Select(g => items.Get(g.id)).Where(d => d.quality == 3).ToList();
+            var rares = loot.GearOrder.Where(g => !g.legacy && !(g.effects ?? new GearEffect[0]).Any(e => e.kind == "luck")).Select(g => items.Get(g.id)).Where(d => d.quality == 3).ToList();
             foreach (var c in crafted)
                 foreach (var r in rares.Where(r => r.slot == c.slot && GearLooks.BandOf(r.level + 1) == GearLooks.BandOf(c.level + 1) && r.level >= c.level))
                 {
@@ -376,6 +379,75 @@ namespace Crulanda.Tests
                     Assert.LessOrEqual(c.armor, r.armor, c.id + " stays under " + r.id + " in armour.");
                     Assert.Less(c.stamina + c.strength + c.agility + c.intellect + c.spirit, r.stamina + r.strength + r.agility + r.intellect + r.spirit, c.id + " has fewer stat points than " + r.id + ".");
                 }
+        }
+
+        // ---------- the leaves: found recipes (Phase 8.6 step 5) ----------
+        /// <summary>
+        /// Leaves the zones' secrets should hold, by secret id: the secrets are another helper's work (Docs/PHASE8_6_LIVING_WORLD.md 3c, 3e),
+        /// so these are listed here until each secret's item is set. Each leaf named here has another source too.
+        /// </summary>
+        public static readonly Dictionary<string, string> SecretLeaves = new Dictionary<string, string> {
+            { "secret.oakhaven.shepherds-tin", "leaf.harvest_feast" },        // the plan: "the Shepherd's Tin a cheese" (the Harvest Home board's cheese)
+            { "secret.verdant.tappers-stump", "leaf.sap_venison" },           // "the Tapper's Stump the sap glaze"
+            { "secret.ashrim.carvers-bundle", "leaf.tempered_ashsteel_bow" }, // "the Bone-Carver's Bundle": a bone-backed bow
+        };
+        /// <summary>
+        /// Every leaf can be had (the plan's sources, Docs/PHASE8_6_LIVING_WORLD.md 3c; decision 11, coin only): sold by a named villager
+        /// who lives in a zone (never by a whole trade, and nothing in a vendor entry asks for standing), dropped from a boss-only table
+        /// (LootTableDef.elite) whose tag is an elite camp's, given by a quest, held by a secret, or listed for a secret above; between them
+        /// 30-40 leaves, and each source names a real leaf.
+        /// </summary>
+        [Test] public void Every_leaf_is_in_a_table_a_vendor_a_quest_or_a_secret()
+        {
+            var items = LootTestData.Items(); var zones = LootTestData.Zones(); var quests = LootTestData.Quests();
+            var leaves = items.Items.Values.Where(d => d.kind == "recipe").Select(d => d.id).ToList();
+            Assert.That(leaves.Count, Is.InRange(30, 40), "The plan's 30-40 leaves (" + leaves.Count + ").");
+            bool Lives(string npc)
+            {
+                foreach (var z in zones)
+                {
+                    if (z.life == null) continue;
+                    var names = z.life.names != null && z.life.names.Length > 0 ? z.life.names : VillageLife.DefaultNames;
+                    if (z.life.villagers > 0 && Array.IndexOf(names, npc) >= 0) return true;
+                    if ((z.life.residents ?? new ZoneResident[0]).Any(r => r != null && r.name == npc)) return true;
+                    if ((z.life.households ?? new ZoneHousehold[0]).Any(h => h != null && (h.members ?? new ZoneMember[0]).Any(m => m != null && m.name == npc))) return true;
+                }
+                return false;
+            }
+            var sources = leaves.ToDictionary(l => l, l => new List<string>());
+            foreach (var v in items.Vendors)
+                foreach (var id in v.items ?? new string[0])
+                {
+                    if (!sources.ContainsKey(id)) continue;
+                    Assert.IsFalse(string.IsNullOrEmpty(v.npc), id + " is sold by a named villager (the trade's own), not by every " + v.role + ".");
+                    Assert.IsTrue(Lives(v.npc), v.npc + ", who sells " + id + ", lives in a zone.");
+                    sources[id].Add("sold by " + v.npc);
+                }
+            foreach (var t in items.Loot)
+                foreach (var e in t.entries ?? new LootEntry[0])
+                {
+                    if (!sources.ContainsKey(e.item)) continue;
+                    Assert.IsTrue(t.elite, e.item + ": a leaf drops only from a boss (an elite-only table, tag " + t.tag + ").");
+                    Assert.IsTrue(zones.Any(z => (z.camps ?? new ZoneCamp[0]).Any(c => c != null && c.elite && LootContext.CampTag(c) == t.tag && c.levelMin >= t.levelMin && c.levelMax <= t.levelMax)),
+                        e.item + ": an elite camp carries the tag " + t.tag + ".");
+                    Assert.That(e.chance, Is.InRange(.01f, .5f), e.item + ": a chance, not a certainty.");
+                    sources[e.item].Add("dropped by " + t.tag);
+                }
+            foreach (var q in quests.Quests.Values)
+                foreach (var b in q.rewards?.bagItems ?? new string[0]) if (sources.ContainsKey(b)) sources[b].Add("quest " + q.id);
+            foreach (var z in zones)
+                foreach (var s in z.secrets ?? new ZoneSecret[0]) if (s != null && !string.IsNullOrEmpty(s.item) && sources.ContainsKey(s.item)) sources[s.item].Add("secret " + s.id);
+            foreach (var kv in SecretLeaves)
+            {
+                Assert.IsTrue(sources.ContainsKey(kv.Value), kv.Key + " is to hold " + kv.Value + ", a leaf.");
+                Assert.IsTrue(zones.Any(z => (z.secrets ?? new ZoneSecret[0]).Any(s => s != null && s.id == kv.Key)), kv.Key + " is a secret.");
+                sources[kv.Value].Add("for " + kv.Key);
+            }
+            var none = sources.Where(kv => kv.Value.Count == 0).Select(kv => kv.Key).ToList();
+            Assert.IsEmpty(none, "Leaves nobody gives:\n" + string.Join("\n", none));
+            Assert.GreaterOrEqual(items.Vendors.Where(v => (v.items ?? new string[0]).Any(sources.ContainsKey)).Select(v => v.npc).Distinct().Count(), 6, "Sold by the trades' own villagers in every zone.");
+            Assert.GreaterOrEqual(sources.Values.Count(s => s.Any(x => x.StartsWith("quest "))), 4, "A few in quest rewards.");
+            Assert.GreaterOrEqual(sources.Values.Count(s => s.Any(x => x.StartsWith("dropped "))), 10, "Bosses, elites and the dungeons' bosses drop them.");
         }
     }
 }

@@ -2395,6 +2395,7 @@ def build_all(C):
             look = parse_look(lk) if lk else (fallbacks.get(it.get('slot'), 'sword.arming'), FAMILIES[fallbacks.get(it.get('slot'), 'sword.arming')][0], 'oakhaven', False)
             out.append(('item/' + safe(id_), gear_icon(id_, looks, look, id_), it['name'], q, False))
         elif id_ in ITEMS: out.append(('item/' + safe(id_), plain_icon(id_, ITEMS[id_]), it['name'], q, False))
+        elif kind == 'recipe': out.append(('item/' + safe(id_), plain_icon(id_, leaf_spec(it)), it['name'], q, False))   # a leaf (Phase 8.6)
         else: missing.append('item ' + id_)
     for r in C['prof'].get('recipes') or []:
         if not any(i['id'] == r['output'] for i in C['items']): missing.append('recipe output ' + r['output'])
@@ -2740,6 +2741,66 @@ ABILITIES.update({'scoundrel.quick_cut': ('#3a1a20', a_sc_quick_cut), 'scoundrel
                   'scoundrel.rallying_verse': ('#1e3a2c', a_sc_rallying_verse), 'scoundrel.bribe': ('#3a3018', a_sc_bribe), 'scoundrel.favour': ('#1e3434', a_sc_favour)})
 BRANCH.update({'cutthroat': ('#3a1418', ['#c0303a', '#e8e0d0', '#9be05a', GOLD, '#ff9070']), 'silver-tongue': ('#2a2440', ['#e0d0ff', '#fff2c0', '#c8a0ff', '#9fc8ff', '#ffffff']),
                'fixer': ('#3a3018', [GOLD, '#c0303a', '#9fe8c0', '#fff2c0', '#d07050'])})
+
+# ---- Phase 8.6 (2026-10-15, p86-craft): the leaves (found recipes), the simples, the dishes and feasts, the fleece and the geode chip;
+# Leatherworking and Weaving's trade icons. GAME-ONLY imagery. The crafted gear itself is drawn from its look (gear_icon). ----
+def leaf_page(c, mark='#b23a30', ink='#6b4a2c'):
+    """A leaf torn from a trade's book: a parchment page with a ragged edge, ruled lines and the trade's mark."""
+    c.push(rot=-12)
+    b = c.poly([(22, 10), (78, 12), (82, 28), (76, 44), (82, 62), (76, 78), (80, 92), (24, 90), (20, 52)], smooth=False)
+    c.part(b, '#efe6cc', 'matte')
+    for y in (24, 32, 40, 48, 56, 64): c.flat(c.line([(28, y), (68, y)], 1.3), ink, .55, clip=b)
+    s = c.blob(60, 76, 8, 7, n=10, jit=.1, smooth=True); c.part(s, mark, 'gem')
+LEAF_MARK = {'smith': '#8d96a3', 'tanner': '#a8703a', 'weaver': '#4a7ab0', 'bowyer': '#6e8a3a', 'herbalist': '#3f8a4a', 'cook': '#c06a18'}
+ITEMS.update({
+    'mat.fleece': ('hide', pelt, ('#e8e2d4',), dict(belly='#f4f0e6', small=True)),
+    'mat.geode_chip': ('ore', shard, ('#a8b4c4',), dict(mat='gem', glowc='#cfe0ff', thin=True)),
+    'potion.tincture_ox': ('potion', flask, ('#b05030',), dict(shape='vial')), 'potion.tincture_hare': ('potion', flask, ('#c8a050',), dict(shape='vial')),
+    'potion.tincture_owl': ('potion', flask, ('#5a70c8',), dict(shape='vial')), 'potion.tincture_hearth': ('potion', flask, ('#d08840',), dict(shape='vial')),
+    'potion.tincture_bear': ('potion', flask, ('#6a4a2a',), dict(shape='vial')),
+    'potion.cordial_ox': ('potion', flask, ('#b05030',), dict(shape='tall', label='#c9b48a')), 'potion.cordial_hare': ('potion', flask, ('#c8a050',), dict(shape='tall', label='#c9b48a')),
+    'potion.cordial_owl': ('potion', flask, ('#5a70c8',), dict(shape='tall', label='#c9b48a')), 'potion.cordial_hearth': ('potion', flask, ('#d08840',), dict(shape='tall', label='#c9b48a')),
+    'potion.cordial_bear': ('potion', flask, ('#6a4a2a',), dict(shape='tall', label='#c9b48a')),
+    'potion.draught_mana': ('potion', flask, ('#3a6ae0',)), 'potion.draught_vigor': ('potion', flask, ('#d04a2a',)), 'potion.draught_focus': ('potion', flask, ('#4ac0a0',)),
+    'potion.draught_nerve': ('potion', flask, ('#a03a8a',)), 'potion.draught_breath': ('potion', flask, ('#70b0d0',)), 'potion.draught_salt': ('potion', flask, ('#e8eef2',)),
+    'potion.clean_blood': ('potion', flask, ('#7a1a2a',), dict(shape='tri')),
+    'salve.tallow': ('potion', tallow), 'salve.scree': ('potion', salt, ('#8a8a88',), dict(crust=True)),
+    'food.cask_stew': ('food', bowl_stew, ('#8a4a20',)), 'food.harvest_feast': ('food', pie, ('#d9a04a', '#c8a050')),
+    'food.bear_broth': ('food', bowl_stew, ('#6a3a20', '#5a3a24')), 'food.passfire_feast': ('food', roast, ('#5a2a18', '#c86a4a')),
+    'food.sap_venison': ('food', meat_chop, ('#8a3a2a', '#d8b070'), dict(glaze='#40e080')), 'food.shore_feast': ('food', pie, ('#b8d070', '#6a3a30')),
+})
+def leaf_spec(item):
+    """A leaf's picture: its trade's mark, read off its name ("a smith's leaf: ...")."""
+    word = item.get('name', '').split("'")[0].replace('a ', '', 1).strip()
+    return ('quest', leaf_page, (LEAF_MARK.get(word, '#b23a30'),))
+PROF_ICONS.update({'leatherworking': ('hide', pelt, ('#a8703a',)), 'weaving': ('herb', skein)})
+
+# ---- the classes' standing buffs for the buff-up before a boss (2026-10-15, p86-buffs; Chris: "food buffs, alchemy buffs, class buffs";
+# GAME-ONLY imagery; Icons/ability/buff-class-<class>, by the status id). No machines. ----
+def a_bf_warrior(c): rays(c, 50, 50, 18, 46, 10, '#ffb070', .5, 6); c.back(c.ell(50, 50, 36), '#c05030', .4, 10); m_fist(c, '#c8a060', '#ffffff')
+def a_bf_paladin(c): c.back(c.ell(50, 50, 40), '#ffe9a0', .4, 12); m_banner(c, '#c0303a', GOLD); rings(c, 50, 54, (44,), '#fff2c0', .45, w=3)
+def a_bf_druid(c):
+    c.back(c.ell(50, 50, 38), '#7fbf50', .4, 10); m_leaf(c, '#5f9a48', '#7a5434')
+    c.push(sc=.46, dx=18, dy=-20); m_heart(c, '#d0ffe0', '#ffffff'); c.pop()
+def a_bf_ranger(c): c.back(c.ell(50, 50, 38), '#c8a050', .35, 10); m_paw(c, '#8a6a40', '#efe6cf'); m_wind(c, '#e0f0d0', '#ffffff')
+def a_bf_mage(c):
+    c.back(c.ell(50, 50, 40), '#ff9040', .45, 12); m_flame(c, '#ff7a2a', '#ffd860')
+    c.push(sc=.42, dx=18, dy=-22); m_eye(c, '#fff2c0', '#ffffff'); c.pop()
+def a_bf_rogue(c): c.back(c.ell(50, 50, 38), '#9fb0c8', .35, 10); m_hand(c, IVORY, '#8a90b0'); c.spark(76, 24, 9, '#ffffff', .9); c.spark(26, 30, 6, '#dfeeff', .7)
+def a_bf_archivist(c): c.back(c.ell(50, 50, 40), '#9fc8ff', .4, 12); rings(c, 50, 54, (42, 30), '#dfeeff', .55, w=3); m_note(c, '#e0e8ff', '#ffffff')
+def a_bf_saltmender(c): c.back(c.ell(50, 50, 38), '#eeeee4', .4, 10); m_stone(c, '#e8e6dc', '#ffffff'); m_snow(c, '#ffffff', '#dfe8f0')
+def a_bf_cleric(c): rays(c, 50, 50, 16, 46, 12, '#fff2c0', .55, 6); c.back(c.ell(50, 50, 32), '#ffe9a0', .4, 10); m_flame(c, '#ffd860', '#fff6e0'); rings(c, 50, 52, (40,), GOLD, .5, w=3)
+def a_bf_scoundrel(c):
+    c.back(c.ell(50, 50, 38), GOLD, .35, 10); m_flask(c, '#c87a2a', GOLD)
+    c.push(sc=.4, dx=20, dy=-22); m_coin(c, GOLD, '#8a6a20'); c.pop()
+def a_bf_shaman(c):
+    c.back(c.ell(50, 50, 40), '#70b0ff', .4, 12); m_sun(c, '#ffd860', '#fff2c0')
+    c.push(sc=.7, dy=14); m_cloud(c, '#dfe8f0', '#9fc8ff'); c.pop()
+BUFF_ICONS = {'buff.class.warrior': ('#4a2220', a_bf_warrior), 'buff.class.paladin': ('#4a2a24', a_bf_paladin), 'buff.class.druid': ('#1e3420', a_bf_druid),
+              'buff.class.ranger': ('#3a3018', a_bf_ranger), 'buff.class.mage': ('#40200e', a_bf_mage), 'buff.class.rogue': ('#26283a', a_bf_rogue),
+              'buff.class.archivist': ('#22304a', a_bf_archivist), 'buff.class.saltmender': ('#2a3038', a_bf_saltmender), 'buff.class.cleric': ('#4a3a1a', a_bf_cleric),
+              'buff.class.scoundrel': ('#3a3018', a_bf_scoundrel), 'buff.class.shaman': ('#22304a', a_bf_shaman)}
+ABILITIES.update(BUFF_ICONS)
 
 def main():
     here = os.path.dirname(os.path.abspath(__file__))

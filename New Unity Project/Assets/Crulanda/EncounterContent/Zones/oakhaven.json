@@ -66,8 +66,8 @@
     },
     "playerFacing": 15,
     "companion": {
-      "x": -16.5,
-      "y": -12.8
+      "x": -18.4,
+      "y": -11.91
     },
     "recovery": {
       "x": -8,
@@ -1635,8 +1635,8 @@
       "kind": "hitch",
       "name": "The Cask's hitching rail",
       "at": {
-        "x": -21.2,
-        "y": -24.3
+        "x": -22.51,
+        "y": -25.81
       },
       "rotation": 41
     },
@@ -1644,13 +1644,13 @@
       "kind": "inn",
       "name": "The Golden Cask",
       "at": {
-        "x": -14,
-        "y": -16
+        "x": -15.41,
+        "y": -16.1
       },
       "rotation": 221,
       "size": {
-        "x": 12,
-        "y": 8
+        "x": 14,
+        "y": 10
       },
       "variant": 0
     },
@@ -1908,12 +1908,12 @@
     {
       "kind": "hedge",
       "at": {
-        "x": -21,
-        "y": -9
+        "x": -21.31,
+        "y": -7.0
       },
       "rotation": 261,
       "size": {
-        "x": 7
+        "x": 3
       }
     },
     {
@@ -3703,8 +3703,8 @@
       "kind": "board",
       "name": "Notice board",
       "at": {
-        "x": -22,
-        "y": -27
+        "x": -23.31,
+        "y": -28.51
       },
       "rotation": 40,
       "interact": "Read the notices",
@@ -3760,8 +3760,8 @@
       "kind": "kitchen",
       "name": "The Cask's kitchen",
       "at": {
-        "x": -20,
-        "y": -18.3
+        "x": -22.49,
+        "y": -18.76
       },
       "rotation": 41
     },
@@ -4186,8 +4186,8 @@
       "kind": "market",
       "name": "The Cask's yard table",
       "at": {
-        "x": -12.6,
-        "y": -9.8
+        "x": -13.73,
+        "y": -8.81
       },
       "rotation": 311,
       "variant": 2
@@ -4196,8 +4196,8 @@
       "kind": "market",
       "name": "The Cask's yard jug",
       "at": {
-        "x": -12.9,
-        "y": -9.5
+        "x": -14.03,
+        "y": -8.52
       },
       "rotation": 200,
       "variant": 4,
@@ -4207,8 +4207,8 @@
       "kind": "market",
       "name": "The Cask's yard plate",
       "at": {
-        "x": -12.2,
-        "y": -10.2
+        "x": -13.33,
+        "y": -9.21
       },
       "rotation": 0,
       "variant": 8,
@@ -4228,8 +4228,8 @@
       "kind": "market",
       "name": "The Cask's log store",
       "at": {
-        "x": -16,
-        "y": -22.2
+        "x": -16.99,
+        "y": -23.34
       },
       "rotation": 311,
       "variant": 23
@@ -4238,8 +4238,8 @@
       "kind": "market",
       "name": "The Cask's hand cart",
       "at": {
-        "x": -18.5,
-        "y": -26.5
+        "x": -19.82,
+        "y": -28.01
       },
       "rotation": 24,
       "variant": 27
@@ -6430,8 +6430,8 @@
       "name": "Wren's Cairn",
       "kind": "vista",
       "at": {
-        "x": -214,
-        "y": -122
+        "x": -212.6,
+        "y": -120.6
       },
       "radius": 5,
       "rotation": 180,
@@ -6494,7 +6494,7 @@
       "prompt": "Search the pack at the bottom of the pit",
       "at": {
         "x": 36,
-        "y": 203.5
+        "y": 202
       },
       "rotation": 0,
       "text": "At the bottom of the pit, where he left it to climb out: one of Caddock's foragers' packs, with the north farms' eggs in it, broken, a draught, and a letter from his mother that he never answered.",

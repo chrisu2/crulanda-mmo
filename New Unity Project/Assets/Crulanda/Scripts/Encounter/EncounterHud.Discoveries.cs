@@ -40,8 +40,9 @@ namespace Crulanda.Encounter
 
         /// <summary>
         /// The quest book's Discoveries tab. Left: found / total for the whole world, then every zone (this one first) with its own
-        /// count. Right, on parchment: the chosen zone's finds by name and text, then how many more lie hidden there and a clue for
-        /// each (ZoneSecret.clue, a riddle that points without naming the spot; 2026-10-15, Chris: "still havent found many secrets").
+        /// count. Right, on parchment: the chosen zone's finds by name and text, then how many more lie hidden there, how many about
+        /// each of its great places (decision 6, Phase 8.6: "3 hidden about the Mastwood"), and a clue for each (ZoneSecret.clue, a
+        /// riddle that points without naming the spot; 2026-10-15, Chris: "still havent found many secrets").
         /// </summary>
         void BookDiscoveries(Rect list, Rect page)
         {
@@ -77,6 +78,10 @@ namespace Crulanda.Encounter
             var view = new Rect(page.x + 20, py, page.width - 30, page.yMax - 16 - py); float width = view.width - 24, height = 0;
             foreach (var d in sel.found) height += EntryHeight(d, width);
             measureContent.text = rest; float restH = rest.Length > 0 ? qSmall.CalcHeight(measureContent, width) : 0; height += restH + 8;
+            // Where they lie, by the zone's great places (decision 6): "3 hidden about the Mastwood · 2 hidden about Thornshaw".
+            var parts = new List<string>(); foreach (var (place, count) in sel.regions) parts.Add(DiscoveryLog.RegionLine(place, count));
+            string where = parts.Count > 0 ? string.Join("  ·  ", parts) : "";
+            measureContent.text = where; float whereH = where.Length > 0 ? qSmall.CalcHeight(measureContent, width) : 0; if (whereH > 0) height += whereH + 8;
             // The clues of what is still hidden (2026-10-15): "STILL HIDDEN", then a riddle a line, each measured for its wrap.
             var clueH = new List<float>(sel.clues.Count);
             if (sel.clues.Count > 0) { height += 30; foreach (var c in sel.clues) { measureContent.text = "·  " + c; float ch = qSmall.CalcHeight(measureContent, width - 8) + 6; clueH.Add(ch); height += ch; } }
@@ -90,6 +95,7 @@ namespace Crulanda.Encounter
                 yy += 14;
             }
             if (restH > 0) { Ink(new Rect(0, yy, width, restH), rest, qSmall, new Color(.35f, .27f, .18f)); yy += restH + 8; }
+            if (whereH > 0) { Ink(new Rect(0, yy, width, whereH), where, qSmall, new Color(.42f, .3f, .16f)); yy += whereH + 8; }
             if (sel.clues.Count > 0)
             {
                 Ink(new Rect(0, yy + 4, width, 24), "STILL HIDDEN", qHead, new Color(.42f, .22f, .05f)); yy += 30;

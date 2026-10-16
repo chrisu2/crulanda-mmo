@@ -229,7 +229,8 @@ namespace Crulanda.Encounter
         /// A trade's recipes (DESIGN 11): the skill bar, the list easiest first, each coloured by what it still teaches (red while
         /// locked, with the skill it wants) and with how many the bags make ("x3"), a "Can make" filter; under it the chosen recipe:
         /// what it makes (the item's own tooltip), its makings as have / need (red when short), the station in reach ("Forge: Vell's
-        /// smithy") or the one wanted (red), Make and Make all, and why it can't be made when it can't.
+        /// smithy") or the one wanted (red), Make and Make all, and why it can't be made when it can't. A found recipe whose leaf is not yet
+        /// learned (Phase 8.6 step 5) is a grey "?" row with its trade and skill, and chosen it shows nothing more.
         /// </summary>
         void RecipePage(ProfessionLog log, ProfessionDef d, Rect page)
         {
@@ -254,7 +255,7 @@ namespace Crulanda.Encounter
             var all = log.Db.RecipesFor(d.id);
             var list = TradesCanMakeOnly ? all.FindAll(r => log.DifficultyOf(r) != ProfessionLog.Difficulty.Locked && log.CanMake(r) > 0) : all;
             if (TradesRecipe == null || !list.Exists(r => r.id == TradesRecipe))
-                TradesRecipe = (list.Find(r => log.DifficultyOf(r) != ProfessionLog.Difficulty.Locked && log.CanMake(r) > 0) ?? (list.Count > 0 ? list[0] : null))?.id;
+                TradesRecipe = (list.Find(r => log.DifficultyOf(r) != ProfessionLog.Difficulty.Locked && log.CanMake(r) > 0) ?? list.Find(log.Knows) ?? (list.Count > 0 ? list[0] : null))?.id;
             const float rowH = 26, listH = 140;
             var box = new Rect(x, py, inner, listH); Fill(box, new Color(.35f, .22f, .08f, .08f));
             if (list.Count == 0) Ink(new Rect(x + 8, py + 6, inner - 16, 22), "Nothing you can make from your bags.", qSmall, InkBrown);
@@ -265,6 +266,14 @@ namespace Crulanda.Encounter
             {
                 var r = list[i]; var row = new Rect(0, i * rowH, view.width, rowH); var diff = log.DifficultyOf(r);
                 if (r.id == TradesRecipe) Fill(row, new Color(.55f, .36f, .1f, .22f));
+                if (!log.Knows(r))
+                {
+                    // A found recipe not yet learned (Phase 8.6 step 5): a grey "?" with its band, and nothing else.
+                    Ink(new Rect(row.x + 8, row.y + 3, row.width * .66f, 20), "?", nodeInk, SpentInk);
+                    Ink(new Rect(row.x + row.width * .66f, row.y + 3, row.width * .34f - 8, 20), d.name + " " + r.skill, nodeInkRight, SpentInk);
+                    if (GUI.Button(row, GUIContent.none, GUIStyle.none)) TradesRecipe = r.id;
+                    continue;
+                }
                 Ink(new Rect(row.x + 8, row.y + 3, row.width * .66f, 20), r.name, nodeInk, RecipeInk(diff));
                 int n = log.CanMake(r);
                 string right = diff == ProfessionLog.Difficulty.Locked ? d.name + " " + r.skill : n > 0 ? "x" + n : "";
@@ -274,6 +283,12 @@ namespace Crulanda.Encounter
             GUI.EndScrollView();
             py += listH + 10;
             var rec = log.Db.Recipe(TradesRecipe); if (rec == null) return;
+            if (!log.Knows(rec))
+            {
+                Ink(new Rect(x, py, inner, 22), "?", qHead, SpentInk);
+                Ink(new Rect(x, py + 24, inner, 22), "Not yet learned: a leaf teaches it (" + d.name + " " + rec.skill + ").", nodeInk, SpentInk);
+                return;
+            }
             // What it makes.
             var outDef = items?.Get(rec.output); int count = System.Math.Max(1, rec.count);
             var square = new Rect(x, py, Slot, Slot);

@@ -775,7 +775,7 @@
   ],
   "props": [
     {
-      "kind": "house",
+      "kind": "inn",
       "name": "Pilgrims' Rest",
       "at": {
         "x": -16,
@@ -2659,6 +2659,58 @@
       "document": "doc.peaks.watchers",
       "xp": 60,
       "canonStatus": "CANON-EXPANDED: the Pale Things as cosmic auditors are CANON (world_bible.md); Lisle Tamber, the Salt-Menders' scholar, and her notebook are GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.cairn-book",
+      "name": "The Cairn-Book",
+      "kind": "read",
+      "prompt": "Read the book on the cairn",
+      "at": {
+        "x": -6,
+        "y": 150
+      },
+      "rotation": 33,
+      "text": "A pilgrims' cairn above the water behind the north wall, stone on stone to a man's chest, and on its flat top a book wrapped in oilcloth under a slate. Every crossing writes a line in it.",
+      "clue": "Above the water held behind the north wall, a cairn stands to a man's chest, and every pilgrim who crosses writes a line in what lies on top of it.",
+      "hint": "Maddoc Vire says the pilgrims keep a book on a cairn above the tarn, and every crossing writes a line. He's never read it. He says it isn't his to read.",
+      "document": "doc.peaks.cairn_book",
+      "xp": 100,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible.md); the cairn and its book are GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.old-post-roll",
+      "name": "The Old Garrison's Roll",
+      "kind": "carving",
+      "prompt": "Read the names cut in the stone",
+      "at": {
+        "x": 160,
+        "y": -76
+      },
+      "rotation": 0,
+      "text": "A stone by the old east watch, its face cut with names in a soldier's hand, one under another, the last half finished. Whoever held the pass before the Sandthrone kept their roll in stone.",
+      "clue": "East, where the old watch looked down the road before the Sandthrone came, a stone keeps a roll of names, the last one half cut.",
+      "hint": "Yara Quell says the men who held the pass before the Sandthrone cut their names in a stone by their old post, east along the road. The last name isn't finished. She thinks about that.",
+      "xp": 100,
+      "canonStatus": "GAME-ONLY: the old garrison and its roll. The Sandthrone toll on the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
+    },
+    {
+      "id": "secret.peaks.slide-runner",
+      "name": "A Toll-Runner Under the Scree",
+      "kind": "remains",
+      "prompt": "Search the satchel in the scree",
+      "at": {
+        "x": 128,
+        "y": 40
+      },
+      "rotation": 200,
+      "text": "Half under the scree where the mountainside came down: bones, a cap dented by the stones, and a satchel strapped tight. He was going round the gate, not through it.",
+      "clue": "Where half a mountainside came down east of the road, someone going round the gate was caught under the scree. His satchel is still strapped.",
+      "hint": "Hadrik Sull says a runner tried the high way round the gate the night the slope came down, east of the switchbacks. The Sandthrone never found him to fine him. He laughs at that.",
+      "item": "craft.ridgesteel_pauldrons",
+      "document": "doc.peaks.runners_reckoning",
+      "xp": 120,
+      "gold": 24,
+      "canonStatus": "GAME-ONLY: the runner and his reckoning. The Sandthrone toll on the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
     }
   ],
   "nodes": [

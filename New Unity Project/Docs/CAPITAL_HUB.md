@@ -134,3 +134,8 @@ sitting on a throne".**
 **Chris, 2026-10-16 ~01:55 (verbatim): "need a limited shared space. maybe 3 slots and maybe they can buy more in the future. the
 remainder is character only".** So the Treasury Vault is two parts: a shared shelf of 3 slots for all your characters (more bought
 later), kept in the profile; and the character's own vault (48 slots, rows bought with coin), kept on the character.
+**Chris, 2026-10-16 ~02:05 (verbatim, a screenshot of the Crafters' Court: trainers on bare paving, one stall and a cookfire): "need more
+profession tools/small huts/vendored items".** The Crafters' Court gets a workshop for every trade: small open-fronted huts or stalls
+with each craft's tools and stock (a smith's forge, anvil, quench tub and racks; the leatherworker's stretching frames and hides; the
+weaver's loom, spindles and bolts; the herbalist's drying racks and jars; the cook's hearth and pots; the miner's and woodcutter's tool
+racks), and vendors selling each trade's tools and materials.

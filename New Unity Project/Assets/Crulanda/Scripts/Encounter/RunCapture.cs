@@ -222,7 +222,9 @@ namespace Crulanda.Encounter
                 {
                     // Swimming counts as stuck too: the paths never run through swim-deep water, so the bot has no way out of a pool it has
                     // fallen or been knocked into, and it bobs about more than a metre (adit-final2, 2026-10-15: "just standing in water").
-                    if (dist > reach + 1 && (Vector3.Distance(stuckFrom, me) < 1 || motor.Swimming || otherLevel && Time.time - headAt > 10))
+                    // Swimming is stuck however near the leader it is (adit-final9, 2026-10-15: in the chute pool 4 m from the tank, the healer and the
+                    // archer stopped at the shore 13 m back, the tank waited for them and the run stood: "stuck in the water again").
+                    if (motor.Swimming || dist > reach + 1 && (Vector3.Distance(stuckFrom, me) < 1 || otherLevel && Time.time - headAt > 10))
                     {
                         var at = goal - to.normalized * Mathf.Min(2.5f, dist * .5f);
                         // Onto the level of what it is after (checked against at.y, a point off a sloping cave floor, it refused every rescue in adit-final8).

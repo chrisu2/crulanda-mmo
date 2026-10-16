@@ -56,7 +56,7 @@ namespace Crulanda.Encounter
                 default: return false;
             }
             if (role == "henwife") return true;
-            if (role == "blacksmith" || role == "lumberjack" || role == "miller" || role == "elder" && variant % 2 == 0) return false;
+            if (role == "blacksmith" || role == "lumberjack" || role == "miller" || role == "councilor" || role == "elder" && variant % 2 == 0) return false;
             string n = name ?? "";
             foreach (var f in FemaleNames) if (n == f || n.StartsWith(f + " ")) return true;
             foreach (var m in MaleNames) if (n == m || n.StartsWith(m + " ")) return false;
@@ -205,6 +205,9 @@ namespace Crulanda.Encounter
                 case "stranger": s.kit = ModelFigure.Kit.Ranger; s.bleach = true; Wear(C(.2f, .2f, .22f), C(.16f, .15f, .15f)); Hood(C(.17f, .17f, .19f)); break;
                 case "pilgrim": Wear(C(.86f, .58f, .16f), C(.7f, .56f, .34f)); Hood(C(.84f, .62f, .24f)); break;
                 case "warden": s.kit = ModelFigure.Kit.Ranger; Wear(C(.2f, .46f, .18f), C(.36f, .24f, .13f)); Hood(C(.16f, .38f, .14f)); break;
+                // The High Councilor (CANON look, book1 ch.12:365): white silk, the head bare, pale skin tight on the skull, no beard.
+                case "councilor": s.kit = ModelFigure.Kit.Ranger; s.bleach = true; s.shirt = ClothTint(C(.95f, .94f, .9f), .15f); s.breeches = ClothTint(C(.92f, .9f, .84f), .15f); s.hair = 4; s.beard = false; s.hairColour = Gain(C(.85f, .85f, .83f), 1.25f); break;
+                case "scholar": Wear(C(.13f, .12f, .17f), C(.1f, .09f, .12f)); break;   // a clerk's dark robe (GAME-ONLY)
                 case "innkeeper": Wear(C(.9f, .86f, .74f), C(.26f, .2f, .17f)); s.beard = !s.female; break;
                 case "drinker": if (v % 2 == 0) Hood(VillagerCloth[Mathf.Abs(v * 3 + 2) % VillagerCloth.Length]); break;
                 default: if (v % 4 == 2) Hood(VillagerCloth[Mathf.Abs(v * 3 + 2) % VillagerCloth.Length]); break;   // plain folk: a headscarf

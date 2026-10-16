@@ -35,6 +35,10 @@ namespace Crulanda.Encounter
         public List<string> inventory = new List<string>();
         /// <summary>Bag slots (Inventory.BagSize) and worn gear by EquipSlot. Format 6.</summary>
         public List<ItemStack> bag = new List<ItemStack>();
+        /// <summary>This character's own vault at the Treasury (2026-10-16, Chris: "the remainder is character only"): 48 slots and the
+        /// rows of 12 it has bought (vaultRows). The shared shelf of 3 is the profile's (CharacterProfile).</summary>
+        public List<ItemStack> vault = new List<ItemStack>();
+        public int vaultRows;
         public List<ItemStack> equipment = new List<ItemStack>();
         public List<EnemyRecord> enemies = new List<EnemyRecord>();
         // ---------- notice boards (2026-10-03; older saves load with zero days and no boards, and draw on first use) ----------

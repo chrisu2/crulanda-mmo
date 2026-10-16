@@ -32,7 +32,7 @@ namespace Crulanda.Encounter
             qList = new GUIStyle(GUI.skin.button) { fontSize = 14, alignment = TextAnchor.MiddleLeft, wordWrap = true, padding = new RectOffset(10, 6, 4, 4) };
         }
         void Ink(Rect r, string s, GUIStyle style, Color c) { GUI.contentColor = c; GUI.Label(r, s, style); GUI.contentColor = Color.white; }
-        static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : q.kind == "bounty" ? (q.rare ? "Rare posting" : q.poster == "sandthrone" ? "Sandthrone contract" : "Bounty") : "Side quest"; }
+        static string KindLabel(QuestDef q) { return q.kind == "main" ? "Chronicle" : q.kind == "npc" ? "Village work" : q.kind == "faction" ? "Faction" : q.kind == "bounty" ? (q.rare ? "Rare posting" : q.poster == "sandthrone" ? "Sandthrone contract" : CouncilErrands.IsErrand(q) ? "Council errand" : GuildHalls.IsAsk(q) ? "Guild ask" : "Bounty") : "Side quest"; }
 
         /// <summary>The ! or ? over someone's head, or ' ' (no quests here, or too far away).</summary>
         // Each person's marker is worked out again every 0.4 s, not every frame (playtest note 23: the quest log was asked for every
@@ -240,7 +240,7 @@ namespace Crulanda.Encounter
             if (status == QuestStatus.Available)
             {
                 if (GUI.Button(new Rect(w.x + 24, w.yMax - 52, 150, 36), "Accept", button)) session.AcceptQuest(quest);
-                if (GUI.Button(new Rect(w.xMax - 174, w.yMax - 52, 150, 36), "Decline", button)) { if (c.entries.Count > 1) c.selected = null; else session.Conversation = null; }
+                if (GUI.Button(new Rect(w.xMax - 174, w.yMax - 52, 150, 36), "Decline", button)) { session.DeclineQuest(quest); if (c.entries.Count > 1) c.selected = null; else session.Conversation = null; }
             }
             else if (status == QuestStatus.ReadyToTurnIn)
             {

@@ -451,6 +451,7 @@ namespace Crulanda.World
                 float R() { return (float)sr.NextDouble(); }
                 var t = new GameObject(string.IsNullOrEmpty(s.name) ? s.kind : s.name).transform; t.SetParent(all, false);
                 t.position = Ground(s.at); t.rotation = Quaternion.Euler(0, s.rotation, 0);
+                if (CourtStation(t, s, R)) { AddStation(s.kind, t.name, t.position, t); continue; }   // a Crafters' Court workshop's own (ZoneBuilder.CrownCourt)
                 switch (s.kind)
                 {
                     case "forge": FieldAnvil(t, s.variant, R); break;

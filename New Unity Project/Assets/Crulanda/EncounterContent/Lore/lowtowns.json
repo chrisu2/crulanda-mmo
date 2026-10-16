@@ -1,0 +1,258 @@
+{
+  "zone": "zone.lowtowns",
+  "canonStatus": "GAME-ONLY: the Lowtowns' chapter of the book of lore, its lines the game's; the Lowtowns, the Rust Market, the Rusty Spoon, the Iron Teeth, the Weave-Eaters and the Chemical River are CANON (world_bible.md; book1 ch.1, 3, 7, 15-16, 20), as each line says.",
+  "entries": [
+    {
+      "id": "lore.lowtowns.places.the-gate-ward",
+      "chapter": "places",
+      "subject": "The Gate Ward",
+      "more": "The reeve before Edda Holt stopped writing the warrants into the book, and hid the last page she did write in the wall.",
+      "page": "doc.lowtowns.old_toll",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.places.the-holding-house",
+      "chapter": "places",
+      "subject": "The Holding House",
+      "more": "The warders' orders: hold a child one night, give it up at first light, ask nothing. One warder wrote on the back that he asked.",
+      "page": "doc.lowtowns.warder_orders",
+      "canonStatus": "CANON-EXPANDED: the Council's hired men; GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.places.the-rusty-spoon",
+      "chapter": "places",
+      "subject": "The Rusty Spoon",
+      "more": "Mother Sall's slate of debts has a column for broken chairs, and the column has run off the slate and onto the wall.",
+      "page": "doc.lowtowns.spoon_slate",
+      "canonStatus": "CANON: the Rusty Spoon (book1 ch.1:9); the slate GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.places.the-tenement-rows",
+      "chapter": "places",
+      "subject": "The Tenement Rows",
+      "more": "Every child in the Rows learns Rule One before their letters, and somebody keeps chalking it under the bridge.",
+      "page": "doc.lowtowns.rule_one",
+      "canonStatus": "CANON: Rule One of the Lowtowns (book1 ch.1:257)"
+    },
+    {
+      "id": "lore.lowtowns.places.the-soup-hall",
+      "chapter": "places",
+      "subject": "The Soup-Hall",
+      "more": "Brother Aldo's slate counts who ate. Gytha's girl had a second bowl for her hands, which were cold, and bright.",
+      "page": "doc.lowtowns.soup_slate",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.places.the-rust-market",
+      "chapter": "places",
+      "subject": "The Rust Market",
+      "more": "The price-board by the long stalls has every price crossed out and written higher, and EVERYTHING DEARER in soot across the bottom.",
+      "page": "doc.lowtowns.price_board",
+      "canonStatus": "CANON: the Rust Market's skewered rat and aether-spiced wine (book1 ch.3:7); the board GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.places.the-shard-burners-yard",
+      "chapter": "places",
+      "subject": "The Shard-Burners' Yard",
+      "more": "The burners' tally: names, dates and nights of light bought. Osric's rule at the bottom: never sell a family its own shard twice.",
+      "page": "doc.lowtowns.burner_tally",
+      "canonStatus": "GAME-ONLY reading (the shards as burned memory)"
+    },
+    {
+      "id": "lore.lowtowns.places.the-drain-courts",
+      "chapter": "places",
+      "subject": "The Drain Courts",
+      "more": "The militia held the tanners' court a whole winter and cut the nights into the brick.",
+      "secret": "secret.lowtowns.court-marks",
+      "canonStatus": "CANON-EXPANDED: the former Lowtown militia (book1 ch.20:127); GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.places.the-docks",
+      "chapter": "places",
+      "subject": "The Docks",
+      "more": "The dockers keep a lamp lit in a niche on the riverside walk, a copper in the dish for the river. It is for no god; it is for the lamp.",
+      "secret": "secret.lowtowns.lamp-shrine",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.places.the-chemical-river",
+      "chapter": "places",
+      "subject": "The Chemical River",
+      "line": "Black, slow, iridescent and poisonous. Nothing natural lives in it. The barges go through it anyway, poled by people who try not to splash.",
+      "canonStatus": "CANON: the Chemical River (book1 ch.15-16)"
+    },
+    {
+      "id": "lore.lowtowns.places.the-outfall",
+      "chapter": "places",
+      "subject": "The Outfall",
+      "line": "The Forge District's drain under the wall, grated and signed. Past the grating the culvert turns and goes down, and a warm breath comes up it.",
+      "canonStatus": "GAME-ONLY (the Sludge-Tunnels, DUNGEON_DESIGN.md)"
+    },
+    {
+      "id": "lore.lowtowns.people.old-wulf",
+      "chapter": "people",
+      "subject": "Old Wulf",
+      "more": "The militia's last roll is cut into the brick by the well: twenty-two names, nineteen struck through, and Wulf's with room after it.",
+      "page": "doc.lowtowns.militia_roll",
+      "canonStatus": "CANON: the former Lowtown militia (book1 ch.20:127); Wulf GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.people.ketta-rune",
+      "chapter": "people",
+      "subject": "Ketta Rune",
+      "more": "Her grandmother's count, knotted in amber cloth: forty-one Eaters pinned, and three more in Ketta's hand. Bone holds. Steel lies.",
+      "page": "doc.lowtowns.harpoon_count",
+      "canonStatus": "CANON: bone harpoons on amber rope (book1 ch.20:177-191); Ketta GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.people.rudd-crake",
+      "chapter": "people",
+      "subject": "Rudd Crake",
+      "more": "One of Rudd's gang went into the far courts with a twist of salt to find what took his sister, and lies there yet, the salt in his fist.",
+      "page": "doc.lowtowns.drowned_docker",
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters and salt (book1 ch.20); GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.people.ebba-strand",
+      "chapter": "people",
+      "subject": "Ebba Strand",
+      "more": "On her days off Ebba walks to the top of the town where the smog thins, to look at the Crown. Just to look.",
+      "secret": "secret.lowtowns.smog-thin",
+      "canonStatus": "CANON-EXPANDED: the Crown, white stone and gold (world_bible.md Geography); Ebba GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.people.mabb-soot",
+      "chapter": "people",
+      "subject": "Mabb Soot",
+      "more": "Grey-bell grows only in the cinders the burners tip out. Mabb won't pick it. She says it remembers.",
+      "secret": "secret.lowtowns.grey-bell",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.people.gorm-rock-wall",
+      "chapter": "people",
+      "subject": "Gorm Rock-Wall",
+      "line": "An orc of the Lowtowns, built like a wall and about as easy to move. He drinks at the Spoon and stops fights there; he dreams of a pier in the north where the water runs clear.",
+      "canonStatus": "CANON: Gorm Rock-Wall, an orc of the Lowtowns (book1 ch.1:21); his dream of a pier is CANON (book1 ch.1:153)"
+    },
+    {
+      "id": "lore.lowtowns.people.gytha-pell",
+      "chapter": "people",
+      "subject": "Gytha Pell",
+      "line": "A mother in the Rows whose girl, Ysa, sparked over the washing and was taken up by warrant. She stands on her step every day.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.gutter-hound",
+      "chapter": "creatures",
+      "subject": "Gutter-hound",
+      "line": "Feral dogs of the back yards, bred from the strays of a hundred years. They run in packs and they are always hungry.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.dock-rat-cutter",
+      "chapter": "creatures",
+      "subject": "Dock-rat cutter",
+      "line": "River thieves who work the barges at night with short knives, cutting bales loose and purses too.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.dock-rat-poler",
+      "chapter": "creatures",
+      "subject": "Dock-rat poler",
+      "line": "The dock-rats' polers: they keep the stolen barges moving and use the pole on anyone who comes too close.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.weave-eater",
+      "chapter": "creatures",
+      "subject": "Weave-Eater",
+      "line": "Shadowy spirits of the drains, born of the High City's magical waste. Steel that passes through one comes out black and brittle; salt makes it solid; bone holds it.",
+      "canonStatus": "CANON: Weave-Eaters, parasitic spirits born of the High City's magical pollution (book1 ch.1:251); steel through one turns black and brittle (book1 ch.20:155)"
+    },
+    {
+      "id": "lore.lowtowns.creatures.mother-of-drains",
+      "chapter": "creatures",
+      "subject": "Mother of Drains",
+      "line": "The militia's name for the great Eater under the courts. She comes up only after dark, and the lamps gutter when she does.",
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters (book1 ch.1:251); the Mother GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.iron-teeth-runner",
+      "chapter": "creatures",
+      "subject": "Iron Teeth runner",
+      "line": "The Iron Teeth's runners keep the back lanes of the market for the gang. Up here they trade. Back there, they don't.",
+      "canonStatus": "CANON: the Iron Teeth (B1WB:26; book1 ch.7:21); GAME-ONLY camp"
+    },
+    {
+      "id": "lore.lowtowns.creatures.iron-teeth-sifter",
+      "chapter": "creatures",
+      "subject": "Iron Teeth sifter",
+      "line": "The Teeth's sifters work the slag that comes out of the Outfall, picking out the bits that glow.",
+      "canonStatus": "CANON: the Iron Teeth (B1WB:26; book1 ch.7:21); the sifting GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.knuckle-brannoc",
+      "chapter": "creatures",
+      "subject": "Knuckle Brannoc",
+      "line": "The Iron Teeth's yard-boss by the Outfall. Iron on his knuckles, a ledger in his coat, and two sifters always at his back.",
+      "canonStatus": "CANON faction: the Iron Teeth (book1 ch.7:21); Brannoc GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.hired-warder",
+      "chapter": "creatures",
+      "subject": "Hired warder",
+      "line": "The Council's hired men at the Holding House. They do not read the warrants and they do not ask the children's names.",
+      "canonStatus": "CANON-EXPANDED: the Council's hired men; GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.grey-touched",
+      "chapter": "creatures",
+      "subject": "Grey-touched",
+      "line": "What is left when a shard is burned wrong: grey, slow, and almost somebody. The burners keep them in the cellar.",
+      "canonStatus": "GAME-ONLY (the shards as burned memory)"
+    },
+    {
+      "id": "lore.lowtowns.creatures.the-lantern-eater",
+      "chapter": "creatures",
+      "subject": "The Lantern-Eater",
+      "line": "A Weave-Eater that drinks the light out of the lamps of one lane, a lamp a night, the glass frosted black behind it.",
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters (book1 ch.1:251); the Lantern-Eater GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.herbs.node-slagiron",
+      "chapter": "herbs",
+      "subject": "node.slagiron",
+      "line": "Slag-iron: the foundries' cast-offs heaped in the yards of fallen terraces. Hard to work and never clean, but iron.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals"
+    },
+    {
+      "id": "lore.lowtowns.herbs.node-cinderbeam",
+      "chapter": "herbs",
+      "subject": "node.cinderbeam",
+      "line": "Cinder-beams: the old roof timbers of fallen terraces, charred black outside and sound within.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals"
+    },
+    {
+      "id": "lore.lowtowns.herbs.node-sootwort",
+      "chapter": "herbs",
+      "subject": "node.sootwort",
+      "line": "Soot-wort grows in the gutters and on the ash heaps where nothing else will. The Lowtowns cough, and soot-wort is for coughs.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals"
+    },
+    {
+      "id": "lore.lowtowns.herbs.node-lamp_lichen",
+      "chapter": "herbs",
+      "subject": "node.lamp_lichen",
+      "line": "Lamp-lichen glows by the drains, a dim gold-green. Pick it at night and your hands shine till morning.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals"
+    },
+    {
+      "id": "lore.lowtowns.herbs.herb-grey_bell",
+      "chapter": "herbs",
+      "subject": "herb.grey_bell",
+      "line": "Pale bells with a light in them like a held breath. Rare, and the Lowtowners leave it be.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals"
+    }
+  ]
+}

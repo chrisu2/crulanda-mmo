@@ -193,3 +193,27 @@ The systems for the cap of 20, done on `p9-lowtowns` 2026-10-16 (compile-checked
   herb.grey_bell) in the Shard-Burners' Yard. Camp tags with tables: `gutterhound` (the hide), `dockrat` (dock sacking); elite tags
   `drainmother` (Mother of Drains) and `brannoc` (Knuckle Brannoc) drop the slag-iron leaves; Ketta Rune and Old Wulf sell one leaf each
   (residents of the zone, named so). A forge, a bench and a fire in the zone (section 6's stations).
+
+## Status (p9-lowzone)
+The zone's first full pass, done on `p9-lowzone` 2026-10-16 (compile-checked, tests written, nothing run in Unity; OPEN until Chris has walked it):
+- **The zone** `zone.lowtowns` (480 m, 15-20, biome `lowtowns`; `EncounterContent/Zones/lowtowns.json`, made and checked by
+  `tools/wip/lowtowns/make_lowtowns.py`): every place of section 2 (the Gate Ward and the open outer gate, the toll-house, the Holding House,
+  the carters' yard, the Rusty Spoon with its kitchen, the Tenement Rows, the soup-hall, the Rust Market's three stall runs, its hearth,
+  the Blind Seer's Antiquities, the Iron Teeth's warehouse, the Shard-Burners' Yard and its sunk cellar, three quays with poled barges, the
+  Drain Courts with seven drain mouths, the Outfall's grating and sign, the Forge District's shut gate, the Chemical River and two brick
+  bridges), about 170 terraces laid along the lanes, smog by day (fog 18-150 m, thinning at night: `ZoneLighting.nightClear`), rain often,
+  soot falling, the Crown on its mountain in the north-east sky (`CrownSkyline`), roofs and stacks past the edge.
+- **New kinds** (`ZoneBuilder.Lowtowns.cs`): tenement (shop and blind-back styles; a named one is a home), warehouse, lane_wall, brick_bridge,
+  drain_mouth (the Outfall's grated), dock, barge, market_hall, dead_house, holding_house, town_wall (gate open or shut), chimney_stack,
+  lane_lamp (orange; one snuffed), cobbles, puddle, washing_line, soup_hall, toll_house, dye_vat, shard_rack. No machines.
+- **People** (section 3, every one with stories), 16 villagers in eight named terraces; Gorm an orc resident (`look: "orc"`).
+- **Camps** 15-20 (section 4), the Mother of Drains and Knuckle Brannoc at 20, the rare Lantern-Eater; night camps (`ZoneCamp.night`,
+  `EncounterEnemy.Night`); the mechanics (`WeaveEaterRules`): thrown salt (calcified 4 s), the bone harpoon (pinned 5 s), blackened steel
+  (-10% attack power 20 s); Tibb sells salt, Ketta harpoons (`Items/lowtowns.json`).
+- **Quests** (`Quests/lowtowns.json`): Corwin's breadcrumb after `main.verdant.5`, the five, eight side and NPC quests, five bounties, the
+  Lowtowners, six Chronicle pages and ten lore pages at fourteen hidden finds; the lore chapter `Lore/lowtowns.json`.
+- **Road:** Oakhaven's "South-east road to Argentis (dangerous, 15-20)" and back.
+- **Tests:** `LowtownsZoneTests` and the shared zone tests counting the new zone.
+- **Open:** the elites' signature loot lists (LootDataTests) and named pieces; the Crown's "Low Stair" sign still says 16-19 (crown.json is
+  on `p9-crown`; change it to 15-20 at the merge); the city's jobs on the streets (lamplighters, porters) wait for `p9-cityinn`'s; a supervised
+  run, captures and the frame time at the market.

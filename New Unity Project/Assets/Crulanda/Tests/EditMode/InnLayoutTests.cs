@@ -19,7 +19,7 @@ namespace Crulanda.Tests
     /// </summary>
     public class InnLayoutTests
     {
-        static readonly string[] Files = { "oakhaven", "khaven", "peaks", "ashrim", "verdant" };
+        static readonly string[] Files = { "oakhaven", "khaven", "peaks", "ashrim", "verdant", "lowtowns" };   // the Lowtowns' Rusty Spoon (Phase 9.1)
         static ZoneDefinition Zone(string file) { return JsonUtility.FromJson<ZoneDefinition>(File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Zones/" + file + ".json"))); }
         static IEnumerable<(string file, ZoneProp p)> Inns()
         {

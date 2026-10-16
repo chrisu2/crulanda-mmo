@@ -21,7 +21,7 @@ namespace Crulanda.Tests
             var dir = Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", folder);
             return Directory.GetFiles(dir, "*.json").OrderBy(p => p, System.StringComparer.Ordinal).Select(File.ReadAllText).ToList();
         }
-        static readonly string[] Zones = { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant" };
+        static readonly string[] Zones = { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns" };
         static (QuestLog log, Bounties boards, ItemDatabase items) Fresh()
         {
             var items = ItemDatabase.Parse(Texts("Items")); var db = QuestDatabase.Parse(Texts("Quests"));

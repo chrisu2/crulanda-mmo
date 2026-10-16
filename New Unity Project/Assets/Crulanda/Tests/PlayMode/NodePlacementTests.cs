@@ -76,7 +76,7 @@ namespace Crulanda.Tests
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
-            Assert.AreEqual(5, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim and the Verdant Shore are registered.");
+            Assert.AreEqual(6, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim, the Verdant Shore and the Lowtowns are registered.");
             var problems = new List<string>();
             foreach (var id in zones)
             {
@@ -227,7 +227,7 @@ namespace Crulanda.Tests
         /// <summary>Each zone's stations (DESIGN 6.1): which kinds it has (the workplaces' and the inn's, and its own).</summary>
         static readonly Dictionary<string, string[]> StationKinds = new Dictionary<string, string[]> {
             { "zone.oakhaven", new[] { "bench", "fire", "forge" } }, { "zone.khaven", new[] { "bench", "fire" } }, { "zone.peaks", new[] { "fire", "forge" } },
-            { "zone.ashrim", new[] { "bench", "fire", "forge" } }, { "zone.verdant", new[] { "bench", "fire", "forge" } } };
+            { "zone.ashrim", new[] { "bench", "fire", "forge" } }, { "zone.verdant", new[] { "bench", "fire", "forge" } }, { "zone.lowtowns", new[] { "bench", "fire", "forge" } } };   // the Lowtowns: the dyer's vats, the soup kettle and the Spoon, the market hearth
         /// <summary>
         /// The zone's stations (BUILD_PLAN step 9): the kinds DESIGN 6.1 gives it; every one can be walked to from the start, to
         /// within reach of it (EncounterSession.StationRange) and on its side of its walls (ZoneStationSpot.Reaches); its own (field anvils, benches, cookfires, under "Zone stations") one

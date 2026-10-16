@@ -38,6 +38,8 @@ namespace Crulanda.World
                 case "gloom": return new Grade { saturation = .86f, contrast = 1.2f, exposure = 1.04f, vignette = .85f, bloom = .65f, threshold = .9f, tint = new Color(1.04f, .96f, 1.02f) };   // Khaven: drained, rose-violet dusk; deeper darks so the lit windows and the low sun carry it
                 // The Verdant Shore: rich, saturated and a little soft, lifted toward emerald, with the glow of a humid forest.
                 case "verdant": return new Grade { saturation = 1.3f, contrast = 1.1f, exposure = 1.04f, vignette = .55f, bloom = .7f, threshold = .9f, tint = new Color(.97f, 1.03f, .97f) };
+                // The Lowtowns (Phase 9.1): soot and smog drain the colour toward a brown-grey; the lamps' orange still glows through it.
+                case "lowtowns": return new Grade { saturation = .82f, contrast = 1.16f, exposure = 1, vignette = .8f, bloom = .75f, threshold = .85f, tint = new Color(1.03f, .99f, .94f) };
                 default: return new Grade { saturation = 1.28f, contrast = 1.12f, exposure = 1.03f, vignette = .55f, bloom = .62f, threshold = .95f, tint = new Color(1.02f, 1.01f, .98f) };   // Oakhaven: a clear pastoral day, warm light and cool distance
             }
         }

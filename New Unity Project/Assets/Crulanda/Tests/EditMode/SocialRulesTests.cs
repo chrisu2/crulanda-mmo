@@ -43,12 +43,16 @@ namespace Crulanda.Tests
             { "varrow", SocialKind.Call }, { "greywhisperer", SocialKind.Call }, { "hollowsong", SocialKind.Call }, { "hobb", SocialKind.Call }, { "kettle", SocialKind.Call },
             { "bargeman", SocialKind.Call }, { "netter", SocialKind.Call },   // (S6) the Black Cove's rope teams, the barge's crew and the harbour netters: people, they call
             { "warden", SocialKind.Call },   // the grey picket (2026-10-15): Concord wardens, people: they call
-            { "forager", SocialKind.Call }   // the foragers' camp (2026-10-15): deserters living rough; its data says call
+            { "forager", SocialKind.Call },   // the foragers' camp (2026-10-15): deserters living rough; its data says call
+            // The Lowtowns (Phase 9.1): the gutter-hounds and the drains' Weave-Eaters pack; the river thieves, the Iron Teeth, the hired
+            // warders and the grey-touched call (people, and what was people).
+            { "gutterhound", SocialKind.Pack }, { "drainmother", SocialKind.Pack }, { "lanterneater", SocialKind.Pack },
+            { "dockrat", SocialKind.Call }, { "ironteeth", SocialKind.Call }, { "sifter", SocialKind.Call }, { "brannoc", SocialKind.Call }, { "warder", SocialKind.Call }, { "greytouched", SocialKind.Call }
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()
         {
-            Assert.AreEqual(6, zones.Count, "Five zones and the Sealed Adit.");
+            Assert.AreEqual(7, zones.Count, "Five zones, the Sealed Adit and the Lowtowns (Phase 9.1).");
             int camps = 0;
             foreach (var (zone, camp, _) in Camps())
             {
@@ -151,8 +155,8 @@ namespace Crulanda.Tests
         [Test] public void Each_of_the_twelve_elites_has_its_own_move()
         {
             var elites = Camps().Where(x => x.camp.elite).ToList();
-            Assert.AreEqual(32, elites.Count, "Twelve camp elites in the five zones and twenty in the Sealed Adit since its rework (the rare Quiet Miner among them).");
-            Assert.AreEqual(33, EliteMoves.All.Length, "Twenty camp elites, the Rock-Eater, which rides beside Nix in his camp (D5), and the reworked Adit's twelve (2026-10-14).");
+            Assert.AreEqual(35, elites.Count, "Twelve camp elites in the five zones and twenty in the Sealed Adit since its rework (the rare Quiet Miner among them), and the Lowtowns' three (the Mother of Drains, Knuckle Brannoc and the rare Lantern-Eater, Phase 9.1).");
+            Assert.AreEqual(36, EliteMoves.All.Length, "Twenty camp elites, the Rock-Eater, which rides beside Nix in his camp (D5), and the reworked Adit's twelve (2026-10-14); and the Lowtowns' three, Phase 9.1).");
             var plain = EliteMoves.For("nobody at all", false);
             foreach (var (zone, camp, _) in elites)
             {
@@ -167,7 +171,7 @@ namespace Crulanda.Tests
                 Assert.That(m.enrageAt, Is.InRange(.2f, .4f)); Assert.Less(m.enrageHaste, .8f, "Enraged, it swings faster.");
                 Assert.Greater(m.callAt, m.enrageAt, "It calls before it enrages.");
             }
-            Assert.AreEqual(33, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Thirty-three different moves (the reworked Adit's twelve among them, 2026-10-14; the Old Burrower's Earth-Heave, not a second Rock-Crush).");
+            Assert.AreEqual(36, EliteMoves.All.Select(m => m.name).Distinct().Count(), "Thirty-six different moves (the Lowtowns' three, Phase 9.1) (the reworked Adit's twelve among them, 2026-10-14; the Old Burrower's Earth-Heave, not a second Rock-Crush).");
             // Dungeon end bosses are a step harder than outdoor named elites: Caddock, the Hollow Root-Warden, the Rail-Captain and (the Adit
             // rework) Brother Hollowsong, the Wake's boss, and only they.
             CollectionAssert.AreEquivalent(new[] { "Caddock, the Bandit King", "The Hollow Root-Warden", "Rail-Captain Orsk Danner", "Brother Hollowsong" }, EliteMoves.All.Where(m => m.boss).Select(m => m.mob).ToList());

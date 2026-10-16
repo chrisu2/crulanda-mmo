@@ -8,7 +8,7 @@ namespace Crulanda.Tests
     /// to four, and the set follows night, the grey's edge and the dungeon (ZoneMusic.TracksFor).</summary>
     public class ZoneMusicTests
     {
-        static readonly string[] ZoneIds = { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.adit" };
+        static readonly string[] ZoneIds = { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.adit", "zone.lowtowns" };
 
         [Test] public void Every_track_in_every_set_is_in_Resources()
         {

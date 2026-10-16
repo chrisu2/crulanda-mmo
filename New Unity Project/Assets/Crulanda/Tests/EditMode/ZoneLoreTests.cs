@@ -61,6 +61,7 @@ namespace Crulanda.Tests
             var counts = zones.ToDictionary(z => z.id, z => (z.secrets ?? new ZoneSecret[0]).Count(s => s != null));
             Assert.GreaterOrEqual(counts["zone.oakhaven"], 25); Assert.AreEqual(13, counts["zone.khaven"]); Assert.AreEqual(13, counts["zone.peaks"]);
             Assert.AreEqual(13, counts["zone.ashrim"]); Assert.AreEqual(14, counts["zone.verdant"]); Assert.AreEqual(13, counts["zone.adit"]);
+            Assert.AreEqual(14, counts["zone.lowtowns"], "The Lowtowns' fourteen (Phase 9.1): ten pages of the book of lore, a lookout, militia marks, a lamp-shrine and the grey-bell.");
         }
 
         [Test] public void Every_named_person_in_every_zone_has_two_or_three_stories_and_nobody_else_has_any()
@@ -90,7 +91,7 @@ namespace Crulanda.Tests
         {
             var quests = QuestDatabase.Parse(Texts("Quests")); var zones = Zones();
             var lore = quests.Documents.Values.Where(d => d.IsLore).Select(d => d.id).ToList();
-            Assert.AreEqual(14, lore.Count, "Fourteen pages of the book of lore: two each in Khaven, the Peaks, the Rim and the Shore (2026-10-15), and six at the books, shelves and dead of Phase 8.6.");
+            Assert.AreEqual(24, lore.Count, "Fourteen pages of the book of lore: two each in Khaven, the Peaks, the Rim and the Shore (2026-10-15), and six at the books, shelves and dead of Phase 8.6; and the Lowtowns' ten (Phase 9.1).");
             var held = new Dictionary<string, ZoneSecret>();
             foreach (var z in zones) foreach (var s in z.secrets ?? new ZoneSecret[0]) if (s != null && !string.IsNullOrEmpty(s.document)) held[s.document] = s;
             foreach (var id in lore)

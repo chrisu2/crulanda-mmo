@@ -20,7 +20,7 @@ namespace Crulanda.Tests
         [Test] public void Every_landmark_is_a_place_to_explore_once()
         {
             var a = Fresh(out var p);
-            Assert.AreEqual(5, a.Zones.Count, "The five zones.");
+            Assert.AreEqual(6, a.Zones.Count, "The five zones and the Lowtowns (Phase 9.1).");
             var oak = a.Zones.First(z => z.id == "zone.oakhaven"); var place = Achievements.Pois(oak).First();
             Assert.Greater(a.PoisIn(oak), 30, "Oakhaven's landmarks are its places.");
             Assert.IsFalse(a.Explored(oak, place));

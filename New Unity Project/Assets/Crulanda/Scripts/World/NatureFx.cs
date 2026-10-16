@@ -13,7 +13,7 @@ namespace Crulanda.World
         ZoneBuilder zone; ParticleSystem ps; ParticleSystem.EmissionModule emission; float nextCheck; bool ash, filled;
         public void Init(ZoneBuilder builder)
         {
-            zone = builder; ash = zone.Zone.biome == "ash";
+            zone = builder; ash = zone.Zone.biome == "ash" || zone.Zone.biome == "lowtowns";   // the Lowtowns: soot drifting down out of the smog
             var mat = ash ? zone.art.ashFlake : zone.art.leaf;
             if (mat == null) { enabled = false; return; }
             if (ash) mat = new Material(mat) { name = "Ash flake (soft)", mainTexture = FlakeTexture() };   // the art's flake has a hard rim: at a few pixels it drew as a dot

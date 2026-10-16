@@ -221,3 +221,13 @@ count by region; the Lore tab in the quest book; villagers step aside and shelte
    10. Well-fed and elixirs 30 minutes, one stat; a draught for each class's pool. 11. Coin only. 12. Taprooms for the Peaks, the Rim
    and the Shore. 13. Stepping aside for you and the party, and shelter under a roof in rain. 14. The Cask 14x10, the Hearth 13x9,
    fifteen seats.
+
+## Buffs to beat the bosses (Chris, 2026-10-15 ~23:25, verbatim)
+"we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses"
+**The plan (PROVISIONAL):** before a boss or an elite camp the leader stops short of the pull ("buff up"): every sim eats (a party feast
+when one is carried, else its own well-fed dish), drinks the elixir for its role (a tank's armour salve or stamina, a healer's cordial,
+damage-dealers' tinctures) and its class draught when low; each class casts its party buff on everyone (the Paladin's oath/standard, the
+Druid's, the Archivist's songs, the Shaman's and the Cleric's blessings, whichever exists; a class with none gets one, small); the run bot
+(you) does the same from the bags; then the pull. Sims carry what they craft and buy (SimEconomy), so a richer sim party is better
+buffed. Bosses are then tuned for a buffed party (the buffs worth about 10-15% of the party's damage and survival), so going in unbuffed
+is harder, not impossible. Lands on top of step 4 (the consumables, branch p86-craft) once its tests pass.

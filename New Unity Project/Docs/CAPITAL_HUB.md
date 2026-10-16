@@ -129,3 +129,5 @@ Pizza); chosen: ivy grown by the builder (painted style, any wall), weathering, 
 need to use some of our texture packs".** And of the inn (screenshot): "table and mug still not meeting. hovering over tables" (fixed in
 the inn code: the dressing sits on the table's own top), "all trainers standing backwards" (fixed: a post in a city faces the room),
 "floor is blocked in armory" (fixed: no plinth across a hall's door).
+**Chris, 2026-10-16 ~01:40 (verbatim, a screenshot of the audience hall): "falling through the floor. he needs more regal attire and
+sitting on a throne".**

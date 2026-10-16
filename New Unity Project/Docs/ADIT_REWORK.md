@@ -1,5 +1,12 @@
 # The Sealed Adit, reworked (design; 2026-10-14)
 
+## Chris, 2026-10-15 ~23:45 (verbatim): "one caveat. bosses/elites will not respawn so no one is trying to exploit the gear/loot drops"
+The 20-minute respawn (section 1, Q1) is for the ordinary mobs only; bosses and elites stay dead (the scope: below, once asked).
+Asked (the question prompt, verbatim): "Until a lockout resets (Recommended)" and "Everywhere (Recommended)". **So:** every boss and elite, in
+dungeons and in the open world, is killed and looted once per character per lockout; dead for that character until the lockout resets
+(a real-time day for dungeons' bosses and the open world's elites, at 06:00 local; a real-time week for raids when they come). The
+ordinary mobs keep the 20-minute respawn. Kept on the character (save format 11, with Phase 8.6's recipes).
+
 ## Chris's words (2026-10-14, verbatim)
 "what are the three new dungeons? you should have the build guide on levels. i think adit dungeon need to be more complex like wow's
 wailing caves or the deadmine. adit is nothing like those"

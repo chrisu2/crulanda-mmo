@@ -95,9 +95,9 @@ namespace Crulanda.Encounter
         public List<LootLuck> lootLuck = new List<LootLuck>();
 
         // ---------- levels (save format 5) ----------
-        /// <summary>The highest level (13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). A talent point a level
+        /// <summary>The highest level (19 since the Lowtowns, Phase 9.1; 15 from round 29, 13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). A talent point a level
         /// to <see cref="TalentCap"/>, which is this.</summary>
-        public const int LevelCap = 15;   // 15 now, 30 in the end (Chris, 2026-10-07; ROADMAP: Phase 9)
+        public const int LevelCap = 19;   // 19 with the Lowtowns (Phase 9.1, 16-19; Chris, 2026-10-15: "Lowtowns & Rust Market 16-19"), 30 in the end (2026-10-07)
         /// <summary>A point a level to the level cap (TALENT_DEPTH.md, Chris's decision of 2026-10-09: "1 a level (as now)", 16 points at 15,
         /// enough for a path's tier 3). It had stayed at 10 when the levels went to 15, so the Vanguard's, the Jailer's and the Cantor's
         /// third tiers could not be reached in play (caught 2026-10-10 by the Jailer's test).</summary>

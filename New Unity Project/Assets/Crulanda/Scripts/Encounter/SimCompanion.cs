@@ -21,7 +21,7 @@ namespace Crulanda.Encounter
         /// <summary>Time and kills with you this grouping (5.5: SimMemory on leaving).</summary>
         public float joinedAt; public int killsTogether;
         NavMeshAgent agent; ActorVisual visual;
-        float nextAct, nextHeal, nextRegen, nextCatchUp, downSince = -1, healAt, pendingSince = -1, leadDestAt = -10; Vector3 leadDest; Actor healing;
+        float nextAct, nextHeal, nextRegen, nextCatchUp, downSince = -1, healAt, noWaySince = -1, pendingSince = -1, leadDestAt = -10; Vector3 leadDest; Actor healing;
         public string Activity { get; private set; } = "Following you";
         public enum PartyRole { Tank, Healer, Damage }
         /// <summary>Its part in the party (5.6): Warriors and Paladins tank (a Paladin heals when no Druid is along), Druids heal, Rangers and Mages deal damage.</summary>
@@ -619,6 +619,10 @@ namespace Crulanda.Encounter
             {
                 nextCatchUp = Time.time + 1;
                 bool stuck = !agent.isOnNavMesh || (toPlayer > 25 && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete) || toPlayer > 60;
+                // No way to you for six seconds at any distance over 6 m (adit-final11, 2026-10-15: the Ranger and the Rogue stood 13 m off by the
+                // chute's pool with no path, the leader waited for them and the run stood); the fight rule below still holds.
+                bool noWay = toPlayer > 6 && agent.isOnNavMesh && !agent.pathPending && (!agent.hasPath || agent.pathStatus != NavMeshPathStatus.PathComplete);
+                if (noWay) { if (noWaySince < 0) noWaySince = Time.time; else if (Time.time - noWaySince > 6) stuck = true; } else noWaySince = -1;
                 // Never out of a fight to you (2026-10-15, the full run: you fell at the duo, got up at the stone, and every sim was warped to your
                 // side, the beast back to full): while a mob is on the party within 15 m of it (it is in that fight), a sim fights on and catches up after.
                 if (stuck && agent.isOnNavMesh && ((Quarry != null && Quarry.actor.IsAlive && Quarry.FightingParty)

@@ -614,6 +614,9 @@ namespace Crulanda.Encounter
             {
                 nextCatchUp = Time.time + 1;
                 bool stuck = !agent.isOnNavMesh || (toPlayer > 25 && !agent.pathPending && agent.pathStatus != NavMeshPathStatus.PathComplete) || toPlayer > 60;
+                // Never out of a fight to you (2026-10-15, the full run: you fell at the duo, got up at the stone, and every sim was warped to your
+                // side, the beast back to full): while a mob is on the party within 35 m of it, a sim fights on and catches up after.
+                if (stuck && agent.isOnNavMesh && session.Enemies.Exists(e => e != null && e.actor.IsAlive && e.FightingParty && Vector3.Distance(e.transform.position, transform.position) < 35)) stuck = false;
                 if (stuck && NavMesh.SamplePosition(player.transform.position - player.transform.forward * 2.5f, out var near, 12, NavMesh.AllAreas)) agent.Warp(near.position);
             }
             if (!agent.isOnNavMesh) return;

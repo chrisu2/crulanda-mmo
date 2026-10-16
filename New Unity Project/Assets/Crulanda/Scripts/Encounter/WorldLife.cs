@@ -1100,7 +1100,11 @@ namespace Crulanda.Encounter
             state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
             until = Time.time + (activity == "home" ? HomeStay : 14 + life.R01 * 30);
             visual.Pose = PoseFor(activity);
-            var look = life.LookFor(transform.position); if (look.HasValue) Face(look.Value);
+            var look = life.LookFor(transform.position);
+            // Someone at a fixed post (a trainer at the racks, a clerk at a desk against the wall) faces the room, away from the prop at
+            // their back (2026-10-16, Chris in the Crown's Hall of Arms: "all trainers standing backwards").
+            if (look.HasValue && fixedPlace != null) { var back = transform.position - look.Value; back.y = 0; if (back.sqrMagnitude > .01f) Face(transform.position + back); }
+            else if (look.HasValue) Face(look.Value);
             if (activity == "field") FaceRow();
             if (Coop != null) KeeperStart();
             if ((activity == "home" || activity == "sleep") && home != null) Hide();

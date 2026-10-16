@@ -283,14 +283,16 @@ namespace Crulanda.Encounter
                 if (e == null || !e.actor.IsAlive || !e.FightingParty) continue;
                 fighting++;
                 if (e.RaidMarked == RaidMark.Moon) moon = e;
-                else if (e.RaidMarked == RaidMark.None && e != session.Target && !e.Controlled && !(e.Elite && e.Move != null && e.Move.boss))
+                else if (e.RaidMarked == RaidMark.None && e != session.Target && !e.Controlled && !e.Elite)   // never an elite (adit-final10: the Rogue put the Moon on Lusk)
                 { float d = Vector3.Distance(e.transform.position, transform.position); if (d > far) { far = d; pick = e; } }
             }
             if (fighting < 2) return;
             bool marked = false;
             if (moon == null && pick != null) { moon = pick; moon.RaidMarked = RaidMark.Moon; marked = true; }
             if (moon == null || moon.Incapacitated || Vector3.Distance(moon.transform.position, transform.position) > 25) return;
-            if (moon.Apply("incap", actor, 20) != null) { nextHold = Time.time + 6; return; }
+            // A hold that does not take leaves no Moon (adit-final10, 2026-10-15: the Moon stayed on Gang-Boss Lusk, who cannot be held, and the
+            // healer, the Ranger and the Rogue left him to the tank alone: the tank fell, then you, five times; Chris: "paladin keeps dieing").
+            if (moon.Apply("incap", actor, 20) != null) { if (marked) moon.RaidMarked = RaidMark.None; nextHold = Time.time + 6; return; }
             nextHold = Time.time + 25;
             bool rogue = sim.classId == "class.rogue", scoundrel = sim.classId == "class.scoundrel";
             string what = rogue ? (sim.chatty > .65f ? "gouged moon, dont touch it" : "Moon is held. Leave it be.") : scoundrel ? (sim.chatty > .65f ? "sang moon still, dont touch it" : "Moon's dazed. Leave it be.") : (sim.chatty > .65f ? "lulling moon" : "Moon's asleep. Don't wake it.");
@@ -583,6 +585,9 @@ namespace Crulanda.Encounter
         {
             if (!Leading.HasValue) return false;
             foreach (var e in session.Enemies) if (e != null && e.actor.IsAlive && e.Camp && !e.Game && Vector3.Distance(e.transform.position, Leading.Value) < 16 && SameFloor(e.transform.position, Leading.Value)) return false;
+            // An elite whose home is the camp keeps it standing wherever it is (adit-final10: Lusk, off the mark's floor after the wipe, was
+            // counted gone and his camp "cleared" at full health).
+            foreach (var e in session.Enemies) if (e != null && e.actor.IsAlive && e.Camp && e.Elite && !e.Game && Vector3.Distance(e.Home, Leading.Value) < 16) return false;
             return true;
         }
         void Update()

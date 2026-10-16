@@ -1723,6 +1723,10 @@ namespace Crulanda.Encounter
                         if (patrol) break;
                         foreach (var w in stood) { var d = w - point; d.y = 0; if (d.magnitude < gap * .9f) { footed = false; break; } }
                     }
+                    // Eight draws all footed on another's place (or off the navmesh): spots turned round the camp's centre by the golden
+                    // angle, a little further out each, with no more draws from the dice, so no later camp's mobs move (the bowl's rim's
+                    // third overseer on its 3 m walk against the wall, ZoneContentTests 2026-10-16: "spawned 2/3").
+                    if (!footed && !patrol) footed = FootingRound(camp, gap, stood, out point, out spot);
                     if (!footed) continue;
                     placed.Add(spot); stood.Add(point);
                     int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
@@ -1762,6 +1766,24 @@ namespace Crulanda.Encounter
                 }
             }
             return spawned;
+        }
+        /// <summary>A camp mob's footing found without the dice: spots round the camp's centre (the golden angle, each a quarter gap further
+        /// out, from half a gap to two gaps past the camp's radius), the first whose navmesh point is clear of those stood already and on the
+        /// camp's own level (within 1.5 m of the height it is stood nearest: not the floor under its deck). False when none is.</summary>
+        bool FootingRound(Crulanda.World.ZoneCamp camp, float gap, List<Vector3> stood, out Vector3 point, out Vector2 spot)
+        {
+            for (int k = 0; k < 24; k++)
+            {
+                float r = gap * .5f + gap * .25f * k, a = k * 2.39996f;
+                if (r > camp.radius + gap * 2) break;
+                spot = camp.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
+                var want = Zone.StandAt(spot, DeckHeight(camp, spot), 1);
+                if (!NavMesh.SamplePosition(want, out var hit, 3, NavMesh.AllAreas) || Mathf.Abs(hit.position.y + 1 - want.y) > 1.5f) continue;
+                point = hit.position + Vector3.up; bool clear = true;
+                foreach (var w in stood) { var d = w - point; d.y = 0; if (d.magnitude < gap * .9f) { clear = false; break; } }
+                if (clear) return true;
+            }
+            point = default; spot = camp.center; return false;
         }
         /// <summary>
         /// Outlying mobs (playtest note 92, 2026-10-07: "still need more camps, pretty deserted to level up"): round each outdoor camp of

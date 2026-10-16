@@ -193,6 +193,19 @@ world; 9 waits on 8.5. Each step: fix, targeted tests, build, capture, commit, p
 Labels: the metals, herbs, dishes, recipes, inns, villagers: GAME-ONLY; aether-geodes, Veridian sap, salt, the Silent Pilgrims, the
 Sandthrone, the Ash-Walkers: CANON where cited; lore entries labelled one by one; this whole plan PROVISIONAL.
 
+**Status (p86-inns, 2026-10-15): steps 1-3 and decisions 12-14 written, compiled, not yet run in Unity.** Double doors on every inn
+(`ZoneBuilder.InnDoorW` 2.6 m, nav gap 1.6; `ZoneDoor.hinge2`, `SetHalfShut` after `InnkeeperBed`); the Cask 14 x 10 and the Hearth
+13 x 9 laid out by one plan (`ZoneBuilder.InnPlan`: five tables of three, a 4.4 m bar with two stools, the hearth bench) and registered
+(`ZoneInn`, `ZoneBuilder.Inns`; WorldLife reads its seats from it); neighbours moved in oakhaven.json (the Cask's centre, kitchen, log
+store, hitch, hand cart, board, yard table, hedge shortened, Mira's spawn) and khaven.json (the Hearth's centre, the barrels). The
+doorway lanes and queue (`ZoneDoorway`, `DoorwayRoute` in Encounter/Doorways.cs; carrier and innkeeper, villager, sim, idler, a
+place up for every 2 s waited), the stuck watchdog (`Headway`, villagers and the sims' "jammed"), stopped figures out of the crowd's
+pushing. Pilgrims' Rest and Wain's Rest are waystations (`kind: inn`, variant 2; Wain's Rest `was: ruined_house` keeps the ruin's 48
+draws, canvas-roofed over its burnt rafters: GAME-ONLY, PROVISIONAL; its pad's radius 11 to 14); the Hearth-Tree has a walk-in
+hearth-house (`style: inn`). Decision 13: stepping aside for you and your party, shelter in the rain (`GiveWay`). Tests to run:
+EditMode `InnLayoutTests`, `DoorwayTests`, `WorkshopDataTests`, `ZoneGrowthTests`; PlayMode `VillageDoorTests`, `SimLifeTests`,
+`VillageSupplyTests`, `BuildingGroundTests`, `ZoneContentTests`. Not done: the waystations' hearths are not cooking stations.
+
 ## 5. Open decisions for Chris (one line each)
 1. **Place:** 8.6 straight after Phase 8 (his 23:25 "work on phase 8"), before or after the talents' fourth paths and 8.5?
 2. **8.5 and 8.6 together** as one gear phase, or 8.6's looks (3f, step 9) alone waiting on 8.5's rig choice?

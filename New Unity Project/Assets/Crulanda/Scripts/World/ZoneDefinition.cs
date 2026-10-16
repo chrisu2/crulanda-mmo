@@ -291,7 +291,8 @@ namespace Crulanda.World
     /// spine (size: length, height), shrine (the Cult of Ash's), idol, cavern (a walk-in cave in a rocky knoll, its mouth at
     /// the prop facing -Z; variant 0 is Crowsfoot Hollow's plan; give it a level ZoneShape pad under its floor, see Hollow).
     /// rotation in degrees (0 = door faces south). variant picks colour/size variations; some are looks of their own:
-    /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), crypt 1 a turfed barrow, grave 1 heaved over.
+    /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), inn 2 a waystation (one storey, a long table and bunks),
+    /// crypt 1 a turfed barrow, grave 1 heaved over.
     /// </summary>
     [Serializable] public sealed class ZoneProp
     {
@@ -324,8 +325,13 @@ namespace Crulanda.World
         public string joins;
         /// <summary>How the Sealed Adit dresses a cavern of variant 2 (ZoneBuilder.Adit): "main" (the Workings, the Gallery, the stair and
         /// the Rail Hall), "geode", "vent", "breach", or any other word for a plain cave of lamps and rubble. Empty: by its name, as the
-        /// first Adit's caves were.</summary>
+        /// first Adit's caves were. A treehouse of style "inn" is walked into: its round house has a double door and seats (the Shore's
+        /// Hearth-Tree, Phase 8.6, 2026-10-15).</summary>
         public string style;
+        /// <summary>The kind of prop that stood here before it was raised again (2026-10-15: "ruined_house", Wain's Rest as a waystation):
+        /// it takes that kind's draws from the zone's stream and counts as that kind did for the camps' ground (ZoneBuilder.MobGround),
+        /// so nothing else in the zone moves.</summary>
+        public string was;
     }
     /// <summary>
     /// A deck in a cave (GAME-ONLY; the Adit rework, ZoneBuilder.AditDecks): a walkable way of planks, cut stone, rope or scree, running

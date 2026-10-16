@@ -109,8 +109,9 @@ namespace Crulanda.Tests
         }
 
         /// <summary>
-        /// The Shattered Peaks has people (an elder, a merchant, and the rest talking as gossips) but no inn, so meat sold there is
-        /// only sold: nobody talks of an inn's pot, or of any of the inn's news of the day.
+        /// The Shattered Peaks has people (an elder, a merchant, and the rest talking as gossips) but no tavern (its Pilgrims' Rest is a
+        /// waystation since 2026-10-15: a long table and bunks, no bar, no cask, no pot), so meat sold there is only sold: nobody talks
+        /// of an inn's pot, or of any of the inn's news of the day.
         /// </summary>
         [UnityTest] public IEnumerator SellingMeat_WhereThereIsNoInn_NobodyTalksOfAPot()
         {
@@ -120,7 +121,8 @@ namespace Crulanda.Tests
             var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var life = VillageLife.Active;
             Assert.AreEqual(root, s.SaveDirectoryOverride, "This test saves to its own folder.");
             Assert.AreEqual("zone.peaks", s.Zone.Zone.id); Assert.NotNull(life, "The Peaks has its people.");
-            Assert.AreEqual(0, life.Places["inn"].Count, "The Peaks has no inn.");
+            Assert.IsFalse(life.Tavern, "The Peaks has no tavern: its Pilgrims' Rest is a waystation.");
+            Assert.IsTrue(s.Zone.Inns.Exists(i => i.name == "Pilgrims' Rest" && i.style == "waystation"), "Somewhere to rest, all the same.");
             life.Deliver("inn.meat", 3); life.Deliver("sold.inn.meat", 3);   // as EncounterSession.SellBag delivers meat sold to any merchant
             var innNews = new[] { "Boar in the Cask's pot tonight. Somebody's been hunting.", "Meat in the pot at the inn tonight. Somebody's been hunting.",
                 "Hare in the Cask's pot tonight. The hunter's doing.", "The cask's run dry at the inn. The out-of-work drank it by supper.",

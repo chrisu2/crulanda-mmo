@@ -1454,13 +1454,13 @@
       "kind": "inn",
       "name": "The Cracked Hearth",
       "at": {
-        "x": -12,
-        "y": 15
+        "x": -12.63,
+        "y": 15.78
       },
       "rotation": 321,
       "size": {
-        "x": 11,
-        "y": 7
+        "x": 13,
+        "y": 9
       },
       "variant": 1
     },
@@ -1668,8 +1668,8 @@
     {
       "kind": "barrels",
       "at": {
-        "x": -7,
-        "y": 12
+        "x": -4.74,
+        "y": 12.39
       },
       "variant": 2
     },

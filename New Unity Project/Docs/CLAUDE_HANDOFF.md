@@ -1,6 +1,71 @@
-# Crulanda: Claude handoff (Start here rewritten 2026-10-15 ~16:00; covers the Adit finished on the afternoon of Oct 15)
+# Crulanda: Claude handoff (Start here rewritten 2026-10-16 ~01:45: the stopping point after the castle night)
 
 ## Start here
+
+**Stopping point: 2026-10-16 ~01:45.** Chris: "once complete find a stopping point. backup, publish all to git, and create a handoff for
+next time documenting everything done and what needs to be done." then "ok shutdown the computer when done". Everything below is pushed
+to GitHub (every branch), backed up to E:, and the PC shut down at his word. Nothing is VERIFIED until Chris sees it in his build.
+
+### Published
+- **The normal game** (`D:\crulanda-work\outputs\Crulanda-Playable`, 01:23, from `feet-bow-adit-kit` before the three merges below;
+  save backed up to `save-backups/20261016-0123-before-ccpack-publish`): the Adit run fixes (the bot counts height to the leader, out of
+  water at any distance, a sim with no path to you catches up, Lusk's Moon and his camp, a boss camp open while he lives), Chris's CC rule
+  (holds on elites half as long, each kind once a fight; Nix held once), every mob's signature move and the sims' holds (cc-pack), birds
+  that walk and hop now and then, the talent window's role tags. Tests 41/41 and a Nix win at 01:16. No full group run since adit-final11
+  (cut for the stopping point).
+- **The castle preview** (`D:\crulanda-work\outputs\Crulanda-Castle-Preview\Play Castle Preview.bat`, 01:27, from `p9-capital`): plays a
+  copy of Chris's saves in `D:\crulanda-work\castle-preview-save` (`--crulanda-save-dir`), because p9-capital moves the profile and world
+  saves to format 2. `/crown` jumps there. Frames: `D:\crulanda-work\world-captures\crown-2` (50).
+
+### Branches (all pushed; worktrees under D:\code\mmo-*)
+| Branch | What | State |
+|---|---|---|
+| `feet-bow-adit-kit` (D:\code\mmo) | the working branch; tonight merged: cc-pack, p86-craft, p86-buffs, p86-lockout | the three p86 merges are compile-checked only, not yet run together in Unity; they bring **character save format 11** (recipes, lockouts): back up Chris's saves before the next publish |
+| `p86-craft` | buffs, 37 found leaves, Leatherworking, Weaving, Simpling, every tier's nine slots | merged; 131/132 + 11/11 (the one red, set-piece icons `loot.set.t1_*`, is older than tonight: run tools/art/make_icons.py) |
+| `p86-buffs` | buff up before bosses (stop, eat, elixir, a class buff for every class) | merged; 26/27 (the same icons) + 30/30 |
+| `p86-lockout` | lockouts (dungeons 2 days, open-world elites a day, open-world bosses and raids a week, at 06:00) and the dungeon queue (J, /queue) | merged; 27/27 + 4/4 |
+| `p86-inns` | double doors, bigger inns, doorway queues, taprooms everywhere, step aside, rain shelter; table dressing on the table's top | NOT merged: 23/24 (a moved prop by a grove), 24/26 (two villagers couldn't path into the Cask; the Adit camp reach is the old search-budget red) |
+| `p86-lore` | the Lore tab's seven chapters, 91 secrets with clues, five new kinds, regrowing herbs | NOT merged: 31/31, 12/13 (a map's "?" mark stands on secret.oakhaven.elins-cairn) |
+| `p9-capital` | the castle: zone (p9-crown), halls (p9-halls), bank and Exchange (p9-exchange), inn and townsfolk (p9-cityinn), throne and floors (p9-throne), ivy/iron/gardens (p9-crowndetail), the two-part bank, bookcases, facing, doorways | NOT merged: 75/79 and 12/16 (below) |
+| `p9-lowtowns` | the cap 15 to 19 (one commit); tools/wip/talents19.py (the talent plan, not run) | waits on the castle |
+| `p85-hero` | the Modular Hero pack's base body, poses and presets (route a) | nothing built on it yet |
+
+### The castle's open reds (p9-capital, 2026-10-16 00:45-00:57)
+1. `Hall_roles_are_read_from_the_residents_role` expects "The Lantern Watch" (a guildmaster role parse after the merges).
+2. `The_Council_wardens_stand_in_pairs`: Warden Maeve Corbin has no partner (an odd warden after the townsfolk).
+3. The Gilded Lantern's city layout: seats 0.25 m from their tables (the test wants more room).
+4. `secret.crown.clerks-purse`'s clue names "The Spire" (a landmark): reword.
+5. Maddy Brook (water-carrier) can't be walked to from the Gilt Approach.
+6. The detail's cost check ("The detail stays cheap"): measure the ivy and garden triangles, trim.
+7. The Adit camp-reach red (old, the search budget; trust the hop map).
+Also look in the frames: Aethelgard did not read as seated and robed in crown-2/crown-07-the-audience-hall; the Crafters' Court is still bare.
+
+### Chris's words tonight (verbatim; the docs hold them in full)
+- "keep going finish phase 8" / "them move to 9"; the question prompts: Phase 8.6 on my defaults, the gear fit on the hero pack's body
+  (PHASE8_6_LIVING_WORLD.md, ROADMAP), the Lowtowns first in Phase 9 (ZONE_LOWTOWNS.md: Oakhaven's south road, Gorm himself, the
+  Council's warders, the dead-house cellar), Hallow's Creek on the recommended answers (DUNGEON2_DESIGN.md).
+- The castle (CAPITAL_HUB.md, all of it): "we need to implement a castle (central point) ..."; the Crown of Argentis, open from level 1,
+  Aethelgard, castle first; "use the map for reference design"; "make sure all professions are located in the castle"; the bank shared,
+  then "need a limited shared space. maybe 3 slots ... the remainder is character only"; the Exchange with sims; "i really want the castle
+  done asap so double down on it"; the inn redesigned; "lots more npcs in the castle with real jobs"; a castle on the northern skyline;
+  more detail (ivy, iron); "we need a real garden"; the fixes (the floor, the trainers, the mugs, the throne, the bookshelves); "need more
+  profession tools/small huts/vendored items" (NOT done: first job next time); "otherwise looks like a good start".
+- CC (CC_DESIGN.md): "you can't CC elites , bosses, world bosses , etc." then "normal CCs are cut in half the duration and can't imply the
+  same CC after the first" and, of Nix, "CC duration cut in half and can only have one cc type one time".
+- Lockouts (ADIT_REWORK.md, top): bosses/elites don't respawn; "Until a lockout resets", "Everywhere"; "the dungeons should include an
+  instance que that can be done every 2 days for loot"; "open world boss is once per week"; "raids once per week".
+- "we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses" (built: p86-buffs; the bosses not yet retuned for it).
+- "birds still hoppy/jumpy ..." (fixed); "in the talent tree you need to designate their distinction like tank/healer/dps/support" (fixed).
+
+### Next, in order
+1. The Crafters' Court: a workshop for every trade (huts or stalls, tools, stock) and vendors of each trade's tools and materials.
+2. The castle's reds above; frames of the throne (front, side, back), the inn, the gardens, the skyline from Oakhaven; then merge p9-capital.
+3. The p86-inns and p86-lore reds; merge them.
+4. Run the merged working branch in Unity (the p86 merges together), back up Chris's saves (format 11), publish, a full group run.
+5. Retune the bosses for buffed parties (Nix with one hold); the set-piece icons.
+6. Phase 8.5 on p85-hero (retarget, map the looks to parts); Phase 9: the Lowtowns (talents for 19 in tier 3 per talents19.py, then the zone).
+
+## Earlier start here (the evening of Oct 15)
 
 **Night of 2026-10-15 (~22:15): Chris: "keep going finish phase 8" then "them move to 9".** His answers tonight (question prompts,
 verbatim in the docs): Phase 8.6 on my defaults (PHASE8_6_LIVING_WORLD.md, end); Phase 8.5 by route (a), the hero pack's body (ROADMAP;

@@ -114,3 +114,6 @@ profile's format goes up one, Chris's saves backed up first); the Exchange "Sims
 **Chris, 2026-10-15 ~23:30 (verbatim): "i really want the castle done asap so double down on it".** Three helpers on it from 23:35: the
 zone and buildings (p9-crown), the bank and the Exchange (p9-exchange), the halls' people and systems (p9-halls: Aethelgard's audience,
 the Archive's reading room, the guild halls, the trainers, the dresser); the talent tiers for 19 paused.
+
+**Chris, 2026-10-16 ~00:30 (verbatim): "dont need the same exact inn in the castle. needs a redesign".** The Gilded Lantern gets its own
+design: a city inn of the High City (white stone and gilt, not the village's timber inn), its own shape and rooms.

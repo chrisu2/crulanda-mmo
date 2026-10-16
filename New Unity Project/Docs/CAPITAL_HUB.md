@@ -153,3 +153,14 @@ Written, compile-checked, not yet run in Unity (EditMode `BankTests`, `ExchangeT
   Collect. Opened by a resident with role `auctioneer`, or `/exchange`.
 - Not yet: the clerks placed in the castle (the zone step), sims buying gear or each other's lots, a listing's own bid amount typed in
   (Bid places the least next bid).
+## Status (p9-crowndetail, 2026-10-16; written and compile-checked, NOT yet run in Unity)
+Chris (verbatim, of the Gilt Gate's stair): "will need to add more detail. search online for vines/ivy or something so it is not so white
+. maybe add some iron or something"; then "we need a real garden. need to use some of our texture packs". `ZoneBuilder.CrownDetail.cs`
+(all GAME-ONLY looks), hooked from Crown.cs in three lines (the end of BuildPaving; `parterre` builds `Garden`; Paved leaves a garden's
+lawns to the grass): ivy clumps up the curtain wall, its towers, the gate's towers, the stair and ramp parapets and some houses and halls
+(more facing north, by the gardens and round the Gilt Gate); damp bands, tinted stone panels in the masonry's own courses, rain streaks,
+moss on the stair, dirt along the paving; iron studs, strap hinges and rings on the gate leaves, braziers at the gates, lanterns on
+brackets and posts, handrails up the Grand Stair and the Gilt Ramp, a cresting on the Crown terrace's edge, grilles, door bands, banner
+chains; a string course on corbels and slate caps. The gardens: leaf-carded box hedges, gravel walks, the packs' flowers in beds, lawns
+of the zone's grass, topiary, small trees, rose arches, stone benches, urns. No colliders on any of it. To run: CrownZoneTests,
+CrownZonePlayTests (the new detail test), then the Crown tour's gate, stair and garden frames for Chris.

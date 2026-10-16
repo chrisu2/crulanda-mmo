@@ -112,6 +112,39 @@ namespace Crulanda.Tests
             Assert.Greater(walls.Count, 150, "The curtain wall, its towers and the parapets stand in stretches, each solid.");
             yield return null;
         }
+        /// <summary>
+        /// The Crown's surface detail (ZoneBuilder.CrownDetail; Chris, 2026-10-16: "so it is not so white . maybe add some iron"; "we need a
+        /// real garden"): ivy, ironwork and weathering on the Gilt Gate, the stair and the walls, iron on the houses, halls and banners, the
+        /// gardens planted; ivy in clumps, not everywhere; the lot cheap (its triangles counted as built, estimated some 200k against the
+        /// 7.46 M the Crown drew a frame before it); and none of it solid: no collider under any "Detail" part or in a garden, and the
+        /// gate's passage, the ramp, the stair and the Way still walked.
+        /// </summary>
+        [UnityTest] public IEnumerator The_walls_gate_and_stair_wear_ivy_iron_and_weather_and_none_of_it_blocks_a_way()
+        {
+            var zone = ZoneBuilder.Active; var counts = zone.CrownDetail; var problems = new List<string>();
+            int Get(string k) { return counts.TryGetValue(k, out var v) ? v : 0; }
+            foreach (var key in new[] { "gate:ivy clumps", "gate:iron", "gate:weathering", "gate:braziers", "stair:moss", "wall:ivy clumps", "wall:weathering", "wall:iron", "wall:trim", "wall:lanterns",
+                "house:iron", "house:lanterns", "house:weathering", "hall:lanterns", "banner:iron", "garden:plants", "garden:arches", "garden:benches", "garden:urns", "garden:topiary" })
+                if (Get(key) <= 0) problems.Add("nothing counted for " + key);
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+            Assert.That(Get("ivy clumps"), Is.InRange(30, 400), "Ivy in clumps here and there, not on everything.");
+            Assert.Less(Get("leaf cards"), 60000, "Leaf cards within bounds.");
+            Assert.Less(Get("triangles"), 400000, "The detail stays cheap.");
+            foreach (var col in zone.GetComponentsInChildren<Collider>(true))
+                for (var p = col.transform; p != null && p != zone.transform; p = p.parent)
+                    if (p.name.StartsWith("Detail ")) { problems.Add(col.name + " is solid under " + p.name); break; }
+            foreach (var g in zone.Zone.props.Where(p => p != null && p.kind == "parterre"))
+            {
+                var t = zone.transform.Find("Zone static scenery/" + g.name); if (t == null) { problems.Add(g.name + " is not built"); continue; }
+                if (t.GetComponentsInChildren<Collider>(true).Length > 0) problems.Add(g.name + " has a collider: a garden is walked through");
+            }
+            var start = Start(zone);
+            foreach (var (what, at) in new[] { ("the Gilt Gate's passage", new Vector2(108, 10)), ("the Gilt Ramp", new Vector2(120, 10)), ("before the gate's braziers", new Vector2(115.5f, 10)),
+                ("the Grand Stair", new Vector2(0, 45)), ("the Grand Stair by its handrail", new Vector2(5.6f, 45)), ("the Processional Way", new Vector2(60, 10)) })
+                if (!NavMesh.SamplePosition(zone.Ground(at), out var hit, 1.5f, NavMesh.AllAreas) || !NavReach.Walkable(start, hit.position)) problems.Add(what + " at " + at + " can't be walked to");
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+            yield return null;
+        }
     }
 }
 #endif

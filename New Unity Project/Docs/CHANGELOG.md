@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-15, 20:00-22:10: the full run's falls, warps and stalls (Chris watching: "warrior fell off again", "outside again"; all OPEN)
+- **The Warrior fell off every run:** a knockback picked the nearest floor, which on a catwalk could be the hall below. A knockback now starts
+  from the floor under the victim and lands on that same floor or not at all (`EncounterEnemy.Boss` Knock, `AditSwingLoad` KnockAlong).
+- **The party warped onto the grass over the Sunless River:** every catch-up teleport (the run bot's rescue, a sim's, Mira's) lands only on
+  your level now.
+- **Sims warped out of a fight to catch up with you** (after you got up at the stone the duo reset): a sim stays while its own target fights the
+  party or any fight is within 30 m (at 15 m the healer and the archer were pulled out).
+- **The leader stood "leading you" at the yard for minutes:** it asked for its way every frame and a long way never got worked out. It asks
+  when the way changes or every 2 s, and a way still being worked out after 3 s is walked cave by cave.
+- **The party stood outside on the grass for twenty minutes after the wipe at Nix** (adit-final8): the bot walked back from the stone and
+  stopped on the yard's grass right over the tank, who was 50 m below in the cave: by the flat distance it had arrived. The bot now counts the
+  height, and ten seconds with no headway on another level warps it beside the leader, on the leader's level.
+- **Nix's camp was given up with Nix alive:** the leader's "nothing to fight here for 45 s, leave it" clock ran while it waited for you; it now
+  runs only with the party there.
+
 ## 2026-10-15, 18:00-20:00: the party fights on when you fall (three solo-era bugs; Chris: "ugh more wasted time for dumb bugs that should have already been caught")
 Why the sim parties wiped at the Nix duo all afternoon was not the duo's numbers: three rules from before parties existed.
 - **A mob reset the moment you fell** (`EncounterEnemy`: `if (!Player.IsAlive) ResetFight()`), whoever else was fighting it. Now a mob with a

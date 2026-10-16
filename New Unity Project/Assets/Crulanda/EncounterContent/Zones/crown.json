@@ -2414,7 +2414,7 @@
         "role": "warden",
         "title": "Warden of the Council",
         "at": {
-          "x": -9,
+          "x": -4,
           "y": 59
         },
         "look": "concord",
@@ -2429,7 +2429,7 @@
         "role": "warden",
         "title": "Warden of the Council",
         "at": {
-          "x": 9,
+          "x": 4,
           "y": 59
         },
         "look": "concord",

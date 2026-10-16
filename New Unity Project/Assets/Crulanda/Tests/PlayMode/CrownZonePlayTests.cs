@@ -130,7 +130,7 @@ namespace Crulanda.Tests
             Assert.That(Get("ivy clumps"), Is.InRange(30, 2000), "Ivy in clumps here and there, not on everything.");
             // Raised 2026-10-16 with the ivy made dense mats (Chris: "only a few plants"); the city drew 7.46 M a frame before the detail:
             // a million more is the ceiling (the frame rate is the real check: crown-perf.txt in the capture).
-            Assert.Less(Get("leaf cards"), 600000, "Leaf cards within bounds.");
+            Assert.Less(Get("leaf cards"), 800000, "Leaf cards within bounds.");
             Assert.Less(Get("triangles"), 3000000, "The detail stays cheap.");
             foreach (var col in zone.GetComponentsInChildren<Collider>(true))
                 for (var p = col.transform; p != null && p != zone.transform; p = p.parent)

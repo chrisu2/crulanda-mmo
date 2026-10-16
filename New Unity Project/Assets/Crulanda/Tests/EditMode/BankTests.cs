@@ -90,7 +90,7 @@ namespace Crulanda.Tests
             try
             {
                 CharacterProfile.Remember(root, "class.warrior");
-                var warrior = Character("class.warrior", 600);   // the shared shelf's 3 more slots cost 500 Inventory.Add(warrior, db, "mat.copper_ore", 15);
+                var warrior = Character("class.warrior", 600); Inventory.Add(warrior, db, "mat.copper_ore", 15);   // 600: the shared shelf's 3 more slots cost 500
                 var v = CharacterProfile.LoadVault(root, out var msg); Assert.NotNull(v, msg);
                 Assert.AreEqual(15, TreasuryVault.Deposit(v, warrior, db, warrior.bag.FindIndex(s => s.item == "mat.copper_ore"), -1, out _));
                 Assert.IsTrue(TreasuryVault.BuyRow(v, warrior, out _));
@@ -133,7 +133,7 @@ namespace Crulanda.Tests
                 var v = CharacterProfile.LoadVault(root, out var msg); Assert.NotNull(v, msg);
                 Assert.AreEqual(3, v.slots.Count); Assert.AreEqual(0, TreasuryVault.Used(v)); Assert.AreEqual(0, v.rowsBought);
                 Assert.IsTrue(store.TryRead("profile", out var still, out _)); Assert.AreEqual(1, still.formatVersion, "reading does not write: the file is format 2 from its next save");
-                v.slots[3] = new ItemStack { item = "potion.minor", count = 2 };
+                v.slots[2] = new ItemStack { item = "potion.minor", count = 2 };   // the shared shelf's last of 3
                 Assert.IsTrue(CharacterProfile.SaveVault(root, v, out msg), msg);
                 Assert.IsTrue(store.TryRead("profile", out var now, out _)); Assert.AreEqual(2, now.formatVersion);
                 Assert.AreEqual("class.druid", CharacterProfile.LastClass(root), "the character choice came through");

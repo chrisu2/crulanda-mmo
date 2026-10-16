@@ -883,6 +883,9 @@ namespace Crulanda.World
             if (!IvyArt) { Parterre(t, size); return; }
             var r = CityRandom(t, 0x6a2d); float R() { return (float)r.NextDouble(); }
             float hx = size.x / 2, hz = size.y / 2, inX = hx - GardenHedge - GardenWalk, inZ = hz - GardenHedge - GardenWalk, lo = GardenCross + GardenBed;
+            // The gardeners' and strollers' places, as the plain parterre had them (CrownLifeTests: "gardener is sent to 'garden', which has no
+            // spot"): on the walk inside the hedge, by each quarter.
+            foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Workplace(t, "garden", new Vector3(sx * hx / 2, 0, sz * (hz - GardenHedge - GardenWalk / 2)), new Vector3(sx * hx / 2, .2f, sz * hz / 2));
             var d = new DetailSet(t, "garden", "garden"); var up = Vector3.up; var right = t.TransformDirection(Vector3.right); var fwd = t.TransformDirection(Vector3.forward);
             Vector3 W(float x, float y, float z) { return t.TransformPoint(new Vector3(x, LocalGround(t, x, z) + y, z)); }
             void Ground(Material m, float x0, float x1, float z0, float z1, float lift)

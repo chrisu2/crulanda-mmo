@@ -32,6 +32,7 @@ namespace Crulanda.World
             GameObject WallPiece(Vector3 pos, Vector3 scale) { var o = BoxPart(t, pos, scale, white); o.AddComponent<BoxCollider>(); o.AddComponent<NavBlocker>(); return o; }
             // ---------- the shell: a marble floor, the walls (each its own collider and navmesh blocker), the ceiling ----------
             Part(PrimitiveType.Cube, t, new Vector3(0, .025f, 0), new Vector3(w - wall, .05f, d - wall), Marble);
+            HallFloor(t, w - wall, d - wall, .05f);   // solid underfoot, as every hall of the Crown (CrownThronePlayTests: none here)
             WallPiece(new Vector3(0, wallH / 2, d / 2), new Vector3(w, wallH, wall));
             foreach (int s in new[] { -1, 1 }) WallPiece(new Vector3(s * w / 2, wallH / 2, 0), new Vector3(wall, wallH, d));
             float side = (w - doorW) / 2;

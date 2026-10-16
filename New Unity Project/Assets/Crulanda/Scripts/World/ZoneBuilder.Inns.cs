@@ -161,7 +161,7 @@ namespace Crulanda.World
                 // The gallery's columns: at its inner corners and two down each end.
                 foreach (int s in new[] { -1, 1 }) foreach (float z in new[] { -4.2f, 2.4f, hz - g }) p.columns.Add(new Vector2(s * (hx - g), z));
                 // The stair up the front wall to the +x gallery, from 2.8 m right of the middle.
-                p.stair = new Vector2((2.8f + hx - g) / 2, -hz + .7f); p.stairSize = new Vector2(hx - g - 2.8f, 1.4f);
+                p.stair = new Vector2((2.8f + hx - g) / 2, -hz + p.wall / 2 + 1f); p.stairSize = new Vector2(hx - g - 2.8f, 2f);   // 2 m wide from the wall's inner face (1.4 m centred on the wall's middle left 0.15 m to walk past the rail: CrownLifeTests)
                 // The booths along the -x end: a table against the wall, a settle either side, two at each.
                 foreach (float z in new[] { -4.6f, -1.6f, 1.4f })
                 {
@@ -172,7 +172,7 @@ namespace Crulanda.World
                 foreach (var at in new[] { new Vector2(-5, -5.2f), new Vector2(5.2f, -3.8f), new Vector2(-4.2f, .8f), new Vector2(3.6f, .6f), new Vector2(-.4f, -2.4f) })
                 {
                     p.tables.Add(at); p.turns.Add(45);
-                    for (int k = 0; k < 4; k++) { float a = (45 + k * 90) * Mathf.Deg2Rad; p.seats.Add((at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * SeatRadius, at)); }
+                    for (int k = 0; k < 4; k++) { float a = (45 + k * 90) * Mathf.Deg2Rad; p.seats.Add((at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * SeatRadius * 1.15f, at)); }   // on the diagonals: out past the table's corners (CrownZoneTests)
                 }
                 // Where the servers and the pot-boy wait between trays, in the aisles.
                 p.serve.Add(new Vector2(-1.6f, 3.4f)); p.serve.Add(new Vector2(1.4f, -.6f)); p.serve.Add(new Vector2(-2.6f, -4.4f));

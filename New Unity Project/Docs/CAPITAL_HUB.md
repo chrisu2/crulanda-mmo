@@ -120,3 +120,5 @@ design: a city inn of the High City (white stone and gilt, not the village's tim
 **Chris, 2026-10-16 ~00:35 (verbatim): "will need lots more npcs in the castle with real jobs like in oakhaven".** The Crown gets a
 working population as Oakhaven has (VillageWork: carriers, servants, guards' rounds, lamplighters, gardeners, clerks, cooks, grooms,
 messengers, merchants' errands), many more than the first pass's six walkers.
+**Chris, 2026-10-16 ~01:05 (verbatim): "maybe see a castle off in the distance when looking north".** From Oakhaven (whose North road
+leads to the Crown) the Crown of Argentis shows on the northern skyline: the walled plateau, the keep's spire, the dome, faint in the haze.

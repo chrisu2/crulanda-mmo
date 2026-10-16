@@ -55,7 +55,7 @@ namespace Crulanda.Encounter
                 Aim(agent, exit); return true;
             }
             var entry = way.Entry(In); float d = Flat(pos, entry);
-            if (leg == Leg.Approach && d > AskWithin) { Aim(agent, entry); return true; }
+            if (leg == Leg.Approach && d > JoinWithin(way)) { Aim(agent, entry); return true; }
             // In line from AskWithin; on the lane only from its end, or from the first place in line (ReadyWithin), so it is held just
             // for the step to its end and the walk across.
             bool ready = d < ReadyWithin || queued && lastPlace == 0 && Flat(pos, way.QueueSpot(In, 0)) < ReadyWithin;
@@ -73,6 +73,13 @@ namespace Crulanda.Encounter
         /// the lane is taken the moment it is free, and held only for the step to its end and the walk across.</summary>
         public const float ReadyWithin = 1.3f;
         bool queued; int lastPlace = -1;
+        /// <summary>
+        /// How near the lane's end one joins the line: <see cref="AskWithin"/>, or a metre past the next free place in line when the line
+        /// is longer than that. (VillageDoorTests, 2026-10-15: from the fifth in line on the line's places stand past 3.5 m back, so those
+        /// coming up behind it walked at the lane's end through the waiting, made no headway for 10 s and the watchdog gave the inn up for
+        /// a wander: Garet Moss and Osk Farrow, never in.)
+        /// </summary>
+        public float JoinWithin(ZoneDoorway way) { return Mathf.Max(AskWithin, Flat(way.QueueSpot(In, way.InLine(In)), way.Entry(In)) + 1); }
         bool Finish(NavMeshAgent agent, ZoneDoorway way, object who)
         {
             way.Release(who); leg = Leg.Done;

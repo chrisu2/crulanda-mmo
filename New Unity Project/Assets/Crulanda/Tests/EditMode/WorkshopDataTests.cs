@@ -136,8 +136,14 @@ namespace Crulanda.Tests
             int first = Array.FindIndex(z.props, p => p != null && p.name == NewProps[0]);
             var block = z.props.Skip(first).Take(NewProps.Length).Select(p => p.name).ToArray();
             CollectionAssert.AreEqual(NewProps, block, "The new props are appended together, in order.");
-            Assert.IsTrue(z.props.Skip(first + NewProps.Length).All(p => p != null && (p.kind == "training_yard" || p.kind == "training_dummy" || p.kind == "mending_dummy")),
-                "After them only what was appended later: the training yard and its dummies.");
+            // Straight after them the training field; after that only rounds appended later still (the open ground's places and
+            // the market pieces, 87e0ff83 and 402427bc): none of those is a name from before the trades or from the six.
+            var later = z.props.Skip(first + NewProps.Length).ToArray();
+            CollectionAssert.AreEqual(new[] { "training_yard", "training_dummy", "mending_dummy" }, later.Take(3).Select(p => p != null ? p.kind : null).ToArray(),
+                "After them only what was appended later: the training yard and its dummies first.");
+            var before = new HashSet<string>(z.props.Take(first).Where(p => p != null && !string.IsNullOrEmpty(p.name)).Select(p => p.name).Concat(NewProps));
+            Assert.IsTrue(later.All(p => p != null && (string.IsNullOrEmpty(p.name) || !before.Contains(p.name))),
+                "Nothing after them is a prop from before them, moved down the list.");
             foreach (var p in added)
             {
                 string q = p.name + ": "; float half = Mathf.Max(p.size.x, p.size.y) / 2, reach = Reach(p);

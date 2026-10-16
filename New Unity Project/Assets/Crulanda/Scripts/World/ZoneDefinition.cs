@@ -35,6 +35,9 @@ namespace Crulanda.World
         public ZoneProp[] props = new ZoneProp[0];
         public ZoneWasting wasting;         // only when the JSON has a "wasting" block (ZoneBuilder.ParseZone)
         public ZoneLabel[] landmarks = new ZoneLabel[0];
+        /// <summary>Far places drawn on the skyline past the world's edge (DistantSkyline; Chris, 2026-10-16: "maybe see a castle off in
+        /// the distance when looking north"): Oakhaven's view of the Crown of Argentis up its North road. Empty: none.</summary>
+        public ZoneSkyline[] skyline = new ZoneSkyline[0];
         public string[] objectives = new string[0];
         public ZoneExit[] exits = new ZoneExit[0];
         public ZoneGrove[] groves = new ZoneGrove[0];
@@ -314,7 +317,8 @@ namespace Crulanda.World
     /// spine (size: length, height), shrine (the Cult of Ash's), idol, cavern (a walk-in cave in a rocky knoll, its mouth at
     /// the prop facing -Z; variant 0 is Crowsfoot Hollow's plan; give it a level ZoneShape pad under its floor, see Hollow).
     /// rotation in degrees (0 = door faces south). variant picks colour/size variations; some are looks of their own:
-    /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), crypt 1 a turfed barrow, grave 1 heaved over.
+    /// well 1 blood-stone, inn 1 the Cracked Hearth (split, glowing chimney), inn 2 a waystation (one storey, a long table and bunks),
+    /// crypt 1 a turfed barrow, grave 1 heaved over.
     /// A city's (ZoneBuilder.Crown, the Crown of Argentis): council_keep, dome_hall, archive, mansion (variant 0 the Exchange, 1 the
     /// Treasury, 2 the Hall of Arms, 3 the Armoury), guild_hall (variant: the guild, SimGuilds' order) walk in; gilt_house, colonnade,
     /// fountain, statue, city_lamp, council_banner, parterre, stair (treads over a ramp terrace), city_wall (uses points; variant 0 the
@@ -352,8 +356,13 @@ namespace Crulanda.World
         public string joins;
         /// <summary>How the Sealed Adit dresses a cavern of variant 2 (ZoneBuilder.Adit): "main" (the Workings, the Gallery, the stair and
         /// the Rail Hall), "geode", "vent", "breach", or any other word for a plain cave of lamps and rubble. Empty: by its name, as the
-        /// first Adit's caves were.</summary>
+        /// first Adit's caves were. A treehouse of style "inn" is walked into: its round house has a double door and seats (the Shore's
+        /// Hearth-Tree, Phase 8.6, 2026-10-15).</summary>
         public string style;
+        /// <summary>The kind of prop that stood here before it was raised again (2026-10-15: "ruined_house", Wain's Rest as a waystation):
+        /// it takes that kind's draws from the zone's stream and counts as that kind did for the camps' ground (ZoneBuilder.MobGround),
+        /// so nothing else in the zone moves.</summary>
+        public string was;
     }
     /// <summary>
     /// A deck in a cave (GAME-ONLY; the Adit rework, ZoneBuilder.AditDecks): a walkable way of planks, cut stone, rope or scree, running
@@ -486,7 +495,15 @@ namespace Crulanda.World
     /// (unset: from its south-west); viewPitch and viewZoom set that shot's camera (0: 17 degrees, 11 m). ground (optional):
     /// "licked" paints the place's ground smooth and uncracked in an ash zone (the Unwoven Flats); paint only.
     /// </summary>
-    [Serializable] public sealed class ZoneLabel { public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; public string ground; }   // canonStatus: CANON / CANON-EXPANDED / GAME-ONLY / PROVISIONAL
+    /// viewHeight (optional, p9-cityinn): the shot is taken from a free camera that many metres over the ground at view, aimed at the
+    /// landmark viewAim metres over its ground (a city seen whole from high over its walls), not from the player's orbit camera.
+    [Serializable] public sealed class ZoneLabel { public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; public string ground; public float viewHeight, viewAim; }
+    /// <summary>
+    /// A far place on the skyline (DistantSkyline): kind ("crown": the Crown of Argentis on its mountain), bearing from the zone's middle
+    /// in degrees (0 north, 90 east), distance in reaches past the zone's middle (the zone's half plus its backdrop; 0: 1.75, past the
+    /// forest ring and in front of the far ranges), scale (0: 1), name and canonStatus for the record. Never reached; nothing solid.
+    /// </summary>
+    [Serializable] public sealed class ZoneSkyline { public string kind, name, canonStatus; public float bearing, distance, scale; }   // canonStatus: CANON / CANON-EXPANDED / GAME-ONLY / PROVISIONAL
 
     public static class ZoneColors
     {

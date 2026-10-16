@@ -114,7 +114,7 @@ namespace Crulanda.Encounter
             {
                 string role = Roles[i % Roles.Length], need = Needs(role);
                 // Out of work: a trade whose workplace this village lacks. Where there is an inn they drink; elsewhere they gossip.
-                if (need != null && Places[need].Count == 0) role = Places["inn"].Count > 0 ? "drinker" : "gossip";
+                if (need != null && Places[need].Count == 0) role = Tavern ? "drinker" : "gossip";
                 var start = RandomPlace(role == "drinker" ? "inn" : "green") ?? Zone.Ground(z.spawns.recovery);
                 var names = z.life.names != null && z.life.names.Length > 0 ? z.life.names : Names;
                 string name = names[i % names.Length];
@@ -481,6 +481,9 @@ namespace Crulanda.Encounter
                 case "woods": return "in the woods"; case "meadow": return "out on the hill gathering"; case "green": return "on the green";
                 case "well": return "at the well"; case "inn": case "bar": case "kitchen": case "kitchendoor": case "passedout": return "at the inn";
                 case "yard": case "herd": return "with the hens";
+                case "keep": return "at the Keep"; case "councilhall": return "at the Council Hall"; case "archive": return "in the Archive";
+                case "exchange": return "at the Exchange"; case "treasury": return "at the Treasury"; case "guildhall": return "at the guild hall";
+                case "gate": return "at the gate"; case "garden": return "in the gardens"; case "street": case "lamp": return "about the streets"; case "serve": return "at the inn";
                 default: return null;
             }
         }
@@ -529,7 +532,7 @@ namespace Crulanda.Encounter
             int space = name.IndexOf(' ');
             if (space < 0) return name;
             string first = name.Substring(0, space);
-            return first == "Old" || first == "Goody" || first == "Warden" || first == "Sister" ? name : first;
+            return first == "Old" || first == "Goody" || first == "Warden" || first == "Sister" || first == "Lord" || first == "Lady" ? name : first;   // the Crown's lords and ladies go by their whole name
         }
         /// <summary>Hens lay through the working day, one egg each at most; the count resets before dawn. The water pan dries out. The
         /// purses keep their day (<see cref="Purses"/>).</summary>
@@ -538,6 +541,7 @@ namespace Crulanda.Encounter
         void Update() { using (perfMark.Auto()) UpdateTimed(); }
         void UpdateTimed()
         {
+            NightDoors();
             foreach (var coop in Zone.Coops) coop.Dry(Time.deltaTime / 420);   // a pan lasts about four hours
             PlowTeam.Tend(this);   // the plough team out on a bare field by day (note 150)
             if (Time.time < nextLay) return;
@@ -553,6 +557,19 @@ namespace Crulanda.Encounter
             Purses();
         }
         float nextLay;
+        /// <summary>
+        /// After the innkeeper's bedtime one leaf of each inn's double door is shut and the other left open till he is up, so the late
+        /// drinkers go out one at a time (Phase 8.6 plan 3a: "the look of a village at night, not a bug"). Only a door standing open is
+        /// touched: one you shut stays shut, one you open stays open till the hour turns.
+        /// </summary>
+        void NightDoors()
+        {
+            bool late = WorldClock.Between(VillageWork.InnkeeperBed, VillageWork.InnkeeperUp);
+            if (lateDoors == late) return;
+            lateDoors = late;
+            foreach (var inn in Zone.Inns) if (inn != null && inn.door != null && inn.door.Open) inn.door.SetHalfShut(late);
+        }
+        bool? lateDoors;
         public IEnumerable<Critter> HensOf(ZoneCoop coop) { foreach (var c in Critters) if (c.Coop == coop) yield return c; }
         void OnDestroy() { if (Active == this) Active = null; }
         public Villager Find(string name) { return Villagers.Find(v => v.Name == name); }
@@ -561,6 +578,9 @@ namespace Crulanda.Encounter
         {
             var z = Zone.Zone;
             foreach (var key in new[] { "field", "well", "green", "inn", "mill", "wander", "forge", "stall", "oven", "tannery", "woodpile", "woods", "meadow", "leathershop", "dryhut", "kitchen", "kitchendoor", "bar", "lodge", "bench" }) Places[key] = new List<Vector3>();
+            // A city's places (the Crown, p9-cityinn): the halls' desks and floors, the gate's yard, the lamps and the parterres are
+            // registered by the builder (ZoneBuilder.Crown); the streets are drawn from the roads below and the fountains are its wells.
+            foreach (var key in CityPlaces) Places[key] = new List<Vector3>();
             // Trade workplaces (exact stand points, with where to look while working, and whose place it is).
             foreach (var w in Zone.Workplaces)
                 if (NavMesh.SamplePosition(w.stand, out var wh, 1.5f, NavMesh.AllAreas)) { Places[w.kind].Add(wh.position); faceAt[wh.position] = w.look; placeName[wh.position] = w.name; }
@@ -602,26 +622,50 @@ namespace Crulanda.Encounter
                 if (prop == null) continue;
                 if (prop.kind == "well") for (int i = 0; i < 3; i++) { float a = i * 2.1f; AddPlace("well", prop.at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * 2.3f); }
                 if (prop.kind == "mill") AddPlace("mill", prop.at + new Vector2(0, -(prop.size.y > 0 ? prop.size.y : 6) / 2 - 2));
+                // A city's fountain is its well: four places round the basin's rim (ZoneBuilder.Fountain: 4.6 m for the Crown Square's, else 3).
+                if (prop.kind == "fountain") for (int i = 0; i < 4; i++) { float a = (i + .5f) * Mathf.PI / 2; AddPlace("well", prop.at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * ((prop.variant == 1 ? 4.6f : 3) + 1.3f)); }
             }
+            if (z.city) Streets(z);
             if (z.clearings.Length > 0)
             {
                 var green = z.clearings[0];
                 for (int i = 0; i < 8; i++) { float a = i * Mathf.PI / 4; AddPlace("green", green.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * Mathf.Max(3, green.radius - 3)); }
             }
-            // Inside the inn: seats around the tables and a spot at the bar (same layout as ZoneBuilder.Inn).
-            foreach (var door in Zone.Doors)
-            {
-                if (!door.openable || door.hinge == null) continue;
-                var inn = door.hinge.parent;
-                foreach (var table in new[] { new Vector2(2.2f, -1.6f), new Vector2(2.8f, 1.3f), new Vector2(-2.8f, -1.9f) })
-                    for (int k = 0; k < 3; k++)
+            // Inside the inns: the seats at the tables, the stools at the bar and the bench by the hearth, as the builder laid them out
+            // and registered them (ZoneBuilder.Inns; Phase 8.6, 2026-10-15: the layout was written here a second time before, and the
+            // two could drift apart). Each faces its table, the bar or the fire (playtest note 30).
+            foreach (var inn in Zone.Inns)
+                foreach (var seats in new[] { inn.seats, inn.bar, inn.bench })
+                    foreach (var seat in seats)
                     {
-                        float a = k * 120 * Mathf.Deg2Rad; int had = Places["inn"].Count;
-                        AddPlace("inn", inn.TransformPoint(new Vector3(table.x + Mathf.Cos(a) * .95f, 0, table.y + Mathf.Sin(a) * .95f)), true);
-                        if (Places["inn"].Count > had) faceAt[Places["inn"][had]] = inn.TransformPoint(new Vector3(table.x, 0, table.y));   // a seat faces its table (playtest note 30)
+                        int had = Places["inn"].Count;
+                        AddPlace("inn", seat.at, true);
+                        if (Places["inn"].Count > had) faceAt[Places["inn"][had]] = seat.face;
                     }
+            // A city's folk wander its streets and squares: points thrown over the whole flat would land below the walls, where nobody
+            // can walk to them (the Crown stands on its plateau over the Lowtowns).
+            if (z.city) { Places["wander"].AddRange(Places["street"]); Places["wander"].AddRange(Places["green"]); }
+            else for (int i = 0; i < 24; i++) AddPlace("wander", new Vector2((R01 - .5f) * z.flatRadius * 1.6f, (R01 - .5f) * z.flatRadius * 1.6f));
+        }
+        /// <summary>The kinds of place a city adds (see <see cref="VillageWork"/>'s Crown trades).</summary>
+        public static readonly string[] CityPlaces = { "keep", "councilhall", "archive", "exchange", "treasury", "guildhall", "gate", "lamp", "garden", "street", "serve" };
+        /// <summary>A city's streets: a place every 12 m along each road, on alternate sides a metre in from its edge (the sweepers' beat,
+        /// the pages' and the nobles' strolls). Draws nothing random.</summary>
+        void Streets(ZoneDefinition z)
+        {
+            int n = 0;
+            foreach (var r in z.roads)
+            {
+                if (r == null || r.points == null || r.points.Length < 2) continue;
+                float carry = 6;
+                for (int i = 0; i + 1 < r.points.Length; i++)
+                {
+                    Vector2 a = r.points[i], b = r.points[i + 1], d = b - a; float len = d.magnitude; if (len < .1f) continue; d /= len;
+                    var side = new Vector2(-d.y, d.x);
+                    for (float s = carry; s < len; s += 12, n++) AddPlace("street", a + d * s + side * (n % 2 == 0 ? 1 : -1) * Mathf.Max(0, r.width / 2 - 1));
+                    carry = Mathf.Repeat(carry - len, 12);
+                }
             }
-            for (int i = 0; i < 24; i++) AddPlace("wander", new Vector2((R01 - .5f) * z.flatRadius * 1.6f, (R01 - .5f) * z.flatRadius * 1.6f));
         }
         /// <summary>How far from the village's middle its people go to work the fields, cut wood or walk the meadows: the farms and
         /// woods past it (a grown zone's outer ring) are the wild's, not a day's errand.</summary>
@@ -690,7 +734,10 @@ namespace Crulanda.Encounter
         // ---------- the village's stock: goods carried between the trades ----------
         /// <summary>What is left in yesterday's cask at the inn each morning, in tankards (the merchant brings a fresh one: "a cask for the inn").</summary>
         public const int MorningAle = 10;
-        void MorningCask() { if (Places.TryGetValue("inn", out var seats) && seats.Count > 0) Stock["inn.ale"] = MorningAle; }
+        void MorningCask() { if (Tavern) Stock["inn.ale"] = MorningAle; }
+        /// <summary>The village has a tavern: a bar, a cask and an innkeeper (the Golden Cask, the Cracked Hearth), so out-of-work folk drink
+        /// there and the inn's news is talked of. A waystation or the Keepers' hearth-house is somewhere to sit and rest, no more (2026-10-15).</summary>
+        public bool Tavern { get { return Zone != null && Zone.Inns.Exists(i => i != null && i.Staffed); } }
         /// <summary>What has been delivered where today, by "place.good" (inn.eggs, stall.flour, forge.wood...); see <see cref="VillageWork"/>.</summary>
         public readonly Dictionary<string, int> Stock = new Dictionary<string, int>();
         public int Count(string key) { return Stock.TryGetValue(key, out var n) ? n : 0; }
@@ -899,10 +946,10 @@ namespace Crulanda.Encounter
                     return Count("forge.wood") > 0 ? "The woodcutter brought oak this morning. Hearth's drawing well." : null;
                 case "miller": return Count("mill.grain") > 0 ? "Barley's in from the fields. The stone's turning on something, at least." : null;
                 case "leatherworker": case "skinner": return Count("sold.tannery.hides") > 0 ? "Somebody's been selling pelts in the village. Clean ones, too; not a grey edge among them." : Count("tannery.hides") > 0 ? "The hunter's been by with a hide. Grey at one edge; the rest'll do." : null;
-                case "innkeeper": return Places["inn"].Count > 0 && Count("inn.ale") == 0 ? "Dry. Ama's cask never sees the night out." : Count("sold.inn.meat") > 0 ? MeatSoldInnkeeper : Count("inn.meat") > 0 ? "Garet's hares are in the pot. Don't tell the out-of-work." : null;
+                case "innkeeper": return Tavern && Count("inn.ale") == 0 ? "Dry. Ama's cask never sees the night out." : Count("sold.inn.meat") > 0 ? MeatSoldInnkeeper : Count("inn.meat") > 0 ? "Garet's hares are in the pot. Don't tell the out-of-work." : null;
                 case "henwife": return Count("stall.eggs") > 0 ? "Eggs are at the produce stall if you're wanting any. I don't sell from the yard." : Count("inn.eggs") > 0 ? "Took the Cask its eggs this morning. The rest go to the stall after dinner." : null;
                 case "drinker": case "elder": case "gossip": case "farmer":
-                    if (Places["inn"].Count == 0) return null;   // all of it is the inn's news, and a camp with no inn has none (meat sold there is only sold)
+                    if (!Tavern) return null;   // all of it is the inn's news, and a camp with no tavern has none (meat sold there is only sold; a waystation keeps no pot)
                     return Count("inn.ale") == 0 ? "The cask's run dry at the inn. The out-of-work drank it by supper." : Count("sold.inn.meat") > 0 ? MeatSoldLine : Count("inn.meat") > 0 ? "Hare in the Cask's pot tonight. The hunter's doing." : Count("inn.bread") > 0 && Count("inn.eggs") > 0 ? "Bread and eggs at the Cask today. Like old times, nearly." : Count("inn.wood") > 0 ? "The Cask's got a fire going. Dry oak, for once." : null;
                 default: return null;
             }
@@ -1017,7 +1064,7 @@ namespace Crulanda.Encounter
             v.Keeper = look == "keeper";
             // A Council warden of the Crown (look "concord"): the Concord's warden in its white tabard, friendly (ZoneBuilder.Crown; GAME-ONLY).
             bool concord = look == "concord";
-            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper || concord ? null : role);
+            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper || concord ? null : VillageWork.OutfitOf(role));
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace;
             v.Coop = coop; v.Fold = fold;
@@ -1026,6 +1073,7 @@ namespace Crulanda.Encounter
             // but the drinkers.
             v.bedAt = role == "drinker" ? 23 + (index % 3) * .3f : role == "child" ? 19.8f + (index % 3) * .2f : role == "henwife" ? HerdHour : role == "baker" ? 19.6f : role == "hunter" && life.Places["lodge"].Count > 0 ? HunterBed : role == "innkeeper" ? VillageWork.InnkeeperBed : 20.2f + (index % 5) * .25f;
             v.wakeAt = role == "drinker" ? 7.5f : role == "henwife" ? 5.7f : role == "baker" ? 4.6f : role == "innkeeper" ? VillageWork.InnkeeperUp : 5.8f + (index % 5) * .3f;
+            var hours = VillageWork.HoursOf(role); if (hours.HasValue) { v.bedAt = hours.Value.x; v.wakeAt = hours.Value.y; }   // the Crown's late and night trades
             if (fixedPlace != null) v.bedAt = v.wakeAt = 0;   // residents keep their post day and night
             v.lastHour = WorldClock.Hour; v.index = index; v.tolerance = .85f + (index % 5) * .18f;
             go.SetActive(true);
@@ -1056,7 +1104,62 @@ namespace Crulanda.Encounter
             if (!agent.enabled || !agent.isOnNavMesh) return;
             float reel = Reeling; visual.Stagger = reel; ShowTankard(false);
             agent.speed = (Role == "child" ? 1.9f : Role == "elder" ? 1.1f : 1.6f) * speedScale * (1 - .35f * reel);
-            agent.isStopped = false; agent.SetDestination(target); state = State.Travel; visual.Pose = ActorPose.None;
+            // Through an inn's doorway by its lane (Phase 8.6 step 2, DoorwayRoute): first to the lane's end, the rest once through.
+            DropRoute(); route = DoorwayRoute.Plan(life.Zone, transform.position, target);
+            agent.isStopped = false; agent.SetDestination(route != null ? route.Start : target); state = State.Travel; visual.Pose = ActorPose.None;
+            headway.Reset(transform.position, Time.time);
+        }
+        // ---------- the doorway, the watchdog, giving way (Phase 8.6 step 2 and decision 13, 2026-10-15) ----------
+        DoorwayRoute route; readonly Headway headway = new Headway(); float nextGiveWay; bool walkingSet; int prioritySet = -1;
+        /// <summary>On the way through an inn's doorway (in line for its lane, or on it), or null.</summary>
+        public DoorwayRoute Route { get { return route; } }
+        /// <summary>On the way somewhere (walking, in line at a doorway, or fleeing), not stopped at what they came for.</summary>
+        public bool Travelling { get { return state == State.Travel || state == State.Flee; } }
+        void DropRoute() { if (route != null) { route.Drop(this); route = null; } }
+        /// <summary>How pressed they are at a doorway (ZoneDoorway): a carrier with a load and the innkeeper first, then villagers, then
+        /// idlers (the out-of-work done for the day, those wandering).</summary>
+        int Rank { get { return Carrying || Role == "innkeeper" || state == State.Flee ? ZoneDoorway.Carrier : spent || activity == "wander" || activity == "sleepitoff" ? ZoneDoorway.Idler : ZoneDoorway.Villager; } }
+        /// <summary>
+        /// Walking, each gives way by how pressed they are (the crowd's avoidance: lower goes first): a carrier and the innkeeper 40,
+        /// villagers 60, idlers 90 (the sims 80). Stopped (at a seat, the bar, a workplace), they no longer avoid anyone, so nobody
+        /// walking by shoves them off their seat, and they rank above every walker (30), so the walkers steer round them as round a
+        /// post (Phase 8.6 plan 3a: "walkers are never pushed by the seated"; at 99, as the plan first had it, the walkers' avoidance
+        /// would ignore them and walk through them).
+        /// </summary>
+        void Avoid()
+        {
+            bool moving = state == State.Travel || state == State.Flee; int rank = Rank;
+            int priority = state == State.Hidden ? 99 : !moving ? 30 : rank == ZoneDoorway.Carrier ? 40 : rank == ZoneDoorway.Idler ? 90 : 60;   // indoors (no body): nobody steers round them
+            if (moving == walkingSet && priority == prioritySet) return;
+            walkingSet = moving; prioritySet = priority;
+            agent.obstacleAvoidanceType = moving ? ObstacleAvoidanceType.HighQualityObstacleAvoidance : ObstacleAvoidanceType.NoObstacleAvoidance;
+            agent.avoidancePriority = priority;
+        }
+        /// <summary>The watchdog on a walk: three seconds without headway, a step aside and the path again; ten, the errand given up as a
+        /// path that cannot reach (Stranded) gives it up. True when it gave up.</summary>
+        bool Watch()
+        {
+            float now = Time.time;
+            headway.Tick(transform.position, agent.pathPending ? float.MaxValue : agent.remainingDistance, now);
+            if (headway.Lost(now))
+            {
+                partner = null; CancelErrand(false); DropRoute(); activity = "wander"; headway.Reset(transform.position, now);
+                var alt = life.RandomPlace("wander"); if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = now + 5; }
+                return true;
+            }
+            if (headway.StepDue(now)) headway.BeginStep(agent);
+            return false;
+        }
+        /// <summary>Folk taking their ease (on the green, at the well, wandering) step aside too; those at work or sat down do not.</summary>
+        bool Idle { get { return state == State.Activity && (activity == "green" || activity == "well" || activity == "wander"); } }
+        /// <summary>Tests: sent to a place of this kind now, as a shift would send them (VillageDoorTests: an evening at the Cask).</summary>
+        public bool SendTo(string place)
+        {
+            if (!agent.isOnNavMesh || !life.Places.TryGetValue(place, out var list) || list.Count == 0) return false;
+            var spot = life.RandomPlace(place, this); if (!spot.HasValue) return false;
+            foreach (var r in renderers) r.enabled = true;
+            CancelErrand(); enabled = true; indoors = false; Bubble = null;
+            activity = place; until = Time.time + 60; Go(spot.Value); return true;
         }
         /// <summary>
         /// What next: bed when it is time; a resident's post; the errand that is due (see <see cref="VillageWork"/>); otherwise one of
@@ -1078,7 +1181,8 @@ namespace Crulanda.Encounter
             if (Role == "drinker" && DrinkerNext()) return;
             if (StartErrand()) return;
             var shift = VillageWork.ShiftFor(Role, WorldClock.Hour);
-            GoTo(shift != null ? VillageWork.PlacesFor(shift, Role, life.Places["lodge"].Count > 0) : Role == "child" ? new[] { "green", "green", "wander", "wander", "well" } : new[] { "wander", "green" });
+            var places = shift != null ? VillageWork.PlacesFor(shift, Role, life.Places["lodge"].Count > 0) : Role == "child" ? new[] { "green", "green", "wander", "wander", "well" } : new[] { "wander", "green" };
+            GoTo(GiveWay.Shelter(places, Role, life.Places["inn"].Count > 0));   // in the rain, under a roof (decision 13)
         }
         /// <summary>Walk to one of these kinds of place (a repeat weights the choice; a kind this village lacks is passed over).</summary>
         void GoTo(string[] options)
@@ -1187,7 +1291,7 @@ namespace Crulanda.Encounter
         void CancelErrand(bool again = true)
         {
             if (errand != null && errand.need != null && life.ErrandEnded(this, errand, leg > 0, again)) done.Remove(errand.id);
-            errand = null; goingIn = false; DropLoad();
+            errand = null; goingIn = false; DropLoad(); DropRoute();
         }
         /// <summary>An errand's place is there but nobody can get near it for the grey-coats: say so, and let it go for today.</summary>
         void Blocked(string place)
@@ -1266,7 +1370,7 @@ namespace Crulanda.Encounter
         void Carry(Load what, int count)
         {
             DropLoad(); loadKind = what; loadCount = count; load = LoadProps.Build(transform, what, count);
-            if (visual != null) visual.Carry = what == Load.Bread || what == Load.Goods ? ActorVisual.Carrying.Front : what == Load.Grain || what == Load.Flour || what == Load.Logs ? ActorVisual.Carrying.Shoulder : ActorVisual.Carrying.Side;
+            if (visual != null) visual.Carry = what == Load.Bread || what == Load.Goods || what == Load.Papers ? ActorVisual.Carrying.Front : what == Load.Grain || what == Load.Flour || what == Load.Logs ? ActorVisual.Carrying.Shoulder : ActorVisual.Carrying.Side;
         }
         /// <summary>Puts down whatever is carried (the capture tools' farmer frames: a load puts the trade's tool away).</summary>
         public void PutDownLoad() { DropLoad(); }
@@ -1332,6 +1436,16 @@ namespace Crulanda.Encounter
                 case "woodpile": return ActorPose.Chop;
                 case "woods": return Role == "lumberjack" ? ActorPose.Chop : Role == "hunter" || Role == "warden" ? ActorPose.None : ActorPose.Gather;
                 case "meadow": return Role == "hunter" ? ActorPose.None : ActorPose.Gather;
+                // The Crown's (p9-cityinn): at a desk, the clerks and scribes write; at the gate and the Exchange the porters lift; the
+                // guards stand their watch; the gardeners kneel at the beds, the sweepers sweep, the lamplighter reaches up to a lamp.
+                case "archive": return ActorPose.Knead;
+                case "keep": return Role == "clerk" || Role == "scribe" ? ActorPose.Knead : ActorPose.Talk;
+                case "councilhall": case "guildhall": case "serve": return ActorPose.Talk;
+                case "exchange": case "gate": return Role == "porter" ? ActorPose.Work : ActorPose.Talk;
+                case "treasury": return Role == "porter" ? ActorPose.Work : Role == "vaultguard" || Role == "nightguard" ? ActorPose.None : ActorPose.Talk;
+                case "garden": return Role == "gardener" ? ActorPose.Gather : ActorPose.None;
+                case "street": return Role == "sweeper" ? ActorPose.Work : ActorPose.None;
+                case "lamp": return Role == "lamplighter" ? ActorPose.Work : ActorPose.None;
                 default: return ActorPose.None;
             }
         }
@@ -1339,6 +1453,7 @@ namespace Crulanda.Encounter
         /// hides where it stopped and is not counted at home (see the flee branch of Update).</summary>
         void Hide()
         {
+            DropRoute();
             state = State.Hidden; indoors = true; calmSince = Time.time; foreach (var r in renderers) r.enabled = false;
             DropLoad(); ShowTankard(false);   // the goods put away in the pantry
             if (agent.isOnNavMesh) agent.isStopped = true; Bubble = null;
@@ -1508,9 +1623,11 @@ namespace Crulanda.Encounter
         void Flee()
         {
             state = State.Flee; visual.Pose = ActorPose.None; Say(life.R01 < .5f ? "Run! Get inside!" : "Collectors! Hide!", 3);
-            if (home != null && agent.isOnNavMesh) { agent.speed = 4; agent.isStopped = false; agent.SetDestination(home.position); }
+            DropRoute();
+            if (home != null && agent.isOnNavMesh) { agent.speed = 4; agent.isStopped = false; route = DoorwayRoute.Plan(life.Zone, transform.position, home.position); agent.SetDestination(route != null ? route.Start : home.position); }
             else { state = State.Activity; visual.Pose = ActorPose.Cower; until = Time.time + 8; }
         }
+        void OnDisable() { DropRoute(); }   // off the doorway's lane and out of its line
         /// <summary>Tests: where the villager is in its day (state, path, destination), for a failure's message.</summary>
         public string Trace { get { return state + "/" + activity + " until " + (until - Time.time).ToString("0") + "s, " + (agent == null ? "no agent" : !agent.enabled ? "agent off" : !agent.isOnNavMesh ? "off mesh" : agent.pathStatus + " dest " + agent.destination.ToString("0") + " left " + agent.remainingDistance.ToString("0.0") + (agent.isStopped ? " stopped" : "")) + " at " + transform.position.ToString("0"); } }
         bool Arrived { get { return agent.enabled && agent.isOnNavMesh && !agent.pathPending && agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance <= agent.stoppingDistance + .25f; } }
@@ -1523,6 +1640,7 @@ namespace Crulanda.Encounter
         {
             if (life == null || !agent.isOnNavMesh) return;
             bool danger = life.Danger(transform.position);
+            Avoid();
             if (state == State.Hidden)
             {
                 if (danger) calmSince = Time.time;
@@ -1534,6 +1652,7 @@ namespace Crulanda.Encounter
             }
             if (state == State.Flee)
             {
+                if (route != null) { if (route.Tick(agent, this, ZoneDoorway.Carrier, Time.time)) return; route = null; }   // in at the inn's door first (the innkeeper's home is upstairs)
                 // Only a flight that reached the door counts as indoors; one stranded short of it hides where it stopped.
                 if (Arrived || Stranded) { activity = "fled"; Hide(); var d = transform.position - home.position; d.y = 0; indoors = d.magnitude < 3.5f; }
                 return;
@@ -1555,15 +1674,27 @@ namespace Crulanda.Encounter
             }
             if (held)
             {
-                held = false; visual.Pose = heldPose;
+                held = false; visual.Pose = heldPose; headway.Reset(transform.position, Time.time);   // a talk is no stall
                 if (state == State.Travel && agent.isOnNavMesh && heldDestination.HasValue) { agent.isStopped = false; agent.SetDestination(heldDestination.Value); }
                 until = Mathf.Max(until, Time.time + 3);
             }
             if (Interrupted) { partner = null; ChooseNext(); return; }
+            // Out of the way of you and your party (decision 13): a step a metre off your line, walking or taking their ease.
+            if ((state == State.Travel || Idle) && !PassedOut && Time.time >= nextGiveWay && GiveWay.Due(life.Session, transform.position, out var aside))
+            { nextGiveWay = Time.time + 3; headway.BeginStep(agent, aside, GiveWay.Step); }
+            headway.Steer(agent, Time.deltaTime);
+            // Through an inn's doorway: the lane's end, in line for it (still on purpose), on it, then on to where they were going.
+            if (state == State.Travel && route != null)
+            {
+                if (route.Tick(agent, this, Rank, Time.time)) { if (route.Waiting) headway.Reset(transform.position, Time.time); else Watch(); BarkAtPlayer(); return; }
+                route = null;
+            }
             if (state == State.Travel && Stranded) { partner = null; CancelErrand(false); activity = "wander"; var alt = life.RandomPlace("wander"); if (alt.HasValue) Go(alt.Value); else { state = State.Activity; until = Time.time + 5; } return; }
             if (state == State.Travel && Arrived) StartActivity();
+            if (state == State.Travel && Watch()) return;
             if (state == State.Activity)
             {
+                if (Idle && GiveWay.Raining && until > Time.time + 6) until = Time.time + 6;   // caught in the rain at their ease: off under a roof
                 if (activity == "green" || activity == "well") Chat();
                 if (activity == "field") FieldStep();
                 if (activity == "herd") Herd();

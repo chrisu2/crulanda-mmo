@@ -2076,6 +2076,7 @@ namespace Crulanda.Encounter
                 Crulanda.World.ZoneDoor best = null; float bestDistance = DoorRange;
                 foreach (var door in Zone.Doors)
                 {
+                    if (door.kind == "bunk") continue;   // a waystation's bunks are a bed, not a door (2026-10-15)
                     float dist = Vector3.Distance(Player.transform.position, door.position);
                     if (dist < bestDistance) { best = door; bestDistance = dist; }
                 }

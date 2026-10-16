@@ -47,11 +47,13 @@ namespace Crulanda.Tests
         /// <summary>Buildings of a home's kind that are the enemy's own: the Sandthrone's toll-house in the Peaks.</summary>
         static readonly string[] EnemyBuildings = { "Toll-house" };
         /// <summary>Where people live, in any zone: a house, an inn, a mill, a treehouse, a shelter, and whatever a household
-        /// names as its house (Moss's lodge is a barn). As tools/wip/zonegrowth/rule120.py counts them, less the enemy's own.</summary>
+        /// names as its house (Moss's lodge is a barn). As tools/wip/zonegrowth/rule120.py counts them, less the enemy's own and a
+        /// building raised over a ruin nobody lives in (Wain's Rest, a waystation since 2026-10-15: its keeper is long gone, the
+        /// waybook says; it stood a ruin when the camps were placed).</summary>
         static List<ZoneProp> Homes(ZoneDefinition z)
         {
             var named = new HashSet<string>(z.life.households.Where(h => h != null && !string.IsNullOrEmpty(h.house)).Select(h => h.house));
-            return z.props.Where(p => p != null && System.Array.IndexOf(EnemyBuildings, p.name) < 0
+            return z.props.Where(p => p != null && System.Array.IndexOf(EnemyBuildings, p.name) < 0 && p.was != "ruined_house"
                 && (p.kind == "house" || p.kind == "inn" || p.kind == "mill" || p.kind == "treehouse" || p.kind == "shelter" || (!string.IsNullOrEmpty(p.name) && named.Contains(p.name)))).ToList();
         }
         /// <summary>

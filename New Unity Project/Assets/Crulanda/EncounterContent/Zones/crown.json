@@ -364,11 +364,13 @@
       "radius": 12,
       "canonStatus": "GAME-ONLY",
       "view": {
-        "x": 38,
-        "y": 98
+        "x": 28,
+        "y": 90
       },
       "viewPitch": 16,
-      "viewZoom": 24
+      "viewZoom": 24,
+      "viewHeight": 14,
+      "viewAim": 15
     },
     {
       "name": "The Archive",
@@ -452,19 +454,21 @@
     },
     {
       "name": "The Gilded Lantern",
-      "text": "The Crown's inn, where the guilds drink after a run.",
+      "text": "The Crown's inn: white stone, a gallery round the taproom, a lantern on the roof.",
       "at": {
-        "x": 30,
-        "y": 24
+        "x": 31,
+        "y": 31
       },
-      "radius": 8,
+      "radius": 12,
       "canonStatus": "GAME-ONLY",
       "view": {
-        "x": 24,
-        "y": 12
+        "x": 18,
+        "y": 11
       },
       "viewPitch": 12,
-      "viewZoom": 12
+      "viewZoom": 14,
+      "viewHeight": 6.5,
+      "viewAim": 4.5
     },
     {
       "name": "The Hall of Arms",
@@ -532,7 +536,7 @@
     },
     {
       "name": "The Crown of Argentis",
-      "text": "The High City from the south-east, as the old maps draw it.",
+      "text": "The High City from high in the south-east, as the old maps draw it: the keep's spire, the dome, the Archive.",
       "at": {
         "x": 0,
         "y": 60
@@ -540,11 +544,13 @@
       "radius": 18,
       "canonStatus": "CANON",
       "view": {
-        "x": 150,
-        "y": -20
+        "x": 155,
+        "y": -90
       },
       "viewPitch": 22,
-      "viewZoom": 60
+      "viewZoom": 60,
+      "viewHeight": 110,
+      "viewAim": 30
     }
   ],
   "props": [
@@ -1063,12 +1069,12 @@
       "kind": "inn",
       "name": "The Gilded Lantern",
       "at": {
-        "x": 30,
-        "y": 24
+        "x": 31,
+        "y": 31
       },
       "size": {
-        "x": 14,
-        "y": 9
+        "x": 22,
+        "y": 16
       },
       "variant": 3
     },
@@ -2036,13 +2042,13 @@
         "role": "innkeeper",
         "title": "Innkeeper",
         "at": {
-          "x": 28.3,
-          "y": 27.1
+          "x": 34.7,
+          "y": 37.3
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
-          "Gilded by name. The ale's honest, and so am I, mostly.",
-          "Every guild in the Row drinks here after a run. I keep the tables apart."
+          "Gilded by name, and by the Council's leave: the lantern on my roof was lit the year the charter was signed.",
+          "Every guild in the Row drinks here after a run. I keep the tables apart, and the gallery for those who'd rather not be seen."
         ]
       },
       {
@@ -2523,6 +2529,778 @@
         "stories": [
           "I climbed the wall by the Gilt Garden once. You can see the whole sea. And the smoke.",
           "Mother says the sea serpents on the old maps are real. I've never seen one. I look every day."
+        ]
+      },
+      {
+        "name": "Wendel Asper",
+        "role": "clerk",
+        "title": "Council Clerk",
+        "place": "keep",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Three copies of everything. One for the Hall, one for the Archive, one for the fire when the Council changes its mind.",
+          "The High Councilor signs with a quill older than I am. I sharpen it every morning. He has never noticed."
+        ]
+      },
+      {
+        "name": "Hollis Fane",
+        "role": "clerk",
+        "title": "Council Clerk",
+        "place": "keep",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I carry the edicts across the square at eight. People read my face to guess what's in them. I keep it very still.",
+          "My father was a clerk in the Lowtowns' tithe office. He came up the Low Stair once, for my oath. He never came up again."
+        ]
+      },
+      {
+        "name": "Imogen Sware",
+        "role": "clerk",
+        "title": "Council Clerk",
+        "place": "councilhall",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The resonance registers go to the Archive sealed. I've never seen inside one. I'm told that's a mercy.",
+          "Wendel's my husband. We met over a misfiled petition. It's still misfiled; we keep it for luck."
+        ]
+      },
+      {
+        "name": "Piers Lathom",
+        "role": "clerk",
+        "title": "Council Clerk",
+        "place": "keep",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The petitions queue from the fountain at dawn. I read the first line of each. Most of them start with 'Please'.",
+          "The Archive answers every query in writing. At length. Usually in the negative."
+        ]
+      },
+      {
+        "name": "Odile Marchbank",
+        "role": "scribe",
+        "title": "Scribe of the Archive",
+        "place": "archive",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I copy the old shelf-marks as they were. Little goblin letters in the margins: 'this one glows', 'this one doesn't'.",
+          "Piers brings me the Council's ink. It's blacker than ours and it never quite dries."
+        ]
+      },
+      {
+        "name": "Fenn Haverly",
+        "role": "scribe",
+        "title": "Scribe of the Archive",
+        "place": "archive",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Every map in the Archive has the Wasting drawn a little further west than the last. Nobody redraws the old ones.",
+          "My sister and I copy the same register from both ends. We meet in the middle around midsummer."
+        ]
+      },
+      {
+        "name": "Rosalind Penrose",
+        "role": "scribe",
+        "title": "Scribe of the Archive",
+        "place": "archive",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Fenn copies the Council's registers; I copy the Silent Pilgrims' letters asking for them. Neither of us is allowed to read the other's.",
+          "A good hand is a quiet hand. The Archivist says that. She says it loudly."
+        ]
+      },
+      {
+        "name": "Nim Coyle",
+        "role": "page",
+        "title": "Page of the Council",
+        "place": "keep",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I run the Keep's letters to the Exchange, the Row and the Treasury. Mum says walk. Nobody walks in a page's coat.",
+          "The wardens let me through any door if I hold the seal up. I hold it up a lot."
+        ]
+      },
+      {
+        "name": "Bram Feld",
+        "role": "page",
+        "title": "Page of the Council",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I carried a summons to the Scree Hounds once. Their master read it and laughed and gave me a copper. I still don't know why.",
+          "There are two hundred steps on the Grand Stair. I've run them in under a minute. Twice."
+        ]
+      },
+      {
+        "name": "Lettie Marsh",
+        "role": "page",
+        "title": "Page of the Council",
+        "place": "keep",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I came up from the Lowtowns with a letter for my aunt. She'd gone. The Clerk gave me a coat and a bag instead.",
+          "The Treasury's tally is the heaviest letter in the Crown. It's only one page. You feel it, though."
+        ]
+      },
+      {
+        "name": "Ambrose Wick",
+        "role": "lamplighter",
+        "title": "Lamplighter",
+        "place": "lamp",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Thirty lamps from the Gilt Gate to the Crown Square. I light the Way's first, so the carts can see the stair.",
+          "The Lantern's on the roof of the inn gets lit before mine. Corin does it himself. Show-off."
+        ]
+      },
+      {
+        "name": "Sal Tallow",
+        "role": "lamplighter",
+        "title": "Lamplighter",
+        "place": "lamp",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The Council likes the Square bright before the bells. I like it bright before the drinkers.",
+          "A dirty wick burns grey. The Crown doesn't burn grey. That's half my job and all of my pride."
+        ]
+      },
+      {
+        "name": "Mabry Ash",
+        "role": "gardener",
+        "title": "Gardener of the Crown",
+        "place": "garden",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Box hedges, white lilies, gold marigold. The Council's colours, in rows. The roses do as they like.",
+          "We water from the fountains. The Lowtowns' water comes up grey; ours comes down the mountain clean."
+        ]
+      },
+      {
+        "name": "Oswin Bell",
+        "role": "gardener",
+        "title": "Gardener of the Crown",
+        "place": "garden",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The topiary balls are older than I am. You don't cut them. You persuade them.",
+          "Lilies for the Council's table every morning. White, as ordered. One day I'll send yellow and see who notices."
+        ]
+      },
+      {
+        "name": "Tilly Rook",
+        "role": "gardener",
+        "title": "Gardener of the Crown",
+        "place": "garden",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I tend the Archive garden. The scribes eat their bread on my benches and leave the crusts for my sparrows.",
+          "There's a bed behind the Hall that won't grow anything. The old gardener said not to dig deep there. I haven't."
+        ]
+      },
+      {
+        "name": "Dob Sallow",
+        "role": "sweeper",
+        "title": "Street Sweeper",
+        "place": "street",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Petitioners, pigeons and petals. Same every day. The Way's swept by six or the wardens hear about it.",
+          "I found a gold button by the Treasury once. Handed it in. They gave me a receipt."
+        ]
+      },
+      {
+        "name": "Hester Crale",
+        "role": "sweeper",
+        "title": "Street Sweeper",
+        "place": "street",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The Crown's clean because we sweep it. Below the wall, nobody sweeps. You can tell from up here.",
+          "Dob's my brother. He sweeps the Way, I sweep the Square. We meet at the stair and argue about the leaves."
+        ]
+      },
+      {
+        "name": "Will Ewer",
+        "role": "watercarrier",
+        "title": "Water-Carrier",
+        "place": "well",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Fresh from the fountains for the Keep's ewers. The High Councilor drinks it cold. I've never seen him drink it at all.",
+          "Two buckets, twenty trips. The Lantern's kitchen first, before the cook starts shouting."
+        ]
+      },
+      {
+        "name": "Maddy Brook",
+        "role": "watercarrier",
+        "title": "Water-Carrier",
+        "place": "well",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The fountains were dry a year when old Agathe was a girl. She says nobody would say why. I ask the fountains every morning.",
+          "Will carries for the Keep and the Lantern. I carry for the Hall. They wash their hands a great deal, up there."
+        ]
+      },
+      {
+        "name": "Martha Saffron",
+        "role": "cook",
+        "title": "Cook of the Gilded Lantern",
+        "place": "kitchen",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Capon for the Councillors' clerks, barley for the porters, and the same pie for everyone on a feast day.",
+          "Corin keeps the bar; I keep the kitchen. He thinks he's in charge. The pots know better."
+        ]
+      },
+      {
+        "name": "Effie Ladd",
+        "role": "server",
+        "title": "Server",
+        "place": "serve",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The guilds sit apart. The Long Road by the fire, the Hounds in the booths, the Watch wherever there's light.",
+          "The gallery's for those who'd rather not be seen. I carry up, I carry down, I see nothing."
+        ]
+      },
+      {
+        "name": "Rufus Kemble",
+        "role": "server",
+        "title": "Server",
+        "place": "serve",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "A Council clerk tips a copper and a lecture. A porter tips a copper and a joke. I prefer the porters.",
+          "Corin says the second jug's on the house. It isn't. It's on whoever's sat nearest the door."
+        ]
+      },
+      {
+        "name": "Pip Tolley",
+        "role": "potboy",
+        "title": "Pot-Boy",
+        "place": "kitchen",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I fetch the water and clear the pots. Somebody left a silver spoon in the gravy. I gave it back. Mostly.",
+          "When I'm grown I'll keep an inn on the Gilt Approach. Smaller. With a dog."
+        ]
+      },
+      {
+        "name": "Brock Harle",
+        "role": "porter",
+        "title": "Porter of the Exchange",
+        "place": "exchange",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Crates up from the gate, coin over to the Treasury, lots out to the Row. My back keeps the accounts.",
+          "Glass from the coast is the worst. You can't drop it, and it knows you can't."
+        ]
+      },
+      {
+        "name": "Jem Carrow",
+        "role": "porter",
+        "title": "Porter of the Exchange",
+        "place": "gate",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Two wardens walk behind me when I carry coin. They never offer to carry it.",
+          "The carts from Oakhaven come fewer every week. Lighter, too."
+        ]
+      },
+      {
+        "name": "Ulf Danning",
+        "role": "porter",
+        "title": "Porter of the Exchange",
+        "place": "exchange",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I came down from the Rim to carry salt. Now I carry everything else. The salt still comes, though.",
+          "The Exchange's clerk counts every crate twice. I count them once and carry them."
+        ]
+      },
+      {
+        "name": "Sabine Orrel",
+        "role": "vaultguard",
+        "title": "Guard of the Treasury",
+        "place": "treasury",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I take the watch at six from Hugo. He's my husband. We pass each other at the vault door twice a day and that's our marriage.",
+          "Nobody tries the vault door. That's the point of a door like that."
+        ],
+        "look": "concord"
+      },
+      {
+        "name": "Hugo Dramm",
+        "role": "nightguard",
+        "title": "Guard of the Treasury",
+        "place": "treasury",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Nights at the vault. The lamps hum, the square sleeps, and the Council's window stays lit.",
+          "Sabine leaves me bread on the counter at six. I leave her the quiet."
+        ],
+        "look": "concord"
+      },
+      {
+        "name": "Lisette Vane",
+        "role": "steward",
+        "title": "Steward of the Row",
+        "place": "guildhall",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I keep the halls' books on the Row. Four guilds, four ledgers, one pen.",
+          "The Hounds break things, the Long Road loses them, the Watch writes them down, Oak and Ember mends them. I pay for all of it."
+        ]
+      },
+      {
+        "name": "Godric Penny",
+        "role": "steward",
+        "title": "Steward of the Row",
+        "place": "guildhall",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The halls' dues go to the Treasury every afternoon. Counted twice. Lisette counts them a third time when I'm not looking.",
+          "A guild hall needs bandages, oil, bread and a good lock. In that order."
+        ]
+      },
+      {
+        "name": "Cyprian Lowe",
+        "role": "trader",
+        "title": "Trader of the Exchange",
+        "place": "exchange",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Copper from the east, salt from the Rim, glass from the coast. I sell all three and keep none.",
+          "The Trade Princes' factor watches my prices. I watch hers. We have tea."
+        ]
+      },
+      {
+        "name": "Della Marchant",
+        "role": "trader",
+        "title": "Trader of the Exchange",
+        "place": "exchange",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I deal in cloth. Wool from Oakhaven's folds, sold as Crown silk. Ada knows. Ada says nothing.",
+          "The day's takings go to the Treasury before dusk. Nothing stays in a purse after dark in Argentis. Not even up here."
+        ]
+      },
+      {
+        "name": "Ottoline Fairweather",
+        "role": "patron",
+        "title": "Patron of the Exchange",
+        "place": "exchange",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I buy what the adventurers bring up the Approach. Glowing lanterns, carved bone, a goblin's ledger once. I collect.",
+          "Don't ask what it cost. I've stopped asking myself."
+        ]
+      },
+      {
+        "name": "Barnaby Crisp",
+        "role": "patron",
+        "title": "Patron of the Exchange",
+        "place": "exchange",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "My cousin keeps a stall in Oakhaven. I buy her eggs at the Exchange for three times the price. Family.",
+          "The Lantern's booths are the best seats in the Crown. Book early, tip Effie."
+        ]
+      },
+      {
+        "name": "Lord Aldous Merriweather",
+        "role": "noble",
+        "title": "Lord of the Crown",
+        "place": "garden",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "My house has stood on the north row since before the charter. The gilt was my grandmother's idea. The debt was my father's.",
+          "The Council asks my opinion on the tithe every spring. Then it does what it was going to do. It's very civilised."
+        ]
+      },
+      {
+        "name": "Lady Seraphine Goldhawk",
+        "role": "noble",
+        "title": "Lady of the Crown",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Mail under silk this season, the dresser says. I say silk under silk, and nobody argues with a Goldhawk.",
+          "From the gardens you can see the Lowtowns' smoke. One learns to face the other way."
+        ]
+      },
+      {
+        "name": "Lord Percival Ivory",
+        "role": "noble",
+        "title": "Lord of the Crown",
+        "place": "green",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I sit on no council and I petition no one. That is what being old money means.",
+          "The Gilded Lantern's gallery has the best view of who's dining with whom. I dine there often."
+        ]
+      },
+      {
+        "name": "Hobb Lark",
+        "role": "servant",
+        "title": "Servant of House Merriweather",
+        "place": "well",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "His lordship's letters go to the Keep dressed as compliments. I carry them. I don't read them. Much.",
+          "Water from the fountain, never the cistern. Her ladyship can tell. I can't."
+        ]
+      },
+      {
+        "name": "Tess Wren",
+        "role": "servant",
+        "title": "Maid of House Goldhawk",
+        "place": "street",
+        "works": true,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "The mistress buys silk from the coast. Third bolt this month. I carry it up from the Exchange like it's eggs.",
+          "My mother sweeps the Square. I wave to her from the house. She pretends not to see me; it's the rules."
+        ]
+      }
+    ],
+    "households": [
+      {
+        "name": "The Aspers",
+        "house": "House Aurel",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Wendel Asper",
+            "kin": "head"
+          },
+          {
+            "name": "Imogen Sware",
+            "kin": "wife"
+          },
+          {
+            "name": "Nim Coyle",
+            "kin": "son"
+          }
+        ]
+      },
+      {
+        "name": "The Fanes",
+        "house": "House Brightwater",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Hollis Fane",
+            "kin": "head"
+          },
+          {
+            "name": "Lettie Marsh",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "The Lathoms",
+        "house": "House Calloway",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Piers Lathom",
+            "kin": "head"
+          },
+          {
+            "name": "Odile Marchbank",
+            "kin": "wife"
+          }
+        ]
+      },
+      {
+        "name": "The Haverlys",
+        "house": "House Delane",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Fenn Haverly",
+            "kin": "head"
+          },
+          {
+            "name": "Rosalind Penrose",
+            "kin": "sister"
+          }
+        ]
+      },
+      {
+        "name": "The Wicks",
+        "house": "House Eversley",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Ambrose Wick",
+            "kin": "head"
+          },
+          {
+            "name": "Sal Tallow",
+            "kin": "wife"
+          }
+        ]
+      },
+      {
+        "name": "The Ashes",
+        "house": "House Fairchild",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Mabry Ash",
+            "kin": "head"
+          },
+          {
+            "name": "Oswin Bell",
+            "kin": "husband"
+          },
+          {
+            "name": "Tilly Rook",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "House Goldhawk",
+        "house": "House Goldhawk",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 40,
+        "members": [
+          {
+            "name": "Lady Seraphine Goldhawk",
+            "kin": "head"
+          },
+          {
+            "name": "Tess Wren",
+            "kin": "maid"
+          }
+        ]
+      },
+      {
+        "name": "The Sallows",
+        "house": "House Harcourt",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Dob Sallow",
+            "kin": "head"
+          },
+          {
+            "name": "Hester Crale",
+            "kin": "sister"
+          }
+        ]
+      },
+      {
+        "name": "House Ivory",
+        "house": "House Ivory",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 40,
+        "members": [
+          {
+            "name": "Lord Percival Ivory",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "The Ewers",
+        "house": "House Juniper",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Will Ewer",
+            "kin": "head"
+          },
+          {
+            "name": "Maddy Brook",
+            "kin": "wife"
+          }
+        ]
+      },
+      {
+        "name": "The porters",
+        "house": "House Kestrell",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Brock Harle",
+            "kin": "head"
+          },
+          {
+            "name": "Jem Carrow",
+            "kin": "lodger"
+          },
+          {
+            "name": "Ulf Danning",
+            "kin": "lodger"
+          }
+        ]
+      },
+      {
+        "name": "The Orrels",
+        "house": "House Larkspur",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Sabine Orrel",
+            "kin": "head"
+          },
+          {
+            "name": "Hugo Dramm",
+            "kin": "husband"
+          }
+        ]
+      },
+      {
+        "name": "House Merriweather",
+        "house": "House Merriweather",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 40,
+        "members": [
+          {
+            "name": "Lord Aldous Merriweather",
+            "kin": "head"
+          },
+          {
+            "name": "Hobb Lark",
+            "kin": "servant"
+          }
+        ]
+      },
+      {
+        "name": "The Vanes",
+        "house": "House Northgate",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Lisette Vane",
+            "kin": "head"
+          },
+          {
+            "name": "Godric Penny",
+            "kin": "husband"
+          }
+        ]
+      },
+      {
+        "name": "The Lowes",
+        "house": "House Oriel",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 20,
+        "members": [
+          {
+            "name": "Cyprian Lowe",
+            "kin": "head"
+          },
+          {
+            "name": "Della Marchant",
+            "kin": "partner"
+          }
+        ]
+      },
+      {
+        "name": "The Fairweathers",
+        "house": "House Pennington",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 20,
+        "members": [
+          {
+            "name": "Ottoline Fairweather",
+            "kin": "head"
+          },
+          {
+            "name": "Barnaby Crisp",
+            "kin": "cousin"
+          }
+        ]
+      },
+      {
+        "name": "The Felds",
+        "house": "House Quillfeather",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Bram Feld",
+            "kin": "head"
+          }
+        ]
+      },
+      {
+        "name": "The Lantern's staff",
+        "house": "The Gilded Lantern",
+        "canonStatus": "GAME-ONLY",
+        "stipend": 10,
+        "members": [
+          {
+            "name": "Martha Saffron",
+            "kin": "head"
+          },
+          {
+            "name": "Effie Ladd",
+            "kin": "lodger"
+          },
+          {
+            "name": "Rufus Kemble",
+            "kin": "lodger"
+          },
+          {
+            "name": "Pip Tolley",
+            "kin": "lodger"
+          }
         ]
       }
     ]

@@ -93,6 +93,13 @@ namespace Crulanda.World
                 r.sharedMaterials = mats;
             }
         }
+        /// <summary>The height of a placed prop's top in <paramref name="parent"/>'s space (a table's top, to set its mugs on).</summary>
+        public static float TopIn(Transform parent, GameObject prop)
+        {
+            var rs = prop.GetComponentsInChildren<Renderer>(true); if (rs.Length == 0) return 0;
+            var b = rs[0].bounds; foreach (var r in rs) b.Encapsulate(r.bounds);
+            return parent.InverseTransformPoint(new Vector3(b.center.x, b.max.y, b.center.z)).y;
+        }
         public static GameObject ModelProp(Transform parent, string path, Vector3 foot, float yaw, float height, bool solid = false, float? width = null, Vector3? box = null)
         {
             var src = PropSource(path); if (src == null) return null;

@@ -153,3 +153,11 @@ Written, compile-checked, not yet run in Unity (EditMode `BankTests`, `ExchangeT
   Collect. Opened by a resident with role `auctioneer`, or `/exchange`.
 - Not yet: the clerks placed in the castle (the zone step), sims buying gear or each other's lots, a listing's own bid amount typed in
   (Bid places the least next bid).
+
+## Status (p9-cityinn, 2026-10-16; written and compile-checked, NOT yet run in Unity)
+Chris (verbatim): "dont need the same exact inn in the castle. needs a redesign"; "will need lots more npcs in the castle with real jobs like in oakhaven"; "maybe see a castle off in the distance when looking north".
+- **The Gilded Lantern** (inn variant 3, `ZoneBuilder.CityInn.cs`; GAME-ONLY): 22 x 16 at (31, 31), white stone, gilt courses, slate roof and a lit gilt lantern cupola on the ridge; a portico over a grand double door (3.2 m, the doorway lanes), step-free; inside a two-storey taproom with a gallery round three walls on columns, a walked stair up to it, the long bar with six stools, a hearth with a carved mantel, three booths, five round tables, the kitchen's range. Its plan is `InnPlan.For(size, 3)`; registered as ZoneInn "city" (staffed).
+- **39 working residents** (GAME-ONLY names and lines) with days in `VillageWork` (clerks, scribes, pages, lamplighters, gardeners, sweepers, water-carriers, the Lantern's cook, servers and pot-boy, porters, the Treasury's day and night guards, stewards, traders, patrons, nobles, servants), homes in the gilt houses (18 households) or the Lantern's rooms. Their places are registered by the halls (desks in the Keep, the Council Hall, the Archive, the Exchange's floor, the Treasury, the guild halls, the Gilt Gate's yard, the lamps, the parterres; fountains are wells; streets along the roads). New loads: papers, a besom, a lamplighter's pole.
+- **Frames**: "The Crown of Argentis" from a free camera 110 m over the south-east (`viewHeight`/`viewAim` on a landmark); the Council Hall from over the colonnade; the Lantern's front.
+- **Oakhaven's skyline**: the Crown on its mountain to the north (`skyline` in the zone file, `DistantSkyline.cs`; the forest ring dips for it), capture `oakhaven-83-skyline-crown.png`.
+- To run: EditMode `CrownZoneTests`; PlayMode `CrownLifeTests`, `CrownZonePlayTests`, `BuildingGroundTests`; the world capture of zone.crown and of zone.oakhaven.

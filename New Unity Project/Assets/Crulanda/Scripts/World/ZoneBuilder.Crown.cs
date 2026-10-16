@@ -538,7 +538,19 @@ namespace Crulanda.World
             CouncilBanner(t, new Vector3(-5, 9.5f, d / 2 - .3f), 0, 1.8f, 5); CouncilBanner(t, new Vector3(5, 9.5f, d / 2 - .3f), 0, 1.8f, 5);   // on the back wall, facing the door
             foreach (float z in new[] { -5f, 3f }) ModelProp(t, "Fantasy/Chandelier", new Vector3(0, H - 2.2f, z), 0, 1.4f);
             foreach (int s in new[] { -1, 1 }) { Brazier(t, new Vector3(s * 5.4f, .16f, d / 2 - 1.6f), Gilt); Glow(t, new Vector3(s * 5.4f, 1.6f, d / 2 - 1.6f), 7, 1.1f, new Color(1, .7f, .4f), 1.6f); }
-            _ = r;
+            // The Council's clerks' desks down the side aisles, against the walls (p9-cityinn): a sloped desk of dark oak with its papers
+            // and a candle, solid; a clerk writes at each, and the pages and water-carriers come in by the door (the city's "keep").
+            foreach (int s in new[] { -1, 1 })
+                foreach (float z in new[] { -3.5f, 1.5f, 6.5f })
+                {
+                    var desk = new Vector3(s * (w / 2 - .55f), 0, z);
+                    Solidify(BoxPart(t, desk + Vector3.up * .5f, new Vector3(.6f, 1, 1.4f), DarkOak));
+                    Part(PrimitiveType.Cube, t, desk + new Vector3(-s * .05f, 1.06f, 0), new Vector3(.62f, .05f, 1.4f), DarkOak, Quaternion.Euler(0, 0, s * 12));
+                    Part(PrimitiveType.Cube, t, desk + new Vector3(-s * .08f, 1.1f, (float)r.NextDouble() * .3f - .15f), new Vector3(.3f, .01f, .4f), Tint(art.plaster, new Color(.95f, .93f, .86f)), Quaternion.Euler(0, 0, s * 12));
+                    ModelProp(t, "Medieval/Prefabs/CandleV1", desk + new Vector3(0, 1.02f, .55f), 0, .2f);
+                    Workplace(t, "keep", desk + new Vector3(-s * 1.55f, 0, 0), desk + new Vector3(0, 1, 0));
+                }
+            foreach (int s in new[] { -1, 1 }) Workplace(t, "keep", new Vector3(s * 3, 0, -d / 2 + 3), new Vector3(0, 1, 0));
         }
 
         // ---------- the Council Hall ----------
@@ -579,6 +591,8 @@ namespace Crulanda.World
             Lettering(t, "Edicts of the Council", board + new Vector3(0, -1.75f, -.1f), 3.6f);
             ModelProp(t, "Fantasy/Chandelier", mid + Vector3.up * (H - 2), 0, 1.4f);
             foreach (int s in new[] { -1, 1 }) CouncilBanner(t, new Vector3(s * (w / 2 - .3f), 8.5f, 4), s < 0 ? 270 : 90, 1.8f, 4.5f);
+            // Where the clerks, the gardeners' lilies and the water-carriers come to (p9-cityinn): either side of the floor, facing the lectern.
+            foreach (int s in new[] { -1, 1 }) { Workplace(t, "councilhall", new Vector3(s * 9.5f, 0, -2), mid + Vector3.up); Workplace(t, "councilhall", new Vector3(s * 6, 0, -7.5f), mid + Vector3.up); }
         }
 
         // ---------- the Archive ----------
@@ -625,6 +639,12 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, lectern + new Vector3(0, 1.15f, 0), new Vector3(.6f, .06f, .45f), Tint(art.plaster, new Color(.94f, .9f, .78f)), Quaternion.Euler(-15, 0, 0));
             foreach (float z in new[] { -3f, 4f }) ModelProp(t, "Fantasy/Chandelier", new Vector3(0, H - 2, z), 0, 1.2f);
             Lettering(t, t.name, new Vector3(0, 5.3f, -d / 2 - .4f), 6);
+            // The scribes' places (p9-cityinn): at the reading desks either side of each chair, and before the wall shelves.
+            foreach (int s in new[] { -1, 1 })
+            {
+                foreach (float dx in new[] { -.8f, .8f }) Workplace(t, "archive", new Vector3(s * 7.5f + dx, 0, -5.2f), new Vector3(s * 7.5f + dx, .8f, -3.8f));
+                Workplace(t, "archive", new Vector3(s * (w / 2 - 2), 0, -2.4f), new Vector3(s * (w / 2 - .65f), 1.2f, -2.4f));
+            }
         }
 
         // ---------- the civic halls ----------
@@ -659,6 +679,10 @@ namespace Crulanda.World
                         if (ModelProp(t, "KayKit/crates_stacked", new Vector3(s * (w / 2 - 1.4f), 0, d / 2 - 1.6f), s * 20, 2, true) == null) Solidify(BoxPart(t, new Vector3(s * (w / 2 - 1.4f), .8f, d / 2 - 1.6f), new Vector3(1.6f, 1.6f, 1.6f), Tint(art.timber, new Color(.5f, .38f, .24f))));
                         CityBench(t, new Vector3(s * 6, 0, -d / 2 + 3.4f), 0, 2.6f);
                     }
+                    // The floor's places (p9-cityinn): traders and their customers at the counter, clear of the clerk and the factor;
+                    // the porters at the stacked crates.
+                    foreach (float x in new[] { -5.5f, .6f, 5.5f }) Workplace(t, "exchange", new Vector3(x, 0, d / 2 - 3.5f - (Mathf.Abs(x) < 1 ? 2.1f : 1.6f)), new Vector3(x, 1, d / 2 - 3.5f));
+                    foreach (int s in new[] { -1, 1 }) Workplace(t, "exchange", new Vector3(s * (w / 2 - 1.4f), 0, d / 2 - 4.6f), new Vector3(s * (w / 2 - 1.4f), .8f, d / 2 - 1.6f));
                     break;
                 }
                 case 1:   // the Treasury Vault
@@ -673,6 +697,14 @@ namespace Crulanda.World
                     {
                         var at = new Vector3(s * (w / 2 - 1.2f), 0, -1 + k * 2.2f);
                         if (ModelProp(t, "KayKit/chest", at, s < 0 ? 90 : 270, 1, true) == null) Solidify(BoxPart(t, at + Vector3.up * .45f, new Vector3(1.1f, .9f, .8f), Tint(art.timber, new Color(.35f, .22f, .12f))));
+                    }
+                    // The guards' places (p9-cityinn): either side of the door, facing out, and either side of the vault door behind the
+                    // counter; and before the counter, where the porters and stewards hand in coin.
+                    foreach (int s in new[] { -1, 1 })
+                    {
+                        Workplace(t, "treasury", new Vector3(s * 2.8f, 0, -d / 2 + 1.8f), new Vector3(s * 2.8f, 1, -d / 2 - 2));
+                        Workplace(t, "treasury", new Vector3(s * 2.6f, 0, d / 2 - 1.8f), new Vector3(0, 2.3f, d / 2));
+                        Workplace(t, "treasury", new Vector3(s * 2.2f, 0, d / 2 - 6.4f), new Vector3(s * 2.2f, 1, d / 2 - 4));
                     }
                     break;
                 }
@@ -723,6 +755,8 @@ namespace Crulanda.World
             var board = new Vector3(-w / 2 + .32f, 2, -.5f);
             BoxPart(t, board, new Vector3(.1f, 1.6f, 2.4f), DarkOak);
             for (int k = 0; k < 6; k++) Part(PrimitiveType.Cube, t, board + new Vector3(.07f, k < 3 ? .35f : -.35f, -.8f + (k % 3) * .8f), new Vector3(.01f, .5f, .45f), Tint(art.plaster, new Color(.95f, .92f, .84f)), Quaternion.Euler(((float)r.NextDouble() - .5f) * 8, 0, 0));
+            // The steward's places (p9-cityinn): at the notice board, and by the door.
+            Workplace(t, "guildhall", new Vector3(-w / 2 + 1.4f, 0, -.5f), board); Workplace(t, "guildhall", new Vector3(3.6f, 0, -d / 2 + 2.1f), new Vector3(0, 1, -.6f));
             var hearth = new Vector3(w / 2 - .7f, 0, 1.6f);
             SolidBox(t, hearth + Vector3.up * 1.1f, new Vector3(.9f, 2.2f, 2.2f), Masonry);
             Part(PrimitiveType.Cube, t, hearth + new Vector3(-.46f, .55f, 0), new Vector3(.06f, .7f, 1.3f), art.glass);
@@ -829,6 +863,7 @@ namespace Crulanda.World
             l.type = LightType.Point; l.range = 10; l.intensity = 1.2f; l.color = new Color(1, .78f, .45f);
             NightLights.Add(new NightLight { light = l, dayIntensity = 0, nightIntensity = 1.6f });
             Solid(t, new Vector3(0, 1.7f, 0), new Vector3(.5f, 3.4f, .5f));
+            Workplace(t, "lamp", new Vector3(0, 0, -1.1f), new Vector3(0, 3.4f, 0));   // where the lamplighter reaches up to it (p9-cityinn)
         }
         /// <summary>A Council banner on its own pole (a square, a gate, the stair head): a gilt-capped pole and a crossbar.</summary>
         void CouncilBannerPole(Transform t, float height)
@@ -864,6 +899,7 @@ namespace Crulanda.World
             }
             Part(PrimitiveType.Cylinder, t, Vector3.up * .5f, new Vector3(.3f, .5f, .3f), CityShade);
             Part(PrimitiveType.Sphere, t, Vector3.up * 1.5f, Vector3.one * 1.2f, hedge);
+            foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Workplace(t, "garden", new Vector3(sx * hx / 2, 0, sz * hz / 2), new Vector3(sx * hx / 2, .2f, sz * hz / 2 * 1.6f));   // the gardeners' beds (p9-cityinn)
         }
         /// <summary>
         /// Stairs over a ramp terrace (GAME-ONLY): white treads a .45 m going, each a block from under the ground at its low edge up to the
@@ -1017,6 +1053,8 @@ namespace Crulanda.World
                 CrownDevice(t, new Vector3(0, under + 3.4f, f * (D / 2 + .32f)), f < 0 ? 0 : 180, 1.8f, Gilt);
             }
             Lettering(t, t.name, new Vector3(0, under + 1.2f, -D / 2 - .32f), w * .9f);
+            // An open gate's yard inside it, where the porters take the carts' crates (p9-cityinn).
+            if (!shut) foreach (int s in new[] { -1, 1 }) Workplace(t, "gate", new Vector3(s * 1.8f, 0, D / 2 + 2.5f), new Vector3(0, 1, D / 2));
             var oak = Tint(art.timber, new Color(.32f, .2f, .11f));
             foreach (int s in new[] { -1, 1 })
             {

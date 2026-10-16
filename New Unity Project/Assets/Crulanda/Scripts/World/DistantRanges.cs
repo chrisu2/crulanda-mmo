@@ -27,19 +27,24 @@ namespace Crulanda.World
             int seed = zone.seed % 997;
             // The Wasting's side (Oakhaven's east): no land there.
             float wastingYaw = zone.wasting != null ? 90 : float.NaN;
+            // A far place on the skyline (DistantSkyline: Oakhaven's view of the Crown up the North road): the forest ring and the near
+            // range dip toward it, a gap in the hills it stands in (2026-10-16). The far range stands behind it whole.
+            if (zone.skyline != null && zone.skyline.Length > 0 && zone.skyline[0] != null) d.notchYaw = zone.skyline[0].bearing;
             // Wooded hills rising behind the backdrop's ridge, their crests a run of tree crowns (2026-10-10, Chris: "horizon still looks
             // empty", against Elwynn's), and the hills and mountains past them nearer and taller than they were: a forest ring at 1.5
             // reaches, tall enough to stand over the ridge and its trees (some 45 m at 350 m, seen from the zone), none on the Ash Rim.
             d.woodTint = mountain ? new Color(.17f, .27f, .27f) : biome == "gloom" ? new Color(.22f, .24f, .25f) : biome == "verdant" ? new Color(.13f, .3f, .2f) : new Color(.17f, .3f, .19f);
-            if (!ash) d.wood = d.Ring(go.transform, shader, reach * 1.5f, mountain ? 95 : 82, 26, seed + 77, wastingYaw, .07f, 4320, 9);
-            d.near = d.Ring(go.transform, shader, reach * (mountain ? 2.45f : 2.0f), mountain ? 110 * scale : ash ? 110 * scale : 150, mountain || ash ? 50 * scale : 60, seed, wastingYaw, .05f);
+            if (!ash) d.wood = d.Ring(go.transform, shader, reach * 1.5f, mountain ? 95 : 82, 26, seed + 77, wastingYaw, .07f, 4320, 9, .3f);
+            d.near = d.Ring(go.transform, shader, reach * (mountain ? 2.45f : 2.0f), mountain ? 110 * scale : ash ? 110 * scale : 150, mountain || ash ? 50 * scale : 60, seed, wastingYaw, .05f, 360, 0, .55f);
             d.far = d.Ring(go.transform, shader, reach * 2.75f, 175 * scale, 80 * scale, seed + 41, wastingYaw, .028f);
             d.LateUpdate();
         }
 
         /// <summary>A ring of <paramref name="N"/> columns; <paramref name="crowns"/> above 0 runs a row of rounded tree crowns that tall
         /// (about two every three degrees, each its own size, smaller ones between) along the crest: a wood's skyline, not a saw's.</summary>
-        Material Ring(Transform parent, Shader shader, float radius, float tall, float vary, int seed, float skipYaw, float freq, int N = 360, float crowns = 0)
+        /// <summary>The bearing of a far place on the skyline the rings dip for (NaN: none); see <see cref="DistantSkyline"/>.</summary>
+        float notchYaw = float.NaN;
+        Material Ring(Transform parent, Shader shader, float radius, float tall, float vary, int seed, float skipYaw, float freq, int N = 360, float crowns = 0, float notch = 1)
         {
             var v = new Vector3[(N + 1) * 2]; var t = new int[N * 6];
             for (int i = 0; i <= N; i++)
@@ -58,6 +63,7 @@ namespace Crulanda.World
                     top += crowns * (size * (Mathf.Pow(Mathf.Abs(Mathf.Sin(f * Mathf.PI)), .3f) - .65f) + .35f * small * (Mathf.Pow(Mathf.Abs(Mathf.Sin(g * Mathf.PI)), .4f) - .6f));
                 }
                 if (!float.IsNaN(skipYaw)) { float off = Mathf.Abs(Mathf.DeltaAngle(a, skipYaw)); top *= Mathf.SmoothStep(0, 1, (off - 25) / 30f); }
+                if (!float.IsNaN(notchYaw) && notch < 1) { float off = Mathf.Abs(Mathf.DeltaAngle(a, notchYaw)); top *= Mathf.Lerp(notch, 1, Mathf.SmoothStep(0, 1, (off - 14) / 22f)); }
                 var dir = new Vector3(Mathf.Sin(r), 0, Mathf.Cos(r));
                 v[i * 2] = dir * radius + Vector3.up * -60; v[i * 2 + 1] = dir * radius + Vector3.up * Mathf.Max(-10, top);
                 if (i < N) { int b = i * 2, k = i * 6; t[k] = b; t[k + 1] = b + 1; t[k + 2] = b + 2; t[k + 3] = b + 1; t[k + 4] = b + 3; t[k + 5] = b + 2; }

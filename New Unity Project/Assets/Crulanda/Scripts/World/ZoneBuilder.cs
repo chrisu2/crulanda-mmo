@@ -1650,9 +1650,12 @@ namespace Crulanda.World
                 var at = plan.tables[n]; float turn = plan.turns[n];
                 if (kitTables)
                 {
-                    ModelProp(t, "Fantasy/Table_Large", new Vector3(at.x, .045f, at.y), -turn, .8f, false, 1.5f);
+                    var table = ModelProp(t, "Fantasy/Table_Large", new Vector3(at.x, .045f, at.y), -turn, .8f, false, 1.5f);
+                    // On the table's own top as it came out (2026-10-16, Chris: "table and mug still not meeting. hovering over tables": the
+                    // width cap makes the long table lower than .8 m, and the mug and candle stood at a fixed .845).
+                    float top = table != null ? TopIn(t, table) : .845f;
                     for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; ModelProp(t, "Fantasy/Stool", new Vector3(seat.x, .045f, seat.y), -(turn + k * 120) + 90, .45f); }
-                    ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, .845f, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, .845f, at.y + .25f), turn + 70, .12f);
+                    ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, top, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, top, at.y + .25f), turn + 70, .12f);
                     continue;
                 }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .78f, at.y), new Vector3(1.2f, .04f, 1.2f), boards);

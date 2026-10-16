@@ -422,7 +422,7 @@
     },
     {
       "name": "The Crafters' Court",
-      "text": "Every trade's trainer and its anvil, still-table and hearth.",
+      "text": "Every trade's workshop: its trainer at the station, its stall and an apprentice at the work.",
       "at": {
         "x": 88,
         "y": 80
@@ -430,11 +430,43 @@
       "radius": 14,
       "canonStatus": "GAME-ONLY",
       "view": {
-        "x": 74,
-        "y": 68
+        "x": 70,
+        "y": 66
       },
-      "viewPitch": 30,
+      "viewPitch": 28,
       "viewZoom": 16
+    },
+    {
+      "name": "The Court Smithy",
+      "text": "The anvil, the hearth and the ironmonger's stall.",
+      "at": {
+        "x": 84,
+        "y": 91
+      },
+      "radius": 4,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 81,
+        "y": 83
+      },
+      "viewPitch": 14,
+      "viewZoom": 7
+    },
+    {
+      "name": "The Court Loom-house",
+      "text": "The loom, its dye pots and the draper's stall.",
+      "at": {
+        "x": 76,
+        "y": 60.5
+      },
+      "radius": 4,
+      "canonStatus": "GAME-ONLY",
+      "view": {
+        "x": 78.5,
+        "y": 68.5
+      },
+      "viewPitch": 14,
+      "viewZoom": 7
     },
     {
       "name": "Guild Row",
@@ -985,6 +1017,199 @@
       "at": {
         "x": 72,
         "y": 62
+      }
+    },
+    {
+      "kind": "court_workshop",
+      "name": "The Court Smithy",
+      "at": {
+        "x": 84,
+        "y": 91
+      },
+      "rotation": 0,
+      "variant": 0
+    },
+    {
+      "kind": "court_workshop",
+      "name": "The Court Leather-shop",
+      "at": {
+        "x": 85,
+        "y": 60.5
+      },
+      "rotation": 180,
+      "variant": 1
+    },
+    {
+      "kind": "court_workshop",
+      "name": "The Court Loom-house",
+      "at": {
+        "x": 76,
+        "y": 60.5
+      },
+      "rotation": 180,
+      "variant": 2
+    },
+    {
+      "kind": "court_workshop",
+      "name": "The Court Still-room",
+      "at": {
+        "x": 97.5,
+        "y": 81
+      },
+      "rotation": 90,
+      "variant": 3
+    },
+    {
+      "kind": "court_workshop",
+      "name": "The Court Cookshop",
+      "at": {
+        "x": 94,
+        "y": 60.5
+      },
+      "rotation": 180,
+      "variant": 4
+    },
+    {
+      "kind": "court_workshop",
+      "name": "The Court Bowyer's",
+      "at": {
+        "x": 74.5,
+        "y": 91
+      },
+      "rotation": 0,
+      "variant": 5
+    },
+    {
+      "kind": "court_workshop",
+      "name": "The Court Ore-house",
+      "at": {
+        "x": 93.5,
+        "y": 91
+      },
+      "rotation": 0,
+      "variant": 6
+    },
+    {
+      "kind": "court_workshop",
+      "name": "The Court Herbary",
+      "at": {
+        "x": 97.5,
+        "y": 71
+      },
+      "rotation": 90,
+      "variant": 7
+    },
+    {
+      "kind": "court_well",
+      "name": "The Court well",
+      "at": {
+        "x": 85,
+        "y": 75
+      }
+    },
+    {
+      "kind": "court_board",
+      "name": "The Court's board of orders",
+      "at": {
+        "x": 71.5,
+        "y": 76
+      },
+      "rotation": 270
+    },
+    {
+      "kind": "court_bench",
+      "name": "Bench, the Court well north",
+      "at": {
+        "x": 85,
+        "y": 78.6
+      },
+      "size": {
+        "x": 2,
+        "y": 0
+      }
+    },
+    {
+      "kind": "court_bench",
+      "name": "Bench, the Court well south",
+      "at": {
+        "x": 85,
+        "y": 71.4
+      },
+      "rotation": 180,
+      "size": {
+        "x": 2,
+        "y": 0
+      }
+    },
+    {
+      "kind": "court_goods",
+      "name": "Bars and charcoal, the Court Smithy",
+      "at": {
+        "x": 79,
+        "y": 91.6
+      },
+      "variant": 0
+    },
+    {
+      "kind": "court_goods",
+      "name": "Ore crates, the Court Ore-house",
+      "at": {
+        "x": 89.1,
+        "y": 91.8
+      },
+      "variant": 1
+    },
+    {
+      "kind": "court_goods",
+      "name": "Barrels, the Court's north-east corner",
+      "at": {
+        "x": 99.5,
+        "y": 90
+      },
+      "variant": 2
+    },
+    {
+      "kind": "court_goods",
+      "name": "Sacks and bolts, the Court Loom-house",
+      "at": {
+        "x": 80.5,
+        "y": 59.6
+      },
+      "variant": 3
+    },
+    {
+      "kind": "court_goods",
+      "name": "Firewood, the Court Cookshop",
+      "at": {
+        "x": 99.6,
+        "y": 62.5
+      },
+      "rotation": 90,
+      "variant": 4
+    },
+    {
+      "kind": "court_goods",
+      "name": "Crates, the Court's south-west corner",
+      "at": {
+        "x": 66,
+        "y": 58.6
+      },
+      "variant": 5
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Crafters' Court south",
+      "at": {
+        "x": 69,
+        "y": 68
+      }
+    },
+    {
+      "kind": "city_lamp",
+      "name": "Lamp, the Crafters' Court north",
+      "at": {
+        "x": 69,
+        "y": 84
       }
     },
     {
@@ -1718,32 +1943,62 @@
   "stations": [
     {
       "kind": "forge",
-      "name": "Forge: the Crafters' Court anvil",
+      "name": "Forge: the Court Smithy's anvil",
       "at": {
-        "x": 84,
-        "y": 90
+        "x": 83.0,
+        "y": 91.55
       },
       "rotation": 0,
       "canonStatus": "GAME-ONLY"
     },
     {
       "kind": "bench",
-      "name": "Bench: the Crafters' Court still-table",
+      "name": "Bench: the Court Leather-shop's cutting bench",
       "at": {
-        "x": 98,
-        "y": 80
+        "x": 86.2,
+        "y": 59.65
+      },
+      "rotation": 180,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "bench",
+      "name": "Bench: the Court Loom-house's loom",
+      "at": {
+        "x": 77.2,
+        "y": 59.65
+      },
+      "rotation": 180,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "bench",
+      "name": "Bench: the Court Still-room's still-table",
+      "at": {
+        "x": 98.35,
+        "y": 82.2
       },
       "rotation": 90,
       "canonStatus": "GAME-ONLY"
     },
     {
       "kind": "fire",
-      "name": "Fire: the Crafters' Court cook-hearth",
+      "name": "Fire: the Court Cookshop's hearth",
       "at": {
-        "x": 82,
-        "y": 66
+        "x": 95.2,
+        "y": 59.35
       },
       "rotation": 180,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "bench",
+      "name": "Bench: the Court Bowyer's bench",
+      "at": {
+        "x": 73.3,
+        "y": 91.85
+      },
+      "rotation": 0,
       "canonStatus": "GAME-ONLY"
     }
   ],
@@ -2242,8 +2497,8 @@
         "role": "profession-trainer:blacksmithing",
         "title": "Blacksmithing Trainer",
         "at": {
-          "x": 88.5,
-          "y": 88.6
+          "x": 83.0,
+          "y": 90.1
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
@@ -2256,8 +2511,8 @@
         "role": "profession-trainer:alchemy",
         "title": "Alchemy Trainer",
         "at": {
-          "x": 96.6,
-          "y": 84.5
+          "x": 97.0,
+          "y": 82.2
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
@@ -2270,8 +2525,8 @@
         "role": "profession-trainer:cooking",
         "title": "Cooking Trainer",
         "at": {
-          "x": 86.5,
-          "y": 67.5
+          "x": 95.2,
+          "y": 60.7
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
@@ -2284,8 +2539,8 @@
         "role": "profession-trainer:mining",
         "title": "Mining Trainer",
         "at": {
-          "x": 92,
-          "y": 93.5
+          "x": 92.3,
+          "y": 90.5
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
@@ -2298,8 +2553,8 @@
         "role": "profession-trainer:woodcutting",
         "title": "Woodcutting Trainer",
         "at": {
-          "x": 78,
-          "y": 93.5
+          "x": 73.3,
+          "y": 90.5
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
@@ -2312,8 +2567,8 @@
         "role": "profession-trainer:herbalism",
         "title": "Herbalism Trainer",
         "at": {
-          "x": 100,
-          "y": 73
+          "x": 97.0,
+          "y": 72.2
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
@@ -2326,8 +2581,8 @@
         "role": "profession-trainer:leatherworking",
         "title": "Leatherworking Trainer",
         "at": {
-          "x": 74,
-          "y": 72
+          "x": 86.2,
+          "y": 61.0
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
@@ -2340,8 +2595,8 @@
         "role": "profession-trainer:weaving",
         "title": "Weaving Trainer",
         "at": {
-          "x": 74,
-          "y": 78
+          "x": 77.2,
+          "y": 61.0
         },
         "canonStatus": "GAME-ONLY",
         "stories": [
@@ -3003,6 +3258,173 @@
         "stories": [
           "The mistress buys silk from the coast. Third bolt this month. I carry it up from the Exchange like it's eggs.",
           "My mother sweeps the Square. I wave to her from the house. She pretends not to see me; it's the rules."
+        ]
+      },
+      {
+        "name": "Osric Penhale",
+        "role": "court-vendor:smith",
+        "title": "Ironmonger",
+        "at": {
+          "x": 86.2,
+          "y": 90.25
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Copper bars and bog-iron, cut to the weight the Council's assayer stamps. Nobody argues with the stamp.",
+          "Master Brask forges and I sell. He says that makes me the clever one. He doesn't mean it kindly."
+        ]
+      },
+      {
+        "name": "Maudie Thorncroft",
+        "role": "court-vendor:leather",
+        "title": "Leather-seller",
+        "at": {
+          "x": 83.3,
+          "y": 60.95
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Salt from the Rim, by the bag. Your hides will thank you, or at least they won't rot.",
+          "The Crown buys gloves by the dozen and never asks whose hide they were."
+        ]
+      },
+      {
+        "name": "Prue Calvert",
+        "role": "court-vendor:weaver",
+        "title": "Draper",
+        "at": {
+          "x": 74.3,
+          "y": 60.95
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Salt sets the dye, madder or woad. Without it your red runs pink at the first rain.",
+          "Ada says the loom forgives nothing. I say the customer forgives less."
+        ]
+      },
+      {
+        "name": "Tobiah Quarles",
+        "role": "court-vendor:simpler",
+        "title": "Simples-seller",
+        "at": {
+          "x": 97.05,
+          "y": 79.3
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Vials, stoppered and clean. A good draught deserves better than a cracked cup.",
+          "Sister Wenlow's still never cools. Neither does the cough in the Lowtowns."
+        ]
+      },
+      {
+        "name": "Margery Cobb",
+        "role": "court-vendor:cook",
+        "title": "Victualler",
+        "at": {
+          "x": 92.3,
+          "y": 60.95
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Flour from Oakhaven's mill, salt from the Rim and cheese from Harrow. A cook can't ask more of a road.",
+          "Bettany cooks for the Council's clerks. I feed everyone who can't afford Bettany."
+        ]
+      },
+      {
+        "name": "Cuthbert Brenning",
+        "role": "court-vendor:bowyer",
+        "title": "Timber-seller",
+        "at": {
+          "x": 76.2,
+          "y": 90.55
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "A hatchet and a sack of charcoal. Everything else in my trade grows where the wind fells it.",
+          "Orla won't cut a living tree. I won't sell her anything that came from one."
+        ]
+      },
+      {
+        "name": "Grisel Hallam",
+        "role": "court-vendor:miner",
+        "title": "Ore-seller",
+        "at": {
+          "x": 95.2,
+          "y": 90.55
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Picks for the seams and charcoal for the smelting. The ore you dig yourself; the Council taxes it if I do.",
+          "Dunstan swears copper sings when you strike it right. Forty years and I've only heard him."
+        ]
+      },
+      {
+        "name": "Wilmot Pellow",
+        "role": "court-vendor:herbalist",
+        "title": "Herb-seller",
+        "at": {
+          "x": 97.05,
+          "y": 69.3
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Vials to carry what you pick, and a draught for when the picking goes wrong.",
+          "Liesel says bare hands are enough. Mine were green to the wrist; I wear gloves now."
+        ]
+      },
+      {
+        "name": "Elsie Marlowe",
+        "role": "apprentice",
+        "title": "Court Apprentice",
+        "place": "tannery",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Three years at the bellows and Master Brask still calls me 'the girl'. Next year he'll call me 'smith'.",
+          "The bars come up the Gilt Approach cold. They go down it hot, as horseshoes."
+        ]
+      },
+      {
+        "name": "Kester Toller",
+        "role": "apprentice",
+        "title": "Court Apprentice",
+        "place": "tannery",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Scrape, salt, stretch, wait. The waiting is the hard part.",
+          "I stitched a scabbard for a warden last week. He never said thank you. He did come back for a belt."
+        ]
+      },
+      {
+        "name": "Dickon Drummond",
+        "role": "apprentice",
+        "title": "Court Apprentice",
+        "place": "tannery",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I knead for Bettany before the bells. By noon the whole Court smells of bread.",
+          "Bettany says I salt like a sailor. I've never seen the sea."
+        ]
+      },
+      {
+        "name": "Jemmy Orrell",
+        "role": "apprentice",
+        "title": "Court Apprentice",
+        "place": "tannery",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I sort what the gatherers bring: ore here, herbs there, and whatever crawled in with them out of the door.",
+          "One day I'll go down to the Lowtowns and see the Spire from underneath."
+        ]
+      },
+      {
+        "name": "Lise Marrable",
+        "role": "apprentice",
+        "title": "Court Apprentice",
+        "place": "tannery",
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Warp weights are clay. I make them myself and fire them in the Cookshop's ashes.",
+          "Ada says I spin a fine thread. Prue says I spin a fine story. They're both right."
         ]
       }
     ],

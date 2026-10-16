@@ -15,7 +15,7 @@ namespace Crulanda.Encounter
     /// most hurt of the party. Its numbers follow its level. It falls when beaten and gets up again once the fight is over.
     /// Not saved: a party is for the session (the sim goes back to the world when you leave or it is dismissed).
     /// </summary>
-    public sealed class SimCompanion : MonoBehaviour
+    public sealed partial class SimCompanion : MonoBehaviour   // its class's hold and its area blow: SimCompanion.Fight.cs
     {
         public Actor actor; public EncounterSession session; public SimAdventurer sim; public int slot;
         /// <summary>Time and kills with you this grouping (5.5: SimMemory on leaving).</summary>
@@ -49,13 +49,14 @@ namespace Crulanda.Encounter
         /// <summary>Has an interrupt (Kick, Hush, Shield Bash, Censure, Quench): stops a cast in its reach every 12 s.</summary>
         public bool Interrupter { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.mage" || sim.classId == "class.scoundrel"; } }
         /// <summary>Its longest wait in seconds (a hold, a kick, a heal, a taunt), for a Scoundrel's favour (ScoundrelKit, 2026-10-14).</summary>
-        public float LongestWait { get { return Mathf.Max(0, Mathf.Max(Mathf.Max(nextHold, nextKick), Mathf.Max(nextHeal, nextTaunt)) - Time.time); } }
+        public float LongestWait { get { return Mathf.Max(0, Mathf.Max(Mathf.Max(Mathf.Max(nextHold, nextKick), Mathf.Max(nextHeal, nextTaunt)), nextClassHold) - Time.time); } }   // its class's hold too (SimCompanion.Fight)
         /// <summary>A Scoundrel's favour called in: its longest wait comes up to <paramref name="seconds"/> sooner. The seconds taken off.</summary>
         public float CallInFavour(float seconds)
         {
             float now = Time.time, wait = LongestWait; if (wait <= 0 || seconds <= 0) return 0;
             float cut = Mathf.Min(seconds, wait);
-            if (nextHold - now >= wait - .001f) nextHold -= cut;
+            if (nextClassHold - now >= wait - .001f) nextClassHold -= cut;
+            else if (nextHold - now >= wait - .001f) nextHold -= cut;
             else if (nextKick - now >= wait - .001f) nextKick -= cut;
             else if (nextHeal - now >= wait - .001f) nextHeal -= cut;
             else nextTaunt -= cut;
@@ -695,6 +696,7 @@ namespace Crulanda.Encounter
                 }
             }
             if (Controller && Time.time >= nextHold) HoldTheMoon();
+            if (Time.time >= nextHoldLook) HoldOne(quarry);   // every other class's hold (SimCompanion.Fight)
             if (Interrupter && Time.time >= nextKick)
                 foreach (var e in session.Enemies)
                     if (e != null && e.actor.IsAlive && e.Casting && e.FightingParty && e.CastProgress > .25f && Vector3.Distance(e.transform.position, transform.position) <= Reach + 1.5f)
@@ -723,15 +725,14 @@ namespace Crulanda.Encounter
                 if (Time.time >= nextAct)
                 {
                     nextAct = Time.time + Interval;
+                    if (Time.time >= nextArea && SwingWide(quarry) > 0) return;   // a pack about its quarry: this blow goes across them all (SimCompanion.Fight)
                     int dmg = Hit;
                     if (Melee) visual?.Strike();
                     else
                     {
                         visual?.CastRelease();
-                        var hand = visual != null ? visual.RightHandle : null; var from = hand != null ? hand.position : transform.position + Vector3.up * 1.3f;
-                        bool arrow = sim.classId == "class.ranger";
-                        var colour = sim.classId == "class.mage" ? new Color(1, .55f, .15f) : sim.classId == "class.druid" ? new Color(.45f, .85f, .3f) : sim.classId == "class.archivist" ? new Color(.6f, .8f, 1) : sim.classId == "class.saltmender" ? new Color(.97f, .97f, .92f) : new Color(.9f, .88f, .8f);
-                        Bolt.Fire(from, quarry.transform, colour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
+                        bool arrow = Arrow;
+                        Bolt.Fire(Hand, quarry.transform, BoltColour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
                     }
                     quarry.Receive(dmg, actor);
                     if (Role == PartyRole.Tank) quarry.threat.Add(actor.EntityId.Value, BaseHit * 3f);   // a tank's blows hold attention: three of its full blows a swing on top of the half it lands, over the damage-dealers' 1.6 (2026-10-15)

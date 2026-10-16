@@ -248,6 +248,55 @@ namespace Crulanda.Tests
                 }
         }
 
+        /// <summary>
+        /// No pocket in the Lantern (CrownLifeTests, 2026-10-16: a server "stood stuck at (40.17, 9.08, 36.72)", the cook's place, three
+        /// times a day): the kitchen's range stood in the back corner 1.45 m from the gallery's corner column, so the navmesh between
+        /// them (each solid padded by NavPad, the walkable mesh the agent's radius short of that) was a strip 0.25 m wide, and whoever was
+        /// sent there could not get out. Over the plan's solids (the walls, the bar, the hearth, the range, the columns, the stair and its
+        /// rail: the tables, settles, stools and bench are walked between), a grid flood from inside the door through every point whose
+        /// middle keeps NavPad + the agent's radius + half a way of 0.9 m from every solid (a way 0.9 m wide on the navmesh, 2.1 m of clear
+        /// floor between solids: a walker and room to pass); every seat, stool, bench seat, server's place, the innkeeper's, the
+        /// cook's and the hatch lie within a step of that way (a 1.2 m path to the door, the body and the way's half).
+        /// </summary>
+        [Test] public void Every_place_in_the_Gilded_Lantern_has_a_wide_way_to_the_door()
+        {
+            var inn = Prop("The Gilded Lantern"); var plan = ZoneBuilder.InnPlan.For(inn.size, inn.variant); var inner = plan.Inner;
+            const float way = .9f, step = .05f; float keep = ZoneBuilder.NavPad + ZoneBuilder.NavAgentRadius + way / 2, reach = way / 2 + .15f;
+            var solids = plan.Furniture().Where(f => !f.what.StartsWith("table")).ToList();
+            int si = solids.FindIndex(f => f.what == "the stair"); Assert.GreaterOrEqual(si, 0, "The stair is solid.");
+            solids[si] = ("the stair and its rail", solids[si].at + new Vector2(0, .04f), solids[si].half + new Vector2(0, .04f));   // the rail, .16 thick on its open side
+            float Clear(Vector2 p)
+            {
+                float c = Mathf.Min(inner.x - Mathf.Abs(p.x), inner.y - Mathf.Abs(p.y));
+                foreach (var (_, at, half) in solids) c = Mathf.Min(c, Outside(p, at, half));
+                return c;
+            }
+            int nx = Mathf.CeilToInt(2 * inner.x / step), nz = Mathf.CeilToInt(2 * inner.y / step);
+            Vector2 Cell(int i, int j) { return new Vector2(-inner.x + (i + .5f) * step, -inner.y + (j + .5f) * step); }
+            var wide = new bool[nx, nz]; for (int i = 0; i < nx; i++) for (int j = 0; j < nz; j++) wide[i, j] = Clear(Cell(i, j)) >= keep;
+            var reached = new bool[nx, nz]; var queue = new Queue<(int, int)>();
+            var seed = (nx / 2, Mathf.FloorToInt((keep + .1f) / step)); Assert.IsTrue(wide[seed.Item1, seed.Item2], "The way starts inside the door.");
+            reached[seed.Item1, seed.Item2] = true; queue.Enqueue(seed);
+            while (queue.Count > 0)
+            {
+                var (i, j) = queue.Dequeue();
+                foreach (var (a, b) in new[] { (i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1) })
+                    if (a >= 0 && b >= 0 && a < nx && b < nz && wide[a, b] && !reached[a, b]) { reached[a, b] = true; queue.Enqueue((a, b)); }
+            }
+            float ToWay(Vector2 p)
+            {
+                float best = float.MaxValue; int r = Mathf.CeilToInt(2 / step), ci = Mathf.FloorToInt((p.x + inner.x) / step), cj = Mathf.FloorToInt((p.y + inner.y) / step);
+                for (int i = Mathf.Max(0, ci - r); i < Mathf.Min(nx, ci + r); i++) for (int j = Mathf.Max(0, cj - r); j < Mathf.Min(nz, cj + r); j++)
+                    if (reached[i, j]) best = Mathf.Min(best, Vector2.Distance(p, Cell(i, j)));
+                return best;
+            }
+            var places = plan.seats.Select(s => ("a seat", s.at)).Concat(plan.stools.Select(s => ("a stool", s.at))).Concat(plan.benchSeats.Select(s => ("a bench seat", s.at)))
+                .Concat(plan.serve.Select(s => ("a server's place", s))).Concat(new[] { ("the innkeeper's place", plan.stand), ("the cook's place", plan.cook), ("the hatch", plan.hatch) });
+            var problems = new List<string>();
+            foreach (var (what, at) in places) { float d = ToWay(at); if (d > reach) problems.Add(what + " at " + at + " is " + (d > 2 ? "over 2" : d.ToString("0.00")) + " m from a way " + way + " m wide to the door"); }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
         static IEnumerable<ZoneResident> Workers { get { return crown.life.residents.Where(r => r != null && r.works && VillageWork.CityRoles.Contains(r.role)); } }
 
         [Test] public void At_least_thirty_of_the_Crowns_people_have_real_jobs_and_homes()

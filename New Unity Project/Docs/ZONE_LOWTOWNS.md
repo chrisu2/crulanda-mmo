@@ -119,7 +119,9 @@ pin, a short root on a spirit, CANON craft), steel that passes through a Weave-E
    and gear (SimGear tier 6), the balance page's targets set again for 16-19 (BALANCE_REPORT.md says they are reset as the cap rises).
 2. **Talents:** at 19 a single-branch build needs about 20 ranks: every branch has 16 or more built, rows 4 are written for the
    Warrior, Druid, Paladin's Vanguard, the fourth paths and the Archivist's Cantor, and not written for the first three branches of the
-   Ranger, Mage, Rogue and Archivist (CLASS_STATUS.md). Build row 4 everywhere first (one new rank pair a branch is enough for 19).
+   Ranger, Mage, Rogue and Archivist (CLASS_STATUS.md). (Corrected 2026-10-15 ~23:45 by the talent helper's reading of TalentTree: a tier-4 node needs 20 points already in its branch, so at
+   19 (20 points) no tier 4 can ever be bought. The extra ranks go in tier 3's free columns instead, to at least 21 a branch. The node
+   plan, not run and with no kit code yet: tools/wip/talents19.py; paused for the castle.)
 3. **Gear:** tier 6 loot tables (uncommon, rare, the named pieces of the zone's elites), the crafted slag-iron kit (Phase 8.6 rules),
    the class sets' tier 1 stays the Adit's.
 4. **Abilities:** each class's rank-ups at 16-19 (new ranks of existing abilities, one new ability at 18 if the class has a gap).

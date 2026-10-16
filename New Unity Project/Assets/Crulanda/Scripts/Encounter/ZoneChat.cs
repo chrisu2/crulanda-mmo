@@ -170,6 +170,14 @@ namespace Crulanda.Encounter
                     case "/groster": case "/ginfo": GuildRoster(); return;
                     case "/gquit": LeaveGuild(); return;
                     case "/invis": Unseen = !Unseen; Message(Unseen ? "Unseen: mobs will not notice you (until you hit one). /invis again to be seen." : "Seen again."); return;
+                    case "/crown":   // a tester's way to the capital (2026-10-16, Chris's castle preview: the bat took him to the Adit)
+                        {
+                            var crown = Zone != null ? Zone.FindZone("zone.crown") : null; if (crown == null) { Message("The Crown of Argentis is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            Message("To the Crown of Argentis...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.crown", name = "/crown", arrive = crown.spawns.player });
+                            return;
+                        }
                     case "/adit":   // a tester's way in (Chris, 2026-10-08): level 11 and straight to the Sealed Adit's yard
                         {
                             var adit = Zone != null ? Zone.FindZone("zone.adit") : null; if (adit == null) { Message("The Sealed Adit is not in this build."); return; }

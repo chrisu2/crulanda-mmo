@@ -416,7 +416,10 @@ namespace Crulanda.World
             // The ceiling: solid, so the third-person camera pulls in under it instead of poking through (the inn's).
             Part(PrimitiveType.Cube, t, new Vector3(0, H + .1f, 0), new Vector3(w - th, .2f, d - th), Tint(art.plaster, new Color(.92f, .9f, .84f))).AddComponent<BoxCollider>();
             // A plinth course and a cornice outside, a gilt band under the cornice.
-            foreach (int sz in new[] { -1, 1 }) { Part(PrimitiveType.Cube, t, new Vector3(0, .3f, sz * (d / 2 + .12f)), new Vector3(w + .3f, .6f, .25f), CityShade).name = "Plinth"; Part(PrimitiveType.Cube, t, new Vector3(0, wallH - .25f, sz * (d / 2 + .15f)), new Vector3(w + .5f, .5f, .3f), CityWhite); Part(PrimitiveType.Cube, t, new Vector3(0, wallH - .62f, sz * (d / 2 + .06f)), new Vector3(w + .1f, .16f, .14f), Gilt); }
+            // The front's plinth stops either side of the doorway (2026-10-16, Chris in the Armoury: "floor is blocked": a 0.6 m course ran
+            // across every hall's door).
+            foreach (int s in new[] { -1, 1 }) { float span = (w + .3f - doorW) / 2; Part(PrimitiveType.Cube, t, new Vector3(s * (doorW / 2 + span / 2), .3f, -(d / 2 + .12f)), new Vector3(span, .6f, .25f), CityShade).name = "Plinth"; }
+            foreach (int sz in new[] { -1, 1 }) { if (sz > 0) Part(PrimitiveType.Cube, t, new Vector3(0, .3f, sz * (d / 2 + .12f)), new Vector3(w + .3f, .6f, .25f), CityShade).name = "Plinth"; Part(PrimitiveType.Cube, t, new Vector3(0, wallH - .25f, sz * (d / 2 + .15f)), new Vector3(w + .5f, .5f, .3f), CityWhite); Part(PrimitiveType.Cube, t, new Vector3(0, wallH - .62f, sz * (d / 2 + .06f)), new Vector3(w + .1f, .16f, .14f), Gilt); }
             foreach (int sx in new[] { -1, 1 }) { Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 + .12f), .3f, 0), new Vector3(.25f, .6f, d + .3f), CityShade).name = "Plinth"; Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 + .15f), wallH - .25f, 0), new Vector3(.3f, .5f, d + .5f), CityWhite); Part(PrimitiveType.Cube, t, new Vector3(sx * (w / 2 + .06f), wallH - .62f, 0), new Vector3(.14f, .16f, d + .1f), Gilt); }
             // The door's gilt frame, outside.
             foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * (doorW / 2 + .15f), doorH / 2, -d / 2 - .3f), new Vector3(.3f, doorH, .14f), Gilt);

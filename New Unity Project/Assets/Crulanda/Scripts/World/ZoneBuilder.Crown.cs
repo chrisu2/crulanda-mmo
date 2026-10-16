@@ -357,18 +357,30 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, at + q * new Vector3(0, -h / 2 - .08f, -wall / 2 - .08f), new Vector3(w + .4f, .16f, .2f), CityWhite, q);   // the sill
             Part(PrimitiveType.Cube, t, at + q * new Vector3(0, 0, -wall / 2 - .04f), new Vector3(.08f, h, .06f), Gilt, q);   // a mullion
         }
-        /// <summary>A shelf of books against a wall (the KayKit shelf where the kit is there), solid; its front looks along yaw's -Z.</summary>
+        /// <summary>A bookcase against a wall, solid; its open front looks along yaw's -Z: a dark oak case (back, sides, five shelves, a cornice)
+        /// full of books (2026-10-16, Chris in the Archive: "looks like tables above table, but should be bookshelves": the KayKit wall shelf,
+        /// stretched to 2.4 m, read as benches stacked in rows).</summary>
         void BookShelf(Transform t, Vector3 foot, float yaw, System.Random r)
         {
-            if (ModelProp(t, "KayKit/shelves", foot, yaw, 2.4f, true) != null) return;
-            var q = Quaternion.Euler(0, yaw, 0);
-            Solidify(BoxPart(t, foot + Vector3.up * 1.2f, new Vector3(2.2f, 2.4f, .55f), DarkOak, q));
+            var q = Quaternion.Euler(0, yaw, 0); const float W = 2.2f, H = 2.6f, D = .5f;
+            Solidify(BoxPart(t, foot + q * new Vector3(0, H / 2, .22f), new Vector3(W, H, .06f), DarkOak, q));   // the back
+            foreach (int s in new[] { -1, 1 }) BoxPart(t, foot + q * new Vector3(s * (W / 2 - .04f), H / 2, 0), new Vector3(.08f, H, D), DarkOak, q);
+            for (int row = 0; row < 5; row++) BoxPart(t, foot + q * new Vector3(0, .08f + row * .58f, 0), new Vector3(W - .1f, .05f, D), DarkOak, q);
+            BoxPart(t, foot + q * new Vector3(0, H + .06f, -.03f), new Vector3(W + .12f, .12f, D + .1f), DarkOak, q);   // the cornice
+            Part(PrimitiveType.Cube, t, foot + q * new Vector3(0, H - .02f, -D / 2 - .02f), new Vector3(W, .04f, .02f), Gilt, q);
             for (int row = 0; row < 4; row++)
-                for (int k = 0; k < 7; k++)
+            {
+                float x = -W / 2 + .14f;
+                while (x < W / 2 - .2f)
                 {
-                    var c = Color.HSVToRGB((float)r.NextDouble(), .45f, .3f + (float)r.NextDouble() * .35f);
-                    Part(PrimitiveType.Cube, t, foot + q * new Vector3(-.9f + k * .3f, .35f + row * .55f, -.3f), new Vector3(.22f, .38f + (float)r.NextDouble() * .08f, .3f), Tint(art.cloth, c), q);
+                    float bw = .05f + (float)r.NextDouble() * .05f, bh = .34f + (float)r.NextDouble() * .14f;
+                    if (r.NextDouble() < .08) { x += .18f; continue; }   // a gap where a book is out
+                    var c = Color.HSVToRGB((float)r.NextDouble(), .4f + (float)r.NextDouble() * .2f, .25f + (float)r.NextDouble() * .3f);
+                    float lean = r.NextDouble() < .1 ? 8 : 0;
+                    Part(PrimitiveType.Cube, t, foot + q * new Vector3(x + bw / 2, .105f + row * .58f + bh / 2, -.02f), new Vector3(bw, bh, .3f), Tint(art.cloth, c), q * Quaternion.Euler(0, 0, lean));
+                    x += bw + .01f;
                 }
+            }
         }
         /// <summary>A table of dark oak (top, four legs), solid; long along x of yaw's frame.</summary>
         void CityTable(Transform t, Vector3 foot, float yaw, float len, float wide)

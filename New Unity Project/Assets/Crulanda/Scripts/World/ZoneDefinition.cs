@@ -201,6 +201,9 @@ namespace Crulanda.World
     /// - vista: a lookout, found by walking within radius (a cairn or nothing at all);
     /// - cache: a hidden box or bundle; note: a page or scrap tucked away; herb: a rare plant; chest: a locked chest;
     ///   key: a key hidden somewhere else, for a chest that names it in needs. These are found by searching (E, prompt).
+    /// - (Phase 8.6) carving: marks cut in a stone, a post or a cave wall (a line in the book of lore); read: a book, a cairn's book
+    ///   or slates (a page); grave: a named stone (a line in the book); remains: a dead adventurer (gear and a page); shrine: a
+    ///   wayshrine (its blessing; after the find, for a crown). A found herb grows back a game day after it is picked.
     /// Rewards: xp, gold, an item id, a document id (a readable page, as quests give). height lifts the prop off the ground
     /// (something tucked up under a bridge or in a tree); rotation turns it. canonStatus as everywhere.
     /// clue: the Discoveries tab's line for it while it is not found, a riddle in the book's voice that points at the region and

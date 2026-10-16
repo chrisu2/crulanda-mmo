@@ -48,6 +48,13 @@
   ],
   "documents": [
     {
+      "id": "doc.khaven.deserters_leaf",
+      "kind": "lore",
+      "title": "A Deserter's Last Leaf",
+      "text": "Leaves from a Sandthrone picket's daybook, the last of them loose in his satchel:\n\nFirst night out. Emmet will have struck my name by now. Let him. I took the north watch for the coin and I'm leaving it for the same reason: there isn't any.\n\nSecond night. The grey trunks talk when the wind drops. Not words. The way a crowd talks through a wall. I kept on west, where they stand thickest, because nobody from the Company will follow me in here.\n\nThird night. One of them said my mother's name. I have not said it aloud since the Dry Wells. I sat down against a trunk to think about that.\n\nFourth night. I'm not cold. That ought to worry me more than it does. The talk is very close now, and kind. I think I'll stay and listen a while.",
+      "canonStatus": "GAME-ONLY: the deserter, his leaf and the wood that talks. The Sandthrone are a CANON mercenary company (world_bible.md)."
+    },
+    {
       "id": "doc.khaven.tally",
       "title": "Forty Sovereigns",
       "text": "A notched tally-stick, with a scrap of paper wound round it in a clumsy hand:\n\nBureau wagon, Oakhaven run.\nTwo, small, taken on at Khaven gate. Sound.\nForty sovereigns: twenty paid at the gate, twenty at the toll.\nRide them north by the Peaks road. Hand on at the gate to the Concord escort.\nNo questions, as agreed.",

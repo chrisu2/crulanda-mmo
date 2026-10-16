@@ -10,7 +10,12 @@ Why the sim parties wiped at the Nix duo all afternoon was not the duo's numbers
 - **Mira stood idle while you were down**: she now heals and fights on while the party is still in a fight.
 - **A rider's home stayed at its camp:** Nix, off the dead beast, walked back there and reset after the lull his own Shriek made. His home is
   now where he climbs down.
-- **The fight test** (`AditNixFightTests`): you get up as the run does and a reset duo is pulled again.
+- **Whoever gets up at the stone leaves every mob's threat list:** Nix had chased the revived tank across the dungeon past his leash and reset
+  at 426 health with three sims on him.
+- **The run bot assists the tank** (RunCapture and the test): it went for Nix while he was free and died at 15 s in every fight.
+- **The fight test** (`AditNixFightTests`): you get up as the run does, back where you fell, and a reset duo is pulled again.
+- **Result (20:16-20:21):** the run's party beat the duo 3 of 3 (Nix down at 211-225 s; the tank and you fall near the end and the
+  rest finish him: hard, winnable); the party and death tests 44/44. Published 20:2x and the full group run started.
 - **Silent test runs:** batch-mode tests, tours, captures and group runs mute every sound (`QuietRuns`; Chris: "please turn the music off in
   future testing").
 - **The duo's moves 11% further apart** (Chris: "move timer to 11%" after a 12% win with the tank never low).

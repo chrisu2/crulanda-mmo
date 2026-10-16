@@ -1165,11 +1165,12 @@ namespace Crulanda.World
                 // 2026-10-15: a ruin added after the zone was laid out) draws from its own stream too, so the groves after it keep
                 // their trees; variant 0 (the Hollins' and the other zones' ruins) draws from the zone's, as it always did.
                 var zoneRng = rng; int legacy = p.kind == "cave" ? 30 : p.kind == "rib" ? 6 : p.kind == "perch" || p.kind == "wallow" || p.kind == "brood" || p.kind == "cavern" || p.kind == "monolith" || p.kind == "giant_tree" || p.kind == "treehouse" || p.kind == "waterfall" || p.kind == "mushrooms" || p.kind == "fallen_giant" || p.kind == "leathershop" || p.kind == "dryhut" || p.kind == "kitchen" || p.kind == "gamerack" || p.kind == "skep" || (p.kind == "ruined_house" && p.variant == 1) ? 0 : -1;
+                if (p.was == "ruined_house" && p.kind != "ruined_house") legacy = RuinDraws(p.size.x > 0 ? p.size : new Vector2(8, 6));   // raised over a fallen house (Wain's Rest, 2026-10-15): the ruin's draws
                 if (legacy >= 0) { for (int k = 0; k < legacy; k++) _ = R01; rng = new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663)); }
                 switch (p.kind)
                 {
                     case "house": House(t, p.size.x > 0 ? p.size : new Vector2(7, 5), 3f, p.variant, false); break;
-                    case "inn": Inn(t, p.size.x > 0 ? p.size : new Vector2(12, 8), p.variant); break;
+                    case "inn": if (p.variant == 2) Waystation(t, p.size.x > 0 ? p.size : new Vector2(8, 6), p); else Inn(t, p.size.x > 0 ? p.size : new Vector2(12, 8), p.variant); break;
                     case "barn": Barn(t, p.size.x > 0 ? p.size : new Vector2(12, 8)); break;
                     case "mill": Mill(t, p.size.x > 0 ? p.size : new Vector2(7, 6)); break;
                     case "well": Well(t, p.variant); break;
@@ -1197,7 +1198,7 @@ namespace Crulanda.World
                         Tower(t, p.size.x > 0 ? p.size.x : 4.4f); break;
                     case "giant_tree": GiantTree(t, p.variant); trunks.Add(p.at); break;
                     case "fallen_giant": FallenGiant(t, p.size.x > 0 ? p.size.x : 36); break;
-                    case "treehouse": Treehouse(t, p.variant); trunks.Add(p.at); break;
+                    case "treehouse": Treehouse(t, p.variant, p.style == "inn"); trunks.Add(p.at); break;
                     case "waterfall": Waterfall(t, p.size.x > 0 ? p.size.x : 6, p.lift > 0 ? p.lift : 10); break;
                     case "mushrooms": Mushrooms(t, p.size.x > 0 ? p.size.x : 2, p.variant); break;
                     case "monolith": Monolith(t); break;
@@ -1265,7 +1266,7 @@ namespace Crulanda.World
                 if (t != null && Footprint(p).x > 0)   // see-through where it hides the player (playtest notes 26 and 120)
                 {
                     var fade = t.gameObject.AddComponent<RoofFade>(); bool open = p.kind == "forge" || p.kind == "tannery" || p.kind == "shelter";
-                    fade.Half = Footprint(p) - Vector2.one * (open || p.kind == "tower" || p.kind == "crypt" || p.kind == "kitchen" ? .3f : .8f);   // the walls, not the eaves
+                    fade.Half = Footprint(p) - Vector2.one * (open || p.kind == "tower" || p.kind == "crypt" || p.kind == "kitchen" ? .3f : p.kind == "inn" && p.variant == 2 ? .15f : .8f);   // the walls, not the eaves
                     fade.Walled = !open;
                 }
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
@@ -1311,6 +1312,8 @@ namespace Crulanda.World
             {
                 case "barn" when p.size.x > 0 && WalksIn(p.name, p.size): return new Vector2(p.size.y, p.size.x) / 2 + Vector2.one * .8f;   // a walk-in barn runs back from its front
                 case "house": return (p.size.x > 0 ? p.size : new Vector2(7, 5)) / 2 + Vector2.one * .8f;
+                // A waystation (2026-10-15) to its walls' outer faces: Wain's Rest's waybook is pushed into a crack in its back wall, outside.
+                case "inn" when p.variant == 2: return (p.size.x > 0 ? p.size : new Vector2(8, 6)) / 2 + Vector2.one * .15f;
                 case "inn": case "barn": return (p.size.x > 0 ? p.size : new Vector2(12, 8)) / 2 + Vector2.one * .8f;
                 case "mill": case "keep": return (p.size.x > 0 ? p.size : new Vector2(7, 6)) / 2 + Vector2.one * .8f;
                 case "tower": return Vector2.one * ((p.size.x > 0 ? p.size.x : 4.4f) / 2 + .3f);
@@ -1545,10 +1548,13 @@ namespace Crulanda.World
         /// A walk-in inn: hollow ground floor behind a working door, with a bar, tables, stools and a lit hearth.
         /// Built at ground level (no plinth under the floor) so characters and navigation walk straight in.
         /// Each wall piece is its own collider/nav blocker so the interior stays open. variant 1 is the Cracked Hearth (CrackedHearth).
+        /// The door is a double door <paramref name="doorW"/> wide (Phase 8.6, 2026-10-15: two leaves, 2.6 m; it was one of 1.6) and the
+        /// room is laid out by its plan (InnPlan): five tables of three, the bar with two stools, the hearth's bench.
         /// </summary>
-        void Inn(Transform t, Vector2 size, int variant)
+        void Inn(Transform t, Vector2 size, int variant, float doorW = InnDoorW)
         {
-            float w = size.x, d = size.y, H = 6.4f, storey = 3.7f, wall = .3f, doorW = 1.6f, doorH = 2.4f;
+            var plan = InnPlan.For(size, variant, doorW);
+            float w = size.x, d = size.y, H = 6.4f, storey = 3.7f, wall = plan.wall, doorH = plan.doorH;
             var plaster = Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);
             var boards = Tint(art.timber, new Color(.38f, .27f, .18f));
             var dark = Tint(art.timber, new Color(.2f, .13f, .08f));
@@ -1566,9 +1572,10 @@ namespace Crulanda.World
             {
                 // The jambs' colliders stop .1 m short of the opening (the plaster doesn't): EncounterNavigation pads every blocker
                 // by .1 m and the navmesh erodes by the agent's .5 m, which left the 1.6 m door a one-voxel diagonal thread that broke
-                // at some angles to the grid (the Cracked Hearth's taproom was cut off from Khaven). The nav gap is now 1.6 m.
+                // at some angles to the grid (the Cracked Hearth's taproom was cut off from Khaven). With the 2.6 m double door the
+                // way through is 1.6 m (NavGap): two abreast.
                 var jamb = WallPiece(new Vector3(s * (doorW / 2 + side / 2), H / 2, -d / 2), new Vector3(side, H, wall)).GetComponent<BoxCollider>();
-                jamb.size -= new Vector3(.1f, 0, 0); jamb.center += new Vector3(s * .05f, 0, 0);
+                jamb.size -= new Vector3(JambShort, 0, 0); jamb.center += new Vector3(s * JambShort / 2, 0, 0);
             }
             WallPiece(new Vector3(0, doorH + (H - doorH) / 2, -d / 2), new Vector3(doorW, H - doorH, wall));
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
@@ -1608,58 +1615,57 @@ namespace Crulanda.World
                 BoxPart(t, new Vector3(w / 2 - 1.1f, H + roofH * .75f, d * .15f), new Vector3(1, roofH * 1.1f, 1), Masonry, null, 1);
                 BoxPart(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.3f + .04f, d * .15f), new Vector3(1.2f, .12f, 1.2f), Tint(Masonry, new Color(.45f, .44f, .4f)), null, 1);   // its cap
             }
-            // The door: a plank door on a hinge at the left jamb, on a stone threshold (with steps down if the ground falls away).
-            var hinge = new GameObject("Door hinge").transform; hinge.SetParent(t, false); hinge.localPosition = new Vector3(-doorW / 2, 0, -d / 2 - .02f);
-            var door = PlankDoor(hinge, new Vector3(doorW / 2, doorH / 2, 0), doorW, doorH, dark, .1f);
-            var doorCollider = door.AddComponent<BoxCollider>();
-            DoorSteps(t, 0, -d / 2 - wall / 2, .05f, 2, wall, footing);
-            var innDoor = new ZoneDoor { name = t.name, kind = "inn", openable = true, hinge = hinge, blocker = doorCollider, position = t.TransformPoint(new Vector3(0, 1, -d / 2)) };
+            // The door: two plank leaves on hinges at the two jambs (DoubleDoor), on a stone threshold (with steps down if the ground
+            // falls away).
+            var innDoor = DoubleDoor(t, -d / 2, doorW, doorH, dark, t.name);
+            DoorSteps(t, 0, -d / 2 - wall / 2, .05f, doorW + .4f, wall, footing);
             Doors.Add(innDoor); innDoor.SetOpen(true);   // the inn keeps its door open; villagers come and go
             if (art.particle != null && variant != 1) Smoke(t, new Vector3(w / 2 - 1.1f, H + roofH * 1.4f, d * .15f));
-            // Inside: bar counter with barrels behind it, three tables with stools, and the hearth.
-            var bar = Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + 2.6f, .55f, d / 2 - 1.5f), new Vector3(4, 1.1f, .7f), boards);
+            // Inside (the plan's): the bar counter with barrels behind it and two stools before it, five tables of three, and the hearth.
+            var bar = Part(PrimitiveType.Cube, t, new Vector3(plan.bar.x, .55f, plan.bar.y), new Vector3(plan.barSize.x, 1.1f, plan.barSize.y), boards);
             bar.AddComponent<BoxCollider>(); bar.AddComponent<NavBlocker>();
-            Part(PrimitiveType.Cube, t, new Vector3(-w / 2 + 2.6f, 1.12f, d / 2 - 1.5f), new Vector3(4.2f, .08f, .9f), dark);
+            Part(PrimitiveType.Cube, t, new Vector3(plan.bar.x + .05f, 1.12f, plan.bar.y), new Vector3(plan.barSize.x + .2f, .08f, .9f), dark);
             for (int i = 0; i < 3; i++) Barrel(t, new Vector3(-w / 2 + 1.2f + i * 1.1f, .045f, d / 2 - .55f), 1, i * 40);   // the kit's barrels behind the bar (2026-10-07)
             // The bar's top dressed from the Medieval props (2026-10-07): two mugs, a bottle and a candle along it.
             ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(-w / 2 + 1.3f, 1.16f, d / 2 - 1.5f), 20, .13f); ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(-w / 2 + 2.1f, 1.16f, d / 2 - 1.55f), -60, .13f);
             ModelProp(t, "Medieval/Prefabs/BottleV1", new Vector3(-w / 2 + 3.4f, 1.16f, d / 2 - 1.45f), 0, .28f); ModelProp(t, "Medieval/Prefabs/CandleV1", new Vector3(-w / 2 + 4.2f, 1.16f, d / 2 - 1.6f), 0, .2f);
+            bool kitTables = HasProp("Fantasy/Table_Large");
+            foreach (var (at, face) in plan.stools)
+            {
+                if (kitTables) ModelProp(t, "Fantasy/Stool", new Vector3(at.x, .045f, at.y), 0, .62f);
+                else { Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .32f, at.y), new Vector3(.36f, .32f, .36f), dark); Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .65f, at.y), new Vector3(.42f, .03f, .42f), boards); }
+            }
             // The innkeeper's place at the open end of the bar, and behind it the door to the rooms upstairs (barred to the player:
             // whoever lodges at the inn goes to bed through it), set between two of the back wall's windows. With a kitchen on the
             // back wall, the kitchen's own door shows in the taproom too.
-            Workplace(t, "bar", new Vector3(-w / 2 + 5.3f, 0, d / 2 - 1.4f), new Vector3(0, 1, -1));
-            float roomsX = -w / 2 + 5.4f;
+            Workplace(t, "bar", new Vector3(plan.stand.x, 0, plan.stand.y), new Vector3(0, 1, -1));
+            float roomsX = plan.roomsX;
             InnerDoor(t, roomsX, d / 2 - wall / 2, dark);
             Doors.Add(new ZoneDoor { name = t.name + ", upstairs", kind = "rooms", openable = false, position = t.TransformPoint(new Vector3(roomsX, 1, d / 2 - .7f)) });
             if (kitchen.HasValue) InnerDoor(t, kitchen.Value - KitchenDoorX, d / 2 - wall / 2, dark);
             // The kit's chandelier over the room and a bench by the hearth (2026-10-07); the tables below are the kit's where it is there.
-            ModelProp(t, "Fantasy/Chandelier", new Vector3(0, 2.55f, -.2f), 0, .8f); ModelProp(t, "Fantasy/Bench", new Vector3(w / 2 - 2.3f, .045f, .8f), 90, .5f);
-            ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(w / 2 - 1.3f, .045f, -1.2f), 0, .5f);
-            bool kitTables = HasProp("Fantasy/Table_Large"); int tableNo = 0;
-            foreach (var at in new[] { new Vector2(2.2f, -1.6f), new Vector2(2.8f, 1.3f), new Vector2(-2.8f, -1.9f) })
+            ModelProp(t, "Fantasy/Chandelier", new Vector3(0, 2.55f, -.2f), 0, .8f); ModelProp(t, "Fantasy/Bench", new Vector3(plan.bench.x, .045f, plan.bench.y), 90, .5f);
+            ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(plan.woodpile.x, .045f, plan.woodpile.y), 0, .5f);   // round the hearth's back (it stood where a table's seat is now)
+            for (int n = 0; n < plan.tables.Count; n++)
             {
+                var at = plan.tables[n]; float turn = plan.turns[n];
                 if (kitTables)
                 {
-                    float turn = tableNo * 50; tableNo++;
-                    ModelProp(t, "Fantasy/Table_Large", new Vector3(at.x, .045f, at.y), turn, .8f, false, 1.5f);
-                    for (int k = 0; k < 3; k++) { float a = (k * 120 + turn + 30) * Mathf.Deg2Rad; ModelProp(t, "Fantasy/Stool", new Vector3(at.x + Mathf.Cos(a) * 1.0f, .045f, at.y + Mathf.Sin(a) * 1.0f), -k * 120 - turn + 60, .45f); }
+                    ModelProp(t, "Fantasy/Table_Large", new Vector3(at.x, .045f, at.y), -turn, .8f, false, 1.5f);
+                    for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; ModelProp(t, "Fantasy/Stool", new Vector3(seat.x, .045f, seat.y), -(turn + k * 120) + 90, .45f); }
                     ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, .845f, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, .845f, at.y + .25f), turn + 70, .12f);
                     continue;
                 }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .78f, at.y), new Vector3(1.2f, .04f, 1.2f), boards);
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .4f, at.y), new Vector3(.18f, .38f, .18f), dark);
-                for (int k = 0; k < 3; k++)
-                {
-                    float a = k * 120 * Mathf.Deg2Rad;
-                    Part(PrimitiveType.Cylinder, t, new Vector3(at.x + Mathf.Cos(a) * .95f, .25f, at.y + Mathf.Sin(a) * .95f), new Vector3(.4f, .25f, .4f), dark);
-                }
+                for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .25f, seat.y), new Vector3(.4f, .25f, .4f), dark); }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .88f, at.y), new Vector3(.12f, .08f, .12f), art.glass);   // candle
             }
-            var hearth = BoxPart(t, new Vector3(w / 2 - .6f, 1, .8f), new Vector3(.9f, 2, 2.4f), Masonry, null, 1);
+            var hearth = BoxPart(t, new Vector3(plan.hearth.x, 1, plan.hearth.y), new Vector3(plan.hearthSize.x, 2, plan.hearthSize.y), Masonry, null, 1);
             hearth.AddComponent<BoxCollider>(); hearth.AddComponent<NavBlocker>();
             Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.02f, .55f, .8f), new Vector3(.1f, .8f, 1.4f), art.glass);   // embers
             var fire = new GameObject("Hearth fire").AddComponent<Light>(); fire.transform.SetParent(t, false);
-            fire.transform.localPosition = new Vector3(w / 2 - 1.6f, 1, .8f); fire.type = LightType.Point; fire.range = 9; fire.intensity = 1.8f; fire.color = new Color(1, .55f, .25f);
+            fire.transform.localPosition = new Vector3(plan.fire.x, 1, plan.fire.y); fire.type = LightType.Point; fire.range = 9; fire.intensity = 1.8f; fire.color = new Color(1, .55f, .25f);
             AddStation("fire", t.name, Ground(new Vector2(fire.transform.position.x, fire.transform.position.z)), t);   // the hearth is a fire to cook at, named after the inn
             StationRoom(t, new Rect(-w / 2, -d / 2, w, d));   // worked from the taproom, not from the street or the kitchen through a wall
             var room = new GameObject("Taproom light").AddComponent<Light>(); room.transform.SetParent(t, false);
@@ -1669,6 +1675,7 @@ namespace Crulanda.World
             var glow = new GameObject("Inn lantern").AddComponent<Light>(); glow.transform.SetParent(t, false);
             glow.transform.localPosition = new Vector3(0, 2.2f, -d / 2 - 1.2f); glow.type = LightType.Point; glow.range = 8; glow.intensity = 1.4f; glow.color = new Color(1, .72f, .4f);
             NightLights.Add(new NightLight { light = glow, dayIntensity = .6f, nightIntensity = 2.2f });   // faint by day: at 1.4 it bloomed to a pale blob on the plaster
+            RegisterInn(t, "tavern", innDoor, plan, plan.Inner);   // its seats, bar stools and bench for the village (VillageLife.FindPlaces)
         }
         /// <summary>
         /// The Cracked Hearth (inn variant 1): a stone chimney breast on the hearth gable (+X), split from its glowing ash-pit
@@ -5989,7 +5996,7 @@ namespace Crulanda.World
             if (Mathf.Abs(p.x) > Half - 14 || Mathf.Abs(p.y) > Half - 14) return false;
             float y = 0; if (Hollow.CoverAt(p, 2) > 0 || Hollow.FloorUnder(p, ref y)) return false;
             if (NearRoad(p, 6) || Water.NearWater(p, 4) || InBuilding(p) || NearProp(p, 3) || Steep(p, 2) > .5f) return false;
-            foreach (var o in Zone.props) if (o != null && (o.kind == "house" || o.kind == "inn" || o.kind == "mill" || o.kind == "barn" || o.kind == "forge" || o.kind == "stall") && Vector2.Distance(o.at, p) < 115) return false;
+            foreach (var o in Zone.props) if (o != null && o.was != "ruined_house" && (o.kind == "house" || o.kind == "inn" || o.kind == "mill" || o.kind == "barn" || o.kind == "forge" || o.kind == "stall") && Vector2.Distance(o.at, p) < 115) return false;   // a waystation raised over a ruin (Wain's Rest) is no village: its camps keep their ground
             foreach (var c in Zone.clearings) if (c != null && Vector2.Distance(p, c.center) < c.radius + 4) return false;
             foreach (var e in Zone.exits) if (e != null && (Vector2.Distance(p, e.at) < 16 || Vector2.Distance(p, e.arrive) < 16)) return false;
             foreach (var z in AllZones()) foreach (var e in z.exits) if (e != null && e.to == Zone.id && Vector2.Distance(p, e.arrive) < 16) return false;

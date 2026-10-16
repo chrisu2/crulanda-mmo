@@ -68,20 +68,22 @@ namespace Crulanda.Tests
             Assert.AreEqual(0, Mathf.DeltaAngle(kitchen.rotation, inn.rotation + 180), 1, "The kitchen faces away from the inn.");
             Assert.LessOrEqual(Mathf.Abs(local.x) + ZoneBuilder.KitchenSize.x / 2, w / 2 - .17f, "The lean-to stays between the inn's corner posts.");
             // The ground-floor windows on the back wall (x as ZoneBuilder.Inn lays them out): the kitchen takes the place of the
-            // ones its lean-to would cover, and only those (two, at 0.7 and 3.3).
+            // ones its lean-to would cover, and only those (two: at 0.7 and 3.3 in the 12 m Cask; at 2.3 and 4.9 since it grew to
+            // 14 m, Phase 8.6, 2026-10-15, the kitchen moved with its back wall).
             var windows = new List<float>(); for (float x = -w / 2 + 1.5f; x < w / 2 - .8f; x += 2.6f) windows.Add(x);
             var covered = windows.Where(x => Mathf.Abs(x - local.x) < ZoneBuilder.KitchenSize.x / 2 + .85f).ToList();
-            CollectionAssert.AreEqual(new[] { .7f, 3.3f }, covered.Select(x => Mathf.Round(x * 10) / 10).ToArray(), "The kitchen covers the two back windows the plan gives up, no others.");
+            CollectionAssert.AreEqual(new[] { 2.3f, 4.9f }, covered.Select(x => Mathf.Round(x * 10) / 10).ToArray(), "The kitchen covers the two back windows the plan gives up, no others.");
             // The doors on the inner back wall: the rooms door and the kitchen's door, each clear of the other, of every window
             // left, of the bar top and of the hearth.
-            float rooms = -w / 2 + 5.4f, kitchenDoor = local.x - ZoneBuilder.KitchenDoorX, jamb = .52f, glass = .53f;
+            var plan = ZoneBuilder.InnPlan.For(inn.size, inn.variant);   // the taproom as the builder lays it out (Phase 8.6)
+            float rooms = plan.roomsX, kitchenDoor = local.x - ZoneBuilder.KitchenDoorX, jamb = .52f, glass = .53f;
             Assert.Greater(Mathf.Abs(kitchenDoor - rooms), 2 * jamb, "The rooms door and the kitchen door stand apart.");
             foreach (var x in windows.Except(covered))
             {
                 Assert.Greater(Mathf.Abs(x - rooms), jamb + glass, "The rooms door clears the window at " + x);
                 Assert.Greater(Mathf.Abs(x - kitchenDoor), jamb + glass, "The kitchen door clears the window at " + x);
             }
-            Assert.Greater(rooms - jamb, -w / 2 + 2.6f + 2.1f, "The rooms door clears the bar top.");
+            Assert.Greater(rooms - jamb, plan.bar.x + .05f + (plan.barSize.x + .2f) / 2, "The rooms door clears the bar top.");
             Assert.Less(kitchenDoor + jamb, w / 2 - 1.05f, "The kitchen door clears the hearth.");
         }
 

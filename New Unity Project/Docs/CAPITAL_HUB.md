@@ -117,3 +117,6 @@ the Archive's reading room, the guild halls, the trainers, the dresser); the tal
 
 **Chris, 2026-10-16 ~00:30 (verbatim): "dont need the same exact inn in the castle. needs a redesign".** The Gilded Lantern gets its own
 design: a city inn of the High City (white stone and gilt, not the village's timber inn), its own shape and rooms.
+**Chris, 2026-10-16 ~00:35 (verbatim): "will need lots more npcs in the castle with real jobs like in oakhaven".** The Crown gets a
+working population as Oakhaven has (VillageWork: carriers, servants, guards' rounds, lamplighters, gardeners, clerks, cooks, grooms,
+messengers, merchants' errands), many more than the first pass's six walkers.

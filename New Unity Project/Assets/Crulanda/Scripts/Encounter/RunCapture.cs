@@ -39,7 +39,9 @@ namespace Crulanda.Encounter
             string Clock(float t) { int m = (int)(t / 60); return m + ":" + ((int)(t % 60)).ToString("00"); }
             Crulanda.World.WorldClock.Hour = 11; EncounterHud.UiScale = 1; EncounterHud.DefaultPanels = true; s.MeterOpen = true;   // the HUD in frame at 1440x900 (the party frame was cut off), the meter up
             var weather = Crulanda.World.WorldWeather.Active; if (weather != null) weather.Force(weather.TourKind(), true);
-            if (s.Progress.Level < 11) { s.Progress.experience = EncounterProgress.XpForLevel(11); s.Player.SetLevel(11); }
+            // The party's level: a level under the zone's top (the Adit 10-12: eleven, as before; Hallow's Creek 15-20: nineteen).
+            int runLevel = Mathf.Clamp((s.Zone.Zone.levelMax > 0 ? s.Zone.Zone.levelMax : 12) - 1, 2, EncounterProgress.LevelCap);
+            if (s.Progress.Level < runLevel) { s.Progress.experience = EncounterProgress.XpForLevel(runLevel); s.Player.SetLevel(runLevel); }
             s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max); s.Player.Resource.Pool.Fill();
             // The gates the run's quests open (the singing door's sigils, the platform gate's goblin) stand open, and for the full run those worked
             // by hand (a pen's bar, a bookcase); a boss's door is left to its boss, and a bar worked from its far side stays as it is (the Adit rework).
@@ -59,7 +61,7 @@ namespace Crulanda.Encounter
                 var x = pop.World.sims.Find(y => y.classId == want && !chosen.Contains(y)); if (x != null) chosen.Add(x);
             }
             var p0 = s.Player.transform.position; int k = 0;
-            foreach (var x in chosen) { x.zone = s.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = 11; x.bold = x.classId == "class.warrior" ? .95f : .3f; x.gearBonus = 2; x.x = p0.x + 2 + k; x.z = p0.z + (k % 2 == 0 ? 1.5f : -1.5f); k++; }   // gearBonus: bought upgrades, the better pieces of its level (Chris: "give the warrior some better gear")
+            foreach (var x in chosen) { x.zone = s.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = runLevel; x.bold = x.classId == "class.warrior" ? .95f : .3f; x.gearBonus = 2; x.x = p0.x + 2 + k; x.z = p0.z + (k % 2 == 0 ? 1.5f : -1.5f); k++; }   // gearBonus: bought upgrades, the better pieces of its level (Chris: "give the warrior some better gear")
             // Their packs for the bosses (BossBuffs; Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"): bought with their own coin at
             // the level-11 tier, a purse of 120 at the least (as gearBonus above: what a sim of eleven would have put by), so a richer one carries a feast.
             foreach (var x in chosen) { x.coin = Mathf.Max(x.coin, 120); SimEconomy.Stock(x, s.Items); }

@@ -5,7 +5,7 @@ namespace Crulanda.Encounter
 {
     /// <summary>
     /// The capital's two windows (EncounterSession.Capital.cs), each beside the bags:
-    /// - The Treasury Vault: its slots twelve to a row, shared by all your characters. Right-click or drag a bag item onto it to store
+    /// - The Treasury Vault: each character's own slots twelve to a row, and a shared shelf of 3 for all your characters. Right-click or drag a bag item onto it to store
     ///   it (onto a slot to put it there), right-click or drag a vault item onto the bags to take it out, drag within the vault to
     ///   move or stack; "Buy a row" adds 12 slots for the price shown.
     /// - The Exchange: three tabs. Browse (the sims' lots, searched by name, slot, level range and quality; Buy outright or Bid the
@@ -54,7 +54,12 @@ namespace Crulanda.Encounter
             ItemStyles(); var v = session.Vault; if (v == null) return;
             var w = BankRect; var p = session.Progress; var e = Event.current; var mouse = e.mousePosition;
             CapitalFrame(w, "THE TREASURY VAULT");
-            Shadow(new Rect(w.x + 14, w.y + 40, w.width - 28, 22), (session.CapitalClerk ?? "The vault") + "  ·  shared by all your characters  ·  " + TreasuryVault.Used(v) + "/" + TreasuryVault.Size(v) + " slots used", tiny, new Color(.82f, .74f, .56f));
+            // Two tabs: this character's own vault, and the shelf every character shares (Chris, 2026-10-16: "need a limited shared space.
+            // maybe 3 slots and maybe they can buy more in the future. the remainder is character only").
+            if (GUI.Toggle(new Rect(w.x + 14, w.y + 38, 150, 24), !session.BankShared, "Your vault", micro) && session.BankShared) session.ShowSharedVault(false);
+            if (GUI.Toggle(new Rect(w.x + 170, w.y + 38, 170, 24), session.BankShared, "Shared shelf", micro) && !session.BankShared) session.ShowSharedVault(true);
+            v = session.Vault; if (v == null) return;
+            Shadow(new Rect(w.x + 350, w.y + 40, w.width - 364, 22), (session.BankShared ? "every character's" : "this character's") + "  ·  " + TreasuryVault.Used(v) + "/" + TreasuryVault.Size(v) + " slots used", tiny, new Color(.82f, .74f, .56f));
             var view = new Rect(w.x + 10, w.y + 68, w.width - 20, w.height - 170);
             int rows = Mathf.CeilToInt(v.slots.Count / (float)TreasuryVault.RowSize);
             vaultScroll = GUI.BeginScrollView(view, vaultScroll, new Rect(0, 0, view.width - 20, rows * (VaultSlot + VaultGap) + 4));
@@ -80,11 +85,11 @@ namespace Crulanda.Encounter
             float y = w.yMax - 96;
             GUI.Label(new Rect(w.x + 14, y, w.width - 28, 40), "Right-click or drag from your bags to store · right-click or drag out to take back · stacks merge · quest items stay with you", tiny);
             int price = TreasuryVault.NextRowPrice(v);
-            if (price < 0) Shadow(new Rect(w.x + 14, w.yMax - 44, 300, 30), "Every row of the vault is yours.", text, new Color(.7f, .66f, .58f));
+            if (price < 0) Shadow(new Rect(w.x + 14, w.yMax - 44, 300, 30), session.BankShared ? "The shelf is as big as it grows." : "Every row of the vault is yours.", text, new Color(.7f, .66f, .58f));
             else
             {
                 GUI.enabled = p.gold >= price;
-                if (GUI.Button(new Rect(w.x + 14, w.yMax - 44, 270, 32), "Buy a row of 12 (" + TreasuryVault.Coin(price) + ")", micro)) session.BuyVaultRow();
+                if (GUI.Button(new Rect(w.x + 14, w.yMax - 44, 270, 32), (session.BankShared ? "Buy 3 more shared slots (" : "Buy a row of 12 (") + TreasuryVault.Coin(price) + ")", micro)) session.BuyVaultRow();
                 GUI.enabled = true;
             }
             Shadow(new Rect(w.x + 300, w.yMax - 40, 150, 24), p.gold + " crowns", text, new Color(1, .86f, .4f));

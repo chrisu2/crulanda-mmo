@@ -103,10 +103,10 @@ namespace Crulanda.Encounter
         {
             if (!TryLoad(root, out var d, out message, out bool missing))
             {
-                if (missing) { message = null; return TreasuryVault.Ensure(new VaultData()); }
+                if (missing) { message = null; return TreasuryVault.Ensure(new VaultData { shared = true }); }
                 return null;
             }
-            return TreasuryVault.Ensure(new VaultData { slots = d.vault, rowsBought = d.vaultRows });
+            return TreasuryVault.Ensure(new VaultData { slots = d.vault, rowsBought = d.vaultRows, shared = true });
         }
         /// <summary>Writes the vault into the profile, keeping the character choice. False (and why) when the profile is there but
         /// cannot be read or is newer (it is then left as it is).</summary>

@@ -90,7 +90,7 @@ namespace Crulanda.Tests
             try
             {
                 CharacterProfile.Remember(root, "class.warrior");
-                var warrior = Character("class.warrior", 300); Inventory.Add(warrior, db, "mat.copper_ore", 15);
+                var warrior = Character("class.warrior", 600);   // the shared shelf's 3 more slots cost 500 Inventory.Add(warrior, db, "mat.copper_ore", 15);
                 var v = CharacterProfile.LoadVault(root, out var msg); Assert.NotNull(v, msg);
                 Assert.AreEqual(15, TreasuryVault.Deposit(v, warrior, db, warrior.bag.FindIndex(s => s.item == "mat.copper_ore"), -1, out _));
                 Assert.IsTrue(TreasuryVault.BuyRow(v, warrior, out _));
@@ -99,7 +99,7 @@ namespace Crulanda.Tests
                 CharacterProfile.Remember(root, "class.mage");
                 Assert.AreEqual("class.mage", CharacterProfile.LastClass(root));
                 var back = CharacterProfile.LoadVault(root, out msg); Assert.NotNull(back, msg);
-                Assert.AreEqual(15, TreasuryVault.Count(back, "mat.copper_ore")); Assert.AreEqual(1, back.rowsBought); Assert.AreEqual(60, back.slots.Count);
+                Assert.AreEqual(15, TreasuryVault.Count(back, "mat.copper_ore")); Assert.AreEqual(1, back.rowsBought); Assert.AreEqual(6, back.slots.Count);   // the shared shelf: 3, and 3 bought (Chris, 2026-10-16)
                 var mage = Character("class.mage");
                 Assert.AreEqual(15, TreasuryVault.Withdraw(back, mage, db, back.slots.FindIndex(s => s.item == "mat.copper_ore"), -1, out _));
                 Assert.IsTrue(CharacterProfile.SaveVault(root, back, out msg), msg);
@@ -113,7 +113,7 @@ namespace Crulanda.Tests
         [Test] public void No_profile_gives_an_empty_vault()
         {
             string root = TempRoot();
-            try { var v = CharacterProfile.LoadVault(root, out var msg); Assert.NotNull(v, msg); Assert.AreEqual(48, v.slots.Count); Assert.AreEqual(0, TreasuryVault.Used(v)); }
+            try { var v = CharacterProfile.LoadVault(root, out var msg); Assert.NotNull(v, msg); Assert.AreEqual(3, v.slots.Count); Assert.AreEqual(0, TreasuryVault.Used(v)); }
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
         }
 
@@ -131,7 +131,7 @@ namespace Crulanda.Tests
                 store.Write("profile", new SaveEnvelope { formatVersion = 1, payloadType = "CrulandaProfile", gameVersion = "0.3.0", savedAtUtc = DateTime.UtcNow.ToString("O"), payloadJson = v1 });
                 Assert.AreEqual("class.druid", CharacterProfile.LastClass(root));
                 var v = CharacterProfile.LoadVault(root, out var msg); Assert.NotNull(v, msg);
-                Assert.AreEqual(48, v.slots.Count); Assert.AreEqual(0, TreasuryVault.Used(v)); Assert.AreEqual(0, v.rowsBought);
+                Assert.AreEqual(3, v.slots.Count); Assert.AreEqual(0, TreasuryVault.Used(v)); Assert.AreEqual(0, v.rowsBought);
                 Assert.IsTrue(store.TryRead("profile", out var still, out _)); Assert.AreEqual(1, still.formatVersion, "reading does not write: the file is format 2 from its next save");
                 v.slots[3] = new ItemStack { item = "potion.minor", count = 2 };
                 Assert.IsTrue(CharacterProfile.SaveVault(root, v, out msg), msg);
@@ -155,6 +155,16 @@ namespace Crulanda.Tests
                 Assert.IsTrue(store.TryRead("profile", out var env, out _)); Assert.AreEqual(99, env.formatVersion); Assert.AreEqual(payload, env.payloadJson, "left as it was");
             }
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }
+        }
+        /// <summary>Chris, 2026-10-16: "need a limited shared space. maybe 3 slots and maybe they can buy more in the future. the remainder is
+        /// character only": the shared shelf is 3 slots, 3 more at a time at its own prices; a character's own vault is 48 and rows of 12.</summary>
+        [Test] public void The_shared_shelf_is_three_slots_and_the_rest_is_the_characters()
+        {
+            var shelf = TreasuryVault.Ensure(new VaultData { shared = true });
+            Assert.AreEqual(3, TreasuryVault.Size(shelf)); Assert.AreEqual(500, TreasuryVault.NextRowPrice(shelf));
+            var p = Character("class.warrior", 600); Assert.IsTrue(TreasuryVault.BuyRow(shelf, p, out _)); Assert.AreEqual(6, TreasuryVault.Size(shelf)); Assert.AreEqual(100, p.gold);
+            var own = TreasuryVault.Ensure(new VaultData { slots = p.vault, rowsBought = p.vaultRows });
+            Assert.AreEqual(48, TreasuryVault.Size(own)); Assert.AreEqual(100, TreasuryVault.NextRowPrice(own));
         }
     }
 }

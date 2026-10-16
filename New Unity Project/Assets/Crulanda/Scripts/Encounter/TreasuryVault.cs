@@ -11,6 +11,9 @@ namespace Crulanda.Encounter
     {
         public List<ItemStack> slots = new List<ItemStack>();
         public int rowsBought;
+        /// <summary>The shared shelf (the profile's, every character's) rather than a character's own vault: its size and prices
+        /// differ (Chris, 2026-10-16). Set when it is read; not saved.</summary>
+        [NonSerialized] public bool shared;
     }
 
     /// <summary>
@@ -30,7 +33,16 @@ namespace Crulanda.Encounter
         public const string FullLine = "The vault is full. Buy another row of slots from the clerk.";
 
         /// <summary>How many slots the vault has: 48 and 12 for each row bought.</summary>
-        public static int Size(VaultData v) { return (StartRows + Math.Max(0, Math.Min(MaxBoughtRows, v != null ? v.rowsBought : 0))) * RowSize; }
+        public static int Size(VaultData v)
+        {
+            int bought = Math.Max(0, Math.Min(MaxBoughtRows, v != null ? v.rowsBought : 0));
+            return v != null && v.shared ? SharedStart + bought * SharedStep : (StartRows + bought) * RowSize;
+        }
+        /// <summary>The shared shelf (Chris, 2026-10-16: "need a limited shared space. maybe 3 slots and maybe they can buy more in the
+        /// future. the remainder is character only"): 3 slots for all your characters, 3 more at a time, dear; each character's own
+        /// vault is the 48 and its rows (EncounterProgress.vault).</summary>
+        public const int SharedStart = 3, SharedStep = 3;
+        public static readonly int[] SharedPrices = { 500, 1500, 4000, 10000 };
         /// <summary>Pads the vault to its size and clears empty stacks. Never shortened: slots past its size keep what they hold.</summary>
         public static VaultData Ensure(VaultData v)
         {
@@ -43,7 +55,7 @@ namespace Crulanda.Encounter
             return v;
         }
         /// <summary>What the next row costs, or -1 when every row is bought.</summary>
-        public static int NextRowPrice(VaultData v) { int n = v != null ? v.rowsBought : 0; return n >= MaxBoughtRows ? -1 : RowPrices[Math.Max(0, n)]; }
+        public static int NextRowPrice(VaultData v) { int n = v != null ? v.rowsBought : 0; return n >= MaxBoughtRows ? -1 : (v != null && v.shared ? SharedPrices : RowPrices)[Math.Max(0, n)]; }
         /// <summary>Buys the next row of 12 with the character's coin. Refused (why) when all are bought or the coin is short.</summary>
         public static bool BuyRow(VaultData v, EncounterProgress p, out string why)
         {

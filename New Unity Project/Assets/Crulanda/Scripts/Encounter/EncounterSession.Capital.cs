@@ -20,7 +20,14 @@ namespace Crulanda.Encounter
         public bool ExchangeOpen { get; private set; }
         /// <summary>Who keeps the open counter (the clerk's name, or the counter's own when opened by a command).</summary>
         public string CapitalClerk { get; private set; }
-        public VaultData Vault { get; private set; }
+        /// <summary>The vault shown: this character's own, or the shared shelf (<see cref="BankShared"/>; Chris, 2026-10-16: "need a limited
+        /// shared space. maybe 3 slots ... the remainder is character only").</summary>
+        public VaultData Vault { get { return !BankOpen ? null : BankShared ? sharedVault : ownVault; } }
+        /// <summary>The window shows the shared shelf (true) or the character's own vault (false, as it opens).</summary>
+        public bool BankShared { get; private set; }
+        VaultData sharedVault, ownVault;
+        /// <summary>Shows the shared shelf or the character's own vault.</summary>
+        public void ShowSharedVault(bool shared) { if (BankOpen) BankShared = shared; }
         /// <summary>The bag slot chosen to list on the Exchange (-1 none): right-click or drag it from the bags.</summary>
         public int ExchangeSell = -1;
         /// <summary>The world save the Exchange lives in (the sims'), or null with no zone loaded.</summary>
@@ -53,7 +60,9 @@ namespace Crulanda.Encounter
             if (CapitalShut("The vault")) return false;
             var v = CharacterProfile.LoadVault(SaveRoot, out var why);
             if (v == null) { Message("The vault can't be opened (" + why + "). Nothing in it is changed."); return false; }
-            OpenCounter(at); Vault = v; BankOpen = true; CapitalClerk = clerk;
+            if (Progress.vault == null) Progress.vault = new List<ItemStack>();
+            ownVault = TreasuryVault.Ensure(new VaultData { slots = Progress.vault, rowsBought = Progress.vaultRows }); Progress.vault = ownVault.slots;
+            OpenCounter(at); sharedVault = v; BankShared = false; BankOpen = true; CapitalClerk = clerk;
             return true;
         }
         /// <summary>Opens the Exchange: refused in a fight, with saving off, or with no world loaded.</summary>
@@ -70,7 +79,7 @@ namespace Crulanda.Encounter
         public void CloseCapital()
         {
             if ((BankOpen || ExchangeOpen) && bagsForCapital) InventoryOpen = false;
-            BankOpen = ExchangeOpen = false; bagsForCapital = false; Vault = null; ExchangeSell = -1; CapitalClerk = null;
+            BankOpen = ExchangeOpen = false; bagsForCapital = false; sharedVault = ownVault = null; BankShared = false; ExchangeSell = -1; CapitalClerk = null;
         }
         /// <summary>Walked away from the counter: it shuts.</summary>
         void TickCapital()
@@ -83,10 +92,11 @@ namespace Crulanda.Encounter
         /// <summary>Writes the vault; on failure the bags are put back as they were and the vault re-read.</summary>
         bool StoreVault(List<ItemStack> bagBefore, int goldBefore)
         {
-            if (CharacterProfile.SaveVault(SaveRoot, Vault, out var why)) return true;
+            if (!BankShared) { Progress.vault = ownVault.slots; Progress.vaultRows = ownVault.rowsBought; return true; }   // the character's own: saved with the character
+            if (CharacterProfile.SaveVault(SaveRoot, sharedVault, out var why)) return true;
             Message("The vault could not be saved (" + why + "). Nothing moved.");
             Progress.bag = bagBefore; Progress.gold = goldBefore;
-            Vault = CharacterProfile.LoadVault(SaveRoot, out _); if (Vault == null) CloseCapital();
+            sharedVault = CharacterProfile.LoadVault(SaveRoot, out _); if (sharedVault == null) CloseCapital();
             return false;
         }
         /// <summary>A bag stack into the vault (onto a chosen vault slot, or wherever it fits).</summary>
@@ -112,14 +122,14 @@ namespace Crulanda.Encounter
         public void MoveVault(int a, int b)
         {
             if (!BankOpen || Vault == null) return;
-            TreasuryVault.Move(Vault, Items, a, b); StoreVault(CopyBag(), Progress.gold);
+            TreasuryVault.Move(Vault, Items, a, b); if (StoreVault(CopyBag(), Progress.gold) && !BankShared) Save(false);
         }
         public void BuyVaultRow()
         {
             if (!BankOpen || Vault == null) return;
             var before = CopyBag(); int gold = Progress.gold;
             if (!TreasuryVault.BuyRow(Vault, Progress, out var why)) { Message(why); return; }
-            if (StoreVault(before, gold)) { Save(false); Message("Another row of 12: the vault holds " + TreasuryVault.Size(Vault) + "."); }
+            if (StoreVault(before, gold)) { Save(false); Message(BankShared ? "Three more shared slots: the shelf holds " + TreasuryVault.Size(Vault) + "." : "Another row of 12: your vault holds " + TreasuryVault.Size(Vault) + "."); }
         }
 
         // ---------- the Exchange ----------
@@ -170,7 +180,7 @@ namespace Crulanda.Encounter
 
         // ---------- tester's commands (ZoneChat) ----------
         /// <summary>/bank: the vault's window where you stand (to try it before the castle's clerk is placed).</summary>
-        void TesterBank() { if (Player != null && OpenBank("The Treasury Vault", Player.transform.position)) Message("Testing: the Treasury Vault, shared by all your characters. Walk off or Esc to close."); }
+        void TesterBank() { if (Player != null && OpenBank("The Treasury Vault", Player.transform.position)) Message("Testing: the Treasury Vault: your own vault, and a shared shelf of 3 for all your characters. Walk off or Esc to close."); }
         /// <summary>/exchange: the Exchange's window where you stand.</summary>
         void TesterExchange() { if (Player != null && OpenExchange("The Exchange", Player.transform.position)) Message("Testing: the Exchange. Right-click a bag item to list it; walk off or Esc to close."); }
     }

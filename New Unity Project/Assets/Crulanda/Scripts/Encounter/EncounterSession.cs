@@ -1308,6 +1308,7 @@ namespace Crulanda.Encounter
         public string StatusName(string id)
         {
             var food = Consumables.StatusName(id); if (food != null) return food;   // a dish's, a tincture's or a salve's (Phase 8.6)
+            var standing = ClassBuffs.StatusName(id); if (standing != null) return standing;   // a class's standing buff (the buff-up before a boss)
             var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id;
         }
         /// <summary>The player's figure (blows, flinches and casts on it: playtest note 25).</summary>

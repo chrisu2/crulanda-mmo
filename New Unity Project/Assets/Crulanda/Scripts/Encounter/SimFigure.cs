@@ -141,7 +141,7 @@ namespace Crulanda.Encounter
             if (!population.Lively) { Begin(Doing.Loiter); return; }
             float Noise() { return Random.value * .3f; }
             var prey = health > .6f ? FindPrey() : null; var node = FindNode(); var inn = Inn; var exit = FindExit(); var mark = health > .6f ? FindMark() : null;
-            int goods = SimEconomy.GoodsCount(sim); var recipe = SimEconomy.Craftable(sim, Session.Professions?.Db, Session.Items);
+            int goods = SimEconomy.SellableCount(sim, Session.Items); var recipe = SimEconomy.Craftable(sim, Session.Professions?.Db, Session.Items);
             float hunt = prey != null ? .35f + .6f * sim.bold + Noise() : -1;
             float gather = node != null ? .3f + .5f * (1 - sim.bold) + Noise() : -1;
             float rest = inn != null ? (health < .6f ? 1.2f : .12f + .2f * sim.chatty) + Noise() : -1;
@@ -347,6 +347,7 @@ namespace Crulanda.Encounter
             int coin = SimEconomy.SellAll(sim, Session.Items);
             if (coin > 0) SimChatter.Active?.Sold(sim, coin);
             if (SimEconomy.Upgrade(sim)) { SimGear.Dress(visual, sim, Session.Items); SimChatter.Active?.Upgraded(sim); }
+            SimEconomy.Stock(sim, Session.Items);   // its pack for the bosses, bought with what is left (BossBuffs)
             Choose();
         }
         void Craft()

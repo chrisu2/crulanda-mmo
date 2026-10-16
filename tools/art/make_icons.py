@@ -2775,6 +2775,33 @@ def leaf_spec(item):
     return ('quest', leaf_page, (LEAF_MARK.get(word, '#b23a30'),))
 PROF_ICONS.update({'leatherworking': ('hide', pelt, ('#a8703a',)), 'weaving': ('herb', skein)})
 
+# ---- the classes' standing buffs for the buff-up before a boss (2026-10-15, p86-buffs; Chris: "food buffs, alchemy buffs, class buffs";
+# GAME-ONLY imagery; Icons/ability/buff-class-<class>, by the status id). No machines. ----
+def a_bf_warrior(c): rays(c, 50, 50, 18, 46, 10, '#ffb070', .5, 6); c.back(c.ell(50, 50, 36), '#c05030', .4, 10); m_fist(c, '#c8a060', '#ffffff')
+def a_bf_paladin(c): c.back(c.ell(50, 50, 40), '#ffe9a0', .4, 12); m_banner(c, '#c0303a', GOLD); rings(c, 50, 54, (44,), '#fff2c0', .45, w=3)
+def a_bf_druid(c):
+    c.back(c.ell(50, 50, 38), '#7fbf50', .4, 10); m_leaf(c, '#5f9a48', '#7a5434')
+    c.push(sc=.46, dx=18, dy=-20); m_heart(c, '#d0ffe0', '#ffffff'); c.pop()
+def a_bf_ranger(c): c.back(c.ell(50, 50, 38), '#c8a050', .35, 10); m_paw(c, '#8a6a40', '#efe6cf'); m_wind(c, '#e0f0d0', '#ffffff')
+def a_bf_mage(c):
+    c.back(c.ell(50, 50, 40), '#ff9040', .45, 12); m_flame(c, '#ff7a2a', '#ffd860')
+    c.push(sc=.42, dx=18, dy=-22); m_eye(c, '#fff2c0', '#ffffff'); c.pop()
+def a_bf_rogue(c): c.back(c.ell(50, 50, 38), '#9fb0c8', .35, 10); m_hand(c, IVORY, '#8a90b0'); c.spark(76, 24, 9, '#ffffff', .9); c.spark(26, 30, 6, '#dfeeff', .7)
+def a_bf_archivist(c): c.back(c.ell(50, 50, 40), '#9fc8ff', .4, 12); rings(c, 50, 54, (42, 30), '#dfeeff', .55, w=3); m_note(c, '#e0e8ff', '#ffffff')
+def a_bf_saltmender(c): c.back(c.ell(50, 50, 38), '#eeeee4', .4, 10); m_stone(c, '#e8e6dc', '#ffffff'); m_snow(c, '#ffffff', '#dfe8f0')
+def a_bf_cleric(c): rays(c, 50, 50, 16, 46, 12, '#fff2c0', .55, 6); c.back(c.ell(50, 50, 32), '#ffe9a0', .4, 10); m_flame(c, '#ffd860', '#fff6e0'); rings(c, 50, 52, (40,), GOLD, .5, w=3)
+def a_bf_scoundrel(c):
+    c.back(c.ell(50, 50, 38), GOLD, .35, 10); m_flask(c, '#c87a2a', GOLD)
+    c.push(sc=.4, dx=20, dy=-22); m_coin(c, GOLD, '#8a6a20'); c.pop()
+def a_bf_shaman(c):
+    c.back(c.ell(50, 50, 40), '#70b0ff', .4, 12); m_sun(c, '#ffd860', '#fff2c0')
+    c.push(sc=.7, dy=14); m_cloud(c, '#dfe8f0', '#9fc8ff'); c.pop()
+BUFF_ICONS = {'buff.class.warrior': ('#4a2220', a_bf_warrior), 'buff.class.paladin': ('#4a2a24', a_bf_paladin), 'buff.class.druid': ('#1e3420', a_bf_druid),
+              'buff.class.ranger': ('#3a3018', a_bf_ranger), 'buff.class.mage': ('#40200e', a_bf_mage), 'buff.class.rogue': ('#26283a', a_bf_rogue),
+              'buff.class.archivist': ('#22304a', a_bf_archivist), 'buff.class.saltmender': ('#2a3038', a_bf_saltmender), 'buff.class.cleric': ('#4a3a1a', a_bf_cleric),
+              'buff.class.scoundrel': ('#3a3018', a_bf_scoundrel), 'buff.class.shaman': ('#22304a', a_bf_shaman)}
+ABILITIES.update(BUFF_ICONS)
+
 def main():
     here = os.path.dirname(os.path.abspath(__file__))
     ap = argparse.ArgumentParser(description='Paints the Crulanda HUD icons (items, quest items, abilities, talents, trades).')

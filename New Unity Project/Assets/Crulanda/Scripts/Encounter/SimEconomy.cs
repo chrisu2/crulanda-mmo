@@ -12,7 +12,8 @@ namespace Crulanda.Encounter
     /// sold at the merchant's stall for the items' values; a crafter with the makings for a recipe makes the piece and wears it
     /// (wornSlots/wornIds), or keeps a spare it already wears better to sell to you (never at the stall); a brewer or cook sells what
     /// it makes; and coin buys better gear (gearBonus raises the quality of what SimGear makes). The merchant sells charcoal, vials,
-    /// fleeces and salt. Found recipes (a leaf's) are the player's: the sims make only what their skill teaches.
+    /// fleeces and salt. Found recipes (a leaf's) are the player's: the sims make only what their skill teaches. Each keeps a pack of food
+    /// and simples for the bosses, made or bought (Stock, Kept; BossBuffs), eaten and drunk at the buff-up before a boss.
     /// </summary>
     public static class SimEconomy
     {
@@ -37,18 +38,57 @@ namespace Crulanda.Encounter
             s.goodCounts[i] += n; if (s.goodCounts[i] <= 0) { s.goodIds.RemoveAt(i); s.goodCounts.RemoveAt(i); }
         }
         public static int GoodsCount(SimAdventurer s) { int n = 0; foreach (var c in s.goodCounts) n += c; return n; }
+        /// <summary>Its goods less its pack for the bosses (<see cref="Kept"/>): what sends it to the stall.</summary>
+        public static int SellableCount(SimAdventurer s, ItemDatabase items) { int n = 0; for (int i = 0; i < s.goodIds.Count; i++) n += Mathf.Max(0, s.goodCounts[i] - Kept(s, items, s.goodIds[i])); return n; }
         public static int Value(ItemDatabase items, string id) { var d = items?.Get(id); return d != null && d.value > 0 ? d.value : 1; }
-        /// <summary>Sells everything it carries (materials, potions and food, never gear: a spare piece is kept for trading with you) for the items' values.</summary>
+        /// <summary>Sells everything it carries (materials, potions and food, never gear: a spare piece is kept for trading with you) for the items' values;
+        /// its pack for the bosses (<see cref="Kept"/>: a dish, an elixir, a draught, a feast) is kept too.</summary>
         public static int SellAll(SimAdventurer s, ItemDatabase items)
         {
             int coin = 0;
             for (int i = s.goodIds.Count - 1; i >= 0; i--)
             {
                 var d = items?.Get(s.goodIds[i]); if (d != null && d.kind == "gear") continue;
-                coin += Value(items, s.goodIds[i]) * s.goodCounts[i]; s.goodIds.RemoveAt(i); s.goodCounts.RemoveAt(i);
+                int keep = Mathf.Min(s.goodCounts[i], Kept(s, items, s.goodIds[i])), sell = s.goodCounts[i] - keep;
+                coin += Value(items, s.goodIds[i]) * sell;
+                if (keep > 0) s.goodCounts[i] = keep; else { s.goodIds.RemoveAt(i); s.goodCounts.RemoveAt(i); }
             }
             s.coin += coin; return coin;
         }
+
+        // ---------- the pack for the bosses (Chris, 2026-10-15: "we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses") ----------
+        /// <summary>How many of an item a sim keeps for its buff-up before a boss (BossBuffs.Pack at its level's tier, and one feast of its tier):
+        /// never sold at the stall.</summary>
+        public static int Kept(SimAdventurer s, ItemDatabase items, string item)
+        {
+            if (s == null || items == null || string.IsNullOrEmpty(item)) return 0;
+            var d = items.Get(item); if (d == null || d.kind != "consumable") return 0;
+            if (BossBuffs.IsFeast(d)) { var f = BossBuffs.FeastFor(s.level, items); return f != null && f.id == item ? 1 : 0; }
+            foreach (var (id, count) in BossBuffs.Pack(s.classId, s.level, items)) if (id == item) return count;
+            return 0;
+        }
+        /// <summary>
+        /// Fills its pack for the bosses (at the stall, and after an hour's work away): what it made itself counts (an alchemist's tinctures and
+        /// draughts); what is short it buys from other adventurers at a fair price (BossBuffs.FairPrice, twice the value) while its coin
+        /// lasts, its part's elixir first, then its dish, then its draught; a feast of its tier only when it has <see cref="BossBuffs.FeastPurse"/>
+        /// times the feast's price to spare after. So a richer sim party is better buffed. The coin spent.
+        /// </summary>
+        public static int Stock(SimAdventurer s, ItemDatabase items)
+        {
+            if (s == null || items == null) return 0;
+            int spent = 0; var pack = BossBuffs.Pack(s.classId, s.level, items);
+            // The elixir first (the pack lists dish, elixir, draught).
+            pack.Sort((a, b) => Order(items.Get(a.id)).CompareTo(Order(items.Get(b.id))));
+            foreach (var (id, count) in pack)
+            {
+                var d = items.Get(id); int price = BossBuffs.FairPrice(d);
+                while (Count(s, id) < count && s.coin >= price) { s.coin -= price; spent += price; Add(s, id, 1); }
+            }
+            var feast = BossBuffs.FeastFor(s.level, items);
+            if (feast != null && Count(s, feast.id) == 0 && s.coin >= BossBuffs.FairPrice(feast) * BossBuffs.FeastPurse) { int price = BossBuffs.FairPrice(feast); s.coin -= price; spent += price; Add(s, feast.id, 1); }
+            return spent;
+        }
+        static int Order(ItemDef d) { return d == null ? 9 : d.buff != null && d.buff.kind != "food" ? 0 : d.food ? 1 : 2; }
         public const int MaxGearBonus = 2;
         /// <summary>What a step up in gear costs at the merchant: more at higher levels and for each step already taken.</summary>
         public static int UpgradeCost(SimAdventurer s) { return 25 * (s.gearBonus + 1) * Mathf.Max(1, s.level); }

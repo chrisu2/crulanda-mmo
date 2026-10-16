@@ -243,3 +243,12 @@ buffed. Bosses are then tuned for a buffed party (the buffs worth about 10-15% o
 is harder, not impossible. Lands on top of step 4 (the consumables, branch p86-craft) once its tests pass.
 - Wain's Rest's roof of salt-cart canvas (the inns helper's PROVISIONAL choice, the Deacon's Tally saying its rafters were burnt): Chris,
   2026-10-15 ~23:30, verbatim: "canvas roof is fine. i really want the castle done asap so double down on it".
+## Status (p86-buffs, 2026-10-15): buffs to beat the bosses, written, not yet run in Unity
+Chris's brief (verbatim): "we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses" (the plan is on main). Built on p86-craft:
+the party's leader stops 25-30 m short of a boss or an elite camp (not trash), says "buff up" in Party and waits until every living member has
+buffed or 12 s pass, then pulls. Each sim eats (a party feast when a sim near carries one, else its dish), drinks its part's elixir (tank: salve,
+else Bear's-wort; healer: Hearth-ease; damage: its main stat's tincture), its draught under 60% of its pool, and lays its class's standing buff
+on the party. Every class has one in its kit (half an hour, +3% of one stat, GAME-ONLY names, icons from tools/art/make_icons.py). Sims keep
+a pack (made or bought at twice the value; a feast only when rich) that the stall never takes. /buff does yours; the run bot buffs from its
+bags (given a few of its tier) and logs "buffed:" lines. On a sim, the buffs' stat points become a share of its blow, mend and health (at
+most 15% a stat). Mira has no buff of her own yet. Code: BossBuffs.cs, EncounterSession.Buffs.cs. Tests: BuffUpRulesTests, BossBuffTests.

@@ -1455,7 +1455,7 @@
         "kind": "salve",
         "stat": "Armor",
         "name": "Scree salve",
-        "amount": 70,
+        "amount": 50,
         "seconds": 1800
       },
       "description": "Bear fat and cinder-thistle ground with grit from the scree. The skin takes a blow like a hide does.",

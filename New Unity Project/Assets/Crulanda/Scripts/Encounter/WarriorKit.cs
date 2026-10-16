@@ -44,6 +44,10 @@ namespace Crulanda.Encounter
         public WarriorKit(EncounterSession session, ClassLoadout loadout, IRandomSource random) : base(session)
         { this.loadout = loadout ?? throw new System.ArgumentNullException(nameof(loadout)); this.random = random; }
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
+        /// <summary>Its standing party buff at a buff-up before a boss (Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"; GAME-ONLY):
+        /// the Warrior's word down the line before a charge: every arm a little harder. Half an hour, +3% Strength on everyone (BossBuffs).</summary>
+        public static readonly ClassBuff Standing = new ClassBuff("class.warrior", "Steel Your Arms", Crulanda.Core.StatType.Strength);
+        public override ClassBuff PartyBuff { get { return Standing; } }
         int R(string id) { return s.TalentRank(id); }
 
         // ---------- crowd control (CC_DESIGN section 2, 2026-10-08) ----------

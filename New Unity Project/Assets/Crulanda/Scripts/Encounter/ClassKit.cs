@@ -61,6 +61,9 @@ namespace Crulanda.Encounter
         /// <summary>The kit's own buffs on the whole party, with the seconds left (0: for as long as it is kept up): the buff row by the
         /// party frames (Chris, 2026-10-14: "we need a buff ui so i know what buff/songs are on the party").</summary>
         public virtual IEnumerable<(string name, float remaining)> PartyBuffs() { yield break; }
+        /// <summary>The class's standing party buff, laid on the party at a buff-up before a boss (/buff, the run bot; a sim of the class lays
+        /// the same: BossBuffs, ClassBuffs.For). Half an hour, a small share of one stat, named in the class's voice; GAME-ONLY.</summary>
+        public virtual ClassBuff PartyBuff { get { return null; } }
         /// <summary>Extra target-frame text (e.g. EXPOSED 2.1s, Rooted).</summary>
         public virtual string TargetStatus(EncounterEnemy enemy) { return null; }
 

@@ -142,7 +142,8 @@ namespace Crulanda.Encounter
         /// times its blow, a tank and a healer half, so a tank does about 70% of a damage-dealer (the balance bands: tanks 42-55, damage 62-72).
         /// </summary>
         public static float RoleDamage(PartyRole role) { return role == PartyRole.Damage ? 1.6f : .5f; }
-        public int Hit { get { return Mathf.Max(1, Mathf.RoundToInt(BaseHit * RoleDamage(Role))); } }
+        /// <summary>Its blow in a party, with what its buffs add (BossBuffs.Edge on its main stat: a dish's, an elixir's, a class buff's).</summary>
+        public int Hit { get { return Mathf.Max(1, Mathf.RoundToInt(BaseHit * RoleDamage(Role) * (1 + DamageEdge))); } }
         public int HealAmount { get { return Mathf.RoundToInt(12 + 5 * sim.level); } }
         /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
         public void GainXp(int xp)
@@ -259,7 +260,7 @@ namespace Crulanda.Encounter
                     if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone || Held(e)) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
-                if (best == null && Leading.HasValue && waitingAt == null && !Regrouping && Vector3.Distance(transform.position, Leading.Value) < 18 && PartyBehind() <= 16)   // no pull till the party is up
+                if (best == null && Leading.HasValue && waitingAt == null && !Regrouping && !BuffPending && Vector3.Distance(transform.position, Leading.Value) < 18 && PartyBehind() <= 16)   // no pull till the party is up (and buffed, at a boss: BossBuffs)
                 {
                     // At the camp it leads to: the nearest of its mobs still standing (not while it waits at a shut gate: the camp past it is not its to pull, D7;
                     // not while the party gathers at a wing's home; on the camp's own floor or deck, not one 12 m below it: the Adit rework).
@@ -312,7 +313,15 @@ namespace Crulanda.Encounter
                 best = d; pick = e;
             }
             if (pick == null) { Leading = null; return null; }
+            return LeadTo(pick);
+        }
+        /// <summary>Leads the party to this mob's camp (Lead's pick, or a test's): said in Party. An elite's camp is buffed up for first, short of
+        /// it (BossBuffs).</summary>
+        public string LeadTo(EncounterEnemy pick)
+        {
+            if (pick == null) return null;
             Leading = pick.transform.position; LeadingName = pick.Elite ? pick.Name : SimChatter.Plural(pick.Name);
+            leadElite = pick.Elite; leadKey = new object();
             session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "follow me, " + LeadingName.ToLower() + " this way" : "Follow me. The " + LeadingName.ToLower() + " are this way.");
             return LeadingName;
         }
@@ -332,7 +341,12 @@ namespace Crulanda.Encounter
             PassRegroups();
             if (route.Count > 0) BeginStep(); else StopLeading();
         }
-        public void StopLeading() { Leading = null; LeadingName = null; route.Clear(); Dungeon = null; StoppedBy = null; waitingAt = null; wingSeen.Clear(); }
+        public void StopLeading()
+        {
+            Leading = null; LeadingName = null; route.Clear(); Dungeon = null; StoppedBy = null; waitingAt = null; wingSeen.Clear();
+            if (BuffingUp) { BuffingUp = false; session.EndBuffStop(this); }
+            leadElite = false; leadKey = null; drawBackSince = -1;
+        }
         /// <summary>A dungeon run (round 27; the Adit rework: RouteStep, DungeonPlan): the steps still to go, in order, each with the gate across
         /// the way before it (D7: shut, the run waits at it), and the dungeon's name.</summary>
         readonly List<RouteStep> route = new List<RouteStep>();
@@ -604,6 +618,7 @@ namespace Crulanda.Encounter
                 if (!session.InCombat && Time.time - downSince > 6) { actor.Health.Revive(Mathf.RoundToInt(actor.Health.Pool.Max * .4f)); downSince = -1; session.Message(sim.name + " gets back up."); }
                 return;
             }
+            if (Time.time >= nextEdge) { nextEdge = Time.time + .5f; RefreshEdge(); }   // its buffs' health (BossBuffs)
             // Held by a boss (HoldUntil): stunned, rooted or disoriented it stands and does nothing; feared it runs from what frightened it.
             if (Time.time < heldUntil)
             {
@@ -633,6 +648,8 @@ namespace Crulanda.Encounter
             }
             if (!agent.isOnNavMesh) return;
             if (!session.InCombat && Time.time >= nextRegen) { nextRegen = Time.time + 1; actor.Health.ApplyHealing(Mathf.Max(3, actor.Health.Pool.Max / 40)); }
+            // Its turn at a buff-up (BossBuffs): a beat after the leader stops, each in its slot's turn, out of a fight.
+            if (session.BuffingUp && BuffedStop != session.BuffStop && !session.InCombat && healing == null && Time.time >= session.BuffStopSince + .8f + .7f * slot) BuffUpNow();
             // Mending first, for the healers: the most hurt of the party under 60%. A cast of a second (the spell pose held, playtest
             // note 68), then the release, the heal and its glow.
             if (healing != null)
@@ -775,6 +792,8 @@ namespace Crulanda.Encounter
                 // anyone alive is more than 12 m behind, and pulls nothing until they are all within reach.
                 float behind = PartyBehind();
                 if (behind > 16) { Activity = "Waiting for the party"; agent.isStopped = true; return; }
+                // A boss or an elite camp next: stopped short of it while the party buffs up (Chris, 2026-10-15; BossBuffs).
+                if (BuffStopTick(toCamp)) return;
                 // A long way through the caves (2026-10-15, the adit-final run: woken at the yard after a wipe at Nix, the leader was sent at his
                 // camp 400 m off, its path came back partial (the navmesh's search gives up on a long way), it stood at the path's end, and the
                 // camp was left as "out of reach" 45 s on: Nix never fell and his chute door never opened). Once the path to the camp comes back
@@ -833,7 +852,133 @@ namespace Crulanda.Encounter
         /// <summary>For a test's log: the headway it measures to its camp (its best so far, by which measure, and seconds since it last improved).</summary>
         public string HeadwayNote { get { return "best " + leadBest.ToString("0") + " m (" + (leadKind == 2 ? "caves' way" : leadKind == 1 ? "path" : "straight") + "), " + (Time.time - leadBestAt).ToString("0") + " s since better"; } }
         /// <summary>A mend: the party's healer gives a sixth of the healed one's health (or its old flat sum, if more); a tank's is the flat sum.</summary>
-        public int MendFor(Actor who) { return Role == PartyRole.Healer ? Mathf.Max(HealAmount, Mathf.RoundToInt(who.Health.Pool.Max * .16f)) : HealAmount; }
+        public int MendFor(Actor who) { return Mathf.RoundToInt((Role == PartyRole.Healer ? Mathf.Max(HealAmount, Mathf.RoundToInt(who.Health.Pool.Max * .16f)) : HealAmount) * (1 + MendEdge)); }
+
+        // ---------- buffing up before a boss (Chris, 2026-10-15: "we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses"; BossBuffs) ----------
+        /// <summary>Stopped short of a boss or an elite camp, leading, while the party buffs up.</summary>
+        public bool BuffingUp { get; private set; }
+        /// <summary>The stop at which it last took its turn (EncounterSession.BuffStop; -1 none), and what it used then ("Shore feast (5 fed),
+        /// Scree salve, Sworn to the Colours on 5").</summary>
+        public int BuffedStop { get; private set; } = -1;
+        public string BuffNote { get; private set; }
+        object buffDoneFor, leadKey; bool leadElite; float buffSince, drawBackSince = -1, nextEdge, healthEdge; int buffStop; Vector3 drawBackTo;
+        Combatant combatant; readonly object edgeSource = new object();
+        StatusEffectRuntime Statuses { get { if (combatant == null) combatant = GetComponent<Combatant>(); return combatant != null ? combatant.Statuses : null; } }
+        /// <summary>The step it leads to now is a boss's or an elite camp's (a dungeon's step with an elite among its camps; a run to an elite).</summary>
+        bool StepIsBoss { get { return route.Count > 0 ? !route[0].regroup && route[0].boss : leadElite; } }
+        object StepKey { get { return route.Count > 0 ? route[0] : leadKey; } }
+        /// <summary>A boss or an elite camp ahead that the party has not yet buffed up for: nothing of it is pulled meanwhile.</summary>
+        public bool BuffPending { get { return Leading.HasValue && waitingAt == null && StepIsBoss && StepKey != null && buffDoneFor != StepKey; } }
+        /// <summary>
+        /// The stop (in the leading, once the party is up with it): within <see cref="BossBuffs.StopShort"/> of a boss's or an elite camp it
+        /// stops and says "buff up" in Party, nearer than <see cref="BossBuffs.StopMin"/> it first draws back to that distance (eight seconds at
+        /// most); then it waits until every living member has buffed (EncounterSession.PartyBuffed, three seconds at least) or
+        /// <see cref="BossBuffs.StopWait"/> pass, and goes on to pull. A fight breaks it off. True while it stands (or draws back).
+        /// </summary>
+        bool BuffStopTick(float toCamp)
+        {
+            if (BuffingUp)
+            {
+                float since = Time.time - buffSince;
+                bool done = session.InCombat || since >= BossBuffs.StopWait || (since >= BossBuffs.StopAtLeast && session.PartyBuffed(buffStop));
+                if (!done) { Activity = "Buffing up for " + ThePlace; agent.isStopped = true; return true; }
+                BuffingUp = false; buffDoneFor = StepKey; session.EndBuffStop(this);
+                if (!session.InCombat) session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "ok, pulling" : "Ready. I'm pulling " + ThePlace + ".");
+                return false;
+            }
+            // How far it is still to go: the walk when its path to the camp is known (a cave's way winds: 30 m through the rock may be 80 on foot), else the straight line.
+            float along = toCamp;
+            if (!legging && agent.hasPath && !agent.pathPending && (leadDest - Leading.Value).sqrMagnitude < 1 && !float.IsInfinity(agent.remainingDistance)) along = Mathf.Max(toCamp, agent.remainingDistance);
+            if (!BuffPending || session.InCombat || along > BossBuffs.StopShort) { drawBackSince = -1; return false; }
+            // Come in nearer than the stop (a step that begins close by the last fight): it draws back the way it faces from the camp to the stop's
+            // distance first, where the paths go there, eight seconds at most; else it stops where it stands.
+            if (along < BossBuffs.StopMin && (drawBackSince < 0 || Time.time - drawBackSince < 8))
+            {
+                if (drawBackSince < 0)
+                {
+                    drawBackSince = Time.time;
+                    var away = transform.position - Leading.Value; away.y = 0; if (away.sqrMagnitude < .01f) away = -transform.forward;
+                    var path = new NavMeshPath();
+                    if (NavMesh.SamplePosition(Leading.Value + away.normalized * BossBuffs.StopShort, out var hit, 6, NavMesh.AllAreas) && Mathf.Abs(hit.position.y - transform.position.y) < 4
+                        && NavMesh.CalculatePath(transform.position, hit.position, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete) drawBackTo = hit.position;
+                    else drawBackSince = Time.time - 8;   // nowhere to draw back to: it stops here
+                }
+                if (Time.time - drawBackSince < 8 && Vector3.Distance(transform.position, drawBackTo) > 2)
+                {
+                    Activity = "Drawing back to buff up"; agent.isStopped = false; agent.speed = 4.2f;
+                    if ((drawBackTo - leadDest).sqrMagnitude > 1 || Time.time - leadDestAt > 2) { leadDest = drawBackTo; leadDestAt = Time.time; agent.SetDestination(drawBackTo); }
+                    return true;
+                }
+            }
+            drawBackSince = -1;
+            BuffingUp = true; buffSince = Time.time; buffStop = session.BeginBuffStop(this); agent.isStopped = true;
+            Activity = "Buffing up for " + ThePlace;
+            session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "buff up, " + (LeadingName ?? "boss").ToLower() + " next" : "Buff up before " + ThePlace + ". Eat, drink, and lay your blessings on us.");
+            return true;
+        }
+        /// <summary>The consumables it carries: its goods (what it made and what it bought: SimEconomy.Stock).</summary>
+        public List<ItemDef> Carried()
+        {
+            var l = new List<ItemDef>(); var items = session != null ? session.Items : null; if (items == null) return l;
+            for (int i = 0; i < sim.goodIds.Count; i++) { var d = items.Get(sim.goodIds[i]); if (d != null && d.kind == "consumable" && sim.goodCounts[i] > 0) l.Add(d); }
+            return l;
+        }
+        /// <summary>
+        /// Its turn at a buff-up, from its own goods, taking only what it lacks (BossBuffs.Wants): a feast first when a party sim near carries one
+        /// (that one eats it and feeds the party round it, five at most, and says so), else its own dish; the elixir for its part
+        /// (BossBuffs.PickElixir: a tank's salve or Bear's-wort, a healer's Hearth-ease, a damage-dealer's tincture of its main stat); its
+        /// class's draught under 60% of its pool; its class's standing buff on the party (ClassBuffs) when anyone near lacks it.
+        /// </summary>
+        void BuffUpNow()
+        {
+            BuffedStop = session.BuffStop; var used = new List<string>(); var st = Statuses; float now = Time.time;
+            if (st != null && BossBuffs.Wants(st, Consumables.FedId, now))
+            {
+                SimCompanion holder = null; ItemDef feast = null;
+                foreach (var p in session.PartySims)
+                {
+                    if (p == null || p.actor == null || !p.actor.IsAlive || Vector3.Distance(p.transform.position, transform.position) > BossBuffs.BuffReach) continue;
+                    var f = BossBuffs.PickFeast(p.Carried()); if (f != null) { holder = p; feast = f; break; }
+                }
+                if (feast != null)
+                {
+                    SimEconomy.Add(holder.sim, feast.id, -1);
+                    int fed = Consumables.Feed(feast, session.FeastCircle(holder.actor), now);
+                    used.Add((holder == this ? "" : holder.sim.name.Split(' ')[0] + "'s ") + feast.name + " (" + fed + " fed)");
+                    session.ChatSay(ChatChannel.Party, holder.sim.name, holder.sim.chatty > .65f ? feast.name.ToLower() + " out, eat up" : "I have a " + feast.name + ". Gather round and eat.");
+                }
+                if (BossBuffs.Wants(st, Consumables.FedId, now))   // no feast, or out of its reach: its own dish
+                {
+                    var dish = BossBuffs.PickDish(Carried());
+                    if (dish != null) { SimEconomy.Add(sim, dish.id, -1); Consumables.Apply(dish, st, now); used.Add(dish.name); }
+                }
+            }
+            var elixir = BossBuffs.PickElixir(Role, BossBuffs.MainStat(sim.classId), Carried());
+            if (st != null && elixir != null && BossBuffs.Wants(st, Consumables.StatusId(elixir.buff), now)) { SimEconomy.Add(sim, elixir.id, -1); Consumables.Apply(elixir, st, now); used.Add(elixir.name); }
+            var pool = actor.Resource != null ? actor.Resource.Pool : null;
+            if (pool != null && pool.Max > 0 && pool.Ratio < BossBuffs.DraughtBelow)
+            {
+                var draught = BossBuffs.PickDraught(BossBuffs.PoolOf(sim.classId), Carried());
+                if (draught != null) { SimEconomy.Add(sim, draught.id, -1); pool.Change(draught.restore); used.Add(draught.name); }
+            }
+            var mine = ClassBuffs.For(sim.classId);
+            if (mine != null && session.WantsClassBuff(mine, actor)) { int n = session.LayClassBuff(mine, actor); if (n > 0) used.Add(mine.name + " on " + n); }
+            if (this == session.BuffLeader && session.Companion != null && session.Progress.recruited && session.Companion.actor != null)   // Mira's, if she has one
+            { var hers = session.Companion.PartyBuff; if (hers != null && session.WantsClassBuff(hers, session.Companion.actor)) session.LayClassBuff(hers, session.Companion.actor); }
+            BuffNote = used.Count > 0 ? string.Join(", ", used) : "nothing needed";
+        }
+        /// <summary>What its buffs add to its blow (its main stat) and its mend (Spirit): BossBuffs.Edge.</summary>
+        public float DamageEdge { get { return actor == null ? 0 : BossBuffs.Edge(actor.Stats, Statuses, BossBuffs.MainStat(sim.classId), sim.level); } }
+        public float MendEdge { get { return actor == null ? 0 : BossBuffs.Edge(actor.Stats, Statuses, Crulanda.Core.StatType.Spirit, sim.level); } }
+        /// <summary>Its buffs' Stamina as health (BossBuffs.Edge on Stamina, a share of its health while they last): a sim's health is set by its
+        /// level, not its Stamina, so this is how a dish's Stamina reaches it.</summary>
+        void RefreshEdge()
+        {
+            float want = BossBuffs.Edge(actor.Stats, Statuses, Crulanda.Core.StatType.Stamina, sim.level);
+            if (Mathf.Abs(want - healthEdge) < .001f) return;
+            healthEdge = want; actor.Stats.RemoveModifiersFromSource(edgeSource);
+            if (want > 0) actor.Stats.AddModifier(new StatModifier(Crulanda.Core.StatType.MaxHealth, ModifierOp.PercentAdd, want, edgeSource));
+        }
         /// <summary>The most hurt of the party within <paramref name="reach"/>: you, Mira (when recruited), the sims, Mother Quillet.</summary>
         Actor MostHurt(float reach)
         {

@@ -42,6 +42,10 @@ namespace Crulanda.Encounter
             foreach (var id in BarIds) if (!abilities.ContainsKey(id) || !unlocks.ContainsKey(id)) throw new ArgumentException("Shaman ability '" + id + "' is missing from content or unlocks.");
         }
         public override string[] ImplementedTalents { get { return ImplementedIds; } }
+        /// <summary>Its standing party buff at a buff-up before a boss (Chris, 2026-10-15: "food buffs, alchemy buffs, class buffs"; GAME-ONLY):
+        /// the weather-speaker asks the old weather to look kindly on the party. Half an hour, +3% Intellect on everyone (BossBuffs).</summary>
+        public static readonly ClassBuff Standing = new ClassBuff("class.shaman", "Old Weather's Favour", Crulanda.Core.StatType.Intellect);
+        public override ClassBuff PartyBuff { get { return Standing; } }
         int R(string id) { return s.TalentRank(id); }
         float Now { get { return Time.time; } }
         int Level { get { return s.Player.Level; } }

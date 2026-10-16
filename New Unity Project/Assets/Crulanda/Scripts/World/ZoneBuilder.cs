@@ -1559,6 +1559,7 @@ namespace Crulanda.World
             }
             // Floor, skirting and walls.
             Part(PrimitiveType.Cube, t, new Vector3(0, .02f, 0), new Vector3(w - wall, .05f, d - wall), boards);
+            HallFloor(t, w - wall, d - wall, .045f);   // solid: you stand on the boards, not 5 cm down in them (ZoneBuilder.Crown)
             WallPiece(new Vector3(0, H / 2, d / 2), new Vector3(w, H, wall));
             foreach (int s in new[] { -1, 1 }) WallPiece(new Vector3(s * w / 2, H / 2, 0), new Vector3(wall, H, d));
             float side = (w - doorW) / 2;

@@ -46,7 +46,8 @@ namespace Crulanda.Encounter
             switch (role)
             {
                 case "blacksmith": case "merchant": case "baker": case "henwife": case "farmer": case "hunter": case "leatherworker":
-                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": case "innkeeper": case "goblin": return true;
+                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": case "innkeeper": case "goblin":
+                case "councilor": case "scholar": return true;   // the Crown's costumes (a resident's look, WorldLife)
                 default: return false;
             }
         }
@@ -450,6 +451,10 @@ namespace Crulanda.Encounter
                     // A goblin (PROVISIONAL look until the goblins have a figure: the pressed goblins in the Adit's cages, note 125): grey-green
                     // skin, rags the colour of rock dust.
                     if (role == "goblin") { clothC = new Color(.36f, .32f, .26f); accentC = new Color(.27f, .24f, .2f); legC = new Color(.25f, .22f, .18f); skin = Mat(new Color(.5f, .6f, .42f)); }
+                    // The High Councilor (CANON look, book1 ch.12:365: "ancient", "pale skin pulled tight against his skull", robes of white
+                    // silk): white robes, gold for the trim, the skin pale and a little grey. His clerk (GAME-ONLY): a dark robe.
+                    if (role == "councilor") { clothC = new Color(.95f, .94f, .9f); accentC = new Color(.92f, .72f, .24f); legC = new Color(.92f, .9f, .84f); skin = Mat(new Color(.86f, .8f, .74f)); }
+                    if (role == "scholar") { clothC = new Color(.13f, .12f, .17f); accentC = new Color(.9f, .88f, .82f); legC = new Color(.1f, .09f, .12f); }
                     break;
                 default: clothC = new Color(.6f, .27f, .18f); accentC = new Color(.4f, .35f, .3f); legC = new Color(.28f, .2f, .16f); break;
             }
@@ -973,6 +978,61 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Cylinder, body, new Vector3(.25f, -.04f, .08f), new Vector3(.1f, .01f, .1f), iron, new Vector3(0, 0, 90)); // ring of keys
                     Beard(new Color(.36f, .24f, .14f), .3f);
                     break;
+                case "councilor":
+                {
+                    // The High Councilor's robes of state (2026-10-16, Chris: "he needs more regal attire"). CANON look (book1 ch.12:365):
+                    // ancient, pale, "elegant robes of pure white silk, heavily embroidered with highly complex geometric patterns". GAME-ONLY:
+                    // the gold of them, the high collar, the chain of office and the rings. No crown: he is a councillor, not a king.
+                    var silk = M(.96f, .95f, .91f, .35f); var gilt = M(1f, .8f, .36f, .7f, .8f); var gem = M(.55f, .08f, .12f, .8f, .3f);
+                    cloth.color = new Color(.95f, .94f, .9f); legs.color = new Color(.92f, .9f, .84f);
+                    // The robe: to the floor all round (on the hips, so it hangs from them sitting too: seated, its foot is in the seat), and a
+                    // mantle from the shoulders down the back. Kept on a model too (its kit: a board or a drum is otherwise left off, Remap).
+                    var robe = Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.52f, .42f, .44f), silk); robe.name = "Robe";
+                    var hem = Part(PrimitiveType.Cylinder, body, new Vector3(0, -.9f, 0), new Vector3(.56f, .02f, .48f), gilt); hem.name = "Robe hem";
+                    var mantle = Part(PrimitiveType.Cube, body, new Vector3(0, .05f, -.18f), new Vector3(.6f, 1.05f, .04f), silk, new Vector3(-4, 0, 0)); mantle.name = "Mantle";
+                    var mantleHem = Part(PrimitiveType.Cube, body, new Vector3(0, -.46f, -.2f), new Vector3(.6f, .06f, .05f), gilt, new Vector3(-4, 0, 0));
+                    classKit = new[] { robe, hem, mantle, mantleHem };
+                    // The front: a gold band down the robe's opening, worked either side in gold lozenges (the embroidery).
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .2f, .165f), new Vector3(.1f, .62f, .02f), gilt);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, -.48f, .235f), new Vector3(.1f, .76f, .02f), gilt);
+                    for (int i = 0; i < 4; i++) foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(sx * .13f, .38f - i * .16f, .162f), new Vector3(.045f, .045f, .015f), gilt, new Vector3(0, 0, 45));
+                    for (int i = 0; i < 4; i++) foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(sx * .14f, -.22f - i * .18f, .19f), new Vector3(.05f, .05f, .015f), gilt, new Vector3(0, 0, 45));
+                    // A high standing collar, white edged in gold, round the back and sides of the neck.
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .6f, -.1f), new Vector3(.34f, .22f, .03f), silk, new Vector3(-14, 0, 0)).name = "Collar";
+                    foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(sx * .16f, .59f, -.01f), new Vector3(.03f, .2f, .18f), silk, new Vector3(0, 0, sx * 10));
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .705f, -.12f), new Vector3(.35f, .025f, .04f), gilt, new Vector3(-14, 0, 0));
+                    // The chain of office: gold links from shoulder to shoulder across the breast, a medallion with a red stone on it.
+                    for (int i = 0; i <= 8; i++)
+                    {
+                        float a = (i / 8f - .5f) * Mathf.PI * .8f;
+                        Part(PrimitiveType.Sphere, body, new Vector3(Mathf.Sin(a) * .22f, .38f + (1 - Mathf.Cos(a)) * .3f, .165f - (1 - Mathf.Cos(a)) * .08f), Vector3.one * .055f, gilt).name = "Chain of office";
+                    }
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .31f, .18f), new Vector3(.12f, .012f, .12f), gilt, new Vector3(90, 0, 0)).name = "Medallion";
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .31f, .19f), Vector3.one * .045f, gem);
+                    // Rings: gold with a red stone, one on each hand.
+                    foreach (var (hand, arm) in new[] { (handL, armL), (handR, armR) })
+                    {
+                        var on = hand != null ? hand : arm; var at = hand != null ? new Vector3(0, -.07f, .02f) : new Vector3(0, -.6f, .05f);
+                        if (on == null) continue;
+                        Part(PrimitiveType.Sphere, on, at, Vector3.one * .035f, gilt).name = "Ring"; Part(PrimitiveType.Sphere, on, at + new Vector3(0, 0, .015f), Vector3.one * .02f, gem);
+                    }
+                    break;
+                }
+                case "scholar":
+                {
+                    // A clerk of the Council (GAME-ONLY): a dark scholar's robe to the floor, white bands at the throat, the ledger under the
+                    // arm, an inkhorn and a quill at the belt.
+                    var dark = M(.12f, .11f, .16f); var paper = M(.93f, .9f, .8f);
+                    cloth.color = new Color(.13f, .12f, .17f); legs.color = new Color(.1f, .09f, .12f);
+                    var robe = Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.5f, .42f, .42f), dark); robe.name = "Robe";
+                    classKit = new[] { robe };   // kept on a model (Remap)
+                    foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(sx * .03f, .5f, .165f), new Vector3(.05f, .14f, .015f), paper);   // the bands
+                    Part(PrimitiveType.Cube, armL, new Vector3(0, -.42f, .12f), new Vector3(.08f, .32f, .24f), M(.45f, .18f, .1f)).name = "Ledger";
+                    Part(PrimitiveType.Cube, armL, new Vector3(-.005f, -.42f, .12f), new Vector3(.07f, .3f, .22f), paper);
+                    Part(PrimitiveType.Cylinder, body, new Vector3(.24f, -.02f, .1f), new Vector3(.05f, .06f, .05f), M(.2f, .14f, .1f));   // the inkhorn
+                    Part(PrimitiveType.Cube, body, new Vector3(.25f, .1f, .1f), new Vector3(.01f, .2f, .03f), paper, new Vector3(0, 0, -12));   // a quill
+                    break;
+                }
                 case "drinker":
                     // (The tankard is not part of the outfit: it is in the hand only at the inn, see Villager.DrinkRound.)
                     if (variant % 2 == 0) Hood(accent, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f));

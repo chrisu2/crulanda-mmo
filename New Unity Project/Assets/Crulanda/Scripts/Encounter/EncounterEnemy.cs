@@ -256,12 +256,13 @@ namespace Crulanda.Encounter
         public void Slow(float fraction, float seconds)
         {
             if (!actor.IsAlive || fraction <= 0 || seconds <= 0) return;
+            if (Elite && !Slowed && !OnceAFight("slow", ref seconds)) return;   // once a fight, half the time (an elite's slow still running is only topped up)
             float factor = Mathf.Clamp01(1 - fraction);
             if (!Slowed || factor < slowFactor) slowFactor = factor;
             slowUntil = Mathf.Max(slowUntil, Time.time + seconds);
         }
         /// <summary>Root: cannot move, can still strike whatever is in reach. Leash distance still applies.</summary>
-        public void Root(float seconds) { if (actor.IsAlive && seconds > 0) rootUntil = Mathf.Max(rootUntil, Time.time + seconds); }
+        public void Root(float seconds) { if (actor.IsAlive && seconds > 0 && OnceAFight("root", ref seconds)) rootUntil = Mathf.Max(rootUntil, Time.time + seconds); }
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Enemy");
         void Update() { using (perfMark.Auto()) UpdateTimed(); }
@@ -345,7 +346,7 @@ namespace Crulanda.Encounter
         public void ResetFight()
         {
             ClearFight();
-            threat.Clear(); Victim = null; slowUntil = rootUntil = 0; unreachableSince = -1; TappedBy = null;
+            threat.Clear(); Victim = null; slowUntil = rootUntil = 0; unreachableSince = -1; TappedBy = null; ForgetHolds();
             UnscaleFromGroup(); ResetCasting(); ResetFlee();
             if (!actor.IsAlive) return;
             actor.Health.ApplyHealing(actor.Health.Pool.Max);
@@ -416,7 +417,7 @@ namespace Crulanda.Encounter
             if (visual != null) { visual.localRotation = Quaternion.identity; visual.localPosition = Vector3.zero; }
             UnscaleFromGroup(); TappedBy = null; actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             ClearFight(); evadeUntil = 0;
-            threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0; ResetFlee();
+            threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0; ResetFlee(); ForgetHolds();
             Drops = null; Coins = 0; LootBeacon.Clear(this);
             if (agent.isOnNavMesh) agent.isStopped = false;
             if (Game) GetComponent<GameAnimal>()?.Stand();

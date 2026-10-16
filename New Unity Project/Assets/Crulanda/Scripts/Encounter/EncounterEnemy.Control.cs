@@ -59,15 +59,13 @@ namespace Crulanda.Encounter
         public string Apply(string kind, Actor by, float seconds)
         {
             if (!actor.IsAlive || Game || seconds <= 0) return "Nothing to hold";
-            bool holdable = Elite && Move != null && Move.holdable;   // the duo's Nix (2026-10-11): held the whole fight if the party keeps him held
-            if (IsBoss && !holdable && (kind == "incap" || kind == "fear")) { session.FloatText(transform.position, "Immune", Color.white); return "Immune"; }
-            if (!holdable)
+            if (Elite && kind != "silence") { if (!OnceAFight(kind, ref seconds)) return "Immune (once a fight)"; }   // Chris's rule (CC_DESIGN.md); an interrupt is not a hold
+            else
             {
                 var d = diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow ? (Time.time, was.n + 1) : (Time.time, 0);
                 if (d.Item2 >= 2) { diminish[kind] = (was.at, was.n); session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }
                 diminish[kind] = d;
                 if (d.Item2 == 1) seconds *= .5f;
-                if (Elite && (kind == "incap" || kind == "fear")) seconds *= EliteHold;
             }
             float until = Time.time + seconds;
             switch (kind)
@@ -83,10 +81,22 @@ namespace Crulanda.Encounter
             return null;
         }
         float lostUntil;
+        /// <summary>The holds an elite has had this fight (Chris, 2026-10-15: "you can't CC elites, bosses, world bosses", then "normal CCs are cut
+        /// in half the duration and can't imply the same CC after the first"; of the Nix duo "CC duration cut in half and can only have one cc
+        /// type one time"). Cleared when the fight resets or it rises again.</summary>
+        readonly HashSet<string> heldOnce = new HashSet<string>();
+        /// <summary>An elite, a boss or a world boss: each kind of hold once a fight, for half its time. False (and "Immune") for a second.</summary>
+        public bool OnceAFight(string kind, ref float seconds)
+        {
+            if (!Elite) return true;
+            if (!heldOnce.Add(kind)) { session.FloatText(transform.position, "Immune", Color.white); return false; }
+            seconds *= .5f; return true;
+        }
+        public void ForgetHolds() { heldOnce.Clear(); }
         /// <summary>Its raid mark (Ctrl+1 skull, Ctrl+2 moon, Ctrl+3 cross, Ctrl+4 clears; one mob a mark).</summary>
         public RaidMark RaidMarked { get; set; }
         /// <summary>What the party's helpers (sims, Mira, the Ranger's companion) don't hit: a held mob, or one marked moon or cross.</summary>
-        public bool LeaveAlone { get { return Incapacitated || RaidMarked == RaidMark.Moon || RaidMarked == RaidMark.Cross; } }
+        public bool LeaveAlone { get { return Incapacitated || (RaidMarked == RaidMark.Moon && (!Elite || Controlled)) || RaidMarked == RaidMark.Cross; } }   // an elite's Moon only while it is held: its one hold a fight spent, the party fights it (Chris's rule, 2026-10-15)
         /// <summary>Lets a hold or a fear go early (an Archivist binding another mob).</summary>
         public void Release() { incapUntil = 0; fearUntil = 0; }
         /// <summary>A Rogue's Vanish: this mob forgets <paramref name="who"/> (its threat on them is gone) and doesn't notice them again

@@ -5,6 +5,13 @@ any CC classes yet, so that is something we need to look at next." Classic dunge
 taken out of the fight while the group kills the rest, casters interrupted. Crulanda has slows and roots (Ranger Pin and Snare, Druid
 Stillroot and Briar Snare) but nothing that takes a mob out of a fight, no interrupts, and sims that would break CC anyway.
 
+## Chris's rule (2026-10-15 ~23:05, verbatim): "you can't CC elites , bosses, world bosses , etc."
+Then, asked which effects and what of Nix (the question prompt, verbatim): "normal CCs are cut in half the duration and can't imply the same
+CC after the first." and, of the Nix duo, "CC duration cut in half and can only have one cc type one time".
+**The rule as built:** on an elite, a boss or a world boss every hold (stun, incapacitate: sleep, sap, hex, gouge; fear; root; disorient;
+slow) lasts half as long, and each kind lands once a fight: a second stun, a second fear and so on is "Immune" until the fight resets.
+Interrupts (a silence on a cast) are not holds and work as before. Nix follows it like any elite: held once, for half the time.
+
 ## Decisions for Chris (my picks first)
 1. **Classic strength (pick):** long CC (20-30 s) that breaks on damage, short stuns (3-4 s) that don't. (Or modern: everything short.)
 2. **Marking with keys (pick):** Ctrl+1 skull (kill first), Ctrl+2 moon (CC), Ctrl+3 cross (second CC), Ctrl+4 clear. Sims read the marks.

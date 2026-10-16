@@ -292,7 +292,7 @@ namespace Crulanda.Encounter
             if (moon == null || moon.Incapacitated || Vector3.Distance(moon.transform.position, transform.position) > 25) return;
             // A hold that does not take leaves no Moon (adit-final10, 2026-10-15: the Moon stayed on Gang-Boss Lusk, who cannot be held, and the
             // healer, the Ranger and the Rogue left him to the tank alone: the tank fell, then you, five times; Chris: "paladin keeps dieing").
-            if (moon.Apply("incap", actor, 20) != null) { if (marked) moon.RaidMarked = RaidMark.None; nextHold = Time.time + 6; return; }
+            if (moon.Apply("incap", actor, 20) != null) { if (marked || moon.Elite) moon.RaidMarked = RaidMark.None; nextHold = Time.time + 6; return; }
             nextHold = Time.time + 25;
             bool rogue = sim.classId == "class.rogue", scoundrel = sim.classId == "class.scoundrel";
             string what = rogue ? (sim.chatty > .65f ? "gouged moon, dont touch it" : "Moon is held. Leave it be.") : scoundrel ? (sim.chatty > .65f ? "sang moon still, dont touch it" : "Moon's dazed. Leave it be.") : (sim.chatty > .65f ? "lulling moon" : "Moon's asleep. Don't wake it.");

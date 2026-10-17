@@ -1,14 +1,82 @@
-# Crulanda: Claude handoff (Start here rewritten 2026-10-16 ~01:45: the stopping point after the castle night)
+# Crulanda: Claude handoff (Start here rewritten 2026-10-17 ~00:10: the stopping point after the Lowtowns and Hallow's Creek)
 
 ## Start here
 
-**Update 2026-10-16 ~11:40 (Chris on the castle preview, morning).** He played the preview: "inn does look better"; of the ivy "plants
-not even on the wall.only a few plants", then "still sparse looking". On `p9-capital`: the ivy follows each wall's real face (a ray back
-to the stone at every step), leaves lie flat, and it grows as wide sheets on almost every stretch up to the stone ledge. The castle preview
-was rebuilt three times (11:23, 11:31; frames `world-captures/crown-3`, `crown-4`); the frame rate at noon went 91 → 90 → 74 fps with the
-heavy ivy. Open: the upper walls above the ledge are bare (ask Chris: climb higher or hang from the top), and thin the far ivy if 74 fps
-feels heavy. The detail budget test (CrownZonePlayTests) now allows 3 M triangles. Then "save and backup and create handoff for next
-time" (this note). Everything below still holds.
+**Stopping point: 2026-10-17 ~00:10.** Chris: "once all these jobs are complete. backup, save and then complete the handoff for next
+time". Everything is committed and pushed (every branch), backed up to E: (tools\Backup.ps1). Nothing is VERIFIED until Chris sees it
+in his build.
+
+### What is in the normal game now (published 2026-10-16 23:54)
+`D:\crulanda-work\outputs\Crulanda-Playable`, from `p9-lowtowns` (fast-forwarded into `feet-bow-adit-kit`); Chris's saves backed up
+first (save-backups/20261016-2354-before-castle-lowtowns-publish). It carries everything since the 01:23 publish:
+- **Phase 8.6** (inns, crafting, buffs, lockouts, lore), already published at 15:27 on Oct 16 (character save format 11).
+- **The castle, the Crown of Argentis** (CAPITAL_HUB.md): the halls, the library, Aethelgard on his throne, the guild halls, the two-part
+  bank (3 shared slots, more bought; the rest per character), the Exchange with sims listing and buying, the Crafters' Court with every
+  trade, the Gilded Lantern inn (its own design), ivy, gardens, iron; profile and world saves at format 2. `/crown` jumps there.
+- **Level 20**: 47 talent nodes, gear band 16-20 (slag-iron, tier 6).
+- **The Lowtowns** (zone.lowtowns, 15-20; ZONE_LOWTOWNS.md): Oakhaven's south-east road; the Rust Market (14 stalls, market folk),
+  street clutter, the city roofline on the horizon, the Crown lower on the NE skyline (it hung "upside down" at the top of the view
+  before), the new **Rusty Spoon** (inn variant 4: soot-brick warehouse, sagging timber upper floor, sunken bar, dice pit, the curtained
+  back room; Chris: "each zone has to be unique not reused assets"). `/lowtowns` (sets you to 17).
+- **Hallow's Creek** (zone.hallows, dungeon 15-20; DUNGEON2_DESIGN.md): 27 camps on the standard run, the frozen town (townsfolk held
+  mid-step, ash grey), the glass-slab bridge with parapets on every edge, the stair down to the Fallen Mason, the Old Archive (broken
+  roof, ledger shelves, papers in the air), the Bell Tower with its bell, the crater square, the Warden's walk escort, three still-lamp
+  checkpoints. `/hallows` (sets you to 16).
+- **Checkpoints in every dungeon** (Chris: "maybe 3 checkpoints in dungeons"): the Adit's three miners' cairns, Hallow's Creek's three
+  still lamps; Recover wakes you and the fallen party at the furthest reached.
+- **Balance** (BALANCE_REPORT.md, Chris's answers): hybrids' damage builds 10% under the pure damage classes ("A bit lower"; the
+  Warrior counts as a hybrid: "Hybrid"); sims count their gear's Stamina ("Fix it now"), and mobs hit a sim party harder to match;
+  the Warrior sim is the toughest in a party; the group-run bot spends its talents.
+
+### Tested
+- Final round (chainR195): EditMode 120/120 and PlayMode 53/53, all green, including the Adit camp-reach check (now by hops, ZoneContentTests) that had failed for days; the release build 0 shader errors.
+- The level-17 Hallow's Creek group run (run-captures/hallows-4, 23:10): all 27 camps, no wipes, 43 min; the Druid healed 41/s (it was
+  16/s at 19: the run at 19 was too easy, Chris: "still not balanced i dont think").
+- Frames: world-captures/lowtowns-5 (the Spoon, the skyline), hallows-3 and -4 (bridge, square, archive, tower), lowtowns-3/-4.
+  Frame rate at noon: Lowtowns ~154 fps, Hallow's Creek ~116 fps.
+
+### Next, in order
+1. **The Rust Market's high view: upside-down roofs along the top of the frame** (world-captures/lowtowns-5/lowtowns-12-the-rust-market.png,
+   also faintly the soup hall's). NOT the Crown on the skyline (lowered to summit 95 and coloured whole, 950ad7bc: no change), NOT the
+   DistantRanges city ring (built upright) and not the backdrop rows (the perf file's HIGH list shows nothing else 25 m up). It looks like a
+   mirror of the city about a plane over the camera: suspect a reflection (the Water shader's sky/probe sample, the realtime "Sky
+   reflection" probe in ZoneBuilder.cs:145, the puddles) or the RoofFade dither. Reproduce at that view and toggle renderers.
+2. **The sims under-hit their damage band.** In the level-17 run the Paladin bot (talented, x0.64) did 64/s, inside its band (59-65),
+   but the sim Rogue did 42/s and the Ranger 37/s (+14 the wolf); pure damage should be 66-72. Raise the sims' damage to their band
+   (SimCompanion's hit formula, their rotation, the Rogue standing in boss stuns, holding the marked mob), then a group run at 17 for
+   Chris to watch. Chris's eye is on the meter ("still not balanced i dont think").
+3. **The run bot got stuck 20 times** in the level-17 run (warped to the leader/fight; the bridge was the worst before the parapets, but
+   it still happens on Main Street, the Granary, the Archive). It is the test player's steering (RunCapture), not the sims; read the
+   log's positions (run-captures/hallows-4/run-player.log).
+4. Chris looks at the Lowtowns, the Rusty Spoon, Hallow's Creek (queue it with J or /queue at 15+, or /hallows), the checkpoints, the
+   castle. Reports stay open until he confirms.
+5. From before: retune bosses for buffed parties (Nix with one hold); Phase 8.5 on p85-hero (the Modular Hero body); the p86-inns and
+   p86-lore leftovers if any; the Lowtowns' generator (tools/wip/lowtowns/make_lowtowns.py) is out of date with lowtowns.json: never
+   run it over the file.
+6. Later dungeons need not be caves (Chris: "all dungeons don't have to be cave systems"); every zone's buildings its own.
+
+### Lessons from today (memory holds them)
+- A chain that waits with `Start-Process -Wait` hangs when Unity starts Unity Hub (2 h lost); chains now wait on Unity's own pid, and
+  every chain has a stall watcher (scratchpad stallwatch.sh: 20 min with no new line and no Unity or game running, or 90 min on a step).
+  Never say a job is running without looking at its output and the process.
+- Cloned chains: fix the wait line (chainRNNN.out) every time.
+- Check the frames yourself before telling Chris a zone is done: the first Hallow's Creek frames showed T-posed townsfolk, a roofless
+  archive and cameras in walls.
+
+### Chris's words today (verbatim; the docs hold them)
+- "after this work on next dungeon and raise top level to 20. make sure there is a zone for 15-20 and a dungeon for the same range";
+  "no thanks i dont want a half assed version. complete it first".
+- "keeps falling off the edge over and over"; "people still falling off the crazy stone stair area"; "still not balanced i dont think".
+- "just fyi all dungeons don't have to be cave systems. just a note" (DUNGEON_DESIGN.md section 0).
+- "one thing to help respawns is to have checkpoints in the dungeon so they don't have to run all the back from the original spawn
+  area. maybe 3 checkpoints in dungeons" (DUNGEON_DESIGN.md section 0).
+- "same damn inn in the lowlands as well. each zone has to be unique not reused assets" (WORLD_ZONES.md).
+- Balance answers (BALANCE_REPORT.md): hybrids "A bit lower"; sims' gear Stamina "Fix it now"; the Warrior "Hybrid".
+- "ugh always making mistakes and wasting time"; "you have wasted most of the day with the run on jobs" (the stalled chains).
+
+---
+
+## Earlier (Oct 16 and before)
 
 ### The night of Oct 15-16
 

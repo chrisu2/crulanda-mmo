@@ -1,5 +1,16 @@
 # Changelog
 
+## 2026-10-16 23:54: published: the castle, level 20, the Lowtowns, Hallow's Creek (OPEN until Chris checks them in game)
+- **In the normal game** (save backed up to save-backups/20261016-2354-before-castle-lowtowns-publish): the Crown of Argentis; the cap at
+  20; the Lowtowns (15-20) with a fuller Rust Market, street clutter, the city roofline and the new Rusty Spoon (its own building: Chris,
+  "each zone has to be unique not reused assets"); Hallow's Creek (dungeon 15-20) with the townsfolk held mid-step, the Old Archive, the
+  Bell Tower, the crater square, the glass-slab bridge with parapets and a real stair down to the Fallen Mason; three checkpoints in
+  each dungeon; hybrids' damage 10% under the pure classes and sims' health counting their gear (Chris's answers, BALANCE_REPORT.md).
+- Tests: EditMode 120/120, PlayMode 53/53 (the Adit's camp-reach check passes by hops). A level-17 group run cleared Hallow's Creek in
+  43 minutes with no wipes.
+- Open: the Rust Market's high view shows upside-down roofs at the top of the frame; the sims under-hit their damage band; the run bot
+  gets stuck (CLAUDE_HANDOFF.md, Next).
+
 ## 2026-10-16: three checkpoints in each dungeon (Chris: "maybe 3 checkpoints in dungeons"; OPEN until checked in game)
 - **Dead in a dungeon, you no longer walk back from the entrance.** The Sealed Adit has three miners' cairns (the end of the Old Workings,
   the Gallery's east side, inside the Rail Hall's gate) and Hallow's Creek three still lamps (the lip before the bridge, Main Street, the
@@ -379,7 +390,8 @@ so low". Details and the table in BALANCE_REPORT.md, round 5.
 
 ## 2026-10-11, 16:50 on — Chris watching a group run of the Adit (notes 133-141; branch feet-bow-adit-kit)
 Chris: "need to show a test run of the dungeon with a group", then a report a minute as he watched (PLAYTEST_NOTES 133-141). Built and run
-on his screen the same hour, each run in `D:\crulanda-workun-captures`:
+on his screen the same hour, each run in `D:\crulanda-work
+un-captures`:
 - **RunCapture** (`Crulanda.exe --crulanda-run-capture <folder> --crulanda-zone zone.adit --crulanda-class class.paladin`): you at
   level 11 with four sims (a Warrior tanking and leading, a Druid, a Ranger with its wolf, a Rogue for the holds), the gates open, a sim
   leading the run camp by camp, you following, fighting, searching every body and wearing upgrades; dead, up at the stone. At three times

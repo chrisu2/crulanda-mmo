@@ -23,6 +23,13 @@ namespace Crulanda.Encounter
         {
             return classId == "class.warrior" || classId == "class.paladin" ? "heavy" : classId == "class.ranger" || classId == "class.rogue" || classId == "class.shaman" || classId == "class.scoundrel" ? "leather" : "cloth";
         }
+        /// <summary>The class that always tanks a party (SimCompanion.Role, the Warrior).</summary>
+        public static bool Tank(string classId) { return classId == "class.warrior"; }
+        /// <summary>
+        /// Whether the sim goes without the piece in armour slot <paramref name="i"/>: a few go bareheaded or without a neck piece or a
+        /// mantle, but never the tank, which owns all seven (2026-10-16: the Warrior tank bareheaded had the least armour of the mail in the party).
+        /// </summary>
+        static bool Bare(SimAdventurer s, int i) { return i <= 2 && !Tank(s.classId) && Mathf.Abs(s.gearSeed + i * 13) % 5 == 0; }
         public static bool CarriesWeapon(string classId) { return classId == "class.warrior" || classId == "class.paladin" || classId == "class.rogue" || classId == "class.scoundrel"; }
         /// <summary>Whether a piece by its name is of the class's weight (a Hauberk for the mail classes, a Jerkin for leather, a Tunic for cloth).</summary>
         public static bool Suits(string classId, string name)
@@ -48,7 +55,7 @@ namespace Crulanda.Encounter
             {
                 var forged = SimEconomy.Worn(s, ArmourSlots[i]); if (forged != null && items.Get(forged) != null) { ids.Add(forged); continue; }   // its own make (5.3c)
                 // A few sims go bareheaded or without a neck piece or a mantle: not everyone owns all seven.
-                if (i <= 2 && Mathf.Abs(s.gearSeed + i * 13) % 5 == 0) continue;
+                if (Bare(s, i)) continue;
                 var id = Pick(items, ArmourSlots[i], s, i, d => d.name.Contains(want[i]));
                 if (id != null) ids.Add(id);
             }
@@ -82,7 +89,7 @@ namespace Crulanda.Encounter
             var forged = SimEconomy.Worn(s, slot); if (forged != null && items.Get(forged) != null && (i >= 0 || TakesWeapons(s.classId))) return forged;
             if (i >= 0)
             {
-                if (i <= 2 && Mathf.Abs(s.gearSeed + i * 13) % 5 == 0) return null;
+                if (Bare(s, i)) return null;
                 var want = Wanted[Weight(s.classId)]; return Pick(items, slot, s, i, d => d.name.Contains(want[i]));
             }
             if (slot == "mainhand" && TakesWeapons(s.classId)) return Pick(items, "mainhand", s, 7, d => true);

@@ -76,8 +76,13 @@ namespace Crulanda.Encounter
             Give(BossBuffs.FeastFor(lvl, s.Items), 2); Give(BossBuffs.PickDish(all, lvl), 2);
             Give(BossBuffs.PickElixir(s.PlayerRole, BossBuffs.MainStat(s.ClassDef.id), all, lvl), 3); Give(BossBuffs.PickDraught(Consumables.PoolOf(s.ClassDef), all, lvl), 2);
             Log("Your bags for the bosses: " + (mine.Count > 0 ? string.Join(", ", mine) : "nothing of your tier") + ".");
-            // You in your class's kit at this level too (the temp save has only the starter gear): the armour of a sim's pieces.
-            s.Player.Stats.SetBase(Crulanda.Core.StatType.Armor, SimCompanion.ArmourFor(new SimAdventurer { classId = s.ClassDef.id, level = s.Progress.Level, gearSeed = 7, gearBonus = 2 }, s.Items));
+            // Your talent points spent as a player of your level would have them: every point in your class's path for the part you play
+            // (2026-10-16, the Hallow's Creek run at nineteen: the bot had none, so the Paladin's damage path's scale, x0.71 in
+            // EncounterSession.RoleScale, never applied, and the untalented Paladin out-hit the Rogue and the Ranger).
+            Log("Your talents: " + SpendForRole(s) + ".");
+            // You in your class's kit at this level too (the temp save has only the starter gear): the armour of a sim's pieces (the
+            // pieces only: the tank's edge in SimCompanion.ArmourFor is the Warrior sim's).
+            s.Player.Stats.SetBase(Crulanda.Core.StatType.Armor, SimCompanion.PiecesArmour(new SimAdventurer { classId = s.ClassDef.id, level = s.Progress.Level, gearSeed = 7, gearBonus = 2 }, s.Items));
             yield return new WaitForSeconds(.5f);
             Log("The party: you (" + s.ClassDef.displayName + ", " + s.Player.Health.Pool.Max + " health, armour " + s.Player.Stats.GetRounded(Crulanda.Core.StatType.Armor) + "), " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " (" + SimRoster.ClassName(c.sim.classId) + ", " + c.Role + ", " + c.actor.Health.Pool.Max + " health, armour " + c.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor) + ")")) + (s.SimPets.Count > 0 ? "; " + string.Join(", ", s.SimPets.Select(p => p.actor.DisplayName)) : "") + ".");
             // Dressed for the Adit: the temp save has no gear, so each party member's own level-11 kit (the sims' SimGear is on them already).
@@ -307,6 +312,25 @@ namespace Crulanda.Encounter
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, (shots < 10 ? "0" : "") + shots + "-" + name + ".png")); shots++;
         }
         static bool MeleeClass(EncounterSession s) { var id = s.ClassDef != null ? s.ClassDef.id : ""; return id == "class.warrior" || id == "class.paladin" || id == "class.rogue" || id == "class.scoundrel"; }
+        /// <summary>
+        /// Every talent point the bot has, spent as the balance harness buys a build: all in its class's first path for the part it plays
+        /// (EncounterSession.PlayerRole: a tank's path, a healer's or a damage path; the Paladin with a Warrior along deals damage, the
+        /// Judicator). What was bought, for the log.
+        /// </summary>
+        static string SpendForRole(EncounterSession s)
+        {
+            if (s.Talents == null || s.Progress == null) return "no talent tree";
+            var role = s.PlayerRole;
+            string want = role == SimCompanion.PartyRole.Tank ? "tank" : role == SimCompanion.PartyRole.Healer ? "healer" : "dps";
+            var branch = s.Talents.Branches.FirstOrDefault(b => b.role == want) ?? s.Talents.Branches.FirstOrDefault();
+            if (branch == null) return "no path";
+            s.Progress.talents = new List<TalentRank>();
+            var ids = branch.nodes.Select(n => n.id).ToList();
+            for (int pass = 0; pass < 40 && s.Talents.Available(s.Progress) > 0; pass++)
+                foreach (var id in ids) if (s.Talents.Propose(s.Progress, id, 1, out var next, out _)) s.Progress.talents = next;
+            s.Kit.ClearTransient(); s.Kit.ApplyStats();
+            return branch.name + " (" + branch.role + "), " + s.Progress.talents.Sum(t => t.rank) + " points; your blows x" + s.PlayerDamageScale.ToString("0.00");
+        }
         /// <summary>The bot's turn (2026-10-14, Chris: the Shaman "plays poorly ... 14 damage a second against the Paladin's 33"; it pressed
         /// slots 1-3 whatever they were, and for a Shaman two of them are mends): a mend when someone of the party is under 45% and the kit
         /// has one, else the first ready damage ability on the bar in its order, else the first slot.</summary>

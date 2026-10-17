@@ -186,9 +186,30 @@ namespace Crulanda.Encounter
             }
             return d.value > 0 ? RollChoice.Greed : RollChoice.Pass;
         }
-        public static int MaxHealthFor(SimAdventurer s) { return (s.classId == "class.warrior" || s.classId == "class.paladin" ? 150 : 115) + 22 * Mathf.Max(1, s.level); }
-        /// <summary>The armour of the pieces a sim wears (SimGear.For: its class's weight at its level), summed as the player's is.</summary>
+        /// <summary>
+        /// A sim's health at its level. The Warrior, always the party's tank (Role), has a player Warrior's: 180 and 25 a level past the
+        /// first (class.warrior's stats in Encounter.asset), the most of any class at every level. 2026-10-16, the Hallow's Creek run at
+        /// level 19: on the shared 150 + 22 a level the tank had 568 to the Paladin player's 607 (175 + 24 a level), and the gap grew past 15.
+        /// </summary>
+        public static int MaxHealthFor(SimAdventurer s)
+        {
+            if (SimGear.Tank(s.classId)) return TankBaseHealth + TankHealthPerLevel * (Mathf.Max(1, s.level) - 1);
+            return (s.classId == "class.paladin" ? 150 : 115) + 22 * Mathf.Max(1, s.level);
+        }
+        public const int TankBaseHealth = 180, TankHealthPerLevel = 25;
+        /// <summary>
+        /// What the tank's armour has over its pieces: the sims spend no talent points, so the Warrior tank's own training (Tempered
+        /// Armour, its shield work) is folded in here (2026-10-16: the tank had 329 to the Paladin player's 375 at level 19).
+        /// </summary>
+        public const float TankArmourEdge = 1.1f;
+        /// <summary>A sim's armour: its pieces, and for the Warrior tank (which owns all seven: SimGear.For) the edge above.</summary>
         public static int ArmourFor(SimAdventurer s, ItemDatabase items)
+        {
+            int armour = PiecesArmour(s, items);
+            return s != null && SimGear.Tank(s.classId) ? Mathf.RoundToInt(armour * TankArmourEdge) : armour;
+        }
+        /// <summary>The armour of the pieces a sim wears (SimGear.For: its class's weight at its level), summed as the player's is.</summary>
+        public static int PiecesArmour(SimAdventurer s, ItemDatabase items)
         {
             int armour = 0; if (s == null || items == null) return 0;
             foreach (var id in SimGear.For(s, items)) { var d = items.Get(id); if (d != null) armour += d.armor; }

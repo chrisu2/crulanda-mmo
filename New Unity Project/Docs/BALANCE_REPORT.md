@@ -384,3 +384,36 @@ Chris, 2026-10-16: "raise top level to 20". The numbers the harness sets its tar
 - **Targets for the harness at 16-20 (to set when it runs):** the same shares as at 15 (each build's role band against the DPS median,
   healer HPS against the 4%/s test), measured at level 18 with the band's uncommon kit and at 20 with tier 6; sims at 16-20 wear the
   16-20 band (SimGear) and live in the Lowtowns' band (SimRoster.Homes, 15-20).
+
+## The Hallow's Creek group run at 19 (2026-10-16): who does the damage, and who is the tank
+Chris, 2026-10-16, after the run at level 19: "still not balanced i dont think". His meter after 581 s of fighting: you (the bot playing
+the Paladin) 51 a second, the Rogue 45, the Ranger 40 and its wolf 15, the Druid healer 11 (and 16 healing), the Warrior tank 22.
+Health and armour: you 607 and 375, the Warrior tank 568 and 329, the others 533.
+
+**What was wrong**
+- **The bot had no talents.** The run's temp save never spent a point, so at 19 the Paladin had 20 unspent and no build. The damage
+  scale that holds each build to its band (`EncounterSession.RoleScale`) goes by the build with the most points, so the Judicator's
+  x0.71 never applied, and the untalented kit hit at full strength (Smite and its swings on the weapon's power). Nothing from the cap of
+  20 was in play: no level-20 talents, and the bot wore its starter gear.
+- **Not the sims' rotation.** Sims have no talents or abilities to forget at 16-20: their blow is a formula (12 + 4 a level in melee,
+  10 + 3.6 at range, x1.6 for a damage-dealer, one every 2 s or 2.4 s), which grows faster a level than a player's attack power (2 a
+  level). On paper the Rogue (70 a second at 19), the Ranger with its wolf (about 70) and the untalented Paladin (about 70) were level.
+  The Rogue landed less of it: it holds the marked mob (the held mob is not struck) and stood in melee with the tank through the bosses'
+  stuns. Counted with its wolf, the Ranger (55) out-did you already.
+- **The tank's health and armour.** Sims' health was one formula for the mail classes (150 + 22 a level), under a player's 24-25 a
+  level, so a Paladin player passed the Warrior tank from about level 12 and the gap grew past 15. A few sims go bareheaded or without a
+  neck piece or a mantle by their seed; the tank in this run was one of them.
+
+**What changed**
+- The run bot spends its points as the balance harness buys a build: all in its class's first path for the part it plays
+  (`RunCapture.SpendForRole`; a Paladin with a Warrior along plays damage: the Judicator, x0.71). The log says what it bought.
+- The Warrior sim (always the party's tank) has a player Warrior's health, 180 and 25 a level past the first (630 at 19, was 568), the
+  most of any class at every level; the other sims keep theirs.
+- The tank owns all seven pieces (`SimGear.Tank`, never bareheaded), and its armour is its pieces x1.1 (`SimCompanion.TankArmourEdge`:
+  the Warrior's tank training that a sim spends no points on). At 11-20 with its two bought upgrades it is over the run's player
+  (a Paladin in a sim's best pieces) at every seed. The bot's armour is set from the pieces only (`SimCompanion.PiecesArmour`).
+- EditMode test: `SimGearTests.The_warrior_tank_is_the_toughest_of_a_party`.
+
+**Not changed, for Chris to decide:** the Judicator is held to the same band as the pure damage builds (62-72 at 15, Chris 2026-10-13);
+a hybrid under the pure damage classes would mean a lower band for it. Sims' health counts none of their gear's stamina while a
+player's does, so a player in real level-19 gear will out-last a sim of the same class. Not measured yet: the run again at 17.

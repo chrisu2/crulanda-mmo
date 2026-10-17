@@ -40,6 +40,34 @@ namespace Crulanda.Tests
                         StringAssert.Contains(want, chest.name, classId);
                     }
         }
+        /// <summary>
+        /// The party's tank is its toughest member (2026-10-16, the Hallow's Creek run at 19: the Warrior tank had 568 health and 329 armour
+        /// to the Paladin player's 607 and 375). Its health is a player Warrior's at its level (Encounter.asset), at least any class's
+        /// own at every level and any other sim's; it owns every piece, and with its edge its armour is over a Paladin's pieces of the same
+        /// seed, and over the run's player (a Paladin dressed as a sim of seed 7 with two upgrades bought) whatever its seed, at 11-20.
+        /// </summary>
+        [Test] public void The_warrior_tank_is_the_toughest_of_a_party()
+        {
+            var content = UnityEditor.AssetDatabase.LoadAssetAtPath<EncounterContent>("Assets/Crulanda/EncounterContent/Encounter.asset"); Assert.NotNull(content);
+            var classes = content.AllClasses().Select(c => c.definition).ToList(); var warrior = classes.First(c => c.id == "class.warrior");
+            var items = new ItemDatabase();
+            for (int level = 1; level <= EncounterProgress.LevelCap; level++)
+            {
+                int tank = SimCompanion.MaxHealthFor(Sim("class.warrior", level, 3));
+                Assert.AreEqual(warrior.stats.baseHealth + warrior.stats.healthPerLevel * (level - 1), tank, "a player Warrior's health at " + level);
+                foreach (var c in classes) Assert.GreaterOrEqual(tank, c.stats.baseHealth + c.stats.healthPerLevel * (level - 1), c.id + " at " + level);
+                foreach (var id in SimRoster.ClassIds) Assert.GreaterOrEqual(tank, SimCompanion.MaxHealthFor(Sim(id, level, 3)), id + " sim at " + level);
+                foreach (int seed in new[] { 0, 5, 7, 13, 4471, 98123 })
+                {
+                    var w = Sim("class.warrior", level, seed);
+                    Assert.AreEqual(9, SimGear.For(w, items).Count, "the tank owns all seven pieces, a weapon and a shield");
+                    Assert.Greater(SimCompanion.ArmourFor(w, items), SimCompanion.PiecesArmour(Sim("class.paladin", level, seed), items), "over a Paladin's pieces at " + level);
+                }
+                if (level < 11) continue;
+                var player = Sim("class.paladin", level, 7); player.gearBonus = 2; int you = SimCompanion.PiecesArmour(player, items);
+                for (int seed = 0; seed < 200; seed++) { var w = Sim("class.warrior", level, seed); w.gearBonus = 2; Assert.GreaterOrEqual(SimCompanion.ArmourFor(w, items), you, "seed " + seed + " at " + level); }
+            }
+        }
         [Test] public void Quality_rises_with_level()
         {
             int Rares(int level) { int n = 0; for (int seed = 0; seed < 200; seed++) for (int slot = 0; slot < 7; slot++) if (SimGear.QualityFor(Sim("class.mage", level, seed), slot) >= 3) n++; return n; }

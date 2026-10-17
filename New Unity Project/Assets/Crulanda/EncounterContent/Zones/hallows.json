@@ -2205,7 +2205,7 @@
       },
       "rise": 0.0,
       "rise2": -1.5,
-      "width": 3,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2239,7 +2239,7 @@
       },
       "rise": -1.5,
       "rise2": -4,
-      "width": 3,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2273,7 +2273,7 @@
       },
       "rise": -4,
       "rise2": -6,
-      "width": 3,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2307,7 +2307,7 @@
       },
       "rise": -6,
       "rise2": -7,
-      "width": 3,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2341,7 +2341,7 @@
       },
       "rise": -7,
       "rise2": -4.5,
-      "width": 3,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2375,7 +2375,7 @@
       },
       "rise": -4.5,
       "rise2": -2.5,
-      "width": 3,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2409,7 +2409,7 @@
       },
       "rise": -2.5,
       "rise2": 0,
-      "width": 3,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2460,7 +2460,7 @@
       },
       "rise": -12,
       "rise2": -13,
-      "width": 3,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2469,15 +2469,15 @@
       "rails": "none",
       "at": {
         "x": -16,
-        "y": -158.86
+        "y": -159.36
       },
       "at2": {
         "x": -16,
-        "y": -155.86
+        "y": -155.36
       },
       "rise": -10.2,
       "rise2": -10.2,
-      "width": 4,
+      "width": 5,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2494,7 +2494,7 @@
       },
       "rise": -13,
       "rise2": -10.2,
-      "width": 2.6,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2502,16 +2502,16 @@
       "style": "stone",
       "rails": "none",
       "at": {
-        "x": -8.5,
+        "x": -9,
         "y": -155.36
       },
       "at2": {
-        "x": -5.5,
+        "x": -5,
         "y": -155.36
       },
       "rise": -7.4,
       "rise2": -7.4,
-      "width": 4,
+      "width": 5,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2528,7 +2528,7 @@
       },
       "rise": -10.2,
       "rise2": -7.4,
-      "width": 2.6,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -2545,7 +2545,7 @@
       },
       "rise": -7.4,
       "rise2": -4.5,
-      "width": 2.6,
+      "width": 3.6,
       "canonStatus": "GAME-ONLY"
     },
     {

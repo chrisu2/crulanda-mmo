@@ -60,6 +60,23 @@ namespace Crulanda.Tests
             // The chasm: its floor is forty metres down and out of the navmesh; the slabs carry the way from the lip to the gatehouse.
             var pit = zone.Zone.pits[0]; Assert.Less(zone.HeightAt(pit.center.x + 40, pit.center.y), zone.Datum - 30, "the chasm is deep");
             Assert.IsFalse(NavMesh.SamplePosition(new Vector3(pit.center.x + 40, zone.Datum - pit.depth, pit.center.y), out _, 3, NavMesh.AllAreas), "no navmesh at the chasm's floor");
+            // The parapets (hallows-3, 2026-10-16: people fell off the stair of small slabs and the run bot was warped eight times round the
+            // slabs): a wall along every open edge of the bridge's decks, solid and cut out of the navmesh, broken down to its kerb only at
+            // the jump off the third slab; no agent's navmesh comes to an open edge.
+            Assert.Greater(zone.Parapets.Count, 40, "the parapets along the slabs, the ramps and the stair of small slabs");
+            var broken = zone.Parapets.Where(r => r.broken).ToList(); Assert.AreEqual(1, broken.Count, "one broken stretch: the jump"); Assert.AreEqual("The third slab", broken[0].deck);
+            foreach (var name in new[] { "The first stair", "The second stair", "The third stair", "The first step-stone", "The second step-stone", "The Mason's slab", "The far Table" })
+                Assert.IsTrue(zone.Parapets.Exists(r => r.deck == name && !r.broken), name + " has a parapet");
+            var parapets = GameObject.Find("The bridge's parapets"); Assert.NotNull(parapets, "the parapets are built");
+            Assert.AreEqual(zone.Parapets.Count, parapets.GetComponentsInChildren<NavBlocker>().Length, "each parapet solid and a nav blocker");
+            var near = new List<string>();
+            foreach (var r in zone.Parapets)
+            {
+                if (Vector3.Distance(r.a, r.b) < 2) continue;
+                var mid = (r.a + r.b) / 2 + Vector3.up * .1f;
+                if (NavMesh.SamplePosition(mid, out var hit, .45f, NavMesh.AllAreas)) near.Add(r.deck + " at " + mid.ToString("0.0") + ": navmesh at " + hit.position.ToString("0.0"));
+            }
+            Assert.IsEmpty(near, "navmesh at an open edge of the bridge: " + string.Join("; ", near));
             zone.OpenGates(); yield return Frames(60);
             var yard = On(zone.Ground(zone.Zone.spawns.player, .2f), "the yard");
             var gatehouse = On(zone.Anchors["the gatehouse"] + Vector3.up * .2f, "the gatehouse");

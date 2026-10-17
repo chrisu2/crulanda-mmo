@@ -176,6 +176,11 @@ namespace Crulanda.Tests
             var low = zone.decks.Single(d => d.name == "The low slab"); var third = zone.decks.Single(d => d.name == "The third slab");
             Assert.Greater(low.at.x + low.width / 2, third.at.x - third.width / 2 + .4f, "the low slab runs under the third slab's lip");
             Assert.Less(Mathf.Abs(jump.toAt.x - low.at.x), low.width / 2 - 1, "the jump lands on the low slab");
+            // Broad enough for a party between the parapets (hallows-3, 2026-10-16): the ramps and the stair of small slabs 3.5 m and more, the
+            // step-stones 5 m.
+            foreach (var d in open.Where(d => d.style == "stone" && (d.name.StartsWith("Ramp to") || d.name == "The low ramp" || d.name.EndsWith(" stair") && !d.name.Contains("wall-walk"))))
+                if (d.width < 3.5f) bad.Add(d.name + " is " + d.width + " m wide");
+            foreach (var d in open.Where(d => d.name.EndsWith("step-stone"))) if (d.width < 5) bad.Add(d.name + " is " + d.width + " m wide");
             Clean(bad, "decks");
         }
 

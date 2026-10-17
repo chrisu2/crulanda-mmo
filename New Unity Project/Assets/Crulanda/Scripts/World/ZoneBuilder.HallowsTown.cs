@@ -188,13 +188,14 @@ namespace Crulanda.World
                 // The skins down the long sides.
                 foreach (int side in new[] { -1, 1 })
                     Part(PrimitiveType.Cube, g, (a + b) / 2 - up * thick / 2 + right * side * (half + .03f), new Vector3(.05f, thick + .08f, len), glass, rot);
-                // Shards along both edges, leaning out.
+                // Shards along both edges, standing out of the glass skin under the parapet's kerb and leaning out over the fog: none on
+                // the walk (hallows-3, 2026-10-16: the parapets stand on the edges now).
                 foreach (int side in new[] { -1, 1 })
                     for (float u = .5f; u < len - .3f; u += .8f + R() * .6f)
                     {
                         float tall = .3f + R() * .8f, lean = 15 + R() * 25, wide = .14f + R() * .22f;
                         var q = rot * Quaternion.Euler(0, (R() - .5f) * 40, -side * lean);
-                        var foot = a + fwd * u + right * side * (half - .06f) - up * .12f;
+                        var foot = a + fwd * u + right * side * (half + .04f) - up * .3f;
                         if (AtJoin(spot, foot)) continue;
                         Part(PrimitiveType.Cube, g, foot + q * Vector3.up * (tall / 2), new Vector3(.04f, tall, wide), glass, q);
                     }
@@ -202,14 +203,14 @@ namespace Crulanda.World
                 int lines = Mathf.Clamp(Mathf.RoundToInt(len / 3), 1, 4);
                 for (int l = 0; l < lines; l++)
                 {
-                    var p = a + fwd * (len * (l + .5f) / lines) + right * ((R() - .5f) * half) + up * .006f;
+                    var p = a + fwd * (len * (l + .5f) / lines) + right * ((R() - .5f) * Mathf.Max(0, half - .6f)) + up * .006f;
                     float heading = R() * 360;
                     for (int k = 0; k < 4; k++)
                     {
                         float seg = .5f + R() * .7f; heading += (R() - .5f) * 80;
-                        var dir = rot * Quaternion.Euler(0, heading, 0) * Vector3.forward; var q = Vector3.Project(p - a, right).magnitude > half - .3f ? -dir : dir;
+                        var dir = rot * Quaternion.Euler(0, heading, 0) * Vector3.forward; var q = Vector3.Project(p - a, right).magnitude > half - .8f ? -dir : dir;
                         var next = p + q * seg;
-                        if (Mathf.Abs(Vector3.Dot(next - (a + b) / 2, right)) > half - .1f) break;
+                        if (Mathf.Abs(Vector3.Dot(next - (a + b) / 2, right)) > half - .6f) break;
                         Part(PrimitiveType.Cube, g, (p + next) / 2, new Vector3(.035f, .01f, seg), crack, Quaternion.LookRotation(q, up));
                         p = next;
                     }

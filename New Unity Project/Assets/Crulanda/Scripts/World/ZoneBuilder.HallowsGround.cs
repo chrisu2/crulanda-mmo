@@ -112,6 +112,7 @@ namespace Crulanda.World
                     Hazards.Add(spot);
                     HazardAreas.Add((new Vector3(mid.x, spot.floor + .5f, mid.y), Quaternion.LookRotation(new Vector3(dir.x, 0, dir.y)), new Vector3(h.width, 2.5f, len)));
                 }
+            PrepareParapets();
         }
         /// <summary>A point on open ground: the land, or the deck there nearest <paramref name="rise"/> metres over the yard.</summary>
         public Vector3 OpenPoint(Vector2 at, float rise) { return StandAt(at, Datum + rise); }
@@ -164,6 +165,7 @@ namespace Crulanda.World
             var root = new GameObject("Open-ground works").transform; root.SetParent(props, false);
             var stone = Dressed(new Color(.6f, .6f, .62f)); var timber = Tint(art.timber, new Color(.36f, .34f, .32f));   // the paused town's timber: grey to the grain
             foreach (var spot in DeckSpots) if (spot.cave == null) BuildOpenDeck(spot, root, spot.def.style == "timber" ? timber : stone);
+            BuildParapets(root);
             if (Zone.gates != null) foreach (var gd in Zone.gates) if (gd != null && string.IsNullOrEmpty(gd.cave) && !string.IsNullOrEmpty(gd.title)) OpenGate(gd, root);
             // The hungry shadows: a strip of ground darker than any shade, its edges soft (two lighter strips either side).
             var dark = Tint(art.stone, new Color(.05f, .05f, .07f)); var dim = Tint(art.stone, new Color(.12f, .12f, .15f));
@@ -244,6 +246,138 @@ namespace Crulanda.World
             float h = top.y - foot + .3f; if (h < .2f) return;
             var o = Part(PrimitiveType.Cube, parent, new Vector3(top.x, top.y - h / 2, top.z), new Vector3(size.x, h, size.z), m, rot); o.name = "Plinth";
             o.AddComponent<BoxCollider>();
+        }
+
+        // ---------- the bridge's parapets ----------
+        /// <summary>A stretch of parapet along an open edge of one of the bridge's decks: its ends on the deck's top at the edge, the way out
+        /// over the fog (level), and whether it is the broken stretch at the jump off the third slab (a kerb a player hops up on and off).</summary>
+        public sealed class ParapetRun { public Vector3 a, b, outward; public bool broken; public string deck; }
+        /// <summary>
+        /// The bridge's parapets (hallows-3, 2026-10-16: "people still falling off the crazy stone stair area"; the run bot was stuck and
+        /// warped eight times round the slabs): every edge of a slab, a ramp or a stair over the chasm's fog that has neither land nor another
+        /// deck at its height beyond it gets a low stone wall, solid and cut out of the navmesh, so nobody walks off and no agent's path hugs
+        /// the drop. Gaps only where a ramp or a stair runs on into a slab (or onto the land at the lips). At the jump off the third slab the
+        /// wall is broken down to its kerb (<see cref="ParapetBroken"/> high: a player hops up on it and off; it is no step, so a walker
+        /// following the leader never goes over it).
+        /// </summary>
+        public readonly List<ParapetRun> Parapets = new List<ParapetRun>();
+        /// <summary>The parapet's height over the walk, its thickness in from the edge, and the broken stretch's height at the jump.</summary>
+        public const float ParapetHigh = 1.05f, ParapetThick = .42f, ParapetBroken = .45f;
+        /// <summary>Whether a deck is one of the bridge's: a stone walk over the chasm's fog (the slabs, the ramps and stairs between them,
+        /// the lower orbit and the stair of small slabs).</summary>
+        bool BridgeDeck(ZoneDeckSpot s)
+        {
+            if (s == null || s.cave != null || s.round || s.def == null || s.def.style != "stone" || s.mid == null || s.mid.Length < 2) return false;
+            var a = s.mid[0]; var b = s.mid[s.mid.Length - 1];
+            return FogFloor(new Vector2((a.x + b.x) / 2, (a.z + b.z) / 2), out _);
+        }
+        void PrepareParapets()
+        {
+            Parapets.Clear();
+            foreach (var s in DeckSpots)
+            {
+                if (!BridgeDeck(s)) continue;
+                var a = s.mid[0]; var b = s.mid[s.mid.Length - 1]; var along = b - a; float len = along.magnitude; if (len < .5f) continue;
+                var fwd = along / len; var right = Vector3.Cross(Vector3.up, fwd).normalized; var flat = new Vector3(fwd.x, 0, fwd.z).normalized; float h = s.half;
+                ParapetEdge(s, a + right * h, b + right * h, right);
+                ParapetEdge(s, a - right * h, b - right * h, -right);
+                ParapetEdge(s, a - right * h, a + right * h, -flat);
+                ParapetEdge(s, b - right * h, b + right * h, flat);
+            }
+        }
+        /// <summary>One edge of a bridge deck, walked a quarter metre at a time: the open stretches of it become parapet runs.</summary>
+        void ParapetEdge(ZoneDeckSpot s, Vector3 p0, Vector3 p1, Vector3 outward)
+        {
+            float L = Vector3.Distance(p0, p1); int n = Mathf.Max(1, Mathf.CeilToInt(L / .25f));
+            int start = -1; bool brokenRun = false;
+            for (int i = 0; i <= n; i++)
+            {
+                bool open = false, broken = false;
+                if (i < n) { var p = Vector3.Lerp(p0, p1, (i + .5f) / n); open = OpenEdge(s, p, outward); broken = open && AtJump(p); }
+                if (start >= 0 && (!open || broken != brokenRun))
+                {
+                    var ra = Vector3.Lerp(p0, p1, start / (float)n); var rb = Vector3.Lerp(p0, p1, i / (float)n);
+                    if (Vector3.Distance(ra, rb) >= .5f) Parapets.Add(new ParapetRun { a = ra, b = rb, outward = outward, broken = brokenRun, deck = s.def.name });
+                    start = -1;
+                }
+                if (open && start < 0) { start = i; brokenRun = broken; }
+            }
+        }
+        /// <summary>Whether a deck's edge at <paramref name="p"/> is open: no land within .6 m under the walk half a metre beyond it, and no
+        /// other deck at its height on it or a hand's breadth beyond it (where a ramp or a stair runs on into a slab; a wider look leaves the
+        /// sliver of fog where a ramp leaves a slab's edge at a slant unwalled).</summary>
+        bool OpenEdge(ZoneDeckSpot s, Vector3 p, Vector3 outward)
+        {
+            var far = p + outward * .45f;
+            if (HeightAt(far.x, far.z) > p.y - .6f) return false;
+            var q = p + outward * .15f;
+            foreach (var o in DeckSpots)
+            {
+                if (o == s || o == null || o.cave != null || o.mid == null) continue;
+                if (o.Top(new Vector2(p.x, p.z), out var y) && Mathf.Abs(y - p.y) < 1.2f) return false;
+                if (o.Top(new Vector2(q.x, q.z), out y) && Mathf.Abs(y - p.y) < 1.2f) return false;
+            }
+            return true;
+        }
+        /// <summary>Whether an edge point is where a player's jump (a scenery drop on open ground) goes off.</summary>
+        bool AtJump(Vector3 p)
+        {
+            if (Zone.drops == null) return false;
+            foreach (var d in Zone.drops)
+            {
+                if (d == null || !d.scenery || !string.IsNullOrEmpty(d.fromCave)) continue;
+                var from = new Vector3(d.fromAt.x, Datum + d.fromRise, d.fromAt.y);
+                if (Mathf.Abs(p.y - from.y) < 1.5f && Vector2.Distance(new Vector2(p.x, p.z), d.fromAt) < (d.width > 0 ? d.width : 2) / 2 + .5f) return true;
+            }
+            return false;
+        }
+        /// <summary>The parapets built: a kerb flush with the deck's edge, a wall on it and a coping along the top, a post at each end and
+        /// every couple of metres between, all the bridge's grey stone; one solid box over the whole run, a NavBlocker (EncounterNavigation
+        /// cuts it and its pad out of the navmesh). The broken stretch at the jump: the kerb alone, the wall's stumps at its ends.</summary>
+        void BuildParapets(Transform root)
+        {
+            if (Parapets.Count == 0) return;
+            var t = new GameObject("The bridge's parapets").transform; t.SetParent(root, false);
+            var wall = Dressed(PausedStone * .92f); var cap = Dressed(PausedStone * 1.02f); var kerb = Dressed(PausedStone * .8f);
+            var rr = new System.Random(4421);
+            foreach (var r in Parapets)
+            {
+                var run = r.b - r.a; float len = run.magnitude; if (len < .3f) continue;
+                var rot = Quaternion.LookRotation(run / len, Vector3.up); var up = rot * Vector3.up; var inward = -r.outward;
+                var flatRot = Quaternion.LookRotation(new Vector3(r.outward.x, 0, r.outward.z), Vector3.up);
+                var mid = (r.a + r.b) / 2;
+                Vector3 At(float y, float inset) { return mid + inward * inset + up * y; }
+                var go = new GameObject((r.broken ? "Broken parapet: " : "Parapet: ") + r.deck).transform; go.SetParent(t, false);
+                float high = r.broken ? ParapetBroken : ParapetHigh;
+                // The solid: from a little under the walk to the top, the parapet's whole thickness in from the edge.
+                var solid = new GameObject("Solid: parapet"); solid.transform.SetParent(go, false);
+                solid.transform.localPosition = At((high - .1f) / 2, ParapetThick / 2); solid.transform.localRotation = rot;
+                solid.AddComponent<BoxCollider>().size = new Vector3(ParapetThick, high + .1f, len); solid.AddComponent<NavBlocker>();
+                // The kerb, flush with the edge.
+                BoxPart(go, At(r.broken ? .2f : .1f, ParapetThick / 2 + .02f), new Vector3(ParapetThick + .04f, r.broken ? .5f : .3f, len), kerb, rot);
+                if (r.broken)
+                {
+                    // The wall's stumps at each end of the break, jagged, no higher than the posts beside them.
+                    foreach (float e in new[] { .25f, len - .25f })
+                    {
+                        float tall = .3f + (float)rr.NextDouble() * .35f;
+                        var at = r.a + run / len * e + inward * ParapetThick / 2 + Vector3.up * (ParapetBroken + tall / 2 - .05f);
+                        BoxPart(go, at, new Vector3(.3f, tall, .4f), wall, flatRot * Quaternion.Euler(((float)rr.NextDouble() - .5f) * 16, 0, ((float)rr.NextDouble() - .5f) * 16));
+                    }
+                    continue;
+                }
+                // The wall on the kerb and the coping along its top.
+                BoxPart(go, At(.6f, ParapetThick / 2), new Vector3(.3f, .74f, len), wall, rot);
+                BoxPart(go, At(ParapetHigh - .06f, ParapetThick / 2), new Vector3(ParapetThick, .12f, len + .04f), cap, rot);
+                // The posts: plumb, at both ends and every couple of metres, each with a cap.
+                int posts = Mathf.Max(1, Mathf.CeilToInt(len / 2.4f));
+                for (int k = 0; k <= posts; k++)
+                {
+                    var foot = Vector3.Lerp(r.a, r.b, k / (float)posts) + inward * ParapetThick / 2;
+                    BoxPart(go, foot + Vector3.up * .6f, new Vector3(.5f, 1.25f, .5f), wall, flatRot);
+                    BoxPart(go, foot + Vector3.up * 1.27f, new Vector3(.58f, .08f, .58f), cap, flatRot);
+                }
+            }
         }
 
         /// <summary>A gate on open ground (ZoneGateDef with no cave): two stone posts and what shuts the way between them by its look (a door of

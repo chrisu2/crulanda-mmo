@@ -106,6 +106,11 @@ above the yard; "+n" is a floor reached by stairs. Elites: 15 (section 7 lists e
   Warden's walk (once begun, the Archive's door shuts behind her). Nothing required is walked twice.
   (2026-10-16, hallows-1) The jump is a player's alone: the low slab runs under the third slab's lip so a step off lands on it, and
   it is no navmesh link (scenery); the leader and the party go down and back up the stair of small slabs from the fifth slab.
+  (2026-10-16, hallows-3: people still fell off the stair of small slabs; the run bot was warped back eight times round the slabs)
+  Every open edge of the bridge's decks has a parapet (GAME-ONLY): a stone kerb, a low wall with a coping and posts, 1.05 m, solid and
+  cut out of the navmesh, with gaps only where a ramp or a stair runs on into a slab or onto the lips. At the jump off the third slab it
+  is broken down to its kerb (0.45 m: a player hops up and off; a walker never steps over it). The ramps and the stair of small slabs
+  are 3.6 m wide and the step-stones 5 x 4 m so a party fits between the walls; the glass shards stand outside the walls.
 - **Respawns:** none while inside (as asked for the Adit, Q1; decision 11). Bossdoors and bars shut again on every visit.
 - **Spirit stones:** two, 20 m from any camp: under the gatehouse's wall-walk, and by the stone willow on the Square's east rim.
 

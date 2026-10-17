@@ -57,6 +57,42 @@ namespace Crulanda.Encounter
         }
         readonly Dictionary<Vector3, Vector3> faceAt = new Dictionary<Vector3, Vector3>();
         readonly Dictionary<Vector3, string> placeName = new Dictionary<Vector3, string>();
+        /// <summary>
+        /// The open side of a fixed post (2026-10-17, the Crown's Hall of Arms: trainers facing the wall): 24 rays at chest height
+        /// (1.5 m over the feet, so counters and desks don't count but walls, racks and screens do) out to 8 m, each way scored by
+        /// the clear runs of the whole half-circle it looks over, the nearer ways counting more (by the cosine): so a row of
+        /// trainers along a back wall faces the door, not along the row. The best way, or null when every way is about as open
+        /// (out on a square, where the post's own look decides). People and creatures are not walls.
+        /// </summary>
+        public static Vector3? OpenSide(Vector3 feet)
+        {
+            const int N = 24;
+            var clear = new float[N];
+            for (int i = 0; i < N; i++) clear[i] = ClearRun(feet, Quaternion.Euler(0, i * 360f / N, 0) * Vector3.forward, 8);
+            int best = 0; float bestScore = float.MinValue, worstScore = float.MaxValue;
+            for (int i = 0; i < N; i++)
+            {
+                float score = 0;
+                for (int k = -5; k <= 5; k++) score += clear[(i + k + N) % N] * Mathf.Cos(k * 15 * Mathf.Deg2Rad);
+                if (score > bestScore) { bestScore = score; best = i; }
+                worstScore = Mathf.Min(worstScore, score);
+            }
+            if (bestScore - worstScore < 3) return null;
+            return Quaternion.Euler(0, best * 360f / N, 0) * Vector3.forward;
+        }
+        /// <summary>How far one can see along the floor from a post at chest height (1.5 m) before a wall or a solid prop, up to <paramref name="reach"/>.</summary>
+        public static float ClearRun(Vector3 feet, Vector3 dir, float reach = 6)
+        {
+            dir.y = 0; if (dir.sqrMagnitude < 1e-4f) return reach; dir.Normalize();
+            float run = reach;
+            foreach (var hit in Physics.RaycastAll(feet + Vector3.up * 1.5f, dir, reach, ~0, QueryTriggerInteraction.Ignore))
+            {
+                if (hit.distance >= run || hit.collider is CharacterController) continue;
+                if (hit.collider.GetComponentInParent<Villager>() != null || hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() != null) continue;
+                run = hit.distance;
+            }
+            return run;
+        }
         /// <summary>Where someone working at a place should look (the anvil, the counter's customers), if it is a workplace. Of
         /// stand points close together (the kitchen's range and table), the nearest one's.</summary>
         public Vector3? LookFor(Vector3 at)
@@ -541,6 +577,7 @@ namespace Crulanda.Encounter
         void Update() { using (perfMark.Auto()) UpdateTimed(); }
         void UpdateTimed()
         {
+            FigureLod();
             NightDoors();
             foreach (var coop in Zone.Coops) coop.Dry(Time.deltaTime / 420);   // a pan lasts about four hours
             PlowTeam.Tend(this);   // the plough team out on a bare field by day (note 150)
@@ -557,6 +594,25 @@ namespace Crulanda.Encounter
             Purses();
         }
         float nextLay;
+        /// <summary>
+        /// How near a figure must be to cast a shadow, and to be drawn at all, metres from the camera (2026-10-17, Chris at /crown: "still
+        /// laggy"; the capture rig: 64 fps at noon with the Crown's 105 figures of some 17 renderers each, 127 with none). Past
+        /// <see cref="FigureShadowReach"/> a figure casts no shadow; past <see cref="FigureDrawReach"/> it is not drawn (its animation
+        /// then stops too: the figures cull their update when not seen). Twelve figures looked at a frame; 4 m of give either way so
+        /// nobody flickers on a line.
+        /// </summary>
+        public const float FigureShadowReach = 30, FigureDrawReach = 95;
+        int lodNext;
+        void FigureLod()
+        {
+            var cam = Camera.main; if (cam == null || Villagers.Count == 0) return;
+            var eye = cam.transform.position;
+            for (int k = 0, n = Mathf.Min(12, Villagers.Count); k < n; k++)
+            {
+                lodNext = (lodNext + 1) % Villagers.Count;
+                var v = Villagers[lodNext]; if (v != null) v.Lod(eye);
+            }
+        }
         /// <summary>
         /// After the innkeeper's bedtime one leaf of each inn's double door is shut and the other left open till he is up, so the late
         /// drinkers go out one at a time (Phase 8.6 plan 3a: "the look of a village at night, not a bug"). Only a door standing open is
@@ -681,7 +737,24 @@ namespace Crulanda.Encounter
         }
         void AddPlace(string key, Vector3 world, bool exact)
         {
-            if (NavMesh.SamplePosition(world, out var hit, exact ? 1.2f : 3f, NavMesh.AllAreas)) Places[key].Add(hit.position);
+            if (!NavMesh.SamplePosition(world, out var hit, exact ? 1.2f : 3f, NavMesh.AllAreas)) return;
+            // Nobody is sent to loiter before an inn's door (2026-10-17, the Gilded Lantern: "people stuck getting into inn"): a spot
+            // thrown or snapped into the door's apron is dropped, so the line to go in and the way out stay clear. Placed spots (the
+            // seats, the workplaces) are exact and kept, and so is a resident's own post.
+            if (!exact && !key.StartsWith("post:") && InDoorApron(hit.position)) return;
+            Places[key].Add(hit.position);
+        }
+        /// <summary>Within an inn door's apron: 4.5 m either way of the door line and 1.5 m past each jamb (the lanes, the lines and the way up to them).</summary>
+        public bool InDoorApron(Vector3 p)
+        {
+            if (Zone == null) return false;
+            foreach (var inn in Zone.Inns)
+            {
+                var way = inn != null && inn.door != null ? inn.door.Way : null; if (way == null) continue;
+                var r = p - way.middle; r.y = 0;
+                if (Mathf.Abs(Vector3.Dot(r, way.inward)) < 4.5f && Mathf.Abs(Vector3.Dot(r, way.across)) < way.width / 2 + 1.5f) return true;
+            }
+            return false;
         }
         /// <summary>A random place of a kind, avoiding spots near living enemies (villagers steer clear of the collectors, though
         /// they will draw water with one across the square: <see cref="KeepClear"/>). With <paramref name="who"/>, one of their own
@@ -1027,6 +1100,10 @@ namespace Crulanda.Encounter
         /// <summary>The fold a shepherd keeps (null for everyone else).</summary>
         public ZoneFold Fold { get; private set; }
         public string Activity { get { return activity; } }
+        /// <summary>The fixed post this resident keeps ("post:Name", or a kind of place), or null for one who goes about the day.</summary>
+        public string Post { get { return fixedPlace; } }
+        /// <summary>Stood at their post now (not walking to it).</summary>
+        public bool AtPost { get { return fixedPlace != null && activity == fixedPlace && state == State.Activity; } }
         /// <summary>Goods in hand (see <see cref="Load"/>), carried on an errand between trades.</summary>
         public bool Carrying { get { return load != null; } }
         /// <summary>How much a drinker has had (0 sober; past <see cref="Tolerance"/> they fold or go home), how much they can hold, and
@@ -1093,6 +1170,31 @@ namespace Crulanda.Encounter
             if (v.Bedtime && home != null && (coop == null || !coop.Open)) { v.activity = "sleep"; v.StartActivity(); }   // spawned at night: already abed
             else v.ChooseNext();
             return v;
+        }
+        // ---------- far off: no shadow, then not drawn (VillageLife.FigureLod) ----------
+        int lod; readonly List<Renderer> lodHidden = new List<Renderer>(); readonly List<(Renderer r, UnityEngine.Rendering.ShadowCastingMode mode)> lodShadows = new List<(Renderer, UnityEngine.Rendering.ShadowCastingMode)>();
+        /// <summary>How far off this figure is drawn: 0 in full, 1 without its shadow, 2 not drawn (VillageLife.FigureLod).</summary>
+        public int LodLevel { get { return lod; } }
+        /// <summary>
+        /// Sets the figure's level for the camera at <paramref name="eye"/>. Only what this turned off is turned back on: the figure's
+        /// own hidden parts (the head and hair under a hood, ActorVisual) stay hidden, and a shadow mode comes back as it was.
+        /// </summary>
+        public void Lod(Vector3 eye)
+        {
+            float d = Vector3.Distance(transform.position, eye), give = 4;
+            int want = d > VillageLife.FigureDrawReach + (lod == 2 ? -give : give) ? 2 : d > VillageLife.FigureShadowReach + (lod >= 1 ? -give : give) ? 1 : 0;
+            if (life.Session != null && life.Session.Conversation != null && life.Session.Conversation.npc == Name) want = 0;
+            if (want == lod) return;
+            foreach (var r in lodHidden) if (r != null) r.forceRenderingOff = false;
+            lodHidden.Clear();
+            foreach (var (r, mode) in lodShadows) if (r != null) r.shadowCastingMode = mode;
+            lodShadows.Clear();
+            lod = want; if (want == 0) return;
+            foreach (var r in GetComponentsInChildren<Renderer>(true))
+            {
+                if (r.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.Off) { lodShadows.Add((r, r.shadowCastingMode)); r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; }
+                if (want == 2 && !r.forceRenderingOff) { lodHidden.Add(r); r.forceRenderingOff = true; }
+            }
         }
         public void Say(string line, float seconds) { Bubble = line; BubbleUntil = Time.time + seconds; }
         public void FacePlayer()
@@ -1238,7 +1340,18 @@ namespace Crulanda.Encounter
             var look = life.LookFor(transform.position);
             // Someone at a fixed post (a trainer at the racks, a clerk at a desk against the wall) faces the room, away from the prop at
             // their back (2026-10-16, Chris in the Crown's Hall of Arms: "all trainers standing backwards").
-            if (look.HasValue && fixedPlace != null && life.Zone != null && life.Zone.Zone != null && life.Zone.Zone.city) { var back = transform.position - look.Value; back.y = 0; if (back.sqrMagnitude > .01f) Face(transform.position + back); }
+            // 2026-10-17, Chris again at /crown: "still people standing backwards": the Hall of Arms' trainers had no workplace near
+            // their posts, so nothing turned them and they kept the yaw they were made with (facing the racks and the wall). Now
+            // anyone at a fixed post with nothing to look at, and anyone at a fixed post in a city, turns to the open side: the way
+            // with the most clear floor at chest height (VillageLife.OpenSide), so the wall and the rack are at their back.
+            bool city = life.Zone != null && life.Zone.Zone != null && life.Zone.Zone.city;
+            if (fixedPlace != null && activity == fixedPlace && (city || !look.HasValue) && !Seated)
+            {
+                var open = VillageLife.OpenSide(transform.position - Vector3.up * agent.baseOffset);
+                if (open.HasValue) Face(transform.position + open.Value);
+                else if (look.HasValue && city) { var back = transform.position - look.Value; back.y = 0; if (back.sqrMagnitude > .01f) Face(transform.position + back); }
+                else if (look.HasValue) Face(look.Value);
+            }
             else if (look.HasValue) Face(look.Value);
             if (Seated && activity == fixedPlace) transform.rotation = Quaternion.Euler(0, SeatYaw, 0);   // on his throne, facing the hall
             if (activity == "field") FaceRow();

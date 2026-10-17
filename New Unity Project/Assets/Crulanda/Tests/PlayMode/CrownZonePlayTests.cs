@@ -43,6 +43,40 @@ namespace Crulanda.Tests
         }
         static Vector3 Start(ZoneBuilder zone) { Assert.IsTrue(NavMesh.SamplePosition(zone.Ground(zone.Zone.spawns.player), out var hit, 2.5f, NavMesh.AllAreas), "The Gilt Approach is walkable."); return hit.position; }
 
+        /// <summary>
+        /// The Crown's frame rate (2026-10-17, Chris: "still laggy"; the capture rig 64 fps at noon, 24.7 M triangles, its figures half
+        /// the frame): seen from the Gilt Approach most of the city's small detail (ivy, leaves, flowers, iron, the weathering; cut into
+        /// cells, DetailCull) is not drawn, none of it a shadow but the trim's; every figure past 99 m of the camera is not drawn and
+        /// none past 34 m casts a shadow (VillageLife.FigureLod); the walk-in halls' detail, which fades with its walls, is left alone.
+        /// </summary>
+        [UnityTest] public IEnumerator Far_detail_and_far_figures_are_not_drawn()
+        {
+            var zone = ZoneBuilder.Active; Assert.AreEqual("zone.crown", zone.Zone.id);
+            var cull = zone.GetComponent<DetailCull>(); Assert.IsNotNull(cull, "The Crown's detail has its culler.");
+            Assert.Greater(cull.Count, 200, "The detail is cut into cells, each culled on its own.");
+            var life = VillageLife.Active; Assert.IsNotNull(life);
+            var cam = Camera.main; Assert.IsNotNull(cam);
+            for (int i = 0; i < 20 + life.Villagers.Count / 12 * 2; i++) yield return null;
+            Assert.GreaterOrEqual(cull.Off, cull.Count / 2, "From the Gilt Approach at least half the city's detail cells are not drawn (" + cull.Off + " of " + cull.Count + ").");
+            var problems = new List<string>(); var eye = cam.transform.position;
+            foreach (var r in zone.GetComponentsInChildren<MeshRenderer>(true))
+            {
+                if (!r.name.StartsWith("Detail ") || r.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.Off) continue;
+                if (r.name.EndsWith(" leaves")) problems.Add(r.name + " casts a shadow");
+            }
+            int far = 0;
+            foreach (var v in life.Villagers)
+            {
+                if (v == null || !v.isActiveAndEnabled) continue;
+                float d = Vector3.Distance(v.transform.position, eye);
+                if (d > VillageLife.FigureDrawReach + 4 && v.LodLevel != 2) problems.Add(v.Name + " is drawn " + d.ToString("0") + " m off");
+                if (d > VillageLife.FigureDrawReach + 4) far++;
+                if (d > VillageLife.FigureShadowReach + 4 && v.GetComponentsInChildren<Renderer>().Any(x => x.shadowCastingMode != UnityEngine.Rendering.ShadowCastingMode.Off && !x.forceRenderingOff)) problems.Add(v.Name + " casts a shadow " + d.ToString("0") + " m off");
+            }
+            Assert.Greater(far, 10, "Most of the city's people are far from the gate.");
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
         [UnityTest] public IEnumerator The_ground_climbs_from_the_approach_to_the_Crown()
         {
             var zone = ZoneBuilder.Active; Assert.AreEqual("zone.crown", zone.Zone.id);
@@ -130,6 +164,8 @@ namespace Crulanda.Tests
             Assert.That(Get("ivy clumps"), Is.InRange(30, 2000), "Ivy in clumps here and there, not on everything.");
             // Raised 2026-10-16 with the ivy made dense mats (Chris: "only a few plants"); the city drew 7.46 M a frame before the detail:
             // a million more is the ceiling (the frame rate is the real check: crown-perf.txt in the capture).
+            // 2026-10-17 (Chris: "still laggy"; 24.7 M triangles a frame): what is built stays under these, but far detail is no longer
+            // drawn (DetailCull): Far_detail_and_far_figures_are_not_drawn holds the drawn share to half or less.
             Assert.Less(Get("leaf cards"), 800000, "Leaf cards within bounds.");
             Assert.Less(Get("triangles"), 3000000, "The detail stays cheap.");
             foreach (var col in zone.GetComponentsInChildren<Collider>(true))

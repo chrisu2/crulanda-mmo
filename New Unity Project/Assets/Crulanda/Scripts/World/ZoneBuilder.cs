@@ -136,6 +136,8 @@ namespace Crulanda.World
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
             // A dungeon's three checkpoints (ZoneBuilder.Checkpoints; Chris, 2026-10-16), after the map as the secrets are.
             BuildCheckpoints();
+            // The Crown's small detail and garden plants not drawn far off (DetailCull, 2026-10-17: "still laggy").
+            if (culledDetail.Count > 0 && Application.isPlaying) gameObject.AddComponent<DetailCull>().Init(culledDetail);
             if (Hollow.All.Count > 0 && Application.isPlaying) gameObject.AddComponent<PropCull>().Init(props);   // a zone with caves: far props not drawn (note 225)
             BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves
             BuildStations();  // the trades' stations of their own (field anvils, benches, cookfires): streams of their own, no colliders
@@ -1053,6 +1055,8 @@ namespace Crulanda.World
                 {
                     total++;
                     if (!mr.enabled || mr.sharedMaterials.Length != 1 || mr.sharedMaterial == null || mr.name == "Footing" || mr.name == "Footing coping" || mr.name == "Door steps") continue;
+                    // The Crown's detail culled by the cell (DetailCull) stays its own renderer.
+                    if (culledSet.Contains(mr)) continue;
                     var mf = mr.GetComponent<MeshFilter>(); if (mf == null || mf.sharedMesh == null || mf.sharedMesh.subMeshCount != 1 || !mf.sharedMesh.isReadable) continue;
                     if (mr.GetComponent<MonoBehaviour>() != null) continue;
                     var key = (mr.sharedMaterial, mr.shadowCastingMode, mr.receiveShadows);

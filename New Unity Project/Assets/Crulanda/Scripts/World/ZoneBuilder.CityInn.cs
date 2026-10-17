@@ -88,14 +88,20 @@ namespace Crulanda.World
                 if (art.particle != null) Smoke(t, stack + Vector3.up * (roofH * .65f));
             }
             // ---------- the front: the portico, the grand door, the lanterns, the name ----------
-            float front = -d / 2, pz = front - 2.1f, colH = 4.6f;
+            // The columns stand wide of the door (2026-10-17, Chris at the Lantern: "people stuck getting into inn": a knot of folk
+            // pressed against the -x column under the bay tree, the house's own inside stood in the doorway). They stood 0.95 m off the
+            // jambs with the bay trees' tubs 1 m off the wall behind them, so whoever came along the front from either side was fed
+            // through a gap of one body between the column, the tub and the wall, across the lane of those coming out. Now 2.2 m off,
+            // the tubs outside them in their line: the floor before the door is open 3.8 m either side of its middle and 2 m deep
+            // to the columns, the line to go in forms on open floor (PostFacingPlayTests).
+            float front = -d / 2, pz = front - 2.1f, colH = 4.6f, colX = doorW / 2 + 2.2f;
             foreach (int s in new[] { -1, 1 })
             {
-                var c = new Vector3(s * (doorW / 2 + .95f), 0, pz);
+                var c = new Vector3(s * colX, 0, pz);
                 Solidify(Part(PrimitiveType.Cylinder, t, c + Vector3.up * colH / 2, new Vector3(.55f, colH / 2, .55f), Marble));
                 Part(PrimitiveType.Cube, t, c + Vector3.up * .18f, new Vector3(.85f, .36f, .85f), CityShade); Part(PrimitiveType.Cube, t, c + Vector3.up * (colH - .14f), new Vector3(.8f, .28f, .8f), Gilt);
             }
-            float span = doorW + 3.2f;
+            float span = 2 * colX + 1.3f;
             BoxPart(t, new Vector3(0, colH + .4f, front - 1.2f), new Vector3(span, .8f, 2.6f), white);   // the entablature, on the wall and the columns
             Part(PrimitiveType.Cube, t, new Vector3(0, colH + .02f, front - 1.2f), new Vector3(span - .3f, .05f, 2.3f), Tint(art.plaster, new Color(.94f, .92f, .86f)));   // its soffit
             MeshPart(ZoneMeshes.Gable(span, 1.5f, .4f), t, new Vector3(0, colH + .8f, pz - .3f), white);
@@ -121,10 +127,10 @@ namespace Crulanda.World
             var innDoor = DoubleDoor(t, front, doorW, doorH, oak, t.name);
             DoorSteps(t, 0, front - wall / 2, .05f, doorW + .4f, wall, CityShade);
             Doors.Add(innDoor); innDoor.SetOpen(true);   // the Lantern keeps its doors open; the city comes and goes
-            // Bay trees in tubs either side of the portico (each solid at its tub).
+            // Bay trees in tubs either side of the portico, outside its columns and in their line (each solid at its tub).
             foreach (int s in new[] { -1, 1 })
             {
-                var tub = new Vector3(s * (doorW / 2 + 3.1f), 0, front - 1.1f);
+                var tub = new Vector3(s * (colX + 1.8f), 0, pz);
                 Part(PrimitiveType.Cylinder, t, tub + Vector3.up * .35f, new Vector3(.8f, .35f, .8f), white); Part(PrimitiveType.Cylinder, t, tub + Vector3.up * .66f, new Vector3(.86f, .03f, .86f), Gilt);
                 Part(PrimitiveType.Cylinder, t, tub + Vector3.up * 1.1f, new Vector3(.08f, .5f, .08f), Tint(art.bark != null ? art.bark : art.timber, new Color(.4f, .3f, .2f)));
                 Part(PrimitiveType.Sphere, t, tub + Vector3.up * 1.9f, Vector3.one * 1.1f, Tint(art.foliage, new Color(.16f, .34f, .14f)));

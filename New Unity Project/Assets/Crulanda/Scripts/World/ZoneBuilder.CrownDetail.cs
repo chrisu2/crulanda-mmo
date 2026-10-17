@@ -116,7 +116,10 @@ namespace Crulanda.World
             }
         }
         /// <summary>Makes a detail set's meshes under its frame, named "Detail ..." (the tests find them so), none with a collider. The flat
-        /// overlays and the leaves cast no shadow; the iron and the trim do.</summary>
+        /// overlays, the leaves, the flowers and the iron cast no shadow; the trim does (2026-10-17: the iron's shadows off too, for the
+        /// frame rate). Outside the walk-in halls (which fade a face at a time, RoofFade) and the gate's swinging leaves, the small detail is
+        /// cut into cells of <see cref="DetailCell"/> metres and each cell is not drawn far off (<see cref="DetailCull"/>: the ivy, leaves,
+        /// flowers and iron past 70 m, the weathering past 130 m; the trim and the gardens' ground always).</summary>
         void Flush(DetailSet d)
         {
             foreach (var kv in d.bits)
@@ -126,19 +129,44 @@ namespace Crulanda.World
                 for (int i = 0; i < b.v.Count; i++) { verts.Add(d.frame.InverseTransformPoint(b.v[i])); norms.Add(d.frame.InverseTransformDirection(b.n[i])); }
                 var mesh = new Mesh { name = "Detail " + d.label }; if (verts.Count > 65000) mesh.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
                 mesh.SetVertices(verts); mesh.SetNormals(norms); mesh.SetUVs(0, b.uv); mesh.SetTriangles(b.t, 0); mesh.RecalculateBounds();
-                var o = MeshPart(mesh, d.frame, Vector3.zero, kv.Key); o.name = "Detail " + d.label;
-                var r = o.GetComponent<MeshRenderer>(); r.shadowCastingMode = flatDetail.Contains(kv.Key) ? UnityEngine.Rendering.ShadowCastingMode.Off : UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true;
+                PlaceDetail(d, mesh, kv.Key, false);
                 Tally("triangles", b.Triangles);
             }
             foreach (var kv in d.cards)
             {
                 if (kv.Value.Count == 0 || kv.Key == null) continue;
-                var o = MeshPart(kv.Value.Build("Detail " + d.label + " leaves"), d.frame, Vector3.zero, kv.Key); o.name = "Detail " + d.label + " leaves";
-                o.GetComponent<MeshRenderer>().shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+                PlaceDetail(d, kv.Value.Build("Detail " + d.label + " leaves"), kv.Key, true);
                 Tally("triangles", kv.Value.Count * 2); Tally("leaf cards", kv.Value.Count);
             }
         }
-
+        /// <summary>The side of a detail cell, metres (in its frame's space).</summary>
+        public const float DetailCell = 24;
+        /// <summary>The detail drawn only near (DetailCull) and its band, gathered as it is made; handed to the culler once the zone is built.</summary>
+        readonly List<(Renderer r, int band)> culledDetail = new List<(Renderer, int)>();
+        readonly HashSet<Renderer> culledSet = new HashSet<Renderer>();
+        void CullDetail(Renderer r, int band) { if (r == null || culledSet.Contains(r)) return; culledDetail.Add((r, band)); culledSet.Add(r); }
+        /// <summary>The small things: ivy stems, flowers, iron and rust (no shadow, not drawn past 70 m).</summary>
+        bool SmallDetail(Material m)
+        {
+            if (m == IvyStem || m == Iron || m == Rust) return true;
+            for (int k = 0; k < 4; k++) if (m == Bloom(k)) return true;
+            return false;
+        }
+        /// <summary>The gardens' and the roads' ground (gravel, lawn, beds, dirt): always drawn.</summary>
+        bool GroundDetail(Material m) { return m == Dirt || m == Gravel || m == BedSoil || m == Lawn; }
+        void PlaceDetail(DetailSet d, Mesh mesh, Material m, bool leaves)
+        {
+            string name = "Detail " + d.label + (leaves ? " leaves" : "");
+            bool small = leaves || SmallDetail(m);
+            int band = d.place == "hall" || d.label == "gate leaf" ? -1 : small ? 0 : flatDetail.Contains(m) && !GroundDetail(m) ? 1 : -1;
+            var shadow = small || flatDetail.Contains(m) ? UnityEngine.Rendering.ShadowCastingMode.Off : UnityEngine.Rendering.ShadowCastingMode.On;
+            foreach (var part in band >= 0 ? ZoneMeshes.SplitByCell(mesh, DetailCell) : new List<Mesh> { mesh })
+            {
+                var o = MeshPart(part, d.frame, Vector3.zero, m); o.name = name;
+                var r = o.GetComponent<MeshRenderer>(); r.shadowCastingMode = shadow; r.receiveShadows = true;
+                if (band >= 0) CullDetail(r, band);
+            }
+        }
         // ---------- the palette ----------
         readonly HashSet<Material> flatDetail = new HashSet<Material>();
         Material Flat(Material m) { if (m != null) flatDetail.Add(m); return m; }
@@ -834,6 +862,8 @@ namespace Crulanda.World
             if (!HasProp(path)) return false;
             var go = ModelProp(t, path, local, yaw, height); if (go == null) return false;
             if (!path.StartsWith("Nature/")) DressNature(go);
+            // Not drawn past 70 m, and no shadow: a flower's shadow is not seen (2026-10-17, for the frame rate).
+            foreach (var pr in go.GetComponentsInChildren<Renderer>(true)) { pr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; CullDetail(pr, 0); }
             foreach (var mf in go.GetComponentsInChildren<MeshFilter>(true))
                 if (mf.sharedMesh != null) for (int k = 0; k < mf.sharedMesh.subMeshCount; k++) Tally("triangles", (int)(mf.sharedMesh.GetIndexCount(k) / 3));
             Tally("garden:plants"); return true;

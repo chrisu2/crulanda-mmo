@@ -295,6 +295,82 @@ namespace Crulanda.World
         }
         /// <summary>A guild's banner (GAME-ONLY): its field, a band of its second colour, and its sign: the Lantern Watch a lantern, Oak and
         /// Ember an oak leaf over an ember, the Long Road a road running up it, the Scree Hounds a hound's head.</summary>
+        /// <summary>The callings of the Hall of Arms' row, in the trainers' order along it (ZoneLife: warrior, paladin, ranger, druid,
+        /// mage, rogue, archivist, salt-mender, cleric, scoundrel, shaman): each banner's field, its mark's colour and the mark's shape.</summary>
+        static readonly (Color field, Color mark, int shape)[] ClassBanners =
+        {
+            (new Color(.55f, .1f, .08f), new Color(.85f, .82f, .78f), 0),
+            (new Color(.95f, .9f, .78f), new Color(.85f, .62f, .2f), 1),
+            (new Color(.2f, .36f, .16f), new Color(.82f, .74f, .5f), 2),
+            (new Color(.36f, .26f, .14f), new Color(.45f, .7f, .3f), 3),
+            (new Color(.14f, .2f, .52f), new Color(.75f, .82f, 1f), 4),
+            (new Color(.12f, .12f, .14f), new Color(.7f, .7f, .74f), 5),
+            (new Color(.62f, .5f, .32f), new Color(.3f, .18f, .1f), 6),
+            (new Color(.1f, .4f, .44f), new Color(.88f, .94f, .95f), 7),
+            (new Color(.92f, .92f, .9f), new Color(.8f, .64f, .25f), 8),
+            (new Color(.32f, .12f, .38f), new Color(.86f, .7f, .3f), 9),
+            (new Color(.6f, .3f, .1f), new Color(.98f, .8f, .3f), 10),
+        };
+        /// <summary>
+        /// A calling's banner over its trainer (GAME-ONLY; 2026-10-17): a gilt rod, a field of the calling's colour 1.3 m wide and
+        /// 2.1 m long with a gilt hem, and its mark in the middle: crossed blades (warrior), a sun (paladin), an arrow (ranger), a
+        /// leaf (druid), a star (mage), a dagger (rogue), an open book (archivist), waves (salt-mender), a ring (cleric), a coin and
+        /// a die (scoundrel), a flame (shaman). Hung on the wall at <paramref name="top"/>, facing -z. Primitives, no colliders.
+        /// </summary>
+        void ClassBanner(Transform t, Vector3 top, int calling)
+        {
+            var c = ClassBanners[calling % ClassBanners.Length]; float w = 1.3f, h = 2.1f;
+            Material field = Tint(art.cloth, c.field), mark = Tint(art.cloth, c.mark);
+            Part(PrimitiveType.Cylinder, t, top, new Vector3(.06f, w / 2 + .12f, .06f), Gilt, Quaternion.Euler(0, 0, 90));
+            Part(PrimitiveType.Cube, t, top + new Vector3(0, -h / 2 - .05f, 0), new Vector3(w, h, .04f), field);
+            Part(PrimitiveType.Cube, t, top + new Vector3(0, -h - .03f, -.01f), new Vector3(w, .12f, .05f), Gilt);
+            var m = top + new Vector3(0, -h * .5f, -.04f);
+            Quaternion Z(float a) { return Quaternion.Euler(0, 0, a); }
+            switch (c.shape)
+            {
+                case 0: foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, m, new Vector3(.09f, .95f, .02f), mark, Z(s * 35)); break;
+                case 1:
+                    Part(PrimitiveType.Cylinder, t, m, new Vector3(.42f, .01f, .42f), mark, Quaternion.Euler(90, 0, 0));
+                    for (int k = 0; k < 8; k++) Part(PrimitiveType.Cube, t, m + Z(k * 45) * new Vector3(0, .34f, 0), new Vector3(.05f, .16f, .02f), mark, Z(k * 45));
+                    break;
+                case 2:
+                    Part(PrimitiveType.Cube, t, m, new Vector3(.05f, .9f, .02f), mark);
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, m + new Vector3(s * .06f, .38f, 0), new Vector3(.05f, .2f, .02f), mark, Z(s * 40));
+                    break;
+                case 3:
+                    Part(PrimitiveType.Sphere, t, m, new Vector3(.36f, .7f, .02f), mark, Z(20));
+                    Part(PrimitiveType.Cube, t, m + new Vector3(.08f, -.4f, -.005f), new Vector3(.03f, .3f, .02f), mark, Z(20));
+                    break;
+                case 4:
+                    Part(PrimitiveType.Cube, t, m, new Vector3(.38f, .38f, .02f), mark, Z(45));
+                    Part(PrimitiveType.Cube, t, m, new Vector3(.12f, .7f, .02f), mark);
+                    Part(PrimitiveType.Cube, t, m, new Vector3(.7f, .12f, .02f), mark);
+                    break;
+                case 5:
+                    Part(PrimitiveType.Cube, t, m + new Vector3(0, .1f, 0), new Vector3(.08f, .6f, .02f), mark);
+                    Part(PrimitiveType.Cube, t, m + new Vector3(0, -.22f, 0), new Vector3(.32f, .05f, .02f), mark);
+                    Part(PrimitiveType.Cube, t, m + new Vector3(0, -.36f, 0), new Vector3(.06f, .22f, .02f), Gilt);
+                    break;
+                case 6:
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, m + new Vector3(s * .18f, 0, 0), new Vector3(.34f, .48f, .02f), mark, Z(-s * 8));
+                    Part(PrimitiveType.Cube, t, m, new Vector3(.03f, .5f, .025f), Gilt);
+                    break;
+                case 7:
+                    for (int k = 0; k < 3; k++) for (int j = -1; j <= 1; j++) Part(PrimitiveType.Cube, t, m + new Vector3(j * .2f, .22f - k * .22f, 0), new Vector3(.2f, .05f, .02f), mark, Z((j == 0 ? 1 : -1) * 20));
+                    break;
+                case 8:
+                    for (int k = 0; k < 12; k++) Part(PrimitiveType.Cube, t, m + Z(k * 30) * new Vector3(0, .28f, 0), new Vector3(.15f, .06f, .02f), mark, Z(k * 30));
+                    break;
+                case 9:
+                    Part(PrimitiveType.Cylinder, t, m + new Vector3(-.16f, .1f, 0), new Vector3(.3f, .01f, .3f), mark, Quaternion.Euler(90, 0, 0));
+                    Part(PrimitiveType.Cube, t, m + new Vector3(.18f, -.18f, 0), new Vector3(.26f, .26f, .02f), Tint(art.cloth, new Color(.92f, .9f, .85f)), Z(15));
+                    break;
+                default:
+                    Part(PrimitiveType.Cube, t, m + new Vector3(0, -.1f, 0), new Vector3(.4f, .4f, .02f), mark, Z(45));
+                    Part(PrimitiveType.Sphere, t, m + new Vector3(0, .2f, 0), new Vector3(.26f, .5f, .02f), mark);
+                    break;
+            }
+        }
         void GuildBanner(Transform t, Vector3 top, float yaw, float w, float h, int guild)
         {
             var q = Quaternion.Euler(0, yaw, 0); var c = GuildColours[Mathf.Abs(guild) % GuildColours.Length];
@@ -811,7 +887,32 @@ namespace Crulanda.World
                         if (ModelProp(t, "Fantasy/WeaponStand", new Vector3(x, 0, d / 2 - 1), 180, 1.6f, true) == null) Solidify(BoxPart(t, new Vector3(x, .8f, d / 2 - 1), new Vector3(1.4f, 1.6f, .5f), DarkOak));
                     foreach (int s in new[] { -1, 1 })
                         if (ModelProp(t, "Fantasy/Dummy", new Vector3(s * (w / 2 - 1.6f), 0, -d / 2 + 1.8f), s * 30, 1.9f, true) == null) Solidify(Part(PrimitiveType.Cylinder, t, new Vector3(s * (w / 2 - 1.6f), .95f, -d / 2 + 1.8f), new Vector3(.5f, .95f, .5f), Tint(art.hay, new Color(.8f, .7f, .45f))));
-                    foreach (int s in new[] { -1, 1 }) CouncilBanner(t, new Vector3(s * (w / 2 - 4), 5.8f, d / 2 - .3f), 0, 1.6f, 3.6f);
+                    // The hall dressed (2026-10-17, Chris's frame of the trainers' row: a bare stone room, a white floor, blank pale cloths
+                    // over the racks): a banner of each calling hung over its trainer's post along the back wall (the trainers stand every
+                    // 2 m from 10 m left of the middle, ZoneLife), the Council's two banners moved to the end walls, a red runner with a
+                    // gilt edge from the door to the row, a bench along each end wall, and iron candle-stands in the back corners (wax
+                    // and a bright flame, no light of their own: the hall's windows and the lamps outside light it). No colliders: nothing
+                    // in the way of the trainers' row or the door.
+                    for (int k = 0; k < ClassBanners.Length; k++) ClassBanner(t, new Vector3(-10 + k * 2, 5.3f, d / 2 - .3f), k);
+                    foreach (int s in new[] { -1, 1 }) CouncilBanner(t, new Vector3(s * (w / 2 - .3f), 5.8f, 0), s * 90, 1.6f, 3.6f);
+                    var runner = Tint(art.cloth, new Color(.5f, .1f, .1f));
+                    Part(PrimitiveType.Cube, t, new Vector3(0, .06f, -1.6f), new Vector3(2.2f, .02f, d - 5), runner);
+                    foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(s * 1.05f, .065f, -1.6f), new Vector3(.12f, .02f, d - 5), Gilt);
+                    foreach (int s in new[] { -1, 1 }) CityBench(t, new Vector3(s * (w / 2 - .9f), 0, -.5f), s * 90, 3);
+                    var wax = Tint(art.plaster, new Color(.95f, .92f, .8f)); var iron = Tint(art.metal, new Color(.16f, .15f, .14f)); var flame = Tint(art.glass, new Color(1, .78f, .35f));
+                    foreach (int s in new[] { -1, 1 })
+                    {
+                        var stand = new Vector3(s * (w / 2 - .7f), 0, d / 2 - .7f);
+                        Part(PrimitiveType.Cylinder, t, stand + Vector3.up * .8f, new Vector3(.07f, .8f, .07f), iron);
+                        Part(PrimitiveType.Cylinder, t, stand + Vector3.up * .03f, new Vector3(.45f, .03f, .45f), iron);
+                        Part(PrimitiveType.Cylinder, t, stand + Vector3.up * 1.62f, new Vector3(.32f, .02f, .32f), iron);
+                        foreach (float ox in new[] { 0f, .1f, -.1f })
+                        {
+                            float tall = ox == 0 ? .26f : .18f; var o = new Vector3(ox, 0, 0);
+                            Part(PrimitiveType.Cylinder, t, stand + o + Vector3.up * (1.64f + tall / 2), new Vector3(.05f, tall / 2, .05f), wax);
+                            Part(PrimitiveType.Sphere, t, stand + o + Vector3.up * (1.68f + tall), new Vector3(.035f, .06f, .035f), flame);
+                        }
+                    }
                     break;
                 }
                 default:   // the Armoury: the dresser's

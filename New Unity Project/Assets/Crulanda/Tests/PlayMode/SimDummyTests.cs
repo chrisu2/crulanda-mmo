@@ -75,7 +75,8 @@ namespace Crulanda.Tests
             e.enabled = false; var ag = e.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (ag != null && ag.isOnNavMesh) ag.isStopped = true;
             // No armour, as the balance harness's dummies (BalanceHarness.Dummy): the band is measured on them. An Oakhaven mob's armour
             // took about a tenth off every blow (the first Unity run, 2026-10-17: the level-11 Rogue 46.5 and Mage 46.4 against an aim of 51.5).
-            e.actor.SetLevel(BalanceHarness.DummyLevel); e.actor.Stats.SetBase(Crulanda.Core.StatType.Armor, BalanceHarness.DummyArmour);
+            // Its level is set with yours at each level tested (AtLevel).
+            e.actor.Stats.SetBase(Crulanda.Core.StatType.Armor, BalanceHarness.DummyArmour);
             e.actor.Health.Pool.SetMax(5000000, false); e.actor.Health.Pool.SetCurrent(5000000);
             // Nothing else near it: no other mob joins, no splash lands elsewhere.
             foreach (var o in session.Enemies)
@@ -120,6 +121,11 @@ namespace Crulanda.Tests
             Time.captureDeltaTime = Step;
             foreach (int level in Levels)
             {
+                // You and the dummy at the level tested, as the harness's player and dummies are both 15. A mob over the one it fights takes a
+                // tenth less a level (EncounterEnemy.OvermatchTakenNormal, five levels at most); with no one on it, that one is you (FoeLevel):
+                // the second Unity run (19:25) had a level-15 dummy against your Oakhaven level, and every blow lost half.
+                session.Progress.experience = EncounterProgress.XpForLevel(level); session.Player.SetLevel(level);
+                dummy.actor.SetLevel(level); dummy.actor.Health.Pool.SetMax(5000000, false); dummy.actor.Health.Pool.SetCurrent(5000000);
                 foreach (var c in party)
                 {
                     c.MatchLevel(level); Assert.AreEqual(level, c.sim.level);
@@ -178,6 +184,11 @@ namespace Crulanda.Tests
             var a = session.Enemies.First(e => e != null && e.actor.IsAlive && e.Camp && !e.Elite && !e.Game && !e.Hidden &&
                 session.Enemies.Any(o => o != null && o != e && o.actor.IsAlive && o.Camp && !o.Elite && !o.Game && !o.Hidden && Vector3.Distance(o.transform.position, e.transform.position) < 12));
             var b = session.Enemies.Where(o => o != null && o != a && o.actor.IsAlive && o.Camp && !o.Elite && !o.Game && !o.Hidden).OrderBy(o => Vector3.Distance(o.transform.position, a.transform.position)).First();
+            // Only these two: every other mob within 60 m is stilled and taken far off (the second Unity run, 19:25: after the free wolf fell
+            // another Grey wolf of the camp came, and the Ranger rightly shot that one first).
+            foreach (var o in session.Enemies)
+                if (o != null && o != a && o != b && (o.transform.position - a.transform.position).sqrMagnitude < 60 * 60)
+                { o.enabled = false; var oag = o.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (oag != null) oag.enabled = false; o.transform.position += Vector3.forward * 400; }
             var c = Join("class.ranger"); Assert.NotNull(c, "a Ranger joins"); yield return null;
             session.Player.GetComponent<AdventurerMotor>().Teleport(a.transform.position + Vector3.back * 6); yield return null;
             c.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(session.Player.transform.position + Vector3.right * 2);

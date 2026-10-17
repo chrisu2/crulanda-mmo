@@ -164,8 +164,8 @@ namespace Crulanda.Tests
                 // The baseline: the main camera into the RenderTexture, and the screen as ScreenCapture takes it.
                 var basePx = RenderMain(cam, rt, read); float baseline = Measure(basePx, W, H, out int baseEdges);
                 Save("00-baseline.png", basePx, W, H);
-                yield return new WaitForEndOfFrame();
-                float baseScreen = ScreenFigure(out var screenPx, out int sw, out int sh);
+                yield return null;
+                Color32[] screenPx = null; int sw = 0, sh = 0; float baseScreen = -1;
                 if (screenPx != null) Save("00-screen.png", screenPx, sw, sh);
                 Debug.Log("SKYGHOST baseline " + baseline.ToString("F4") + " edges=" + baseEdges + " screen=" + baseScreen.ToString("F4") + (screenPx != null ? " (" + sw + "x" + sh + ")" : ""));
 
@@ -205,8 +205,8 @@ namespace Crulanda.Tests
                 {
                     s.off();
                     s.pixels = RenderMain(cam, rt, read); s.rt = Measure(s.pixels, W, H, out s.edges);
-                    yield return new WaitForEndOfFrame();
-                    s.screen = ScreenFigure(out _, out _, out _);
+                    yield return null;
+                    s.screen = -1;
                     s.on();
                     Debug.Log("SKYGHOST " + s.name + " " + s.rt.ToString("F4") + " edges=" + s.edges + " screen=" + s.screen.ToString("F4") + " drop=" + (baseline - s.rt).ToString("F4"));
                 }

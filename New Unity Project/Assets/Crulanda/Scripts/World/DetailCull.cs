@@ -16,7 +16,9 @@ namespace Crulanda.World
     public sealed class DetailCull : MonoBehaviour
     {
         /// <summary>The bands: 0 the small things (ivy, leaves, flowers, iron, plants), 1 the weathering laid over the walls.</summary>
-        public static readonly float[] Bands = { 70, 130 };
+        // 100 m (was 70): at 70 the far walls lost their ivy and read white again from the squares (the inn front, 2026-10-17 frames); the noon
+        // frame rate at 70 was 130 fps, from 64.
+        public static readonly float[] Bands = { 100, 160 };
         const float Give = 3;
         Renderer[] renderers; int[] bands; Vector3[] centres; float[] radii; int next;
         public int Count { get { return renderers != null ? renderers.Length : 0; } }

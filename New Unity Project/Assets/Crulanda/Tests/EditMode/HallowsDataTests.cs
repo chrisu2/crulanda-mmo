@@ -170,6 +170,12 @@ namespace Crulanda.Tests
             // The chasm: the slabs cross it, the pit is deep, and its fog sends a fall back (N3).
             var pit = zone.pits.Single(); Assert.Greater(pit.depth, 30); Assert.Less(pit.fog, -15); Assert.Greater(pit.fog, -pit.depth);
             Assert.AreEqual(1, zone.drops.Count(d => string.IsNullOrEmpty(d.fromCave)), "one drop: off the third slab to the lower orbit");
+            // The jump is a player's, onto the low slab under the third slab's lip; the paths go down the stair of small slabs (hallows-1, 2026-10-16:
+            // as a navmesh link over a six-metre gap the run bot walked off after the leader into the fog for four minutes).
+            var jump = zone.drops.Single(d => string.IsNullOrEmpty(d.fromCave)); Assert.IsTrue(jump.scenery, "the jump is no navmesh link");
+            var low = zone.decks.Single(d => d.name == "The low slab"); var third = zone.decks.Single(d => d.name == "The third slab");
+            Assert.Greater(low.at.x + low.width / 2, third.at.x - third.width / 2 + .4f, "the low slab runs under the third slab's lip");
+            Assert.Less(Mathf.Abs(jump.toAt.x - low.at.x), low.width / 2 - 1, "the jump lands on the low slab");
             Clean(bad, "decks");
         }
 

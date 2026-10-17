@@ -1727,6 +1727,10 @@ namespace Crulanda.Encounter
                     // angle, a little further out each, with no more draws from the dice, so no later camp's mobs move (the bowl's rim's
                     // third overseer on its 3 m walk against the wall, ZoneContentTests 2026-10-16: "spawned 2/3").
                     if (!footed && !patrol) footed = FootingRound(camp, gap, stood, out point, out spot);
+                    // A footing off the camp's own deck (a draw past a narrow loft's edge stood on the floor under it: the Picker-Master's
+                    // sorters, both on the Granary's floor under the north loft, HallowsNavTests 2026-10-16) is found again round the camp's
+                    // centre on its deck, with no more draws from the dice (so no later camp moves); kept where it was only if none is.
+                    if (footed && !patrol && OffDeck(camp, spot, point) && FootingRound(camp, gap, stood, out var onDeck, out var deckSpot)) { point = onDeck; spot = deckSpot; }
                     if (!footed) continue;
                     placed.Add(spot); stood.Add(point);
                     int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
@@ -1779,7 +1783,9 @@ namespace Crulanda.Encounter
                 spot = camp.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
                 var want = Zone.StandAt(spot, DeckHeight(camp, spot), 1);
                 if (!NavMesh.SamplePosition(want, out var hit, 3, NavMesh.AllAreas) || Mathf.Abs(hit.position.y + 1 - want.y) > 1.5f) continue;
-                point = hit.position + Vector3.up; bool clear = true;
+                point = hit.position + Vector3.up;
+                if (OffDeck(camp, spot, point)) continue;
+                bool clear = true;
                 foreach (var w in stood) { var d = w - point; d.y = 0; if (d.magnitude < gap * .9f) { clear = false; break; } }
                 if (clear) return true;
             }
@@ -1835,6 +1841,15 @@ namespace Crulanda.Encounter
                     }
                 }
             }
+        }
+        /// <summary>Whether a camp mob's footing (<paramref name="point"/>, a metre over the navmesh) is off the open-ground deck its camp
+        /// stands on (Hallow's Creek: a slab, a loft, a landing): more than 1.5 m from the deck's height (<see cref="DeckHeight"/>). A camp on
+        /// the land, or in a cave (whose decks are measured from the cave's floor), is never off it.</summary>
+        static bool OffDeck(Crulanda.World.ZoneCamp camp, Vector2 spot, Vector3 point)
+        {
+            if (camp == null || !string.IsNullOrEmpty(camp.cave)) return false;
+            float deck = DeckHeight(camp, spot);
+            return !float.IsNegativeInfinity(deck) && Mathf.Abs(point.y - 1 - deck) > 1.5f;
         }
         /// <summary>
         /// The height a camp's mob is stood nearest (ZoneBuilder.StandAt): a camp up on a deck in a cave (ZoneCamp.rise: a trestle's landing,

@@ -104,6 +104,8 @@ above the yard; "+n" is a floor reached by stairs. Elites: 15 (section 7 lists e
   early from the Square walks back over the slabs; a bar on the gatehouse's town side keeps the Pact behind it.
 - **One-way bits:** the jump to the lower orbit (full runs; the climb back is a stair); the Cellars' far trapdoor (bars behind); the
   Warden's walk (once begun, the Archive's door shuts behind her). Nothing required is walked twice.
+  (2026-10-16, hallows-1) The jump is a player's alone: the low slab runs under the third slab's lip so a step off lands on it, and
+  it is no navmesh link (scenery); the leader and the party go down and back up the stair of small slabs from the fifth slab.
 - **Respawns:** none while inside (as asked for the Adit, Q1; decision 11). Bossdoors and bars shut again on every visit.
 - **Spirit stones:** two, 20 m from any camp: under the gatehouse's wall-walk, and by the stone willow on the Square's east rim.
 

@@ -90,12 +90,27 @@ namespace Crulanda.Encounter
             int deaths = 0, warps = 0, shots = 0, elitesSeen = 0, mends = 0, looted = 0; var lootTally = new SortedDictionary<string, int>(); float lootUntil = 0; var seen = new HashSet<string>(); var mending = new Dictionary<SimCompanion, string>(); var engagedAt = new Dictionary<EncounterEnemy, float>(); var searched = new HashSet<EncounterEnemy>(); float idleLogAt = 0, pathAt = 0; Vector3 pathGoal = Vector3.zero; NavMeshPath path = null; int holds = 0; string lastHold = null; var simHeld = new Dictionary<SimCompanion, bool>();
             float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1, atCorpseSince = -1, headBest = 0, headAt = Time.time; UnityEngine.Object headFor = null; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
+            bool wasFalling = false; float fogFellAt = -99;
             int botBuffed = -1, buffStops = 0; var simBuffed = new Dictionary<SimCompanion, int>();
             Time.timeScale = Speed;
             Shot(s, directory, "00-" + Clock(0) + "-setting-out", ref shots, leader);
             while (leader != null && leader.Dungeon != null && Time.realtimeSinceStartup - realStart < RealLimitSeconds)
             {
                 float t = Time.time - start; var me = s.Player.transform.position;
+                // (Hallow's Creek) Falling into the chasm's fog twice in half a minute: the way the bot steers goes over a slab's edge, the fog
+                // puts it back on the lip, and it walks off again (hallows-1, 2026-10-16: four minutes of it after the far Table). The second
+                // time it is warped to beside the leader. Ten metres over the fog is under every slab: only a fall is down there.
+                bool falling = s.Zone != null && s.Zone.FogFloor(new Vector2(me.x, me.z), out float fogY) && me.y < fogY + 10;
+                if (falling && !wasFalling)
+                {
+                    bool again = Time.time - fogFellAt < 30; fogFellAt = Time.time;
+                    if (again && NavMesh.SamplePosition(leader.transform.position, out var byLeader, 3, NavMesh.AllAreas))
+                    {
+                        motor.Teleport(byLeader.position + Vector3.up * 1.05f); warps++; fogFellAt = -99; me = s.Player.transform.position;
+                        Log(Clock(t) + "  fell into the fog twice; warped to the leader (" + warps + ")");
+                    }
+                }
+                wasFalling = falling;
                 // The leader's state when nothing moves (every 20 s of nobody fighting), to see what holds the run.
                 if (Time.time >= idleLogAt) { idleLogAt = Time.time + 20; Log(Clock(t) + (s.InCombat ? "  fighting: " : "  quiet: ") + string.Join("; ", s.PartySims.Where(c => c != null).Select(c => c.sim.name.Split(' ')[0] + " " + (c.Activity ?? "").ToLower() + " (" + Vector3.Distance(c.transform.position, me).ToString("0") + " m)")) + "; bags " + s.Progress.bag.Take(Inventory.BagSize).Count(b => !b.Empty) + "/" + Inventory.BagSize + (s.DuoState != null ? "; " + s.DuoState : "")); }
                 // A camp cleared: the leader moves its mark on.

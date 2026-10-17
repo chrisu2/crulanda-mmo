@@ -64,10 +64,13 @@ namespace Crulanda.Tests
             var yard = On(zone.Ground(zone.Zone.spawns.player, .2f), "the yard");
             var gatehouse = On(zone.Anchors["the gatehouse"] + Vector3.up * .2f, "the gatehouse");
             float over = NavReach.Length(yard, gatehouse); Assert.Less(over, 400, "over the slabs from the yard to the gatehouse (" + over.ToString("0") + " m)");
-            // The lower orbit: down by the drop, back up the stair to the fifth slab; a camp's mob never takes the drop.
+            // The lower orbit: down the stair of small slabs from the fifth slab and back up it. The jump off the third slab is a player's
+            // (the low slab runs under its lip), not a way the paths take: as a navmesh link over a six-metre gap the leader took it and the
+            // run bot walked off after it into the fog for four minutes (hallows-1, 2026-10-16).
+            Assert.IsFalse(zone.Drops.Exists(d => Vector2.Distance(new Vector2(d.from.x, d.from.z), new Vector2(-6.2f, -179.36f)) < 3), "no navmesh link off the third slab");
             var third = zone.DeckSpots.Find(d => d.def != null && d.def.name == "The third slab"); var mason = zone.DeckSpots.Find(d => d.def != null && d.def.name == "The Mason's slab");
             var top = On(third.mid[third.mid.Length / 2] + Vector3.up * .2f, "the third slab"); var low = On(mason.mid[mason.mid.Length / 2] + Vector3.up * .2f, "the Mason's slab");
-            Assert.Less(NavReach.Length(top, low), 80, "down to the Mason by the drop"); Assert.Less(NavReach.Length(low, top), 120, "and back up the stair of small slabs");
+            Assert.Less(NavReach.Length(top, low), 90, "down to the Mason by the stair of small slabs"); Assert.Less(NavReach.Length(low, top), 120, "and back up the stair of small slabs");
             // The belfry by the tower's flights, and the Archive's floor by its steps.
             Assert.Less(NavReach.Length(On(zone.Anchors["the tower door"] + Vector3.up * .2f, "the tower door"), On(zone.Anchors["the belfry stair-head"] + Vector3.up * .2f, "the belfry stair-head")), 120, "up the tower to the belfry");
             Assert.Less(NavReach.Length(On(zone.Anchors["the Archive's steps"] + Vector3.up * .2f, "the Archive's steps"), On(zone.Anchors["the Warden's cell"] + Vector3.up * .2f, "the Warden's cell")), 120, "into the Archive and to the Warden's cell");

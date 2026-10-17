@@ -214,6 +214,10 @@ namespace Crulanda.Encounter
         float heldUntil, campIdleSince = -1; string heldKind; Vector3 fearFrom;
         // Headway toward the camp it leads to (2026-10-13): the nearest it has come, when, and the last frame it was leading.
         float leadBest, leadBestAt, leadSeen; Vector3 leadFor; int leadKind;
+        /// <summary>The optional step it is leading to and the seconds spent on the way to it out of a fight (waits included).</summary>
+        RouteStep optionalFor; float optionalSpent;
+        /// <summary>How long it leads toward an optional camp, out of a fight, before leaving it as out of reach.</summary>
+        public const float OptionalReach = 120;
         /// <summary>A boss's hold on this sim (EliteMove.cc): "stun", "root", "fear" or "disorient", for seconds, from where (fear runs from it).</summary>
         public void HoldUntil(string kind, float seconds, Vector3 from)
         {
@@ -812,6 +816,16 @@ namespace Crulanda.Encounter
             if (Leading.HasValue)
             {
                 float toCamp = Vector3.Distance(transform.position, Leading.Value);
+                // An optional camp (a side boss, a side room) not got to in OptionalReach seconds out of a fight, waits for you and the party
+                // counted in, is left (hallows-1, 2026-10-16: the leader led to the Fallen Mason for four minutes and more; the bot walked off
+                // the third slab after it into the fog every few seconds, each fall a wait for you, and each wait started the headway clock
+                // below afresh).
+                if (route.Count > 0 && route[0].optional && !route[0].regroup && waitingAt == null && toCamp > 6)
+                {
+                    if (optionalFor != route[0]) { optionalFor = route[0]; optionalSpent = 0; }
+                    else if (!session.InCombat && !BuffingUp) optionalSpent += Time.deltaTime;
+                    if (optionalSpent > OptionalReach) { optionalFor = null; leadSeen = 0; LeaveCamp(); return; }
+                }
                 if (toPlayer > 18) { Activity = "Waiting for you"; agent.isStopped = true; return; }
                 // The whole party, not only you (Chris, 2026-10-11, watching the run: "warrior needs to wait on party"): it stops while
                 // anyone alive is more than 12 m behind, and pulls nothing until they are all within reach.
@@ -845,7 +859,11 @@ namespace Crulanda.Encounter
                     bool known = agent.hasPath && !agent.pathPending && !float.IsInfinity(agent.remainingDistance);
                     int kind = legging ? 2 : known ? 1 : 0;
                     float left = kind == 2 ? legLeft : kind == 1 ? agent.remainingDistance : toCamp;
-                    if (leadFor != Leading.Value || Time.time - leadSeen > 1) { leadFor = Leading.Value; leadKind = kind; leadBest = left; leadBestAt = Time.time; }
+                    if (leadFor != Leading.Value || leadSeen <= 0) { leadFor = Leading.Value; leadKind = kind; leadBest = left; leadBestAt = Time.time; }
+                    // Back to leading after a wait (for you, the party, a fight, a buff-up): the clock was stopped while it waited, not
+                    // started again (hallows-1: a wait of a second every few seconds kept it from ever running out), and the measure is
+                    // taken afresh from where it stands now.
+                    else if (Time.time - leadSeen > 1) { leadBestAt += Time.time - leadSeen; leadKind = kind; leadBest = left; }
                     else if (kind != leadKind) { if (kind != 0) { leadKind = kind; leadBest = left; } }
                     else if (left < leadBest - 1.5f) { leadBest = left; leadBestAt = Time.time; }
                     else if (!session.InCombat && Time.time - leadBestAt > 45) { leadSeen = 0; LeaveCamp(); return; }

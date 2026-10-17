@@ -94,7 +94,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(session.Invite(s.id), "joins");
             var c = session.PartySim(s.id); Assert.NotNull(c); Assert.IsNull(SimPopulation.Active.Find(s.id), "no second figure in the world");
             Assert.AreSame(c.actor, session.PartyActor(s.id), "a party member the enemies can turn on");
-            Assert.AreEqual(SimCompanion.MaxHealthFor(s), c.actor.Health.Pool.Max);
+            Assert.AreEqual(SimCompanion.MaxHealthFor(s, session.Items), c.actor.Health.Pool.Max, "its level's health and its gear's Stamina (2026-10-16)");
             // Follows: the player steps away, the sim comes after.
             var motor = session.Player.GetComponent<AdventurerMotor>();
             // Twelve metres off along open ground the sim has a way across (straight north could land on a roof, in a wall or across water:

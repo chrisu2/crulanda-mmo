@@ -121,7 +121,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(0, SimEconomy.Count(healer.sim, "food.harvest_feast"), "the feast was eaten");
             Assert.IsTrue(session.PartySims.All(c => c.BuffedStop == session.BuffStop), "each took its turn: " + string.Join("; ", session.PartySims.Select(c => c.sim.name + ": " + c.BuffNote)));
             Assert.Greater(mage.DamageEdge, 0, "the mage hits harder for it"); Assert.LessOrEqual(mage.DamageEdge, BossBuffs.MaxEdge);
-            Assert.Greater(tank.actor.Health.Pool.Max, SimCompanion.MaxHealthFor(tank.sim), "the tank's health is up with its dish");
+            Assert.Greater(tank.actor.Health.Pool.Max, SimCompanion.MaxHealthFor(tank.sim, session.Items), "the tank's health is up with its dish");
             // Then the pull.
             until = Time.time + 40;
             while (Time.time < until && !session.Enemies.Any(e => e != null && e.actor.IsAlive && e.FightingParty && e.Camp && Vector3.Distance(e.transform.position, tank.Leading ?? e.transform.position) < 20))

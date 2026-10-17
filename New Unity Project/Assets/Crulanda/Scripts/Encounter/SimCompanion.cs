@@ -143,7 +143,11 @@ namespace Crulanda.Encounter
         /// </summary>
         public static float RoleDamage(PartyRole role) { return role == PartyRole.Damage ? 1.6f : .5f; }
         /// <summary>Its blow in a party, with what its buffs add (BossBuffs.Edge on its main stat: a dish's, an elixir's, a class buff's).</summary>
-        public int Hit { get { return Mathf.Max(1, Mathf.RoundToInt(BaseHit * RoleDamage(Role) * (1 + DamageEdge))); } }
+        /// <summary>
+        /// Its blow in a party, with what its buffs add (BossBuffs.Edge on its main stat). A hybrid class dealing damage hits
+        /// EncounterSession.HybridDpsShare of a pure damage-dealer's (Chris, 2026-10-16: "A bit lower"), as a player's hybrid damage path does.
+        /// </summary>
+        public int Hit { get { return Mathf.Max(1, Mathf.RoundToInt(BaseHit * RoleDamage(Role) * (Role == PartyRole.Damage && EncounterSession.Hybrid(sim.classId) ? EncounterSession.HybridDpsShare : 1) * (1 + DamageEdge))); } }
         public int HealAmount { get { return Mathf.RoundToInt(12 + 5 * sim.level); } }
         /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
         public void GainXp(int xp)
@@ -153,7 +157,7 @@ namespace Crulanda.Encounter
             sim.experience = Mathf.Max(sim.experience, EncounterProgress.XpForLevel(sim.level)) + xp;
             if (sim.experience >= EncounterProgress.XpForLevel(sim.level + 1))
             {
-                sim.level++; actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+                sim.level++; actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim, session.Items)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
                 SimGear.Dress(GetComponent<ActorVisual>(), sim, session.Items); SimChatter.Active?.Ding(sim, true);
             }
         }
@@ -163,7 +167,7 @@ namespace Crulanda.Encounter
         {
             level = Mathf.Min(level, EncounterProgress.LevelCap); if (sim.level >= level) return;
             sim.level = level; sim.experience = EncounterProgress.XpForLevel(level);
-            actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim, session.Items)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             SimGear.Dress(GetComponent<ActorVisual>(), sim, session.Items);
         }
         /// <summary>Its choice in a roll (Round 25, note 72): Need for gear of its weight and slot that beats what it wears, Greed for
@@ -187,16 +191,51 @@ namespace Crulanda.Encounter
             return d.value > 0 ? RollChoice.Greed : RollChoice.Pass;
         }
         /// <summary>
-        /// A sim's health at its level. The Warrior, always the party's tank (Role), has a player Warrior's: 180 and 25 a level past the
-        /// first (class.warrior's stats in Encounter.asset), the most of any class at every level. 2026-10-16, the Hallow's Creek run at
-        /// level 19: on the shared 150 + 22 a level the tank had 568 to the Paladin player's 607 (175 + 24 a level), and the gap grew past 15.
+        /// A sim's health at its level, with the Stamina on what it wears (<paramref name="items"/>; null: its level's health alone).
+        /// The Warrior, always the party's tank (Role), has a player Warrior's: 180 and 25 a level past the first (class.warrior's stats in
+        /// Encounter.asset), the most of any class at every level (2026-10-16, the Hallow's Creek run at 19: on the shared 150 + 22 a level
+        /// the tank had 568 to the Paladin player's 607). Its gear's Stamina counts as a player's does, 5 health a point (Chris, 2026-10-16,
+        /// "Fix it now": a sim's health counted none of it), and the tank's whole is x<see cref="TankHealthEdge"/>.
         /// </summary>
-        public static int MaxHealthFor(SimAdventurer s)
+        public static int MaxHealthFor(SimAdventurer s, ItemDatabase items = null)
         {
-            if (SimGear.Tank(s.classId)) return TankBaseHealth + TankHealthPerLevel * (Mathf.Max(1, s.level) - 1);
-            return (s.classId == "class.paladin" ? 150 : 115) + 22 * Mathf.Max(1, s.level);
+            int gear = HealthPerStamina * GearStamina(s, items);
+            if (SimGear.Tank(s.classId)) return Mathf.RoundToInt((TankBaseHealth + TankHealthPerLevel * (Mathf.Max(1, s.level) - 1) + gear) * TankHealthEdge);
+            return (s.classId == "class.paladin" ? 150 : 115) + 22 * Mathf.Max(1, s.level) + gear;
         }
-        public const int TankBaseHealth = 180, TankHealthPerLevel = 25;
+        public const int TankBaseHealth = 180, TankHealthPerLevel = 25, HealthPerStamina = 5;
+        /// <summary>
+        /// What the tank's health has over its level and gear: the sims spend no talent points, so the Warrior tank's Scarred Veteran
+        /// (3% maximum health a rank, three ranks) is folded in, as its Tempered Armour is in <see cref="TankArmourEdge"/>.
+        /// </summary>
+        public const float TankHealthEdge = 1.09f;
+        /// <summary>The Stamina on the pieces it wears (SimGear.For), summed as the player's is.</summary>
+        public static int GearStamina(SimAdventurer s, ItemDatabase items)
+        {
+            int sta = 0; if (s == null || items == null) return 0;
+            foreach (var id in SimGear.For(s, items)) { var d = items.Get(id); if (d != null) sta += d.stamina; }
+            return sta;
+        }
+        /// <summary>
+        /// How much sturdier its gear's Stamina makes it: its health with its gear over its health without (1 with none). A party's
+        /// mobs strike that much harder (EncounterEnemy.GroupScale), so a fight is as hard as it was before the sims counted their gear.
+        /// </summary>
+        public static float GearToughness(SimAdventurer s, ItemDatabase items)
+        {
+            int bare = MaxHealthFor(s); return bare > 0 ? (float)MaxHealthFor(s, items) / bare : 1;
+        }
+        /// <summary>
+        /// The run bot's kit (RunCapture, the Nix fight test): the temp save has only the starter gear, so the player is given the armour and
+        /// the Stamina of a sim's pieces of its class and level (<paramref name="like"/>), the pieces only (not the tank's edges).
+        /// </summary>
+        public static void KitPlayerLike(EncounterSession s, SimAdventurer like)
+        {
+            s.Player.Stats.SetBase(Crulanda.Core.StatType.Armor, PiecesArmour(like, s.Items));
+            s.Player.Stats.RemoveModifiersFromSource(playerKitSource);
+            s.Player.Stats.AddModifiers(new List<StatModifier> { new StatModifier(Crulanda.Core.StatType.MaxHealth, ModifierOp.Flat, HealthPerStamina * GearStamina(like, s.Items), playerKitSource) });
+            s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max);
+        }
+        static readonly object playerKitSource = new object();
         /// <summary>
         /// What the tank's armour has over its pieces: the sims spend no talent points, so the Warrior tank's own training (Tempered
         /// Armour, its shield work) is folded in here (2026-10-16: the tank had 329 to the Paladin player's 375 at level 19).
@@ -219,7 +258,7 @@ namespace Crulanda.Encounter
         public void Init(Actor a, EncounterSession s, SimAdventurer data, int partySlot)
         {
             actor = a; session = s; sim = data; slot = partySlot; agent = GetComponent<NavMeshAgent>(); visual = GetComponent<ActorVisual>();
-            actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim, session.Items)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             actor.Stats.SetBase(Crulanda.Core.StatType.Armor, ArmourFor(sim, session.Items));   // what it wears turns blows as yours does (2026-10-11; it had no armour at all)
             actor.Health.Died += h => session.Meter.Death(actor);   // the scorecard's deaths
             nextAct = Time.time + .5f + slot * .3f; joinedAt = Time.time;

@@ -20,6 +20,9 @@ DPS_T = {'dps': (62, 72, 67), 'cc': (45, 52, 48.5), 'support': (45, 52, 48.5), '
 ST_T, AOE_T, AOE_RATIO = (66, 72, 69), (62, 67, 64), (1.7, 2.3, 2.0)
 AOE = {'class.warrior/dps', 'class.paladin/judicator', 'class.ranger/skirmisher', 'class.mage/combustion', 'class.shaman/stormcaller'}
 HPS_T = (40, 50, 45)
+# Chris, 2026-10-16 ("Should a Paladin built for damage do less damage than a Rogue or Ranger?" "A bit lower"): a hybrid class's damage
+# build (a class with a tank's or a healer's path) targets 90% of the pure classes' band (EncounterSession.HybridDpsShare, HybridClasses).
+HYBRID, HYBRID_SHARE = {'class.warrior', 'class.druid', 'class.paladin', 'class.archivist', 'class.saltmender', 'class.cleric', 'class.shaman'}, .90
 
 single, three, heal, role = {}, {}, {}, {}
 for f in glob.glob(os.path.join(folder, 'balance-*.csv')):
@@ -48,6 +51,7 @@ for k in sorted(single):
     # 1.25 times against three (the Unwriting, Thornsong, Bonecaller, Sifter) is held to the area band against one, as the splash builds are.
     area = k in AOE or (k in three and v > 0 and statistics.mean(three[k]) / v > 1.25)
     if r == 'dps': lo, hi, mid = AOE_T if area else ST_T
+    if r == 'dps' and k.split('/')[0] in HYBRID: lo, hi, mid = (round(x * HYBRID_SHARE, 1) for x in (lo, hi, mid))
     line = '%-34s %-8s DPS %6.1f  scale %.2f' % (k, r + ('/area' if r == 'dps' and area else ''), v, old)
     if v > 0 and not (lo <= v <= hi):
         new = round(old * mid / v, 2); changes.append(('BuildDamageScale', k, old, new)); line += '  -> %.2f (to %.1f)' % (new, mid)

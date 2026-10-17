@@ -15,9 +15,10 @@ namespace Crulanda.Encounter
     {
         public static readonly Dictionary<string, float> BuildDamageScale = new Dictionary<string, float>
         {
-            // DPS toward the median
-            { "class.ranger/marksman", 0.64f }, { "class.druid/thornclaw", 0.74f }, { "class.ranger/skirmisher", 0.69f }, { "class.paladin/judicator", 0.71f },
-            { "class.mage/combustion", 1.88f }, { "class.druid/thornsong", 2.42f }, { "class.archivist/the-unwriting", 1.6f },
+            // DPS toward the median; a hybrid class's damage path at HybridDpsShare of it (2026-10-16: judicator .71, thornclaw .74,
+            // thornsong 2.42 and the-unwriting 1.6 before, each x0.9)
+            { "class.ranger/marksman", 0.64f }, { "class.druid/thornclaw", 0.67f }, { "class.ranger/skirmisher", 0.69f }, { "class.paladin/judicator", 0.64f },
+            { "class.mage/combustion", 1.88f }, { "class.druid/thornsong", 2.18f }, { "class.archivist/the-unwriting", 1.44f },
             // under the role caps
             { "class.ranger/pathfinder", .60f }, { "class.rogue/thiefs-grace", .82f }, { "class.rogue/swashbuckler", .72f }, { "class.paladin/vanguard", .92f },
             { "class.warrior/support", .93f }, { "class.warrior/jailer", .93f },
@@ -30,15 +31,15 @@ namespace Crulanda.Encounter
             { "class.rogue/locksmith", 0.87f },   // 2026-10-13 fixed-dummy retune
             { "class.saltmender/mason", 1.25f },   // 2026-10-13 fixed-dummy retune
             { "class.saltmender/salt-speaker", 1.27f },   // 2026-10-13 fixed-dummy retune
-            { "class.warrior/dps", 1.1f },   // 2026-10-13 fixed-dummy retune
-            { "class.cleric/censure", 1.68f },   // 2026-10-13 fixed-dummy retune
+            { "class.warrior/dps", 0.99f },   // 2026-10-13 fixed-dummy retune 1.1; x0.9 a hybrid (2026-10-16)
+            { "class.cleric/censure", 1.51f },   // 2026-10-13 fixed-dummy retune 1.68; x0.9 a hybrid (2026-10-16)
             { "class.scoundrel/cutthroat", 0.86f },   // 2026-10-14: 80.2 on the dummies, to the middle of 62-72
             { "class.cleric/warden", 2.32f },   // 2026-10-13 fixed-dummy retune
             { "class.shaman/gravewind", 2.5f },   // 2026-10-13 fixed-dummy retune
-            { "class.shaman/stormcaller", 2.08f },   // 2026-10-13 fixed-dummy retune
+            { "class.shaman/stormcaller", 1.87f },   // 2026-10-13 fixed-dummy retune 2.08; x0.9 a hybrid (2026-10-16)
             { "class.druid/barkhide", 1.33f },   // 2026-10-13 fixed-dummy retune
             { "class.mage/heatweaver", 1.39f },   // 2026-10-13 fixed-dummy retune
-            { "class.saltmender/sifter", 1.31f },   // 2026-10-13 fixed-dummy retune
+            { "class.saltmender/sifter", 1.18f },   // 2026-10-13 fixed-dummy retune 1.31; x0.9 a hybrid (2026-10-16)
             { "class.shaman/stonebound", 2.45f },   // 2026-10-13 fixed-dummy retune
         };
         /// <summary>The same for the build's companion (Ranger pet, thrall): only the pet builds are scaled.</summary>
@@ -62,6 +63,16 @@ namespace Crulanda.Encounter
         };
         public float PlayerHealScale { get { var lead = LeadBuild; return (lead != null && BuildHealScale.TryGetValue(lead, out var v) ? v : 1) * GearPowerNow; } }   // GearPowerNow: a class set's abilityPower or echo (loot DESIGN.md 3.8)
         public const float HealerDpsCap = .50f, ControlDpsCap = .75f, SupportDpsCap = .75f;
+        /// <summary>
+        /// A hybrid class's damage paths sit this share of the pure damage classes' (Chris, 2026-10-16, asked "Should a Paladin built for
+        /// damage do less damage than a Rogue or Ranger?": "A bit lower"), for what else the class can be: a hybrid has a tank's or a
+        /// healer's path besides its damage (Docs/BALANCE_REPORT.md). Their scales above are the 62-72 retune's x0.9; the sims' blows too
+        /// (SimCompanion.Hit).
+        /// </summary>
+        public const float HybridDpsShare = .90f;
+        /// <summary>The hybrid classes: every class with a tank's or a healer's path (talent data; TalentDataTests checks the list).</summary>
+        public static readonly HashSet<string> HybridClasses = new HashSet<string> { "class.warrior", "class.druid", "class.paladin", "class.archivist", "class.saltmender", "class.cleric", "class.shaman" };
+        public static bool Hybrid(string classId) { return classId != null && HybridClasses.Contains(classId); }
         int scaleCount = -1; List<TalentRank> scaleList; float scale = 1;
         /// <summary>The build the player has spent most in (class/branch id), or null with no ranks.</summary>
         public string LeadBuild

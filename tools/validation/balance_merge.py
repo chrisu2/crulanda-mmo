@@ -8,6 +8,13 @@ folder = sys.argv[1] if len(sys.argv) > 1 else r'D:\crulanda-work\outputs\balanc
 out = sys.argv[2] if len(sys.argv) > 2 else os.path.join(folder, 'BALANCE_ALL.md')
 CAPS = {'healer': .50, 'control': .75, 'support': .75}
 SLACK = .03
+# Chris, 2026-10-16 ("Should a Paladin built for damage do less damage than a Rogue or Ranger?" "A bit lower"): a hybrid class's damage
+# build (a class with a tank's or a healer's path) targets 90% of the pure classes' DPS band (EncounterSession.HybridDpsShare).
+HYBRID, HYBRID_SHARE = {'warrior', 'druid', 'paladin', 'archivist', 'saltmender', 'cleric', 'shaman'}, .90
+def band(t, targets, default):
+    lo, hi = targets.get(t['role'], default)
+    if t['role'] == 'dps' and t['cls'] in HYBRID: lo, hi = round(lo * HYBRID_SHARE), round(hi * HYBRID_SHARE)
+    return lo, hi
 
 rows = {}   # (class, build, role) -> {scenario: [dps...], 'hps': [hps...]}
 tanks = {}  # (class, build) -> lists of the tank test's figures ("# tank" lines: taken, self-heal, net, threat a second; refills)
@@ -46,7 +53,7 @@ def _csvs():
     target = {'dps': (62, 72), 'pet': (62, 72), 'control': (45, 52), 'support': (45, 52), 'utility': (45, 52), 'healer': (0, 35), 'tank': (42, 55)}
     out_rows = [['class', 'build', 'role', 'dps_single', 'dps_vs_3', 'vs3_over_single', 'hps', 'target_min', 'target_max', 'in_range']]
     for t in sorted(table, key=lambda t: (t['cls'], t['role'], t['build'])):
-        lo, hi = target.get(t['role'], (0, 0))
+        lo, hi = band(t, target, (0, 0))
         out_rows.append([t['cls'], t['build'], name.get(t['role'], t['role']), round(t['single'], 1), round(t['aoe'], 1), round(t['aoe'] / t['single'], 2) if t['single'] > 0 else '',
                          round(t['hps'], 1) if t['hps'] > 0 else '', lo, hi, 1 if (lo <= t['single'] <= hi or (lo == 0 and t['single'] <= hi)) else 0])
     with open(os.path.join(folder, 'balance-summary.csv'), 'w', encoding='utf-8', newline='') as h: csv.writer(h).writerows(out_rows)
@@ -110,7 +117,7 @@ AOE = {'warrior/dps', 'paladin/judicator', 'ranger/skirmisher', 'mage/combustion
 AOE_MIN, ST_MAX = 1.7, 1.25
 HPS_T = (40, 50)   # healer HPS on the wounded dummy (Chris, 02:07, for level 15)
 def status(t):
-    lo, hi = TARGET.get(t['role'], (0, 1e9)); v = t['single']
+    lo, hi = band(t, TARGET, (0, 1e9)); v = t['single']
     out = 'ok' if lo <= v <= hi else ('**HIGH**' if v > hi else '**LOW**')
     if t['role'] in ('dps', 'pet') and t['single'] > 0:
         ratio = t['aoe'] / t['single']; aoe = (t['cls'] + '/' + t['build']) in AOE
@@ -131,7 +138,7 @@ lines = ['# Balance, every class and build (' + ', '.join(classes) + ')', '',
 order = {'tank': 0, 'dps': 1, 'pet': 1, 'control': 2, 'support': 3, 'utility': 3, 'healer': 4}
 counts = {}
 for t in sorted(table, key=lambda t: (t['cls'], order.get(t['role'], 9), t['build'])):
-    lo, hi = TARGET.get(t['role'], (0, 0)); st = status(t); counts[st.startswith('ok')] = counts.get(st.startswith('ok'), 0) + 1
+    lo, hi = band(t, TARGET, (0, 0)); st = status(t); counts[st.startswith('ok')] = counts.get(st.startswith('ok'), 0) + 1
     tgt = ('at most %d' % hi) if lo == 0 else '%d-%d' % (lo, hi)
     kind = (' (AoE)' if (t['cls'] + '/' + t['build']) in AOE else ' (area spells)' if t['single'] > 0 and t['aoe'] / t['single'] > ST_MAX else ' (single)') if t['role'] in ('dps', 'pet') else ''
     lines.append('| %s | %s | %s%s | %.1f | %.1f | %s | %s | %s | %s |' % (t['cls'], t['build'], NAME.get(t['role'], t['role']), kind, t['single'], t['aoe'],

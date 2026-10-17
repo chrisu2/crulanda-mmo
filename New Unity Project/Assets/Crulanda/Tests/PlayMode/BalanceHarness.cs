@@ -379,17 +379,22 @@ namespace Crulanda.Tests
 
         /// <summary>Note 177 (Chris 18:22, "control classes should not be top tier dps for sure" / "or healers"): single-target DPS of each
         /// healer, control and support build against the DPS-role median; healer at most 50%, control and support at most 75% (3 points'
-        /// slack for "about").</summary>
+        /// slack for "about"); a hybrid class's damage build at most 90% of the pure damage classes' median (2026-10-16).</summary>
         public static List<string> CapViolations(List<string> rows)
         {
             var data = rows.Skip(1).Select(l => l.Split(',')).Where(c => c.Length >= 11 && c[3] == "single" && float.TryParse(c[6], out _)).ToList();
             var builds = data.GroupBy(c => (c[0], c[1], c[2])).Select(g => (key: g.Key, dps: g.Average(c => float.Parse(c[6])))).ToList();
             var dps = builds.Where(b => b.key.Item3 == "dps").Select(b => b.dps).OrderBy(x => x).ToList(); if (dps.Count == 0) return new List<string>();
             float med = dps.Count % 2 == 1 ? dps[dps.Count / 2] : (dps[dps.Count / 2 - 1] + dps[dps.Count / 2]) / 2;
+            var pureList = builds.Where(b => b.key.Item3 == "dps" && !EncounterSession.Hybrid(b.key.Item1)).Select(b => b.dps).OrderBy(x => x).ToList();
+            float pure = pureList.Count == 0 ? 0 : pureList.Count % 2 == 1 ? pureList[pureList.Count / 2] : (pureList[pureList.Count / 2 - 1] + pureList[pureList.Count / 2]) / 2;
             var bad = new List<string>();
             foreach (var b in builds)
             {
                 float cap = b.key.Item3.Contains("heal") ? EncounterSession.HealerDpsCap : b.key.Item3 == "control" ? EncounterSession.ControlDpsCap : b.key.Item3 == "support" ? EncounterSession.SupportDpsCap : -1;
+                // A hybrid's damage path (Chris, 2026-10-16: "A bit lower"): at most HybridDpsShare of the pure damage classes' median.
+                if (b.key.Item3 == "dps" && EncounterSession.Hybrid(b.key.Item1) && pure > 0 && b.dps > pure * (EncounterSession.HybridDpsShare + .03f))
+                    bad.Add(b.key.Item1.Replace("class.", "") + " " + b.key.Item2 + " (hybrid dps) " + b.dps.ToString("0.0") + " = " + (100 * b.dps / pure).ToString("0") + "% of the pure classes' " + pure.ToString("0.0") + ", cap " + (EncounterSession.HybridDpsShare * 100).ToString("0") + "%");
                 if (cap > 0 && b.dps > med * (cap + .03f)) bad.Add(b.key.Item1.Replace("class.", "") + " " + b.key.Item2 + " (" + b.key.Item3 + ") " + b.dps.ToString("0.0") + " = " + (100 * b.dps / med).ToString("0") + "% of " + med.ToString("0.0") + ", cap " + (cap * 100).ToString("0") + "%");
             }
             return bad;

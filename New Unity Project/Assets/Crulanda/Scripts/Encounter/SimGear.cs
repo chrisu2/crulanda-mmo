@@ -40,6 +40,9 @@ namespace Crulanda.Encounter
         }
         public static int QualityFor(SimAdventurer s, int slot)
         {
+            // The tank buys its armour first (Chris, 2026-10-11: "give the warrior some better gear"; 2026-10-16, with the sims' health counting
+            // their gear's Stamina, so the tank stays the sturdiest of a party): uncommon at once, rare from level 8.
+            if (Tank(s.classId)) return s.level >= 8 ? 3 : 2;
             int roll = Mathf.Abs(s.gearSeed * 31 + slot * 977) % 100;
             roll -= 18 * s.gearBonus;   // bought upgrades (SimEconomy): better odds of the better piece
             if (s.level >= 8 && roll < 25) return 3;

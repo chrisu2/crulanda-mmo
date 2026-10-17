@@ -76,7 +76,7 @@ namespace Crulanda.Encounter
             return f;
         }
         /// <summary>Its health for its level (whole when it grows).</summary>
-        public void Refit() { actor.Stats.SetBase(StatType.MaxHealth, SimCompanion.MaxHealthFor(sim)); if (actor.IsAlive) actor.Health.ApplyHealing(actor.Health.Pool.Max); }
+        public void Refit() { actor.Stats.SetBase(StatType.MaxHealth, SimCompanion.MaxHealthFor(sim, Session != null ? Session.Items : null)); if (actor.IsAlive) actor.Health.ApplyHealing(actor.Health.Pool.Max); }
 
         // ---------- choosing ----------
         /// <summary>A camp mob of its level (two under to one over), alive, not an elite, not already fought by someone else, nearest first.</summary>

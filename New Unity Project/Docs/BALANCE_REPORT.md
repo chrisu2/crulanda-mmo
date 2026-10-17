@@ -414,6 +414,41 @@ Health and armour: you 607 and 375, the Warrior tank 568 and 329, the others 533
   (a Paladin in a sim's best pieces) at every seed. The bot's armour is set from the pieces only (`SimCompanion.PiecesArmour`).
 - EditMode test: `SimGearTests.The_warrior_tank_is_the_toughest_of_a_party`.
 
-**Not changed, for Chris to decide:** the Judicator is held to the same band as the pure damage builds (62-72 at 15, Chris 2026-10-13);
-a hybrid under the pure damage classes would mean a lower band for it. Sims' health counts none of their gear's stamina while a
-player's does, so a player in real level-19 gear will out-last a sim of the same class. Not measured yet: the run again at 17.
+**Asked of Chris** (his answers below, the same day): whether a hybrid's damage path should sit under the pure damage builds, and
+whether the sims' health should count their gear's Stamina.
+
+## Chris, 2026-10-16 ~22:55 (answers, verbatim)
+- Question: "Should a Paladin built for damage do less damage than a Rogue or Ranger?" Answer: "A bit lower"
+- Question: "Sims' health ignores the stamina on their gear... Fix it?" Answer: "Fix it now"
+
+## Hybrids a bit lower; the sims' gear Stamina counted (2026-10-16, after Chris's answers)
+**Hybrids.** A hybrid is a class with a tank's or a healer's path besides its damage path: Warrior, Druid, Paladin, Archivist, Salt-Mender,
+Cleric, Shaman (`EncounterSession.HybridClasses`; `TalentDataTests` checks the list against the talent files). The pure damage classes are
+the Ranger, Mage, Rogue and Scoundrel. A hybrid's damage path now targets 90% of the pure band (`EncounterSession.HybridDpsShare`):
+single-target 59-65 (to 62) in place of 66-72, area 56-60 (to 58) in place of 62-67, at level 15 on the dummies. Each hybrid damage
+scale is the old one x0.9: Judicator .71 to .64, Thornclaw .74 to .67, Thornsong 2.42 to 2.18, the Unwriting 1.6 to 1.44, Warrior DPS 1.1
+to .99, Censure 1.68 to 1.51, Stormcaller 2.08 to 1.87, Sifter 1.31 to 1.18. A sim of a hybrid class in the damage part hits x0.9 too
+(`SimCompanion.Hit`). The harness's role check (`BalanceHarness.CapViolations`) now also fails a hybrid damage build over 93% of the pure
+classes' median; `toolsalidationalance_retune.py` and `balance_merge.py` use the hybrid band. The Warrior counts as a hybrid because
+it has a tank's path: a choice for Chris to overturn if he sees the Warrior as a pure damage class. Not yet measured in the harness.
+
+**The sims' gear Stamina.** A sim's health is its level's plus 5 for each point of Stamina on the pieces it wears
+(`SimCompanion.MaxHealthFor(sim, items)`, `GearStamina`), as a player's is. Uncommon and rare pieces carry a lot of it: at level 11
+a sim gains about 230-330 health (+60-80%), at 19 about 390-550. To keep the Warrior the toughest of a party:
+- it buys its armour first: uncommon pieces from the start, rare from level 8 (`SimGear.QualityFor`);
+- its health is a player Warrior's (180 + 25 a level) plus its gear's, x1.09 (`TankHealthEdge`, its Scarred Veteran, which a sim
+  spends no point on);
+- `SimGearTests.The_warrior_tank_is_the_toughest_of_a_party`: over every other class's sim of the same seed and purse, at every level.
+  Over two sims of different seeds it is the sturdiest nearly always but not by rule: a cloth or leather sim in all rares with the
+  best Stamina pieces can pass a tank in uncommons.
+
+**The fights kept as hard as before.** The group scaling (`EncounterEnemy.GroupScale`: each sim adds a share to a mob's health and
+blows) was tuned on 2026-10-11 for sims whose health counted no gear. A mob fighting a party now also strikes x the party's sims' mean
+gear toughness (`SimCompanion.GearToughness`: health with the gear over health without), so a sim falls as fast as it did. A sim
+healer's mend is 16% of the hurt member's health, so it rises with them. You and Mira alone are unchanged (no sims: x1). The run bot,
+and the Nix fight test's player, wear a sim's pieces' Stamina as well as their armour (`SimCompanion.KitPlayerLike`), so they keep
+their place in the party. **Side effect for Chris's own play in a group:** his health already counted his gear, so the mobs now hit
+him harder in a party with sims, by about the sims' gain (x1.6-1.9). The group tests assert that the party wins; none of them asserts
+how hard the fight is, so the only measure is a group run. The elite tests (`EliteBalanceTests`) fight you alone on paper and do not
+move. Not measured yet: the group run at 17, Adit runs at 11.
+

@@ -24,6 +24,17 @@ namespace Crulanda.Tests
         static string Json(string id) { return File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Talents/" + id + ".json")); }
         static TalentTree Tree(string id) { return TalentTree.Parse("class." + id, Json(id), EncounterProgress.TalentCap, Kits[id]); }
 
+        /// <summary>The hybrid classes (EncounterSession.HybridClasses; Chris, 2026-10-16, "A bit lower": their damage paths sit at 90% of
+        /// the pure classes') are those with a tank's or a healer's path besides a damage path.</summary>
+        [Test] public void The_hybrids_are_the_classes_with_a_tank_or_healer_path()
+        {
+            var hybrids = Kits.Keys.Where(id => { var roles = Tree(id).Branches.Select(b => b.role).ToList(); return roles.Contains("dps") && (roles.Contains("tank") || roles.Contains("healer")); })
+                .Select(id => "class." + id).ToList();
+            CollectionAssert.AreEquivalent(hybrids, EncounterSession.HybridClasses);
+            foreach (var id in hybrids)
+                foreach (var b in Tree(id.Substring(6)).Branches.Where(b => b.role == "dps"))
+                    Assert.IsTrue(EncounterSession.BuildDamageScale.ContainsKey(id + "/" + b.id), id + "/" + b.id + ": a hybrid's damage path has its scale (x0.9 of the pure band)");
+        }
         [Test] public void Every_class_file_has_a_kit_and_loads_at_the_cap()
         {
             var files = Directory.GetFiles(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Talents"), "*.json").Select(Path.GetFileNameWithoutExtension).ToList();

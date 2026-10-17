@@ -92,7 +92,8 @@ namespace Crulanda.Tests
             foreach (var x in chosen) { x.zone = s.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = 11; x.bold = x.classId == "class.warrior" ? .95f : .3f; x.gearBonus = 2; x.x = p0.x + 2 + k; x.z = p0.z + (k % 2 == 0 ? 1.5f : -1.5f); k++; }
             pop.Refresh(); yield return new WaitForSeconds(.5f);
             foreach (var x in chosen) Assert.IsTrue(s.Invite(x.id, true), "invited " + x.name + " (" + x.classId + ")");
-            s.Player.Stats.SetBase(Crulanda.Core.StatType.Armor, SimCompanion.ArmourFor(new SimAdventurer { classId = s.ClassDef.id, level = s.Progress.Level, gearSeed = 7, gearBonus = 2 }, s.Items));
+            // The run's kit: a sim's pieces' armour and Stamina (2026-10-16: the sims' health counts their gear's Stamina, and the mobs strike a party harder for it).
+            SimCompanion.KitPlayerLike(s, new SimAdventurer { classId = s.ClassDef.id, level = s.Progress.Level, gearSeed = 7, gearBonus = 2 });
             yield return new WaitForSeconds(.5f);
             var log = new List<string>(); void Log(string line) { log.Add(line); Debug.Log("AditNixFight " + line); }
             Log("party: you (" + s.ClassDef.displayName + " " + s.Progress.Level + ", " + s.Player.Health.Pool.Max + " health, armour " + s.Player.Stats.GetRounded(Crulanda.Core.StatType.Armor) + "), " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " (" + SimRoster.ClassName(c.sim.classId) + ", " + c.Role + ", " + c.actor.Health.Pool.Max + " health, armour " + c.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor) + ")")) + (s.SimPets.Count > 0 ? "; " + string.Join(", ", s.SimPets.Where(p => p != null).Select(p => p.actor.DisplayName + " " + p.actor.Health.Pool.Max)) : ""));

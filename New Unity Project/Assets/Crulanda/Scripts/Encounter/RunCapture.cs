@@ -80,9 +80,9 @@ namespace Crulanda.Encounter
             // (2026-10-16, the Hallow's Creek run at nineteen: the bot had none, so the Paladin's damage path's scale, x0.71 in
             // EncounterSession.RoleScale, never applied, and the untalented Paladin out-hit the Rogue and the Ranger).
             Log("Your talents: " + SpendForRole(s) + ".");
-            // You in your class's kit at this level too (the temp save has only the starter gear): the armour of a sim's pieces (the
-            // pieces only: the tank's edge in SimCompanion.ArmourFor is the Warrior sim's).
-            s.Player.Stats.SetBase(Crulanda.Core.StatType.Armor, SimCompanion.PiecesArmour(new SimAdventurer { classId = s.ClassDef.id, level = s.Progress.Level, gearSeed = 7, gearBonus = 2 }, s.Items));
+            // You in your class's kit at this level too (the temp save has only the starter gear): the armour and the Stamina of a sim's
+            // pieces (the pieces only: the tank's edges are the Warrior sim's), as the sims' health counts theirs (2026-10-16).
+            SimCompanion.KitPlayerLike(s, new SimAdventurer { classId = s.ClassDef.id, level = s.Progress.Level, gearSeed = 7, gearBonus = 2 });
             yield return new WaitForSeconds(.5f);
             Log("The party: you (" + s.ClassDef.displayName + ", " + s.Player.Health.Pool.Max + " health, armour " + s.Player.Stats.GetRounded(Crulanda.Core.StatType.Armor) + "), " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " (" + SimRoster.ClassName(c.sim.classId) + ", " + c.Role + ", " + c.actor.Health.Pool.Max + " health, armour " + c.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor) + ")")) + (s.SimPets.Count > 0 ? "; " + string.Join(", ", s.SimPets.Select(p => p.actor.DisplayName)) : "") + ".");
             // Dressed for the Adit: the temp save has no gear, so each party member's own level-11 kit (the sims' SimGear is on them already).

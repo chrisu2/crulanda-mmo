@@ -3344,6 +3344,32 @@
       "after": "walk"
     }
   ],
+  "checkpoints": [
+    {
+      "name": "The still lamp at the lip",
+      "look": "lamp",
+      "at": {
+        "x": -7,
+        "y": -238
+      }
+    },
+    {
+      "name": "The still lamp on Main Street",
+      "look": "lamp",
+      "at": {
+        "x": 7.2,
+        "y": -57
+      }
+    },
+    {
+      "name": "The still lamp by the Archive",
+      "look": "lamp",
+      "at": {
+        "x": 34,
+        "y": 64
+      }
+    }
+  ],
   "events": [
     {
       "id": "glitch",

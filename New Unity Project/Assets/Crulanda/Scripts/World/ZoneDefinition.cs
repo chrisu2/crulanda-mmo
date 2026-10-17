@@ -98,6 +98,8 @@ namespace Crulanda.World
         public ZoneEvent[] events = new ZoneEvent[0];
         /// <summary>Trails of living lichen along the run's way (<see cref="ZoneCrumb"/>).</summary>
         public ZoneCrumb[] crumbs = new ZoneCrumb[0];
+        /// <summary>A dungeon's three checkpoints, in the run's order (<see cref="ZoneCheckpoint"/>; Chris, 2026-10-16: where a fallen party wakes).</summary>
+        public ZoneCheckpoint[] checkpoints = new ZoneCheckpoint[0];
         // ---- a dungeon on open ground (Hallow's Creek, Docs/DUNGEON2_DESIGN.md section 5, N1-N7; all GAME-ONLY, all optional) ----
         /// <summary>Pits sunk in the land (<see cref="ZonePit"/>: Hallow's Creek's chasm under the Bridge of Shattered Glass).</summary>
         public ZonePit[] pits = new ZonePit[0];
@@ -486,6 +488,13 @@ namespace Crulanda.World
     /// <summary>A named place in a cave (GAME-ONLY): along, aside and rise over its floor (a deck). ZoneBuilder.Anchors holds where each stands.
     /// (Hallow's Creek, N1) With no cave: at <see cref="at"/> on open ground, rise metres over the yard (on a deck there) or on the land at 0.</summary>
     [Serializable] public sealed class ZoneAnchor { public string name, cave; public float along, aside, rise; public Vector2 at; }
+    /// <summary>
+    /// A dungeon's checkpoint (GAME-ONLY; Chris, 2026-10-16: "maybe 3 checkpoints in dungeons"): a marker on the way that the party reaches by
+    /// coming within a few metres of it; dead, you recover at the latest reached (by its place in the zone's list, the run's order) instead of
+    /// the zone's start. Placed as an anchor is (in a cave: along, aside, rise; on open ground: at, rise). look: "cairn" (a miners' waycairn
+    /// with a pale chalk rune) or "lamp" (a still lamp on an iron post, its flame stopped in the pause). Not saved: kept for the visit.
+    /// </summary>
+    [Serializable] public sealed class ZoneCheckpoint { public string name, cave, look; public float along, aside, rise; public Vector2 at; }
     /// <summary>
     /// A wing of a dungeon (GAME-ONLY; the run a sim leads): id and name; after: the wings or groups done before it opens (comma-separated);
     /// group: wings of which one is enough (the Scriptorium or the Muster Yard); exit: "drop" or "walk", the way home from its end; home:

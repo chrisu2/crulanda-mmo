@@ -1,5 +1,14 @@
 # Changelog
 
+## 2026-10-16: three checkpoints in each dungeon (Chris: "maybe 3 checkpoints in dungeons"; OPEN until checked in game)
+- **Dead in a dungeon, you no longer walk back from the entrance.** The Sealed Adit has three miners' cairns (the end of the Old Workings,
+  the Gallery's east side, inside the Rail Hall's gate) and Hallow's Creek three still lamps (the lip before the bridge, Main Street, the
+  Archive's steps). Walk past one (you or anyone in your party) and the chat says "Checkpoint reached"; fall, and Recover wakes you and the
+  fallen of your party at the furthest one reached. Kept for the visit, not saved. Elsewhere nothing changes.
+- The group run's log has a line for each checkpoint reached and where you got up after each death.
+- Tests: CheckpointDataTests (three per dungeon, clear of camps, rounds, secrets, water and the road's middle), CheckpointTests (on the
+  floor, walkable from the yard, reached by walking up, you wake at the furthest reached). Docs/DUNGEON_DESIGN.md section 0.
+
 ## 2026-10-15 22:00 to 2026-10-16 01:45: Phase 8 to finish, the castle, lockouts (Chris: "keep going finish phase 8", "them move to 9")
 The full record is CLAUDE_HANDOFF.md's Start here (branches, tests, Chris's words, what is next). In short:
 - **Into the working branch and published 01:23:** the Adit run's fixes (the bot on the grass over the tank, in the chute's pool; sims

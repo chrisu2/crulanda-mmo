@@ -234,7 +234,8 @@ namespace Crulanda.Encounter
             {
                 if (c == null || (fighting && c.actor.IsAlive)) continue;
                 if (!c.actor.IsAlive) c.actor.Health.Revive(c.actor.Health.Pool.Max); else c.actor.Health.ApplyHealing(c.actor.Health.Pool.Max);
-                var agent = c.GetComponent<NavMeshAgent>(); if (agent != null) agent.Warp(RecoveryPoint + Vector3.left * (2 + c.slot) - Vector3.up * .1f);
+                // Beside where you wake (in a dungeon, the checkpoint: EncounterSession.Checkpoints).
+                var agent = c.GetComponent<NavMeshAgent>(); if (agent != null) agent.Warp(WakeBeside(Vector3.left * (2 + c.slot) - Vector3.up * .1f));
             }
         }
     }

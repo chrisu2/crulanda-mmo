@@ -134,6 +134,8 @@ namespace Crulanda.World
             CullWoodsFloor();   // after the map: from above, the woods would be culled off it
             Lap("map");
             BuildSecrets();   // after the map: a hidden find must never show on the minimap or the zone map
+            // A dungeon's three checkpoints (ZoneBuilder.Checkpoints; Chris, 2026-10-16), after the map as the secrets are.
+            BuildCheckpoints();
             if (Hollow.All.Count > 0 && Application.isPlaying) gameObject.AddComponent<PropCull>().Init(props);   // a zone with caves: far props not drawn (note 225)
             BuildNodes();     // after the secrets (they keep clear of them), each from a stream of its own: nothing else moves
             BuildStations();  // the trades' stations of their own (field anvils, benches, cookfires): streams of their own, no colliders

@@ -1499,6 +1499,8 @@ namespace Crulanda.Encounter
             if (Zone != null) new GameObject("Sims").AddComponent<SimPopulation>().Init(this, SaveRoot);
             if (Zone != null) Crulanda.World.ZoneMusic.Begin(Zone.Zone, () => InCombat, () => Player != null ? Player.transform.position : Vector3.zero);   // the zone's music (2026-10-15, Chris's three packs: ZoneMusic; /music in the chat)
             StartQuests(); StartDiscoveries(); StartArmoury(); StartAdit();
+            // A dungeon's checkpoints, none reached (EncounterSession.Checkpoints; after StartAdit: the navmesh is cut by then).
+            StartCheckpoints();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [" + KeyBindings.InteractLabel + "], then follow the path to the sentries.");
             ReconcileQuests();
             SweepLockouts();   // the bosses and elites locked for you are not there (EncounterSession.Lockout; after the quests, for their exception)
@@ -1968,6 +1970,8 @@ namespace Crulanda.Encounter
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F11)) { Crulanda.World.WorldClock.Advance(1); Message("Time skips ahead: " + Crulanda.World.WorldClock.Text + " (dev)."); }
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             TickLoot();
+            // (A dungeon's checkpoints) reached by a party member near one, you alive or not.
+            TickCheckpoints();
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
             TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickFeats(); TickNodes(); TickWork(); TickCastPose();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
@@ -2406,12 +2410,13 @@ namespace Crulanda.Encounter
             bool InIt(EncounterEnemy e) { return e != null && e.actor.IsAlive && (e.Victim != null || e.threat.Any) && PartyNear(e); }
             bool fighting = Enemies.Exists(InIt);
             Player.Health.Revive(Player.Health.Pool.Max);
-            Player.GetComponent<AdventurerMotor>().Teleport(RecoveryPoint);
+            // (Chris, 2026-10-16) In a dungeon, the latest checkpoint reached this visit; else the spirit stone or the zone's camp.
+            Player.GetComponent<AdventurerMotor>().Teleport(RecoverAt);
             if (!fighting || !Companion.actor.IsAlive)
             {
                 Companion.actor.Health.Revive(Companion.actor.Health.Pool.Max);
                 Companion.actor.Health.ApplyHealing(1000); Companion.actor.Resource.Pool.Fill();
-                Companion.GetComponent<NavMeshAgent>().Warp(RecoveryPoint + Vector3.right * 2.5f - Vector3.up * .1f);
+                Companion.GetComponent<NavMeshAgent>().Warp(WakeBeside(Vector3.right * 2.5f - Vector3.up * .1f));
             }
             // Whoever gets up at the stone has left the fight: off every mob's list, so a mob turns to the party still at it rather than
             // chasing the revived tank across the dungeon past its leash and resetting (R154: Nix at 426 with three sims on him).
@@ -2423,7 +2428,8 @@ namespace Crulanda.Encounter
             foreach (var e in Enemies)
                 if (e != null && (!fighting || !InIt(e))) e.ResetFight();
                 else if (e != null && e.Victim == Player) e.threat.Remove(Player.EntityId.Value);   // it turns to the party still at it
-            Message((BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
+            WokeAt = LatestCheckpoint != null ? LatestCheckpoint.def.name : BoundStone() != null ? "the spirit stone" : "camp";
+            Message((LatestCheckpoint != null ? "You wake at the checkpoint: " + LatestCheckpoint.def.name + "." : BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
         }
         public void Save(bool announce = true)
         {

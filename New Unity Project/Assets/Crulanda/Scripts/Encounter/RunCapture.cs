@@ -97,6 +97,8 @@ namespace Crulanda.Encounter
             float start = Time.time, realStart = Time.realtimeSinceStartup, nextShot = Time.time + 20, nextSwing = 0, stuckAt = Time.time, deadAt = -1, atCorpseSince = -1, headBest = 0, headAt = Time.time; UnityEngine.Object headFor = null; var stuckFrom = s.Player.transform.position;
             string leadingName = leader.LeadingName;
             bool wasFalling = false; float fogFellAt = -99;
+            // (A dungeon's checkpoints, EncounterSession.Checkpoints) the ones reached so far on the log.
+            int checkpointsLogged = 0;
             int botBuffed = -1, buffStops = 0; var simBuffed = new Dictionary<SimCompanion, int>();
             Time.timeScale = Speed;
             Shot(s, directory, "00-" + Clock(0) + "-setting-out", ref shots, leader);
@@ -124,6 +126,8 @@ namespace Crulanda.Encounter
                 // The wing it is in now, a regroup at a wing's home, a wait at a shut gate (the Adit rework).
                 if (leader.Wing != wingNow) { wingNow = leader.Wing; wingDone = 0; wingCamps = leader.WingCampsLeft; if (wingNow != null) { wingNo++; Log(Clock(t) + "  wing " + wingNo + ": " + wingNow + " (" + wingCamps + " camps)"); } }
                 if (leader.Regrouping != regrouping) { regrouping = leader.Regrouping; if (regrouping) Log(Clock(t) + "  regrouping at the " + leader.LeadingName); }
+                // A checkpoint reached (Chris, 2026-10-16: three in each dungeon; dead, you wake at the latest).
+                while (checkpointsLogged < s.CheckpointsReached.Count) Log(Clock(t) + "  checkpoint reached: " + s.CheckpointsReached[checkpointsLogged++]);
                 if (!leader.WaitingAtGate) gateSince = -1;
                 else if (gateSince < 0) { gateSince = Time.time; Log(Clock(t) + "  waiting at " + leader.StoppedBy); }
                 else if (Time.time - gateSince > 60)
@@ -176,7 +180,7 @@ namespace Crulanda.Encounter
                         var healer = s.PartySims.Find(c => c != null && c.Role == SimCompanion.PartyRole.Healer);
                         Log(Clock(t) + "  you fell at " + leadingName + " (death " + deaths + "; " + s.Player.Health.Pool.Max + " health; the healer " + (healer == null ? "none" : healer.sim.name + " " + (healer.actor.IsAlive ? Vector3.Distance(healer.transform.position, me).ToString("0") + " m off, " + (healer.Activity ?? "").ToLower() : "dead")) + ")");
                     }
-                    else if (Time.time - deadAt > 4) { s.Recover(); deadAt = -1; }
+                    else if (Time.time - deadAt > 4) { s.Recover(); deadAt = -1; Log(Clock(t) + "  recovered at " + s.WokeAt); }
                     EncounterInput.Scripted = Vector2.zero; yield return null; continue;
                 }
                 deadAt = -1;

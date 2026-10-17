@@ -3335,6 +3335,29 @@
       "exit": "walk"
     }
   ],
+  "checkpoints": [
+    {
+      "name": "The Overlook cairn",
+      "look": "cairn",
+      "cave": "The Sealed Adit",
+      "along": 369.0,
+      "aside": -3.6
+    },
+    {
+      "name": "The Gallery's east cairn",
+      "look": "cairn",
+      "cave": "The Singing Gallery",
+      "along": 210.0,
+      "aside": 26.0
+    },
+    {
+      "name": "The Rail Hall cairn",
+      "look": "cairn",
+      "cave": "The Deep Way",
+      "along": 168.0,
+      "aside": -5.0
+    }
+  ],
   "events": [
     {
       "id": "wake",

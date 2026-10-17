@@ -55,10 +55,13 @@ namespace Crulanda.Tests
             var cull = zone.GetComponent<DetailCull>(); Assert.IsNotNull(cull, "The Crown's detail has its culler.");
             Assert.Greater(cull.Count, 200, "The detail is cut into cells, each culled on its own.");
             var life = VillageLife.Active; Assert.IsNotNull(life);
-            var cam = Camera.main; Assert.IsNotNull(cam);
-            for (int i = 0; i < 20 + life.Villagers.Count / 12 * 2; i++) yield return null;
+            for (int i = 0; i < 10; i++) yield return null;
+            // A camera at the Gilt Approach, 3 m over the player's spawn: every cell and every figure measured from there this frame
+            // (the game measures a share a frame from the main camera, wherever the test's camera happens to be).
+            var eye = Start(zone) + Vector3.up * 3;
+            cull.Refresh(eye); life.RefreshFigures(eye);
             Assert.GreaterOrEqual(cull.Off, cull.Count / 2, "From the Gilt Approach at least half the city's detail cells are not drawn (" + cull.Off + " of " + cull.Count + ").");
-            var problems = new List<string>(); var eye = cam.transform.position;
+            var problems = new List<string>();
             foreach (var r in zone.GetComponentsInChildren<MeshRenderer>(true))
             {
                 if (!r.name.StartsWith("Detail ") || r.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.Off) continue;
@@ -67,7 +70,7 @@ namespace Crulanda.Tests
             int far = 0;
             foreach (var v in life.Villagers)
             {
-                if (v == null || !v.isActiveAndEnabled) continue;
+                if (v == null || !v.gameObject.activeInHierarchy) continue;
                 float d = Vector3.Distance(v.transform.position, eye);
                 if (d > VillageLife.FigureDrawReach + 4 && v.LodLevel != 2) problems.Add(v.Name + " is drawn " + d.ToString("0") + " m off");
                 if (d > VillageLife.FigureDrawReach + 4) far++;

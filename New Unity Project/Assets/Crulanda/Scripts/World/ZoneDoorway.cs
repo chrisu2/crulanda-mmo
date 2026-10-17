@@ -57,8 +57,17 @@ namespace Crulanda.World
         public Vector3 QueueSpot(bool goingIn, int place)
         {
             var back = goingIn ? -inward : inward;
-            return Entry(goingIn) + back * (WaitOff + WaitStep * Mathf.Max(0, place)) + across * Side(goingIn) * .6f;
+            float turn = goingIn ? inTurn : outTurn, aside = goingIn ? inAside : outAside;
+            if (turn != 0) back = Quaternion.AngleAxis(turn * Side(goingIn), Vector3.up) * back;
+            return Entry(goingIn) + back * (WaitOff + WaitStep * Mathf.Max(0, place)) + across * Side(goingIn) * aside;
         }
+        /// <summary>
+        /// Each line's set (2026-10-17, Chris: "people stuck getting into inn"; the Golden Cask's first places in line stood in the
+        /// porch post's hole in the navmesh): how far to its own side of the lane it stands (metres) and how far its line turns off
+        /// straight back (degrees, positive toward its own side). Straight back and 0.6 m aside unless the life fits them to the floor
+        /// round the door (VillageLife.FitDoorLines).
+        /// </summary>
+        public float inAside = .6f, outAside = .6f, inTurn, outTurn;
 
         /// <summary>
         /// Asks for the lane going this way: true when <paramref name="who"/> has it (it is free, they are first in line by rank and by how

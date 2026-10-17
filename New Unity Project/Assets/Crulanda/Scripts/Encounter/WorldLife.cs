@@ -78,7 +78,11 @@ namespace Crulanda.Encounter
                 worstScore = Mathf.Min(worstScore, score);
             }
             if (bestScore - worstScore < 3) return null;
-            return Quaternion.Euler(0, best * 360f / N, 0) * Vector3.forward;
+            // Then the clearest single way within 30 degrees of it (the nearer to it on a tie): the half-circle picks the side of the
+            // room, this the gap in it (2026-10-17, PostFacingPlayTests: a court apprentice faced a post 2.8 m off with open floor beside it).
+            int pick = best;
+            foreach (int k in new[] { 0, 1, -1, 2, -2 }) { int i = (best + k + N) % N; if (clear[i] > clear[pick] + .05f) pick = i; }
+            return Quaternion.Euler(0, pick * 360f / N, 0) * Vector3.forward;
         }
         /// <summary>How far one can see along the floor from a post at chest height (1.5 m) before a wall or a solid prop, up to <paramref name="reach"/>.</summary>
         public static float ClearRun(Vector3 feet, Vector3 dir, float reach = 6)
@@ -141,7 +145,7 @@ namespace Crulanda.Encounter
         {
             Session = session; Zone = session.Zone; Active = this;
             var z = Zone.Zone; rng = new System.Random(z.seed + 7);
-            FindPlaces(); MorningCask(); NameHouseholds();
+            FindPlaces(); FitDoorLines(); MorningCask(); NameHouseholds();
             if (Places["bench"].Count == 0) Places["bench"].AddRange(Places["dryhut"]);   // the alchemy bench: the herbalist's drying hut (2026-10-07; the Druid and Mage sims brew there)
             // Without households in the zone's data, villager i takes house i while houses last and the rest lodge at the inn.
             bool named = Households.Count > 0; var lodging = Zone.Doors.Find(d => d.kind == "rooms");
@@ -603,6 +607,8 @@ namespace Crulanda.Encounter
         /// </summary>
         public const float FigureShadowReach = 30, FigureDrawReach = 95;
         int lodNext;
+        /// <summary>Every figure's level set now for a camera at <paramref name="eye"/> (the tests).</summary>
+        public void RefreshFigures(Vector3 eye) { foreach (var v in Villagers) if (v != null) v.Lod(eye); }
         void FigureLod()
         {
             var cam = Camera.main; if (cam == null || Villagers.Count == 0) return;
@@ -743,6 +749,65 @@ namespace Crulanda.Encounter
             // seats, the workplaces) are exact and kept, and so is a resident's own post.
             if (!exact && !key.StartsWith("post:") && InDoorApron(hit.position)) return;
             Places[key].Add(hit.position);
+        }
+        /// <summary>
+        /// Each inn's two lines (going in, going out) fitted to the floor round its door (2026-10-17, Chris: "people stuck getting into
+        /// inn"; PostFacingPlayTests: the Golden Cask's first two places in line stood in its porch post's hole in the navmesh, the
+        /// Cracked Hearth's on the navmesh's edge): of the sets tried (0.6, 0.9, 0.3 and 1.2 m to the line's own side; straight back
+        /// or turned 20, 40 or 60 degrees either way), the first whose six places all stand on open floor with a straight way to the
+        /// lane's end (<see cref="DoorSpotProblem"/>), else the one with the most places good from the front of the line.
+        /// </summary>
+        void FitDoorLines()
+        {
+            if (Zone == null) return;
+            Physics.SyncTransforms();
+            var asides = new[] { .6f, .9f, .3f, 1.2f }; var turns = new[] { 0f, 20f, -20f, 40f, -40f, 60f, -60f };
+            foreach (var inn in Zone.Inns)
+            {
+                var way = inn != null && inn.door != null ? inn.door.Way : null; if (way == null) continue;
+                foreach (bool goingIn in new[] { true, false })
+                {
+                    int bestGood = -1; float bestAside = .6f, bestTurn = 0;
+                    foreach (float turn in turns)
+                    {
+                        foreach (float aside in asides)
+                        {
+                            if (goingIn) { way.inAside = aside; way.inTurn = turn; } else { way.outAside = aside; way.outTurn = turn; }
+                            int good = 0;
+                            while (good < DoorLinePlaces && DoorSpotProblem(way.QueueSpot(goingIn, good), way.Entry(goingIn)) == null) good++;
+                            if (good > bestGood) { bestGood = good; bestAside = aside; bestTurn = turn; }
+                            if (good == DoorLinePlaces) break;
+                        }
+                        if (bestGood == DoorLinePlaces) break;
+                    }
+                    if (goingIn) { way.inAside = bestAside; way.inTurn = bestTurn; } else { way.outAside = bestAside; way.outTurn = bestTurn; }
+                }
+            }
+        }
+        /// <summary>How many places in line a door's line is fitted for.</summary>
+        public const int DoorLinePlaces = 6;
+        /// <summary>
+        /// Why a place in a door's line is no place to wait (null when it is good): off the navmesh (nothing within 0.5 m), under 0.9 m
+        /// of floor round it (0.15 m from the navmesh's edge, which is already a body's half-width in from anything solid), the floor
+        /// to the lane's end broken, or something solid in a body's width (0.3 m) at 1 m up on the straight way there (the door's
+        /// own leaves, people and creatures aside).
+        /// </summary>
+        public static string DoorSpotProblem(Vector3 spot, Vector3 entry)
+        {
+            if (!NavMesh.SamplePosition(entry, out var eh, .5f, NavMesh.AllAreas)) return "the lane's end is off the navmesh";
+            if (!NavMesh.SamplePosition(spot, out var h, .5f, NavMesh.AllAreas)) return "off the navmesh";
+            if (NavMesh.FindClosestEdge(h.position, out var edge, NavMesh.AllAreas) && edge.distance < .15f) return "under 0.9 m of floor round it (" + edge.distance.ToString("0.00") + " m to the navmesh's edge)";
+            if (NavMesh.Raycast(h.position, eh.position, out var cut, NavMesh.AllAreas)) return "the floor to the lane's end is broken at " + cut.position;
+            var from = h.position + Vector3.up; var dir = eh.position + Vector3.up - from;
+            if (dir.sqrMagnitude < .01f) return null;
+            foreach (var hit in Physics.SphereCastAll(from, .3f, dir.normalized, dir.magnitude, ~0, QueryTriggerInteraction.Ignore))
+            {
+                var c = hit.collider; if (c is CharacterController || c.GetComponentInParent<Villager>() != null || c.GetComponentInParent<Crulanda.Gameplay.Actor>() != null) continue;
+                if (c.transform.parent != null && c.transform.parent.name.StartsWith("Door hinge")) continue;
+                if (hit.distance <= 0 && hit.point == Vector3.zero) continue;
+                return c.name + " stands between it and the lane's end";
+            }
+            return null;
         }
         /// <summary>Within an inn door's apron: 4.5 m either way of the door line and 1.5 m past each jamb (the lanes, the lines and the way up to them).</summary>
         public bool InDoorApron(Vector3 p)

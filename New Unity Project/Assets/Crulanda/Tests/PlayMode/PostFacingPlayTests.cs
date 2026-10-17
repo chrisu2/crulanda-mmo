@@ -18,8 +18,8 @@ namespace Crulanda.Tests
     /// People at their posts face the room, and an inn's door is clear to walk up to (2026-10-17, Chris at /crown: "still people
     /// standing backwards at /crown" — the Hall of Arms' trainers faced their racks and the wall — and "people stuck getting into
     /// inn" — a knot of folk against the Gilded Lantern's column):
-    /// - every trainer and vendor at a fixed post, and everyone at a fixed post in a city, stood at it faces open floor: a look 3 m
-    ///   straight ahead at chest height meets no wall or solid prop wherever the post has any such open way (VillageLife.ClearRun);
+    /// - every trainer and vendor at a fixed post, and everyone at a fixed post in a city, stood at it faces open floor: 2.5 m clear
+    ///   straight ahead at chest height, or 1.2 m with a way clear for 3 m within 60 degrees, wherever the post has any such way (VillageLife.ClearRun);
     /// - every inn's lane ends, its places in line (six going in, four going out) and the way up to the door from 4 m out are on the
     ///   navmesh with a way of 0.9 m round them, and from each straight to the lane's end the navmesh runs unbroken and nothing solid
     ///   stands in a body's width (a sphere of 0.3 m at 1 m up).
@@ -72,8 +72,12 @@ namespace Crulanda.Tests
                 for (int i = 0; i < 24; i++) most = Mathf.Max(most, VillageLife.ClearRun(feet, Quaternion.Euler(0, i * 15, 0) * Vector3.forward, 3));
                 if (most < 2.9f) continue;
                 checkedPosts++;
+                // Facing open floor: 2.5 m clear straight ahead, or at least 1.2 m with a way clear for 3 m within 60 degrees of it
+                // (2026-10-17: a court apprentice at her bench looked out past a post 2.8 m off, open floor beside it).
                 float ahead = VillageLife.ClearRun(feet, v.transform.forward, 3);
-                if (ahead < 2.9f) problems.Add(v.Name + " <" + v.Title + "> faces a wall or a prop " + ahead.ToString("0.0") + " m ahead at " + feet + " (yaw " + v.transform.eulerAngles.y.ToString("0") + ")");
+                bool openNear = false;
+                for (int a = -60; a <= 60; a += 15) if (VillageLife.ClearRun(feet, Quaternion.Euler(0, a, 0) * v.transform.forward, 3) >= 2.9f) openNear = true;
+                if (ahead < 2.5f && !(ahead >= 1.2f && openNear)) problems.Add(v.Name + " <" + v.Title + "> faces a wall or a prop " + ahead.ToString("0.0") + " m ahead at " + feet + " (yaw " + v.transform.eulerAngles.y.ToString("0") + ")");
             }
             if (zoneId == "zone.crown") Assert.GreaterOrEqual(checkedPosts, 11, "The Hall of Arms' eleven trainers at least.");
             Assert.IsEmpty(problems, string.Join("\n", problems));

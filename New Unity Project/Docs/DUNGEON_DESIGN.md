@@ -21,6 +21,7 @@
   times its length with chambers far wider and taller, and the new length is filled: more packs and patrols, more bosses and
   mini-bosses, events, side areas, secrets and things to use, not empty tunnel.
 - **The Adit rework (Chris, 2026-10-14, verbatim):** "i think adit dungeon need to be more complex like wow's wailing caves or the deadmine. adit is nothing like those". The plan (a web of wings at three heights round the Singing Gallery; design only, his four questions first) is in ADIT_REWORK.md.
+- **Not every dungeon a cave (Chris, 2026-10-16 ~20:10, verbatim):** "just fyi all dungeons don't have to be cave systems. just a note". So the later dungeons can be built places above ground or in the open (a town, a keep, a tower, a walled district, a ruin), not tunnels by default; Hallow's Creek (DUNGEON2_DESIGN.md) is a paused town in the open with cellars under it.
 
 ## 0.05 No machines (Chris, 2026-10-11, about 01:03, on the Rock-Eater: "more machines!!!!!  i told you NO Machines!")
 Nothing in the dungeon is a machine. Chris's choices (01:04, the question prompt):
@@ -40,7 +41,8 @@ Nothing in the dungeon is a machine. Chris's choices (01:04, the question prompt
 - The built halls: the kit's walls turned to face into the halls (they faced the rock), end walls back to back, the floor flags darkened.
 
 ## 0.07 The group runs Chris watched (2026-10-11, 16:50-18:00; PLAYTEST_NOTES 133-141; toolsalidation\group_run.ps1)
-A party of five led by a sim through the Adit at three times speed, on his screen, each run logged (`D:\crulanda-workun-captures`).
+A party of five led by a sim through the Adit at three times speed, on his screen, each run logged (`D:\crulanda-work
+un-captures`).
 What the runs settled:
 - **Pace:** with the scaling eased, the sims armoured and hitting like players, and no blow over 60% of a member's health, the 17:37
   run cleared 37 of 67 camps in 30 game-minutes (two deaths, both at the Gang-Boss), on course for about 55-60 minutes: the 60-75 minute

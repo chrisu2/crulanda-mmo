@@ -170,5 +170,53 @@ namespace Crulanda.Tests
             foreach (var p in added.Where(p => p.kind != "house")) Assert.AreEqual(Vector2.zero, p.size, p.name + " has no size.");
             Assert.IsEmpty(problems, string.Join("\n", problems));
         }
+
+        /// <summary>How far a trade's workshop reaches from its centre (its furthest built part, as ZoneBuilder builds it), for
+        /// the field check; zero for a prop that is no workshop.</summary>
+        static float WorkshopReach(ZoneProp p)
+        {
+            switch (p.kind)
+            {
+                // The vat's rim and the pile of pelts (about 3.1 m out along the frames).
+                case "tannery": return 3.3f;
+                // The stack's stakes, the chopping block and the scattered split wood.
+                case "woodpile": return 2.2f;
+                // The plinth, the peel and the fire's woodstack.
+                case "oven": return 2.8f;
+                // The smithy's footprint corner (ZoneBuilder.Footprint: 2.9 by 2.4).
+                case "forge": return 3.8f;
+                case "stall": return 2.5f;
+                case "leathershop": case "dryhut": case "kitchen": case "gamerack": return Reach(p);
+                default: return 0;
+            }
+        }
+
+        /// <summary>
+        /// No trade's workshop (the tannery yard, the woodyard, the bakehouse oven, a smithy, a stall, the leather shop, the drying
+        /// hut, the kitchen, the game rack) and no station of a zone's own (a field anvil, bench or cookfire) stands on a field, in
+        /// any zone: nothing of it reaches the ploughed ground or stubble, which ZoneBuilder paints a metre past the field's edge.
+        /// (Chris, 2026-10-17, "tools in the farmers field": Oakhaven's tannery yard stood in the West furrows.)
+        /// </summary>
+        [Test] public void No_workshop_or_station_stands_in_a_field()
+        {
+            var dir = Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Zones"); var problems = new List<string>(); int fields = 0;
+            foreach (var file in Directory.GetFiles(dir, "*.json"))
+            {
+                var z = JsonUtility.FromJson<ZoneDefinition>(File.ReadAllText(file));
+                if (z == null || z.fields == null) continue;
+                foreach (var f in z.fields.Where(f => f != null))
+                {
+                    fields++;
+                    // The paint's furrows and stubble fade out a metre past the field's edge (ZoneBuilder.PaintGround).
+                    const float paint = 1;
+                    foreach (var p in (z.props ?? new ZoneProp[0]).Where(p => p != null && WorkshopReach(p) > 0))
+                        if (ToField(p.at, f) < WorkshopReach(p) + paint) problems.Add(z.displayName + ": the " + p.kind + " '" + p.name + "' at " + p.at + " stands in the field '" + f.name + "'");
+                    foreach (var s in (z.stations ?? new ZoneStation[0]).Where(s => s != null))
+                        if (ToField(s.at, f) < 1.5f + paint) problems.Add(z.displayName + ": the " + s.kind + " '" + s.name + "' at " + s.at + " stands in the field '" + f.name + "'");
+                }
+            }
+            Assert.Greater(fields, 0, "Some zone has fields to check against.");
+            Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
     }
 }

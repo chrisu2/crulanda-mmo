@@ -27,8 +27,8 @@ namespace Crulanda.Tests
     ///   nodes array in the open (in no wood and on no field; a herb prop worked as a node stands where the zone always had it,
     ///   and on no field), a seam near a crag or rock or on a ridge's rocky crown.
     /// Every herb lies on the ground it grows from, nothing of it over a slope (EveryHerb_LiesOnTheGround).
-    /// And every zone's stations (step 9; CheckStations): the kinds it should have, each walkable to within reach on its side of its
-    /// walls (an inn's hearth from the taproom); its own (Oakhaven
+    /// And every zone's stations (step 9; CheckStations): the kinds it should have, each walkable to within reach on its side of its walls
+    /// (an inn's hearth from the taproom) and on no field; its own (Oakhaven
     /// has none) built where the data puts them, clear of water, buildings, roads, nodes, secrets and trunks, with no colliders.
     /// </summary>
     public class NodePlacementTests
@@ -266,6 +266,9 @@ namespace Crulanda.Tests
                     walked = NavReach.Walkable(start, hit.position);
                 }
                 if (!walked) problems.Add(q + "can't be walked to within reach from the start");
+                // Off the fields: no anvil, bench, oven or range stands on ploughed ground or stubble (the paint reaches a metre
+                // past a field's edge; Chris, 2026-10-17, "tools in the farmers field").
+                foreach (var f in z.fields) if (f != null && OutsideRect(new Vector2(st.position.x, st.position.z), f.center, f.size, f.rotation) < 1.5f) problems.Add(q + "stands in the field '" + f.name + "'");
             }
             var own = z.stations ?? new ZoneStation[0]; var container = zone.transform.Find("Zone stations");
             if (own.Length == 0) { if (container != null) problems.Add(zp + "builds stations it has none of"); return; }

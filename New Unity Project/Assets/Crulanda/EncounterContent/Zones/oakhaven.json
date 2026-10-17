@@ -1328,7 +1328,7 @@
       "name": "Thorne's bakehouse",
       "text": "The oven has not gone cold in forty years.",
       "at": {
-        "x": -35,
+        "x": -30.5,
         "y": -11
       },
       "radius": 6
@@ -1337,8 +1337,8 @@
       "name": "Tannery yard",
       "text": "Downwind of the village, for good reason.",
       "at": {
-        "x": -58,
-        "y": -16
+        "x": -23,
+        "y": -41
       },
       "radius": 6
     },
@@ -1346,8 +1346,8 @@
       "name": "Woodyard",
       "text": "Stacked for a winter that may come early.",
       "at": {
-        "x": -24,
-        "y": 60
+        "x": -40,
+        "y": 55
       },
       "radius": 6
     },
@@ -2707,7 +2707,7 @@
       "kind": "oven",
       "name": "Thorne's bakehouse",
       "at": {
-        "x": -35,
+        "x": -30.5,
         "y": -11
       },
       "rotation": 270
@@ -2716,8 +2716,8 @@
       "kind": "tannery",
       "name": "Tannery yard",
       "at": {
-        "x": -58,
-        "y": -16
+        "x": -23,
+        "y": -41
       },
       "rotation": 0
     },
@@ -2725,10 +2725,10 @@
       "kind": "woodpile",
       "name": "Woodyard",
       "at": {
-        "x": -24,
-        "y": 60
+        "x": -40,
+        "y": 55
       },
-      "rotation": 20
+      "rotation": 90
     },
     {
       "kind": "lamp",

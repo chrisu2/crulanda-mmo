@@ -19,8 +19,11 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed partial class EncounterSession
     {
-        /// <summary>How near (flat metres; and within three up or down) a party member comes to a checkpoint to reach it.</summary>
-        public const float CheckpointReach = 4;
+        /// <summary>How near (flat metres; and within three up or down) a party member comes to a checkpoint to reach it. Twelve, not four
+        /// (2026-10-17, hallows-5: the lamp at the lip stands 7 m off the Ash Road's middle, where the leader walks, so the party passed it
+        /// and nobody reached it until the bot ran back from the yard after the Fallen Mason; the Adit's cairns stand 10 to 13 m off the way
+        /// between their camps): a checkpoint is reached by walking past it on the way, as a player expects.</summary>
+        public const float CheckpointReach = 12;
         readonly HashSet<int> checkpointsReached = new HashSet<int>();
         readonly Dictionary<ZoneCheckpointSpot, Vector3> checkpointWake = new Dictionary<ZoneCheckpointSpot, Vector3>();
         float checkpointCheckAt;

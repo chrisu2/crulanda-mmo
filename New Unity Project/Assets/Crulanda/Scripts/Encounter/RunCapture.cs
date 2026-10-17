@@ -103,6 +103,10 @@ namespace Crulanda.Encounter
             Vector3 pathDest = Vector3.zero, blockFrom = s.Player.transform.position; float blockAt = Time.time, sideUntil = -1, sideSign = 1, hopAt = -1;
             var unreachable = new Dictionary<EncounterEnemy, float>(); var unreachableLogged = new HashSet<EncounterEnemy>(); string goalLabel = "the leader";
             var controller = s.Player.GetComponent<CharacterController>();
+            // Where the bot stood last frame (a jump of more than 15 m it did not make itself is logged), and since when it has been more than
+            // 60 m from the leader, and how far then (2026-10-17, hallows-5: 135 to 194 m from the party all through the Fallen Mason's fight,
+            // with nothing in the log).
+            var lastSeen = s.Player.transform.position; float farSince = -1, farFrom = 0; int setDown = 0;
             // (A dungeon's checkpoints, EncounterSession.Checkpoints) the ones reached so far on the log.
             int checkpointsLogged = 0;
             int botBuffed = -1, buffStops = 0; var simBuffed = new Dictionary<SimCompanion, int>();
@@ -111,6 +115,13 @@ namespace Crulanda.Encounter
             while (leader != null && leader.Dungeon != null && Time.realtimeSinceStartup - realStart < RealLimitSeconds)
             {
                 float t = Time.time - start; var me = s.Player.transform.position;
+                // Set down somewhere else by the game, not by the bot (the motor's fall out of the world puts you at the zone's start, the
+                // chasm's fog where you last stood): on the record, from where to where and what it was after.
+                if (s.Player.IsAlive && Vector3.Distance(me, lastSeen) > 15)
+                {
+                    setDown++;
+                    Log(Clock(t) + "  set down by the game at " + At(me) + ", " + Vector3.Distance(me, lastSeen).ToString("0") + " m from where it stood at " + At(lastSeen) + " going to " + goalLabel + (Vector3.Distance(me, s.RecoveryPoint) < 6 ? " (the zone's start: fallen out of the world?)" : ""));
+                }
                 // (Hallow's Creek) Falling into the chasm's fog twice in half a minute: the way the bot steers goes over a slab's edge, the fog
                 // puts it back on the lip, and it walks off again (hallows-1, 2026-10-16: four minutes of it after the far Table). The second
                 // time it is warped to beside the leader. Ten metres over the fog is under every slab: only a fall is down there.
@@ -189,7 +200,7 @@ namespace Crulanda.Encounter
                         Log(Clock(t) + "  you fell at " + leadingName + " (death " + deaths + "; " + s.Player.Health.Pool.Max + " health; the healer " + (healer == null ? "none" : healer.sim.name + " " + (healer.actor.IsAlive ? Vector3.Distance(healer.transform.position, me).ToString("0") + " m off, " + (healer.Activity ?? "").ToLower() : "dead")) + ")");
                     }
                     else if (Time.time - deadAt > 4) { s.Recover(); deadAt = -1; Log(Clock(t) + "  recovered at " + s.WokeAt); }
-                    EncounterInput.Scripted = Vector2.zero; yield return null; continue;
+                    EncounterInput.Scripted = Vector2.zero; lastSeen = s.Player.transform.position; yield return null; continue;
                 }
                 deadAt = -1;
                 // Fight what fights the party near you (letting the tank take the first blows: a mob is yours two and a half seconds after
@@ -248,6 +259,32 @@ namespace Crulanda.Encounter
                         }
                         lootUntil = Time.time + 1.5f;
                         if (corpse == body) corpse = null;
+                    }
+                }
+                // Far from the leader (more than 60 m): what the bot was at is dropped and it goes to the leader, as a player follows the group
+                // down; ten seconds on and not 25 m nearer, or no way there, it is warped beside the leader, with the reason on the record.
+                {
+                    float toLeader = Vector3.Distance(leader.transform.position, me);
+                    if (toLeader <= 60) farSince = -1;
+                    else
+                    {
+                        foe = null; corpse = null;
+                        if (farSince < 0) { farSince = Time.time; farFrom = toLeader; Log(Clock(t) + "  " + toLeader.ToString("0") + " m from the leader at " + At(me) + ": going to it"); }
+                        else if (Time.time - farSince > 10)
+                        {
+                            bool noWay = path == null || !pathOk || path.status != NavMeshPathStatus.PathComplete;
+                            if (noWay || farFrom - toLeader < 25)
+                            {
+                                string why = noWay ? "no way to it (the path " + (path == null ? "none" : pathOk ? path.status.ToString() : "failed") + ")" : "only " + (farFrom - toLeader).ToString("0") + " m nearer in ten seconds";
+                                if (NavMesh.SamplePosition(leader.transform.position - Vector3.up, out var byLeader, 3, NavMesh.AllAreas))
+                                {
+                                    motor.Teleport(byLeader.position + Vector3.up * 1.05f); warps++; repathNow = true; me = s.Player.transform.position;
+                                    Log(Clock(t) + "  " + toLeader.ToString("0") + " m from the leader for ten seconds, " + why + "; warped to the leader (" + warps + ")");
+                                }
+                                else Log(Clock(t) + "  " + toLeader.ToString("0") + " m from the leader for ten seconds, " + why + ", and no navmesh beside it to warp to");
+                            }
+                            farSince = Time.time; farFrom = Vector3.Distance(leader.transform.position, me);
+                        }
                     }
                 }
                 // A caster or an archer fights from range (2026-10-14: the bot walked every class into melee, so the Shaman's run was 14 a second).
@@ -382,6 +419,7 @@ namespace Crulanda.Encounter
                     stuckAt = Time.time; stuckFrom = me; hopsNow = sidestepsNow = 0;
                 }
                 if (Time.time >= nextShot) { nextShot = Time.time + ShotEvery; Shot(s, directory, Clock(t).Replace(':', 'm') + "-" + Slug(leadingName), ref shots, leader); }
+                lastSeen = s.Player.transform.position;
                 yield return null;
             }
             EncounterInput.Scripted = null; Time.timeScale = 1;
@@ -390,7 +428,7 @@ namespace Crulanda.Encounter
             if (!s.ScorecardOpen) s.ShowScorecard((s.Zone.Zone.displayName ?? s.ZoneId) + (done ? " cleared" : " so far"));
             yield return null; yield return null;
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, "99-scorecard.png")); yield return new WaitForSeconds(.6f);
-            Log(Clock(total) + "  " + (done ? "the run is done: every camp on it cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + "; holds the bosses put on the party: " + holds + "; buff-ups before bosses: " + buffStops + "; kerbs hopped: " + hops + "; side-steps round what stood in the way: " + sidesteps + "; bodies and mobs with no way to them: " + outOfReach + ".");
+            Log(Clock(total) + "  " + (done ? "the run is done: every camp on it cleared." : "stopped (the real-time limit): " + (camps - left) + " of " + camps + " camps cleared.") + " Mends seen: " + mends + "; bodies searched: " + looted + "; holds the bosses put on the party: " + holds + "; buff-ups before bosses: " + buffStops + "; kerbs hopped: " + hops + "; side-steps round what stood in the way: " + sidesteps + "; bodies and mobs with no way to them: " + outOfReach + "; set down elsewhere by the game: " + setDown + ".");
             Log("Loot taken: " + (lootTally.Count == 0 ? "nothing" : string.Join(", ", lootTally.Select(kv => kv.Key + (kv.Value > 1 ? " x" + kv.Value : "")))) + "; coin " + s.Progress.gold + ".");
             foreach (var line in s.Meter.Scorecard()) Log(line);
             Finish(s, directory, log, total, camps, camps - left, deaths, warps, done);

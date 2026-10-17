@@ -128,7 +128,9 @@ namespace Crulanda.Encounter
                 if (to.sqrMagnitude > .04f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(to), Time.deltaTime * 10);
             }
             var p = transform.position;
-            if (p.y < Crulanda.World.Hollow.Lowest && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);   // fell out of the world (a cave's deep floor is not that)
+            // Fell out of the world (a cave's deep floor is not that, nor a deck down in Hallow's Creek's chasm: ZoneBuilder.LowestFloor).
+            float lowest = zone != null ? zone.LowestFloor : Crulanda.World.Hollow.Lowest;
+            if (p.y < lowest && !(wet && p.y > surface - 12)) Teleport(session.RecoveryPoint);
         }
         /// <summary>How far below level the orbit goes (Chris, 2026-10-04: "camera should also have a up and down"): under the horizon the
         /// camera runs along the ground and tilts up at the sky, as in the classic MMOs. It was 12 degrees above level at the lowest.</summary>

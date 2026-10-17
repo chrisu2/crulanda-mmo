@@ -23,6 +23,24 @@ namespace Crulanda.World
     {
         /// <summary>The height open ground's heights are measured from: the land at the zone's start (the yard).</summary>
         public float Datum { get; private set; }
+        /// <summary>
+        /// How low anything may stand before it has fallen out of the world: five metres under the deepest floor there is, the caves'
+        /// (Hollow.Lowest), the open-ground decks' and the pits' (2026-10-17, hallows-5: Hollow.Lowest alone counted only the land and the
+        /// cellars, so standing on the Fallen Mason's slab, 13 m down in the chasm, set you back at the zone's start: the run's bot ran
+        /// back 200 m twice in that fight, and so would you).
+        /// </summary>
+        public float LowestFloor
+        {
+            get
+            {
+                float y = Hollow.Lowest;
+                if (Zone != null && Zone.pits != null) foreach (var p in Zone.pits) if (p != null) y = Mathf.Min(y, Datum - p.depth - 5);
+                foreach (var d in DeckSpots)
+                    if (d != null && d.cave == null && d.mid != null)
+                        foreach (var m in d.mid) y = Mathf.Min(y, m.y - 5);
+                return y;
+            }
+        }
         /// <summary>A strip of hazard ground as worked out: its data, its ends on the ground plane, its half width and the floor it lies on.</summary>
         public sealed class HazardSpot
         {

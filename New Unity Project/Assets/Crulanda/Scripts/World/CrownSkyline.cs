@@ -16,7 +16,10 @@ namespace Crulanda.World
         Material rock, stone, gold; float strength = 1;
         static readonly Color Slate = new Color(.3f, .32f, .36f), White = new Color(.93f, .91f, .86f), Gilt = new Color(.95f, .76f, .36f);
         /// <summary>How far past the zone's edge the mountain's foot stands, and how high its summit rises (metres).</summary>
-        public const float Beyond = 380, Summit = 210;
+        public const float Beyond = 380, Summit = 95;
+        // Summit 95 (was 210, 2026-10-16): at 210 the High City stood 20-30 degrees up, over the top of the frame, and only its towers'
+        // feet hung into view, faded at the base like roofs hanging upside down from the smog (Chris saw them as such); at 95 the mountain
+        // and the city sit on the north-east skyline, the spire some 19 degrees up.
         /// <summary>Its bearing from the zone's centre, degrees clockwise from north (the north-east sky).</summary>
         public const float Bearing = 38;
 
@@ -27,7 +30,9 @@ namespace Crulanda.World
             var c = go.AddComponent<CrownSkyline>();
             var dir = Quaternion.Euler(0, Bearing, 0) * Vector3.forward; var foot = dir * (half + Beyond);
             go.transform.localPosition = foot;
-            c.rock = Mat(shader, -30, Summit * .8f); c.stone = Mat(shader, Summit - 10, Summit + 50); c.gold = Mat(shader, Summit + 20, Summit + 110);
+            // The city and its gilt in their own colour top to bottom (faded at the foot they read as hanging from the sky); the smog's veil is
+            // the colours' blend toward the fog in LateUpdate.
+            c.rock = Mat(shader, -30, Summit * .8f); c.stone = Mat(shader, Summit - 120, Summit - 20); c.gold = Mat(shader, Summit - 120, Summit);
             Show(go.transform, Mountain(zone != null ? zone.seed : 1), c.rock, "The mountain");
             // The High City on the summit: a ring of wall with square towers, the halls inside, a dome and the gilt spire at the middle.
             var box = ZoneMeshes.Box(Vector3.one, 2); var cone = ZoneMeshes.Cone(1, 1, 8); var walls = new List<CombineInstance>(); var gilt = new List<CombineInstance>();

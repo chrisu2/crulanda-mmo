@@ -521,3 +521,23 @@ reach.
 **What the meter should show in the next run at 17-20** (not yet measured): the Rogue about 82 x 0.8 of its time in reach, about 66;
 the Ranger with its wolf about 82 x 0.88, about 72; you, the Judicator, about 64 (90% of them, as Chris chose). To run: the Hallow's
 Creek group run at 17 and an Adit run at 11.
+
+**The first Unity run of `SimDummyTests` (2026-10-17 18:34).** The level-11 Rogue landed 46.5 a second and the Mage 46.4, against an aim
+of 51.5. The cause was the test, not the sims: its dummy was an Oakhaven mob with that mob's armour, which took about a tenth off every blow
+(`Combatant.Damage`, CombatMath). The band is measured on the harness's dummies, which have no armour, so the test's dummy now matches
+them: level 15 and armour 0 (`BalanceHarness.DummyLevel`, `DummyArmour`). In real fights armour takes the same share from the sims as from
+you. The last-mob test's killing blow (the mob's health plus 10) was cut by the same armour and left it standing. It now strikes for far
+more than the mob's health.
+
+**The Shaman's staff swings (commit 7dfd6f7e, `ShamanKit.MeleeAutoAttacks` true; Chris: "shaman still had no auto attack").** Its
+numbers do not move, in the harness or in play:
+- No Shaman ability calls `EncounterSession.BeginAutoAttack`, and nothing else in the game does for any class (no key, no click). A
+  class swings only once one of its kit's own blows starts it (the Warrior's, the Rogue's, the Paladin's...).
+- So the Shaman still never swings, and the HUD's swing line will say "Auto attack: use a melee ability". Chris's "no auto attack" is
+  probably still true in his build.
+- If a Shaman ability is made to start it: a swing is `WeaponDamage` (attack power) every 2.6 s, and it carries the build's whole damage
+  scale (`DamageScaleFor`: Stormcaller 1.87, Stonebound 2.45, Gravewind 2.5). Those scales were tuned on spells alone.
+- At 15, with an attack power of about 50, Stormcaller in melee would gain about 36 a second over its 62, and Stonebound would likely pass
+  the tank cap.
+- Then either the swing goes unscaled for the Shaman, or the harness runs the Shaman again and its scales come down. No change is made
+  until it swings.

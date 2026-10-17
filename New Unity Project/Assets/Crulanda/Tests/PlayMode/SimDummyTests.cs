@@ -73,6 +73,9 @@ namespace Crulanda.Tests
             var e = session.Enemies.Where(x => x != null && x.actor.IsAlive && !x.Game && !x.Hidden && !x.Elite && x.Inside == null)
                 .OrderBy(x => x.transform.position.sqrMagnitude).First();
             e.enabled = false; var ag = e.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (ag != null && ag.isOnNavMesh) ag.isStopped = true;
+            // No armour, as the balance harness's dummies (BalanceHarness.Dummy): the band is measured on them. An Oakhaven mob's armour
+            // took about a tenth off every blow (the first Unity run, 2026-10-17: the level-11 Rogue 46.5 and Mage 46.4 against an aim of 51.5).
+            e.actor.SetLevel(BalanceHarness.DummyLevel); e.actor.Stats.SetBase(Crulanda.Core.StatType.Armor, BalanceHarness.DummyArmour);
             e.actor.Health.Pool.SetMax(5000000, false); e.actor.Health.Pool.SetCurrent(5000000);
             // Nothing else near it: no other mob joins, no splash lands elsewhere.
             foreach (var o in session.Enemies)
@@ -184,7 +187,8 @@ namespace Crulanda.Tests
             b.RaidMarked = RaidMark.Moon; Assert.IsNull(b.Apply("incap", session.Player, 20), "held"); yield return null;
             Assert.AreNotEqual(b, c.Quarry, "while another is free, the held one waits");
             Assert.AreEqual(a, c.Quarry, "the free one is fought");
-            a.Receive(a.actor.Health.Pool.Current + 10, session.Player); yield return null;
+            // Far over its health: its armour takes a share of any blow (the first Unity run: a blow of its health and ten left it standing).
+            a.Receive(a.actor.Health.Pool.Max * 100, session.Player); yield return null;
             Assert.IsFalse(a.actor.IsAlive, "the free one falls");
             Assert.IsTrue(b.FightingParty, "the held one is still on the party");
             EncounterEnemy q = null; for (float t = 0; t < 3 && q != b; t += Time.deltaTime) { q = c.Quarry; yield return null; }

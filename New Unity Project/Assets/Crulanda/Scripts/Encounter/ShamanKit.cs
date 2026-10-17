@@ -223,7 +223,8 @@ namespace Crulanda.Encounter
             if (R("sb-mountain") > 0 && !mountainSpent && victim == s.Player && victim.Health.Pool.Ratio < .3f) { mountainSpent = true; PlayerCombat.AddBarrier(Mathf.RoundToInt(victim.Health.Pool.Max * .3f), 8); }
             return dealt;
         }
-        public override bool MeleeAutoAttacks { get { return false; } }
+        // The Shaman swings its staff between calls (Chris, 2026-10-17: "shaman still had no auto attack"); its Stonebound path tanks in melee.
+        public override bool MeleeAutoAttacks { get { return true; } }
 
         // ---------- per frame / lifecycle ----------
         // The Squall's charge fades six seconds after the fight ends, not at once (2026-10-13, the balance harness: against dummies that do

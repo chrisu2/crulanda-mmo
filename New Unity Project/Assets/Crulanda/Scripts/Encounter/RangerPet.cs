@@ -69,7 +69,10 @@ namespace Crulanda.Encounter
             int max = Mathf.RoundToInt(baseHealth * kit.PetHealthScale);
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, max);
         }
-        public int Bite { get { return Mathf.Max(1, Mathf.RoundToInt((6 + 2 * Mathf.Max(1, session.Progress.Level)) * kit.PetBiteScale)); } }
+        /// <summary>Its bite: its keeper's level's (a sim's wolf goes by the sim's level, 2026-10-17: it went by yours) and its keeper's talents.</summary>
+        public int Bite { get { return BiteAt(Master != null && Master.sim != null ? Master.sim.level : session.Progress.Level, kit.PetBiteScale); } }
+        /// <summary>A wolf's bite at a keeper's level and bite scale (SimCompanion.PetDps counts it in its keeper's damage).</summary>
+        public static int BiteAt(int level, float scale) { return Mathf.Max(1, Mathf.RoundToInt((6 + 2 * Mathf.Max(1, level)) * scale)); }
         /// <summary>Sent at a target; its first bite lands <paramref name="firstBite"/> times as hard (Sic).</summary>
         public void Hunt(EncounterEnemy target, float firstBite)
         {

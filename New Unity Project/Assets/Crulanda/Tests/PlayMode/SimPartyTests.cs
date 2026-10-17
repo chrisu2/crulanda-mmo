@@ -352,7 +352,10 @@ namespace Crulanda.Tests
             e.Receive(1, session.Player);
             float t = 0; while (t < 3 && e.GroupShares <= 0) { t += Time.deltaTime; yield return null; }
             Assert.AreEqual(shares, e.GroupShares, 1e-3f, "scaled when the fight starts");
-            Assert.AreEqual(Mathf.Round(alone * (1 + EncounterEnemy.HealthPerShare * shares)), e.actor.Health.Pool.Max, 1, "health grows by the shares");
+            // A damage-part sim weighs a little more on the mob's health (EncounterEnemy.DamagePartHealth, 2026-10-17).
+            float healthShares = EncounterEnemy.HealthSharesFor(session, mobLevel);
+            Assert.GreaterOrEqual(healthShares, shares - 1e-4f, "never under the shares");
+            Assert.AreEqual(Mathf.Round(alone * (1 + EncounterEnemy.HealthPerShare * healthShares)), e.actor.Health.Pool.Max, 1, "health grows by the shares");
             StringAssert.Contains("group of " + (3 + (mira > 0 ? 1 : 0)), e.GroupNote);
             e.ResetFight();
             Assert.AreEqual(alone, e.actor.Health.Pool.Max, "and is itself again when the fight resets");

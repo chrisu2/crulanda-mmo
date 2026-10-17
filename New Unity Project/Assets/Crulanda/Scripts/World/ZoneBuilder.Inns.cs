@@ -58,11 +58,12 @@ namespace Crulanda.World
         /// the tests alike. A tavern (variants 0 and 1): the bar along the back wall from the -x end with two stools before it and the
         /// innkeeper's place at its open end, the rooms door past it, the hearth on the +x end with its bench and woodpile, five
         /// tables of three seats kept off the doorway (its leaves swing in 1.3 m and the lane's line waits inside it). A waystation
-        /// (variant 2): one long table down the room with a bench either side, bunks along the back wall, the hearth on the +x end.
+        /// (variant 2): one long table down the room with a bench either side, bunks along the back wall, the hearth on the +x end. The
+        /// Crown's city inn is variant 3 (<see cref="City"/>), the Lowtowns' Rusty Spoon variant 4 (<see cref="Spoon"/>).
         /// </summary>
         public sealed class InnPlan
         {
-            public float w, d, doorW, doorH, wall = .3f; public bool waystation, city;
+            public float w, d, doorW, doorH, wall = .3f; public bool waystation, city, spoon;
             /// <summary>Tavern: the bar's middle and size (x along it, y its depth), the innkeeper's place, the rooms door's x.</summary>
             public Vector2 bar, barSize, stand; public float roomsX;
             /// <summary>The hearth's footprint (middle, size), its fire (the light, and a station), and the bench before it.</summary>
@@ -83,6 +84,10 @@ namespace Crulanda.World
             /// <summary>The kitchen's places before the range (the cook's first), each a metre or more from the next.</summary>
             public readonly List<Vector2> kitchen = new List<Vector2>();
             public const float ColumnRadius = .35f;
+            /// <summary>The Rusty Spoon (variant 4): the board walls of its back room (middle, half size), the room behind them, and which
+            /// table is the dice pit (the first) and which the back room's card table (the last).</summary>
+            public readonly List<(Vector2 at, Vector2 half)> partitions = new List<(Vector2, Vector2)>();
+            public Rect backRoom;
             /// <summary>Half the room inside the walls.</summary>
             public Vector2 Inner { get { return new Vector2(w / 2 - wall / 2, d / 2 - wall / 2); } }
             /// <summary>The gap between the jambs' colliders, and the navmesh's walkable width through it.</summary>
@@ -95,6 +100,7 @@ namespace Crulanda.World
             public static InnPlan For(Vector2 size, int variant, float doorW = InnDoorW)
             {
                 if (variant == 3) return City(size);
+                if (variant == SpoonVariant) return Spoon(size);
                 var p = new InnPlan { w = size.x, d = size.y, doorW = doorW, waystation = variant == 2 };
                 float w = p.w, d = p.d;
                 if (p.waystation)
@@ -188,6 +194,47 @@ namespace Crulanda.World
                 p.serve.Add(new Vector2(-1.6f, 3.4f)); p.serve.Add(new Vector2(1.4f, -.6f)); p.serve.Add(new Vector2(-2.6f, -4.4f));
                 return p;
             }
+            /// <summary>
+            /// The Rusty Spoon (variant 4; GAME-ONLY, p9-spoon; Chris, 2026-10-16: "same damn inn in the lowlands as well. each zone has to
+            /// be unique not reused assets"): a low taproom in an old brick warehouse. The long scarred bar down the -x end (not the back
+            /// wall), its back a metre off the wall for the casks (no way behind it: too narrow for the navmesh, so no pocket), four stools
+            /// before it, Mother Sall at its open back end, the rooms door past her; the dice pit in the middle of the floor straight in from
+            /// the door (four places round it); five mismatched tables of three; the hearth on the +x end with its bench; and the back room
+            /// for the high-stakes games walled off in boards in the +x back corner, entered by a curtained opening 2.4 m wide, its card
+            /// table of four. Laid out for 14 x 10 (the tests measure it: InnLayoutTests, the way of 0.9 m from every place to the door).
+            /// </summary>
+            static InnPlan Spoon(Vector2 size)
+            {
+                var p = new InnPlan { w = size.x, d = size.y, doorW = InnDoorW, doorH = InnDoorH, spoon = true };
+                float hx = p.w / 2 - p.wall / 2, hz = p.d / 2 - p.wall / 2;
+                // The bar along the -x end, 5 m long, a metre off the wall; the keeper past its back end, the rooms door beyond her.
+                p.bar = new Vector2(-hx + 1.4f, -.1f); p.barSize = new Vector2(.8f, 5);
+                p.stand = new Vector2(-hx + 1.35f, hz - 1.25f); p.roomsX = -3.4f;
+                foreach (float z in new[] { -1.8f, -.6f, .6f, 1.8f }) p.stools.Add((new Vector2(p.bar.x + p.barSize.x / 2 + 1, z), new Vector2(p.bar.x, z)));
+                // The hearth on the +x end toward the front, its bench before it, the woodpile in the front corner.
+                p.hearth = new Vector2(hx - .45f, -2.6f); p.hearthSize = new Vector2(.9f, 2); p.fire = new Vector2(hx - 1.25f, -2.6f);
+                p.bench = new Vector2(hx - 2.05f, -2.6f); p.woodpile = new Vector2(hx - .55f, -hz + .6f);
+                foreach (float z in new[] { -3.1f, -2.1f }) p.benchSeats.Add((new Vector2(hx - 2.15f, z), new Vector2(p.hearth.x, z)));
+                // The back room: a board wall along x = 2.6 from z = .6 to the back, and along z = .6 to the +x end, open from 3 to 5.4.
+                const float front = .6f, side = 2.6f, openA = 3, openB = 5.4f, half = .075f;
+                p.partitions.Add((new Vector2(side, (front + hz) / 2), new Vector2(half, (hz - front) / 2)));
+                p.partitions.Add((new Vector2((side + half + .01f + openA) / 2, front), new Vector2((openA - side - half - .01f) / 2, half)));
+                p.partitions.Add((new Vector2((openB + hx) / 2, front), new Vector2((hx - openB) / 2, half)));
+                p.backRoom = Rect.MinMaxRect(side + half, front + half, hx, hz);
+                // The tables: the dice pit first (four places round it, on its axes), five of three (mismatched chairs), the card table last.
+                void Table(Vector2 at, float from, int n)
+                {
+                    p.tables.Add(at); p.turns.Add(from);
+                    for (int k = 0; k < n; k++) { float a = (from + k * 360f / n) * Mathf.Deg2Rad; p.seats.Add((at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * SeatRadius, at)); }
+                }
+                Table(new Vector2(.2f, -.6f), 0, 4);
+                Table(new Vector2(-2.9f, -3.6f), 90, 3); Table(new Vector2(3.2f, -3.5f), 90, 3); Table(new Vector2(-2.4f, 2.9f), 30, 3);
+                Table(new Vector2(.9f, 2.9f), 90, 3); Table(new Vector2(-2.6f, -.6f), 90, 3);
+                Table(new Vector2(4.75f, 2.85f), 0, 4);
+                return p;
+            }
+            /// <summary>The Spoon's inn variant (ZoneProp.variant of "inn").</summary>
+            public const int SpoonVariant = 4;
             /// <summary>What stands on the floor, each as a box (middle, half size) in the room's frame: the bar, the hearth, the tables,
             /// the long table and the bunks, and in a city inn its columns, its stair and its range (the tests keep the seats and each
             /// other clear of them).</summary>
@@ -202,6 +249,7 @@ namespace Crulanda.World
                 for (int i = 0; i < columns.Count; i++) list.Add(("column " + (i + 1), columns[i], Vector2.one * ColumnRadius));
                 if (stairSize.x > 0) list.Add(("the stair", stair, stairSize / 2));
                 if (rangeSize.x > 0) list.Add(("the range", range, rangeSize / 2));
+                for (int i = 0; i < partitions.Count; i++) list.Add(("the back room's wall " + (i + 1), partitions[i].at, partitions[i].half));
                 return list;
             }
         }

@@ -160,7 +160,8 @@ prop("board", "Notice board", -178, -6, 180, interact="Read the notices", canonS
 prop("cobbles", "The Gate Ward square", -184, 2, 90, (18, 30))
 
 # ---- The Rusty Spoon (CANON, book1 ch.1:9) ----
-prop("inn", "The Rusty Spoon", -125, 18, 0, (14, 10), solid=(15.6, 11.6))
+# Inn variant 4: the Spoon's own building (ZoneBuilder.Spoon.cs; Chris 2026-10-16: "each zone has to be unique not reused assets").
+prop("inn", "The Rusty Spoon", -125, 18, 0, (14, 10), variant=4, solid=(15.6, 11.6))
 prop("kitchen", "The Spoon's kitchen", -121.4, 24.65, 180, solid=(5.6, 3.6), check=False)
 keep(-125, 9, 6)
 prop("lane_lamp", None, -133, 11.5, 0, variant=1); prop("lane_lamp", None, -117, 11.5, 0, variant=1)

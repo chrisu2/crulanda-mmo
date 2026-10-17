@@ -337,14 +337,17 @@ namespace Crulanda.World
         {
             float w = KitchenSize.x, d = KitchenSize.y; const float wallTop = 2.5f, slope = .2794f, pitch = 15.6f;   // the roof drops .95 m over 3.4 m
             var dark = Tint(art.timber, new Color(.26f, .17f, .11f)); var boards = Tint(art.timber, new Color(.4f, .28f, .18f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f));
+            // In the Lowtowns (the Rusty Spoon's): a lean-to of tarred timber with a soot-brick end wall, roofed in tarred boards.
+            bool low = Zone.biome == "lowtowns"; var endWall = low ? SootBrick(2) : Masonry; var roof = low ? TarredTimber : art.slate;
+            if (low) { dark = TarredTimber; boards = Tint(art.timber, new Color(.17f, .14f, .12f)); }
             float Under(float z) { return 2.863f + (z + .2f) * slope; }   // the roof slab's underside over local z
             float drop = FootDrop(t, w + .3f, d + .3f);
             BoxPart(t, new Vector3(.2f, .02f, .05f), new Vector3(w - .5f, .05f, d - .2f), Tint(Masonry, new Color(.62f, .6f, .56f)), null, 1.2f);   // flagged floor
             // The stone end wall, boarded from its top up to the roof; the roof on a ledger along the inn's wall, five rafters
             // and a beam carried by the end wall and one post.
-            BoxPart(t, new Vector3(-w / 2 + .175f, (wallTop - drop) / 2, .05f), new Vector3(.35f, wallTop + drop, d - .1f), Masonry, null, 1.5f);
+            BoxPart(t, new Vector3(-w / 2 + .175f, (wallTop - drop) / 2, .05f), new Vector3(.35f, wallTop + drop, d - .1f), endWall, null, 1.5f);
             MeshPart(PropMesh("Kitchen gable", () => Cutout(new[] { new Vector2(-1.45f, wallTop), new Vector2(1.5f, wallTop), new Vector2(1.5f, 3.34f), new Vector2(-1.45f, 2.52f) }, .12f)), t, new Vector3(-w / 2 + .175f, 0, 0), boards, Quaternion.Euler(0, -90, 0));
-            BoxPart(t, new Vector3(.1f, 2.925f, -.2f), new Vector3(w + .8f, .12f, 3.53f), art.slate, Quaternion.Euler(-pitch, 0, 0), 2.5f);
+            BoxPart(t, new Vector3(.1f, 2.925f, -.2f), new Vector3(w + .8f, .12f, 3.53f), roof, Quaternion.Euler(-pitch, 0, 0), 2.5f);
             Part(PrimitiveType.Cube, t, new Vector3(.1f, 3.3f, d / 2 - .06f), new Vector3(w + .6f, .14f, .12f), dark);
             foreach (float x in new[] { -1.6f, -.6f, .4f, 1.4f, 2.35f }) Bar(t, new Vector3(x, Under(1.42f) - .06f, 1.42f), new Vector3(x, Under(-1.7f) - .06f, -1.7f), .12f, .08f, dark);
             Part(PrimitiveType.Cube, t, new Vector3(.1f, 2.38f, -1.4f), new Vector3(w - .1f, .16f, .16f), art.timber);

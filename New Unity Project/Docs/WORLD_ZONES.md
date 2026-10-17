@@ -4,6 +4,8 @@ Status 2026-09-28. The game opens in **Oakhaven** (`Assets/Crulanda/Scenes/Oakha
 (`PlayableEncounter.unity`) stays in the build as the automated test map.
 
 ## How a zone is made
+
+- **Every zone its own (Chris, 2026-10-16 ~23:00, verbatim):** "same damn inn in the lowlands as well. each zone has to be unique not reused assets" (the Lowtowns' Rusty Spoon was the shared inn shell; earlier the same day, of the castle: "dont need the same exact inn in the castle. needs a redesign"). So no building, inn or set piece is reused from one zone to another: each zone's inns, houses and landmarks get their own design, layout and dressing; shared code may build them, but what the player sees must differ.
 - A zone is a JSON file in `Assets/Crulanda/EncounterContent/Zones/` (format: `Scripts/World/ZoneDefinition.cs`).
   Metres, x = east, z = north, origin at the zone centre. Everything is text, so zones can be authored and diffed like talents.
 - `ZoneBuilder` (runs first, execution order -800) generates at load:

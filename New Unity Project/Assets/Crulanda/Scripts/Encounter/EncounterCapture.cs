@@ -1191,6 +1191,11 @@ namespace Crulanda.Encounter
             lines.Add("COUNT enabled renderers " + visible + ", distinct materials " + mats.Count);
             var top = new List<KeyValuePair<string, int>>(groups); top.Sort((x, y) => y.Value.CompareTo(x.Value));
             for (int i = 0; i < top.Count && i < 15; i++) lines.Add("GROUP " + top[i].Key + " " + top[i].Value);
+            // What stands high over the zone's ground (the Lowtowns' sky showed upside-down roofs, 2026-10-16): every renderer whose
+            // lowest point is 25 m up or more, by name and height, so a stray backdrop or skyline piece can be named from the file.
+            foreach (var hr in UnityEngine.Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+                if (hr != null && hr.enabled && hr.bounds.min.y > 25 && !(hr is ParticleSystemRenderer))
+                    lines.Add("HIGH " + hr.name + " (" + (hr.transform.parent != null ? hr.transform.parent.name : "") + ") y " + hr.bounds.min.y.ToString("0") + ".." + hr.bounds.max.y.ToString("0") + " at " + hr.bounds.center.x.ToString("0") + "," + hr.bounds.center.z.ToString("0") + " scale " + hr.transform.lossyScale.ToString("0.0"));
             File.WriteAllLines(Path.Combine(directory, zone.Zone.id.Replace("zone.", "") + "-perf.txt"), lines);
             Application.targetFrameRate = 60;
         }

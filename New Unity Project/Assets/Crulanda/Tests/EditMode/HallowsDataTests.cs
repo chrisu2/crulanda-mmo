@@ -332,6 +332,14 @@ namespace Crulanda.Tests
             var vowell = EliteMoves.For(EncounterSession.ExaminerName, false); var upcott = EliteMoves.For("Assessor Piers Upcott", false);
             Assert.AreEqual("stone", vowell.ccLook, "the Examiner's hour is the pause"); Assert.AreEqual("stone", upcott.ccLook, "and the Assessor's mark");
             Assert.Greater(vowell.ccWarn, vowell.ccSeconds, "warned by the bell's hum, longer than the pause lasts (section 4.3)");
+            // The hour can be got clear of on the belfry floor (hallows-6, 2026-10-17: at 8 m no part of the 7.8 m floor was clear and it held
+            // the whole party every time): a corner of the floor lies a metre and more past the ring round where he stands.
+            var floor = zone.decks.Single(d => d.name == "The belfry floor"); var home = zone.camps.Single(c => c.mob == EncounterSession.ExaminerName).center;
+            float far = 0;
+            foreach (var x in new[] { floor.at.x - floor.width / 2, floor.at.x + floor.width / 2 })
+                foreach (var y in new[] { floor.at.y, floor.at2.y }) far = Mathf.Max(far, Vector2.Distance(home, new Vector2(x, y)));
+            Assert.Greater(far, vowell.ccReach + 1, "a healer or an archer can step clear of the hour on the belfry floor");
+            Assert.Less(vowell.ccReach, floor.width, "and the hour still reaches past the melee");
             Assert.Greater(EliteMoves.For("The Long Shadow", false).ccWarn, 0, "the Long Shadow's minute is telegraphed");
         }
 

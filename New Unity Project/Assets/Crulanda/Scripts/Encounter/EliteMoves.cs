@@ -241,7 +241,10 @@ namespace Crulanda.Encounter
                 cc = "root", ccName = "Form the line", ccSeconds = 3, ccEvery = 15, ccReach = 4, ccText = "\"Form the line!\" Kersey's halberd hooks your legs from under you.",
                 call = "Kersey calls up the tower: \"Line! Down the stair!\"", callShort = "Line!", enrage = "Kersey plants the halberd and draws her sword." },
             new EliteMove { mob = "Bureau Examiner Thurstan Vowell", name = "The Seal", boss = true, health = BossHealth, hit = BossHit, windup = 2.2f, blow = 4, reach = 3.8f, every = 12, callReach = 12, callMost = 2,
-                cc = "stun", ccName = "The hour", ccSeconds = 3, ccEvery = 18, ccReach = 8, ccText = "The bell hums under the Examiner's hand and the hour comes for you: stone, where you stand.",
+                // The hour's ring 5 m, not 8 (hallows-6, 2026-10-17): the belfry floor is 7.8 m square and no part of it lies 8 m from where he
+                // stands, so "get clear of him" could not be done and the hour held all five, the Druid with them, 3 s of every 18 for three
+                // wiped pulls; at 5 the floor's far side is clear for a healer or an archer, and the tank and the melee still stand in it.
+                cc = "stun", ccName = "The hour", ccSeconds = 3, ccEvery = 18, ccReach = 5, ccText = "The bell hums under the Examiner's hand and the hour comes for you: stone, where you stand.",
                 ccWarn = 3.2f, ccWarnText = "The great bell begins to hum under the Examiner's hand. Get clear of him before the hour comes.", ccLook = "stone",
                 phases = new[] { new BossPhase { at = .5f, kind = "event", camp = "waking", text = "Vowell takes hold of the bell rope. \"It is nearly noon,\" he says. \"It is always nearly noon.\"" } },
                 call = "Vowell: \"Clerks. Take their names.\"", callShort = "Take their names", enrageAt = .35f, enrageHaste = .6f, enrage = "Vowell lets go of the rope. The bell goes on ringing without him." },

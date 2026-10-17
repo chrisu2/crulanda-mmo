@@ -131,6 +131,39 @@ namespace Crulanda.Encounter
             return near;
         }
         public float Reach { get { return Melee ? 2.4f : 20; } }
+        /// <summary>How far past a warned hold's ring a sim stepping clear makes for, and the least it takes as clear (metres).</summary>
+        public const float HoldClearTo = 1.5f, HoldClearLeast = .4f;
+        /// <summary>
+        /// A healer's or an archer's step out of a warned hold (EliteMove.ccWarn, round an elite out to its ccReach) while the warning runs:
+        /// true while it is inside one and on its way out. It makes for the ring's edge and a little past, straight away from the elite or
+        /// turned up to 120 degrees either way, on its own floor (the navmesh within 1.5 m of its height); with nowhere clear it stays.
+        /// </summary>
+        bool StepClearOfHold()
+        {
+            EncounterEnemy ring = null; float deepest = 0;
+            foreach (var e in session.Enemies)
+            {
+                if (e == null || e.actor == null || !e.actor.IsAlive || !e.HoldWarning || e.Move == null || e.Move.ccReach <= 0) continue;
+                float into = e.Move.ccReach + HoldClearLeast - Vector3.Distance(transform.position, e.transform.position);
+                if (into > deepest) { deepest = into; ring = e; }
+            }
+            if (ring == null) return false;
+            var from = ring.transform.position; var away = transform.position - from; away.y = 0;
+            away = away.sqrMagnitude > .01f ? away.normalized : -transform.forward;
+            float edge = ring.Move.ccReach + HoldClearLeast, aim = ring.Move.ccReach + HoldClearTo;
+            foreach (float turn in new[] { 0f, 35f, -35f, 70f, -70f, 105f, -105f, 120f, -120f })
+            {
+                var to = from + Quaternion.Euler(0, turn, 0) * away * aim; to.y = transform.position.y;
+                if (!NavMesh.SamplePosition(to, out var hit, 1.5f, NavMesh.AllAreas)) continue;
+                var flat = hit.position - from; flat.y = 0;
+                if (flat.magnitude < edge) continue;
+                agent.isStopped = false; agent.speed = 5.2f; agent.SetDestination(hit.position);
+                if (visual != null) visual.Casting = false;
+                Activity = "Stepping clear of " + (ring.Move.ccName ?? ring.Move.cc);
+                return true;
+            }
+            return false;
+        }
         public float Interval { get { return Melee ? 2.0f : 2.4f; } }
         /// <summary>A sim's blow: a player's of its level, near enough (2026-10-11, the group run's meter: sims at 8-15 a second against you at 30,
         /// "still low for most"; they hit (6 + 2.4 a level) before, 40% of a player's).</summary>
@@ -731,6 +764,11 @@ namespace Crulanda.Encounter
             }
             if (!agent.isOnNavMesh) return;
             if (!session.InCombat && Time.time >= nextRegen) { nextRegen = Time.time + 1; actor.Health.ApplyHealing(Mathf.Max(3, actor.Health.Pool.Max / 40)); }
+            // A warned hold round an elite (EliteMove.ccWarn with a ccReach: the Examiner's hour, the Long Shadow's minute): a healer or an
+            // archer inside the ring steps clear of it while it is warned, as a player would, a mend in hand landing first. The melee stand in
+            // it. (hallows-6, 2026-10-17: nothing read the warning; the Druid stood 4-8 m off in the Examiner's ring and was stone 3 s of
+            // every 18 through three wiped pulls; the pull that won was the one she and the Ranger stood 9-10 m off.)
+            if (!Melee && healing == null && StepClearOfHold()) return;
             // Its turn at a buff-up (BossBuffs): a beat after the leader stops, each in its slot's turn, out of a fight.
             if (session.BuffingUp && BuffedStop != session.BuffStop && !session.InCombat && healing == null && Time.time >= session.BuffStopSince + .8f + .7f * slot) BuffUpNow();
             // Mending first, for the healers: the most hurt of the party under 60%. A cast of a second (the spell pose held, playtest

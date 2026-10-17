@@ -88,7 +88,7 @@ above the yard; "+n" is a floor reached by stairs. Elites: 15 (section 7 lists e
    the belfry open on arches over the crater, the great bell hanging frozen mid-swing with a painted dial a minute short of noon (the
    clock's works dropped, 0.05; decision 4). **Pact-Captain Rowena Kersey** holds the second landing ("Form the line": a 3 s root on
    everyone within 4 m, every 15 s; drops the Pact-Captain's Breastplate). **Bureau Examiner Thurstan Vowell** waits in the belfry
-   (`boss:true`): "The hour" pauses everyone within 8 m for 3 s (every 18 s, warned by the bell's hum); at half he rings the bell and the
+   (`boss:true`): "The hour" pauses everyone within 5 m (8 m until 2026-10-17, below) for 3 s (every 18 s, warned by the bell's hum); at half he rings the bell and the
    **Waking Hour** begins (E3): colour comes back, the square below moves, and four paused ringers climb the stair against the party
    holding the belfry's stair-head; when the loop snaps, Vowell stands stone for 5 s and the party has him. Drops: the Examiner's
    Sunburst (a necklace) and the Examiner's Seal (a trinket), every time. The reveal: from the arches, the whole town, the crater and
@@ -339,3 +339,32 @@ p9-lowtowns), 2026-10-16. Chris: "no thanks i dont want a half assed version. co
 - **To run (lane A):** EditMode HallowsDataTests, LootDataTests, ClassSetTests, SocialRulesTests, EliteBalanceTests, DiscoveryLogTests;
   PlayMode HallowsNavTests (all), SecretPlacementTests, ZoneContentTests, AditCaveBuildTests (the cave gates); then walk the tower to the
   belfry, the trapdoor from below, the Warden's walk, and capture the Waking Hour's swing and a time-squall.
+
+## The Examiner's three wipes (2026-10-17, the level-17 group run hallows-6)
+**WRITTEN, compiles, NOT RUN in Unity; OPEN until a group run and Chris's build show the Examiner down on the first or second pull.**
+- **What the log showed** (`D:\crulanda-work\run-captures\hallows-6\run-player.log`, 29:42 to 45:55): every camp before him went down
+  without a wipe. His pull at 30:10; you fell at 33:35, 37:25, 40:16 and 43:36; the pull from 44:10 won at 45:55. Of the 210 holds the bosses
+  put on the party in the run, nearly all were his "The hour", every 18 s like a clock from 30:10 to 45:43, on everyone near him: the tank
+  and the Rogue every time, the Druid (Fenna, the only healer) and the Ranger in every pull but the last. The pulls lost: the first, buffed
+  (the Pact-Captain's buff-up still running), took him to 27% (4,461 of 16,642, scaled for five) and into his enrage at 35%, where the tank
+  fell with the healer stone 3 s of every 18; the second and third the same with the Druid standing 4-8 m off; at 36:22 and about 43:30 she
+  died. The pull that won was the only one where she stood 9 m off and the Ranger 10 m (neither held once): about 1 min 45 s.
+- **The cause:** the hour's ring was 8 m round him, and the belfry floor is 7.8 m square (x -5 to 2.8, z 115.2 to 123; he stands at 1, 119):
+  no part of the floor lies 8 m from him (its far corners are 7.1-7.2 m). The warning ("Get clear of him before the hour comes") could not
+  be answered on the floor, only by going down the stair, and nothing in the sims read the warning at all: the healer and the archer stood
+  wherever they first came within reach (20 m), mostly 4-9 m off. So the hour held all five, the healer with them, 3 s of every 18, the
+  whole fight. The CC rule is not this (it is about the party's holds on elites; a boss's holds on the party are by design outside
+  the party's diminishing returns, CC_DESIGN). The group hit scaling (the sims' gear Stamina, GroupToughness) and the damage sims'
+  1.2 shares of health are on every mob of the run alike and every camp before him held; his own numbers (BossHealth 1.25, BossHit 1.1,
+  enrage at 35% 0.6) are the other four bosses'. Not changed.
+- **Fixed:** the hour's ring is **5 m** (EliteMoves; was 8): the tank and the melee still stand in it every 18 s, but the far side of the
+  floor is clear. And **a healer or an archer sim steps clear of a warned hold's ring** (SimCompanion.StepClearOfHold): while an elite's
+  ccWarn runs (the Examiner's hour, the Long Shadow's minute) a non-melee sim inside the ring makes for its edge and 1.5 m past, straight
+  away from it or turned up to 120 degrees either way, on its own floor; a mend in hand lands first; with nowhere clear it stays. The
+  melee (Warrior, Paladin, Rogue, Scoundrel) stand in it. HallowsDataTests checks that a corner of the belfry floor lies a metre past the ring.
+- **Seen, not changed:** after a death the buffs are gone and the run does not buff up again before the next pull (one buff-up a boss), so
+  the second to fourth pulls were unbuffed. The pull that won was unbuffed too, so the hour was the cause; a re-buff after a wipe is for
+  the run's leader to do (SimCompanion's buff stop), a separate change.
+- **To run (lane A):** EditMode HallowsDataTests, EliteBalanceTests, SocialRulesTests; PlayMode HallowsNavTests; then the level-17 group run
+  of Hallow's Creek again: the Druid and the Ranger "Stepping clear of The hour" at the first hum and never held after, and the Examiner
+  down on the first or second pull.

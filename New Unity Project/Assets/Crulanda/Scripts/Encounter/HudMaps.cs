@@ -79,6 +79,7 @@ namespace Crulanda.Encounter
         public static readonly Rect WindowRect = new Rect(230, 50, 980, 800);
         static readonly float[] MinimapRadii = { 28, 45, 70 };
         int zoom = 1;
+        Vector2 sideScroll;
         Texture2D mask, dot, arrow, pin;
         GUIStyle label, title, note, centered, placeSmall;
 
@@ -519,17 +520,24 @@ namespace Crulanda.Encounter
                 GUI.contentColor = new Color(.84f, .78f, .66f); GUI.Label(new Rect(nx + nw + 5 * scale, r.y + 1 * scale, Mathf.Max(1, r.xMax - nx - nw - 5 * scale), r.height), Band(z), worldBand);
                 GUI.contentColor = Color.white;
             }
-            // The side list: the same pip, the name in cream (gold where you are), then the zone's line and its map note.
+            // The side list: the same pip, the name in cream (gold where you are), then the zone's own line. The map notes (worldMapNote)
+            // are the designers' (where canon places a zone, what is provisional), not the player's: never shown (2026-10-17).
+            // It scrolls when it runs past the window's foot (with nine zones it ran off the bottom).
+            float listTop = y, viewH = Mathf.Max(40, WindowRect.yMax - 40 - listTop), contentH = 0, inner = side.width - 16;
+            foreach (var z in all) contentH += 20 + note.CalcHeight(new GUIContent(z.subtitle ?? ""), inner) + 14;
+            sideScroll = GUI.BeginScrollView(new Rect(side.x, listTop, side.width, viewH), sideScroll, new Rect(0, 0, inner, contentH));
+            float ly = 0;
             foreach (var z in all)
             {
-                bool here = z.id == zone.Zone.id; var pipAt = new Vector2(side.x + 7, y + 10);
+                bool here = z.id == zone.Zone.id; var pipAt = new Vector2(7, ly + 10);
                 if (here) { Ring(pipAt, 7, 2, HereGold); Dot(pipAt, 7, HereGold); }
                 else Dot(pipAt, 10, BandColor(z, level));
-                Shadowed(new Rect(side.x + 18, y, side.width - 18, 20), z.displayName + "  " + Band(z), label, here ? gold : new Color(1, .95f, .84f)); y += 20;
-                string info = (z.subtitle ?? "") + (string.IsNullOrEmpty(z.worldMapNote) ? "" : "\n" + z.worldMapNote);
-                float h = note.CalcHeight(new GUIContent(info), side.width);
-                GUI.Label(new Rect(side.x, y, side.width, h), info, note); y += h + 14;
+                Shadowed(new Rect(18, ly, inner - 18, 20), z.displayName + "  " + Band(z), label, here ? gold : new Color(1, .95f, .84f)); ly += 20;
+                string info = z.subtitle ?? "";
+                float h = note.CalcHeight(new GUIContent(info), inner);
+                GUI.Label(new Rect(0, ly, inner, h), info, note); ly += h + 14;
             }
+            GUI.EndScrollView();
         }
     }
 }

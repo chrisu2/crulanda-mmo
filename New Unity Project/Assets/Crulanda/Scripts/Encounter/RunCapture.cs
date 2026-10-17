@@ -39,8 +39,9 @@ namespace Crulanda.Encounter
             string Clock(float t) { int m = (int)(t / 60); return m + ":" + ((int)(t % 60)).ToString("00"); }
             Crulanda.World.WorldClock.Hour = 11; EncounterHud.UiScale = 1; EncounterHud.DefaultPanels = true; s.MeterOpen = true;   // the HUD in frame at 1440x900 (the party frame was cut off), the meter up
             var weather = Crulanda.World.WorldWeather.Active; if (weather != null) weather.Force(weather.TourKind(), true);
-            // The party's level: a level under the zone's top (the Adit 10-12: eleven, as before; Hallow's Creek 15-20: nineteen).
-            int runLevel = Mathf.Clamp((s.Zone.Zone.levelMax > 0 ? s.Zone.Zone.levelMax : 12) - 1, 2, EncounterProgress.LevelCap);
+            // The party's level: the middle of the zone's band, rounded down (the Adit 10-12: eleven, as before; Hallow's Creek 15-20:
+            // seventeen, the level it is entered at; nineteen walked over its first wings, Chris 2026-10-16: "still not balanced").
+            var zd = s.Zone.Zone; int runLevel = Mathf.Clamp(zd.levelMax > 0 ? (zd.levelMin + zd.levelMax) / 2 : 11, 2, EncounterProgress.LevelCap);
             if (s.Progress.Level < runLevel) { s.Progress.experience = EncounterProgress.XpForLevel(runLevel); s.Player.SetLevel(runLevel); }
             s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max); s.Player.Resource.Pool.Fill();
             // The gates the run's quests open (the singing door's sigils, the platform gate's goblin) stand open, and for the full run those worked

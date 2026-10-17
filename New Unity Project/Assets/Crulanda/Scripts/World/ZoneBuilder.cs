@@ -1179,7 +1179,7 @@ namespace Crulanda.World
                 switch (p.kind)
                 {
                     case "house": House(t, p.size.x > 0 ? p.size : new Vector2(7, 5), 3f, p.variant, false); break;
-                    case "inn": if (p.variant == 2) Waystation(t, p.size.x > 0 ? p.size : new Vector2(8, 6), p); else if (p.variant == 3) CityInn(t, p.size.x > 0 ? p.size : new Vector2(22, 16)); else Inn(t, p.size.x > 0 ? p.size : new Vector2(12, 8), p.variant); break;
+                    case "inn": if (p.variant == 2) Waystation(t, p.size.x > 0 ? p.size : new Vector2(8, 6), p); else if (p.variant == 3) CityInn(t, p.size.x > 0 ? p.size : new Vector2(22, 16)); else if (p.variant == InnPlan.SpoonVariant) SpoonInn(t, p.size.x > 0 ? p.size : new Vector2(14, 10)); else Inn(t, p.size.x > 0 ? p.size : new Vector2(12, 8), p.variant); break;
                     case "barn": Barn(t, p.size.x > 0 ? p.size : new Vector2(12, 8)); break;
                     case "mill": Mill(t, p.size.x > 0 ? p.size : new Vector2(7, 6)); break;
                     case "well": Well(t, p.variant); break;

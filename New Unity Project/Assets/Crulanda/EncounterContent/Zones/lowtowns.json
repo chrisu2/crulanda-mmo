@@ -1311,7 +1311,8 @@
       "size": {
         "x": 14,
         "y": 10
-      }
+      },
+      "variant": 4
     },
     {
       "kind": "kitchen",

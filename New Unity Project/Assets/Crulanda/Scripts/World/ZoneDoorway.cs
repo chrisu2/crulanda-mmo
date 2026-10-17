@@ -123,7 +123,7 @@ namespace Crulanda.World
     /// </summary>
     public sealed class ZoneInn
     {
-        /// <summary>"tavern" (a bar, a cask and an innkeeper: the Golden Cask, the Cracked Hearth), "city" (the same, in white stone round a
+        /// <summary>"tavern" (a bar, a cask and an innkeeper: the Golden Cask, the Cracked Hearth, the Rusty Spoon), "city" (the same, in white stone round a
         /// galleried taproom: the Crown's Gilded Lantern, inn variant 3), "waystation" (one storey, a long table
         /// and bunks: Pilgrims' Rest, Wain's Rest) or "hearth" (the Keepers' hearth-house in the Hearth-Tree).</summary>
         public string name, style;

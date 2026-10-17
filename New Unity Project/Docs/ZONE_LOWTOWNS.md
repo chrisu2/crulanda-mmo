@@ -217,3 +217,36 @@ The zone's first full pass, done on `p9-lowzone` 2026-10-16 (compile-checked, te
 - **Open:** the elites' signature loot lists (LootDataTests) and named pieces; the Crown's "Low Stair" sign still says 16-19 (crown.json is
   on `p9-crown`; change it to 15-20 at the merge); the city's jobs on the streets (lamplighters, porters) wait for `p9-cityinn`'s; a supervised
   run, captures and the frame time at the market.
+
+## The Rusty Spoon's own house (p9-spoon, 2026-10-16)
+Chris, 2026-10-16 (WORLD_ZONES.md): "same damn inn in the lowlands as well. each zone has to be unique not reused assets". The Spoon
+had Oakhaven's timber inn in soot brick; it is now inn **variant 4**, its own building inside and out (`ZoneBuilder.Spoon.cs`, the plan
+`InnPlan.Spoon` in `ZoneBuilder.Inns.cs`; `lowtowns.json` and `make_lowtowns.py` give the Spoon `"variant": 4`). The inn is CANON (b1
+ch.1:9); the building, its rooms and everything in them GAME-ONLY.
+- **Outside:** the ground floor of an old soot-brick warehouse (its loading arch bricked up, a barred window grimed orange, small
+  barred lights); over it an upper floor of tarred weatherboard jettied over the lane, and the roof and upper floor **sway down in the
+  middle** (each half hangs from its gable end, 2.2 degrees down to the middle); two raking timber shores prop the west end; tarred boards
+  patch the slates; a crooked brick stack over the hearth; a **pentice** of tarred boards on two crooked posts over the double door
+  (the rain's shelter, where UnderPorch looks); a painted oxblood board with a spoon on it; the sign, a **great rusted iron spoon** hung
+  bowl down from a bracket; the **cellar flap** round the west side (by the Spoon's slate, as the secret's text says); puddles at the door.
+  The kitchen lean-to on the back wall is tarred timber with a soot-brick end wall in the Lowtowns (`Kitchen`, other zones unchanged).
+- **Inside:** a low room (beams at 2.5 m, the middle one sagging). The **long scarred bar runs down the west end** (not the back wall),
+  the ale casks behind it with the water butt among them, a shelf of jugs, the cellar trapdoor; Mother Sall at its open back end, her
+  slate of debts on the wall with the BROKEN CHAIRS column run off onto the brick; the rooms door past her. The **dice pit** in the middle
+  of the floor straight in from the door (sand in a ring of planks, dice and coin, kegs round it to squat on, a lantern low over it); five
+  **mismatched tables** (round, square, a cask with a board on it) and mismatched chairs, one leg short on every third; the brick hearth
+  on the east end with its bench and firewood; the **back room** for the high stakes in tarred boards in the north-east corner, a red
+  curtain over its 2.4 m way in, a baize card table of four under one low lamp, a strongbox; a broken chair and spare legs in a corner.
+  Orange lamplight.
+- **Kept working:** the double door and its lanes (Phase 8.6), 23 seats, 4 stools and the hearth's bench registered as a staffed tavern
+  (ZoneInn "tavern": Mother Sall's "bar" place, Gorm's "inn"), the hearth's fire station, the kitchen station in the lean-to, the rain's
+  shelter, the floor solid and walked (HallFloor). Solid: the walls, the bar, the hearth, the back room's walls, the pentice's posts.
+  No way behind the bar (1 m: too narrow for the navmesh, so no pocket).
+- **Tests:** `InnLayoutTests.The_Rusty_Spoon_is_its_own_inn_variant` (the Cask, the Hearth, the Lantern and the Spoon each a variant of
+  their own; the Spoon's plan its own) and `Every_place_in_the_Rusty_Spoon_has_a_wide_way_to_the_door` (a way 0.9 m wide from every
+  seat, stool, Sall's place and the rooms door to the door); the shared inn tests now count the Spoon. Compile-checked; not run in Unity.
+- **To look at in the local session (OPEN):** run InnLayoutTests, LowtownsZoneTests, DoorwayTests, BuildingGroundTests (the footing),
+  VillageDoorTests and CameraAndTargetTests; then captures of the Spoon front, back and both ends, and inside (the bar, the pit, the back
+  room), by day and at night; watch Sall at the bar and the drinkers find their seats, and the camera under the low ceiling.
+- **Note:** `tools/wip/lowtowns/make_lowtowns.py` no longer reproduces `lowtowns.json` (the market stalls, the slag-iron nodes and some
+  people were edited in the JSON after it); do not run it over the file.

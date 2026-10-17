@@ -180,6 +180,7 @@ namespace Crulanda.Encounter
         bool RootingStamp(AbilityDefinition a)
         {
             return Start(a, () => {
+                SwingIfClose();
                 foreach (var e in FoesNear(s.Player.transform.position, StampRadius))
                 { e.Receive(Dmg((a.power + Level) * (1 + .04f * R("sb-stamp")) * 1.5f), s.Player); e.Slow(.3f + .05f * R("sb-rooted"), 4); if (R("sb-stone-call") > 0) e.threat.Taunt(s.Player.EntityId.Value, Now, StoneCallSeconds); }   // the heavy blow draws them to you (Stone-Call: they must come, 3 s)
             });
@@ -225,6 +226,24 @@ namespace Crulanda.Encounter
         }
         // The Shaman swings its staff between calls (Chris, 2026-10-17: "shaman still had no auto attack"); its Stonebound path tanks in melee.
         public override bool MeleeAutoAttacks { get { return true; } }
+        /// <summary>
+        /// The staff's swing scale (2026-10-17): its build scales (EncounterSession.BuildDamageScale) were tuned on its spells alone, so a
+        /// swing takes its own. Stonebound, the tank in melee, swings at <see cref="StoneSwing"/> of its weapon (its spell scale lowered to
+        /// match, 2.45 to 1.81: spells and swings together in the tank band); a caster path at <see cref="CasterSwing"/> (a Stormcaller
+        /// standing in melee gains about 7%, under the 10% Chris's band allows; at range it never swings); unspent, as Stonebound.
+        /// </summary>
+        public const float StoneSwing = .4f, CasterSwing = .15f;
+        public override float SwingDamageScale(float buildScale)
+        {
+            var lead = s.LeadBuild;
+            return lead == null || lead == "class.shaman/stonebound" ? StoneSwing : CasterSwing;
+        }
+        /// <summary>A blow in melee starts the staff swinging, as the other melee classes' blows do (a cast at range does not).</summary>
+        void SwingIfClose()
+        {
+            var t = s.Target;
+            if (t != null && t.actor.IsAlive && !t.Game && Vector3.Distance(s.Player.transform.position, t.transform.position) < AutoAttackRange) s.BeginAutoAttack();
+        }
 
         // ---------- per frame / lifecycle ----------
         // The Squall's charge fades six seconds after the fight ends, not at once (2026-10-13, the balance harness: against dummies that do

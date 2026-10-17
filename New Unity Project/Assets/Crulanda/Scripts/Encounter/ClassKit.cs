@@ -47,6 +47,9 @@ namespace Crulanda.Encounter
         public virtual float MoveSpeedMultiplier { get { return 1; } }
         public virtual float SwingInterval(float baseInterval) { return baseInterval; }
         public virtual void OnAutoHit() { }
+        /// <summary>The scale on a weapon swing, given the build's scale on your blows (EncounterSession.PlayerDamageScale). The same for
+        /// every class but the Shaman, whose build scales were tuned on its spells alone (ShamanKit, 2026-10-17).</summary>
+        public virtual float SwingDamageScale(float buildScale) { return buildScale; }
         /// <summary>A foe that counts as your kill (yours or your party's) has just fallen (Catch Your Breath, Crowd Pleaser).</summary>
         public virtual void OnFoeDown(EncounterEnemy enemy) { }
         public virtual int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)

@@ -1301,7 +1301,7 @@ namespace Crulanda.Encounter
                 if (abilities.IsCasting && Kit != null && !Kit.MeleeAutoAttacks) return "Casting " + abilities.Casting.name;
                 if (Kit != null && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) return "No weapon swings in this form";
                 bool bow = Kit != null && Kit.RangedAutoAttacks; string what = bow ? "Auto shot" : "Auto attack", next = bow ? "Next shot: " : "Next swing: ";
-                return !AutoAttack ? what + (bow ? ": shoot to begin" : ": use a melee ability") : Target == null || !Target.actor.IsAlive ? what + ": no target" :
+                return !AutoAttack ? what + (bow ? ": shoot to begin" : ": a melee ability or " + KeyBindings.InteractLabel + " begins it") : Target == null || !Target.actor.IsAlive ? what + ": no target" :
                     Distance(Target) >= Kit.AutoAttackRange ? what + ": move closer (Esc stops)" : next + SwingRemaining.ToString("0.0") + "s (Esc stops)";
             }
         }
@@ -2014,7 +2014,10 @@ namespace Crulanda.Encounter
             {
                 nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
                 if (Kit.MeleeAutoAttacks) { PlayerFigure?.Strike(); SpellFx.Slash(Player.transform, Target.transform, false, .6f); } else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
-                Target.Receive(WeaponDamage, Player); Kit.OnAutoHit(); GearSwingProcs();   // a class set's procs on a landed swing (loot DESIGN.md 3.8)
+                // A swing takes the kit's own swing scale (the Shaman's: its build scales were tuned on its spells; ClassKit.SwingDamageScale).
+                int swing = WeaponDamage; float build = PlayerDamageScale, own = Kit.SwingDamageScale(build);
+                if (!Mathf.Approximately(own, build)) swing = Mathf.Max(1, Mathf.RoundToInt(swing * own / Mathf.Max(.01f, build)));
+                Target.Receive(swing, Player); Kit.OnAutoHit(); GearSwingProcs();   // a class set's procs on a landed swing (loot DESIGN.md 3.8)
             }
             if (Time.time >= nextRegen)
             {
@@ -2264,6 +2267,13 @@ namespace Crulanda.Encounter
                 return;
             }
             var station = StationNear(null); if (station != null) { WorkAtStation(station); return; }
+            // Nothing else here and a foe targeted: your weapon swings at it (2026-10-17, Chris: the Shaman "still had no auto attack"; no key
+            // began a swing, only a class's own melee blows).
+            if (Target != null && Target.actor.IsAlive && !Target.Game && Kit != null && (Kit.MeleeAutoAttacks || Kit.RangedAutoAttacks))
+            {
+                BeginAutoAttack(); Message((Kit.RangedAutoAttacks ? "Auto shot at the " : "Auto attack on the ") + Target.actor.DisplayName + (Distance(Target) >= Kit.AutoAttackRange ? " (move closer)." : "."));
+                return;
+            }
             Message("Nothing to interact with here.");
         }
         /// <summary>What answering a knock says when someone home has wares or quest business for you (GAME-ONLY).</summary>

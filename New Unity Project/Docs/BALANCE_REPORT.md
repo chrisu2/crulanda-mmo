@@ -541,3 +541,35 @@ numbers do not move, in the harness or in play:
   the tank cap.
 - Then either the swing goes unscaled for the Shaman, or the harness runs the Shaman again and its scales come down. No change is made
   until it swings.
+
+## The Shaman swings its staff (2026-10-17)
+Chris: "shaman still had no auto attack". He had seen "No weapon swings in this form". Commit 7dfd6f7e made the Shaman a melee swinger
+(`ShamanKit.MeleeAutoAttacks`), but nothing started its swings. In this game a swing begins only when a class's own melee blow starts it.
+There was no attack key, and the right mouse button turns the camera.
+
+**How it starts now**
+- The interact key (E, or G with ESDF) with a foe targeted, and nothing else to use there, starts your auto attack. This works for every
+  class that swings or shoots.
+- The bar's line says so: "Auto attack: a melee ability or E begins it".
+- The Shaman's Rooting Stamp starts it when the target is within 3.2 m, as the other melee classes' blows do. Its casts at range never
+  start it.
+
+**Its own swing scale.** The Shaman's build scales were tuned on its spells alone (Stormcaller 1.87, Stonebound 2.45, Gravewind 2.5).
+A swing now takes the kit's own scale, `ClassKit.SwingDamageScale`, which is the build's scale for every other class. The Shaman's:
+- **Stonebound (tank, in melee):** 0.4 of its weapon (`StoneSwing`). At 15 in the harness's gear its attack power is about 80
+  (8 + 1 a level, the staff's 35, about 25 Strength from the pieces), so it swings for about 12.6 a second every 2.6 s. Its spell scale
+  comes down from 2.45 to 1.81 so that spells and swings together stay at its 48.5, inside the tank band. If its attack power is 70-90,
+  that is 47-50.
+- **Stormcaller, Gravewind, Rainspeaker:** 0.15 (`CasterSwing`). At range they never swing and do not change. A Stormcaller who
+  stands in melee and stamps gains about 4.7 a second, about 7% over its 62, under the 10% allowed.
+- **No talents yet:** 0.4, as Stonebound.
+
+**The harness.** It stands every class 2.4 m from its dummy, where the Stamp would start the staff. So for the Shaman's caster paths it
+stops the swing each frame (they fight at range); Stonebound swings. To confirm: the Shaman's harness run (`CRULANDA_BALANCE_CLASSES=shaman`),
+Stonebound's single-target number about 48.5.
+Test: `ShamanSwingTests` (PlayMode): the interact key starts the swing, and a swing lands for its weapon x the Shaman's own scale.
+
+**The Cleric and the Archivist** (`MeleeAutoAttacks` false) still say "No weapon swings in this form". The Archivist is a singer with
+no melee path. The Cleric's paths (Lantern, Choir, Censure, Warden) work through its Brand, Rebuke and lantern at range. Neither has a
+melee build that would expect to swing, so they are left as they are. If a Cleric in Censure is meant to stand in melee with a mace, it
+would need the same care as the Shaman: a swing scale of its own, since its scale (1.51) is tuned on spells.

@@ -331,6 +331,9 @@ namespace Crulanda.Tests
             while (t < FightSeconds)
             {
                 yield return null; float dt = Time.deltaTime; t += dt;
+                // The Shaman's caster paths fight at range, where its staff never swings (2026-10-17): the harness stands everyone 2.4 m off,
+                // where its Rooting Stamp would start the swing (ShamanKit.SwingIfClose). Stonebound tanks in melee and swings.
+                if (cls == "class.shaman" && branch.id != "stonebound" && s.AutoAttack) s.StopAutoAttack();
                 if (targets > 0 && (s.Target == null || !s.Target.actor.IsAlive)) { var f = foes.FirstOrDefault(x => x != null && x.actor.IsAlive); if (f != null) s.Select(f); }
                 if (targets == 0 && wounded != null) { hurt += dt; if (hurt >= 1) { hurt -= 1; wounded.actor.Health.ApplyDamage(Mathf.Min(wounded.actor.Health.Pool.Current - 1, Mathf.RoundToInt(wounded.actor.Health.Pool.Max * WoundShare))); } }
                 else if (targets == 0) { hurt += dt; if (hurt >= 1) { hurt -= 1; s.Player.Health.ApplyDamage(Mathf.Min(s.Player.Health.Pool.Current - 1, Mathf.RoundToInt(s.Player.Health.Pool.Max * WoundShare))); } }   // no Mira in the scene: you

@@ -40,7 +40,8 @@ namespace Crulanda.Encounter
             { "class.druid/barkhide", 1.33f },   // 2026-10-13 fixed-dummy retune
             { "class.mage/heatweaver", 1.39f },   // 2026-10-13 fixed-dummy retune
             { "class.saltmender/sifter", 1.18f },   // 2026-10-13 fixed-dummy retune 1.31; x0.9 a hybrid (2026-10-16)
-            { "class.shaman/stonebound", 2.45f },   // 2026-10-13 fixed-dummy retune
+            // 2026-10-13 fixed-dummy retune 2.45; 1.81 since its staff swings (2026-10-17, ShamanKit.StoneSwing: about 12.6 of its 48.5 a second at 15)
+            { "class.shaman/stonebound", 1.81f },
         };
         /// <summary>The same for the build's companion (Ranger pet, thrall): only the pet builds are scaled.</summary>
         public static readonly Dictionary<string, float> BuildPetDamageScale = new Dictionary<string, float> { { "class.ranger/beastbond", 0.7f }, { "class.mage/bonecaller", 2.21f }, { "class.ranger/pathfinder", .5f } };

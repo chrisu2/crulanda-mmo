@@ -1244,6 +1244,8 @@ namespace Crulanda.Encounter
                     float score = Mathf.Abs(turn) / 45 + j * .6f; if (score >= best) continue;
                     var p = at + outward * distances[j];
                     if (Mathf.Abs(p.x) > lim || Mathf.Abs(p.y) > lim) continue;
+                    // Never down in a chasm (Hallow's Creek, 2026-10-16: the bridge was shot from the chasm's floor, a blank wall).
+                    if (zone.FogFloor(p, out _)) continue;
                     float floor = zone.HeightAt(p.x, p.y) + 2.2f;
                     if (zone.WaterAt(p, out float s, out _)) floor = Mathf.Max(floor, s + 2);
                     var cam = new Vector3(p.x, Mathf.Max(focus.y + distances[j] * rise, floor), p.y);

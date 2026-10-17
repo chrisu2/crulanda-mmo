@@ -428,6 +428,12 @@
         "y": -180
       },
       "radius": 20,
+      "view": {
+        "x": -30,
+        "y": -224
+      },
+      "viewHeight": 10,
+      "viewAim": 36,
       "canonStatus": "CANON (book1 ch.17)"
     },
     {
@@ -437,6 +443,12 @@
         "y": -128.37391924429124
       },
       "radius": 8,
+      "view": {
+        "x": 18,
+        "y": -98
+      },
+      "viewHeight": 14,
+      "viewAim": 3,
       "canonStatus": "GAME-ONLY"
     },
     {
@@ -455,6 +467,12 @@
         "y": 70
       },
       "radius": 26,
+      "view": {
+        "x": -34,
+        "y": 30
+      },
+      "viewHeight": 14,
+      "viewAim": 13,
       "canonStatus": "CANON (book1 ch.19)"
     },
     {
@@ -473,6 +491,12 @@
         "y": 70
       },
       "radius": 18,
+      "view": {
+        "x": 36,
+        "y": 40
+      },
+      "viewHeight": 13,
+      "viewAim": 7,
       "canonStatus": "CANON (book1 ch.18)"
     },
     {
@@ -2065,6 +2089,35 @@
       },
       "name": "Warden Elvet's satchel",
       "interact": "Take the Warden's papers"
+    },
+    {
+      "kind": "townlife",
+      "at": {
+        "x": 0,
+        "y": 70
+      },
+      "name": "The Square's market",
+      "variant": 1,
+      "style": "stone"
+    },
+    {
+      "kind": "townlife",
+      "at": {
+        "x": 0,
+        "y": -60
+      },
+      "name": "Main Street's yards",
+      "variant": 2,
+      "style": "stone"
+    },
+    {
+      "kind": "townlife",
+      "at": {
+        "x": 0,
+        "y": -175
+      },
+      "name": "The bridge's glass",
+      "variant": 3
     },
     {
       "kind": "crates",

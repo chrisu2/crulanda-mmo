@@ -22,7 +22,7 @@ namespace Crulanda.World
     public sealed partial class ZoneBuilder
     {
         /// <summary>The prop kinds built here (BuildProps).</summary>
-        public static readonly HashSet<string> HallowsKinds = new HashSet<string> { "paused", "hangball", "laundry", "crater", "wellhouse", "stone", "gatehouse", "archive", "granary", "belfry", "copydesk", "ride", "satchel" };
+        public static readonly HashSet<string> HallowsKinds = new HashSet<string> { "paused", "hangball", "laundry", "crater", "wellhouse", "stone", "gatehouse", "archive", "granary", "belfry", "copydesk", "ride", "satchel", "townlife" };
         /// <summary>A paused townsperson's place (EncounterSession.Hallows stands a stone figure there): where, facing, the pose (the prop's
         /// variant) and the name it is known by (or null).</summary>
         public readonly List<(Vector3 at, Quaternion facing, int pose, string name)> PausedSpots = new List<(Vector3, Quaternion, int, string)>();
@@ -50,6 +50,7 @@ namespace Crulanda.World
                 case "belfry": Belfry(t, p.size.x > 0 ? p.size.x : 12); return true;
                 case "copydesk": CopyDesk(t); return true;
                 case "satchel": Satchel(t); return true;
+                case "townlife": TownLife(t, p.variant); return true;
                 case "ride":
                     Wagon(t);
                     for (int k = 0; k < 2; k++) RideTeam.Add((t.TransformPoint(new Vector3((k == 0 ? -.55f : .55f), 0, 3.4f)), t.rotation));
@@ -244,14 +245,14 @@ namespace Crulanda.World
         }
         /// <summary>
         /// The Old Archive (CANON, book1 ch.18: a First Era library, columns twisted like pulled taffy, the crest of an open book with an eye,
-        /// its doors blown in, a maze of petrified shelves): a hall 50 x 24 and 12 m high with no roof left, its floor two metres up (the zone's
+        /// its doors blown in, a maze of petrified shelves): a hall 50 x 24 and 12 m high, its roof broken through over the reading hall, its floor two metres up (the zone's
         /// deck), a doorless front on the west, the shelves standing three metres high as the walls of the maze, twisted columns along the walls,
         /// the Registrar's desk in the apse, and off the north wall three cells (the middle one the Warden's, behind its pen gate).
         /// </summary>
         void HallowsArchive(Transform t, Vector2 size)
         {
             float w = size.x / 2, d = size.y / 2, h = 12, f = 2;
-            var wall = Dressed(new Color(.6f, .58f, .55f)); var shelf = Tint(art.timber, new Color(.42f, .4f, .38f)); var book = Tint(art.stone, new Color(.5f, .46f, .42f));
+            var wall = Dressed(new Color(.6f, .58f, .55f));
             HWallDoors(t, new Vector2(-w, -d), new Vector2(-w, d), 0, h, 1, wall, (d, 7, 7));                              // the west front: its doors long gone
             HWall(t, new Vector2(-w, -d), new Vector2(w, -d), 0, h, 1, wall); HWall(t, new Vector2(w, -d), new Vector2(w, d), 0, h, 1, wall);
             HWallDoors(t, new Vector2(-w, d), new Vector2(w, d), 0, h, 1, wall, (w - 8, 2.4f, f + 2.8f), (w, 2.4f, f + 2.8f), (w + 8, 2.4f, f + 2.8f));   // the north wall and the three cells' doors
@@ -263,12 +264,13 @@ namespace Crulanda.World
             for (float x = -w + 4; x < w - 2; x += 6)
                 foreach (float z in new[] { -d + 1.2f, d - 1.2f })
                     for (int k = 0; k < 8; k++) Part(PrimitiveType.Cube, t, new Vector3(x, f + .6f + k * 1.15f, z), new Vector3(.9f, 1.15f, .9f), wall, Quaternion.Euler(0, k * 11, k % 2 == 0 ? 3 : -3));
-            // The shelves: three metres of stone books, the maze's walls, with gaps for the ways through.
+            // The shelves: three metres of stone ledgers, the maze's walls, with gaps for the ways through (ArchiveStack: a frame and
+            // its books on both faces, ZoneBuilder.HallowsTown).
+            var stacks = new System.Random(6143);
             void Shelf(float x, float z0, float z1)
             {
                 var mid = new Vector3(x, f + 1.5f, (z0 + z1) / 2); float len = z1 - z0;
-                Part(PrimitiveType.Cube, t, mid, new Vector3(.7f, 3, len), shelf);
-                for (float y = f + .5f; y < f + 3; y += .7f) Part(PrimitiveType.Cube, t, new Vector3(x, y, mid.z), new Vector3(.76f, .4f, len - .2f), book);
+                ArchiveStack(t, x, z0, z1, f, stacks);
                 Solid(t, mid, new Vector3(.75f, 3, len));
             }
             foreach (float x in new[] { -12f, 0f, 9f }) { Shelf(x, -d + 3, -2.5f); Shelf(x, 2.5f, d - 3); }
@@ -280,6 +282,8 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(w - .55f, 9, -.8f), new Vector3(.1f, 1.6f, 1.5f), crest, Quaternion.Euler(0, 0, 0));
             Part(PrimitiveType.Cube, t, new Vector3(w - .55f, 9, .8f), new Vector3(.1f, 1.6f, 1.5f), crest);
             Part(PrimitiveType.Sphere, t, new Vector3(w - .6f, 10.2f, 0), new Vector3(.12f, .5f, .8f), Glowing(new Color(.9f, .85f, .6f), .6f));
+            // Its roof (broken over the reading hall), gables, windows, portal, blown-in doors, cases, desks, papers and lamps.
+            ArchiveDressing(t, w, d, h, f);
             LampRing(t, size, f + 3.2f, new Color(.95f, .9f, .7f), 6);
             Fades(t, size);
         }
@@ -293,21 +297,25 @@ namespace Crulanda.World
             HWall(t, new Vector2(w, -d), new Vector2(w, d), 0, h, .9f, wall);
             HWall(t, new Vector2(-w, d), new Vector2(w, d), 0, h, .9f, wall);
             HWallDoors(t, new Vector2(-w, -d), new Vector2(w, -d), 0, h, .9f, wall, (w, 5.5f, 4.6f));
-            foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, h + 2.2f, side * d * .5f), new Vector3(size.x + 1.2f, .3f, d * 1.25f), roof, Quaternion.Euler(side * -26, 0, 0));
+            // The two slopes down from the ridge to the eaves (each turned so its outer edge is the low one: they had been turned the other
+            // way, a V standing open to the sky, frames of 2026-10-16), and the gables under the ridge at each end.
+            foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(0, h + 2.2f, side * d * .5f), new Vector3(size.x + 1.2f, .3f, d * 1.25f), roof, Quaternion.Euler(side * 26, 0, 0));
+            foreach (int side in new[] { -1, 1 }) MeshPart(ZoneMeshes.Gable(2 * d + .9f, 4.5f, .9f, 2, 0, h), t, new Vector3(side * w, h, 0), wall, Quaternion.Euler(0, 90, 0));
             for (int k = 0; k < 4; k++) { var at = new Vector3(-8 + k * 5.5f, .5f, 0); Part(PrimitiveType.Cube, t, at, new Vector3(3.2f, 1, 1.4f), wood); Solid(t, at, new Vector3(3.3f, 1, 1.5f)); }
             LampRing(t, size, 3.2f, new Color(.95f, .85f, .6f), 4);
             Fades(t, size);
         }
         /// <summary>
-        /// The Bell Tower (CANON-EXPANDED, book1 ch.21's clock tower as a bell tower; decision 4): 12 x 12 and 22 m to the belfry's lintels, a
+        /// The Bell Tower (CANON-EXPANDED, book1 ch.21's clock tower as a bell tower; decision 4): 12 x 12 and 24 m to the belfry's lintels, a
         /// door on the south face (the ward-lock), arched openings at the belfry, a pyramid roof; inside, the flights and landings and the
         /// belfry floor are the zone's decks. The great bell hangs frozen mid-swing; on the south face, a painted dial a minute short of noon:
         /// paint on stone, no works, nothing turns (DUNGEON_DESIGN 0.05).
         /// </summary>
         void Belfry(Transform t, float size)
         {
-            float w = size / 2, h = 22, belfry = 18;
-            var wall = Dressed(new Color(.64f, .62f, .6f)); var roof = Tint(art.slate != null ? art.slate : art.stone, new Color(.36f, .36f, .4f));
+            // (24 to the lintels' top: the openings over the parapet are tall enough for round heads, and the bell shows through them.)
+            float w = size / 2, h = 24, belfry = 18;
+            var wall = Dressed(new Color(.64f, .62f, .6f));
             // Below the belfry: solid walls, the door in the south one; at the belfry, a pier at each corner and an arch over each opening.
             HWallDoors(t, new Vector2(-w, -w), new Vector2(w, -w), 0, belfry, 1, wall, (w, 3, 3.6f));
             HWall(t, new Vector2(-w, w), new Vector2(w, w), 0, belfry, 1, wall);
@@ -320,7 +328,8 @@ namespace Crulanda.World
                 // a parapet at the belfry floor (no knockback near the arches: nobody falls out of them)
                 HWall(t, new Vector2(-w, s * w), new Vector2(w, s * w), belfry, belfry + 1.1f, .6f, wall); HWall(t, new Vector2(s * w, -w), new Vector2(s * w, w), belfry, belfry + 1.1f, .6f, wall);
             }
-            for (int k = 0; k < 4; k++) Part(PrimitiveType.Cube, t, new Vector3(0, h + .5f + k * .9f, 0), new Vector3(size + 1 - k * 3.2f, .9f, size + 1 - k * 3.2f), roof);
+            // The base course, buttresses, quoins, string course, slits, the belfry's arches and the pyramid roof (ZoneBuilder.HallowsTown).
+            BelfryDressing(t, w, belfry, h);
             // The great bell, frozen mid-swing on its beam (a dark bronze, the stone not on it: it is the one thing that still rings).
             var bronze = Tint(art.metal, new Color(.42f, .32f, .2f)); var beam = Tint(art.timber, new Color(.3f, .26f, .22f));
             Part(PrimitiveType.Cube, t, new Vector3(0, h - 1.6f, 0), new Vector3(size - 1.5f, .45f, .45f), beam);

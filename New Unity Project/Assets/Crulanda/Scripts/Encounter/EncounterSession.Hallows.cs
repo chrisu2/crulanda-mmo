@@ -77,14 +77,23 @@ namespace Crulanda.Encounter
                 if (Zone.Anchors.TryGetValue("the tower door", out var door)) { Warden = SpawnWarden(door); if (Warden != null) Warden.KeepDoor(); }   // she keeps the door she unbound
             }
         }
-        /// <summary>A paused townsperson: a villager's figure turned to stone and stopped in its first frame (no agent, no collider).</summary>
+        /// <summary>A paused townsperson: a villager's figure turned to stone and held mid-action (no agent, no collider).</summary>
         PausedStone PausedFigure(Vector3 feet, Quaternion facing, int pose, string name, int k)
         {
             var go = new GameObject(string.IsNullOrEmpty(name) ? "A paused townsperson" : name);
             go.transform.SetPositionAndRotation(feet + Vector3.up, facing);
             var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; Destroy(body.GetComponent<Collider>()); body.transform.SetParent(go.transform, false);
             var v = ActorVisual.Attach(go, ActorLook.Villager, 300 + k * 7, false, pose == 1 ? "baker" : null);
-            v.Pose = pose == 1 ? ActorPose.Work : pose == 2 ? ActorPose.Talk : pose == 3 ? ActorPose.Cower : ActorPose.None;
+            v.Pose = pose == 2 ? ActorPose.Talk : pose == 3 ? ActorPose.Cower : ActorPose.None;
+            // Caught at something (PausedStone holds each mid-step or mid-word): the baker stepping out with his bread, and of those
+            // caught walking, one in three with a crate of goods in their arms and one in three with a sack on the shoulder. The load
+            // is under the figure, so it turns to stone with it.
+            Crulanda.Encounter.Load load = pose == 1 ? Crulanda.Encounter.Load.Bread : pose == 0 && k % 3 == 0 ? Crulanda.Encounter.Load.Goods : pose == 0 && k % 3 == 1 ? Crulanda.Encounter.Load.Grain : Crulanda.Encounter.Load.None;
+            if (load != Crulanda.Encounter.Load.None)
+            {
+                LoadProps.Build(go.transform, load, 3);
+                v.Carry = load == Crulanda.Encounter.Load.Grain ? ActorVisual.Carrying.Shoulder : ActorVisual.Carrying.Front;
+            }
             return go.AddComponent<PausedStone>();
         }
 
@@ -404,7 +413,7 @@ namespace Crulanda.Encounter
     public sealed class EventRunView { public string Id; public HashSet<int> Camps; }
 
     /// <summary>A paused townsperson (Hallow's Creek, N5): once the figure is built (two frames on), every part of it turned to grey stone and
-    /// its motion stopped, so it stands in its first frame. A Glitch or the Waking Hour wakes it (<see cref="Wake"/>: its colours back and its
+    /// its motion stopped, held mid-action (Hold). A Glitch or the Waking Hour wakes it (<see cref="Wake"/>: its colours back and its
     /// pose moving) until the loop snaps (<see cref="Sleep"/>). No collider, no agent: nobody fights it.</summary>
     public sealed class PausedStone : MonoBehaviour
     {
@@ -418,8 +427,28 @@ namespace Crulanda.Encounter
         void LateUpdate()
         {
             if (stoned || awake || ++frames < 3) return;
+            // (the figure's model may take a few frames more to be built: the pose is sampled on it)
+            var v = GetComponent<ActorVisual>(); if (v != null && v.Model == null && frames < 60) return;
             Turn(true); enabled = false;
         }
+        /// <summary>
+        /// The moment it was caught in, sampled from the figure's own clips and held: the walkers mid-stride (a load in their arms or on
+        /// a shoulder where they carry one), the talkers mid-word, the cowering crouched with their arms up. Each figure at its own point
+        /// in its clip. Disabling an Animator that writes its defaults puts a figure back in its bind pose (the T-pose of the frames of
+        /// 2026-10-16), so the Animator is told to keep the bones where they are before it is switched off, and the pose is sampled
+        /// both before and after (a sample on a switched-off Animator is not relied on).
+        /// </summary>
+        void Hold(ActorVisual v)
+        {
+            if (v == null || v.Model == null) return;
+            var at = transform.position; float seed = Mathf.Repeat(at.x * 12.9898f + at.z * 78.233f, 1);
+            var pose = v.Pose;
+            if (pose == ActorPose.None) v.Preview(ActorPose.None, 1.35f, .2f + seed * 2.3f);
+            else if (pose == ActorPose.Talk) v.Preview(ActorPose.Talk, 0, 1 + seed * 6);
+            else v.Preview(pose, 0, .4f + seed);
+        }
+        /// <summary>A darker ash than the old pale stone (which read as white, an untextured model), a little rough.</summary>
+        static readonly Color Ash = new Color(.47f, .46f, .45f);
         /// <summary>Its colours and its motion back (a Glitch, the Waking Hour).</summary>
         public void Wake() { awake = true; if (stoned) Turn(false); }
         /// <summary>Stone again and still (the loop snapped).</summary>
@@ -433,9 +462,11 @@ namespace Crulanda.Encounter
                 {
                     if (stone == null && r.sharedMaterial != null)
                     {
-                        stone = new Material(r.sharedMaterial) { name = "Paused stone", color = new Color(.63f, .62f, .61f) };
+                        stone = new Material(r.sharedMaterial) { name = "Paused stone", color = Ash };
                         if (stone.HasProperty("_MainTex")) stone.mainTexture = null;
                         if (stone.HasProperty("_EmissionColor")) stone.SetColor("_EmissionColor", Color.black);
+                        if (stone.HasProperty("_Glossiness")) stone.SetFloat("_Glossiness", .08f);
+                        if (stone.HasProperty("_Metallic")) stone.SetFloat("_Metallic", 0);
                     }
                     if (stone == null) continue;
                     colours.Add((r, r.sharedMaterials));
@@ -444,9 +475,19 @@ namespace Crulanda.Encounter
             }
             else foreach (var (r, mats) in colours) if (r != null) r.sharedMaterials = mats;
             stoned = toStone;
-            foreach (var a in GetComponentsInChildren<Animator>(true)) a.enabled = !toStone;
-            foreach (var a in GetComponentsInChildren<Animation>(true)) a.enabled = !toStone;
-            var v = GetComponent<ActorVisual>(); if (v != null) v.enabled = !toStone;
+            var v = GetComponent<ActorVisual>();
+            if (toStone)
+            {
+                if (v != null) v.enabled = false;
+                Hold(v);
+                foreach (var a in GetComponentsInChildren<Animator>(true)) { a.writeDefaultValuesOnDisable = false; a.enabled = false; }
+                foreach (var a in GetComponentsInChildren<Animation>(true)) a.enabled = false;
+                Hold(v);
+                return;
+            }
+            foreach (var a in GetComponentsInChildren<Animator>(true)) a.enabled = true;
+            foreach (var a in GetComponentsInChildren<Animation>(true)) a.enabled = true;
+            if (v != null) v.enabled = true;
         }
     }
 

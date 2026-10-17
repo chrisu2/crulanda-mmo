@@ -194,6 +194,14 @@ namespace Crulanda.Encounter
                             TravelTo(new Crulanda.World.ZoneExit { to = "zone.hallows", name = "/hallows", arrive = to.spawns.player });
                             return;
                         }
+                    case "/oakhaven":   // home: Oakhaven's green (Chris, 2026-10-17: "is there a command to get to oakhaven?")
+                        {
+                            var oak = Zone != null ? Zone.FindZone("zone.oakhaven") : null; if (oak == null) { Message("Oakhaven is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            Message("To Oakhaven...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.oakhaven", name = "/oakhaven", arrive = oak.spawns.player });
+                            return;
+                        }
                     case "/crown":   // a tester's way to the capital (2026-10-16, Chris's castle preview: the bat took him to the Adit)
                         {
                             var crown = Zone != null ? Zone.FindZone("zone.crown") : null; if (crown == null) { Message("The Crown of Argentis is not in this build."); return; }

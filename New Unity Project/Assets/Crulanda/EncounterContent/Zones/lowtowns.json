@@ -2017,6 +2017,218 @@
       "variant": 27
     },
     {
+      "kind": "stall",
+      "name": "Rag and pot stall",
+      "at": {
+        "x": 116.0,
+        "y": 58.0
+      },
+      "rotation": 180,
+      "variant": 0
+    },
+    {
+      "kind": "stall",
+      "name": "Tallow and wicks",
+      "at": {
+        "x": 104.0,
+        "y": 70.0
+      },
+      "rotation": 270,
+      "variant": 1
+    },
+    {
+      "kind": "stall",
+      "name": "Pies and peas",
+      "at": {
+        "x": 128.0,
+        "y": 70.0
+      },
+      "rotation": 90,
+      "variant": 2
+    },
+    {
+      "kind": "stall",
+      "name": "Second-hand boots",
+      "at": {
+        "x": 119.5,
+        "y": 81.5
+      },
+      "rotation": 17,
+      "variant": 0
+    },
+    {
+      "kind": "stall",
+      "name": "Nails and hinges",
+      "at": {
+        "x": 109.5,
+        "y": 60.0
+      },
+      "rotation": 213,
+      "variant": 1
+    },
+    {
+      "kind": "stall",
+      "name": "Eels and cockles",
+      "at": {
+        "x": 106.0,
+        "y": 77.0
+      },
+      "rotation": 305,
+      "variant": 2
+    },
+    {
+      "kind": "stall",
+      "name": "Old cloth",
+      "at": {
+        "x": 126.5,
+        "y": 77.5
+      },
+      "rotation": 54,
+      "variant": 1
+    },
+    {
+      "kind": "stall",
+      "name": "Pots mended",
+      "at": {
+        "x": 121.0,
+        "y": 62.0
+      },
+      "rotation": 148,
+      "variant": 0
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 133.0,
+        "y": 57.0
+      },
+      "rotation": 30,
+      "variant": 27
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 132.5,
+        "y": 74.5
+      },
+      "rotation": 200,
+      "variant": 27
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 131.5,
+        "y": 79.0
+      },
+      "rotation": 250,
+      "variant": 27
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 135.5,
+        "y": 68.0
+      },
+      "rotation": 15,
+      "variant": 2
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 135.21,
+        "y": 68.08
+      },
+      "rotation": 15,
+      "variant": 5,
+      "lift": 0.78
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 135.74,
+        "y": 67.94
+      },
+      "rotation": 55,
+      "variant": 3,
+      "lift": 0.78
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 121.5,
+        "y": 70.0
+      },
+      "rotation": 70,
+      "variant": 2
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 121.4,
+        "y": 70.28
+      },
+      "rotation": 70,
+      "variant": 5,
+      "lift": 0.78
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 121.59,
+        "y": 69.77
+      },
+      "rotation": 110,
+      "variant": 3,
+      "lift": 0.78
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 110.5,
+        "y": 66.5
+      },
+      "rotation": 40,
+      "variant": 1
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 110.27,
+        "y": 66.69
+      },
+      "rotation": 40,
+      "variant": 5,
+      "lift": 1.08
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 110.69,
+        "y": 66.34
+      },
+      "rotation": 80,
+      "variant": 3,
+      "lift": 1.08
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 124.5,
+        "y": 83.0
+      },
+      "rotation": 0,
+      "variant": 20
+    },
+    {
+      "kind": "market",
+      "at": {
+        "x": 126.0,
+        "y": 88.0
+      },
+      "rotation": 0,
+      "variant": 20
+    },
+    {
       "kind": "barrels",
       "at": {
         "x": 136,
@@ -5752,6 +5964,126 @@
         "stories": [
           "Madder for red, woad for blue, weld for yellow, soot for everything else. The Lowtowns wear a lot of everything else.",
           "My arms are blue to the elbow and red past it. The children call me the Flag."
+        ]
+      },
+      {
+        "name": "Wenna Slate",
+        "role": "merchant",
+        "title": "Rag-and-Pot Seller",
+        "at": {
+          "x": 116.0,
+          "y": 56.3
+        },
+        "facing": 0,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Rags by weight, pots by the hole. A pot with one hole is half price. Two holes, it's a sieve, and sieves cost more.",
+          "My man went to the Forge District for the wages. He sends a coin a month and a letter I can't read. I keep both."
+        ]
+      },
+      {
+        "name": "Jory Clink",
+        "role": "merchant",
+        "title": "Pie-Seller",
+        "at": {
+          "x": 129.7,
+          "y": 70.0
+        },
+        "facing": 270,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Pease pudding, a ha'penny. Rat pie, a penny. The rat's the dear part. Don't ask me why.",
+          "The Council's men buy my pies on the quiet. They say it's for the warders. The warders say it's for the Council's men."
+        ]
+      },
+      {
+        "name": "Sabe Murrow",
+        "role": "merchant",
+        "title": "Pot-Mender",
+        "at": {
+          "x": 121.9,
+          "y": 60.56
+        },
+        "facing": 328,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Bring it back cracked and I'll mend it twice. Bring it back cracked three times and I'll say it was never a pot.",
+          "There's a shard-burner two stalls down sells light by the hour. I sell light by the candle. The candle doesn't remember anything."
+        ]
+      },
+      {
+        "name": "Doll Patchet",
+        "role": "gossip",
+        "title": "Haggler",
+        "at": {
+          "x": 119.48,
+          "y": 78.37
+        },
+        "facing": 17,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Five for the boots or I walk. I won't walk far, mind. They're good boots.",
+          "You hear things in a market. Who's selling, who's buying, whose child went missing in the night. Mostly you hear the price of eels."
+        ]
+      },
+      {
+        "name": "Ivo Tamsin",
+        "role": "elder",
+        "title": "Rag-Buyer",
+        "at": {
+          "x": 123.54,
+          "y": 76.46
+        },
+        "facing": 54,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Forty years I've bought rags. You know a family by its rags. Patches on patches is a family that's holding on.",
+          "When I was a boy the smog came down at dusk and lifted at dawn. Now it doesn't lift. You stop noticing. That's the worst of it."
+        ]
+      },
+      {
+        "name": "Fen Ashlock",
+        "role": "gossip",
+        "title": "Porter",
+        "at": {
+          "x": 107.0,
+          "y": 70.9
+        },
+        "facing": 270,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I carry for anyone. Sacks to the barges, crates up from the docks, a drunk home now and then. A drunk's the heaviest.",
+          "No carts past the Gate Ward by day, the Council says. So it's backs. Mine's as good as any cart and it doesn't need greasing."
+        ]
+      },
+      {
+        "name": "Pip Hensey",
+        "role": "child",
+        "title": "Errand-Runner",
+        "at": {
+          "x": 108.97,
+          "y": 76.02
+        },
+        "facing": 305,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "A copper and I'll run it anywhere. Two and I won't read it. I can't read anyway, but you don't know that.",
+          "My sister sparked. Little lights, on the stairs. Mam says don't talk about it. So I don't. I'm not talking now."
+        ]
+      },
+      {
+        "name": "Rook Garran",
+        "role": "drinker",
+        "title": "Idler",
+        "at": {
+          "x": 111.89,
+          "y": 62.03
+        },
+        "facing": 213,
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I'm not idling. I'm watching the market for a friend. The friend's me. I'm watching for a cheap pie.",
+          "The Spoon opens at noon and so do I. Till then I lean. A man needs a wall in the Lowtowns."
         ]
       }
     ],

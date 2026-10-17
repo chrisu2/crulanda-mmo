@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Linq;
 using UnityEngine;
 
 namespace Crulanda.World
@@ -16,7 +17,10 @@ namespace Crulanda.World
     /// - The ground (<see cref="LowtownGround"/>, <see cref="LowtownEdge"/>): soot-dark setts and black puddles in the paint, the ways paved
     ///   over in wet setts, no grass; the zone's edge is the blind backs of tenements, not woods.
     /// - The backdrop (<see cref="LowtownBackdrop"/>): roofs and stacks past the edge, the Forge District's chimneys to the east, and the
-    ///   mountain with the Crown on it, white stone and gold above the smog, in the north-east sky: never reached (CrownSkyline).
+    ///   mountain with the Crown on it, white stone and gold above the smog, in the north-east sky: never reached (CrownSkyline). Past
+    ///   them the city's own roofline runs round the horizon in the haze, rising toward the Crown (DistantRanges.CityRing), not a wood.
+    /// - The streets' clutter (<see cref="LowtownClutter"/>): crates, barrels, sacks, rubbish, broken hand-carts and planks by the walls,
+    ///   bills on the blind ends, puddles, washing lines across the narrow ways, more lamp posts, the market stalls' stock.
     /// - No machines anywhere (Chris, 2026-10-11): no pipes, cranes, lifts, gondolas or engines. The barges are poled, the bellows
     ///   hand-worked, loads carried.
     /// Each kind draws only from a stream of its own keyed on where it stands, so nothing else in the zone moves for it.
@@ -173,6 +177,12 @@ namespace Crulanda.World
                 if (unit == null) unit = ZoneMeshes.Box(Vector3.one, 1);
                 if (!by.TryGetValue(m, out var list)) by[m] = list = new List<CombineInstance>();
                 list.Add(new CombineInstance { mesh = unit, transform = Matrix4x4.TRS(at, rot ?? Quaternion.identity, size) });
+            }
+            /// <summary>Any mesh (a cylinder, a ball) placed by <paramref name="m"/> into the same joined meshes.</summary>
+            public void AddMesh(Mesh mesh, Material mat, Matrix4x4 m)
+            {
+                if (!by.TryGetValue(mat, out var list)) by[mat] = list = new List<CombineInstance>();
+                list.Add(new CombineInstance { mesh = mesh, transform = m });
             }
             public void Flush(ZoneBuilder z, Transform t, string name)
             {
@@ -641,6 +651,277 @@ namespace Crulanda.World
                     var p = new ZoneProp { kind = "tenement", at = at, rotation = side == 0 ? 0 : side == 1 ? 90 : side == 2 ? 180 : 270, size = new Vector2(w, d), variant = v, style = "back" };
                     var t = Root(p, statics); t.name = "Tenement backs"; Tenement(t, p.size, v, "back", new System.Random(Zone.seed + 77 * ++n), false);
                 }
+            LowtownClutter();
+        }
+
+        // ---------- the streets' clutter ----------
+        /// <summary>Distance from a point to a segment (a point when its ends are one).</summary>
+        static float SegDist(Vector2 p, Vector2 a, Vector2 b)
+        {
+            var ab = b - a; float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / Mathf.Max(.0001f, ab.sqrMagnitude));
+            return Vector2.Distance(p, a + ab * t);
+        }
+        /// <summary>How far round a small prop of the data the clutter keeps off (the buildings are InBuilding's); 0 for one it ignores.</summary>
+        static float ClutterKeep(ZoneProp p)
+        {
+            switch (p.kind)
+            {
+                case "tenement": case "warehouse": case "dead_house": case "holding_house": case "soup_hall": case "toll_house": case "cobbles": case "puddle": case "washing_line": case "barge": case "dock": return 0;
+                case "stall": return 2.2f;
+                case "market": return p.variant == 0 ? 2 : p.variant == 27 ? 1.3f : 1;
+                case "market_hall": return Mathf.Max(p.size.x, p.size.y) / 2 + 1;
+                case "lane_lamp": case "signpost": case "brazier": return .7f;
+                case "well": case "board": case "crates": case "barrels": case "hitch": case "oven": return 1.6f;
+                case "cart": return 2.6f; case "wagon": return 3.2f; case "haystack": return 2.2f;
+                case "dye_vat": return 2.6f; case "shard_rack": return (p.size.x > 0 ? p.size.x : 3) / 2 + .6f;
+                case "drain_mouth": return (p.size.x > 0 ? p.size.x : 3) * (p.variant == 1 ? 2 : 1) / 2 + 2.5f;
+                case "ruin": return Mathf.Max(p.size.x, p.size.y) / 2 + 1.5f;
+                case "brick_bridge": return Mathf.Max(p.size.x, p.size.y) / 2 + 1;
+                default: return Mathf.Max(3, Mathf.Max(p.size.x, p.size.y) / 2 + 1);
+            }
+        }
+        /// <summary>
+        /// The Lowtowns' streets lived in (2026-10-16, Chris: the Rust Market an empty plaza, the streets bare ground between the
+        /// tenements): against the terraces' walls, between their doors and down their backs and ends, crates, barrels, sacks, heaps of
+        /// rubbish, broken hand-carts and planks leant on the brick; bills pasted on the blind gable ends; puddles in the lanes; washing
+        /// lines strung across the narrow ways from wall to wall; more lamp posts where a lane runs dark; and round the market's stalls
+        /// their stock. GAME-ONLY dressing, no machines. Visual only (no colliders, nothing in the navmesh) but the lamp posts' thin iron
+        /// (a lane lamp's own); nothing on a road, in a building, in the water or the river's bank, nor near a door, a node, a secret, a
+        /// station, someone's post, a quest prop or an exit. The small parts are joined into one mesh a material. A stream of its own.
+        /// </summary>
+        void LowtownClutter()
+        {
+            var root = new GameObject("Street clutter").transform; root.SetParent(statics, false);
+            var r = new System.Random(Zone.seed + 7171); float R() { return (float)r.NextDouble(); }
+            var parts = new Batch(); float edge = Half - 12;
+            var clear = new List<(Vector2 at, float r)>();
+            foreach (var d in Doors) clear.Add((new Vector2(d.position.x, d.position.z), 2.4f));
+            foreach (var n in Zone.nodes) if (n != null) clear.Add((n.at, 3));
+            foreach (var s in Zone.secrets) if (s != null) clear.Add((s.at, s.radius + 2.5f));
+            if (Zone.stations != null) foreach (var s in Zone.stations) if (s != null) clear.Add((s.at, 3));
+            if (Zone.life != null && Zone.life.residents != null) foreach (var p in Zone.life.residents) if (p != null && p.at != Vector2.zero) clear.Add((p.at, 2));
+            foreach (var e in Zone.exits) if (e != null) { clear.Add((e.at, 10)); clear.Add((e.arrive, 6)); }
+            foreach (var i in Interactables) clear.Add((new Vector2(i.position.x, i.position.z), 2.2f));
+            if (Zone.spawns != null) { clear.Add((Zone.spawns.player, 5)); clear.Add((Zone.spawns.companion, 3)); clear.Add((Zone.spawns.recovery, 3)); }
+            var small = new List<(Vector2 a, Vector2 b, float r)>();
+            foreach (var p in Zone.props)
+            {
+                if (p == null) continue;
+                if (p.kind == "lane_wall" || p.kind == "town_wall")
+                {
+                    float half = (p.size.x > 0 ? p.size.x : p.kind == "town_wall" ? 40 : 10) / 2; var along = Quaternion.Euler(0, p.rotation, 0) * Vector3.right;
+                    small.Add((p.at - new Vector2(along.x, along.z) * half, p.at + new Vector2(along.x, along.z) * half, p.kind == "town_wall" ? 4 : 1));
+                    continue;
+                }
+                float k = ClutterKeep(p); if (k > 0) small.Add((p.at, p.at, k));
+            }
+            var placed = new List<(Vector2 at, float r)>();
+            bool Free(Vector2 q, float rad, bool road = false)
+            {
+                if (Mathf.Abs(q.x) > edge || Mathf.Abs(q.y) > edge) return false;
+                if (!road && NearRoad(q, rad + .3f)) return false;
+                if (Water.NearWater(q, rad + 1.5f) || InBuilding(q)) return false;
+                for (int k = 0; k < 4; k++) if (InBuilding(q + new Vector2(k < 2 ? (k * 2 - 1) * rad : 0, k >= 2 ? (k * 2 - 5) * rad : 0))) return false;
+                foreach (var c in clear) if ((q - c.at).sqrMagnitude < (c.r + rad) * (c.r + rad)) return false;
+                foreach (var s in small) if (SegDist(q, s.a, s.b) < s.r + rad) return false;
+                foreach (var c in placed) if ((q - c.at).sqrMagnitude < (c.r + rad + .3f) * (c.r + rad + .3f)) return false;
+                return true;
+            }
+            Vector3 G(Vector2 q, float lift = 0) { return root.InverseTransformPoint(new Vector3(q.x, HeightAt(q.x, q.y) + lift, q.y)); }
+            var cyl = Resources.GetBuiltinResource<Mesh>("Cylinder.fbx"); var ball = Resources.GetBuiltinResource<Mesh>("Sphere.fbx");
+            var crateWood = Tint(art.timber, new Color(.38f, .29f, .19f)); var batten = Tint(art.timber, new Color(.22f, .16f, .11f)); var stave = Tint(art.timber, new Color(.3f, .21f, .14f));
+            var sacking = Tint(art.cloth, new Color(.48f, .41f, .3f)); var grime = Tint(art.stone, new Color(.17f, .16f, .15f)); var ash = Tint(art.stone, new Color(.27f, .25f, .23f));
+            Material[] rags = { Tint(art.cloth, new Color(.4f, .22f, .17f)), Tint(art.cloth, new Color(.3f, .32f, .36f)), Tint(art.cloth, new Color(.45f, .4f, .3f)) };
+            Material[] bills = { Tint(art.cloth, new Color(.72f, .67f, .55f)), Tint(art.cloth, new Color(.6f, .55f, .44f)), Tint(art.cloth, new Color(.66f, .5f, .4f)) };
+            var ink = Tint(art.cloth, new Color(.12f, .11f, .11f));
+            void Box(Material m, Vector3 at, Vector3 size, Quaternion rot) { parts.Box(m, at, size, rot); }
+            void Shape(Mesh mesh, Material m, Vector3 at, Vector3 scale, Quaternion rot) { parts.AddMesh(mesh, m, Matrix4x4.TRS(at, rot, scale)); }
+            // The groups, each round a point on the ground (yaw: its turn; out: away from the wall it stands by).
+            void Crates(Vector3 at, Quaternion q)
+            {
+                int n = 1 + (int)(R() * 3);
+                for (int i = 0; i < n; i++)
+                {
+                    float s = .6f + R() * .3f; bool top = i == 2; var c = at + q * new Vector3(top ? -.1f : (i - .5f) * .95f, top ? .78f + s / 2 : s / 2, (R() - .5f) * .2f);
+                    var turn = q * Quaternion.Euler(0, (R() - .5f) * 24, 0);
+                    Box(crateWood, c, Vector3.one * s, turn);
+                    foreach (int sy in new[] { -1, 1 }) Box(batten, c + turn * new Vector3(0, sy * s * .42f, 0), new Vector3(s + .03f, s * .1f, s + .03f), turn);
+                }
+            }
+            void Barrels(Vector3 at, Quaternion q)
+            {
+                int n = 1 + (int)(R() * 3);
+                for (int i = 0; i < n; i++)
+                {
+                    var c = at + q * new Vector3((i - (n - 1) / 2f) * .72f, 0, (i % 2) * .3f - .15f);
+                    Shape(cyl, stave, c + Vector3.up * .45f, new Vector3(.62f, .45f, .62f), Quaternion.identity);
+                    foreach (float y in new[] { .16f, .74f }) Shape(cyl, SootIron, c + Vector3.up * y, new Vector3(.655f, .025f, .655f), Quaternion.identity);
+                    Shape(cyl, batten, c + Vector3.up * .905f, new Vector3(.56f, .01f, .56f), Quaternion.identity);
+                }
+            }
+            void Sacks(Vector3 at, Quaternion q)
+            {
+                int n = 2 + (int)(R() * 3);
+                for (int i = 0; i < n; i++)
+                {
+                    bool up = R() < .4f; var c = at + q * new Vector3((R() - .5f) * 1.1f, up ? .32f : .2f, (R() - .5f) * .6f) + (i == n - 1 && n > 3 ? Vector3.up * .3f : Vector3.zero);
+                    Shape(ball, sacking, c, up ? new Vector3(.45f, .64f, .42f) : new Vector3(.75f, .4f, .5f), q * Quaternion.Euler(0, R() * 360, 0));
+                }
+            }
+            void Rubbish(Vector3 at, Quaternion q)
+            {
+                for (int i = 0, n = 3 + (int)(R() * 4); i < n; i++)
+                {
+                    var c = at + q * new Vector3((R() - .5f) * 1.4f, 0, (R() - .5f) * .9f); float s = .3f + R() * .45f;
+                    Shape(ball, i % 3 == 0 ? ash : grime, c + Vector3.up * s * .2f, new Vector3(s * 1.3f, s * .55f, s), Quaternion.Euler(0, R() * 360, 0));
+                }
+                for (int i = 0, n = 2 + (int)(R() * 3); i < n; i++)
+                {
+                    var c = at + q * new Vector3((R() - .5f) * 1.3f, .08f + R() * .15f, (R() - .5f) * .8f);
+                    if (i % 2 == 0) Box(batten, c, new Vector3(.9f + R() * .6f, .04f, .14f), Quaternion.Euler((R() - .5f) * 30, R() * 180, (R() - .5f) * 30));
+                    else Box(rags[(int)(R() * rags.Length)], c, new Vector3(.45f, .03f, .35f), Quaternion.Euler((R() - .5f) * 40, R() * 180, (R() - .5f) * 40));
+                }
+            }
+            void BrokenCart(Vector3 at, Quaternion q)
+            {
+                // A hand-cart with a wheel gone: its bed down on the axle's broken end, the shafts on the setts, the wheel left lying by it.
+                var tilt = q * Quaternion.Euler(-9, 0, 14); var bed = at + q * new Vector3(0, .42f, 0);
+                Box(crateWood, bed, new Vector3(1.2f, .08f, 1.9f), tilt);
+                foreach (int s in new[] { -1, 1 }) Box(stave, bed + tilt * new Vector3(s * .6f, .17f, 0), new Vector3(.06f, .3f, 1.95f), tilt);
+                Box(stave, bed + tilt * new Vector3(0, .17f, .96f), new Vector3(1.2f, .3f, .06f), tilt);
+                foreach (int s in new[] { -1, 1 }) Box(batten, at + q * new Vector3(s * .42f, .22f, -1.55f), new Vector3(.07f, .07f, 1.6f), q * Quaternion.Euler(-11, 0, 0));
+                Shape(cyl, batten, at + q * new Vector3(.68f, .5f, .1f), new Vector3(1, .045f, 1), q * Quaternion.Euler(0, 0, 90));
+                Shape(cyl, batten, at + q * new Vector3(-1.25f, .05f, .55f), new Vector3(1, .045f, 1), q * Quaternion.Euler(0, R() * 90, 0));
+            }
+            void Planks(Vector3 wallFoot, Quaternion q)
+            {
+                // Planks and a door off its hinges leant on the brick (q: its z away from the wall).
+                for (int i = 0, n = 2 + (int)(R() * 3); i < n; i++)
+                {
+                    float len = 2 + R() * 1.2f, lean = 12 + R() * 8;
+                    var foot = wallFoot + q * new Vector3((i - n / 2f) * .32f + (R() - .5f) * .1f, 0, .1f + Mathf.Sin(lean * Mathf.Deg2Rad) * len);
+                    var rot = q * Quaternion.Euler(-lean, (R() - .5f) * 8, 0);
+                    Box(i % 3 == 2 ? batten : stave, foot + rot * new Vector3(0, len / 2, 0), new Vector3(.24f + R() * .1f, len, .04f), rot);
+                }
+            }
+            void Bills(Vector3 onWall, Quaternion q)
+            {
+                // Bills pasted on a blind wall (q: its z out of the wall), torn and overlapping: a warrant's, a fight's, a lost child's.
+                for (int i = 0, n = 2 + (int)(R() * 4); i < n; i++)
+                {
+                    var c = onWall + q * new Vector3((R() - .5f) * 2.4f, 1.3f + R() * 1.1f, .03f + i * .004f); var turn = q * Quaternion.Euler(0, 0, (R() - .5f) * 10);
+                    var bill = bills[(int)(R() * bills.Length)]; float w = .45f + R() * .3f, h = .6f + R() * .35f;
+                    Box(bill, c, new Vector3(w, h, .01f), turn);
+                    Box(ink, c + turn * new Vector3(0, h * .3f, .006f), new Vector3(w * .7f, h * .12f, .004f), turn);
+                    Box(ink, c + turn * new Vector3(0, -h * .05f, .006f), new Vector3(w * .55f, h * .05f, .004f), turn);
+                }
+            }
+            void Puddle(Vector2 q, float rad)
+            {
+                Shape(cyl, BlackWater, G(q, .085f), new Vector3(rad * 2, .004f, rad * (1.1f + R() * .6f)), Quaternion.Euler(0, R() * 180, 0));
+            }
+            // Against the terraces: between the doors in front, down the backs, at the ends; bills on the blind gable ends.
+            int groups = 0, billed = 0;
+            foreach (var p in Zone.props)
+            {
+                if (p == null || p.kind != "tenement") continue;
+                var size = LowtownSize(p); float w = size.x, d = size.y; var q = Quaternion.Euler(0, p.rotation, 0);
+                Vector2 At(float x, float z) { var o = q * new Vector3(x, 0, z); return p.at + new Vector2(o.x, o.z); }
+                int bays = Mathf.Max(2, Mathf.RoundToInt(w / 2.6f)); float bay = w / bays;
+                var spots = new List<(Vector2 at, Quaternion face, float x)>();
+                if (p.style != "back" && bays > 3) for (int b = 1; b < bays; b += 2) spots.Add((At(-w / 2 + bay * (b + .5f), -d / 2 - 1), q * Quaternion.Euler(0, 180, 0), 0));
+                for (float x = -w / 2 + 2; x < w / 2 - 1; x += 3.5f + R() * 2.5f) spots.Add((At(x, d / 2 + 1), q, 0));
+                foreach (int s in new[] { -1, 1 }) spots.Add((At(s * (w / 2 + 1), (R() - .5f) * d * .5f), q * Quaternion.Euler(0, s * 90, 0), s));
+                foreach (var s in spots)
+                {
+                    if (R() > .62f) continue;
+                    float pick = R(), rad = pick < .12f ? 1.6f : .9f;
+                    var ground = s.at; if (!Free(ground, rad)) continue;
+                    var at = G(ground); var face = s.face;
+                    // Leant on the wall, or set against it: the wall is a metre behind each spot (its -z in face).
+                    if (pick < .12f) BrokenCart(at + face * new Vector3(0, 0, .5f), face * Quaternion.Euler(0, 70 + R() * 40, 0));
+                    else if (pick < .3f) Crates(at, face);
+                    else if (pick < .47f) Barrels(at, face);
+                    else if (pick < .62f) Sacks(at, face);
+                    else if (pick < .82f) Rubbish(at, face);
+                    else Planks(at + face * new Vector3(0, 0, -.65f), face);
+                    placed.Add((ground, rad)); groups++;
+                }
+                // Bills on a blind end wall that stands free (no terrace against it).
+                foreach (int s in new[] { -1, 1 })
+                {
+                    if (R() > .45f) continue;
+                    var foot = At(s * (w / 2 + .6f), 0); if (InBuilding(foot)) continue;
+                    var wall = At(s * w / 2, (R() - .5f) * d * .3f); Bills(G(wall), q * Quaternion.Euler(0, s * 90, 0)); billed++;
+                }
+            }
+            // Round the market's stalls and the stall runs, their stock on the setts.
+            foreach (var p in Zone.props)
+            {
+                if (p == null || (p.kind != "stall" && p.kind != "market_hall")) continue;
+                var q = Quaternion.Euler(0, p.rotation, 0); float reach = p.kind == "stall" ? 2.9f : Mathf.Max(p.size.x, 24) / 2 + 1.5f;
+                for (int k = 0; k < (p.kind == "stall" ? 3 : 5); k++)
+                {
+                    float x = (R() < .5f ? -1 : 1) * reach * (p.kind == "stall" ? 1 : .2f + R() * .8f), z = p.kind == "stall" ? (R() - .3f) * 1.4f : -(p.size.y > 0 ? p.size.y : 6) / 2 - 1.4f;
+                    var o = q * new Vector3(x, 0, z); var ground = p.at + new Vector2(o.x, o.z);
+                    // Free of everything but the stall it serves.
+                    bool own = true; foreach (var s in small) if (s.a != p.at && SegDist(ground, s.a, s.b) < s.r + .8f) { own = false; break; }
+                    if (!own || NearRoad(ground, 1.1f) || InBuilding(ground)) continue;
+                    bool ok = true; foreach (var c in clear) if ((ground - c.at).sqrMagnitude < (c.r + .8f) * (c.r + .8f)) { ok = false; break; }
+                    foreach (var c in placed) if ((ground - c.at).sqrMagnitude < (c.r + 1.1f) * (c.r + 1.1f)) { ok = false; break; }
+                    if (!ok) continue;
+                    var at = G(ground); var face = q * Quaternion.Euler(0, R() * 360, 0); float pick = R();
+                    if (pick < .35f) Crates(at, face); else if (pick < .6f) Sacks(at, face); else if (pick < .85f) Barrels(at, face); else Rubbish(at, face);
+                    placed.Add((ground, .8f)); groups++;
+                }
+            }
+            // Puddles in the lanes and on the setts (on the roads too: a puddle is walked through).
+            int puddles = 0;
+            for (int tries = 0; tries < 900 && puddles < 70; tries++)
+            {
+                var q = new Vector2((R() * 2 - 1) * edge, (R() * 2 - 1) * edge); float rad = .7f + R() * 1.1f;
+                if (InBuilding(q) || Water.NearWater(q, rad + 2)) continue;
+                bool ok = true; foreach (var c in clear) if ((q - c.at).sqrMagnitude < c.r * c.r) { ok = false; break; }
+                if (!ok) continue;
+                Puddle(q, rad); puddles++;
+            }
+            parts.Flush(this, root, "Street clutter");
+            // Washing lines across the narrow ways: from a terrace's front or back to the wall facing it, 4 to 9 m over.
+            int lines = 0; var strung = new List<Vector2>();
+            foreach (var p in Zone.props)
+            {
+                if (p == null || p.kind != "tenement" || lines >= 24) continue;
+                var size = LowtownSize(p); var q = Quaternion.Euler(0, p.rotation, 0);
+                foreach (int sz in new[] { -1, 1 })
+                {
+                    if (R() > .35f) continue;
+                    var outV = q * new Vector3(0, 0, sz); var o2 = new Vector2(outV.x, outV.z); var c3 = q * new Vector3((R() - .5f) * size.x * .5f, 0, sz * size.y / 2); var from = p.at + new Vector2(c3.x, c3.z);
+                    float span = 0; for (float s = 3.5f; s <= 9.5f; s += .5f) if (InBuilding(from + o2 * s)) { span = s; break; }
+                    if (span <= 0) continue;
+                    var mid = from + o2 * (span / 2); if (strung.Exists(m => (m - mid).sqrMagnitude < 14 * 14) || Water.NearWater(mid, 2)) continue;
+                    bool near = false; foreach (var c in clear) if ((mid - c.at).sqrMagnitude < c.r * c.r) { near = true; break; }
+                    if (near) continue;
+                    var t = new GameObject("Washing line").transform; t.SetParent(root, false);
+                    t.position = new Vector3(mid.x, HeightAt(mid.x, mid.y), mid.y); t.rotation = Quaternion.LookRotation(Vector3.Cross(Vector3.up, outV));
+                    WashingLine(t, span, 5.4f + R() * 2.2f, r); strung.Add(mid); lines++;
+                }
+            }
+            // Lamp posts where a lane runs dark: on its verge, none within 22 m of another.
+            var lamps = Zone.props.Where(p => p != null && p.kind == "lane_lamp").Select(p => p.at).ToList(); int posts = 0;
+            foreach (var road in Zone.roads)
+            {
+                if (road == null || road.points == null || road.points.Length < 2) continue;
+                var pts = Densify(road.points, 4f);
+                for (int i = 2; i < pts.Count - 2 && posts < 20; i += 3)
+                {
+                    var dir = (pts[i + 1] - pts[i - 1]).normalized; var side = new Vector2(-dir.y, dir.x) * ((i / 3) % 2 == 0 ? 1 : -1);
+                    var at = pts[i] + side * (road.width / 2 + .7f);
+                    if (lamps.Exists(l => (l - at).sqrMagnitude < 22 * 22) || NearRoad(at, .3f) || !Free(at, .5f, true)) continue;
+                    var t = new GameObject("Lane lamp").transform; t.SetParent(root, false); t.position = new Vector3(at.x, HeightAt(at.x, at.y), at.y); t.rotation = Quaternion.LookRotation(new Vector3(side.x, 0, side.y));
+                    LaneLamp(t, 0); lamps.Add(at); placed.Add((at, .5f)); posts++;
+                }
+            }
+            Debug.Log("Lowtowns clutter: " + groups + " groups, " + billed + " walls billed, " + puddles + " puddles, " + lines + " washing lines, " + posts + " lamp posts.");
         }
         /// <summary>
         /// Past the edge (after BuildBackdrop, which leaves the Lowtowns' woods out): rows of roofs and stacks on the backdrop's skirt, the

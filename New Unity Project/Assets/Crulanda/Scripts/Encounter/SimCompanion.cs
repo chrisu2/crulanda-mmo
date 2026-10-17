@@ -139,15 +139,16 @@ namespace Crulanda.Encounter
         /// <summary>
         /// Its blow in a party, by its role (Chris, 2026-10-15, watching a group run: "tank is really doing too much damage compared to actual
         /// dps users": the Warrior tank 29/s, the Rogue 13, the Ranger 12 and its wolf 8, the Druid healer 12). A damage-dealer hits 1.6
-        /// times its blow, a tank and a healer half, so a tank does about 70% of a damage-dealer (the balance bands: tanks 42-55, damage 62-72).
+        /// times its blow, a tank and a healer half. Since 2026-10-17 the damage part's blow is set from the band instead
+        /// (SimCompanion.Damage: DamageBlow); the 1.6 is kept for what still reads it.
         /// </summary>
         public static float RoleDamage(PartyRole role) { return role == PartyRole.Damage ? 1.6f : .5f; }
-        /// <summary>Its blow in a party, with what its buffs add (BossBuffs.Edge on its main stat: a dish's, an elixir's, a class buff's).</summary>
         /// <summary>
-        /// Its blow in a party, with what its buffs add (BossBuffs.Edge on its main stat). A hybrid class dealing damage hits
-        /// EncounterSession.HybridDpsShare of a pure damage-dealer's (Chris, 2026-10-16: "A bit lower"), as a player's hybrid damage path does.
+        /// Its blow in a party, with what its buffs add (BossBuffs.Edge on its main stat: a dish's, an elixir's, a class buff's). In the
+        /// damage part its blow holds it to the pure damage band, a hybrid to EncounterSession.HybridDpsShare of it (Chris, 2026-10-16:
+        /// "A bit lower"), its pet's bites counted in (SimCompanion.Damage, 2026-10-17); a tank and a healer hit half their formula's blow.
         /// </summary>
-        public int Hit { get { return Mathf.Max(1, Mathf.RoundToInt(BaseHit * RoleDamage(Role) * (Role == PartyRole.Damage && EncounterSession.Hybrid(sim.classId) ? EncounterSession.HybridDpsShare : 1) * (1 + DamageEdge))); } }
+        public int Hit { get { float blow = Role == PartyRole.Damage ? DamageBlow : BaseHit * RoleDamage(Role); return Mathf.Max(1, Mathf.RoundToInt(blow * (1 + DamageEdge))); } }
         public int HealAmount { get { return Mathf.RoundToInt(12 + 5 * sim.level); } }
         /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
         public void GainXp(int xp)
@@ -324,6 +325,8 @@ namespace Crulanda.Encounter
                     if (e == null || !e.actor.IsAlive || !e.FightingParty || e.LeaveAlone || Held(e)) continue;
                     float d = Vector3.Distance(e.transform.position, transform.position); if (d < bestD) { best = e; bestD = d; }
                 }
+                // Nothing free left on the party: the held one, or the one marked to be left alone, is the last, and the party kills it (SimCompanion.Damage).
+                if (best == null) best = LeftForLast();
                 if (best == null && Leading.HasValue && waitingAt == null && !Regrouping && !BuffPending && Vector3.Distance(transform.position, Leading.Value) < 18 && PartyBehind() <= 16)   // no pull till the party is up (and buffed, at a boss: BossBuffs)
                 {
                     // At the camp it leads to: the nearest of its mobs still standing (not while it waits at a shut gate: the camp past it is not its to pull, D7;
@@ -706,6 +709,9 @@ namespace Crulanda.Encounter
                     if (heldKind == "fear") { var away = transform.position - fearFrom; away.y = 0; agent.isStopped = false; agent.speed = 4.5f; agent.SetDestination(transform.position + (away.sqrMagnitude > .01f ? away.normalized : transform.forward) * 6); }
                     else agent.isStopped = true;
                 }
+                // Rooted only its feet are held (2026-10-17, the level-17 Hallow's Creek run: the Rogue stood idle in the Fallen Mason's
+                // roots beside him): it still strikes, or shoots, what is in its reach.
+                if (heldKind == "root") { var q = Quarry; if (q != null && Vector3.Distance(transform.position, q.transform.position) <= Reach) StrikeAt(q, false); }
                 return;
             }
             float toPlayer = Vector3.Distance(transform.position, player.transform.position);
@@ -827,24 +833,7 @@ namespace Crulanda.Encounter
                 float d = Vector3.Distance(transform.position, quarry.transform.position);
                 if (d > Reach) { agent.isStopped = false; agent.speed = 5.2f; agent.SetDestination(quarry.transform.position); Activity = "Closing on " + quarry.actor.DisplayName; return; }
                 agent.isStopped = true;
-                var face = quarry.transform.position - transform.position; face.y = 0;
-                if (face.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(face), Time.deltaTime * 8);
-                Activity = (Melee ? "Fighting " : "Shooting at ") + quarry.actor.DisplayName;
-                if (Time.time >= nextAct)
-                {
-                    nextAct = Time.time + Interval;
-                    if (Time.time >= nextArea && SwingWide(quarry) > 0) return;   // a pack about its quarry: this blow goes across them all (SimCompanion.Fight)
-                    int dmg = Hit;
-                    if (Melee) visual?.Strike();
-                    else
-                    {
-                        visual?.CastRelease();
-                        bool arrow = Arrow;
-                        Bolt.Fire(Hand, quarry.transform, BoltColour, arrow ? .1f : .18f, arrow ? .22f : .28f, arrow);
-                    }
-                    quarry.Receive(dmg, actor);
-                    if (Role == PartyRole.Tank) quarry.threat.Add(actor.EntityId.Value, BaseHit * 3f);   // a tank's blows hold attention: three of its full blows a swing on top of the half it lands, over the damage-dealers' 1.6 (2026-10-15)
-                }
+                StrikeAt(quarry, true);
                 return;
             }
             // The Weaver's escort (D7): while Mother Quillet walks to the lock, the party keeps to her, not to you.

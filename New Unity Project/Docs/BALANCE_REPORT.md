@@ -454,3 +454,70 @@ move. Not measured yet: the group run at 17, Adit runs at 11.
 
 
 - **Warrior (Chris, 2026-10-16 ~22:40):** asked "Is the Warrior a hybrid or a pure damage class?", answered "Hybrid": Warrior damage builds stay 10% under the pure damage classes (Rogue, Ranger, Mage, Scoundrel), as built in 67d05e37.
+
+## The sims' damage in a party fight (2026-10-17)
+Chris, watching the level-17 Hallow's Creek group run's meter (`run-captures\hallows-4`, 1,829 s of 42 min 46 s fighting; you went
+17 to 20, the sims with you): "still not balanced i dont think". You (the bot, Judicator x0.64) 63.8 a second, in the hybrid band; the
+Rogue 42.2, the Ranger 36.7 and its wolf 13.9 (50.6 together), the Warrior tank 16.8, the Druid healer 9.9 and 41.5 healing.
+
+**How the meter counts.** `CombatMeter`: each member's damage over the seconds the party was in a fight (`EncounterSession.InCombat`:
+your target fought, or any mob on the party). Seconds in which a sim does nothing while a mob is still on the party count against it.
+
+**Where the sims' time went.** The run logs what each member is doing every 20 s; 90 of those were in a fight:
+
+| | attacking | at your side / following | closing | stunned, rooted, disoriented | guarding Elvet | mending |
+|---|---|---|---|---|---|---|
+| Rogue | 51 | 24 | 6 | 5 | 4 | |
+| Ranger | 62 | 24 | | | 4 | |
+| Druid | 46 | 23 | | 1 | 4 | 16 |
+| Warrior | 72 | 5 (waiting) | 5 | 7 | 1 | |
+
+- **The last mob of a pack (the most of it).** In 21 of the 90 the Rogue, the Ranger and the Druid stood at your side while the tank
+  fought one mob alone, often for 15-30 s, up to the camp being cleared. It was the one the Rogue had held under the moon: a mob with the
+  moon (or a cross) was "leave it alone" for the whole fight, also after its hold ran out (`EncounterEnemy.LeaveAlone`), so nobody but the
+  tank (who pulls what is left of its camp) and you struck it; three times nobody did, the tank waiting for the party while the mob hit
+  you. About a quarter of the Rogue's fighting time (some 430 s), a fifth of the Ranger's and the healer's.
+- **Boss roots.** A rooted sim did nothing ("rooted (The Fallen Mason)"); a root holds the feet only. Stuns and disorients are real.
+- **The formula sat under the band at every level, not just past 15.** A sim's blow was 1.6 x (12 + 4 a level in melee, 10 + 3.6 at
+  range), every 2 s (2.4 s at range). That formula grows exactly as a mob's health does (90 + 30 a level), so its level scaling is
+  sound, but on a dummy it gave (at mid practice):
+
+| level | pure band | Rogue was | Ranger + wolf was | Mage was | tank | healer |
+|---|---|---|---|---|---|---|
+| 11 | 51.3-56.0 | 47.0 | 34.7 + 14.0 = 48.7 | 34.7 | 14.7 | 10.9 |
+| 15 | 66-72 | 60.5 | 44.8 + 18.0 = 62.8 | 44.8 | 18.9 | 14.0 |
+| 17 | 73.3-80.0 | 67.2 | 49.8 + 20.0 = 69.8 | 49.8 | 21.0 | 15.6 |
+| 20 | 84.3-92.0 | 77.3 | 57.4 + 23.0 = 80.4 | 57.4 | 24.2 | 17.9 |
+
+  In the run (17-20) the Rogue landed 58% of its dummy rate, the Ranger 68%, the wolf 65%: the time above, not the level.
+- Not the cause: the sims' holds cost them no time (instant), and the area blows add damage in packs.
+
+**The bands at other levels.** The harness measures at 15 only. A sim's band at level L is the level-15 band x MobHealth(L) /
+MobHealth(15) (`SimCompanion.BandScale`): a damage-dealer kills a mob of its own level in the same time at every level. The run's
+Paladin bears it out: 63.8 on the meter at 17-20 is the Judicator's 62 at 15 x 1.19 (the scale at 18.5) at about 86% of the time in
+reach.
+
+**What changed**
+- **The last one is fought** (`SimCompanion.LeftForLast`): when nothing free is on the party, a sim takes the nearest held or
+  moon- or cross-marked mob on the party, and its mark comes off. While anything free is on the party the held one waits, as before.
+- **Rooted sims fight on**: a rooted sim strikes or shoots what is in its reach (stunned, disoriented and feared ones still do not).
+- **The damage part is set from the band** (`SimCompanion.Damage`): its blow is the band's middle (69 x BandScale), a hybrid's 90%,
+  less its pet's bites, over its blows a second; its yard practice moves it 4% either way (66.2-71.8 at 15). The Ranger's wolf and the
+  Bonecaller's thrall are counted in their keeper's damage, so the Ranger with its wolf is in the band; the wolf bites by the sim's level
+  (it went by yours). The Unwriting's unwrite is counted too. New blows at mid practice: Rogue and Scoundrel 107 / 138 / 153 / 176 at
+  11 / 15 / 17 / 20 (every 2 s); Ranger 95 / 122 / 136 / 156 (every 2.4 s, the wolf 14 / 18 / 20 / 23 a second besides); Mage 129 /
+  166 / 184 / 212. The Mage rises most (45 to 69 at 15): it had no pet to make up the formula's shortfall.
+- **The tank and the healer are unchanged** (half the formula's blow: the tank 27% of a damage-dealer's band, the healer about 20%).
+  Chris's rule of 2026-10-15 ("tank is really doing too much damage compared to actual dps users") stands.
+- **The fights kept as long** (`EncounterEnemy.DamagePartHealth` 1.2): a damage-part sim adds 1.2 shares to a mob's health (its blows
+  unchanged), so the two damage sims of a party of four add about 7% to the mobs' health, against their blows' rise of 10-14%. The last
+  mob no longer stands for 15-30 s at the end of a pack, so the runs will be quicker in time; the hard part of a fight (the pack all up,
+  the boss) is about as long as it was. No group test asserts how hard a fight is; the group run is the measure.
+- Test: `SimDummyTests` (PlayMode): a Rogue, a Ranger with its wolf, a Warrior tank and a Druid healer, and a Mage, a Scoundrel and an
+  Archivist (a hybrid), at 11, 15, 17 and 20 on a dummy: each damage sim within 3% of its aim and its aim inside its band; the tank a
+  fifth to two fifths of a damage-dealer's, the healer a tenth to a third. And the last mob held under the moon is fought by the party.
+  `SimPartyTests.Mobs_grow_with_the_group_by_its_levels` checks health by the new health shares.
+
+**What the meter should show in the next run at 17-20** (not yet measured): the Rogue about 82 x 0.8 of its time in reach, about 66;
+the Ranger with its wolf about 82 x 0.88, about 72; you, the Judicator, about 64 (90% of them, as Chris chose). To run: the Hallow's
+Creek group run at 17 and an Adit run at 11.

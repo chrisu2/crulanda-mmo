@@ -942,14 +942,16 @@ namespace Crulanda.World
                     for (float a = -edge; a < edge; a += 9 + R() * 8)
                     {
                         var q = side == 0 ? new Vector2(a, -edge) : side == 1 ? new Vector2(edge, a) : side == 2 ? new Vector2(a, edge) : new Vector2(-edge, a);
-                        float w = 8 + R() * 8, d = 7 + R() * 4, h = (side == 1 ? 14 : 9) + R() * (side == 1 ? 12 : 7);
+                        float w = 8 + R() * 8, d = 7 + R() * 4, h = (side == 1 ? 11 : 9) + R() * (side == 1 ? 6 : 7);
                         var g = EdgeGround(q, 0); float yaw = side == 0 || side == 2 ? 0 : 90;
                         var rot = Quaternion.Euler(0, yaw + (R() - .5f) * 6, 0);
                         walls.Add(new CombineInstance { mesh = box, transform = Matrix4x4.TRS(g + Vector3.up * (h / 2 - 1), rot, new Vector3(w, h + 2, d)) });
                         roofs.Add(new CombineInstance { mesh = gable, transform = Matrix4x4.TRS(g + Vector3.up * (h + 1), rot, new Vector3(w + .4f, d * .4f, d + .6f)) });
                         if (R() < (side == 1 ? .5f : .25f))
                         {
-                            float sh = side == 1 ? 20 + R() * 25 : 3 + R() * 3;
+                            // The Forge District's stacks over the east wall: 6 to 12 m over the roofs (they were 20 to 45 m, some 70 m up: the smog
+                            // swallowed their feet and their tops hung from the top of the view like roofs upside down, 2026-10-17).
+                            float sh = side == 1 ? 6 + R() * 6 : 3 + R() * 3;
                             walls.Add(new CombineInstance { mesh = box, transform = Matrix4x4.TRS(g + new Vector3((R() - .5f) * w * .6f, h + sh / 2, 0), rot, new Vector3(side == 1 ? 2.6f : 1, sh, side == 1 ? 2.6f : 1)) });
                             if (side == 1 && R() < .5f) Smoke(root, g + new Vector3(0, h + sh + .5f, 0) - root.position);
                         }

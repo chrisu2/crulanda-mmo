@@ -271,6 +271,8 @@ namespace Crulanda.Encounter
             if (session == null || session.Paused) return;
             if (Sleeping()) return;   // far and idle: nothing to do (EncounterEnemy.Dormant)
             if (!actor.IsAlive) { if (Camp && Time.time >= respawnAt) Respawn(); return; }
+            // Up again some other way (a load, a story revival): solid again.
+            if (walkThrough) WalkThrough(false);
             if (Game) return;   // no threat, no aggro, no swing: GameAnimal grazes, wanders and bolts
             if (ControlTick()) return;   // held, stunned or fleeing: nothing else this frame (EncounterEnemy.Control)
             if (joinAt >= 0 && Time.time >= joinAt) Join();   // it heard a call a beat ago: now it comes
@@ -402,8 +404,23 @@ namespace Crulanda.Encounter
             else if (Figure != null && Figure.Look == ActorLook.RockEater) { }   // a modelled beast: it falls in its own death where it stood
             else if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 90); visual.localPosition = new Vector3(0, -.6f, 0); }
             respawnAt = Time.time + RespawnSeconds;
+            WalkThrough(true);
             DeathCall();   // a boss's relief patrol (EncounterEnemy.Boss)
             session.EnemyDied(this);
+        }
+        bool walkThrough;
+        /// <summary>
+        /// A body is walked through (2026-10-17, hallows-4): it kept its upright capsule, two metres of solid nothing where it fell, so you
+        /// (and the run's bot, stuck and warped after searching a camp's bodies again and again) were walled in by the bodies of a fight on
+        /// a ramp, a stair or in a doorway. The capsule stays for clicks and the search (a ray still finds it); only your own collisions
+        /// skip it. Standing again, it is solid again.
+        /// </summary>
+        void WalkThrough(bool on)
+        {
+            var player = session != null && session.Player != null ? session.Player.GetComponent<CharacterController>() : null;
+            var body = GetComponent<Collider>();
+            if (player != null && body != null) Physics.IgnoreCollision(body, player, on);
+            walkThrough = on;
         }
         /// <summary>Camp mobs come back somewhere in their camp, whole, forgetting the fight.</summary>
         void Respawn()
@@ -421,6 +438,7 @@ namespace Crulanda.Encounter
             var visual = transform.Find("Body");
             if (visual != null) { visual.localRotation = Quaternion.identity; visual.localPosition = Vector3.zero; }
             UnscaleFromGroup(); TappedBy = null; actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            WalkThrough(false);
             ClearFight(); evadeUntil = 0;
             threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0; ResetFlee(); ForgetHolds();
             Drops = null; Coins = 0; NoLoot = false; LootBeacon.Clear(this);

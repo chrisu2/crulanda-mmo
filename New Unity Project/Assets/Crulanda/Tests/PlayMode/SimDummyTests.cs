@@ -1,0 +1,196 @@
+#if UNITY_EDITOR
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using NUnit.Framework;
+using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.TestTools;
+using Crulanda.Encounter;
+using Crulanda.World;
+
+namespace Crulanda.Tests
+{
+    /// <summary>
+    /// Party sims on a training dummy (2026-10-17; Chris, watching the level-17 Hallow's Creek run's meter: "still not balanced i dont
+    /// think"). A sim of each part at levels 11, 15, 17 and 20 sustains its band (SimCompanion.Damage): a pure damage-dealer the pure band
+    /// (66-72 at 15, grown as a mob's health), the Ranger with its wolf counted in, a hybrid 90% of it; the tank's damage modest, the
+    /// healer's less. And the last mob of a pack, held under the moon, is fought by the whole party, not by the tank alone.
+    /// </summary>
+    public class SimDummyTests
+    {
+        string root; EncounterSession session; float hourWas;
+        static readonly int[] Levels = { 11, 15, 17, 20 };
+        /// <summary>Game seconds measured at each level, and a frame's game time (Time.captureDeltaTime): a blow is due at most a frame late.</summary>
+        const float Seconds = 40, Step = .02f;
+
+        [UnitySetUp]
+        public IEnumerator Setup()
+        {
+            root = Path.Combine(Path.GetTempPath(), "Crulanda-simdummy-" + Guid.NewGuid().ToString("N"));
+            hourWas = WorldClock.Hour;
+            // A Warrior: its swings keep the fight on (auto attack) whatever the scene's default class.
+            EncounterSession.StartClassOverride = "class.warrior";
+            SceneManager.sceneLoaded += OnLoaded;
+            yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+            SceneManager.sceneLoaded -= OnLoaded;
+            yield return null;
+            session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+            Assert.NotNull(session); Assert.NotNull(SimPopulation.Active);
+            if (session.Companion != null) session.Companion.gameObject.SetActive(false);
+        }
+        void OnLoaded(Scene scene, LoadSceneMode mode) { UnityEngine.Object.FindFirstObjectByType<EncounterSession>().SaveDirectoryOverride = root; }
+        [UnityTearDown]
+        public IEnumerator Cleanup()
+        {
+            Time.captureDeltaTime = 0;
+            EncounterSession.StartClassOverride = null;
+            WorldClock.Hour = hourWas;
+            SceneManager.sceneLoaded -= OnLoaded;
+            var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N"));
+            SceneManager.SetActiveScene(empty);
+            yield return SceneManager.UnloadSceneAsync("Oakhaven");
+            if (Directory.Exists(root)) Directory.Delete(root, true);
+        }
+
+        /// <summary>A sim of this class (and path, if asked) from anywhere in the world, brought to Oakhaven, online, willing and of your level, and invited.</summary>
+        SimCompanion Join(string classId, Func<SimAdventurer, bool> fits = null)
+        {
+            var pop = SimPopulation.Active;
+            foreach (var s in pop.World.sims.Where(x => x.classId == classId && !session.InParty(x.id) && (fits == null || fits(x))).OrderBy(x => x.zone == "zone.oakhaven" ? 0 : 1).ToList())
+            {
+                s.zone = "zone.oakhaven"; s.onlineFrom = 0; s.onlineHours = 24; s.friendly = .9f; s.level = session.Progress.Level;
+                pop.Refresh();
+                if (session.InviteRefusal(s) == null && session.Invite(s.id)) return session.PartySim(s.id);
+            }
+            return null;
+        }
+        /// <summary>A mob made a training dummy: it stands, never strikes, and has health enough for the whole test.</summary>
+        EncounterEnemy Dummy()
+        {
+            var e = session.Enemies.Where(x => x != null && x.actor.IsAlive && !x.Game && !x.Hidden && !x.Elite && x.Inside == null)
+                .OrderBy(x => x.transform.position.sqrMagnitude).First();
+            e.enabled = false; var ag = e.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (ag != null && ag.isOnNavMesh) ag.isStopped = true;
+            e.actor.Health.Pool.SetMax(5000000, false); e.actor.Health.Pool.SetCurrent(5000000);
+            // Nothing else near it: no other mob joins, no splash lands elsewhere.
+            foreach (var o in session.Enemies)
+                if (o != null && o != e && (o.transform.position - e.transform.position).sqrMagnitude < 40 * 40) { o.enabled = false; var oag = o.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (oag != null) oag.enabled = false; o.transform.position += Vector3.forward * 300; }
+            return e;
+        }
+        /// <summary>Damage a second from a meter row's blows: what landed after its first blow, over the time from the first to the last.</summary>
+        sealed class Clock { public int first = -1, last; public float firstAt, lastAt; public float Rate { get { return lastAt > firstAt ? (last - first) / (lastAt - firstAt) : 0; } } }
+        static int DamageOf(EncounterSession s, string id) { foreach (var r in s.Meter.Rows) if (r.id == id) return r.damage; return 0; }
+
+        /// <summary>Each sim's sustained damage a second on the dummy, per level (ids: the sims' and their pets').</summary>
+        IEnumerator Measure(List<SimCompanion> party, EncounterEnemy dummy, Dictionary<string, float> rates)
+        {
+            var ids = new List<string>();
+            foreach (var c in party) { ids.Add(c.actor.EntityId.Value); var pet = session.SimPets.Find(p => p != null && p.Master == c); if (pet != null) ids.Add(pet.actor.EntityId.Value); }
+            var clocks = ids.ToDictionary(x => x, x => new Clock()); var seen = ids.ToDictionary(x => x, x => DamageOf(session, x));
+            float end = Time.time + Seconds;
+            while (Time.time < end)
+            {
+                yield return null;
+                foreach (var id in ids)
+                {
+                    int now = DamageOf(session, id); if (now == seen[id]) continue;
+                    seen[id] = now; var k = clocks[id];
+                    if (k.first < 0) { k.first = now; k.firstAt = Time.time; }
+                    k.last = now; k.lastAt = Time.time;
+                }
+                if (dummy.actor.Health.Pool.Current < 1000000) dummy.actor.Health.Pool.SetCurrent(5000000);
+            }
+            foreach (var id in ids) rates[id] = clocks[id].Rate;
+        }
+
+        IEnumerator Party(string[] classes, Func<SimAdventurer, bool> fits, List<string> report)
+        {
+            var party = new List<SimCompanion>();
+            foreach (var cls in classes) { var c = Join(cls, fits); Assert.NotNull(c, "a " + cls + " sim joins"); party.Add(c); }
+            yield return null;
+            var dummy = Dummy();
+            var motor = session.Player.GetComponent<AdventurerMotor>();
+            motor.Teleport(dummy.transform.position + Vector3.back * 14 + Vector3.up); yield return null;
+            session.Select(dummy); session.BeginAutoAttack(); Assert.IsTrue(session.AutoAttack, "the fight is on");
+            Time.captureDeltaTime = Step;
+            foreach (int level in Levels)
+            {
+                foreach (var c in party)
+                {
+                    c.MatchLevel(level); Assert.AreEqual(level, c.sim.level);
+                    var ag = c.GetComponent<UnityEngine.AI.NavMeshAgent>();
+                    var at = dummy.transform.position + Quaternion.Euler(0, 40 * party.IndexOf(c), 0) * Vector3.back * (c.Melee ? 1.6f : 10);
+                    if (UnityEngine.AI.NavMesh.SamplePosition(at, out var hit, 4, UnityEngine.AI.NavMesh.AllAreas)) ag.Warp(hit.position);
+                }
+                // A blow or two at the new level before the clock starts.
+                for (float t = 0; t < 5; t += Time.deltaTime) yield return null;
+                var rates = new Dictionary<string, float>();
+                yield return Measure(party, dummy, rates);
+                float pure = SimCompanion.PureDps(level), scale = SimCompanion.BandScale(level);
+                foreach (var c in party)
+                {
+                    float own = rates[c.actor.EntityId.Value]; var pet = session.SimPets.Find(p => p != null && p.Master == c);
+                    float withPet = own + (pet != null ? rates[pet.actor.EntityId.Value] : 0);
+                    string who = c.sim.name + " (" + c.sim.classId.Replace("class.", "") + ", " + c.Role + ", level " + level + ")";
+                    report.Add(who + ": " + withPet.ToString("0.0") + " a second" + (pet != null ? " (its pet " + (withPet - own).ToString("0.0") + ")" : "") + "; band middle " + pure.ToString("0.0") + "; " + c.Activity);
+                    if (c.Role == SimCompanion.PartyRole.Damage)
+                    {
+                        bool hybrid = EncounterSession.Hybrid(c.sim.classId); float share = hybrid ? EncounterSession.HybridDpsShare : 1;
+                        float aim = c.BandDps;
+                        Assert.That(aim, Is.InRange(SimCompanion.PureBandLow * scale * share, SimCompanion.PureBandHigh * scale * share), who + ": its aim is in the " + (hybrid ? "hybrid" : "pure") + " band");
+                        // Within 3% of its aim (5% for the Unwriting: its unwrite ticks are a third of a blow, rounded down).
+                        float within = SimCompanion.Unwriter(c.sim) ? .05f : .03f;
+                        Assert.That(withPet, Is.InRange(aim * (1 - within), aim * (1 + within)), who + " sustains its band on the dummy" + (pet != null ? ", its pet counted in" : ""));
+                    }
+                    else if (c.Role == SimCompanion.PartyRole.Tank) Assert.That(withPet / pure, Is.InRange(.2f, .4f), who + ": a tank's damage is modest (a fifth to two fifths of a damage-dealer's)");
+                    else Assert.That(withPet / pure, Is.InRange(.1f, .35f), who + ": a healer's damage is less again");
+                }
+            }
+            Time.captureDeltaTime = 0;
+            session.StopAutoAttack();
+        }
+
+        /// <summary>The Rogue, the Ranger and its wolf, the Warrior tank and the Druid healer: the Hallow's Creek run's party.</summary>
+        [UnityTest, Timeout(600000)] public IEnumerator A_sim_of_each_part_sustains_its_band_on_a_dummy()
+        {
+            var report = new List<string>();
+            yield return Party(new[] { "class.rogue", "class.ranger", "class.warrior", "class.druid" }, null, report);
+            Debug.Log("Sims on the dummy:\n" + string.Join("\n", report));
+        }
+        /// <summary>The other damage-dealers: a Mage, a Scoundrel and an Archivist (a hybrid in the damage part).</summary>
+        [UnityTest, Timeout(600000)] public IEnumerator The_other_damage_sims_sustain_theirs()
+        {
+            var report = new List<string>();
+            yield return Party(new[] { "class.mage", "class.scoundrel", "class.archivist" }, null, report);
+            Debug.Log("Sims on the dummy:\n" + string.Join("\n", report));
+        }
+
+        /// <summary>The last of a pack (the level-17 Hallow's Creek run, 2026-10-17: a quarter of the fighting the Rogue, the Ranger and the
+        /// healer stood at your side while the tank fought the last mob alone, the one held under the moon): the held mob waits while another
+        /// fights the party, then the party fights it and the moon comes off.</summary>
+        [UnityTest] public IEnumerator The_last_mob_held_under_the_moon_is_fought_by_the_party()
+        {
+            var a = session.Enemies.First(e => e != null && e.actor.IsAlive && e.Camp && !e.Elite && !e.Game && !e.Hidden &&
+                session.Enemies.Any(o => o != null && o != e && o.actor.IsAlive && o.Camp && !o.Elite && !o.Game && !o.Hidden && Vector3.Distance(o.transform.position, e.transform.position) < 12));
+            var b = session.Enemies.Where(o => o != null && o != a && o.actor.IsAlive && o.Camp && !o.Elite && !o.Game && !o.Hidden).OrderBy(o => Vector3.Distance(o.transform.position, a.transform.position)).First();
+            var c = Join("class.ranger"); Assert.NotNull(c, "a Ranger joins"); yield return null;
+            session.Player.GetComponent<AdventurerMotor>().Teleport(a.transform.position + Vector3.back * 6); yield return null;
+            c.GetComponent<UnityEngine.AI.NavMeshAgent>().Warp(session.Player.transform.position + Vector3.right * 2);
+            string me = session.Player.EntityId.Value; a.threat.Add(me, 50); b.threat.Add(me, 50);
+            for (float t = 0; t < 3 && !(a.FightingParty && b.FightingParty); t += Time.deltaTime) { a.threat.Add(me, 1); b.threat.Add(me, 1); yield return null; }
+            Assert.IsTrue(a.FightingParty && b.FightingParty, "both on the party");
+            b.RaidMarked = RaidMark.Moon; Assert.IsNull(b.Apply("incap", session.Player, 20), "held"); yield return null;
+            Assert.AreNotEqual(b, c.Quarry, "while another is free, the held one waits");
+            Assert.AreEqual(a, c.Quarry, "the free one is fought");
+            a.Receive(a.actor.Health.Pool.Current + 10, session.Player); yield return null;
+            Assert.IsFalse(a.actor.IsAlive, "the free one falls");
+            Assert.IsTrue(b.FightingParty, "the held one is still on the party");
+            EncounterEnemy q = null; for (float t = 0; t < 3 && q != b; t += Time.deltaTime) { q = c.Quarry; yield return null; }
+            Assert.AreEqual(b, q, "then the party fights the last one (" + c.Activity + ")");
+            Assert.AreEqual(RaidMark.None, b.RaidMarked, "and the moon comes off it");
+        }
+    }
+}
+#endif

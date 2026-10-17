@@ -27,8 +27,8 @@
   "squallTint": "#C9CDDA",
   "squallText": "A time-squall blows in over the town: the ash in it glitters silver, and for a breath your shadow is a step behind you.",
   "worldMapPosition": {
-    "x": 0.66,
-    "y": 0.47
+    "x": 0.8,
+    "y": 0.575
   },
   "worldMapNote": "East of Oakhaven, past the Road's End, in the grey.",
   "flatRadius": 400,

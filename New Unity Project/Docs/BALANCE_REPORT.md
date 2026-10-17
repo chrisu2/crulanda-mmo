@@ -452,3 +452,5 @@ him harder in a party with sims, by about the sims' gain (x1.6-1.9). The group t
 how hard the fight is, so the only measure is a group run. The elite tests (`EliteBalanceTests`) fight you alone on paper and do not
 move. Not measured yet: the group run at 17, Adit runs at 11.
 
+
+- **Warrior (Chris, 2026-10-16 ~22:40):** asked "Is the Warrior a hybrid or a pure damage class?", answered "Hybrid": Warrior damage builds stay 10% under the pure damage classes (Rogue, Ranger, Mage, Scoundrel), as built in 67d05e37.

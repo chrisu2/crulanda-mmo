@@ -97,7 +97,16 @@ namespace Crulanda.Tests
             Assert.AreEqual(SimCompanion.MaxHealthFor(s), c.actor.Health.Pool.Max);
             // Follows: the player steps away, the sim comes after.
             var motor = session.Player.GetComponent<AdventurerMotor>();
-            motor.Teleport(c.transform.position + Vector3.forward * 12);
+            // Twelve metres off along open ground the sim has a way across (straight north could land on a roof, in a wall or across water:
+            // R189 measured 24.9 m after eight seconds, on one sim's draw).
+            var from = c.transform.position; var to = from + Vector3.forward * 12; var path = new UnityEngine.AI.NavMeshPath();
+            for (int i = 0; i < 16; i++)
+            {
+                var d = Quaternion.Euler(0, i * 22.5f, 0) * Vector3.forward * 12;
+                if (UnityEngine.AI.NavMesh.SamplePosition(from + d, out var hit, 1.5f, UnityEngine.AI.NavMesh.AllAreas) && Mathf.Abs(hit.position.y - from.y) < 2
+                    && UnityEngine.AI.NavMesh.CalculatePath(from, hit.position, UnityEngine.AI.NavMesh.AllAreas, path) && path.status == UnityEngine.AI.NavMeshPathStatus.PathComplete) { to = hit.position; break; }
+            }
+            motor.Teleport(to);
             float before = Vector3.Distance(c.transform.position, session.Player.transform.position);
             // Up to eight seconds of game time (four was tight under a full run's load, c46): it closes three metres of the twelve.
             for (float w = 0; w < 8 && Vector3.Distance(c.transform.position, session.Player.transform.position) >= before - 3; w += Time.deltaTime) yield return null;

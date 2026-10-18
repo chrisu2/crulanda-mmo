@@ -328,7 +328,7 @@ The game's levels (`terraces` in lowtowns.json, style "shelf"; heights GAME-ONLY
   Drain Lane steps down into the courts, and two new step-streets: **the Court Stair** (the courts up 9 m to the High Rows) and **Weir
   Stair** (Weir Lane up to the High Rows). High Lane now ends at Market Lane (it ran into the market's wall).
 - **Retaining walls** (ZoneBuilder.LowtownLevels, GAME-ONLY): soot brick wherever a level stands a metre or more over the next, from under
-  the low ground to the high, a parapet a metre high over any drop of more than 1.2 m, a dark stone coping; solid and cut out of the navmesh;
+  the low ground to the high, a parapet a metre high over any drop of more than a metre (1.2 m until 2026-10-18; see "Rails on the raised walks"), a dark stone coping; solid and cut out of the navmesh;
   none across a stair or a ramp (their sides are walled instead, a causeway between walls). Step-streets have treads of wet setts with an
   iron nosing every fourth (visual: the ramp under them is walked).
 - **Re-placed to stand level** (data, by a script checking every footprint): ten unnamed terraces dropped (they stood across a level's edge;
@@ -514,3 +514,22 @@ session:** LowtownsRoofsTests, LowtownsLevelsTests, LowtownsZoneTests, LowtownsN
 ZoneContentTests, NodePlacementTests, SecretPlacementTests, PostFacingPlayTests, CameraAndTargetTests for the Lowtowns. **To look at:** the
 spout and the climb, the walks (party following over the bridges, the navmesh holding on them), the drop through the washing, the
 fire escape, the water tower from the lane and from the walk, the camera on the walk (no fading of the roof under you).
+
+## Rails on the raised walks (fx-lowrails, 2026-10-18; WRITTEN, compiles, NOT RUN in Unity)
+Chris (2026-10-18): "falling off ramps and bad pathing". Hallow's Creek's decks got rails the same day (ZoneBuilder.HallowsGround); the
+Lowtowns' raised walks now have them too, every one solid and cut out of the navmesh (NavBlocker), standing just outside the walk's edge so
+the walk keeps its width for the navmesh (ZoneBuilder.LowRail). GAME-ONLY.
+- Ramps, stairs and terrace edges: the retaining walls' parapet (a metre over the high side) now stands over any drop of more than a metre
+  (was 1.2 m; ZoneBuilder.LowWallTop, LowParapetDrop = RailDrop), so a ramp's or a stair's side a metre over the street is railed.
+- The roofs: the lead walks' lane-side rail is now iron at a hand rail's height and solid (was a low rail you could step off), with a gap
+  only where the rope bridge over Pell Row leaves it; an iron rail across each walk end no rope bridge lands on. The rope bridges' hand
+  ropes are solid (an unseen rail along each side, from where the bridge leaves the walk). The drops through the washing, the climbs and
+  the tower are E and move you, so the rails stand there too.
+- The weir: timber rails both sides the whole way across (ZoneBuilder.WeirRails), the banks' ends open; over the sluice they follow the
+  plank's two edges and replace the rope hand-line. The sluice's piers now stand on the downstream half only, beside the plank (they stood
+  across the whole crest and shut the walk).
+- The punt landings: a timber rail round each stage's three sides over the water, the bank's end open (the punt is E at the landing).
+- The brick bridges over the river (the Rag Bridge among them): their parapets were solid already; now cut out of the navmesh too.
+- Dead Man's Drop: its railing and its one gap where the lane ends are unchanged.
+- Tests: LowtownsLevelsTests.Ramps_and_stairs_have_a_rail_over_every_drop_beside_them, LowtownsMarksTests.The_weir_is_railed_both_sides_the_whole_way_across.
+- Not checked: the shelf's wall stops a little short of a ramp's side wall (its 1 m pieces); look at the ramps' top corners in a capture.

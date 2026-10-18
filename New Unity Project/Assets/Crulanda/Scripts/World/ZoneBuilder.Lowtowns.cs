@@ -369,6 +369,8 @@ namespace Crulanda.World
                     var at = new Vector3(s * (width / 2 + .22f), y + .65f, z);
                     var para = BoxPart(t, at, block, brick, tilt, 1.5f);
                     var wall = para.AddComponent<BoxCollider>(); wall.center = Vector3.zero; wall.size = block;
+                    // (2026-10-18, Chris: "falling off ramps and bad pathing") Cut out of the navmesh too, so no path hugs the deck's edge.
+                    para.AddComponent<NavBlocker>();
                     Part(PrimitiveType.Cube, t, at + tilt * new Vector3(0, .55f, 0), new Vector3(.6f, .12f, length / segs + .1f), cap, tilt);
                 }
             }

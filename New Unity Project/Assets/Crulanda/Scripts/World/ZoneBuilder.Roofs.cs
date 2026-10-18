@@ -197,10 +197,36 @@ namespace Crulanda.World
                         b.Box(iron, at + Vector3.down * .35f - outv * .2f, new Vector3(.06f, .06f, RoofDeckWide + .3f), Quaternion.LookRotation(outv));
                         b.Box(iron, at + Vector3.down * .7f - outv * (RoofDeckWide / 2 - .15f), new Vector3(.06f, .7f, .06f));
                     }
-                    // A low rail at the lane side (the edge; you can still step off it), posts every two metres.
-                    var railAt = mid + outv * (RoofDeckWide / 2 - .08f);
-                    b.Box(rust, railAt + Vector3.up * .5f, new Vector3(.05f, .05f, len), side);
-                    for (float s = -len / 2 + .2f; s < len / 2; s += 2f) b.Box(rust, railAt + dir * s + Vector3.up * .25f, new Vector3(.05f, .5f, .05f));
+                    // The rail at the lane side (2026-10-18, Chris: "falling off ramps and bad pathing"; was a low rail you could step
+                    // off): iron, solid and cut out of the navmesh, just outside the walk's edge, the whole length but a gap where a rope
+                    // bridge leaves it over the lane. The drops through the washing are E (a rail stands there too: the drop is the
+                    // interaction, not a step off).
+                    float half = len / 2;
+                    var gaps = new List<Vector2>();
+                    foreach (var o in legs)
+                    {
+                        if (o.kind != "bridge") continue;
+                        foreach (var end in new[] { o.a, o.b })
+                        {
+                            float s0 = Vector3.Dot(end - mid, dir); float off = Vector3.Dot(end - mid, outv);
+                            if (Mathf.Abs(s0) < half - .5f && Mathf.Abs(off) < RoofDeckWide) gaps.Add(new Vector2(s0 - RoofBridgeWide / 2 - .1f, s0 + RoofBridgeWide / 2 + .1f));
+                        }
+                    }
+                    var edge0 = mid + outv * (RoofDeckWide / 2);
+                    float from = -half;
+                    gaps.Sort((x, y) => x.x.CompareTo(y.x));
+                    foreach (var g in gaps) { if (g.x > from) LowRail(root, b, leg.name, edge0 + dir * from, edge0 + dir * g.x, outv, rust, rust, .3f, true); from = Mathf.Max(from, g.y); }
+                    if (half > from) LowRail(root, b, leg.name, edge0 + dir * from, edge0 + dir * half, outv, rust, rust, .3f, true);
+                    // Across each end of the walk with no rope bridge landing on it (the row's west end, the far terrace's ends): the
+                    // gable end is a drop to the alley or the lane.
+                    foreach (int e in new[] { -1, 1 })
+                    {
+                        var endAt = mid + dir * (e * half);
+                        bool bridged = false;
+                        foreach (var o in legs) if (o.kind == "bridge" && (Vector3.Distance(o.a, endAt) < 1.2f || Vector3.Distance(o.b, endAt) < 1.2f)) bridged = true;
+                        if (bridged) continue;
+                        LowRail(root, b, leg.name + "'s end", endAt - outv * (RoofDeckWide / 2), endAt + outv * (RoofDeckWide / 2 + .12f), dir * e, rust, rust, .3f, true);
+                    }
                     // The slope behind is not for walking: a wall you cannot see at the walk's inner edge (not in the navmesh: the walk's own
                     // inner edge already stops the agents).
                     var wall = new GameObject("The slope"); wall.transform.SetParent(root, false);
@@ -237,6 +263,24 @@ namespace Crulanda.World
                         }
                         // A timber post at each end, the ropes made fast round it.
                         foreach (var end in new[] { leg.a, leg.b }) b.Box(timber, end + o + Vector3.up * .55f, new Vector3(.14f, 1.3f, .14f));
+                        // (2026-10-18) The hand ropes made solid: a rail you cannot see along each side just outside the planks, cut out of
+                        // the navmesh, so nobody steps off the bridge between the stays.
+                        // It starts where the bridge leaves the lead walk: a bridge across the lane leaves it from the walk's middle line, so
+                        // its rail starts the walk's half width out, clear of the walk.
+                        float Trim(Vector3 end)
+                        {
+                            foreach (var d in legs)
+                                if (d.kind == "deck" && d.Off(end, out float dy) < 1.2f && Mathf.Abs(dy) < 1)
+                                    return (1 - Mathf.Abs(Vector3.Dot(dir, (d.b - d.a).normalized))) * (RoofDeckWide / 2 + .05f);
+                            return 0;
+                        }
+                        float ta = Trim(leg.a), tb = Trim(leg.b);
+                        if (len - ta - tb > .5f)
+                        {
+                            var edge = across * s * (RoofBridgeWide / 2);
+                            var ra = Vector3.Lerp(leg.a, leg.b, ta / len); var rb = Vector3.Lerp(leg.a, leg.b, 1 - tb / len);
+                            LowRail(root, null, leg.name, ra + edge, rb + edge, across * s, null, null, 0, true);
+                        }
                     }
                 }
                 else if (leg.kind == "climb" && leg.name == SpoutName) RainSpout(b, tops[leg.roof], leg, iron, rust);

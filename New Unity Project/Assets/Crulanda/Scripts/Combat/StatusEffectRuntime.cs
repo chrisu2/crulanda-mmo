@@ -84,6 +84,12 @@ namespace Crulanda.Combat
             foreach (var entry in active.ToArray())
                 if (now >= entry.expires) Remove(entry.id);
         }
+        /// <summary>The incoming-damage multiplier of the status of this id (1 when it is not on): above 1 it is harmful.</summary>
+        public float MultiplierOf(string id)
+        {
+            var found = active.Find(e => e.id == id);
+            return found == null ? 1 : found.damageMultiplier;
+        }
         /// <summary>Whether a status of this id is on (expired ones are dropped at the next Tick).</summary>
         public bool Has(string id) { return active.Exists(e => e.id == id); }
         public bool Remove(string id)

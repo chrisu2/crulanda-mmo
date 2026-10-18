@@ -442,6 +442,23 @@ LowtownsNightDropTests, LowtownsLevelsTests, LowtownsZoneTests, LowtownsReworkTe
 change), and the PlayMode NodePlacementTests, SecretPlacementTests, ZoneContentTests, PostFacingPlayTests for the Lowtowns. **To look at:**
 the Drop from the lane (the railing, the gap, the dark), a step off (the fall, the net, the line, the bite), the rungs out; the Night Market
 by day (tarps, nobody) and at night (the keepers, the jars, the butterflies popping, the ring, the lanterns), and fps there at night.
+## The rework, pick 7: new tricks for the other camps (w2-tricks, 2026-10-18; WRITTEN, compiles, NOT RUN)
+Chris: the fights "feel samey". Each camp now has one way of fighting of its own on top of its signature cast (`MobTricks` in
+`Scripts/Encounter/MobTricks.cs`, landed by `EncounterEnemy.Tricks.cs`; tests `MobTrickTests`). Each shows before it lands (a line the
+first time in a fight, a float over the mob, a ring on the ground) and each has an answer.
+- **Shield-Line** (Hired warder; CANON-EXPANDED, b1 ch.1:241, ch.2:155, ch.20:125-127): two warders within 3.5 m lock shields ("Shields
+  locked"); a locked warder takes half from the front and the line marches at 0.8 pace. Answer: hit from the flank or behind, or hold one
+  (a held warder unlocks).
+- **Thrown Slate** (Iron Teeth sifter; GAME-ONLY, b1 ch.1:297): every 13 s at whoever hangs back past 5 m (the farthest it can see), a 2 m
+  ring at their feet for 1.4 s, then 0.9 of a swing and a 1.5 m knock. Answer: step out; interrupt the throw (the ring goes with it).
+  No Lowtowns camp yet stands on a roof; when the roof camps come (pick 3's layers), the sifters go up there.
+- **Flank Bite** (Gutter-hound; GAME-ONLY, b1 ch.3:61, ch.7:73): every 10 s a hound "Circles behind" (up to 2.5 s, fast); at your back it
+  bites for 1.6 swings, else "Finds no back to bite". Answer: turn to it, or a wall at your back.
+- **Boat-Hook** (Dock-rat cutter; GAME-ONLY, the barges b1 ch.15:391, ch.16:75): every 15 s a 1.3 s swing at whoever stands off 3.5-9 m,
+  0.5 of a swing and a 3 m drag toward the cutter, along walkable ground on the same floor (never over an edge). Answer: interrupt, or keep
+  past 9 m.
+- **Someone Else's Memory** (Grey-touched; CANON-EXPANDED, b1 ch.3:133): every 18 s a 1.6 s gathering of light, then everyone within 7 m is
+  dazzled 3.5 s: three blows in ten go wide. Answer: interrupt, or turn your back to it (you; the sims always face it).
 
 ## Landmarks, turf and crossings (w2-marks, 2026-10-18; pick 12)
 Written and compiled, not yet run in Unity. Builder `ZoneBuilder.LowtownMarks.cs`, play `EncounterSession.LowtownMarks.cs`, tests

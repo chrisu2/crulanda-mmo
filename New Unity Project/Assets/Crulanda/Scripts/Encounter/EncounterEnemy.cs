@@ -276,6 +276,8 @@ namespace Crulanda.Encounter
             // Up again some other way (a load, a story revival): solid again.
             if (walkThrough) WalkThrough(false);
             if (Game) return;   // no threat, no aggro, no swing: GameAnimal grazes, wanders and bolts
+            // A thrown slate's or an echo's ring on the ground lands, whatever holds the one who laid it (EncounterEnemy.Tricks).
+            if (pending.Count > 0) TickTrickMarks();
             if (ControlTick()) return;   // held, stunned or fleeing: nothing else this frame (EncounterEnemy.Control)
             if (joinAt >= 0 && Time.time >= joinAt) Join();   // it heard a call a beat ago: now it comes
             if (Hidden)
@@ -303,7 +305,8 @@ namespace Crulanda.Encounter
                 threat.AddProximity(session.Player.EntityId.Value, Time.deltaTime);
             var id = threat.Choose(Time.time, session.IsLivingCombatant);
             Victim = session.CombatActor(id);   // your party, or a sim that came for it (Phase 5.3a)
-            if (Victim == null) { if (inFight) ClearFight(); Idle(); return; }
+            // (A fight done: its tricks start again from nothing next time, EncounterEnemy.Tricks.)
+            if (Victim == null) { if (inFight) { ClearFight(); ResetTrick(); } Idle(); return; }
             strolling = false;
             if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > FarLeash + 6 && Quiet) { Disengage(); return; }
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
@@ -314,10 +317,13 @@ namespace Crulanda.Encounter
             if (Move != null && TickElite()) return;   // an elite drawing back for its heavy blow stands still and does not swing
             if (TickFlee()) return;   // bolting at low health (EncounterEnemy.Flee)
             if (Cast != null && TickCast()) return;   // a caster casting stands still and does not swing (EncounterEnemy.Casts)
+            // A camp's trick: a shield-line, a slate, a circling hound, a boat-hook, a flash, a clock, an echo, a crossbow on the wall (EncounterEnemy.Tricks).
+            if (Trick != null && TickTrick()) return;
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(Victim.transform.position); }
             // Reach: 2.6 m across the ground and 1.6 m of height (a wading target sits lower than one on the bank).
             var gap = Victim.transform.position - transform.position; float across = new Vector2(gap.x, gap.z).magnitude;
-            bool inReach = across < 2.6f && Mathf.Abs(gap.y) < 1.6f;
+            // (A Pact spear in a locked wall reaches further: EncounterEnemy.Tricks.)
+            bool inReach = across < 2.6f + TrickReach && Mathf.Abs(gap.y) < 1.6f;
             // No coasting into (and through) the target after a charge or a lunge out of the grass: stop dead on arrival.
             if (agent.isOnNavMesh && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) agent.velocity = Vector3.zero;
             // Evade: a target it cannot reach (swimming, across deep water) for 4 s makes it give up and go home whole.
@@ -356,7 +362,7 @@ namespace Crulanda.Encounter
         {
             ClearFight();
             threat.Clear(); Victim = null; slowUntil = rootUntil = 0; unreachableSince = -1; TappedBy = null; ForgetHolds();
-            UnscaleFromGroup(); ResetCasting(); ResetFlee();
+            UnscaleFromGroup(); ResetCasting(); ResetFlee(); ResetTrick();
             if (!actor.IsAlive) return;
             actor.Health.ApplyHealing(actor.Health.Pool.Max);
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(home); }
@@ -392,6 +398,10 @@ namespace Crulanda.Encounter
             if (damage > 0 && WeaveEaterRules.Struck(this, source, Time.time) && source == session.Player) session.Message(WeaveEaterRules.BlackenedLine);   // steel through a Weave-Eater (the Lowtowns)
             // Blinded by a Hollow's dust (Hallow's Creek, b1 ch.4:177): the blow goes wide now and then.
             if (damage > 0 && source != null && session.BlindMisses(source)) { session.FloatText(transform.position, "Miss (dust)", new Color(.7f, .7f, .68f)); return; }
+            // A dazzled striker's blow may go wide; a locked shield turns a frontal one (EncounterEnemy.Tricks).
+            int struckFor = damage; damage = TrickTaken(damage, source);
+            // A blow gone wide: nothing reaches it, but it knows who swung.
+            if (struckFor > 0 && damage <= 0) { if (!Game && source != null) threat.Add(source.EntityId.Value, 1); return; }
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * session.DamageScaleFor(source)));
             if (!Game && source != null) session.Meter.Damage(source, actual);
             if (!Game) session.SpreadBlow(this, source, actual);   // an area build's blows splash onto foes near this one (EncounterSession.Spread)
@@ -417,6 +427,7 @@ namespace Crulanda.Encounter
             respawnAt = Time.time + RespawnSeconds;
             WalkThrough(true);
             DeathCall();   // a boss's relief patrol (EncounterEnemy.Boss)
+            ResetTrick();
             session.EnemyDied(this);
         }
         bool walkThrough;
@@ -453,7 +464,7 @@ namespace Crulanda.Encounter
             UnscaleFromGroup(); TappedBy = null; actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             WalkThrough(false);
             ClearFight(); evadeUntil = 0;
-            threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0; ResetFlee(); ForgetHolds();
+            threat.Clear(); Victim = null; Looted = false; slowUntil = rootUntil = 0; ResetFlee(); ForgetHolds(); ResetTrick();
             Drops = null; Coins = 0; NoLoot = false; LootBeacon.Clear(this);
             if (agent.isOnNavMesh) agent.isStopped = false;
             if (Game) GetComponent<GameAnimal>()?.Stand();

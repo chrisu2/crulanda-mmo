@@ -61,6 +61,11 @@ cellar trapdoors behind you (ch.4:161), the slow silent shift (ch.4:109), the ch
 the anchor-well in the Cellars under the well-house (ch.4:191-245). What was built, the numbers and what to run: DUNGEON2_DESIGN.md, "The
 Hollow as chapter 4 shows them".
 
+**Built (branch w2-tricks, 2026-10-18; WRITTEN, compiles, NOT RUN):** Lowtowns pick 7 (the warders' shield-line, the Teeth's thrown
+slates, the hounds' flank bite, the dock-rats' boat-hook, the Grey-touched's flash) and Hallow's Creek pick 8 (cutters against the clock,
+the ringers' Time-Lost echoes, crossbows on the wall, the Pact's shield-wall with spears, "Struck from the record" taking a buff off).
+ZONE_LOWTOWNS.md "The rework, pick 7" and DUNGEON2_DESIGN.md "New tricks for the Bureau and the Pact".
+
 ## 1. What the books say (check at a glance)
 
 ### The Lowtowns (Argentis's lower city)

@@ -74,7 +74,9 @@ namespace Crulanda.Tests
             }
             // Rares come last, so a visit without them moves nobody else's mobs.
             int firstRare = Array.FindIndex(zone.camps, c => c.rare > 0);
-            Assert.Greater(firstRare, 0); Assert.IsTrue(zone.camps.Skip(firstRare).All(c => c.rare > 0), "the rares come last");
+            // A camp released later ("after": the cellar trapdoors' "pull:") may follow the rares: it draws nothing from the camps' dice
+            // (SpawnCamps skips it), and putting it before them would shift the rares' indices, which mob ids and lockouts key on.
+            Assert.Greater(firstRare, 0); Assert.IsTrue(zone.camps.Skip(firstRare).All(c => c.rare > 0 || !string.IsNullOrEmpty(c.after)), "the rares come last (only released-later camps after them)");
             Assert.AreEqual(3, zone.camps.Count(c => c.rare > 0), "the Old Ram, the Grey Carter and the Lamplighter");
             Clean(bad, "camps that do not resolve");
         }

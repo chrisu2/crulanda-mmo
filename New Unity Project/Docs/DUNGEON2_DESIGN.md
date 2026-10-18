@@ -511,3 +511,21 @@ ActorVisual.cs, ActorVisual.Model.cs; EncounterContent/Zones/hallows.json.
 PlayMode HallowsNavTests (new: The_hollow_come_up_the_trapdoors_rise_at_the_well_and_crawl_on_in_halves), GroupRunTests; then the
 level-17 group run through the Cellars (no wipes, as before), and captures of a glide, the dust ring, a half crawling, and the well
 whole and broken.
+
+## New tricks for the Bureau and the Pact (2026-10-18, branch w2-tricks: REWORK_LOWTOWNS_HALLOWS.md pick 8; WRITTEN, compiles, NOT RUN)
+Chris: the fights "feel samey". `MobTricks` (`Scripts/Encounter/MobTricks.cs`) and `EncounterEnemy.Tricks.cs`; tests `MobTrickTests`.
+- **Cutting the Shell** (Bureau cutter; CANON-EXPANDED, b1 ch.17:67, ch.3:133): when a doorstep's cutters are pulled an 18 s clock starts
+  for that camp ("The chisels bite", warnings at 10 and 5 s). It runs only while a cutter is free: holding every cutter stops it. Run out,
+  "The shell breaks" and the camp's cutters hit 30% harder for the fight. (Kept to a buff: a Hollow rising from the shell is the Hollow
+  pass's, not this one.)
+- **Time-Lost Echo** (Paused ringer; CANON-EXPANDED, b1 ch.17:55): a blow it lands (at most one every 6 s) leaves a grey 2 m ring where its
+  foe stood; 2 s later the echo strikes there for a swing. Answer: step out of the ring.
+- **Quarrel from the Wall** (Iron Pact crossbowman; GAME-ONLY, the Pact's town b1 ch.19:33): standing 1.5 m or more above its foe and
+  seeing them, it holds the height and shoots (1 s "Takes aim", 0.8 of a swing, every 4 s). Out of its sight 3 s, it comes down after
+  you. Answer: climb to it, or break its line of sight.
+- **Pact Shield-Wall** (Iron Pact soldier; GAME-ONLY, b1 ch.20:125-127): as the Lowtowns' warders' line (half from the front, a 0.8 march),
+  with spears out between the shields: 1.2 m more reach while locked. Answer: the flank, or break the wall.
+- **Struck from the Record** (Bureau clerk; GAME-ONLY, the Bureau's ledger b1 ch.3:145, 253): every 18 s a 2.2 s reading at whoever in
+  20 m carries a helpful working (a blessing, a class buff, a meal); landed, the one with the most time left is struck off. Answer:
+  interrupt. (The rework's first sketch wiped the last 5 s of damage; Chris's brief of 2026-10-18 asks for a buff taken off instead.)
+To see in game: each line shows once a fight; the rings for the echo and the slate; a cutter camp left alone breaks its shell at 18 s.

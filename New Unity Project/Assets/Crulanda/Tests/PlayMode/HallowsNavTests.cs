@@ -354,7 +354,8 @@ namespace Crulanda.Tests
                 near.threat.Add(s.Player.EntityId.Value, 50); yield return Frames(3);
                 near.actor.Health.ApplyDamage(near.actor.Health.Pool.Max * 10); yield return null;
                 Assert.IsTrue(near.RisingAtWell, "cut down beside the well, it lies a moment");
-                for (float w = 0; w < HollowRules.WellRiseSeconds + 2 && !near.actor.IsAlive; w += Time.deltaTime) yield return null;
+                // the player kept alive (the far stair's other Hollow may notice and fight): the run 2026-10-18 11:44 died here
+                for (float w = 0; w < HollowRules.WellRiseSeconds + 2 && !near.actor.IsAlive; w += Time.deltaTime) { s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max); yield return null; }
                 Assert.IsTrue(near.actor.IsAlive, "and stands up again");
                 Assert.LessOrEqual(near.actor.Health.Pool.Current, HollowRules.Share(near.actor.Health.Pool.Max, HollowRules.WellRiseHealth) + 1, "weaker");
                 near.actor.Health.ApplyDamage(near.actor.Health.Pool.Max * 10); yield return null;
@@ -370,10 +371,15 @@ namespace Crulanda.Tests
                 HollowRules.Dice = () => 0;
                 var cut = s.Enemies.Find(e => e != null && e.BookHollow && e.actor.IsAlive && s.DistanceToWell(e.transform.position) > HollowRules.WellReach); Assert.NotNull(cut);
                 float hit = cut.HitBase;
-                cut.actor.Health.ApplyDamage(cut.actor.Health.Pool.Max * 10); yield return null;
+                s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max);
+                // read at once: the split is in the death itself, before any frame can reset its fight
+                cut.actor.Health.ApplyDamage(cut.actor.Health.Pool.Max * 10);
                 Assert.IsTrue(cut.actor.IsAlive && cut.Half, "its half crawls on");
                 Assert.LessOrEqual(cut.actor.Health.Pool.Current, HollowRules.Share(cut.actor.Health.Pool.Max, HollowRules.HalfHealth) + 1, "low");
                 Assert.AreEqual(hit * HollowRules.HalfHit, cut.HitBase, 1e-3f, "its blow halved");
+                // a fight given up does not make it whole again
+                cut.ResetFight();
+                Assert.LessOrEqual(cut.actor.Health.Pool.Current, HollowRules.Share(cut.actor.Health.Pool.Max, HollowRules.HalfHealth) + 1, "reset, still a half's health");
                 cut.actor.Health.ApplyDamage(cut.actor.Health.Pool.Max * 10); yield return null;
                 Assert.IsFalse(cut.actor.IsAlive, "a half does not split again");
             }

@@ -169,6 +169,14 @@ namespace Crulanda.Encounter
             DeathCall();
             session.EnemyDied(this);
         }
+        /// <summary>A fight given up (ResetFight heals it): a crawling half or a Hollow the well raised goes back no higher than it stood up
+        /// (2026-10-18, the PlayMode run: a half on a player who died reset to full health).</summary>
+        void CapHollowHealth()
+        {
+            if (!actor.IsAlive || (!Half && !risenFromWell)) return;
+            int cap = HollowRules.Share(actor.Health.Pool.Max, Half ? HollowRules.HalfHealth : HollowRules.WellRiseHealth);
+            if (actor.Health.Pool.Current > cap) actor.Health.Pool.SetCurrent(cap);
+        }
         /// <summary>Back whole at its camp (Respawn): no half, not risen, its blow its own again.</summary>
         void RespawnHollow()
         {

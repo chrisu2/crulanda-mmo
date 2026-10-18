@@ -365,6 +365,8 @@ namespace Crulanda.Encounter
             UnscaleFromGroup(); ResetCasting(); ResetFlee(); ResetTrick();
             if (!actor.IsAlive) return;
             actor.Health.ApplyHealing(actor.Health.Pool.Max);
+            // a Hallow's Creek Hollow's half, or one risen at the well, is whole only as far as it ever is again (EncounterEnemy.Hollow)
+            CapHollowHealth();
             if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(home); }
         }
         /// <summary>Seconds until this enemy may swing again (0 = ready as soon as it is in reach).</summary>

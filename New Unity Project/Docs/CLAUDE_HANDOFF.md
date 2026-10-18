@@ -1,6 +1,82 @@
-# Crulanda: Claude handoff (Start here rewritten 2026-10-17 ~00:10: the stopping point after the Lowtowns and Hallow's Creek)
+# Crulanda: Claude handoff (Start here rewritten 2026-10-17 ~21:00: the stopping point after the Oct 17 update)
 
 ## Start here
+
+**Stopping point: 2026-10-17 ~21:00.** Chris: "no run for another 2 hours and then create a handoff and shutdown the computer". Everything
+is committed on `feet-bow-adit-kit` in D:\code\mmo, backed up to E: (tools\Backup.ps1), and the PC shut down at his word. **Not pushed
+to GitHub**: the auto-mode check refused `git push` both times (Oct 16 night and today); ask Chris to allow it or push himself
+(`git -C D:\code\mmo push origin feet-bow-adit-kit`). All the D:\code\mmo-* worktrees were removed today (Chris: "you delete what is no
+longer needed"); every branch is still in git (p85-hero unmerged, nothing built on it). Nothing is VERIFIED until Chris sees it.
+
+### The Oct 17 update (published 2026-10-17 20:47)
+Built from feet-bow-adit-kit; Chris's saves backed up first (save-backups/20261017-2047-before-oct17-update). On top of the Oct 16 publish (castle, level 20, Lowtowns,
+Hallow's Creek, checkpoints, balance answers):
+- **Lowtowns sky:** the "upside-down roofs" at the top of the Rust Market's view were the Forge District's backdrop stacks and blocks
+  (to ~70 m) with their feet in the smog; lowered (SkyGhostDiagnostics found it by toggling: the ghost went with the fog and the
+  backdrop). A few pale downward spikes remain at the very top of that one view (not identified: they show with fog off too).
+- **Sims' damage:** the Rogue/Ranger/healer stood idle at the end of most packs (a moon-held mob was "leave it alone" all fight); now the
+  party fights the last held mob; damage sims' hits set from the band (SimCompanion.Damage.cs); rooted sims keep attacking. Measured in
+  the run: Rogue 61/s, Ranger 52 + wolf 12, Paladin bot 54 (hybrid 90%), Druid heals 51/s.
+- **Run bot:** dead mobs' capsules no longer block the player (EncounterEnemy: real for Chris too); the bot hops kerbs, side-steps, paths
+  from the navmesh; **the chasm floor was "out of the world"** (Hollow.Lowest 5 m under the land: dropping to the Fallen Mason sent you
+  back to the yard; now ZoneBuilder.LowestFloor) — real for Chris too. Stuck warps 20 → 5.
+- **Checkpoints** reached within 12 m (was 4): all three Hallow's Creek lamps reached on the way; after a death the party woke at the
+  furthest lamp.
+- **/oakhaven** chat command (home from anywhere out of a fight).
+- **Auto attack:** E (G on ESDF) with a foe targeted and nothing else to use starts your swing, every class; the Shaman swings its staff
+  (Rooting Stamp starts it), with its own swing scale (Stonebound spells 2.45 → 1.81 so spells + swings stay in the tank band).
+  Cleric and Archivist still have no swings (no melee path).
+- **World map:** labels on dark plates with state pips, auto-placed without overlaps, faint roads, the Lowtowns at Argentis' foot,
+  Hallow's Creek east of Oakhaven, designers' map notes hidden, the zone list scrolls.
+- **Oakhaven:** the tannery yard, woodyard and bake oven off the fields (WorkshopDataTests: no workshop on a field).
+- **The Crown:** trainers and fixed posts face the open room (PostFacingPlayTests); the Hall of Arms dressed (class banners, runner,
+  benches, candle-stands); the Gilded Lantern's porch columns out 2.2 m; every inn's door queues fitted to open floor (Oakhaven's and
+  Khaven's were against the porch posts); **lag:** townsfolk past 30 m cast no shadows and past 95 m are not drawn; ivy/leaves/garden
+  detail in 24 m blocks hidden past 100 m (DetailCull). Noon on the capture rig: 64 → 130 fps (at a 70 m reach; 100 m set after,
+  121 fps measured with the 100 m reach).
+- **The Bureau Examiner** (Hallow's Creek's last boss) wiped the party 3 times: his 3 s "hour" stun every 18 s reached 8 m on a 7.8 m
+  floor, so nobody could get clear; now 5 m and the healer/archer sims step clear at the warning (SimCompanion.StepClearOfHold).
+  Confirmed: the level-17 run (run-captures/hallows-7, 20:44) beat him on the first pull, the Druid "stepping clear of the hour".
+
+### Tested
+- The last full round (chainR200): EditMode 87/87, PlayMode 77/78; then SimDummyTests + SimPartyTests 18/19 after the Mage pet fix.
+  The one red: **a sim Scoundrel at level 15 lands 60.7/s against 64.3-68.2** (the others and other levels pass). Suspect (unconfirmed):
+  the stuck-pet fix (RangerPet, e8fec5a5) sets the Mage's thrall 1.4 m from the dummy beside the Scoundrel and they shove; fix = pick
+  the pet's spot away from party members (about 1.1 m clear). Not done.
+- The level-17 Hallow's Creek run (run-captures/hallows-7): 27/27 camps in 35 min, one death (Sergeant Tredway, woke at the lip lamp),
+  8 stuck warps; meter Rogue 69.6/s, Paladin bot 61.1, Ranger 57.7 + wolf 17.1, Warrior 18.7, Druid heal 50.8. The Examiner first pull.
+- Frames: world-captures/crown-8 (Hall of Arms, the inn porch), lowtowns-7, ui-captures/r197 (the new world map); skyghost/ (the
+  diagnostic's toggles). Noon: Crown 121 fps, Lowtowns 164-230.
+
+### Next, in order
+1. Chris plays the update; reports stay open until he confirms (the Crown's lag and posts, the inn doors, the map, the Shaman's swing
+   with E, /oakhaven, the Lowtowns sky, Hallow's Creek's final boss).
+2. The sim Scoundrel's 5.6% shortfall at level 15 (above).
+3. After a wipe the party does not buff up again before the next pull (BossBuffs: once per boss); make it re-buff after a wipe.
+4. The pale downward spikes at the top of the Rust Market's high view (SkyGhostDiagnostics: run it again, toggle at finer grain).
+5. GitHub push (Chris's permission).
+6. From before: retune bosses for buffed parties (Nix with one hold); Phase 8.5 on p85-hero (the Modular Hero body); the Lowtowns'
+   generator (tools/wip/lowtowns/make_lowtowns.py) is out of date with lowtowns.json: never run it over the file.
+
+### Lessons from today (memory holds them)
+- Don't run Unity jobs while Chris plays: they made his game lag. Chains now wait until the game and Unity are closed (Busy()).
+- Lanes get only committed work while helpers edit: D:\crulanda-work\syncCommitted.ps1 (mirror, then the committed copy of every open
+  file, and files not yet added removed). A half-done helper file broke a run before this.
+- Clean up worktrees as soon as they are merged (memory: clean-up-worktrees).
+- Measure, don't guess: SkyGhostDiagnostics (render the view, toggle groups) found the sky ghost after three wrong guesses.
+- A wipe: read the log from the pull (the Examiner's stun reach vs his floor), don't just turn numbers.
+
+### Chris's words today (verbatim; the docs hold them)
+- "keep working and get it right"; "when i play the new zone. iasked this last night and you said 2-3 hours. did it complete?";
+  "how do i load the game"; "you have left lots of folders in my d:\code\ locations with lots off mmo* variants" / "you delete what is
+  no longer needed."; "is there a command to get to oakhaven?"; "map is not clear"; "shaman still had no auto attack."; "tools in the
+  farmers field"; "still people standing backwards at /crown also still laggy"; "people stuck getting into inn"; "whats been running an
+  hour"; "long run back ..are you not using checkpoints"; "how much longer?"; "no run for another 2 hours and then create a handoff and
+  shutdown the computer".
+
+---
+
+## Oct 16 night (superseded)
 
 **Stopping point: 2026-10-17 ~00:10.** Chris: "once all these jobs are complete. backup, save and then complete the handoff for next
 time". Everything is committed and pushed (every branch), backed up to E: (tools\Backup.ps1). Nothing is VERIFIED until Chris sees it

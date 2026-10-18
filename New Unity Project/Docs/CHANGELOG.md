@@ -1,5 +1,15 @@
 # Changelog
 
+## 2026-10-17 20:47: published: the Oct 17 update (OPEN until Chris checks it in game)
+- The Crown at 121 fps at noon (was 64): far townsfolk not drawn, far ivy and garden detail hidden past 100 m; trainers face the room;
+  the Hall of Arms dressed; inn doorways clear (the Gilded Lantern's porch, every inn's door queues on open floor).
+- Hallow's Creek: dropping into the chasm no longer sends you to the entrance; checkpoints reached within 12 m; the Bureau Examiner's
+  stun reaches 5 m (his floor is 7.8 m) and healer/archer sims step clear: beaten first pull in the confirming run.
+- Sims' damage in their bands (the last held mob is fought; pets that can't reach bite from beside the target); dead bodies no longer
+  block you; E starts auto attack for every class; the Shaman swings its staff; /oakhaven; the world map readable; Oakhaven's tannery,
+  woodyard and oven off the fields; the Lowtowns' east backdrop no longer hangs from the sky.
+- Open: a sim Scoundrel 5.6% under at level 15; re-buff after a wipe; pale spikes atop one Lowtowns view (CLAUDE_HANDOFF.md, Next).
+
 ## 2026-10-16 23:54: published: the castle, level 20, the Lowtowns, Hallow's Creek (OPEN until Chris checks them in game)
 - **In the normal game** (save backed up to save-backups/20261016-2354-before-castle-lowtowns-publish): the Crown of Argentis; the cap at
   20; the Lowtowns (15-20) with a fuller Rust Market, street clutter, the city roofline and the new Rusty Spoon (its own building: Chris,

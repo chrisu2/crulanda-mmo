@@ -691,7 +691,7 @@ namespace Crulanda.Encounter
         public bool Working { get { return workDone != null; } }
         void StartWork(string name, float seconds, Action done, RecipeDef recipe = null)
         {
-            workPose = ActorPose.None; workRecipe = recipe; workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
+            workInFight = false; workPose = ActorPose.None; workRecipe = recipe; workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
         }
         /// <summary>Stops the work in hand, if any (nothing is gathered), saying so when <paramref name="say"/>.</summary>
         /// <summary>Saves and closes the game (the pause menu's Quit, /exit and /quit; Chris, 2026-10-14).</summary>
@@ -702,7 +702,8 @@ namespace Crulanda.Encounter
             if (workDone == null) return;
             var p = Player.transform.position; int health = Player.Health.Pool.Current;
             if (!Player.IsAlive) { CancelWork(); return; }
-            if (new Vector2(p.x - workAt.x, p.z - workAt.z).magnitude > .3f || health < workHealth || InCombat) { CancelWork(true); return; }
+            // (breaking the anchor-well may be done in a fight: EncounterSession.HollowCellars)
+            if (new Vector2(p.x - workAt.x, p.z - workAt.z).magnitude > .3f || health < workHealth || (InCombat && !workInFight)) { workInFight = false; CancelWork(true); return; }
             workHealth = health;   // it may climb (resting heals); only a fall stops the work
             if (Time.time - workStart < workSeconds) return;
             var done = workDone; workDone = null; workName = null; done();

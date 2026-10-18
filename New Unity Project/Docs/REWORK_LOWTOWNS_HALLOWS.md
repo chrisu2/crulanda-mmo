@@ -56,6 +56,10 @@ DUNGEON2_DESIGN.md, "The town as the books write it".
 with the overhang as shelter, stone leaves that cut, green fissures, shadows toward the sun) and 10 (the bridge's hanging and turning
 slabs, the fifth slab that dips under a foot and tips to 45 degrees once the party is past). What was built and what is still to see:
 DUNGEON2_DESIGN.md, "The Ash Road and the bridge as chapter 17 tells them".
+**Built (branch w2-hollow, 2026-10-18; WRITTEN, compiles, NOT RUN):** Hallow's Creek pick 6, the Hollow as chapter 4 shows them: out of
+cellar trapdoors behind you (ch.4:161), the slow silent shift (ch.4:109), the choking dust (ch.4:177), halves that crawl on (ch.4:181) and
+the anchor-well in the Cellars under the well-house (ch.4:191-245). What was built, the numbers and what to run: DUNGEON2_DESIGN.md, "The
+Hollow as chapter 4 shows them".
 
 ## 1. What the books say (check at a glance)
 

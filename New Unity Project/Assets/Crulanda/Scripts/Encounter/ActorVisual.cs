@@ -24,6 +24,8 @@ namespace Crulanda.Encounter
         public ActorPose Pose;
         /// <summary>Riding in a saddle (Nix on the Rock-Eater, EncounterEnemy.HideInside): seated, its legs still, however fast its mount goes.</summary>
         public bool Riding;
+        /// <summary>Carried along the ground without a step (a Hallow's Creek Hollow's shift, b1 ch.4:109; EncounterEnemy.Hollow): the legs stay still.</summary>
+        public bool Gliding;
         int variant; bool child, posed; string role; float stoop, swimLean, swimPhase;
         /// <summary>Held weapon/shield/staff parts, and the same kit slung on the back (shown instead while swimming).</summary>
         Transform[] held, stowed; bool gearStowed;
@@ -1112,6 +1114,8 @@ namespace Crulanda.Encounter
                 if (stowed != null) foreach (var g in stowed) g.gameObject.SetActive(stow);
             }
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
+            // gliding (a Hollow's shift): no stride
+            if (Gliding) delta = Vector3.zero;
             float target = Time.deltaTime > 0 ? delta.magnitude / Time.deltaTime : 0;
             speed = Mathf.Lerp(speed, target, Time.deltaTime * 8);
             float stride = Mathf.Clamp01(speed / 4.5f);

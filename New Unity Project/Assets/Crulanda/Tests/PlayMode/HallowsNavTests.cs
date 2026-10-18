@@ -315,6 +315,71 @@ namespace Crulanda.Tests
             Assert.Less(Time.time, s.Pie.hiddenUntil, "no pie now");
         }
 
+        /// <summary>
+        /// Pick 6, the Hollow as chapter 4 shows them (HollowRules): a Hollow camp pulled in the Cellars brings one more up a cellar trapdoor
+        /// behind the party (ch.4:161), standing on the cellar floor; a Hollow cut down beside the anchor-well lies a moment and stands up again
+        /// (ch.4:191-197), and broken, the well raises no more; a Hollow cut down elsewhere may split, its half crawling on low and slow (ch.4:181).
+        /// </summary>
+        [UnityTest, Timeout(300000)] public IEnumerator The_hollow_come_up_the_trapdoors_rise_at_the_well_and_crawl_on_in_halves()
+        {
+            var s = Session(); var zone = s.Zone; zone.OpenGates(); yield return Frames(30);
+            EncounterSession.ReleaseDelay = .1f;
+            var camps = zone.Zone.camps;
+            int pulled = Array.FindIndex(camps, c => c.name == "Hollow in the long cellar"), door = Array.FindIndex(camps, c => c.name == "Hollow up the cellar trapdoor");
+            Assert.GreaterOrEqual(pulled, 0); Assert.GreaterOrEqual(door, 0);
+            Assert.IsFalse(s.Enemies.Exists(e => e != null && e.CampIndex == door), "nobody stands at the trapdoor before the pull");
+            var motor = s.Player.GetComponent<AdventurerMotor>();
+            var first = s.Enemies.Find(e => e != null && e.CampIndex == pulled && e.actor.IsAlive); Assert.NotNull(first);
+            Assert.IsTrue(first.BookHollow, "a Hallow's Creek Hollow fights as chapter 4 shows them");
+            motor.Teleport(first.transform.position + Vector3.up * .2f - first.transform.forward * 2); yield return Frames(5);
+            first.threat.Add(s.Player.EntityId.Value, 50);
+            for (float w = 0; w < 3 && !s.Enemies.Exists(e => e != null && e.CampIndex == door); w += Time.deltaTime) yield return null;
+            var up = s.Enemies.FindAll(e => e != null && e.CampIndex == door);
+            Assert.AreEqual(1, up.Count, "one comes up the trapdoor when its camp is pulled");
+            Assert.IsTrue(NavMesh.SamplePosition(up[0].transform.position, out var at, 2.5f, NavMesh.AllAreas), "on the cellar floor");
+            Assert.IsTrue(Crulanda.World.Hollow.InsideAny(at.position, 1), "inside the Cellars, not on the street above");
+            Assert.IsNotNull(GameObject.Find("Cellar trapdoor (Hollow up the cellar trapdoor)"), "its trapdoor stands thrown open");
+            foreach (var e in s.Enemies.ToArray()) if (e != null && e.Camp && e.actor.IsAlive) e.ResetFight();
+            yield return Frames(5);
+
+            // The anchor-well: whole, pulsing, under the well-house end of the Cellars.
+            Assert.NotNull(s.AnchorWell, "the anchor-well"); Assert.IsTrue(s.WellWhole);
+            int stair = Array.FindIndex(camps, c => c.name == "Hollow at the far stair");
+            var near = s.Enemies.Find(e => e != null && e.CampIndex == stair && e.actor.IsAlive); Assert.NotNull(near);
+            Assert.Less(s.DistanceToWell(near.transform.position), HollowRules.WellReach, "the far stair's Hollow are within its reach");
+            HollowRules.Dice = () => .99f;
+            try
+            {
+                motor.Teleport(near.transform.position + Vector3.up * .2f - near.transform.forward * 2); yield return Frames(5);
+                near.threat.Add(s.Player.EntityId.Value, 50); yield return Frames(3);
+                near.actor.Health.ApplyDamage(near.actor.Health.Pool.Max * 10); yield return null;
+                Assert.IsTrue(near.RisingAtWell, "cut down beside the well, it lies a moment");
+                for (float w = 0; w < HollowRules.WellRiseSeconds + 2 && !near.actor.IsAlive; w += Time.deltaTime) yield return null;
+                Assert.IsTrue(near.actor.IsAlive, "and stands up again");
+                Assert.LessOrEqual(near.actor.Health.Pool.Current, HollowRules.Share(near.actor.Health.Pool.Max, HollowRules.WellRiseHealth) + 1, "weaker");
+                near.actor.Health.ApplyDamage(near.actor.Health.Pool.Max * 10); yield return null;
+                Assert.IsFalse(near.actor.IsAlive || near.RisingAtWell, "only once: the second time it stays down");
+                // Broken (the work done), the well raises no more.
+                var other = s.Enemies.Find(e => e != null && e.CampIndex == stair && e.actor.IsAlive && e != near); Assert.NotNull(other);
+                s.BreakWell(); Assert.IsFalse(s.WellWhole, "broken");
+                Assert.Less(other.actor.Health.Pool.Current, other.actor.Health.Pool.Max, "the Hollow near it crumble");
+                other.actor.Health.ApplyDamage(other.actor.Health.Pool.Max * 10); yield return null;
+                Assert.IsFalse(other.RisingAtWell || other.actor.IsAlive, "the broken well raises nobody");
+
+                // Elsewhere, the dice for a split: the half crawls on, low, slow and weak, and does not split again.
+                HollowRules.Dice = () => 0;
+                var cut = s.Enemies.Find(e => e != null && e.BookHollow && e.actor.IsAlive && s.DistanceToWell(e.transform.position) > HollowRules.WellReach); Assert.NotNull(cut);
+                float hit = cut.HitBase;
+                cut.actor.Health.ApplyDamage(cut.actor.Health.Pool.Max * 10); yield return null;
+                Assert.IsTrue(cut.actor.IsAlive && cut.Half, "its half crawls on");
+                Assert.LessOrEqual(cut.actor.Health.Pool.Current, HollowRules.Share(cut.actor.Health.Pool.Max, HollowRules.HalfHealth) + 1, "low");
+                Assert.AreEqual(hit * HollowRules.HalfHit, cut.HitBase, 1e-3f, "its blow halved");
+                cut.actor.Health.ApplyDamage(cut.actor.Health.Pool.Max * 10); yield return null;
+                Assert.IsFalse(cut.actor.IsAlive, "a half does not split again");
+            }
+            finally { HollowRules.Dice = () => UnityEngine.Random.value; }
+        }
+
         /// <summary>Pass close to a paused townsperson and it whispers "Help us" (b1 ch.21:38-40).</summary>
         [UnityTest] public IEnumerator A_paused_townsperson_whispers_help_us()
         {

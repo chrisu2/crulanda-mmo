@@ -270,6 +270,8 @@ namespace Crulanda.Encounter
         {
             if (session == null || session.Paused) return;
             if (Sleeping()) return;   // far and idle: nothing to do (EncounterEnemy.Dormant)
+            // (Hallow's Creek) a Hollow lying beside the pulsing anchor-well stands up again (EncounterEnemy.Hollow)
+            if (!actor.IsAlive && RisingAtWell) { TickWellRise(); return; }
             if (!actor.IsAlive) { if (Camp && Time.time >= respawnAt) Respawn(); return; }
             // Up again some other way (a load, a story revival): solid again.
             if (walkThrough) WalkThrough(false);
@@ -285,7 +287,8 @@ namespace Crulanda.Encounter
                 if (session.Player.IsAlive && !EncounterSession.Unseen && Time.time >= lostUntil && Vector3.Distance(transform.position, session.Player.transform.position) < notice) Pounce();
                 return;
             }
-            if (agent != null) agent.speed = Rooted ? 0 : baseSpeed * (Slowed ? slowFactor : 1) * (Time.time < lungeUntil ? 2.2f : 1);
+            // (a Hallow's Creek Hollow's crawling half drags itself at HollowRules.HalfPace)
+            if (agent != null) agent.speed = Rooted ? 0 : baseSpeed * (Slowed ? slowFactor : 1) * (Time.time < lungeUntil ? 2.2f : 1) * HollowPace;
             // You down: a mob with a living party member within 40 m fights on and turns from you to them (2026-10-15: every mob reset the
             // moment you fell, the party's fight with it gone; the run's parties wiped at Nix again and again); alone, it resets as before.
             if (!session.Player.IsAlive) { if (!session.PartyNear(this)) { ResetFight(); return; } threat.Remove(session.Player.EntityId.Value); }
@@ -306,6 +309,8 @@ namespace Crulanda.Encounter
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
             // the Lowtowns' Weave-Eaters: blink, lighthouse, ward-eating (EncounterEnemy.WeaveEater)
             if (BookWeaveEater) TickWeaveEater();
+            // Hallow's Creek's Hollow: the silent shift and the choking dust (EncounterEnemy.Hollow)
+            if (BookHollow && TickHollow()) return;
             if (Move != null && TickElite()) return;   // an elite drawing back for its heavy blow stands still and does not swing
             if (TickFlee()) return;   // bolting at low health (EncounterEnemy.Flee)
             if (Cast != null && TickCast()) return;   // a caster casting stands still and does not swing (EncounterEnemy.Casts)
@@ -385,6 +390,8 @@ namespace Crulanda.Encounter
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
             if (damage > 0 && WeaveEaterRules.Struck(this, source, Time.time) && source == session.Player) session.Message(WeaveEaterRules.BlackenedLine);   // steel through a Weave-Eater (the Lowtowns)
+            // Blinded by a Hollow's dust (Hallow's Creek, b1 ch.4:177): the blow goes wide now and then.
+            if (damage > 0 && source != null && session.BlindMisses(source)) { session.FloatText(transform.position, "Miss (dust)", new Color(.7f, .7f, .68f)); return; }
             int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * session.DamageScaleFor(source)));
             if (!Game && source != null) session.Meter.Damage(source, actual);
             if (!Game) session.SpreadBlow(this, source, actual);   // an area build's blows splash onto foes near this one (EncounterSession.Spread)
@@ -397,6 +404,8 @@ namespace Crulanda.Encounter
         void OnDeath(Health health)
         {
             if (layingAway) return;   // put away by its lockout (EncounterEnemy.Lockout): no call, no kill, no body
+            // A Hallow's Creek Hollow beside the anchor-well lies a moment and stands again, or its half crawls on (EncounterEnemy.Hollow)
+            if (HollowDeath()) return;
             RaidMarked = RaidMark.None;   // the mark dies with it (Chris, 2026-10-11: "once the mob that was cc dies. take off the icon")
             ClearFight();   // before the death pose: a blow half drawn leaves the body leaning
             Victim = null;
@@ -439,6 +448,8 @@ namespace Crulanda.Encounter
             home = transform.position;
             var visual = transform.Find("Body");
             if (visual != null) { visual.localRotation = Quaternion.identity; visual.localPosition = Vector3.zero; }
+            // (a Hallow's Creek Hollow comes back whole: no half, not risen; EncounterEnemy.Hollow)
+            RespawnHollow();
             UnscaleFromGroup(); TappedBy = null; actor.Health.Revive(actor.Health.Pool.Max); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             WalkThrough(false);
             ClearFight(); evadeUntil = 0;

@@ -478,3 +478,36 @@ in `hallows.json`, each labelled with its chapter.
 - Tests: `HallowsDataTests.The_ash_road_has_its_dangers_and_the_bridge_its_drifting_slabs` (data), `HallowsNavTests.A_time_squall_bites_
   in_the_open_not_under_the_overhang_and_the_fifth_slab_tips_behind_you` (play). To see: the shimmer and sparks, the fissures' glow,
   the stumps' shadows, the turning slabs from the bridge, the fifth slab tipping behind you; a group run through the road and bridge.
+## The Hollow as chapter 4 shows them (2026-10-18, branch w2-hollow: REWORK_LOWTOWNS_HALLOWS.md pick 6)
+
+CANON creature and behaviour (b1 ch.4, Oakhaven); GAME-ONLY numbers, trapdoors and places; CANON-EXPANDED the well under the well-house.
+Only the ordinary Hollow of Hallow's Creek (`Hallow's Creek Hollow`, HollowRules); the Hollow Men elsewhere and the Hollow elites keep
+their settled fights. WRITTEN, compiles, NOT RUN.
+- **Out of the cellar doors** ("seemingly rapidly emerging from every single shadowed alleyway and dark cellar door", ch.4:161). Two
+  camps wait under plank trapdoors in the Cellars (`after` "pull:&lt;camp&gt;", a new release key): pull the long cellar's Hollow and one comes up
+  the cellar trapdoor 10 m behind you; pull First-Cut's kin and one comes up the root-cellar trapdoor behind. The trapdoor shows thrown
+  open. Each pulled camp went from three to two, so each fight is the three it was. The trapdoor camps are appended after the rare camps:
+  no camp's index (mob ids, lockouts) moved.
+- **The shift** ("zero visible striding steps", ch.4:109): every 7 s, a foe more than 4 m off, it glides up to 6 m toward them over 0.9 s,
+  its legs still (ActorVisual.Gliding), "Shifts closer". Slow and silent, not the Weave-Eaters' instant jerk.
+- **The choking dust** (ch.4:177): at close quarters, every 16 s (first at 6 s), a ring warned on the ground for 1.5 s; whoever of the
+  party stands within 3.5 m when it puffs is blinded 4 s: a quarter of their blows miss ("Miss (dust)"). The halves do not puff.
+- **The halves** (ch.4:181): cut down, a Hollow splits three times in ten; its half gets up at once at a quarter health, half its blow,
+  0.55 of its pace, crawling low, still on whoever it fought. The kill (XP, loot, quests) is the half's death. A half never splits.
+- **The anchor-well** (ch.4:191-197, 222; broken, ch.4:236-245): a ring of dressed stones round black water in the Cellars, under the
+  well-house (anchor `the anchor-well`, along 103), a violet crystal in it and a violet light breathing over it. A Hollow cut down within
+  14 m while it pulses lies 4 s and stands up again at 0.4 of its health, once a visit each (the far stair's camp, now two, so about its old
+  three). E at it: "Break the crystal in the well", 4 s of work, allowed in a fight, stopped by a blow taken. Broken: white light, the
+  crystal gone, every Hollow within 14 m loses half its health, one lying there stays down. Not saved (it pulses again next visit).
+- **Balance:** the pulled fights keep their size; the dust and the halves make the Hollow a little harder (about a tenth more health
+  through halves, a quarter of the tank's blows missing for 4 s in 16); the well's two risings replace the far stair's third Hollow.
+  Unchecked by a run.
+
+**Files:** Scripts/Encounter/HollowRules.cs, EncounterEnemy.Hollow.cs, EncounterSession.HollowCellars.cs (new); EncounterEnemy.cs,
+EncounterEnemy.Social.cs, EncounterSession.cs (work allowed in a fight), EncounterSession.Hallows.cs, EncounterSession.Adit.cs,
+ActorVisual.cs, ActorVisual.Model.cs; EncounterContent/Zones/hallows.json.
+
+**To run (lane A):** EditMode HollowRulesTests (new), HallowsDataTests (pull keys), MobMoveTests, SocialRulesTests, EliteBalanceTests;
+PlayMode HallowsNavTests (new: The_hollow_come_up_the_trapdoors_rise_at_the_well_and_crawl_on_in_halves), GroupRunTests; then the
+level-17 group run through the Cellars (no wipes, as before), and captures of a glide, the dust ring, a half crawling, and the well
+whole and broken.

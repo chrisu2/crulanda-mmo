@@ -56,6 +56,8 @@ namespace Crulanda.World
             // Moonlit night: a clear blue moon and a blue ambient floor carry the night's colour (the grade no longer drains it), so
             // faces turned from the moon stay readable; the sky stays dark (exposure .3).
             night = new Look { sun = new Color(.45f, .6f, 1f), intensity = .4f, sky = new Color(.24f, .32f, .55f), equator = new Color(.18f, .24f, .42f), ground = new Color(.1f, .12f, .2f), fog = new Color(.09f, .1f, .15f), exposure = .3f };
+            // A zone's own night air (ZoneLighting.nightFog): the Lowtowns' smog stays grey and warm from the fires under it, not moonlit blue.
+            if (!string.IsNullOrEmpty(day.nightFog)) { night.fog = ZoneColors.Parse(day.nightFog, night.fog); dusk.fog = Color.Lerp(dusk.fog, night.fog, .5f); }
             Apply();
         }
         /// <summary>Sky-only reflection probe (water and glossy surfaces reflect the current sky, not a fixed default one).</summary>

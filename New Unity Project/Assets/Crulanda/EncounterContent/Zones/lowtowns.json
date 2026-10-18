@@ -42,17 +42,18 @@
     "sunPitch": 30,
     "sunYaw": -30,
     "sunIntensity": 0.95,
-    "sunColor": "#E6C9A2",
-    "ambientSky": "#7E786C",
-    "ambientEquator": "#605850",
+    "sunColor": "#E7CB8C",
+    "ambientSky": "#857A61",
+    "ambientEquator": "#655A48",
     "ambientGround": "#2A2622",
-    "fogColor": "#837667",
+    "fogColor": "#8E7D57",
     "fogStart": 18,
     "fogEnd": 150,
-    "skyTint": "#8E8476",
+    "skyTint": "#9A8A5F",
     "skyExposure": 0.9,
     "skyHaze": 2.2,
-    "nightClear": 0.6
+    "nightClear": 0.6,
+    "nightFog": "#2D2722"
   },
   "spawns": {
     "player": {
@@ -234,8 +235,8 @@
           "y": 80
         },
         {
-          "x": 92,
-          "y": 62
+          "x": 85,
+          "y": 67.5
         }
       ]
     },
@@ -634,6 +635,34 @@
           "y": -84
         }
       ]
+    },
+    {
+      "name": "The Court Stair",
+      "width": 3.5,
+      "points": [
+        {
+          "x": -116,
+          "y": 190.5
+        },
+        {
+          "x": -84,
+          "y": 190.5
+        }
+      ]
+    },
+    {
+      "name": "Weir Stair",
+      "width": 3,
+      "points": [
+        {
+          "x": -37,
+          "y": 152.3
+        },
+        {
+          "x": -66,
+          "y": 152.3
+        }
+      ]
     }
   ],
   "water": [
@@ -682,7 +711,8 @@
           "y": -245
         }
       ],
-      "depth": 2.4
+      "depth": 2.4,
+      "kind": "chemical"
     },
     {
       "name": "The Outfall run",
@@ -709,23 +739,13 @@
           "y": -214
         }
       ],
-      "depth": 1.2
+      "depth": 1.2,
+      "kind": "chemical"
     }
   ],
   "waterTint": "#1B1A1E",
   "waterReflect": 0.35,
-  "shapes": [
-    {
-      "name": "The burners' cellar",
-      "center": {
-        "x": 154,
-        "y": -150
-      },
-      "radius": 8,
-      "height": -3,
-      "blend": 7
-    }
-  ],
+  "shapes": [],
   "landmarks": [
     {
       "name": "The Gate Ward",
@@ -1769,10 +1789,10 @@
       "kind": "drain_mouth",
       "name": "Drain mouth",
       "at": {
-        "x": -93,
+        "x": -98.4,
         "y": 160
       },
-      "rotation": 270,
+      "rotation": 90,
       "size": {
         "x": 3.6,
         "y": 0
@@ -1842,8 +1862,8 @@
       "kind": "market_hall",
       "name": "The long stalls",
       "at": {
-        "x": 104,
-        "y": 22
+        "x": 105.0,
+        "y": 22.0
       },
       "rotation": 180,
       "size": {
@@ -2307,31 +2327,6 @@
       "at": {
         "x": 136,
         "y": -112
-      }
-    },
-    {
-      "kind": "lane_wall",
-      "name": "Cellar wall",
-      "at": {
-        "x": 154,
-        "y": -161
-      },
-      "size": {
-        "x": 16,
-        "y": 2.4
-      }
-    },
-    {
-      "kind": "lane_wall",
-      "name": "Cellar wall",
-      "at": {
-        "x": 165,
-        "y": -150
-      },
-      "rotation": 90,
-      "size": {
-        "x": 18,
-        "y": 2.4
       }
     },
     {
@@ -3043,8 +3038,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 56.95,
-        "y": -18.79
+        "x": 58.15,
+        "y": -19.54
       },
       "rotation": 167.1,
       "size": {
@@ -3056,8 +3051,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 83.59,
-        "y": -12.06
+        "x": 80.8,
+        "y": -13.55
       },
       "rotation": 170.3,
       "size": {
@@ -3199,8 +3194,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 40.84,
-        "y": -2.17
+        "x": 37.69,
+        "y": -1.86
       },
       "rotation": 347.1,
       "size": {
@@ -3221,19 +3216,6 @@
         "y": 8
       },
       "variant": 11
-    },
-    {
-      "kind": "tenement",
-      "at": {
-        "x": 92.24,
-        "y": 8.49
-      },
-      "rotation": 350.3,
-      "size": {
-        "x": 12.8,
-        "y": 8
-      },
-      "variant": 3
     },
     {
       "kind": "tenement",
@@ -3318,19 +3300,6 @@
         "y": 8
       },
       "variant": 1
-    },
-    {
-      "kind": "tenement",
-      "at": {
-        "x": -121.28,
-        "y": 108.17
-      },
-      "rotation": 98.5,
-      "size": {
-        "x": 14.8,
-        "y": 8
-      },
-      "variant": 11
     },
     {
       "kind": "tenement",
@@ -3438,19 +3407,6 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 30.58,
-        "y": 84.46
-      },
-      "rotation": 189.9,
-      "size": {
-        "x": 17.7,
-        "y": 10
-      },
-      "variant": 4
-    },
-    {
-      "kind": "tenement",
-      "at": {
         "x": 54.75,
         "y": 77.45
       },
@@ -3510,19 +3466,6 @@
         "y": 10
       },
       "variant": 4
-    },
-    {
-      "kind": "tenement",
-      "at": {
-        "x": 37.74,
-        "y": 102.3
-      },
-      "rotation": 9.9,
-      "size": {
-        "x": 14.2,
-        "y": 8
-      },
-      "variant": 6
     },
     {
       "kind": "tenement",
@@ -3942,21 +3885,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 91.75,
-        "y": 88.09
-      },
-      "rotation": 95.7,
-      "size": {
-        "x": 12.4,
-        "y": 8
-      },
-      "variant": 3
-    },
-    {
-      "kind": "tenement",
-      "at": {
-        "x": 94.34,
-        "y": 103.91
+        "x": 97.33,
+        "y": 103.61
       },
       "rotation": 95.7,
       "size": {
@@ -3968,8 +3898,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 104.22,
-        "y": 153.49
+        "x": 111.14,
+        "y": 165.2
       },
       "rotation": 103.5,
       "size": {
@@ -4226,8 +4156,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 105.28,
-        "y": -36.63
+        "x": 104.48,
+        "y": -38.72
       },
       "rotation": 264.5,
       "size": {
@@ -4316,8 +4246,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 120.85,
-        "y": -23.08
+        "x": 121.75,
+        "y": -21.99
       },
       "rotation": 84.5,
       "size": {
@@ -4376,19 +4306,6 @@
         "y": 8
       },
       "variant": 9
-    },
-    {
-      "kind": "tenement",
-      "at": {
-        "x": -59.71,
-        "y": 98.81
-      },
-      "rotation": 78.7,
-      "size": {
-        "x": 15.2,
-        "y": 8
-      },
-      "variant": 3
     },
     {
       "kind": "tenement",
@@ -4484,19 +4401,6 @@
     {
       "kind": "tenement",
       "at": {
-        "x": -77.55,
-        "y": 107.48
-      },
-      "rotation": 258.7,
-      "size": {
-        "x": 17.3,
-        "y": 8
-      },
-      "variant": 3
-    },
-    {
-      "kind": "tenement",
-      "at": {
         "x": -81.47,
         "y": 127.09
       },
@@ -4510,8 +4414,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": -91.98,
-        "y": 182.27
+        "x": -90.29,
+        "y": 178.51
       },
       "rotation": 259.9,
       "size": {
@@ -4519,19 +4423,6 @@
         "y": 8
       },
       "variant": 9
-    },
-    {
-      "kind": "tenement",
-      "at": {
-        "x": -94.78,
-        "y": 198.02
-      },
-      "rotation": 259.9,
-      "size": {
-        "x": 12.2,
-        "y": 8
-      },
-      "variant": 10
     },
     {
       "kind": "tenement",
@@ -4600,8 +4491,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": -44.8,
-        "y": 140.91
+        "x": -44.64,
+        "y": 138.92
       },
       "rotation": 265.4,
       "size": {
@@ -4613,21 +4504,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": -47.39,
-        "y": 160.76
-      },
-      "rotation": 265.4,
-      "size": {
-        "x": 12.6,
-        "y": 10
-      },
-      "variant": 2
-    },
-    {
-      "kind": "tenement",
-      "at": {
-        "x": 36.12,
-        "y": 123.92
+        "x": 35.14,
+        "y": 124.1
       },
       "rotation": 100.3,
       "size": {
@@ -4639,8 +4517,8 @@
     {
       "kind": "tenement",
       "at": {
-        "x": 46.82,
-        "y": 178.73
+        "x": 50.94,
+        "y": 178.93
       },
       "rotation": 101.3,
       "size": {
@@ -4750,19 +4628,6 @@
       "size": {
         "x": 19.2,
         "y": 10
-      },
-      "variant": 2
-    },
-    {
-      "kind": "tenement",
-      "at": {
-        "x": 102.3,
-        "y": 128.66
-      },
-      "rotation": 168.7,
-      "size": {
-        "x": 13.2,
-        "y": 8
       },
       "variant": 2
     },
@@ -4961,7 +4826,7 @@
       "kind": "lane_lamp",
       "at": {
         "x": 45.97,
-        "y": -6.69
+        "y": -3.69
       }
     },
     {
@@ -4974,8 +4839,8 @@
     {
       "kind": "lane_lamp",
       "at": {
-        "x": 93.18,
-        "y": 3.02
+        "x": 92.43,
+        "y": 5.27
       }
     },
     {
@@ -5058,8 +4923,8 @@
     {
       "kind": "lane_lamp",
       "at": {
-        "x": 93.29,
-        "y": 65.27
+        "x": 94.79,
+        "y": 67.52
       }
     },
     {
@@ -5107,8 +4972,8 @@
     {
       "kind": "lane_lamp",
       "at": {
-        "x": 110.42,
-        "y": -32.12
+        "x": 107.42,
+        "y": -29.12
       }
     },
     {
@@ -5143,7 +5008,7 @@
       "kind": "lane_lamp",
       "at": {
         "x": 147.25,
-        "y": -143.22
+        "y": -139.47
       }
     },
     {
@@ -5254,8 +5119,8 @@
     {
       "kind": "lane_lamp",
       "at": {
-        "x": -132.41,
-        "y": 109.84
+        "x": -134.66,
+        "y": 110.59
       }
     },
     {
@@ -5345,7 +5210,7 @@
       "kind": "ruin",
       "name": "A fallen tenement",
       "at": {
-        "x": 40,
+        "x": 49,
         "y": 160
       },
       "size": {
@@ -5629,6 +5494,58 @@
       "levelMin": 18,
       "levelMax": 19,
       "respawn": 80
+    },
+    {
+      "name": "Sludge-eels off the quays",
+      "mob": "Sludge-eel",
+      "tag": "sludgeeel",
+      "look": "eel",
+      "social": "pack",
+      "canonStatus": "CANON creature (sludge-eels: book1 ch.15:391, 'Absolutely nothing natural lived in the toxic depths of the Chemical River. Except things that shouldn't exist. Sludge-eels. Mutated crocodiles.'); the camp GAME-ONLY",
+      "center": {
+        "x": 8.5,
+        "y": -100
+      },
+      "radius": 5,
+      "count": 3,
+      "levelMin": 16,
+      "levelMax": 17,
+      "respawn": 80
+    },
+    {
+      "name": "Sludge-eels above the Rag Bridge",
+      "mob": "Sludge-eel",
+      "tag": "sludgeeel",
+      "look": "eel",
+      "social": "pack",
+      "canonStatus": "CANON creature (sludge-eels: book1 ch.15:391, 'Absolutely nothing natural lived in the toxic depths of the Chemical River. Except things that shouldn't exist. Sludge-eels. Mutated crocodiles.'); the camp GAME-ONLY",
+      "center": {
+        "x": -5,
+        "y": 130
+      },
+      "radius": 5,
+      "count": 3,
+      "levelMin": 17,
+      "levelMax": 18,
+      "respawn": 80
+    },
+    {
+      "name": "The Old Croc",
+      "mob": "The Old Croc",
+      "tag": "rivercroc",
+      "look": "croc",
+      "social": "solitary",
+      "canonStatus": "CANON creature (mutated crocodiles: book1 ch.15:391); the Old Croc, its haunt by the Outfall's mouth and its rarity GAME-ONLY",
+      "center": {
+        "x": 15,
+        "y": -196
+      },
+      "radius": 3,
+      "count": 1,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 600,
+      "rare": 0.35
     },
     {
       "name": "The Lantern-Eater",
@@ -6446,8 +6363,8 @@
       "name": "The Price-Board",
       "kind": "note",
       "at": {
-        "x": 88.5,
-        "y": 28
+        "x": 88.15,
+        "y": 28.35
       },
       "prompt": "Read the board",
       "text": "A board leaned against a post, prices chalked and crossed out and chalked higher, a smear of soot over the lot.",
@@ -6659,8 +6576,8 @@
     {
       "node": "node.slagiron",
       "at": {
-        "x": 44,
-        "y": 164
+        "x": 46.17,
+        "y": 165.25
       },
       "rotation": 235
     },
@@ -6739,8 +6656,8 @@
     {
       "node": "node.cinderbeam",
       "at": {
-        "x": 36,
-        "y": 156
+        "x": 47,
+        "y": 153.5
       },
       "rotation": 305
     },
@@ -6787,8 +6704,8 @@
     {
       "node": "node.lamp_lichen",
       "at": {
-        "x": -98,
-        "y": 152
+        "x": -99.45,
+        "y": 152.39
       },
       "rotation": 0
     },
@@ -6861,6 +6778,377 @@
       },
       "rotation": 200,
       "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "terraces": [
+    {
+      "name": "The Lower Market",
+      "canonStatus": "CANON-EXPANDED: the market's 'twisting, narrow alleyways' (book1 ch.3:9) falling toward the river and the slums (ch.3:257); the Lower Market's name and height GAME-ONLY",
+      "center": {
+        "x": 69.5,
+        "y": -6.0
+      },
+      "size": {
+        "x": 43,
+        "y": 56
+      },
+      "height": 4,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "The Lower Market (Skewer Lane)",
+      "canonStatus": "CANON-EXPANDED: the market's 'twisting, narrow alleyways' (book1 ch.3:9) falling toward the river and the slums (ch.3:257); the Lower Market's name and height GAME-ONLY",
+      "center": {
+        "x": 66.0,
+        "y": 61.0
+      },
+      "size": {
+        "x": 50,
+        "y": 78
+      },
+      "height": 4,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "The Lower Market (north)",
+      "canonStatus": "CANON-EXPANDED: the market's 'twisting, narrow alleyways' (book1 ch.3:9) falling toward the river and the slums (ch.3:257); the Lower Market's name and height GAME-ONLY",
+      "center": {
+        "x": 74.0,
+        "y": 181.0
+      },
+      "size": {
+        "x": 60,
+        "y": 162
+      },
+      "height": 4,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "The Shard-Burners' Yard",
+      "canonStatus": "GAME-ONLY: the Shard-Burners' Yard on its own shelf under the market",
+      "center": {
+        "x": 179.5,
+        "y": -95.0
+      },
+      "size": {
+        "x": 165,
+        "y": 130
+      },
+      "height": 4,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "The Rust Market",
+      "canonStatus": "CANON-EXPANDED: the Rust Market 'against the crumbling stone walls of the Forge District' (book1 ch.3:7), the top of the town; the shelf and its height GAME-ONLY",
+      "center": {
+        "x": 176.5,
+        "y": 44.0
+      },
+      "size": {
+        "x": 171,
+        "y": 148
+      },
+      "height": 8,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "The Rust Market (north)",
+      "canonStatus": "CANON-EXPANDED: the Rust Market 'against the crumbling stone walls of the Forge District' (book1 ch.3:7), the top of the town; the shelf and its height GAME-ONLY",
+      "center": {
+        "x": 183.0,
+        "y": 190.0
+      },
+      "size": {
+        "x": 158,
+        "y": 144
+      },
+      "height": 8,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "The burners' cellar",
+      "canonStatus": "GAME-ONLY: the burners' cellar, sunk in the yard's south edge",
+      "center": {
+        "x": 156.0,
+        "y": -153.0
+      },
+      "size": {
+        "x": 20,
+        "y": 22
+      },
+      "height": 0,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "The Drain Courts",
+      "canonStatus": "CANON-EXPANDED: the Drain Courts sunk among high brick walls ('a dead-end, hemmed in by high brick walls', book1 ch.1:237); the hollow GAME-ONLY",
+      "center": {
+        "x": -147.0,
+        "y": 186.0
+      },
+      "size": {
+        "x": 102,
+        "y": 152
+      },
+      "height": -3,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "The High Rows",
+      "canonStatus": "GAME-ONLY: the High Rows, a ridge of tenements under the mountain (the Lowtowns 'at the base of the mountain', world_bible.md Geography)",
+      "center": {
+        "x": -74.5,
+        "y": 183.0
+      },
+      "size": {
+        "x": 43,
+        "y": 158
+      },
+      "height": 6,
+      "blend": 1.5,
+      "style": "shelf"
+    },
+    {
+      "name": "Gate Street ramp",
+      "canonStatus": "GAME-ONLY: a cart ramp between the levels (no machines: carts are pulled by hand)",
+      "center": {
+        "x": 47.29,
+        "y": -10.33
+      },
+      "size": {
+        "x": 8,
+        "y": 14.08
+      },
+      "rotation": 77.12,
+      "height": 0.0,
+      "heightTo": 4.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "ramp"
+    },
+    {
+      "name": "Gate Street ramp",
+      "canonStatus": "GAME-ONLY: a cart ramp between the levels (no machines: carts are pulled by hand)",
+      "center": {
+        "x": 90.07,
+        "y": -1.42
+      },
+      "size": {
+        "x": 8,
+        "y": 14.08
+      },
+      "rotation": 80.27,
+      "height": 4.0,
+      "heightTo": 8.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "ramp"
+    },
+    {
+      "name": "Drain Lane steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": -129.63,
+        "y": 109.14
+      },
+      "size": {
+        "x": 6,
+        "y": 7.15
+      },
+      "rotation": -171.47,
+      "height": -3.0,
+      "heightTo": 0.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "The twisting causeway",
+      "canonStatus": "CANON: 'a narrow, immensely twisting causeway that led ... down into the deep, dark slums' (book1 ch.3:257); its line GAME-ONLY",
+      "center": {
+        "x": 40.11,
+        "y": 92.85
+      },
+      "size": {
+        "x": 7,
+        "y": 14.08
+      },
+      "rotation": 99.87,
+      "height": 0.0,
+      "heightTo": 4.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "ramp"
+    },
+    {
+      "name": "Skewer Lane steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": 40.27,
+        "y": 41.81
+      },
+      "size": {
+        "x": 6,
+        "y": 9.2
+      },
+      "rotation": 83.66,
+      "height": 0.0,
+      "heightTo": 4.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "Skewer Lane steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": 89.96,
+        "y": 40.36
+      },
+      "size": {
+        "x": 6,
+        "y": 9.2
+      },
+      "rotation": 84.81,
+      "height": 4.0,
+      "heightTo": 8.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "Burners' Row steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": 113.14,
+        "y": -30.69
+      },
+      "size": {
+        "x": 6,
+        "y": 9.2
+      },
+      "rotation": -5.49,
+      "height": 4.0,
+      "heightTo": 8.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "Burners' Row steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": 145.25,
+        "y": -145.25
+      },
+      "size": {
+        "x": 6,
+        "y": 9.2
+      },
+      "rotation": -45.0,
+      "height": 0.0,
+      "heightTo": 4.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "North Rows steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": -68.63,
+        "y": 103.14
+      },
+      "size": {
+        "x": 5,
+        "y": 13.3
+      },
+      "rotation": -11.31,
+      "height": 0.0,
+      "heightTo": 6.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "Weir Back steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": 43.41,
+        "y": 139.32
+      },
+      "size": {
+        "x": 4.5,
+        "y": 9.2
+      },
+      "rotation": 101.31,
+      "height": 0.0,
+      "heightTo": 4.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "Weir Back steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": 103.41,
+        "y": 136.68
+      },
+      "size": {
+        "x": 4.5,
+        "y": 9.2
+      },
+      "rotation": 78.69,
+      "height": 4.0,
+      "heightTo": 8.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "The Court Stair steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": -97.0,
+        "y": 190.5
+      },
+      "size": {
+        "x": 4.5,
+        "y": 19.45
+      },
+      "rotation": 90.0,
+      "height": -3.0,
+      "heightTo": 6.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
+    },
+    {
+      "name": "Weir Stair steps",
+      "canonStatus": "CANON-EXPANDED: a step-street between the levels (the city climbed by spouts and stairs and fallen from, book1 ch.1:297-313; ch.3:257); the stair GAME-ONLY",
+      "center": {
+        "x": -52.0,
+        "y": 152.3
+      },
+      "size": {
+        "x": 4,
+        "y": 13.3
+      },
+      "rotation": -90.0,
+      "height": 0.0,
+      "heightTo": 6.0,
+      "ramp": true,
+      "blend": 1.5,
+      "style": "stair"
     }
   ]
 }

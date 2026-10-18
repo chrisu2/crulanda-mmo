@@ -2,7 +2,7 @@
 
 namespace Crulanda.Encounter
 {
-    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater, SaltMender }
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater, SaltMender, Eel, Croc }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
     public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump, Mine }
 
@@ -117,7 +117,7 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>Not humanoid: no clothes or kit, and a little lighter in health (EncounterEnemy.MobHealth). Weave-Eaters count, though they are no animal.</summary>
-        public static bool IsBeast(ActorLook look) { return look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.WeaveEater || look == ActorLook.Stag || look == ActorLook.Spider || look == ActorLook.Bramble || look == ActorLook.Bear; }
+        public static bool IsBeast(ActorLook look) { return look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.WeaveEater || look == ActorLook.Stag || look == ActorLook.Spider || look == ActorLook.Bramble || look == ActorLook.Bear || look == ActorLook.Eel || look == ActorLook.Croc; }
 
         /// <summary>
         /// Four-legged creatures. The front legs use the arm pivots and the hind legs the leg pivots, so the walk cycle
@@ -417,6 +417,7 @@ namespace Crulanda.Encounter
             if (look == ActorLook.Stag) { BuildStag(); lastPosition = transform.position; return; }
             if (look == ActorLook.Spider) { BuildSpider(); lastPosition = transform.position; return; }
             if (look == ActorLook.Bramble) { BuildBramble(); lastPosition = transform.position; return; }
+            if (look == ActorLook.Eel || look == ActorLook.Croc) { BuildRiverBeast(look); lastPosition = transform.position; return; }   // the Chemical River's (ActorVisual.River.cs)
             if (look == ActorLook.Keeper) { if (!BuildModelBeast(look) && capsule != null) capsule.enabled = true; lastPosition = transform.position; return; }   // a treant (ActorVisual.Beasts.cs)
             if (IsBeast(look)) { BuildBeast(look); lastPosition = transform.position; return; }
             if (orc && OrcKind(look) != null && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // a whole orc (ActorVisual.Beasts.cs)

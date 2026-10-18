@@ -15,8 +15,10 @@ namespace Crulanda.World
     /// the High Rows and the river into the vaults' west end; and the river culvert, off the river's east bank into the crawl. So there
     /// are three ways in, and a loop under the river. The black canal is cave water of the Chemical River's kind (it poisons and hides you
     /// as the river does). Here, for the eye (no colliders but the boat's hull):
-    /// - rubble-stone ribs across the vaults every few metres, on piers at the walls, and a heavier arch at each mouth;
-    /// - the green mould on the ribs, and a dim green light every so often;
+    /// - rubble-stone ribs across the vaults every few metres, each one unbroken band from the floor up one wall, over the roof and down
+    ///   the other, on a footing at each foot, and a heavier arch at each mouth (the cave builder leaves out its dripstone, outcrops and
+    ///   rock ledges in a vault: ZoneBuilder.CaveDressing, ZoneBuilder.Adit's FloorClutter; a little fallen rubble stays at the walls);
+    /// - the green mould as thin pads on the ribs' stones, thicker on every third rib with a dim green light there;
     /// - a broken stone kerb along the canal's edge (the causeway's crumbling edge);
     /// - stone treads down the cellar stair and the other mouths' slopes;
     /// - the fence's pier and black skiff, its sail furled, crates of contraband, a lantern. No machines: stone, timber, rope, iron.
@@ -51,46 +53,58 @@ namespace Crulanda.World
             foreach (var h in vaults)
             {
                 float len = h.Length;
-                // An arch of rubble stones across the passage at s: piers up the walls, voussoirs over the roof, the shell's own profile drawn in
-                // a little (the rock's bumps hide some stones and leave others proud: rubble, not ashlar). heavy: a mouth's portal.
-                void Rib(float s, bool heavy)
+                // A rib of rubble stone across the passage at s: one unbroken band of stones from the floor at one wall, up the wall as a
+                // pier, over the roof and down to the floor at the other, drawn a little inside the shell's own profile (the rock's bumps hide
+                // it here and there). A heavier footing at each foot. heavy: a mouth's portal. lit: a thick growth of the green mould on it
+                // at about head height on one side, and its dim light.
+                void Rib(float s, bool heavy, bool lit)
                 {
                     int i = RingAt(h, s); if (!h.Floored(i) || h.Height[i] < 2.4f) return;
                     // Not in another cave's air (where two meet).
                     var c = h.At(s); if (Hollow.OpenInOther(h, c + Vector3.up * 1.2f, .98f)) return;
                     var f = Forward(h, s); var right = new Vector3(f.z, 0, -f.x);
                     float half = h.Half[i] * .9f, high = h.Height[i] * .92f, deep = heavy ? 1.1f : .7f, block = heavy ? .7f : .5f;
-                    for (int k = 1; k < 10; k++)
+                    var axis = c + Vector3.up * high * .4f;
+                    Vector3 Point(float th)
                     {
-                        float th = k * Mathf.PI / 10, cs = Mathf.Cos(th), sn = Mathf.Sin(th);
-                        float side = half * Mathf.Sign(cs) * Mathf.Pow(Mathf.Abs(cs), .75f), up = high * Mathf.Pow(Mathf.Max(0, sn), .85f);
-                        var at = c + right * side + Vector3.up * up;
-                        var radial = (at - (c + Vector3.up * high * .3f)).normalized;
-                        b.Box((k + (int)(s * 3)) % 3 == 0 ? rubble2 : rubble, at, new Vector3(block * (.85f + R() * .3f), block, deep), Quaternion.LookRotation(f, radial));
-                        // The mould clinging to the archways (book1 ch.6:129): a skin on some stones' faces.
-                        if (R() < .3f) b.Box(mould, at - radial * (block / 2 + .02f), new Vector3(block * .8f, .04f, deep * (.5f + R() * .4f)), Quaternion.LookRotation(f, radial));
+                        float cs = Mathf.Cos(th), sn = Mathf.Sin(th);
+                        float side = (half - block / 2) * Mathf.Sign(cs) * Mathf.Pow(Mathf.Abs(cs), .75f), up = (high - block / 2) * Mathf.Pow(Mathf.Max(0, sn), .85f);
+                        return c + right * side + Vector3.up * up;
                     }
-                    // The piers: from the floor up the walls to the arch's springing.
-                    float spring = high * Mathf.Pow(Mathf.Sin(Mathf.PI / 10), .85f);
+                    const int N = 22;
+                    int litAt = lit ? (R() < .5f ? 4 : N - 5) : -1;
+                    for (int k = 0; k < N; k++)
+                    {
+                        var p0 = Point(k * Mathf.PI / N); var p1 = Point((k + 1) * Mathf.PI / N);
+                        var run = p1 - p0; float length = run.magnitude; if (length < .01f) continue;
+                        var mid = (p0 + p1) / 2; var tangent = run / length;
+                        var inward = Vector3.Cross(f, tangent).normalized; if (Vector3.Dot(inward, axis - mid) < 0) inward = -inward;
+                        var q = Quaternion.LookRotation(f, inward);
+                        // The stones overlap a little at each joint, so the band runs without a gap.
+                        b.Box((k * 7 + (int)(s * 3)) % 3 == 0 ? rubble2 : rubble, mid, new Vector3(length + block * .35f, block * (.9f + R() * .2f), deep * (.92f + R() * .16f)), q);
+                        // The mould clinging to the archways (book1 ch.6:129): thin pads on the stones' inner faces, here and there.
+                        bool thick = k == litAt || k == litAt + 1;
+                        if (thick || R() < .22f)
+                        {
+                            int pads = thick ? 4 : 1 + (int)(R() * 2);
+                            for (int m = 0; m < pads; m++)
+                            {
+                                var along = tangent * (R() - .5f) * length * .7f + f * (R() - .5f) * deep * .6f;
+                                b.Box(mould, mid + along + inward * (block * .5f + .012f), new Vector3(.18f + R() * .35f, .025f, .15f + R() * .3f), q * Quaternion.Euler(0, R() * 90, 0));
+                            }
+                        }
+                        if (k == litAt) Glow(root, mid + inward * .8f, 8, .55f, green, .55f);
+                    }
+                    // The footings: a broader course of stone where each pier meets the floor.
                     foreach (int sd in new[] { -1, 1 })
                     {
-                        var foot = c + right * sd * half * Mathf.Pow(Mathf.Cos(Mathf.PI / 10), .75f);
-                        b.Box(rubble2, foot + Vector3.up * spring / 2, new Vector3(block, spring, deep), Quaternion.LookRotation(f));
-                        if (R() < .5f) b.Box(mould, foot + Vector3.up * (.3f + R() * .5f) - right * sd * (block / 2 + .02f), new Vector3(.04f, .5f + R() * .6f, deep * .7f), Quaternion.LookRotation(f));
+                        var foot = c + right * sd * (half - block * .6f);
+                        b.Box(rubble2, foot + Vector3.up * .35f, new Vector3(block * 1.7f, .7f, deep * 1.25f), Quaternion.LookRotation(f));
                     }
                 }
-                Rib(1.6f, true);
-                for (float s = 6; s < len - 2.5f; s += 4.2f) Rib(s, false);
-
-                // A dim green light every so often (the mould's glow), none in the first stretch (the mouth's daylight).
-                for (float s = 10; s < len - 3; s += h.Name == VaultsCave ? 14 : 22)
-                {
-                    int i = RingAt(h, s); if (!h.Floored(i)) continue;
-                    var c = h.At(s); var right = new Vector3(Forward(h, s).z, 0, -Forward(h, s).x); int sd = ((int)(s / 7)) % 2 == 0 ? 1 : -1;
-                    var at = c + right * sd * h.Half[i] * .7f + Vector3.up * h.Height[i] * .6f;
-                    b.Box(mould, at, new Vector3(.5f, .5f, .5f) * (.6f + R() * .5f));
-                    Glow(root, at - right * sd * .5f, 8, .55f, green, .55f);
-                }
+                Rib(1.6f, true, false);
+                int every = h.Name == VaultsCave ? 3 : 5, no = 0;
+                for (float s = 6; s < len - 2.5f; s += 4.2f, no++) Rib(s, false, no % every == 1);
 
                 // Treads down the stair and the mouths' slopes: where the floor falls more than a step in a metre and a half.
                 for (float s = 1; s < Mathf.Min(len - 2, 45); s += .55f)

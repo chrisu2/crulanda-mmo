@@ -692,7 +692,8 @@ namespace Crulanda.World
                 int lake = part == "vent" ? Named("lake", 26 * X, h.Length - 8 * X) : part == "chapel" ? AnchorRing("lake") : -1;
                 float lakeS = lake >= 0 ? h.Along[lake] : -999, lakeR = lake >= 0 ? LakeRz(lake) + 4 : 0;
                 var rock = Tint(art.stone, AditLining(part) * .55f); var rubbleRock = Tint(art.stone, AditLining(part) * .45f);   // (at .8 they read near white in the cave's light)
-                bool geodes = part == "geode" || part == "foundry", drips = part == "main" || part == "breach" || part == "plain" || part == "workings" || part == "gallery" || part == "deep" || part == "river" || part == "deadline" || part == "cove";
+                bool vault = h.Style == VaultStyle;
+                bool geodes = part == "geode" || part == "foundry", drips = !vault && (part == "main" || part == "breach" || part == "plain" || part == "workings" || part == "gallery" || part == "deep" || part == "river" || part == "deadline" || part == "cove");
                 for (float s = 6; s < h.Length - 4; s += 2.2f)
                 {
                     int i = RingAt(s); float half = h.Half[i];
@@ -706,6 +707,9 @@ namespace Crulanda.World
                         if (skip) continue;
                         bool wall = Mathf.Abs(a) > half * .5f;   // toward the walls, more and bigger outcrops
                         bool big = roll < (wall ? .45f : .25f); float r = big ? (wall ? 1.4f + size * 1.8f : 1.1f + size * 1.2f) : .55f + size * .45f;
+                        // (the Lowtowns' drowned vaults) A built vault, not a natural cave: no outcrops, dripstone or fallen props, only a
+                        // little fallen rubble at the walls' feet.
+                        if (vault) { if (!wall) continue; big = false; r = .45f + size * .35f; roll = .6f; }
                         if (!Room(s, a, r)) continue;
                         var at = On(s, a); at.y = FloorY(at.x, at.z) - .06f;
                         if (big)

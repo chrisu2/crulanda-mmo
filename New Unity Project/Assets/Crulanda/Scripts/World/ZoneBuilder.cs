@@ -5162,6 +5162,8 @@ namespace Crulanda.World
             Vector3 Inward(int i, int k) { var d = c[i] - ring[i, k]; d.y = 0; return d.sqrMagnitude > .01f ? d.normalized : Vector3.zero; }
             Vector3 ToAir(int i, int k) { return (c[i] + Vector3.up * h.Height[i] * .4f - ring[i, k]).normalized; }
             float Yaw(int i) { return Mathf.Atan2(-right[i].z, right[i].x) * Mathf.Rad2Deg; }   // the way the passage runs
+            // (the Lowtowns' drowned vaults) A built vault of rubble stone: no ledges, buttresses of rock or dripstone, only fallen stone.
+            bool vault = h.Style == VaultStyle;
             if (!roots)
             {
                 for (float s = 2.4f; s < h.Length - 3; s += 1.7f)
@@ -5174,6 +5176,7 @@ namespace Crulanda.World
                         Lump(BoulderAt((int)(turn * 6)), t, at, new Vector3(1 + size * .9f, .6f + size * .7f, .9f + lift * .7f), wall, turn * 360);
                         Lump(BoulderAt((int)(lift * 6)), t, at + Inward(i, foot) * .3f + new Vector3(-right[i].z, 0, right[i].x) * (.75f + size * .35f), Vector3.one * (.35f + lift * .3f), wall, lift * 360);
                     }
+                    else if (vault) { }
                     else if (pick < .76f && !torch)
                     {   // a ledge: a bed of the rock standing proud of the wall, long the way the passage runs
                         int k = side > 0 ? 2 + (int)(lift * 2) : P - 3 - (int)(lift * 2);
@@ -5188,7 +5191,7 @@ namespace Crulanda.World
                 for (float s = 5; s < h.Length - 3; s += 2.3f)
                 {
                     int i = RingAt(s), k = P / 2 + (int)((C() - .5f) * 5), count = 2 + (int)(C() * 3); float go = C();
-                    if (h.Height[i] < 3.7f || go < .4f) continue;   // a low roof stays bare
+                    if (h.Height[i] < 3.7f || go < .4f || vault) continue;   // a low roof stays bare
                     for (int d = 0; d < count; d++)
                     {
                         float len = .45f + C() * 1.2f, r = .12f + C() * .12f, yaw = C() * 360; var at = ring[i, k] + new Vector3((C() - .5f) * .8f, .25f, (C() - .5f) * .8f);

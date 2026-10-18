@@ -85,6 +85,13 @@ reference only:
 
 - The game is set **before** Oakhaven's erasure, so the village and the Great Oak stand, alive and in full leaf.
 - Label lore honestly: CANON, CANON-EXPANDED, GAME-ONLY or PROVISIONAL.
+- **Every design document references the books** (Chris, 2026-10-18, verbatim: "you should have to go back and reference the books after i
+  asked. it should always be referenced on all design documents"): before a zone, dungeon, quest or character is designed, read what the
+  novels and world bibles in `D:\code\crulanda` say about it and cite them (book/chapter/line) in the doc, tagging each element CANON /
+  CANON-EXPANDED / GAME-ONLY / CONTRADICTS.
+- **The books' named characters may appear** (Chris, 2026-10-18, verbatim: "i never said not use the name characters. it would be nice to
+  see some of them come alive" ... "like the leader in crowns"): canon characters (as High Councilor Aethelgard in the Crown, Gorm in the
+  Lowtowns, Snivels at the Rusty Spoon) are welcome as NPCs, true to how the books write them and to the game's time (before Book 1's end).
 - Evolve the world first; per-skill balancing comes later.
 - Chris skims: ask him decisions first and short. Keep going without waiting between ordered steps, and tell him at
   each publish. Finish each step (fix, test, re-shoot, verify, commit, publish, back up) before starting the next.

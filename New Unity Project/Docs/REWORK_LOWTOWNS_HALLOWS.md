@@ -34,6 +34,19 @@ Where the books put one of those in these two zones, section 3 asks Chris instea
 
 ---
 
+## Chris's decisions (2026-10-18 ~02:00, verbatim)
+
+"keep all. conflicts: take 2 out. 8. fifty years . stone girl is talla. snivel is fine. i never said not use the name characters. it would
+be nice to see some of them come alive" ... "like the leader in crowns".
+- Picks: **all of them**, both zones (Lowtowns 1-12, Hallow's Creek 1-12).
+- Conflict 2 (the Copper-Tithe): **out** of the game.
+- Conflict 8: Hallow's Creek fell **fifty years** ago; the stone girl by the willow **is Talla**, Valen's sister (named, CANON per Chris).
+- Conflict 9: **Snivels Gear-Grinder** behind the Spoon's bar, as the books write him.
+- The books' named characters may come alive in the game (GAME_BRIEF.md standing rules).
+- Conflicts 1, 3, 4, 5, 6, 7: not answered separately: the recommended answers stand (1 warders, a Seeker glimpsed far off; 3 the Iron Teeth
+  kept in the Lowtowns' turn of the turf; 4 the drowned vaults as the Warrens' upper edge; 5 Dead Man's Drop as a view and a fall onto the
+  nets; 6 blue-chalk cache marks; 7 Gorm's line and the dug-out hollow by the willow).
+
 ## 1. What the books say (check at a glance)
 
 ### The Lowtowns (Argentis's lower city)

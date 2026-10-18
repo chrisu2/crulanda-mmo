@@ -463,13 +463,14 @@ namespace Crulanda.Tests
             motor.Teleport(spot.mid[spot.mid.Length / 2] + Vector3.up * .3f); yield return Frames(5); yield return new WaitForSeconds(.6f);
             Assert.IsTrue(slab.Holds(s.Player.transform.position), "standing on it");
             Assert.Greater(slab.Angle, 1, "it dips under you"); Assert.Less(slab.Angle, 8, "a few degrees, no more");
-            motor.Teleport(zone.Ground(new Vector2(0, -120), .3f)); yield return new WaitForSeconds(3f);
+            // Away up the road (clear of every camp: by the gatehouse its guards could kill you, and a dead player keeps nothing level).
+            motor.Teleport(zone.Ground(new Vector2(0, -290), .3f)); yield return new WaitForSeconds(3f);
             Assert.IsTrue(slab.IsTipped, "once you are past it tips"); Assert.Greater(slab.Angle, 40, "to forty-five degrees");
             Assert.IsTrue(walk.GetComponent<Collider>().enabled, "its walk stays solid");
             On(spot.mid[spot.mid.Length / 2], "the tipped slab's walk");
             var ramp = zone.DeckSpots.Find(d => d.def != null && d.def.name == "Ramp to the last slab");
             motor.Teleport(ramp.mid[ramp.mid.Length / 2] + Vector3.up * .3f); yield return new WaitForSeconds(2.5f);
-            Assert.Less(slab.Angle, 6, "coming back, it rights itself");
+            Assert.IsTrue(s.Player.IsAlive, "alive to come back"); Assert.Less(slab.Angle, 6, "coming back, it rights itself");
         }
     }
 }

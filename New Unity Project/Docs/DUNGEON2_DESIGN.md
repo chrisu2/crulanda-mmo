@@ -471,7 +471,7 @@ in `hallows.json`, each labelled with its chapter.
 - **The bridge's slabs** (CANON, ch.17:193-201): seven slabs hang beside the walk over the chasm, three tilted and still, four turning
   slowly; no colliders, all at least 1.5 m clear of every deck. The walk's own slabs do not move.
 - **The slab that tips** (CANON-EXPANDED, ch.17:243): the fifth slab. A foot on it and it dips about 4 degrees and rocks, with a line
-  ("The slab groans and dips under you ... It holds."); you keep walking. Once nobody is within 12 m of it, it tips to 45 degrees over
+  ("The slab groans and dips under you ... It holds."); you keep walking. Once nobody is within 20 m of it, it tips to 45 degrees over
   the fog, with a line if you are within 60 m; anyone coming near again and it rights itself first. Only its stone moves: its walk's
   collider and navmesh stay flat and solid, and the parapets stay (a real tip under the party was judged too risky for the navmesh and
   the sims). There is no sound in the game for the creak: the warning is the chat line.

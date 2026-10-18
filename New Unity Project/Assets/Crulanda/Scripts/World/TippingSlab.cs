@@ -25,7 +25,7 @@ namespace Crulanda.World
         /// <summary>The dip under a foot (degrees), the rock either side of it, and the tip once the party is past.</summary>
         public const float Dip = 4, Rock = 1.2f, Tipped = 45;
         /// <summary>How near (flat metres from the slab's middle) anyone keeps it level once tipped.</summary>
-        public const float Clear = 12;
+        public const float Clear = 20;
         Transform pivot, walk; Quaternion level; float angle, target; bool someoneOn, stepped;
         /// <summary>The angle the slab shows now (degrees; tests read it).</summary>
         public float Angle { get { return angle; } }
@@ -86,9 +86,9 @@ namespace Crulanda.World
         void Update()
         {
             if (pivot == null) return;
-            // Tipping is slow and heavy (about two seconds to forty-five), righting quicker (a second and a half), the dip a moment
+            // Tipping is slow and heavy (about two seconds to forty-five), righting quick (under a second, begun 20 m out, so it is level before anyone reaches it), the dip a moment
             // (about a seventh of a second, so it answers the foot at once).
-            float speed = target >= Tipped ? 24 : angle > Dip + 1 ? 32 : 30;
+            float speed = target >= Tipped ? 24 : angle > Dip + 1 ? 60 : 30;
             angle = Mathf.MoveTowards(angle, target, speed * Time.deltaTime);
             float rock = someoneOn ? Mathf.Sin(Time.time * 2.3f) * Rock : 0;
             pivot.rotation = level * Quaternion.Euler(0, 0, angle + rock);

@@ -46,8 +46,26 @@ namespace Crulanda.Encounter
         public LootRoll Roll { get; private set; }
         readonly Queue<(string item, int count, string from)> rollQueue = new Queue<(string, int, string)>();
         readonly System.Random rollRng = new System.Random();
-        /// <summary>Whether this drop is rolled for rather than taken: in a party, and uncommon or better.</summary>
-        public bool Rolled(string item) { var d = Items?.Get(item); return PartySims.Count > 0 && d != null && d.quality >= 2; }
+        /// <summary>Whether this drop is rolled for rather than taken: in a party, and uncommon or better, or a piece of gear (of any
+        /// quality) that is an upgrade for one of the party's sims (Chris, 2026-10-18: "group is not rolling on loot..if upgrade they
+        /// need to get it": a common piece went to your bags though the Warrior needed it). Common gear no sim needs is simply taken.</summary>
+        public bool Rolled(string item)
+        {
+            var d = Items?.Get(item); if (PartySims.Count == 0 || d == null) return false;
+            if (d.quality >= 2) return true;
+            return d.kind == "gear" && PartySims.Exists(c => c != null && c.RollFor(d) == RollChoice.Need);
+        }
+        /// <summary>The trades (for a made piece's weight: SimGear.Fits), or null.</summary>
+        public ProfessionDatabase LootTrades { get { return ProfessionContent(); } }
+        /// <summary>Your choice by your own upgrade check (the group run's bot, RunCapture): Need for gear you can wear that beats what you
+        /// wear in its slot (LootJudge.IsUpgrade), else Pass (all passing, it is yours anyway).</summary>
+        public RollChoice YourRollFor(ItemDef d)
+        {
+            if (d == null || d.kind != "gear" || Items == null) return RollChoice.Pass;
+            int slot = ItemDatabase.SlotIndex(d.slot); var eq = Progress.equipment;
+            var worn = slot < 0 || slot >= eq.Count || eq[slot].Empty ? null : Items.Get(eq[slot].item);
+            return LootJudge.IsUpgrade(d, worn, Progress.Level, Progress.classId) ? RollChoice.Need : RollChoice.Pass;
+        }
         void QueueRoll(string item, int count, string from)
         {
             if (Roll != null && !Roll.Done) { rollQueue.Enqueue((item, count, from)); Message(ItemName(item) + " waits its turn to be rolled for."); return; }
@@ -76,7 +94,8 @@ namespace Crulanda.Encounter
             int roll = choice == RollChoice.Pass ? 0 : 1 + rollRng.Next(100);
             r.Choose(memberId, choice, roll);
             string who = memberId == "you" ? "You" : PartySim(memberId)?.sim.name ?? memberId;
-            ChatSay(ChatChannel.Party, who, choice == RollChoice.Pass ? "pass on " + ItemName(r.item) : (choice == RollChoice.Need ? "need " : "greed ") + roll + " for " + ItemName(r.item));
+            // Said as Chris put it (2026-10-18): "Isolde rolls Need (87)".
+            ChatSay(ChatChannel.Party, who, choice == RollChoice.Pass ? "passes on " + ItemName(r.item) : "rolls " + (choice == RollChoice.Need ? "Need" : "Greed") + " (" + roll + ") for " + ItemName(r.item));
             if (r.AllChosen) ResolveRoll();
         }
         void TickRoll()
@@ -109,7 +128,7 @@ namespace Crulanda.Encounter
             {
                 var c = PartySim(winner); if (c == null) { PutBack(r.from, r.item, r.count); return; }
                 var d = Items?.Get(r.item);
-                if (d != null && d.kind == "gear" && r.Of(winner) == RollChoice.Need) { SimEconomy.Wear(c.sim, d.slot, r.item); SimGear.Dress(c.GetComponent<ActorVisual>(), c.sim, Items); ChatSay(ChatChannel.Party, c.sim.name, "won " + name + ", equipping it, ty"); }
+                if (d != null && d.kind == "gear" && r.Of(winner) == RollChoice.Need) { SimEconomy.PutOn(c.sim, d, Items); SimGear.Dress(c.GetComponent<ActorVisual>(), c.sim, Items); ChatSay(ChatChannel.Party, c.sim.name, "won " + name + ", equipping it, ty"); }
                 else if (SimMemory.Of(c.sim) == SimMemory.Standing.Friend && r.Of("you") != RollChoice.Pass && Items != null && Inventory.Add(Progress, Items, r.item, r.count) == 0)
                 { Received(r.item, r.count); ChatSay(ChatChannel.Party, c.sim.name, "won " + name + ", but you have it, I was only greeding"); Message(c.sim.name + " wins " + name + " and gives it to you."); return; }   // a friend (5.5)
                 else { SimEconomy.Add(c.sim, r.item, r.count); ChatSay(ChatChannel.Party, c.sim.name, "won " + name + ", ty"); }

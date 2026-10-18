@@ -203,6 +203,9 @@ namespace Crulanda.Encounter
                     EncounterInput.Scripted = Vector2.zero; lastSeen = s.Player.transform.position; yield return null; continue;
                 }
                 deadAt = -1;
+                // A roll going on (PartyLoot): the bot needs what is an upgrade for you, else passes (2026-10-18; before, it never chose and
+                // its turn ran out as a pass).
+                if (s.Roll != null && !s.Roll.Done && s.Roll.Of("you") == RollChoice.Undecided) s.ChooseRoll("you", s.YourRollFor(s.Items?.Get(s.Roll.item)));
                 // Fight what fights the party near you (letting the tank take the first blows: a mob is yours two and a half seconds after
                 // the party engages it, or at once when it is on you); else keep up with the leader.
                 EncounterEnemy foe = null; float best = 14;

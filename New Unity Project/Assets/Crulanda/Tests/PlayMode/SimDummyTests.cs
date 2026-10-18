@@ -16,8 +16,8 @@ namespace Crulanda.Tests
     /// <summary>
     /// Party sims on a training dummy (2026-10-17; Chris, watching the level-17 Hallow's Creek run's meter: "still not balanced i dont
     /// think"). A sim of each part at levels 11, 15, 17 and 20 sustains its band (SimCompanion.Damage): a pure damage-dealer the pure band
-    /// (66-72 at 15, grown as a mob's health), the Ranger with its wolf counted in, a hybrid 90% of it; the tank's damage modest, the
-    /// healer's less. And the last mob of a pack, held under the moon, is fought by the whole party, not by the tank alone.
+    /// (66-72 at 15, grown as a mob's health), the Ranger with its wolf counted in, a hybrid 90% of it; the tank's three quarters of a
+    /// damage-dealer's (Chris, 2026-10-18), the healer's less. And the last mob of a pack, held under the moon, is fought by the whole party, not by the tank alone.
     /// </summary>
     public class SimDummyTests
     {
@@ -153,8 +153,17 @@ namespace Crulanda.Tests
                         float within = SimCompanion.Unwriter(c.sim) ? .05f : .03f;
                         Assert.That(withPet, Is.InRange(aim * (1 - within), aim * (1 + within)), who + " sustains its band on the dummy" + (pet != null ? ", its pet counted in" : ""));
                     }
-                    else if (c.Role == SimCompanion.PartyRole.Tank) Assert.That(withPet / pure, Is.InRange(.2f, .4f), who + ": a tank's damage is modest (a fifth to two fifths of a damage-dealer's)");
+                    // The tank: three quarters of a damage-dealer's (Chris, 2026-10-18: "maybe 3/4 of dps"; SimCompanion.TankDpsShare).
+                    else if (c.Role == SimCompanion.PartyRole.Tank) Assert.That(withPet / pure, Is.InRange(.7f, .8f), who + ": a tank deals about three quarters of a damage-dealer's");
                     else Assert.That(withPet / pure, Is.InRange(.1f, .35f), who + ": a healer's damage is less again");
+                }
+                // The order Chris asked for: every damage-dealer over the tank, the tank over the healer.
+                float RateOf(SimCompanion c) { var pet = session.SimPets.Find(p => p != null && p.Master == c); return rates[c.actor.EntityId.Value] + (pet != null ? rates[pet.actor.EntityId.Value] : 0); }
+                var tankSim = party.Find(c => c.Role == SimCompanion.PartyRole.Tank); var healSim = party.Find(c => c.Role == SimCompanion.PartyRole.Healer);
+                if (tankSim != null)
+                {
+                    foreach (var c in party) if (c.Role == SimCompanion.PartyRole.Damage) Assert.Greater(RateOf(c), RateOf(tankSim), c.sim.name + " out-damages the tank at " + level);
+                    if (healSim != null) Assert.Greater(RateOf(tankSim), RateOf(healSim), "the tank out-damages the healer at " + level);
                 }
             }
             Time.captureDeltaTime = 0;

@@ -603,3 +603,23 @@ Once per wipe. Tests: `BossBuffTests.After_a_wipe_the_party_buffs_up_again_befor
 `A_wipe_with_nothing_to_take_is_not_stopped_for_again`.
 
 Not run in Unity yet: `SimDummyTests.The_other_damage_sims_sustain_theirs`, `PetWarpSpotTests`, `BossBuffTests`.
+
+## The tank's damage: three quarters of a damage-dealer's (2026-10-18)
+
+Chris, 2026-10-18 (verbatim): "warrior doing way too low damage. its less than half of dps. should be more than healer..maybe 3/4 of dps"
+
+His meter (Hallow's Creek, 222 s): the Rogue 66 a second, you (Paladin) 62, the Ranger 55 and its wolf 17, the Druid 13 damage and 25
+healing, the Warrior tank 19. This replaces the 2026-10-15 rule that the tank's damage be modest; what stays from it is that the tank never
+out-damages the damage-dealers.
+
+- A tank sim (the Warrior, and any sim in the tank part) now deals 75% of the pure band's middle at its level (`SimCompanion.TankDpsShare`,
+  `TankBlow`): about 52 a second at 15 where a damage-dealer does 69. Before, it hit half its formula's blow, about 27% of a damage-dealer.
+  The healer keeps its half blow (about 20%), so the order is damage-dealers (a hybrid 90%), then the tank, then the healer.
+- Threat: the tank's swing still adds three of its formula's blows of threat on top of its damage, so with its damage up it holds aggro more
+  surely, not less.
+- Mob health: the party's damage rises about an eighth (some 31 a second on his 232), so a tank sim now weighs 1.8 health shares on a mob
+  (`EncounterEnemy.TankPartHealth`; a damage-part sim 1.2, the healer 1), 0.8 shares at 0.6 health each, about an eighth of a five's mob
+  health. Fights should last about as long as they did.
+- Test: `SimDummyTests` holds the tank to 0.70-0.80 of the pure band, each damage-dealer over the tank and the tank over the healer.
+  Compiles; not run in Unity yet.
+

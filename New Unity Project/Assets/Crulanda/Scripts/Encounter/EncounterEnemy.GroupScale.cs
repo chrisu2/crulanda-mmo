@@ -31,13 +31,24 @@ namespace Crulanda.Encounter
         /// stand a little longer and the fights' length holds. Its blows are not touched (SharesFor).
         /// </summary>
         public const float DamagePartHealth = 1.2f;
+        /// <summary>
+        /// A tank sim's share of a mob's health (2026-10-18): the tank was raised from about 27% of a damage-dealer's damage to 75%
+        /// (SimCompanion.TankDpsShare; Chris: "maybe 3/4 of dps"), about 31 a second more at 15, an eighth more of a five's damage
+        /// (his Hallow's Creek meter, 232 a second in all). A tank sim weighs 1.8 shares: 0.8 shares at 0.6 health a share is the
+        /// eighth of a five's health (about 3.6 shares' worth), so the fights' length holds.
+        /// </summary>
+        public const float TankPartHealth = 1.8f;
         /// <summary>The health shares a party brings against a mob of <paramref name="mobLevel"/>: SharesFor, a damage-part sim's weighed
         /// <see cref="DamagePartHealth"/>.</summary>
         public static float HealthSharesFor(EncounterSession session, int mobLevel)
         {
             float shares = SharesFor(session, mobLevel); int lv = Mathf.Max(1, mobLevel);
             foreach (var c in session.PartySims)
-                if (c != null && c.actor != null && c.actor.IsAlive && c.Role == SimCompanion.PartyRole.Damage) shares += (DamagePartHealth - 1) * Mathf.Clamp((float)c.sim.level / lv, MinShare, MaxShare);
+            {
+                if (c == null || c.actor == null || !c.actor.IsAlive) continue;
+                float weigh = c.Role == SimCompanion.PartyRole.Damage ? DamagePartHealth : c.Role == SimCompanion.PartyRole.Tank ? TankPartHealth : 1;
+                shares += (weigh - 1) * Mathf.Clamp((float)c.sim.level / lv, MinShare, MaxShare);
+            }
             return shares;
         }
         /// <summary>

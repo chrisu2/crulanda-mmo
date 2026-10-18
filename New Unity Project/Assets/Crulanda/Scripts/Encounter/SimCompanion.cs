@@ -181,7 +181,7 @@ namespace Crulanda.Encounter
         /// damage part its blow holds it to the pure damage band, a hybrid to EncounterSession.HybridDpsShare of it (Chris, 2026-10-16:
         /// "A bit lower"), its pet's bites counted in (SimCompanion.Damage, 2026-10-17); a tank and a healer hit half their formula's blow.
         /// </summary>
-        public int Hit { get { float blow = Role == PartyRole.Damage ? DamageBlow : BaseHit * RoleDamage(Role); return Mathf.Max(1, Mathf.RoundToInt(blow * (1 + DamageEdge))); } }
+        public int Hit { get { float blow = Role == PartyRole.Damage ? DamageBlow : Role == PartyRole.Tank ? TankBlow : BaseHit * RoleDamage(Role); return Mathf.Max(1, Mathf.RoundToInt(blow * (1 + DamageEdge))); } }
         public int HealAmount { get { return Mathf.RoundToInt(12 + 5 * sim.level); } }
         /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
         public void GainXp(int xp)
@@ -204,24 +204,17 @@ namespace Crulanda.Encounter
             actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, MaxHealthFor(sim, session.Items)); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             SimGear.Dress(GetComponent<ActorVisual>(), sim, session.Items);
         }
-        /// <summary>Its choice in a roll (Round 25, note 72): Need for gear of its weight and slot that beats what it wears, Greed for
-        /// anything it could sell, Pass for what is no use to it (a potion it cannot use goes to Greed too: coin is coin). A leaf (a found
-        /// recipe, Phase 8.6) is passed: the sims make only what their skill teaches, and the leaves are yours.</summary>
+        /// <summary>Its choice in a roll (Round 25, note 72): Need for gear that fits it (its class, weight, slot and level) and is an
+        /// upgrade on what it wears there (SimGear.IsUpgrade: armour, weapon damage and stats over the worn piece's; Chris, 2026-10-18:
+        /// "group is not rolling on loot..if upgrade they need to get it"), Greed for anything else it could sell, Pass for what is no
+        /// use to it (a potion it cannot use goes to Greed too: coin is coin). A leaf (a found recipe, Phase 8.6) is passed: the sims
+        /// make only what their skill teaches, and the leaves are yours.</summary>
         public RollChoice RollFor(ItemDef d)
         {
             if (d == null || d.kind == "recipe") return RollChoice.Pass;
             if (d.kind == "gear" && !string.IsNullOrEmpty(d.classOnly))   // a class set's piece (loot DESIGN.md 3.8): Need it for its own class (unless worn already), never for another's
                 return d.classOnly == sim.classId && d.level <= sim.level && SimEconomy.Worn(sim, d.slot) != d.id ? RollChoice.Need : RollChoice.Greed;
-            if (d.kind == "gear")
-            {
-                bool mine = d.slot == "mainhand" || d.slot == "offhand" ? SimGear.CarriesWeapon(sim.classId) : SimGear.Suits(sim.classId, d.name);
-                if (mine && d.level <= sim.level)
-                {
-                    var worn = session.Items?.Get(SimEconomy.Worn(sim, d.slot));
-                    if (worn == null || d.quality > worn.quality || d.quality == worn.quality && d.level > worn.level) return RollChoice.Need;
-                }
-                return RollChoice.Greed;
-            }
+            if (d.kind == "gear") return session != null && SimGear.IsUpgrade(sim, d, session.Items, session.LootTrades) ? RollChoice.Need : RollChoice.Greed;
             return d.value > 0 ? RollChoice.Greed : RollChoice.Pass;
         }
         /// <summary>

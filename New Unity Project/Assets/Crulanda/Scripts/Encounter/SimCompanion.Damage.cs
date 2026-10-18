@@ -14,7 +14,8 @@ namespace Crulanda.Encounter
     /// - A pet's bites (the Ranger's wolf, the Bonecaller's thrall) are part of its keeper's damage: they come off its own blows, so the
     ///   two together are in the band. The Unwriting's unwrite is counted the same way.
     /// - Its practice at the yard moves it about the band's middle, 4% either way.
-    /// - The tank and the healer keep their blows (half the formula's): a tank's damage is modest, a healer's work is its mending.
+    /// - The healer keeps its blows (half the formula's): a healer's work is its mending. The tank's were the same until 2026-10-18 (about
+    ///   27% of a damage-dealer's); now it deals <see cref="TankDpsShare"/> of the pure band (TankBlow), Chris's three quarters.
     /// Where the run's time went (the same run): about a quarter of the fighting time the Rogue, the Ranger and the healer stood at your
     /// side while the tank alone fought the last mob of a pack, the one the Rogue had held under the moon (a moon or a cross stayed "leave
     /// it alone" after the hold ran out); and the boss's roots stopped the Rogue's blows as well as its feet. Both are fixed here.
@@ -51,6 +52,16 @@ namespace Crulanda.Encounter
         public float BlowsPerSecond { get { return 1 / Interval + (Unwriter(sim) ? 5 / 36f : 0); } }
         /// <summary>Its blow in the damage part, before its buffs: its share of the band after its pet's, over its blows a second.</summary>
         public float DamageBlow { get { return Mathf.Max(1, (BandDps - PetDps) / BlowsPerSecond); } }
+        /// <summary>
+        /// A tank sim's share of a pure damage-dealer's band (Chris, 2026-10-18, his Hallow's Creek meter: Rogue 66 a second, Ranger 55 and
+        /// its wolf 17, the Warrior tank 19, the Druid healer 13: "warrior doing way too low damage. its less than half of dps. should be
+        /// more than healer..maybe 3/4 of dps"). Three quarters: more than the healer's, under every damage-dealer's (a hybrid's is 90%).
+        /// </summary>
+        public const float TankDpsShare = .75f;
+        /// <summary>What a tank sim sustains on a dummy: <see cref="TankDpsShare"/> of the pure band's middle at its level.</summary>
+        public float TankDps { get { return PureDps(sim.level) * TankDpsShare; } }
+        /// <summary>Its blow as the party's tank, before its buffs: its share over its blows a second.</summary>
+        public float TankBlow { get { return Mathf.Max(1, TankDps / BlowsPerSecond); } }
 
         /// <summary>Faces its quarry and, when its blow is due, strikes or shoots it (or its area blow goes across the pack about it).
         /// <paramref name="say"/>: what it is doing shows (not while rooted: "Rooted" stays).</summary>

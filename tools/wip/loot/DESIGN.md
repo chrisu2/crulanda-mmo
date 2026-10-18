@@ -477,6 +477,23 @@ tier), `Items.cs` (`classOnly`, `CanEquip`/`ClassMayWear`), `EncounterSession.cs
 
 ---
 
+### 3.9 Party rolls: a sim Needs its upgrades (2026-10-18)
+
+Chris, 2026-10-18 (verbatim): "group is not rolling on loot..if upgrade they need to get it"
+
+GAME-ONLY. The roll itself (Round 25, note 72: Need over Greed, the highest roll of the top tier wins, all passing leaves it to you, twenty
+seconds) was only for uncommon and better, so a common piece a sim needed went straight to your bags. As built:
+- In a party, a drop is rolled for when it is uncommon or better, or when it is gear of any quality that is an upgrade for one of the
+  party's sims. Common gear no sim needs is still simply taken (`EncounterSession.Rolled`, `PartyLoot.cs`).
+- A sim rolls Need for gear that fits it (class, weight, slot, level) and beats what it wears in that slot by its armour, weapon damage and
+  stats (`SimGear.IsUpgrade`, the same check the Exchange's buyers use; before, only quality and item level were compared). A class set's
+  piece is as in 3.8. Anything else it could sell is Greed; what is no use to it, Pass (`SimCompanion.RollFor`).
+- You roll with the buttons as before. The group run's bot rolls Need when the piece is an upgrade for it (`LootJudge.IsUpgrade`, the
+  tooltip's check), else Pass (`EncounterSession.YourRollFor`, `RunCapture`); before, it never chose and its time ran out as a pass.
+- In Party chat: "Isolde rolls Need (87) for X", "passes on X", then "won X, equipping it, ty". A sim that wins with Need wears the piece
+  at once (`SimEconomy.PutOn`: the old piece goes to its spares or is sold). The scorecard's "Loot: X (from) to Y" lines are unchanged.
+- Test: `PartyLootTests.A_common_upgrade_for_a_sim_is_rolled_for_and_the_sim_needs_and_wears_it`. Compiles; not run in Unity yet.
+
 ## 4. Thrill features
 
 | # | Feature | What the player sees | Cost | Step |

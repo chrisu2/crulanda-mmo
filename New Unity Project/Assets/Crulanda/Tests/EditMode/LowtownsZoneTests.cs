@@ -86,12 +86,9 @@ namespace Crulanda.Tests
                 foreach (var m in h.members) housed[m.name] = (housed.TryGetValue(m.name, out var n) ? n : 0) + 1;
             }
             foreach (var n in VillageLife.VillagerNames(z.life).Take(z.life.villagers)) Assert.AreEqual(1, housed.TryGetValue(n, out var k) ? k : 0, n + " lives in one terrace.");
-            foreach (var kept in new[] { "Valen", "Rill", "Silas Vane", "Veyra", "Kaelen", "Aethelgard", "Architect", "Horgus" })
-            {
-                Assert.IsFalse(z.life.residents.Any(r => r.name.Contains(kept)) || z.life.names.Any(n => n.Contains(kept)), kept + " is kept out (section 9).");
-                foreach (var file in new[] { "Zones/lowtowns.json", "Quests/lowtowns.json", "Lore/lowtowns.json" })
-                    StringAssert.DoesNotContain(kept, File.ReadAllText(Content(file)), kept + " is named nowhere in " + file + ".");
-            }
+            // The books' named characters may appear (GAME_BRIEF standing rules, Chris 2026-10-18: "i never said not use the name characters"),
+            // so a name in a label or where the design puts someone is fine. What stays out: the boy Gorm dug out is not named (ch.19:39).
+            Assert.IsFalse(residents["Gorm Rock-Wall"].stories.Any(s => s.Contains("Valen")), "The boy Gorm dug out is not named.");
             foreach (var file in new[] { "Zones/lowtowns.json", "Quests/lowtowns.json", "Lore/lowtowns.json" }) StringAssert.DoesNotContain("Anduin", File.ReadAllText(Content(file)), "No World of Warcraft names.");
         }
 

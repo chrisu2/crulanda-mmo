@@ -34,7 +34,7 @@ namespace Crulanda.Encounter
         public const string Keeper = "Mother Sall", Bartender = "Snivels Gear-Grinder", Gorm = "Gorm Rock-Wall", Drunk = "Ottie Swale";
         /// <summary>The corner drunk's singing: short lines about the song, never its verses (the book gives only its title, ch.1:59).</summary>
         public static readonly string[] BalladLines = {
-            "(singing, badly) The Ballad of the One-Legged Goaaat...",
+            "(singing, badly) The Ballad of the One-Legged Goat... the Goaaat...",
             "(singing) ...and the goat went HOP... no. Wait. From the top.",
             "(singing) The One-Legged Goat! The One-Legged... how does the middle go?",
         };

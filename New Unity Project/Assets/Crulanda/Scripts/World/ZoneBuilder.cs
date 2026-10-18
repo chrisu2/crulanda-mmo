@@ -3765,6 +3765,9 @@ namespace Crulanda.World
             col.color = grad;
             var vel = ps.velocityOverLifetime; vel.enabled = true; vel.space = ParticleSystemSimulationSpace.World;
             vel.x = new ParticleSystem.MinMaxCurve(.25f, .5f); vel.y = new ParticleSystem.MinMaxCurve(0, 0); vel.z = new ParticleSystem.MinMaxCurve(.05f, .15f);
+            // The Lowtowns' smoke is soot, short-lived: pale and six seconds long it climbed 40-50 m into the top of the Rust Market's view and
+            // read as pale spikes hanging from the sky (SkyGhostDiagnostics' band list, 2026-10-18).
+            if (Zone.biome == "lowtowns") { main.startColor = new Color(.26f, .24f, .23f, .45f); main.startLifetime = 3.5f; vel.x = new ParticleSystem.MinMaxCurve(.15f, .3f); }
             ps.GetComponent<ParticleSystemRenderer>().sharedMaterial = art.particle;
             HourTinted.Add(ps);   // grey by day, a dim wisp against the night sky
             return ps;

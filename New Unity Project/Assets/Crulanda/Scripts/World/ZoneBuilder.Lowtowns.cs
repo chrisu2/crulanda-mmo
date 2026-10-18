@@ -486,7 +486,7 @@ namespace Crulanda.World
                 BoxPart(t, new Vector3(0, h * (i + .5f), 0), new Vector3(wdt, h + .05f, wdt), brick, null, 2);
             }
             Part(PrimitiveType.Cube, t, new Vector3(0, high - 1.2f, 0), new Vector3(b1 + .5f, .5f, b1 + .5f), SootBrick(3));
-            var s = Smoke(t, new Vector3(0, high + .4f, 0)); var main = s.main; main.startSize = new ParticleSystem.MinMaxCurve(2.5f, 4.5f); main.startColor = new Color(.24f, .22f, .21f, .5f); main.startLifetime = 14;
+            var s = Smoke(t, new Vector3(0, high + .4f, 0)); var main = s.main; main.startSize = new ParticleSystem.MinMaxCurve(2.5f, 4.5f); main.startColor = new Color(.24f, .22f, .21f, .5f); main.startLifetime = 6;
             var em = s.emission; em.rateOverTime = 4; var shape = s.shape; shape.radius = .9f;
         }
         /// <summary>A lane lamp: an iron post with a lantern on a bracket, burning orange after dark (the Lowtowns' lamps by day are out:

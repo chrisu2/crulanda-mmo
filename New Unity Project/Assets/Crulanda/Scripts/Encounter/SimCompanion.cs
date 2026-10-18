@@ -131,6 +131,10 @@ namespace Crulanda.Encounter
             return near;
         }
         public float Reach { get { return Melee ? 2.4f : 20; } }
+        /// <summary>How far past its Reach a melee sim already striking its quarry may be nudged and still strike (2026-10-18).</summary>
+        public const float StandSlack = .6f;
+        /// <summary>The quarry it last stood in reach of (StandSlack), or null while closing.</summary>
+        EncounterEnemy atQuarry;
         /// <summary>How far past a warned hold's ring a sim stepping clear makes for, and the least it takes as clear (metres).</summary>
         public const float HoldClearTo = 1.5f, HoldClearLeast = .4f;
         /// <summary>
@@ -888,8 +892,10 @@ namespace Crulanda.Encounter
                 if (Role == PartyRole.Tank && quarry.Victim != null && quarry.Victim != actor && Time.time >= nextTaunt && Vector3.Distance(transform.position, quarry.transform.position) < 12)
                 { nextTaunt = Time.time + 8; quarry.threat.Taunt(actor.EntityId.Value, Time.time, 4); session.FloatText(transform.position + Vector3.up * 2, "Taunt", new Color(1, .7f, .3f)); }
                 float d = Vector3.Distance(transform.position, quarry.transform.position);
-                if (d > Reach) { agent.isStopped = false; agent.speed = 5.2f; CloseOn(quarry); Activity = "Closing on " + quarry.actor.DisplayName; return; }
-                closeStuckSince = -1;
+                // Once at its quarry a melee sim holds its ground through a nudge (StandSlack): a shove from a pet or a sim walking past no
+                // longer sends it off "closing on" a quarry it is all but touching (SimDummyTests, 2026-10-18: the Scoundrel 3 s of 40 not striking).
+                if (d > Reach + (Melee && atQuarry == quarry ? StandSlack : 0)) { atQuarry = null; agent.isStopped = false; agent.speed = 5.2f; CloseOn(quarry); Activity = "Closing on " + quarry.actor.DisplayName; return; }
+                atQuarry = quarry; closeStuckSince = -1;
                 agent.isStopped = true;
                 StrikeAt(quarry, true);
                 return;

@@ -1051,7 +1051,10 @@
         "y": 167.9
       },
       "viewPitch": 8,
-      "viewZoom": 12
+      "viewZoom": 12,
+      "viewCave": "The drowned vaults",
+      "viewAlong": 104,
+      "viewAside": -3.5
     }
   ],
   "props": [

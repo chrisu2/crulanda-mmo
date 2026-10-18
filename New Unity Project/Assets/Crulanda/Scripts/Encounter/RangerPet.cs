@@ -62,6 +62,8 @@ namespace Crulanda.Encounter
         float huntSince = -1, lastBiteAt = -1;
         /// <summary>Its agent's stopping distance: about its own width and its quarry's, well inside BiteReach.</summary>
         public const float HuntStop = .9f;
+        /// <summary>Its agent's avoidance priority: less important than the party's and the mobs' (50), so it gives way and they are not shoved.</summary>
+        public const int PetAvoidance = 70;
         /// <summary>Where a warped pet may stand: on a ring round its quarry, no nearer than this to anyone of the party (or you).</summary>
         public const float WarpRingNear = 1.2f, WarpRingFar = 1.6f, WarpClear = 1.1f;
         const int WarpAngles = 12;
@@ -121,6 +123,9 @@ namespace Crulanda.Encounter
             // ground is cut away round it (a dummy's post, a boss's dais) that end is short of it, and it stood 2.3 m off its 2.2 m bite for
             // good (2026-10-18, a sim Bonecaller's thrall that never bit the dummy). It still halts at BiteReach (isStopped).
             if (agent != null) agent.stoppingDistance = HuntStop;
+            // A pet steps round the party, not through it (2026-10-18, SimDummyTests: a Bonecaller's thrall walking in to the dummy shoved
+            // the Scoundrel at its side out of reach, 3 s of 40 not striking): its avoidance yields to everyone at the default 50.
+            if (agent != null) agent.avoidancePriority = PetAvoidance;
             Refit(); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             actor.Health.Died += h => session.Meter.Death(actor);   // the scorecard's deaths
         }

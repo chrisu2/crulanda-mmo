@@ -553,6 +553,7 @@ namespace Crulanda.Encounter
             // searched viewpoint with the player out of frame (LandmarkView); when none is clear, the old orbit framing from
             // its south-west (the exit's from the north-east) stands in.
             var shots = new List<(string name, Vector2 at, float yaw, float pitch, float zoom, Vector2 mark, float radius, float bearing, Transform root, float high, float aim)>();
+            var caveViews = new Dictionary<string, (Vector3 eye, Vector3 focus, Vector3 floor)>();   // by shot name: a landmark under the land (ZoneLabel.viewCave)
             if (zone != null)
             {
                 var z = zone.Zone; shots.Add(("01-entrance", z.spawns.player, z.spawns.playerFacing, 16, 12, Vector2.zero, 0, 0, null, 0, 0));
@@ -569,8 +570,19 @@ namespace Crulanda.Encounter
                     Transform root = null;
                     if (prop != null) { root = zone.transform.Find("Zone props/" + prop.name); if (root == null) root = zone.transform.Find("Zone static scenery/" + prop.name); }
                     float bearing = prop != null && Array.IndexOf(Fronted, prop.kind) >= 0 ? prop.rotation + 205 : Mathf.Atan2(-.6f, -.8f) * Mathf.Rad2Deg;
-                    shots.Add(((n++).ToString("00") + "-" + l.name.ToLowerInvariant().Replace(' ', '-').Replace("'", ""), from, yaw, l.viewPitch > 0 ? l.viewPitch : 17, l.viewZoom > 0 ? l.viewZoom : 11,
+                    string shotName = (n++).ToString("00") + "-" + l.name.ToLowerInvariant().Replace(' ', '-').Replace("'", "");
+                    shots.Add((shotName, from, yaw, l.viewPitch > 0 ? l.viewPitch : 17, l.viewZoom > 0 ? l.viewZoom : 11,
                         l.at, authored ? 0 : l.radius, bearing, root, authored ? l.viewHeight : 0, l.viewAim));
+                    // A landmark under the land (ZoneLabel.viewCave): the camera in that cave, on its floor, looking at the landmark's
+                    // point on the same floor (lowtowns-19 was the street over the drowned vaults).
+                    var cave = string.IsNullOrEmpty(l.viewCave) ? null : Crulanda.World.Hollow.All.Find(hc => hc != null && hc.Name == l.viewCave);
+                    if (cave != null)
+                    {
+                        cave.Local(l.at, out float atAlong, out float atAside);
+                        caveViews[shotName] = (cave.At(l.viewAlong, l.viewAside) + Vector3.up * (l.viewHeight > 0 ? l.viewHeight : 1.7f),
+                            cave.At(atAlong, atAside) + Vector3.up * (l.viewAim > 0 ? l.viewAim : 1), cave.At(l.viewAlong, l.viewAside));
+                    }
+                    else if (!string.IsNullOrEmpty(l.viewCave)) Debug.LogWarning("World tour " + shotName + ": no cave named " + l.viewCave + "; shot from the land");
                 }
                 if (z.exits.Length > 0)
                 {
@@ -590,6 +602,19 @@ namespace Crulanda.Encounter
             foreach (var s in shots)
             {
                 string file = Path.Combine(directory, (zone != null ? zone.Zone.id.Replace("zone.", "") : "world") + "-" + s.name + ".png");
+                if (caveViews.TryGetValue(s.name, out var under))
+                {
+                    // In the cave: the player waits hidden on its floor under the camera, which looks along the cave at the landmark.
+                    motor.Teleport(under.floor + Vector3.up * 1.1f);
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform; var look = Quaternion.LookRotation(under.focus - under.eye);
+                    for (float w = 0; w < .8f; w += Time.deltaTime) { view.SetPositionAndRotation(under.eye, look); yield return null; }
+                    view.SetPositionAndRotation(under.eye, look); ScreenCapture.CaptureScreenshot(file);
+                    yield return new WaitForSeconds(.4f);
+                    motor.enabled = true; foreach (var r in body) r.enabled = true;
+                    continue;
+                }
                 if (zone != null && s.high > 0)
                 {
                     // A free camera high over the ground at the view, aimed at the landmark (viewAim over its ground): a city seen whole

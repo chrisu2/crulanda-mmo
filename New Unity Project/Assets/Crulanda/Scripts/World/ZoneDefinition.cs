@@ -641,7 +641,17 @@ namespace Crulanda.World
     /// </summary>
     /// viewHeight (optional, p9-cityinn): the shot is taken from a free camera that many metres over the ground at view, aimed at the
     /// landmark viewAim metres over its ground (a city seen whole from high over its walls), not from the player's orbit camera.
-    [Serializable] public sealed class ZoneLabel { public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; public string ground; public float viewHeight, viewAim; }
+    [Serializable] public sealed class ZoneLabel
+    {
+        public string name, text, canonStatus; public Vector2 at; public float radius = 10; public Vector2 view; public float viewPitch, viewZoom; public string ground; public float viewHeight, viewAim;
+        /// <summary>
+        /// A landmark under the land (2026-10-18, lowtowns-19 showed the Rust Market's street over the drowned vaults): the capture's
+        /// camera stands in this cave (Hollow.Name), <see cref="viewAlong"/> metres in from its mouth and <see cref="viewAside"/> to the right
+        /// of its middle, eye high over its floor (viewHeight, else 1.7 m), and looks at the landmark's point on the same cave's floor
+        /// (viewAim over it, else 1 m). Null: the camera is on the land as before.
+        /// </summary>
+        public string viewCave; public float viewAlong, viewAside;
+    }
     /// <summary>
     /// A far place on the skyline (DistantSkyline): kind ("crown": the Crown of Argentis on its mountain), bearing from the zone's middle
     /// in degrees (0 north, 90 east), distance in reaches past the zone's middle (the zone's half plus its backdrop; 0: 1.75, past the

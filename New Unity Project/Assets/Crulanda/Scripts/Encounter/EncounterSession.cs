@@ -1658,6 +1658,8 @@ namespace Crulanda.Encounter
                 case "croc": return ActorLook.Croc;   // and its mutated crocodile
                 case "bear": return ActorLook.Bear;
                 case "skeleton": return ActorLook.Skeleton;
+                case "imp": return ActorLook.Imp;         // the Bestiary kit (play note 233; Docs/BESTIARY_MONSTERS.md: what they are is Chris's pick)
+                case "puglin": return ActorLook.Puglin;
                 default: return veteran ? ActorLook.Warden : ActorLook.Collector;
             }
         }

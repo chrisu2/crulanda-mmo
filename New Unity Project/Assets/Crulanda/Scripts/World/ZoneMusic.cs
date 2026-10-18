@@ -27,7 +27,17 @@ namespace Crulanda.World
         public const float Crossfade = 6, FightIn = 1.5f, FightOut = 8, GapMin = 120, GapMax = 240, FirstWait = 12, NightLevel = .6f, Duck = .25f, GreyReach = 70;
         /// <summary>A zone's tracks, as Resources paths without the extension: by day; by night (the day's when empty); near the grey
         /// (zones with a wasting block; the day's when empty); and its fight track (the field one when null).</summary>
-        public sealed class Set { public string[] day = new string[0], night = new string[0], grey = new string[0]; public string combat; }
+        public sealed class Set
+        {
+            public string[] day = new string[0], night = new string[0], grey = new string[0]; public string combat;
+            /// <summary>(Hallow's Creek, REWORK_LOWTOWNS_HALLOWS pick 2) Silence on open ground: no track plays out of doors (<see cref="Silence"/>),
+            /// only in a cave (its day set then) and the fight track in a fight. "The unnatural silence here was absolute, crushing, and
+            /// physically heavy ... Just the crunch of their boots on the pristine gravel" (b1 ch.21:19); sound "fell to the ground and died"
+            /// (b1 ch.17:9).</summary>
+            public bool quiet;
+        }
+        /// <summary>No track: what a quiet zone plays out of doors.</summary>
+        public static readonly string[] Silence = new string[0];
         public const string FieldFight = "Music/Eastern/MeasuredFight", DungeonFight = "Music/Eastern/AggressiveFight";
         /// <summary>The Sealed Adit's and every cave's: the dark pack's two crypts.</summary>
         public static readonly string[] DungeonTracks = { "Music/Dark/ScaryCrypt", "Music/Dark/Crypt" };
@@ -45,7 +55,8 @@ namespace Crulanda.World
             { "zone.verdant", new Set { day = new[] { "Music/Eastern/Oasis", "Music/Last/LastHope" }, night = new[] { "Music/Eastern/RestlessNight" } } },
             { "zone.adit", new Set { day = DungeonTracks, combat = DungeonFight } },
             { "zone.lowtowns", new Set { day = new[] { "Music/Last/RustAndSilence", "Music/Eastern/MysteriousCity" }, night = new[] { "Music/Dark/Cemetery", "Music/Eastern/RestlessNight" } } },   // the Lowtowns (Phase 9.1): rust and smog by day, the drains' night
-            { "zone.hallows", new Set { day = DungeonTracks, combat = DungeonFight } },   // Hallow's Creek, the second dungeon
+            // Hallow's Creek, the second dungeon: silent out of doors, the dungeon's set in its cellars.
+            { "zone.hallows", new Set { day = DungeonTracks, combat = DungeonFight, quiet = true } },
             { "zone.crown", new Set { day = new[] { "Music/Eastern/MysteriousCity", "Music/Last/LastHope" }, night = new[] { "Music/Eastern/RestlessNight" } } },   // the Crown of Argentis (a city)
         };
         /// <summary>A zone's set; a zone not in <see cref="Sets"/> gets Oakhaven's.</summary>
@@ -56,6 +67,7 @@ namespace Crulanda.World
         public static string[] TracksFor(ZoneDefinition zone, Vector3 at, float darkness, out string fight)
         {
             var set = SetFor(zone != null ? zone.id : null);
+            if (set.quiet && !Hollow.InsideAny(at, 1)) { fight = set.combat ?? FieldFight; return Silence; }
             if (set.day == DungeonTracks || Hollow.InsideAny(at, 1)) { fight = DungeonFight; return DungeonTracks; }
             fight = set.combat ?? FieldFight;
             if (zone != null && zone.wasting != null && set.grey.Length > 0 && at.x > zone.wasting.x - GreyReach) return set.grey;

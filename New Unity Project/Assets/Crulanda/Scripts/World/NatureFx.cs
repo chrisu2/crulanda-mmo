@@ -87,6 +87,14 @@ namespace Crulanda.World
             // Ash hangs everywhere: fill the air at once on arrival and after a teleport (the old flakes stay behind; turning
             // the camera moves the focus 24 m at most, so a turn never refills).
             if (Hollow.CameraDepth > .2f) { if (emission.rateOverTime.constant > 0) { emission.rateOverTime = 0; ps.Clear(); } filled = false; nextCheck = 0; return; }   // underground: nothing drifts down through the rock
+            // (Hallow's Creek) Inside the bubble of still air nothing falls: no new flake, and those in the air stop where they are.
+            if (WorldWeather.Still > .5f)
+            {
+                if (emission.rateOverTime.constant > 0) emission.rateOverTime = 0;
+                var hold = ps.velocityOverLifetime; hold.x = new ParticleSystem.MinMaxCurve(0, 0); hold.y = new ParticleSystem.MinMaxCurve(0, 0); hold.z = new ParticleSystem.MinMaxCurve(0, 0);
+                var calm = ps.noise; calm.strength = 0; nextCheck = 0;
+                return;
+            }
             if (ash && (!filled || (at - ps.transform.position).sqrMagnitude > 30 * 30)) { ps.transform.position = at; ps.Clear(); ps.Emit(900); filled = true; }
             ps.transform.position = at;
             // The weather's wind carries them downwind (an ash squall hard); gusts strip more leaves and whip up more ash.
@@ -94,6 +102,7 @@ namespace Crulanda.World
             var vel = ps.velocityOverLifetime;
             vel.x = ash ? new ParticleSystem.MinMaxCurve(.35f + wind.x, 1f + wind.x) : new ParticleSystem.MinMaxCurve(.2f + wind.x, .6f + wind.x);
             vel.z = new ParticleSystem.MinMaxCurve(-.1f + wind.y, .25f + wind.y);
+            vel.y = ash ? new ParticleSystem.MinMaxCurve(-.5f, -.25f) : new ParticleSystem.MinMaxCurve(-.35f, -.15f);
             if (Time.time < nextCheck) return;
             nextCheck = Time.time + 1;
             var noise = ps.noise; noise.strength = (ash ? .4f : .55f) * (1 + weather.wind);

@@ -215,7 +215,14 @@ scorecard; loot tables with signature groups at chance 1; EliteMove's stun, root
 | The Reach-Stones moving a field a year; Bet's letter, the Hollins, Tamsin Reed and her mother's kettle | GAME-ONLY (already in the game) | ashrim.json; Quests/oakhaven.json |
 | The Ash Road as a wing, the overhang, the gatehouse, the Tables, the lower orbit, the Granary on the race, the Cellars and the Cut-Store, the Reed house, Bet's cart, the wagon track, the ward-lock, the Waking Hour as a worked thing, the pause, the shadows as strips, the great bell | GAME-ONLY | this doc |
 | Every person: Road-Captain Everard Hurst, the Old Ram, Sergeant Wymond Tredway, the Fallen Mason, Assessor Piers Upcott, the Lamplighter, Picker-Master Fulke Yelland, Gil Coldwell, First-Cut, the Long Shadow, Registrar Dunstan Pardew, the Reader at the Desk, Warden Sigrid Elvet, Pact-Captain Rowena Kersey, Bureau Examiner Thurstan Vowell, the Grey Carter (a rare on the road, one visit in five), every mob, item, quest and camp | GAME-ONLY (names checked 2026-10-15 against the game's quests, zones, sims' names and bynames, the three later designs and the lore folder) | this doc |
-| Mr Gable the baker and his pie | CANON (decision 8: his name on the shop or an unnamed baker) | b1 ch.21:II, VI |
+| Mr Gable the baker and his pie (a paused figure named Mr Gable; his sign "Gable, Baker"); Martha, his wife, a voice from the back of the shop; the Glitch's words ("Fresh pies! Two coppers!", "Help me ... The silence burns.") | CANON | b1 ch.21:23, 32-36, 64-116, 362-466 |
+| The pie taken in the Glitch ends his loop: he is at rest for good ("Take it. Break the loop.") | CANON wish (ch.21:442), GAME-ONLY deed (ch.17:67's "break the shell, kill the soul" made a mercy) | REWORK_LOWTOWNS_HALLOWS pick 12 |
+| White houses, white picket fences without a speck of peeling paint, roses of red quartz, pristine gravel, no wind, no birds, the bubble of static reality holding the fog back; only the people grey stone, with blue wet eyes that follow you; the whisper "Help us" tasting of copper | CANON | b1 ch.17:269; ch.21:7-40 |
+| Mrs Miller at her line, "as rigid as steel wire"; the two children and the ball in the air; dogs stopped in mid-air | CANON | b1 ch.21:23, 122, 376 |
+| The crater: a hemisphere of glassy obsidian fifty feet deep, a mirror floor whose reflection does not move, the red door on floating marble with its knocker's lips sewn shut, the orbiting chairs, desks, bricks, stone horse, vault corner with rebar, bench and lamppost, the foundation stones in the lower orbit, ozone and old paper | CANON | b1 ch.21:124-136, 188, 200, 222-230 |
+| Aethelgard's chalked equations on the paving (what the crater left of them); the ancient town well; the weeping willow; the chapel's stained glass shattered and hanging in the air | CANON (the chalk kept by the pause, the glass stopped in the air, the willow's quartz fronds: CANON-EXPANDED; the chapel's place and look GAME-ONLY) | b1 ch.19:41-53; ch.21:351 |
+| The stone girl by the willow, bent over the hollow Gorm dug her little brother out of: **Talla**, Valen's sister (her name cut in the willow's bark: GAME-ONLY) | CANON by Chris's decision of 2026-10-18 (the books disagree: ch.17:300-374 has Talla die of the Grey Rot; ch.19:39-53 has an older sister petrified shielding him) | b1 ch.19:39, 53; ch.17:300; REWORK_LOWTOWNS_HALLOWS conflict 8 |
+| The book's bicycle frozen mid-spin an inch off the ground, as a handcart (no machines) | CANON-EXPANDED | b1 ch.21:11 |
 | The whole design, its levels and its place in the count of four | PROVISIONAL | section 9 |
 
 **Kept out on purpose:** Vala Solari (alive, Book 1's; named on the Warden's papers only if decision 6 says so); the Archive's vault,
@@ -370,3 +377,79 @@ p9-lowtowns), 2026-10-16. Chris: "no thanks i dont want a half assed version. co
 - **To run (lane A):** EditMode HallowsDataTests, EliteBalanceTests, SocialRulesTests; PlayMode HallowsNavTests; then the level-17 group run
   of Hallow's Creek again: the Druid and the Ranger "Stepping clear of The hour" at the first hum and never held after, and the Examiner
   down on the first or second pull.
+
+## The town as the books write it (2026-10-18, branch rw-hallows: REWORK_LOWTOWNS_HALLOWS.md picks 1, 2, 3 and 12)
+**WRITTEN, compiles (all assemblies), NOT RUN in Unity; OPEN until the tests below pass and Chris sees it in his build.** Chris, 2026-10-18,
+on the rework plan: "keep all" ... "stone girl is talla" ... "it would be nice to see some of them come alive". Read against b1 chapters 17,
+19 and 21 in full (`D:\code\crulanda\book1\chapter_N.md`, cited `b1 ch.N:L`).
+
+**What was built**
+- **White and perfect, not grey (pick 1; CANON, b1 ch.17:269 "Picket fences. White houses."; ch.21:7-19).** The town's houses, fences, gardens
+  and yards were style "stone" (Petrify: grey); they are now style "white" (ZoneBuilder.HallowsBooks, `Whitewash`): the plaster lime-white,
+  no chimney smoke and no lamp lit (it is 11:59 at noon and nothing moves), every garden fence rebuilt as a straight white picket fence "without
+  a speck of peeling paint" (ch.21:11), a box of red-quartz roses under each front window and a rose bush either side of each door ("petals
+  turned to flakes of red quartz", ch.21:11). Only the people and the beasts are grey stone (ch.21:25). The fossilised farm outside the town
+  stays stone (ch.17:45: CANON). Main Street and the Granary road are **pristine gravel** (ch.21:19): pale, raked, no ruts, a crisp edge
+  (ZonePath.surface "gravel"). The laundry's sheets hang straight down from lines "as rigid as steel wire" (ch.21:23); the first build's
+  sheets "frozen mid-flap" are gone (CONTRADICTS "no wind"). "A man with his hat in the wind" is "A man lifting his hat to a neighbour".
+- **The eyes (pick 1; CANON, ch.21:34-36 "blue. Human. Wet. They shifted. Just a fraction.").** A paused figure's model keeps its own eyes
+  when the rest of it turns to stone: tinted blue, glossy as if wet, with a breath of light (PausedStone.WetEye). Where an eye's mesh turns
+  about its own middle, the eyes turn toward you while you are within ten metres, never more than twelve degrees (FollowWithEyes). **Not
+  verified:** whether the vendor model's eye meshes turn about their middles (if not, the eyes are blue and wet but do not follow); a
+  front, side and close capture is needed.
+- **The bubble and the silence (pick 2; CANON, ch.21:19; ch.17:9).** `bubble` in the zone (ZoneDefinition.ZoneBubble: centre (25, -5),
+  140 m, easing out over 20 m: the gatehouse, the street, the Square, the tower, the Archive and the Granary; not the bridge or the Ash
+  Road). Inside it the weather's wind is nothing (the global `_WeatherWind` the grass, leaves and haze shaders read), no mist or squall's
+  dust is born, falling ash stops where it hangs, and the fog stands 60% further off ("The fog here was thinner, pushed back by the bubble
+  of static reality", ch.21:19; WorldWeather.Still, WorldClock). Outside it the Wasting's weather and fog are as they were. The zone has no
+  critters or birds at all (no `life`): "There were no birds" holds. **No music out of doors** (ZoneMusic.Set.quiet): the town is silent;
+  the fight track still rises in a fight and the Cellars keep the dungeon's set. **The whisper:** pass within 3.2 m of a paused
+  townsperson (out of a fight) and "Help us" rises over it, every 22 s at most; the chat says what it is, a whisper in your skull that
+  tastes of copper, the first time and every 75 s after (ch.21:38-40). **Not done (honestly):** the game has no ambient sound or footstep
+  audio of any kind (only music), so "just the crunch of their boots on the pristine gravel" and a low-pass on voices are not there; the
+  silence is the music's absence. Footstep sounds on gravel need audio assets and a footstep system, a separate piece of work.
+- **The Square as chapter 21 tells it (pick 3; CANON, ch.21:120-230; ch.19:41-53).** The crater (ZoneBuilder.Hallows `Crater`,
+  HallowsBooks `ObsidianBowl`): "a perfect hemisphere of missing reality ... smooth, glassy obsidian, curving down into darkness"
+  (ch.21:126), a skin of black glass from the rim to 16 m down ("the fifty-foot drop", ch.21:134), never under the land; its middle a
+  **mirror floor** whose reflection is a reflection probe rendered once, 1.5 s after the zone is up, and never again, so the town in the glass
+  does not move (ch.21:224; `StillMirror`). The **red door**, "Bright, wet, impossible red", a single wooden door with no frame, handle or
+  keyhole, upright on a **slab of floating marble** with a broken underside (ch.21:130, 230), its brass knocker a face with its eyes shut
+  and its lips sewn shut with five stitches. Round it, **orbiting** slowly (0.7 degrees a second, a Spinner; "like a miniature asteroid
+  belt", ch.21:136): seven chairs, four heavy oak desks, bricks, a petrified horse, the reinforced corner of a bank vault with rusted rebar
+  "sticking out like broken bones", a petrified park bench and a twisted wrought-iron lamppost (ch.21:188), and three foundation stones
+  in the lower orbit (ch.21:200). The rim's low wall is white kerb-stone (nobody goes down: decision 7). **The chalked equations**
+  (ch.19:49): the outer rings, spokes, glyphs and rows of working, cut off at the rim on the Square's south-west (the centre went with
+  the hall). **The ancient town well** (ch.19:41) is the Square's well, named. **The weeping willow** (ch.19:41) replaces the dead oak
+  (the dead oak's draws taken, so nothing else in the zone moves): a leaning trunk, arching limbs and long fronds of pale grey-green
+  quartz hanging straight down. **The chapel** (ch.19:53) north-west of the Square: a small white nave, slate roof, bell-cote, its seven
+  windows empty and their stained glass (red, blue, gold, green, violet) stopped in the air where it burst outward. **The clock** stays the
+  painted dial at a minute short of noon (ch.21:58; built before). E at the rim ("Look down into the crater"), at the chalk, at the well and
+  at the chapel gives the book's words.
+- **The people of chapters 19 and 21 (pick 12; CANON).** **Mr Gable** (ch.21:368), the baker in his doorway with his loaves, looked at
+  with E. In the bakery's Glitch the bell rings, the grey washes away, he cries "Fresh pies! Two coppers! Best in the Creek!"; **Martha**
+  calls from the back, "Make sure the pies are ready for the lunch rush" (ch.21:386; a voice, never seen, as in the book); then he holds the
+  pie out and whispers "Help me ... It burns. The silence burns." (ch.21:102, 454). **Take the pie** (E, only while he holds it out) and
+  "Please. Take it. Break the loop." (ch.21:442); when the loop snaps he does not go back to his minute: a crack, his eyes closed, at rest for
+  good (Progress.keys `hallows.gable`; he never wakes in a later Glitch; GAME-ONLY deed, the books' wish). **Mrs Miller** at her line
+  (ch.21:23, 376). **The children** chasing the ball in the air on Main Street, and two more with a dog stopped in mid-leap where Main Street
+  comes into the Square (ch.21:23, 122; child figures, never Hollow). **Talla** (Chris's decision): the stone girl by the willow, a girl of
+  eleven or twelve thrown down over the dug-out hollow (ch.19:39, 53), her eyes on the empty hollow; E names her (her name cut in the
+  willow's stone bark: GAME-ONLY). Every new prop carries a `canonStatus` with its chapter.
+
+**Files:** EncounterContent/Zones/hallows.json (styles, the people and places, `bubble`, the gravel, two secrets' words), Lore/hallows.json
+and Resources/Lore/hallows.json (lines that said stone fences or a stone cart), Scripts/World/ZoneBuilder.HallowsBooks.cs (new),
+ZoneBuilder.Hallows.cs, ZoneBuilder.HallowsTown.cs, ZoneBuilder.cs, ZoneDefinition.cs (ZoneBubble; ZoneProp.text, canonStatus;
+ZonePath.surface; ZoneInteractable.text), WorldWeather.cs, WorldClock.cs, NatureFx.cs, ZoneMusic.cs, Scripts/Encounter/EncounterSession.Hallows.cs,
+EncounterSession.Adit.cs. `tools/wip/dungeon/hallows_layout.py` is stale (the checkpoints, the parapets' widths and this pass were made in
+the JSON directly): do not regenerate the zone from it.
+
+**Frame cost:** the small parts are joined into one mesh a material (a fence, a house's roses, the chalk, the willow's fronds, the chapel's
+glass); one reflection probe rendered once; one Spinner; the eye check is a distance test a figure a frame. Expected near the ~116 fps
+measured before; **not measured**.
+
+**To run (lane A):** EditMode HallowsDataTests (new: The_town_is_white_and_still_and_its_people_are_the_books), ZoneMusicTests,
+DiscoveryLogTests, ZoneLoreTests, LoreBookTests, CheckpointDataTests; PlayMode HallowsNavTests (new: The_town_is_white_and_still_and_the_square_is_the_books,
+Mr_gable_sells_his_pie_in_the_glitch_and_rests_when_it_snaps, A_paused_townsperson_whispers_help_us; the old ones for the Warden's walk,
+the routes and the bars), ZoneContentTests (Hallow's Creek builds and every camp is walked to). Then front, back and side captures of Main
+Street, a house's roses and fence, the laundry, the crater from the rim (the mirror, the door, the knocker close), the chalk, the willow and
+Talla, the chapel, and a paused face close (the eyes); and the frame rate on Main Street and at the rim.

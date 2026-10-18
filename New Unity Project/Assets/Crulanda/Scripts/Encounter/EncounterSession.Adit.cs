@@ -207,6 +207,9 @@ namespace Crulanda.Encounter
                 case "ride": RideWagon(i); return true;   // (Hallow's Creek) the black-iron wagon home (EncounterSession.Hallows.cs)
                 case "ward": StudyWard(i); return true;
                 case "warden": return TalkToWarden(i);
+                // (Hallow's Creek's people and places, EncounterSession.Hallows) Gable's pie in the Glitch; a paused townsperson or a place looked at.
+                case "pie": TakeThePie(); return true;
+                case "paused": case "look": return LookAtHallows(i);
                 case "pen": case "bar": case "hiddendoor": return UseHandGate(i);   // gates worked by hand (the Adit rework's and Hallow's Creek's)
                 case "cage":   // the lock is the Company's: without Pib's quest, the goblin only shrinks back (with it, the quest counts it and it opens)
                     if (Quests != null && Quests.State(PressedQuest) != null) return false;

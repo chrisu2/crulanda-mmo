@@ -343,6 +343,54 @@ namespace Crulanda.Tests
             Assert.Greater(EliteMoves.For("The Long Shadow", false).ccWarn, 0, "the Long Shadow's minute is telegraphed");
         }
 
+        /// <summary>
+        /// The town as the books write it (Docs/REWORK_LOWTOWNS_HALLOWS.md picks 1, 2, 3 and 12; Chris, 2026-10-18: "keep all", "stone girl is
+        /// talla"): white and perfect, not grey (b1 ch.17:269; ch.21:11), only the farm outside it stone (ch.17:45); the bubble of still air
+        /// over the town and not the bridge (ch.21:19); Main Street's pristine gravel; nothing blown by a wind; the Square's crater, chalk,
+        /// well, willow and chapel; the named people (Mr Gable, Mrs Miller, Talla) and the children with their ball, each looked at with E
+        /// and labelled with its chapter.
+        /// </summary>
+        [Test] public void The_town_is_white_and_still_and_its_people_are_the_books()
+        {
+            var bad = new List<string>();
+            foreach (var p in zone.props.Where(p => p.style == "stone"))
+                if (p.at.y > -200) bad.Add(p.kind + " '" + p.name + "' at " + p.at + " is stone in the town (the books make it white)");
+            Assert.Greater(zone.props.Count(p => p.style == "white" && p.kind == "house"), 15, "the town's houses white");
+            Assert.Greater(zone.props.Count(p => p.style == "white" && p.kind == "fence"), 20, "its fences white pickets");
+            Assert.AreEqual(4, zone.props.Count(p => p.style == "stone" && p.at.y < -250), "the fossilised farm stays stone (b1 ch.17:45)");
+            foreach (var p in zone.props) if (!string.IsNullOrEmpty(p.name) && Regex.IsMatch(p.name, @"\bwind\b", RegexOptions.IgnoreCase)) bad.Add("'" + p.name + "': there is no wind (b1 ch.21:19)");
+            // The bubble: over the gatehouse, the street, the Square, the tower, the Archive and the Granary; not over the bridge or the road.
+            var b = zone.bubble; Assert.NotNull(b); Assert.Greater(b.radius, 0, "the bubble of static reality");
+            StringAssert.Contains("ch.21:19", b.canonStatus);
+            foreach (var at in new[] { new Vector2(0, -128), new Vector2(0, -60), new Vector2(0, 70), new Vector2(0, 118), new Vector2(97, 70), new Vector2(115, -70) })
+                Assert.AreEqual(1, b.StillAt(at.x, at.y), 1e-3f, "still at " + at);
+            foreach (var at in new[] { new Vector2(0, -180), new Vector2(0, -300) }) Assert.AreEqual(0, b.StillAt(at.x, at.y), 1e-3f, "the wind and the fog outside it at " + at);
+            Assert.AreEqual("gravel", zone.roads.Single(r => r.name == "Main Street").surface, "the pristine gravel (b1 ch.21:19)");
+            // The Square and the people: looked at with E, each with its words and its label citing the book.
+            var looked = new Dictionary<string, string> {
+                { EncounterSession.GableName, "ch.21" }, { "Mrs Miller", "ch.21" }, { "Talla", "ch.19" }, { "A child chasing the ball", "ch.21" },
+                { "The crater's rim", "ch.21" }, { "The chalked equations", "ch.19" }, { "The ancient town well", "ch.19" }, { "The chapel's glass", "ch.19" } };
+            foreach (var kv in looked)
+            {
+                var p = zone.props.SingleOrDefault(x => x.name == kv.Key);
+                if (p == null) { bad.Add(kv.Key + " is not in the town"); continue; }
+                if (string.IsNullOrEmpty(p.interact) || string.IsNullOrEmpty(p.text)) bad.Add(kv.Key + " is not looked at with E");
+                if (string.IsNullOrEmpty(p.canonStatus) || !p.canonStatus.StartsWith("CANON") || !p.canonStatus.Contains("b1 " + kv.Value)) bad.Add(kv.Key + " is not labelled with its chapter (" + p.canonStatus + ")");
+            }
+            StringAssert.Contains("TALLA", zone.props.Single(p => p.name == "Talla").text, "the stone girl is Talla (Chris, 2026-10-18)");
+            StringAssert.Contains("Chris, 2026-10-18", zone.props.Single(p => p.name == "Talla").canonStatus);
+            Assert.AreEqual(7, zone.props.Single(p => p.name == "Talla").variant, "bent over the hollow");
+            Assert.IsTrue(zone.props.Any(p => p.kind == "hollow"), "the dug-out hollow by the willow");
+            var willow = zone.props.Single(p => p.name == "The weeping willow"); Assert.AreEqual("willow", willow.style); Assert.AreEqual("dead_oak", willow.kind, "the dead oak's draws kept");
+            Assert.Less(Vector2.Distance(willow.at, zone.props.Single(p => p.name == "Talla").at), 9, "Talla by the willow");
+            Assert.IsTrue(zone.props.Any(p => p.kind == "chapel"), "the chapel (b1 ch.19:53)"); Assert.IsTrue(zone.props.Any(p => p.kind == "handcart"), "the bicycle as a handcart (no machines)");
+            Assert.GreaterOrEqual(zone.props.Count(p => p.kind == "paused" && p.variant == 5), 2, "the children"); Assert.IsTrue(zone.props.Any(p => p.kind == "paused" && p.variant == 6), "a dog in mid-leap");
+            // Every prop given words or a label says where it comes from.
+            foreach (var p in zone.props.Where(p => !string.IsNullOrEmpty(p.canonStatus)))
+                if (!Regex.IsMatch(p.canonStatus, @"^(CANON|CANON-EXPANDED|GAME-ONLY)")) bad.Add(p.name + ": '" + p.canonStatus + "'");
+            Clean(bad, "the town as the books write it");
+        }
+
         [Test] public void No_machines_and_vala_solari_named_once()
         {
             var texts = new[] { "Zones/hallows.json", "Quests/hallows.json", "Lore/hallows.json", "Items/loot.hallows.json" }.Select(f => File.ReadAllText(Path.Combine(Content, f))).ToList();

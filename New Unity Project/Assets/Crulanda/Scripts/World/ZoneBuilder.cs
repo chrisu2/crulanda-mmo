@@ -763,6 +763,15 @@ namespace Crulanda.World
                         var road = Zone.roads[k]; if (!roadBox[k].Contains(p)) continue;
                         float d = DistanceToPath(p, road.points, out bool interior), hw = road.width / 2;
                         if (d > hw + 1.2f) continue;
+                        if (road.surface == "gravel")
+                        {
+                            // (Hallow's Creek, b1 ch.21:19) "the pristine gravel": pale and clean, no ruts, no mud, raked in faint lines
+                            // across the way, its edge crisp.
+                            float raked = Mathf.Abs(Mathf.Repeat(d * 2.2f, 1) - .5f) < .12f ? .03f : 0;
+                            Color gc = Color.Lerp(new Color(.72f, .71f, .68f), new Color(.82f, .81f, .78f), n3 * .7f + n2 * .3f) * (1 - raked);
+                            c = Color.Lerp(c, gc, Mathf.Clamp01((hw + .25f - d) / .45f));
+                            continue;
+                        }
                         // Wheel ruts run along the road but never loop around its open ends.
                         float wheel = interior && Mathf.Abs(d - hw * .45f) < .35f ? .55f : 0;
                         Color rc = Color.Lerp(Color.Lerp(dirt, rut, wheel + n3 * .3f), mud, n2 * .2f);
@@ -1221,7 +1230,11 @@ namespace Crulanda.World
                     case "gallows": Gallows(t); break;
                     case "crypt": Crypt(t, p.variant); break;
                     case "cliff": Cliff(t, p.size.x > 0 ? p.size.x : 20, p.lift); break;
-                    case "dead_oak": DeadTree(p.at, 1, Tint(art.bark, new Color(.4f, .36f, .32f)), 5, statics, t); break;   // weathered, paler bark (plain bark reads black in shade); size comes from the root's scale
+                    case "dead_oak":
+                        // (Hallow's Creek, b1 ch.19:41) style "willow": the weeping willow by the Square (ZoneBuilder.HallowsBooks), taking the
+                        // dead oak's draws from the zone's stream (its root flare's five and its limbs') so nothing after it moves.
+                        if (p.style == "willow") { for (int i = 0; i < 5; i++) _ = R01; SkipBranchDraws(5, .9f * .75f); WeepingWillow(t); break; }
+                        DeadTree(p.at, 1, Tint(art.bark, new Color(.4f, .36f, .32f)), 5, statics, t); break;   // weathered, paler bark (plain bark reads black in shade); size comes from the root's scale
                     case "great_oak": GreatOak(t); break;
                     case "tree": Broadleaf(t, p.variant); break;
                     case "pine": Pine(t); break;
@@ -1277,7 +1290,10 @@ namespace Crulanda.World
                     case "chest": TreasureChest(t); break;
                     default: if (!(Zone.city ? CityProp(t, p) || HallowsProp(p, t) : HallowsProp(p, t) || CityProp(t, p))) Debug.LogWarning("Unknown zone prop kind '" + p.kind + "'."); break;   // (Hallow's Creek's: ZoneBuilder.Hallows; a city's: ZoneBuilder.Crown; both have an "archive": the city's in a city)
                 }
-                if (p.style == "stone" && t != null) Petrify(t);   // (Hallow's Creek) the paused town's houses, fences and carts: grey stone
+                // (Hallow's Creek) the fossilised farm outside the town: grey stone; the town's own houses, fences, gardens and yards: white and
+                // perfect (ZoneBuilder.Hallows, Whitewash).
+                if (p.style == "stone" && t != null) Petrify(t);
+                else if (p.style == "white" && t != null) Whitewash(t, p);
                 rng = zoneRng;
                 if (drop) { DestroyImmediate(t.gameObject); continue; }
                 if (t != null && Footprint(p).x > 0)   // see-through where it hides the player (playtest notes 26 and 120)
@@ -1287,7 +1303,7 @@ namespace Crulanda.World
                     fade.Walled = !open;
                 }
                 if (!string.IsNullOrEmpty(p.interact) && t != null)
-                    Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, node = string.IsNullOrEmpty(p.node) ? null : p.node, position = t.position, root = t });
+                    Interactables.Add(new ZoneInteractable { name = string.IsNullOrEmpty(p.name) ? p.kind : p.name, prompt = p.interact, item = p.item, kind = p.kind, once = p.once, node = string.IsNullOrEmpty(p.node) ? null : p.node, position = t.position, root = t, text = string.IsNullOrEmpty(p.text) ? null : p.text });
             }
         }
         /// <summary>

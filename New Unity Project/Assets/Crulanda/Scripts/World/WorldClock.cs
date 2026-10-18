@@ -124,6 +124,8 @@ namespace Crulanda.World
             // The fog closes in with the weather, never nearer than 55 m at its far end (enemies stay in sight).
             RenderSettings.fogStartDistance = Mathf.Lerp(day.fogStart * w.fog, 1.5f, under); RenderSettings.fogEndDistance = Mathf.Lerp(Mathf.Max(day.fogEnd * w.fog, Mathf.Min(day.fogEnd, 55)), 34, under);
             if (day.nightClear > 0) RenderSettings.fogEndDistance *= 1 + day.nightClear * dark * (1 - under);   // the Lowtowns' smog thins after dark (ZoneLighting.nightClear)
+            // Hallow's Creek's bubble of static reality pushes the fog back (b1 ch.21:19, "The fog here was thinner").
+            if (WorldWeather.StillClear > 0) { RenderSettings.fogStartDistance *= 1 + WorldWeather.StillClear * (1 - under); RenderSettings.fogEndDistance *= 1 + WorldWeather.StillClear * (1 - under); }
             if (sky != null)
             {
                 float exposure = look.exposure * (1 - .3f * w.dim) * (1 - .25f * w.rain) * (1 + flash);

@@ -37,6 +37,7 @@ namespace Crulanda.EditorTools
         {
             if (assetPath.StartsWith(Props + "Nature/")) { NatureMaterial(m); return; }
             if (assetPath.StartsWith(Props + "Village/")) { VillageMaterial(m); return; }
+            if (assetPath.StartsWith(Props + "Food/")) { FoodMaterial(m); return; }
             if (!assetPath.StartsWith(Props + "Fantasy/")) return;
             string sheet = m.name.Contains("Metal") ? "Metal" : m.name.Contains("Furniture") ? "Furniture" : m.name.Contains("Cloth") || m.name.Contains("Banner") ? "Cloth" : "Props";
             var baseMap = AssetDatabase.LoadAssetAtPath<Texture2D>(Props + "Fantasy/Textures/T_Trim_" + sheet + "_BaseColor.png");
@@ -45,6 +46,16 @@ namespace Crulanda.EditorTools
             if (baseMap != null) m.mainTexture = baseMap;
             if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
             m.SetFloat("_Glossiness", sheet == "Metal" ? .45f : .2f); m.SetFloat("_Metallic", sheet == "Metal" ? .35f : 0);
+        }
+        /// <summary>The food models (Resources/Props/Food, 2026-10-18, playtest note 235: Quaternius's food pack, the medieval ones only) carry
+        /// no textures, only a flat colour on each material, written by Blender in linear values (an apple's red is 0.13, 0.03, 0.02): the project
+        /// is in gamma space, so each is brought to gamma, or every loaf and apple comes in near black. Matte, a little sheen.</summary>
+        static void FoodMaterial(Material m)
+        {
+            var c = m.HasProperty("_Color") ? m.color : Color.white;
+            m.shader = Shader.Find("Standard"); m.mainTexture = null;
+            m.color = new Color(c.r, c.g, c.b, 1).gamma;
+            m.SetFloat("_Glossiness", .18f); m.SetFloat("_Metallic", 0);
         }
         /// <summary>The nature kit (Stylized Nature MegaKit, 2026-10-07) names a material after its texture: Bark_NormalTree,
         /// Leaves_NormalTree, Leaves_Pine (Leaf_Pine.png), Rocks (Rocks_Diffuse.png), Grass, Flowers, Mushrooms. Bark gets its normal

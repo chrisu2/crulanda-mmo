@@ -361,6 +361,9 @@ namespace Crulanda.World
                 foreach (int e in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(lt.x + e * (ls.x / 2 - .5f), .21f, lt.y + s * .65f), new Vector3(.08f, .42f, .28f), dark);
             }
             for (float x = lt.x - ls.x / 2 + .5f; x < lt.x + ls.x / 2 - .3f; x += 1.3f) ModelProp(t, "Fantasy/Mug", new Vector3(x, .79f, lt.y + ((int)(x * 10) % 2 == 0 ? .2f : -.2f)), x * 40, .12f);
+            // The zone's fare down the long table between the mugs (playtest note 235): the Rim's salt and flank, the Peaks' smoked meat.
+            CounterFare(t, new Vector3(lt.x - ls.x / 2 + 1.15f, .79f, lt.y), new Vector3(lt.x + ls.x / 2 - .95f, .79f, lt.y), Mathf.Max(1, (int)(ls.x / 1.3f)));
+            TableTops.Add(t.TransformPoint(new Vector3(lt.x, .79f, lt.y)));
             var tick = Tint(art.cloth, new Color(.62f, .55f, .4f)); var bs = plan.bunkSize;
             foreach (var b in plan.bunks)
             {

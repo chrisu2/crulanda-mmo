@@ -271,6 +271,7 @@ namespace Crulanda.World
                         Part(PrimitiveType.Cube, t, new Vector3(at.x, 1.92f, at.y + sz * 1.32f), new Vector3(1.8f, .06f, .14f), Gilt);
                     }
                     ModelProp(t, "Medieval/Prefabs/CandleV1", new Vector3(at.x + .2f, .8f, at.y), 0, .2f);
+                    TableFare(t, new Vector3(at.x - .25f, .795f, at.y), 90, n, .35f);
                     Glow(t, new Vector3(-hx + .2f, 2.3f, at.y), 4, .35f, new Color(1, .76f, .45f), .9f);
                     continue;
                 }
@@ -288,6 +289,7 @@ namespace Crulanda.World
                     { Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .25f, seat.y), new Vector3(.42f, .25f, .42f), oak); Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .52f, seat.y), new Vector3(.44f, .03f, .44f), Cushion); }
                 }
                 ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, tableTop, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, tableTop, at.y + .25f), n * 70, .12f);
+                TableFare(t, new Vector3(at.x, tableTop, at.y), 0, n);   // the Crown's fare (playtest note 235)
             }
             // ---------- the light: two chandeliers in the open, sconces on the walls ----------
             foreach (float x in new[] { -3.2f, 3.2f }) { ModelProp(t, "Fantasy/Chandelier", new Vector3(x, H - 1.9f, -1.6f), 0, 1.2f); Part(PrimitiveType.Cylinder, t, new Vector3(x, H - .02f, -1.6f), new Vector3(.8f, .02f, .8f), Gilt); }

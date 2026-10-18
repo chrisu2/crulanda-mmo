@@ -2,6 +2,19 @@
 
 ## Start here
 
+**Update 2026-10-18 ~18:05: two more publishes (17:49 and 18:00; save backups 20261018-1749- and -1800-before-update-publish).**
+- 17:49: the group run holds the party's level (no experience during a run), the dummy is inert, pets keep clear, the vaults' capture
+  camera inside the hall. 18:00: the drowned vaults read as built vaults (unbroken rubble-stone rib arches on footings, mould pads on
+  the stones, no stalagmites, ledges or dripstone in a cave of style "vaults"; every other cave unchanged). Frame
+  world-captures/lowtowns-19/lowtowns-19-the-drowned-vaults.png; the mould glows a little bright (tune if Chris says so).
+- Tests: the confirming round 192/193 EditMode, 79/80 PlayMode (only the level-15 Scoundrel on the dummy, 3.0 s not striking:
+  not shoves, holds, Nerve or the pet; still open). The vaults round 11/11 + 6/6. Lowtowns ~195-201 fps at noon.
+- Run hallows-12 (level held at 17): 26/26 camps, 32 min, 1 death (bot) + 1 (Warrior); Warrior 47/s, Rogue 62, Ranger 53 + wolf 16,
+  Druid heal 45; the bot Paladin 84.7/s. Chris asked "is the mason's trowel op?": no (52 weapon damage at level 17, on the curve
+  44 at 14 to 57 at 19). The bot starts with its level-1 blade and jumps when it loots a weapon (8:17 here, 11:09 in hallows-11).
+  Open: a dummy test of a level-17 Paladin with the Trowel against a level-17 Rogue with the Picker-Master's Hook, to settle whether
+  the Paladin with a good weapon is too strong (a hybrid should be ~90% of pure) or the sims too soft (Rogue 62 vs a 66-72 band).
+
 **Update 2026-10-18 ~16:50: the rework finished (Chris: "finish up" -> "Finish the rework").** Published 16:44 (save backup
 20261018-1643-before-rework-finish). Every pick of REWORK_LOWTOWNS_HALLOWS.md is now BUILT:
 - Hallow's Creek 4 (a valley town under the gatehouse: Main Street's descent to a -8 floor, the Granary's shelf -3.5, "The town below"

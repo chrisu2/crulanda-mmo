@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-18 17:49 and 18:00: published: group runs hold the level, the drowned vaults' arches (OPEN until Chris checks it)
+- The drowned vaults are built vaults: unbroken stone rib arches, mould on the stones, no cave stalagmites. Group runs give no
+  experience. Details: CLAUDE_HANDOFF.md, Start here.
+
 ## 2026-10-18 16:44: the rework of the Lowtowns and Hallow's Creek finished (OPEN until Chris checks it)
 - Hallow's Creek: the valley town, two roads in, Glitches that open ways, choose your wing. The Lowtowns: the Sweep, the drowned vaults.
   Details: CLAUDE_HANDOFF.md, Start here; REWORK_LOWTOWNS_HALLOWS.md.

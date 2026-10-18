@@ -115,7 +115,8 @@ namespace Crulanda.Tests
                 }
                 for (int i = 0; i < h.Centre.Count; i++)
                 {
-                    if (h.Along[i] < 24) continue;
+                    // The mouths' stairs (their first 28 m, counted from the lip) come up through the ground; the rest lies under it.
+                    if (h.Along[i] < 28) continue;
                     var at = Flat(h.Centre[i]);
                     // Under the river the bed is the ground (the crawl's test above); everywhere else the terraces'.
                     if (ToPath(at, River.points) < River.width / 2 + 4) continue;

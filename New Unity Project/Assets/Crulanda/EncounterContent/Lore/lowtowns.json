@@ -253,6 +253,14 @@
       "subject": "herb.grey_bell",
       "line": "Pale bells with a light in them like a held breath. Rare, and the Lowtowners leave it be.",
       "canonStatus": "GAME-ONLY: the trades' herbs and metals"
+    },
+    {
+      "id": "lore.lowtowns.places.the-drowned-vaults",
+      "chapter": "places",
+      "subject": "The drowned vaults",
+      "more": "Under the green moss in the crawl from the courts the stone is older than any drain, cut deep in patterns too fine for diggers. Nobody in the Lowtowns can read them, and the moss pulses over them like something breathing.",
+      "secret": "secret.lowtowns.moss-carvings",
+      "canonStatus": "CANON-EXPANDED: deep, intricate carvings beneath the pulsing bioluminescent moss of the under-ways (book1 ch.9:55); this wall GAME-ONLY"
     }
   ]
 }

@@ -33,7 +33,9 @@ namespace Crulanda.Tests
         /// <summary>The kinds the builder knows (ZoneBuilder.BuildProps' switch, the Lowtowns' among them).</summary>
         static readonly string[] Kinds = { "tenement", "warehouse", "lane_wall", "brick_bridge", "drain_mouth", "dock", "barge", "market_hall", "dead_house", "holding_house",
             "town_wall", "chimney_stack", "lane_lamp", "cobbles", "puddle", "washing_line", "soup_hall", "toll_house", "dye_vat", "shard_rack",
-            "inn", "kitchen", "forge", "oven", "tannery", "leathershop", "stall", "market", "well", "board", "cart", "wagon", "crates", "barrels", "hitch", "haystack", "brazier", "signpost", "ruin" };
+            "inn", "kitchen", "forge", "oven", "tannery", "leathershop", "stall", "market", "well", "board", "cart", "wagon", "crates", "barrels", "hitch", "haystack", "brazier", "signpost", "ruin",
+            // (2026-10-18) The drowned vaults' three caves (pick 11): walk-in caverns, the Adit's and the cellars' cave tech.
+            "cavern" };
 
         [Test] public void The_zone_reads_and_is_the_Lowtowns()
         {

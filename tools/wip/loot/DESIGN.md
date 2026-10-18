@@ -763,3 +763,5 @@ Not verified:
 - Mob tuning against a player in full boss rares and set bonuses.
 - Whether the hunting and skinning work will edit `ActorVisual.cs` or `EncounterEnemy.cs`; there is no build plan for it in `tools/wip/professions` yet.
 - Palette colours, recipe sizes and day estimates are first guesses, to be tuned from the wardrobe shots.
+
+- **Chris, 2026-10-18 (later), verbatim:** "dont roll on common gear. i just didnt see people win rolls". So: rolls for uncommon and better only (commons are taken as before); the sims Need what is a real upgrade for them (SimGear.IsUpgrade) and wear what they win; each win is said in party chat ("won X, ty") and on screen ("Y wins X.").

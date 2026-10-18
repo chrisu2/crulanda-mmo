@@ -246,39 +246,95 @@ namespace Crulanda.Encounter
         }
         static readonly Color WeaverViolet = new Color(.68f, .5f, 1), WardenGreen = new Color(.5f, .85f, .55f);
         /// <summary>The buffs and songs on you and on each of the party (Chris, 2026-10-14: "we need a buff ui so i know what buff/songs
-        /// are on the party"): a row of chips beside each frame, each a status effect on that one (its name and seconds left) or the
-        /// kit's own buff on the whole party (a verse, a rally).</summary>
+        /// are on the party"), as small square icons since 2026-10-18 (Chris: "for buffs need icons or something bc this is messy and hard
+        /// to read screen"; BuffIcons): yours top right of the target frame, Mira's and each sim's beside their frame, no wider than it.
+        /// Debuffs too, with a red border. The name, time left and effect show on hover.</summary>
         void DrawBuffs()
         {
             var kit = session.Kit; if (kit == null || session.Player == null) return;
-            var party = new List<(string, float)>(kit.PartyBuffs());
-            Chips(new Rect(352, 88, 420, 18), Buffs(session.Player, party));
+            var party = new List<BuffEntry>();
+            foreach (var (name, remaining) in kit.PartyBuffs()) party.Add(new BuffEntry { name = name, remaining = remaining, kind = BuffKind.Song, classId = session.Progress.classId });
+            BuffRow(new Rect(716, 24, BuffIcons.PlayerRowWidth, BuffIcons.Size), Buffs(session.Player, party));
             var m = session.Companion;
-            if (m != null && m.actor != null && session.Progress.recruited) Chips(new Rect(334, 142, 460, 18), Buffs(m.actor, party));
+            if (m != null && m.actor != null && session.Progress.recruited) BuffRow(new Rect(268, 124, BuffIcons.PartyFrameWidth, BuffIcons.Size), Buffs(m.actor, party));
             for (int i = 0; i < session.PartySims.Count; i++)
             {
                 var c = session.PartySims[i]; if (c == null || c.actor == null) continue;
-                Chips(new Rect(388, 200 + 46 * i + 16, 420, 18), Buffs(c.actor, party));
+                BuffRow(new Rect(388, 200 + 46 * i + 6, BuffIcons.PartyFrameWidth, BuffIcons.Size), Buffs(c.actor, party));
             }
         }
-        List<(string, float)> Buffs(Crulanda.Gameplay.Actor a, List<(string, float)> party)
+        List<BuffEntry> Buffs(Crulanda.Gameplay.Actor a, List<BuffEntry> party)
         {
-            var list = new List<(string, float)>();
+            var list = new List<BuffEntry>();
             var cb = a != null ? a.GetComponent<Crulanda.Combat.Combatant>() : null;
-            if (cb != null && cb.Statuses != null) cb.Statuses.Each(Time.time, (id, rem) => list.Add((session.StatusName(id), rem)));
+            var st = cb != null ? cb.Statuses : null;
+            if (st != null) st.Each(Time.time, (id, rem) => {
+                var def = st.DefinitionOf(id); if (def == null && session.content != null) def = session.content.FindStatus(id);
+                var kind = BuffIcons.KindOf(id);
+                list.Add(new BuffEntry { id = id, name = session.StatusName(id), remaining = rem, harmful = st.IsHarmful(id), kind = kind, classId = BuffIcons.ClassOf(id), effect = BuffIcons.Effect(def) });
+            });
             list.AddRange(party);
+            // Helps first, harms after them (WoW's split, kept in one row so it stays within the frame).
+            list.Sort((x, y) => x.harmful.CompareTo(y.harmful));
             return list;
         }
-        void Chips(Rect row, List<(string name, float remaining)> buffs)
+        GUIStyle buffCount, buffGlyph;
+        /// <summary>A row of buff icons: each its picture or glyph, a green or red border, its time in the corner, its tooltip on hover;
+        /// "+N" in the last slot when there are more than fit.</summary>
+        void BuffRow(Rect row, List<BuffEntry> buffs)
         {
-            float x = row.x;
-            foreach (var (name, remaining) in buffs)
+            if (buffs.Count == 0) return;
+            if (buffCount == null)
             {
-                string text = remaining > 0 ? name + " " + Mathf.CeilToInt(remaining) + "s" : name;
-                float w = tiny.CalcSize(new GUIContent(text)).x + 10; if (x + w > row.xMax) break;
-                Fill(new Rect(x, row.y, w, row.height), new Color(.08f, .1f, .06f, .72f));
-                Shadow(new Rect(x + 5, row.y - 1, w, row.height + 2), text, tiny, remaining > 0 && remaining < 5 ? new Color(1, .8f, .6f) : new Color(.8f, 1, .8f));
-                x += w + 4;
+                buffCount = new GUIStyle(tiny) { fontSize = 10, alignment = TextAnchor.LowerRight, clipping = TextClipping.Overflow, padding = new RectOffset(0, 1, 0, 0) };
+                buffGlyph = new GUIStyle(tiny) { fontSize = 12, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter, clipping = TextClipping.Overflow, padding = new RectOffset() };
+            }
+            int shown = BuffIcons.Shown(buffs.Count, row.width);
+            var mouse = Event.current.mousePosition;
+            for (int i = 0; i < shown; i++)
+            {
+                var b = buffs[i]; var r = BuffIcons.IconRect(row, i);
+                Fill(new Rect(r.x - 1, r.y - 1, r.width + 2, r.height + 2), b.harmful ? BuffIcons.Harmful : BuffIcons.Helpful);
+                Fill(r, new Color(.06f, .07f, .06f, .92f));
+                var inner = new Rect(r.x + 1, r.y + 1, r.width - 2, r.height - 2);
+                var icon = BuffIcons.Icon(b.id, b.kind);
+                if (icon != null) GUI.DrawTexture(inner, icon, ScaleMode.ScaleToFit);
+                else BuffGlyph(inner, b);
+                // The time left in the lower right, outlined so it reads over bright pictures.
+                string count = BuffIcons.Countdown(b.remaining);
+                if (count.Length > 0) Outlined(new Rect(r.x, r.y + 2, r.width, r.height), count, buffCount, b.remaining < 10 ? new Color(1, .75f, .5f) : Color.white);
+                if (r.Contains(mouse)) { tooltip = BuffIcons.Tooltip(b); tooltipAt = mouse; }
+            }
+            if (shown < buffs.Count)
+            {
+                var r = BuffIcons.IconRect(row, shown);
+                Fill(r, new Color(0, 0, 0, .7f));
+                Shadow(r, "+" + (buffs.Count - shown), buffGlyph, Color.white);
+                if (r.Contains(mouse))
+                {
+                    var names = new List<string>(); for (int i = shown; i < buffs.Count; i++) names.Add(buffs[i].name + " (" + BuffIcons.TimeLeft(buffs[i].remaining) + ")");
+                    tooltip = string.Join("\n", names); tooltipAt = mouse;
+                }
+            }
+        }
+        /// <summary>The drawn picture of a buff with no icon: a plate for food, a flask for a tincture or salve, the class's colour with its
+        /// initial for a class buff or a song, else the name's initial (red for a harm).</summary>
+        void BuffGlyph(Rect r, BuffEntry b)
+        {
+            switch (b.kind)
+            {
+                case BuffKind.Food:
+                    Disc(new Rect(r.x + 2, r.y + 3, r.width - 4, r.height - 6), new Color(.85f, .8f, .7f)); Disc(new Rect(r.x + 5, r.y + 6, r.width - 10, r.height - 12), new Color(.7f, .45f, .25f));
+                    break;
+                case BuffKind.Elixir: case BuffKind.Salve:
+                    var liquid = b.kind == BuffKind.Salve ? new Color(.85f, .75f, .35f) : new Color(.45f, .6f, 1);
+                    Fill(new Rect(r.center.x - 2, r.y + 2, 4, 6), new Color(.8f, .85f, .9f)); Disc(new Rect(r.x + 3, r.y + 6, r.width - 6, r.height - 7), liquid);
+                    break;
+                default:
+                    var col = b.harmful ? new Color(.55f, .1f, .08f) : b.classId != null ? ClassColour(b.classId) : new Color(.3f, .45f, .3f);
+                    Fill(r, new Color(col.r * .6f, col.g * .6f, col.b * .6f, 1));
+                    Shadow(r, string.IsNullOrEmpty(b.name) ? "?" : b.name.Substring(0, 1).ToUpperInvariant(), buffGlyph, Color.white);
+                    break;
             }
         }
         /// <summary>The target frame's line under a game animal's health (GAME-ONLY).</summary>

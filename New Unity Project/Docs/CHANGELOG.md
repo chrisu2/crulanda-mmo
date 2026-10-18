@@ -1,5 +1,10 @@
 # Changelog
 
+## 2026-10-18: buff icons in place of the text tags (branch fx-icons; WRITTEN, NOT RUN)
+- Chris: "for buffs need icons or something bc this is messy and hard to read screen" (PLAYTEST_NOTES 231). The buffs on you and the
+  party are small square icons with the time in the corner ("12m"), a green or red border (debuffs shown too), and the name, time and
+  effect on hover. Party rows stay within the frame's width. `BuffIcons`, `BuffIconTests`; compiles, not run in Unity.
+
 ## 2026-10-18: Hallow's Creek's Hollow as Book 1 chapter 4 shows them (branch w2-hollow; WRITTEN, NOT RUN)
 - In the Cellars the Hollow come up cellar trapdoors behind you when a camp is pulled, shift close without a step, puff choking dust that
   makes your blows miss, crawl on in halves when cut down, and stand up again beside a violet anchor-well until you break its crystal.

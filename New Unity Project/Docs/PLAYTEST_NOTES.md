@@ -618,7 +618,8 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   saddle.) He chose a rework of the bear over a new model; shown the rework at 16:46 (stone hide, rock slabs, digging claws, horned
   snout): **"this model is horrific, i like the original better."** The 16:26 bear is kept (commit e7bc6bb). CLOSED by his choice.
 - **134. "need to show a test run of the dungeon with a group"** (Chris, 2026-10-11, 16:50.) Built: RunCapture (--crulanda-run-capture),
-  a party of five running the Sealed Adit, timed and photographed, on his screen. The runs since are in D:\crulanda-workun-captures.
+  a party of five running the Sealed Adit, timed and photographed, on his screen. The runs since are in D:\crulanda-work
+un-captures.
 - **135. "so once again no healing from the druid?? and no groups?"** (Chris, 2026-10-11, 16:58, the first run: a party of four dying
   at the first camp.) Measured: the Druid mended 155 times in nine minutes; the group scaling for four sims had made each picket 2,106
   health hitting for 72 against people of 415. Scaling eased (EncounterEnemy.GroupScale: .6 health, .2 damage a share). TESTED by the
@@ -800,3 +801,15 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
   planks/scaffolding"; "wiped because he fell off". And: "it needs to be fixed and soon. i have a deadline today at 6pm". (CHANGELOG
   2026-10-15 12:40-18:00: the leader's give-up and long walk, the bot's corners and water, the bridge rails, damage by role. Nix too
   hard and crowd control/area moves left OPEN.)
+
+## 2026-10-18 (Chris, verbatim)
+
+- 231 "for buffs need icons or something bc this is messy and hard to read screen" (his screenshot: the party frames each followed by
+  a row of text tags, "Well fed 741s", "Sworn to the Colours 741s", "Scree salve 741s", "Steel Your Arms 741s", wide and cluttering).
+  WRITTEN, NOT CHECKED IN GAME (branch fx-icons): the text tags are gone. Each buff is a 22 px square icon (`BuffIcons`,
+  `EncounterHud.DrawBuffs`): a dish shows the food picture, a tincture or salve the potion flask, a class buff its class's buff icon
+  (Icons/ability/buff-class-*), a status with an ability of its id that ability's icon, else a drawn glyph (a plate, a flask, the class
+  colour with an initial). Time left in the corner ("12m"; seconds under a minute), a green border for a help and a red one for a harm
+  (debuffs on the same row, after the helps), and the name, time and effect ("+6 Stamina, +4 Agility") on hover. Party rows sit beside
+  each frame and are no wider than it (six fit: `BuffIconTests`); more than fit end in a "+N" square. Your own row is at the top, right
+  of the target frame (twelve).

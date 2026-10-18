@@ -31,6 +31,7 @@ namespace Crulanda.Combat
             public string id;
             public float expires;
             public float damageMultiplier;
+            public StatusEffectDefinition definition;
         }
         readonly StatBlock stats;
         readonly List<Active> active = new List<Active>();
@@ -56,8 +57,8 @@ namespace Crulanda.Combat
                         !Enum.IsDefined(typeof(StatType), modifier.stat) || !Enum.IsDefined(typeof(ModifierOp), modifier.operation)) return false;
             Tick(now);
             var existing = active.Find(e => e.id == definition.id);
-            if (existing != null) { existing.expires = now + definition.duration; return true; }
-            var entry = new Active { id = definition.id, expires = now + definition.duration, damageMultiplier = definition.incomingDamageMultiplier };
+            if (existing != null) { existing.expires = now + definition.duration; existing.definition = definition; return true; }
+            var entry = new Active { id = definition.id, expires = now + definition.duration, damageMultiplier = definition.incomingDamageMultiplier, definition = definition };
             active.Add(entry);
             if (definition.modifiers != null)
             {
@@ -90,6 +91,19 @@ namespace Crulanda.Combat
             var found = active.Find(e => e.id == id);
             return found == null ? 1 : found.damageMultiplier;
         }
+        /// <summary>The definition a status of this id was put on with (the buff icon's tooltip reads its modifiers), or null.</summary>
+        public StatusEffectDefinition DefinitionOf(string id) { var found = active.Find(e => e.id == id); return found?.definition; }
+        /// <summary>Whether a status is harmful (a debuff: red on the buff row): one that makes its bearer take more, lowers a stat, or by
+        /// its id the grey, the Wasting, a poison or a bleed (the same test as <see cref="RemoveHarmful"/>, plus a lowered stat).</summary>
+        public static bool IsHarmful(string id, float damageMultiplier, StatusEffectDefinition definition)
+        {
+            if (damageMultiplier > 1) return true;
+            if (id != null && (id.Contains("grey") || id.Contains("wasting") || id.Contains("poison") || id.Contains("bleed"))) return true;
+            if (definition?.modifiers != null) foreach (var m in definition.modifiers) if (m != null && m.value < 0) return true;
+            return false;
+        }
+        /// <summary>Whether the status of this id now on is harmful (false when it is not on).</summary>
+        public bool IsHarmful(string id) { var found = active.Find(e => e.id == id); return found != null && IsHarmful(found.id, found.damageMultiplier, found.definition); }
         /// <summary>Whether a status of this id is on (expired ones are dropped at the next Tick).</summary>
         public bool Has(string id) { return active.Exists(e => e.id == id); }
         public bool Remove(string id)

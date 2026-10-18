@@ -573,3 +573,10 @@ Test: `ShamanSwingTests` (PlayMode): the interact key starts the swing, and a sw
 no melee path. The Cleric's paths (Lantern, Choir, Censure, Warden) work through its Brand, Rebuke and lantern at range. Neither has a
 melee build that would expect to swing, so they are left as they are. If a Cleric in Censure is meant to stand in melee with a mace, it
 would need the same care as the Shaman: a swing scale of its own, since its scale (1.51) is tuned on spells.
+
+**A sim Bonecaller's thrall that never bit (SimDummyTests, 2026-10-17 20:27).** The level-11 Mage landed 37.3 a second against its aim
+of 51.5. That is its own blows (37.5) with nothing from its thrall: the thrall's 14 a second, taken off the Mage's blows
+(`SimCompanion.PetDps`), never landed. What kept it off is not known without watching it. The likely causes are no way to the dummy from
+where the thrall rose, or being held off just beyond its 2.2 m reach. Either way the keeper fell under its band.
+Fixed in the game (`RangerPet`): a sim's pet that has hunted for 5 s without a bite is put beside its quarry, on the navmesh, and bites.
+That covers the wolf as well. Your own pets are unchanged.

@@ -54,6 +54,10 @@ namespace Crulanda.Encounter
         Vector3 stayAt;
         public void Command(Order o) { Mode = o; if (o == Order.Stay) { stayAt = transform.position; Quarry = null; fury = 1; } }
         public const float BiteInterval = 2, BiteReach = 2.2f;
+        /// <summary>A sim's pet that has hunted this long without a bite is put beside its quarry (SimCompanion.Damage counts its bites in
+        /// its keeper's damage, so a pet that never arrives leaves its keeper under its band).</summary>
+        public const float NoBiteWarp = 5;
+        float huntSince = -1, lastBiteAt = -1;
 
         public void Init(Actor a, EncounterSession s, IPetMaster k)
         {
@@ -77,7 +81,7 @@ namespace Crulanda.Encounter
         public void Hunt(EncounterEnemy target, float firstBite)
         {
             if (target == null || !target.actor.IsAlive || !actor.IsAlive) return;
-            if (Quarry != target) { Quarry = target; fury = Mathf.Max(fury, firstBite); } else fury = Mathf.Max(fury, firstBite);
+            if (Quarry != target) { Quarry = target; huntSince = Time.time; fury = Mathf.Max(fury, firstBite); } else fury = Mathf.Max(fury, firstBite);
         }
         /// <summary>
         /// At heel it joins the Ranger's fight unasked (playtest note 90, 2026-10-07: "I call a companion but he does nothing"): what the
@@ -117,6 +121,16 @@ namespace Crulanda.Encounter
             if (Quarry != null)
             {
                 float reach = Vector3.Distance(transform.position, Quarry.transform.position);
+                // A sim's pet with no bite for NoBiteWarp seconds of the hunt (2026-10-17, SimDummyTests: a sim Bonecaller's thrall never
+                // bit the dummy and the Mage landed 37 of its 51.5): no way to its quarry, or held off by the press round it. It is put
+                // beside the quarry, on the navmesh, and bites.
+                if (Master != null && reach > BiteReach && Time.time - Mathf.Max(huntSince, lastBiteAt) > NoBiteWarp)
+                {
+                    var side = transform.position - Quarry.transform.position; side.y = 0;
+                    var at = Quarry.transform.position + (side.sqrMagnitude > .01f ? side.normalized : -Quarry.transform.forward) * 1.4f;
+                    if (NavMesh.SamplePosition(at, out var by, 3, NavMesh.AllAreas) && Vector3.Distance(by.position, Quarry.transform.position) < BiteReach + 1) { agent.Warp(by.position); reach = Vector3.Distance(transform.position, Quarry.transform.position); }
+                    huntSince = Time.time;
+                }
                 agent.speed = 5.5f; agent.isStopped = reach <= BiteReach;
                 if (!agent.isStopped) agent.SetDestination(Quarry.transform.position);
                 else
@@ -125,7 +139,7 @@ namespace Crulanda.Encounter
                     if (face.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(face), Time.deltaTime * 8);
                     if (Time.time >= nextBite)
                     {
-                        nextBite = Time.time + BiteInterval;
+                        nextBite = Time.time + BiteInterval; lastBiteAt = Time.time;
                         int bite = Mathf.RoundToInt(Bite * fury); fury = 1;
                         Quarry.Receive(bite, actor);
                         if (kit.PetHolds) Quarry.threat.Add(actor.EntityId.Value, bite);   // Howl: its bites hold attention like a tank's

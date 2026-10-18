@@ -176,8 +176,10 @@ namespace Crulanda.Encounter
                         continue;
                     }
                     string place = r.place ?? "green";
-                    if (r.at != Vector2.zero) { place = "post:" + r.name; Places[place] = new List<Vector3>(); AddPlace(place, r.at); }   // a fixed post
-                    var start = RandomPlace(place) ?? Zone.Ground(r.at != Vector2.zero ? r.at : z.spawns.recovery);
+                    // (the drowned vaults, Lowtowns pick 11) A post down in a cave under the town: stood on the cave's floor, not the street over it.
+                    bool under = r.under && r.at != Vector2.zero;
+                    if (r.at != Vector2.zero) { place = "post:" + r.name; Places[place] = new List<Vector3>(); if (under) AddPlace(place, Zone.StandAt(r.at, float.NegativeInfinity), true); else AddPlace(place, r.at); }   // a fixed post
+                    var start = RandomPlace(place) ?? (under ? Zone.StandAt(r.at, float.NegativeInfinity) : Zone.Ground(r.at != Vector2.zero ? r.at : z.spawns.recovery));
                     Settle(Villager.Spawn(this, r.name, r.role ?? "stranger", 60 + i, null, start, null, place, r.title, r.look, null, r.seated, r.facing), household);
                 }
             // One hen-wife per coop, living in her household's house (without households, the house nearest her coop). The coop

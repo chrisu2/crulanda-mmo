@@ -38,6 +38,14 @@
       "items": [
         "throw.bone_harpoon"
       ]
+    },
+    {
+      "npc": "Ottie Brack",
+      "items": [
+        "potion.healing",
+        "throw.salt_twist"
+      ],
+      "gearForZone": true
     }
   ]
 }

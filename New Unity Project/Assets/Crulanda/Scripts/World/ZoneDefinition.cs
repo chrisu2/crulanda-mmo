@@ -191,7 +191,9 @@ namespace Crulanda.World
     /// in the Crown; "councilor", the High Councilor's white and gold robes of state; "scholar", a clerk's dark robe). canonStatus
     /// (optional): the lore status of the person and their lines (High Councilor Aethelgard is CANON). seated: a post kept sitting, never
     /// standing (the High Councilor on his throne), facing <c>facing</c> (a yaw in degrees: 0 north, +Z; 180 south), even when spoken to.
-    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look, canonStatus; public Vector2 at; public bool works, seated; public float facing; public string[] stories = new string[0]; }
+    /// <summary>A named resident. under: their post (at) is down in a cave under the land there, on its floor (the fence in the
+    /// Lowtowns' drowned vaults); otherwise on the land.</summary>
+    [Serializable] public sealed class ZoneResident { public string name, role, title, place, look, canonStatus; public Vector2 at; public bool works, seated, under; public float facing; public string[] stories = new string[0]; }
     /// <summary>A named person's stories (<see cref="ZoneLife.stories"/>): name as the villager is named, and their lines.</summary>
     [Serializable] public sealed class ZoneStory { public string name; public string[] lines = new string[0]; }
     /// <summary>
@@ -487,6 +489,9 @@ namespace Crulanda.World
         public string name, cave;
         public float from, to, aside, half = 2.5f, radius, depth = 1;
         public bool flood;
+        /// <summary>(The Lowtowns' drowned vaults) "chemical": the Chemical River's own black water, which poisons and hides you as the
+        /// river does (ZoneBuilder.ChemicalAt); empty: the zone's water.</summary>
+        public string kind;
     }
     /// <summary>
     /// A gate across a cave's way (GAME-ONLY; built as a ZoneGate by ZoneBuilder.Adit): its title, its cave and how far in; kind (liftgate,

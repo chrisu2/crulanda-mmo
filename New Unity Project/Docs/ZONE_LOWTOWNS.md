@@ -533,3 +533,38 @@ the walk keeps its width for the navmesh (ZoneBuilder.LowRail). GAME-ONLY.
 - Dead Man's Drop: its railing and its one gap where the lane ends are unchanged.
 - Tests: LowtownsLevelsTests.Ramps_and_stairs_have_a_rail_over_every_drop_beside_them, LowtownsMarksTests.The_weir_is_railed_both_sides_the_whole_way_across.
 - Not checked: the shelf's wall stops a little short of a ramp's side wall (its 1 m pieces); look at the ramps' top corners in a capture.
+
+## The drowned vaults (rw3-vaults, 2026-10-18; pick 11; WRITTEN, compiles, NOT RUN in Unity)
+Chris's pick 11 from REWORK_LOWTOWNS_HALLOWS.md section 4, conflict 4's answer: the vaults under the market as the Warrens' upper edge,
+rubble stone, never the Sludge-Tunnels' red sewer brick. CANON-EXPANDED: the Warrens, "abandoned maintenance tunnels, forgotten cellars,
+and collapsed sewage lines" (b1 ch.6:41); the "drowned lower levels", a haven for "smugglers, fences" (ch.6:185); "a narrow, precarious
+causeway that hugged the crumbling edge of a massive, black-water canal" under "high, arched ceilings" (ch.6:187); the green mould
+"clinging to the archways" (ch.6:129); a black skiff, sails furled, moored "to a rotting, iron-ringed wooden pier", contraband loaded,
+guards on the pier (ch.6:203); carvings under the glowing moss (ch.9:55). Not in: the Rusty Bucket and Horgus (Book 1's people).
+- **Three caves** (props of kind "cavern", variant 2, style "vaults"; the cave tech of the Adit and Hallow's Creek's cellars):
+  **the drowned vaults** down a cellar stair from the market's north edge behind the Blind Seer's (139, 104; +8 to -8), then a vaulted hall
+  west under the market and the Lower Market to (55, 187) at -10, the high hall 5-6 m; **the drain crawl** from the Drain Courts (-112, 218;
+  -3) east under the High Rows, under the river at -14 (its rock under the river's bed) and into the vaults' west end; **the river culvert**
+  off the river's east bank (12, 214; 0) into the crawl. Three ways in and a loop under the river: down from the market, out in the courts,
+  back over a bridge. Past each mouth's stair every passage lies deep enough that its rock stays under the street; nothing of the streets
+  (camps, secrets, nodes, stations, posts, quest places, the start, the exits, the stalls, the Night Market, the Drop) stands over a
+  passage, so the market above is unchanged. The mouths' rock shows as a low heap round each mouth, as every cave mouth does.
+- **The black canal** (cave water of the river's kind, `ZoneCaveWater.kind` "chemical"): down the vaults' north side, 1.3 m deep (waded),
+  the causeway along it with a crumbling stone kerb; it poisons and hides you as the river does (`ZoneBuilder.ChemicalAt`). A shallow
+  seep of it under the river in the crawl.
+- **Dressing** (`ZoneBuilder.DrownedVaults`): rubble-stone ribs every 4 m on piers, a heavier arch at each mouth, the green mould on the
+  ribs, a dim green light every 14 m (22 m in the crawl and culvert), stone treads down the stairs.
+- **The fence:** Ottie Brack, Fence (GAME-ONLY), keeps a post on the causeway at the pier (`ZoneResident.under`: stood on the cave's floor);
+  sells healing potions, salt twists and black-market gear for the zone's levels. The skiff: black, low, sail furled on the boom under
+  the roof, crates, mooring lines, a stern lantern; its hull solid. No machines.
+- **Guards** (CANON faction, the Iron Teeth, ch.7:21; camps GAME-ONLY): Iron Teeth runners at the stair's foot (17-18, three) and sifters
+  on the pier's approach (18-19, three), 18 m off the fence.
+- **Secret:** "Carvings Under the Moss" (carving, in the crawl; ch.9:55). The Lowtowns now hold fifteen secrets (SecretPlacementTests
+  allows fifteen there).
+- **Tests:** `LowtownsVaultsTests` (new, EditMode: three ways in from three levels, the joins floor to floor and the loop under the river,
+  no stretch over 30 degrees and the rock under the town, nothing of the streets over a passage, the canal, the fence, the guards, the
+  secret, the citations). **To run in the local session:** LowtownsVaultsTests, LowtownsLevelsTests, LowtownsZoneTests,
+  LowtownsNightDropTests, LowtownsMarksTests, LowtownsRoofsTests, SocialRulesTests; the PlayMode ZoneContentTests, NodePlacementTests,
+  SecretPlacementTests for the Lowtowns. **To look at:** each mouth from the street (the heap of rock round it), the stair down, the
+  hall (ribs, mould, canal, kerb), the skiff and the fence (buy something), the guards, the crawl under the river and out into the
+  Drain Courts, the culvert from the bank; the market above (nothing moved, nothing poking through); fps in the hall.

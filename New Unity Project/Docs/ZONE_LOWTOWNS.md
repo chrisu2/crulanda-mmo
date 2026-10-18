@@ -459,3 +459,37 @@ first time in a fight, a float over the mob, a ring on the ground) and each has 
   past 9 m.
 - **Someone Else's Memory** (Grey-touched; CANON-EXPANDED, b1 ch.3:133): every 18 s a 1.6 s gathering of light, then everyone within 7 m is
   dazzled 3.5 s: three blows in ten go wide. Answer: interrupt, or turn your back to it (you; the sims always face it).
+
+## The roofs (w2-roofs, 2026-10-18; pick 3)
+Chris's pick 3 from REWORK_LOWTOWNS_HALLOWS.md section 4. Built on `w2-roofs`, compile-checked, NOT run in Unity (OPEN until Chris has
+walked it). CANON-EXPANDED: Valen goes up "a rusted rain-spout" over the rooftop edge (b1 ch.1:297), a fire escape (ch.1:261), laundry
+strung between two tenement blocks (ch.1:225; ch.7:35), and from above steep slate, brick chimneys, iron gutters and "a precarious water
+tower" (ch.7:35-41). The lead walks and the rope bridges are GAME-ONLY. Code: `ZoneBuilder.Roofs` (built), `EncounterSession.Roofs` (play).
+- **Where:** over Pell Row in the Tenement Rows: the three terraces on its north side from the west end (x -170, Tolley's at -150, -130)
+  and the one across the lane (-123, -153); all three storeys, so the gutters stand level (10 m up). The route is worked out from the
+  zone's data (`ZoneBuilder.RoofRoute`): no data changed.
+- **The walks:** a lead walk 2 m wide along each terrace's front gutter, on iron brackets over an iron gutter, a low rusty rail at the lane
+  side, slipped slates and a patch of neon moss; in the navmesh (NavWalkable) so you, Mira and the party walk it. The slope behind is an
+  unseen wall. The walk stands outside the walls, so the camera's roof fade never counts you as indoors there.
+- **Rope bridges:** three, of planks (a few missing) and rope, foot ropes, sagging hand ropes and stays, a timber post at each corner: over
+  the two alleys between the row's terraces and over Pell Row itself (x -126, 7.5 m).
+- **Up:** E at the rusted rain-spout (the row's west end, from Pell Row) or at the fire escape (iron landings and flights up the far
+  terrace's front, its east end): a 3 s climb, then you and the party are on the walk. Not while fighting.
+- **Down:** E on the walk where washing hangs below ("Drop through the washing"): from Tolley's gutter through a line strung across
+  Pell Row, and from the far terrace's west end through the zone's own line there. Instant, no harm (`LaundryDropDamage` 0), the party
+  with you; it works in a fight (a way out). Each climb and drop is offered only at its own height.
+- **The water tower** on Tolley's roof: a barrel of staves and iron hoops on four timber legs astride the ridge between two chimney
+  stacks, leaning, guyed with rope to a stack and the gutter, a weeping stain and moss, a ladder down to the walk. E climbs it for the view
+  (a line, no move). Nothing in it moves: no machines.
+- **A second way:** up at Pell Row's west end and down 30 m or 45 m along it, over the lane: the way round whatever holds Pell Row (pick
+  9's sweep will use it). No camp stands on Pell Row today, so it does not yet bypass a camp; the Rows gutter-hounds keep Gutter Alley
+  behind the south side.
+- **Not built:** walks on more terraces (the south side's are four storeys, 3 m higher: they would need stairs on the roofs).
+
+**Tests:** `LowtownsRoofsTests` (new, EditMode: the terraces there with level gutters; walks and bridges join into one route; climbs start
+on the lane clear of buildings and end on a walk; drops leave a walk and land in Pell Row under washing, harmless; bridges level, wide
+enough, over open air; the walks outside the fade box; the label cites ch.1:225, 261, 297 and ch.7:35-41). **To run in the local
+session:** LowtownsRoofsTests, LowtownsLevelsTests, LowtownsZoneTests, LowtownsNightDropTests, and the PlayMode BuildingGroundTests,
+ZoneContentTests, NodePlacementTests, SecretPlacementTests, PostFacingPlayTests, CameraAndTargetTests for the Lowtowns. **To look at:** the
+spout and the climb, the walks (party following over the bridges, the navmesh holding on them), the drop through the washing, the
+fire escape, the water tower from the lane and from the walk, the camera on the walk (no fading of the roof under you).

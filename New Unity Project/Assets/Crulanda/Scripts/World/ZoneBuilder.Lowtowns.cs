@@ -111,7 +111,7 @@ namespace Crulanda.World
         /// </summary>
         void Tenement(Transform t, Vector2 size, int variant, string style, System.Random r, bool named)
         {
-            float w = size.x, d = size.y; int storeys = 3 + Mathf.Abs(variant) % 2;
+            float w = size.x, d = size.y; int storeys = TenementStoreys(variant);
             const float floor = 3, plinth = .5f; float H = plinth + storeys * floor;
             var brick = SootBrick(variant / 2 + (int)(r.NextDouble() * 2)); var band = SootBrick(3); var frame = TarredTimber;
             var parts = new Batch();   // the small parts merged, one mesh a material (a terrace is many: 150 boxes would be 150 objects)
@@ -165,7 +165,7 @@ namespace Crulanda.World
                 }
             }
             // The roof: slate, pitched along the terrace, with stacks along the ridge (one smoking in three).
-            float roofH = Mathf.Max(2, d * .42f);
+            float roofH = TenementRoofRise(d);
             MeshPart(ZoneMeshes.GableRoof(w + .4f, d + .8f, roofH, .22f, .2f), t, new Vector3(0, H, 0), LowSlate);
             RoofMoss(parts, w + .4f, d + .8f, roofH, H, r);
             foreach (int sx in new[] { -1, 1 }) MeshPart(ZoneMeshes.Gable(d, roofH, .3f, 2), t, new Vector3(sx * (w / 2 - .15f), H, 0), brick, Quaternion.Euler(0, 90, 0));
@@ -783,6 +783,8 @@ namespace Crulanda.World
             // Dead Man's Drop and the Night Market (Lowtowns picks 10 and 8; ZoneBuilder.DeadMansDrop, ZoneBuilder.NightMarket)
             BuildDeadMansDrop();
             BuildNightMarket();
+            // The roofs over Pell Row (Lowtowns pick 3; ZoneBuilder.Roofs)
+            BuildRoofs();
             var paving = new GameObject("Paving").transform; paving.SetParent(statics, false);
             foreach (var road in Zone.roads)
             {

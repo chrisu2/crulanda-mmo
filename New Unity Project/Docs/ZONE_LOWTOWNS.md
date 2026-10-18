@@ -304,3 +304,78 @@ Citations: `b1 ch.N:L` is `D:\code\crulanda\book1\chapter_N.md` at line L.
   a Weave-Eater fight at night in the Drain Courts as a caster (it should blink in and come for you; a Ward should melt), a harpoon then
   no blink for a while; the Spoon at night: Snivels at the bar (his goblin figure, front, back and side), the drunk's lines, a hand of
   Triad, a brawl (the poses, the bubbles, the throw through the window, the boards and glass outside).
+## The rework: built downhill, the books' colours, the Chemical River (rw-lowground, 2026-10-18; picks 1, 2 and 6)
+Chris's picks from REWORK_LOWTOWNS_HALLOWS.md section 4 ("keep all"). Built on `rw-lowground`, compile-checked, not run in Unity (OPEN until
+Chris has walked it). Citations as in that doc: `b1 ch.N:L` is `crulanda\book1\chapter_N.md` line L.
+
+**Pick 1, built downhill (CANON-EXPANDED).** The books: the Rust Market stands "against the crumbling stone walls of the Forge District"
+(b1 ch.3:7), its "twisting, narrow alleyways" (ch.3:9) fall by "a narrow, immensely twisting causeway that led ... down into the deep, dark
+slums" (ch.3:257); dead-ends "hemmed in by high brick walls" (ch.1:237); the Lowtowns lie "at the base of the mountain" (world_bible.md).
+The game's levels (`terraces` in lowtowns.json, style "shelf"; heights GAME-ONLY):
+| Level | Where | Height |
+|---|---|---|
+| The Rust Market | east, from Market Lane to the Forge District's wall (the Forge gate on it) | +8 |
+| The Lower Market | between the river's east bank and the market: Skewer Lane, the skewer stalls, the hearth | +4 |
+| The Shard-Burners' Yard | south-east, under the market | +4 |
+| The burners' cellar | sunk in the yard's south edge, open to the Iron Teeth's yard | 0 |
+| The High Rows (GAME-ONLY name) | north-west, the North Rows road along its ridge | +6 |
+| The Drain Courts | west of the High Rows, sunk among their walls | -3 |
+| The river, the docks, the Gate Ward, the Tenement Rows | the bottom | 0 |
+- **Thirteen ways between the levels** (style "stair" or "ramp", each on its road, none steeper than 26 degrees): the Gate Street cart ramps
+  (0 to 4 to 8, GAME-ONLY; carts by hand, no machines), **the twisting causeway** up from the Rag Bridge on High Lane (CANON, ch.3:257), the
+  Skewer Lane steps (two flights), the Weir Back steps (two), the Burners' Row steps (up to
+  the market, down into the cellar: "Go down into the burners' cellar" is now a stair), the North Rows steps up onto the High Rows, the
+  Drain Lane steps down into the courts, and two new step-streets: **the Court Stair** (the courts up 9 m to the High Rows) and **Weir
+  Stair** (Weir Lane up to the High Rows). High Lane now ends at Market Lane (it ran into the market's wall).
+- **Retaining walls** (ZoneBuilder.LowtownLevels, GAME-ONLY): soot brick wherever a level stands a metre or more over the next, from under
+  the low ground to the high, a parapet a metre high over any drop of more than 1.2 m, a dark stone coping; solid and cut out of the navmesh;
+  none across a stair or a ramp (their sides are walled instead, a causeway between walls). Step-streets have treads of wet setts with an
+  iron nosing every fourth (visual: the ramp under them is walked).
+- **Re-placed to stand level** (data, by a script checking every footprint): ten unnamed terraces dropped (they stood across a level's edge;
+  151 left), eleven moved a few metres along their row, the long stalls 1 m, a fallen tenement and its two salvage nodes 9 m onto the Lower
+  Market, a slag heap, a lamp-lichen and the price-board a metre or two, six lamp posts, one drain mouth set into the High Rows' wall facing
+  the courts. The shape that sank the cellar is gone (the cellar is a terrace now) and so are its two lane walls (the retaining walls are
+  its walls). Every camp, node, secret, station, resident, exit and the start stand on level ground; the Spoon is untouched.
+- **Kept from the plan, changed:** the market is +8 and the High Rows +6 (the plan's +6 and +10); the quays and the river stay at the
+  streets' level (a lowered river would step its water down at the Sett Bridge). The roofs, the Drop and the vaults are later picks.
+
+**Pick 2, the books' colours (CANON unless marked).**
+- By day a dirty yellow-brown haze, not grey: fog `#8E7D57`, the sky and the sun yellowed (b1 ch.1:145: "a dirty yellow haze"); by night the
+  smog grey, warmed from under (`nightFog #2D2722`, a new ZoneLighting field; b1 ch.1:191: "a smear of orange fires and grey smog"), not the
+  shared moonlit blue.
+- Orange fires: four in five lit windows burn orange, one in five a shard's violet (ch.1:191; ch.3:133).
+- The street lamps "sickly, yellow" (ch.3:45), not orange.
+- Neon moss (ch.7:17, "vibrant, unnatural neon moss"): patches on most tenement roofs and strips along the retaining walls' copings, a sick
+  bright green that glows a little.
+- Green bioluminescent mould (ch.6:129; ch.9:55) round the inside of every drain mouth's arch, under the bridges' arches, and at the foot of
+  the Drain Courts' walls; a dim green light in each arch after dark.
+- Shard-light violet (CANON-EXPANDED, the geodes of ch.3:133): the dead-house's lamp and the burners' racks (they were pale blue).
+- The Iron Teeth's mark "painted broadly on the slate roof in faded yellow ochre" (ch.7:21) on both slopes of their warehouse.
+- The market's own amber (GAME-ONLY): horn stall-lanterns under every other bay's awning and a warm light in each stall run.
+- The twin moons, the Eye and the Tear (ch.1:135), were already in the sky (TwinMoons; their shader takes no fog, so the smog does not hide
+  them).
+
+**Pick 6, the Chemical River (CANON).** "The iridescent waterway that bisected Argentis like an infected artery" (b1 ch.16:5), "a thick, ugly
+ribbon of bubbling black sludge" (ch.15:335), "agonizingly thick as curdled molasses" (ch.15:391).
+- The river and the Outfall run are `"kind": "chemical"` (ZonePath.kind): black water all the way down, a dull green-grey scum at the banks,
+  slow and heavy, and an oil film over it in faint drifting rainbow hues (the iridescence).
+- **It poisons:** anyone of the party in it loses 1.2% of their health a second, in half-second bites; it never takes the last of it
+  (Encounter.ChemicalRiver; GAME-ONLY numbers). "It tasted of vinegar, burnt rubber, and alchemical waste" (ch.16:5).
+- **It hides you from magical tracking** ("The chemical runoff interferes with magical tracking", ch.16:75): while you stand or swim in it, a
+  Weave-Eater hunting you loses you unless it is close enough to touch (3 m), and a caster whose spell reaches 8 m or more loses you unless
+  you are within 6 m; each forgets you for 6 s (the Rogue's Vanish rule, renewed every half second you stay in). A mob that only sees you (a
+  hound, a cutter at your elbow) keeps after you. GAME-ONLY reading.
+- **Sludge-eels** (CANON creature, ch.15:391; camps GAME-ONLY): two packs of three in the shallows, off the quays (16-17) and above the Rag
+  Bridge (17-18); a long black body that humps through the sludge, a round sucking mouth; their move a clinging bite that roots.
+- **The Old Croc** (a mutated crocodile, CANON creature ch.15:391; the beast and its haunt GAME-ONLY): a rare (one visit in three) at 19 in
+  the shallows by the Outfall's mouth; long and low, its hide black-olive, pale bony growths where the scutes went wrong, one eye too big,
+  blisters glowing the river's green; its move the Death Roll (a stun). A rare but not an elite, so the elite, loot and lockout lists are
+  unchanged; the Lantern-Eater stays the last camp.
+- Not in: the Rusty Bucket and Horgus (a furnace barge; machines, Book 1's people), the river's old name (a name hazard).
+
+**Tests:** `LowtownsLevelsTests` (new, EditMode: the levels fall the right way, every road climbs by a stair or a ramp under 31 degrees, all
+stands level, the river is chemical with its eels and croc, the poison and the hiding rules, the colours); SocialRulesTests knows the
+sludge-eels (pack) and the Old Croc (solitary). **To run in the local session:** LowtownsLevelsTests, LowtownsZoneTests, SocialRulesTests,
+MobMoveTests, ZoneContentTests, NodePlacementTests, SecretPlacementTests, BuildingGroundTests, CheckpointTests; then captures of the
+market's wall from the Lower Market, the twisting causeway, the Court Stair from the courts, the burners' cellar steps, a roof with moss, the
+river by day and at night (the film, the black), the eels and the croc; walk a lap through every stair and ramp; fps at the market.

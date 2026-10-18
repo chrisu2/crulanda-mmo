@@ -83,6 +83,9 @@ namespace Crulanda.Encounter
             new MobCast { mob = "Iron Teeth sifter", name = "Slag Toss", kind = "bolt", cast = 1.4f, every = 14, first = 4, power = 2.2f, reach = 12 },
             new MobCast { mob = "Hired warder", name = "Cudgel to the Temple", kind = "net", cc = "stun", seconds = 1.5f, area = 0, cast = 1.3f, every = 16, first = 5, power = 0, reach = 4 },
             new MobCast { mob = "Grey-touched", name = "The Forgetting", kind = "drain", cast = 2.2f, every = 15, first = 4, power = 1.8f, reach = 12 },
+            // The Chemical River's (Lowtowns pick 6; CANON creatures, book1 ch.15:391): the sludge-eels' clinging bite, the mutated crocodile's roll.
+            new MobCast { mob = "Sludge-eel", name = "Clinging Mouth", kind = "net", cc = "root", seconds = 1.5f, area = 0, cast = .9f, every = 15, first = 5, power = 0, reach = 3.5f },
+            new MobCast { mob = "The Old Croc", name = "Death Roll", kind = "net", cc = "stun", seconds = 2, area = 0, cast = 1f, every = 14, first = 5, power = 0, reach = 4 },
             new MobCast { mob = "Mist-walker", name = "Palemist Breath", kind = "net", cc = "disorient", seconds = 2, area = 4, cast = 1.6f, every = 16, first = 5, power = 0, reach = 8 },
             new MobCast { mob = "Void-Toucher", name = "Void Pulse", kind = "blast", cast = 1.8f, every = 15, first = 5, power = 2.2f, reach = 4 },
             new MobCast { mob = "Withered Keeper", name = "Grey Roots", kind = "net", cc = "root", seconds = 2.5f, area = 3, cast = 1.6f, every = 16, first = 5, power = 0, reach = 10 },

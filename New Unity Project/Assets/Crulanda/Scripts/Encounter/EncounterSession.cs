@@ -1645,6 +1645,8 @@ namespace Crulanda.Encounter
                 case "stag": return ActorLook.Stag;
                 case "spider": return ActorLook.Spider;
                 case "bramble": return ActorLook.Bramble;
+                case "eel": return ActorLook.Eel;     // the Chemical River's sludge-eels (Lowtowns pick 6, book1 ch.15:391)
+                case "croc": return ActorLook.Croc;   // and its mutated crocodile
                 case "bear": return ActorLook.Bear;
                 case "skeleton": return ActorLook.Skeleton;
                 default: return veteran ? ActorLook.Warden : ActorLook.Collector;
@@ -1948,6 +1950,7 @@ namespace Crulanda.Encounter
             if (Player == null) return;
             TickDormant();
             TickNight();   // the Lowtowns' night camps up out of the drains and back down (EncounterSession.Lowtowns)
+            TickRiver();   // the Chemical River: its poison, and the tracking it hides you from (EncounterSession.River)
             AdvanceToast();
             // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.
             if (lastHour >= 0 && Bounties.DayTurned(lastHour, Crulanda.World.WorldClock.Hour)) Progress.days++;

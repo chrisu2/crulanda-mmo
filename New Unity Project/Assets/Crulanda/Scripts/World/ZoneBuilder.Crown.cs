@@ -24,7 +24,7 @@ namespace Crulanda.World
     {
         // ---------- terraces ----------
         /// <summary>A point in a terrace's own frame (x across, z along, from its centre).</summary>
-        static void TerraceFrame(ZoneTerrace t, float x, float z, out float lx, out float lz)
+        public static void TerraceFrame(ZoneTerrace t, float x, float z, out float lx, out float lz)
         {
             float r = t.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), s = Mathf.Sin(r), dx = x - t.center.x, dz = z - t.center.y;
             lx = dx * c - dz * s; lz = dx * s + dz * c;
@@ -36,15 +36,19 @@ namespace Crulanda.World
             return Mathf.Lerp(t.height, t.heightTo, Mathf.Clamp01((lz + t.size.y / 2) / t.size.y));
         }
         /// <summary>How far a point (in the terrace's frame) lies outside its rectangle; 0 inside.</summary>
-        static float TerraceOut(ZoneTerrace t, float lx, float lz)
+        public static float TerraceOut(ZoneTerrace t, float lx, float lz)
         {
             float ox = Mathf.Abs(lx) - t.size.x / 2, oz = Mathf.Abs(lz) - t.size.y / 2;
             return ox > 0 || oz > 0 ? new Vector2(Mathf.Max(0, ox), Mathf.Max(0, oz)).magnitude : 0;
         }
         /// <summary>The land under the terraces: each levels it in its rectangle and eases back over its blend outside it.</summary>
-        float Terraces(float x, float z, float h)
+        float Terraces(float x, float z, float h) { return TerraceGround(Zone.terraces, x, z, h); }
+        /// <summary>The land at a point under a list of terraces, from its height <paramref name="h"/> under them all: static, so a test
+        /// reads a zone's levels from its data without building it (the Lowtowns' shelves and stairs, LowtownsLevelsTests).</summary>
+        public static float TerraceGround(ZoneTerrace[] terraces, float x, float z, float h)
         {
-            foreach (var t in Zone.terraces)
+            if (terraces == null) return h;
+            foreach (var t in terraces)
             {
                 if (t == null) continue;
                 float blend = Mathf.Max(.25f, t.blend), reach = (t.size.x + t.size.y) / 2 + blend;

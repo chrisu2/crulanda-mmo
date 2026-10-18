@@ -124,11 +124,15 @@ namespace Crulanda.World
     /// levelled at height, easing back to whatever lies under it over blend metres outside its edge (a metre or two: a cliff the
     /// walls stand on). ramp: its level runs from height at its -z end to heightTo at its +z end (a ramp up to a gate or a terrace).
     /// paved: flagged in white stone where it is the ground (no grass grows there). A later terrace lies over an earlier one.
+    /// style (the Lowtowns' levels, ZoneBuilder.LowtownLevels; empty elsewhere): "shelf" (a level of the town, held up by soot-brick
+    /// retaining walls where it stands over the next), "stair" (a ramp drawn as a step-street of treads over the walked slope) or
+    /// "ramp" (a cart ramp or a causeway, paved by the road over it). Empty: as before (the Crown draws its own walls).
     /// </summary>
     [Serializable] public sealed class ZoneTerrace
     {
         public string name, canonStatus; public Vector2 center, size; public float rotation, height, heightTo, blend = 1.5f;
         public bool ramp, paved;
+        public string style;
     }
     /// <summary>
     /// A pit sunk in the land (GAME-ONLY; Hallow's Creek's chasm, DUNGEON2_DESIGN.md N3): a box of <see cref="size"/> round <see cref="center"/>
@@ -322,6 +326,9 @@ namespace Crulanda.World
         /// <summary>A smog that thins after dark (the Lowtowns, Phase 9.1): the fog's far end reaches this share further at night
         /// (.5: half as far again). 0: the same by night as by day.</summary>
         public float nightClear;
+        /// <summary>A zone's own colour of the night's fog (hex; empty: the shared moonlit blue). The Lowtowns: the smog by night, grey and
+        /// lit from under by the orange fires (CANON, book1 ch.1:191: "a smear of orange fires and grey smog").</summary>
+        public string nightFog;
     }
     [Serializable] public sealed class ZoneSpawns
     {
@@ -340,8 +347,10 @@ namespace Crulanda.World
     /// (ZoneWater.Meander). 0 and 0: from the first point, as every creek was.
     /// surface (roads only, optional): "gravel" (Hallow's Creek's "pristine gravel", b1 ch.21:19: pale, clean, no ruts, a crisp edge),
     /// else trodden earth.
+    /// kind (water only; empty: plain water): "chemical", the Lowtowns' Chemical River (CANON, book1 ch.15:335, ch.16:5): black, oily and
+    /// iridescent (ZoneBuilder.ChemicalWater), it poisons whoever is in it and hides them from what tracks by magic (Encounter.ChemicalRiver).
     /// </summary>
-    [Serializable] public sealed class ZonePath { public string name, surface; public float width = 4; public Vector2[] points = new Vector2[0]; public float depth = 1.1f; public int swingFrom; public float swingAlong; }
+    [Serializable] public sealed class ZonePath { public string name, surface; public float width = 4; public Vector2[] points = new Vector2[0]; public float depth = 1.1f; public int swingFrom; public float swingAlong; public string kind; }
     /// <summary>
     /// A lake or pond. radius is the mean waterline (the shore wanders up to a fifth in and out around it); depth is the
     /// water's depth in the middle (a flat bottom, a bank under about 38 degrees, a gentle shore). Deeper than about

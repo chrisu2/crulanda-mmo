@@ -944,8 +944,10 @@ namespace Crulanda.World
                 {
                     var go = new GameObject(c.def.name ?? "Creek"); go.transform.SetParent(transform, false);
                     go.AddComponent<MeshFilter>().sharedMesh = mesh;
-                    var r = go.AddComponent<MeshRenderer>(); r.sharedMaterial = waterMat; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+                    bool chemical = Chemical(c.def);   // the Lowtowns' Chemical River: black, oily, iridescent (ZoneBuilder.ChemicalRiver)
+                    var r = go.AddComponent<MeshRenderer>(); r.sharedMaterial = chemical ? ChemicalWater() : waterMat; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
                     if (art.waterSurface == null) go.AddComponent<WaterDrift>();
+                    if (chemical) OilSheen(go.transform, mesh);
                 }
             foreach (var k in Water.Lakes)
             {

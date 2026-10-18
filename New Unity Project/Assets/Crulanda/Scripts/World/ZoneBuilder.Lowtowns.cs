@@ -40,6 +40,14 @@ namespace Crulanda.World
         Material BlackWater { get { return Tint(art.metal, new Color(.05f, .05f, .06f)); } }
         Material DarkPane { get { return Tint(art.timber, new Color(.06f, .06f, .07f)); } }
         static readonly Color LampOrange = new Color(1, .56f, .24f);
+        /// <summary>The street lamps' light: "the sickly, yellow light of the street lamps" (CANON, book1 ch.3:45).</summary>
+        static readonly Color LampSickly = new Color(.98f, .86f, .4f);
+        /// <summary>Shard-light: violet, as the Council's geodes glow (CANON-EXPANDED, book1 ch.3:133: "a rhythmic, sickly, terrifying violet
+        /// light"); the poor's spent shards burn the same colour, dimmer.</summary>
+        static readonly Color ShardViolet = new Color(.72f, .42f, 1f);
+        /// <summary>A lit window: most burn a fire (the orange fires of book1 ch.1:191), one in five a shard (violet).</summary>
+        Material FireWindow { get { return Glowing(new Color(1, .58f, .26f), 1.25f); } }
+        Material ShardWindow { get { return Glowing(ShardViolet, 1.1f); } }
         /// <summary>An inn's roof: thatch on the even variants and slate on the odd, as it was; slate always in the Lowtowns (the Rusty Spoon).</summary>
         Material InnRoof(int variant) { return Zone.biome == "lowtowns" ? LowSlate : variant % 2 == 0 ? art.thatch : art.slate; }
         /// <summary>A stream of its own for a prop, keyed on where it stands (the zone's stream is never touched).</summary>
@@ -113,7 +121,7 @@ namespace Crulanda.World
             for (int s = 1; s <= storeys; s++)   // a string course at each floor and a cornice under the eaves
                 foreach (int sz in new[] { -1, 1 }) parts.Box(band, new Vector3(0, plinth + s * floor - .1f, sz * (d / 2 + .06f)), new Vector3(w + .1f, s == storeys ? .32f : .16f, .14f));
             int bays = Mathf.Max(2, Mathf.RoundToInt(w / 2.6f)); float bay = w / bays;
-            var lit = art.glass; var dark = DarkPane;
+            var lit = FireWindow; var dark = DarkPane;
             for (int s = 0; s < storeys; s++)
                 for (int b = 0; b < bays; b++)
                 {
@@ -124,7 +132,8 @@ namespace Crulanda.World
                         bool door = sz < 0 && s == 0 && style != "back" && (b % 2 == 0 || bays <= 3);
                         if (door) continue;
                         bool glow = r.NextDouble() < (s == 0 ? .3f : .2f);   // a few lit: the poor burn their shards a little at a time
-                        parts.Box(glow ? lit : dark, new Vector3(x, y, sz * (d / 2 + .02f)), new Vector3(.8f, 1.2f, .06f));
+                        bool shard = glow && r.NextDouble() < .2f;   // a fire in most, a shard's violet in one in five (book1 ch.1:191; ch.3:133)
+                        parts.Box(glow ? (shard ? ShardWindow : lit) : dark, new Vector3(x, y, sz * (d / 2 + .02f)), new Vector3(.8f, 1.2f, .06f));
                         parts.Box(band, new Vector3(x, y - .68f, sz * (d / 2 + .07f)), new Vector3(1.05f, .1f, .16f));   // the sill
                         parts.Box(frame, new Vector3(x, y + .66f, sz * (d / 2 + .05f)), new Vector3(1.0f, .14f, .12f));   // the lintel
                     }
@@ -158,6 +167,7 @@ namespace Crulanda.World
             // The roof: slate, pitched along the terrace, with stacks along the ridge (one smoking in three).
             float roofH = Mathf.Max(2, d * .42f);
             MeshPart(ZoneMeshes.GableRoof(w + .4f, d + .8f, roofH, .22f, .2f), t, new Vector3(0, H, 0), LowSlate);
+            RoofMoss(parts, w + .4f, d + .8f, roofH, H, r);
             foreach (int sx in new[] { -1, 1 }) MeshPart(ZoneMeshes.Gable(d, roofH, .3f, 2), t, new Vector3(sx * (w / 2 - .15f), H, 0), brick, Quaternion.Euler(0, 90, 0));
             for (float x = -w / 2 + 2.2f; x < w / 2 - 1; x += 5.5f)
             {
@@ -166,6 +176,24 @@ namespace Crulanda.World
                 if (r.NextDouble() < .33f) Smoke(t, new Vector3(x, H + roofH * 1.4f + .9f, 0));
             }
             parts.Flush(this, t, "Terrace");
+        }
+        /// <summary>
+        /// The neon moss on a slate roof (CANON, book1 ch.7:17: "a sprawling, chaotic sea of slate rooftops, vibrant, unnatural neon moss"):
+        /// on most roofs one to three patches lying on the slope (a gable roof <paramref name="w"/> by <paramref name="d"/>, its ridge
+        /// <paramref name="roofH"/> over the eaves at <paramref name="eaves"/>), sick bright green that glows a little after dark.
+        /// </summary>
+        void RoofMoss(Batch parts, float w, float d, float roofH, float eaves, System.Random r)
+        {
+            if (r.NextDouble() > .62f) return;
+            float hd = d / 2, slope = Mathf.Atan2(roofH, hd) * Mathf.Rad2Deg; var moss = NeonMoss;
+            for (int k = 0, n = 1 + (int)(r.NextDouble() * 3); k < n; k++)
+            {
+                int side = r.NextDouble() < .5f ? -1 : 1; float u = .2f + (float)r.NextDouble() * .6f, z = side * hd * u;
+                float pw = 1.2f + (float)r.NextDouble() * 3.2f, pd = .8f + (float)r.NextDouble() * 1.6f, x = ((float)r.NextDouble() - .5f) * (w - pw - .6f);
+                // Lying on its side of the roof, falling toward the eaves.
+                var tilt = Quaternion.Euler(side * slope, 0, 0);
+                parts.Box(moss, new Vector3(x, eaves + roofH * (1 - u) + .035f, z), new Vector3(pw, .04f, Mathf.Min(pd, hd * .7f)), tilt);
+            }
         }
         /// <summary>Small boxes gathered by material and joined into one mesh each (a terrace's sills, lintels, panes and stoops).</summary>
         sealed class Batch
@@ -216,6 +244,33 @@ namespace Crulanda.World
                 }
             MeshPart(ZoneMeshes.GableRoof(w + .5f, d + .8f, d * .3f, .22f, .2f), t, new Vector3(0, H, 0), LowSlate);
             foreach (int sx in new[] { -1, 1 }) MeshPart(ZoneMeshes.Gable(d, d * .3f, .3f, 2), t, new Vector3(sx * (w / 2 - .15f), H, 0), brick, Quaternion.Euler(0, 90, 0));
+            IronTeethSign(t, w + .5f, d + .8f, d * .3f, H);
+        }
+        /// <summary>
+        /// The Iron Teeth's mark painted broad on the warehouse's slate (CANON, book1 ch.7:21: "the jagged Iron Teeth symbol painted broadly on
+        /// the slate roof in faded yellow ochre"), on both slopes so the High Rows and the market see it: a band with a row of jagged teeth
+        /// standing up from it, flat on the slope. Paint only.
+        /// </summary>
+        void IronTeethSign(Transform t, float w, float d, float roofH, float eaves)
+        {
+            var ochre = Tint(art.cloth, new Color(.62f, .48f, .2f)); var parts = new Batch();
+            float hd = d / 2, slope = Mathf.Atan2(roofH, hd) * Mathf.Rad2Deg, run = Mathf.Sqrt(hd * hd + roofH * roofH), span = w * .7f;
+            foreach (int side in new[] { -1, 1 })
+            {
+                // Lying on this slope: x along the ridge, up the slope from the eaves.
+                var tilt = Quaternion.Euler(side * slope, 0, 0);
+                Vector3 On(float x, float up) { float u = up / run; return new Vector3(x, eaves + roofH * u + .03f, side * hd * (1 - u)); }
+                parts.Box(ochre, On(0, run * .32f), new Vector3(span, .02f, run * .1f), tilt);
+                int teeth = Mathf.Max(5, Mathf.RoundToInt(span / 1.6f));
+                for (int k = 0; k < teeth; k++)
+                {
+                    float x = -span / 2 + span * (k + .5f) / teeth;
+                    // Each tooth a diamond turned on the slope, its lower half under the band: a jagged point standing up the roof.
+                    var turn = tilt * Quaternion.Euler(0, 45 + (k % 2) * 8, 0);
+                    parts.Box(ochre, On(x, run * .4f), new Vector3(span / teeth * .62f, .02f, span / teeth * .62f), turn);
+                }
+            }
+            parts.Flush(this, t, "Iron Teeth sign");
         }
         /// <summary>A yard wall of soot brick along local x (<paramref name="length"/> long) with a coping and piers every 3 m; variant 1 has a
         /// gate in the middle, its plank leaf standing half open; variant 2 a gate shut.</summary>
@@ -271,6 +326,17 @@ namespace Crulanda.World
                     Part(PrimitiveType.Cube, t, at + tilt * new Vector3(0, .55f, 0), new Vector3(.6f, .12f, length / segs + .1f), cap, tilt);
                 }
             }
+            // Green mould on the arch ring's underside, where the river's damp never dries (book1 ch.6:129), and its glow on the black water.
+            var under = new Batch(); var rm = new System.Random(Zone.seed ^ Mathf.RoundToInt(t.position.z * 11)); var mould = DrainMould;
+            for (int k = 0; k < 14; k++)
+            {
+                float a = .15f + (float)rm.NextDouble() * .7f, z = -length / 2 + length * a, y = .15f + Mathf.Sin(a * Mathf.PI) * rise - .87f;
+                under.Box(mould, new Vector3(((float)rm.NextDouble() - .5f) * (width - .6f), y, z), new Vector3(.4f + (float)rm.NextDouble() * .9f, .03f, .4f + (float)rm.NextDouble() * 1.2f));
+            }
+            under.Flush(this, t, "Mould under the arch");
+            var glow = new GameObject("Mould light").AddComponent<Light>(); glow.transform.SetParent(t, false); glow.transform.localPosition = new Vector3(0, rise - 1.4f, 0);
+            glow.type = LightType.Point; glow.range = 7; glow.intensity = .8f; glow.color = MouldGlow;
+            NightLights.Add(new NightLight { light = glow, dayIntensity = 0, nightIntensity = 1 });
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
             {
                 var at = new Vector3(sx * (width / 2 + .22f), .7f, sz * (length / 2 + .25f));
@@ -300,6 +366,7 @@ namespace Crulanda.World
             foreach (int s in new[] { -1, 1 }) BoxPart(t, new Vector3(s * (radius + .2f), spring / 2, 0), new Vector3(.4f, spring, .9f), clay, null, 1);
             Part(PrimitiveType.Cube, t, new Vector3(0, .03f, -1.4f), new Vector3(span + .5f, .03f, 3), BlackWater);
             Solid(t, new Vector3(0, faceH / 2, .4f), new Vector3(faceW, faceH, 1.6f));
+            ArchMould(t, new Vector3(0, spring, 0), radius, .9f, new System.Random(Zone.seed ^ Mathf.RoundToInt(t.position.x * 13 + t.position.z * 7)));
             if (outfall)
             {
                 for (float x = -radius + .25f; x < radius; x += .35f) Part(PrimitiveType.Cube, t, new Vector3(x, (spring + radius) / 2, -.35f), new Vector3(.07f, spring + radius, .07f), SootIron);
@@ -307,6 +374,32 @@ namespace Crulanda.World
                 var slime = Tint(art.stone, new Color(.18f, .24f, .12f));
                 for (int s = -1; s <= 1; s += 2) Part(PrimitiveType.Cube, t, new Vector3(s * (radius + .9f), faceH * .35f, -.02f), new Vector3(.5f, faceH * .7f, .04f), slime);
             }
+        }
+        /// <summary>
+        /// Green mould glowing in an arch (CANON, book1 ch.6:129: "the faint, greenish glow of bioluminescent mold clinging to the archways";
+        /// ch.9:55): patches round the inside of an arch of <paramref name="radius"/> springing at <paramref name="spring"/> (local, front -z,
+        /// <paramref name="deep"/> through), down its jambs and on the wet floor at its mouth, and a dim green light in it that shows after
+        /// dark. The Drain Courts' mouths, the bridges' arches.
+        /// </summary>
+        void ArchMould(Transform t, Vector3 spring, float radius, float deep, System.Random r)
+        {
+            var parts = new Batch(); var mould = DrainMould;
+            for (int k = 0, n = 6 + (int)(r.NextDouble() * 6); k < n; k++)
+            {
+                float a = Mathf.PI * (float)r.NextDouble(), z = ((float)r.NextDouble() - .5f) * deep, sz = .25f + (float)r.NextDouble() * .5f;
+                var at = spring + new Vector3(Mathf.Cos(a) * (radius - .04f), Mathf.Sin(a) * (radius - .04f), z);
+                parts.Box(mould, at, new Vector3(sz, .03f, sz * (.6f + (float)r.NextDouble() * .8f)), Quaternion.Euler(0, 0, a * Mathf.Rad2Deg - 90));
+            }
+            foreach (int s in new[] { -1, 1 })
+                for (int k = 0; k < 2; k++)
+                {
+                    float h = .3f + (float)r.NextDouble() * spring.y * .8f;
+                    parts.Box(mould, spring + new Vector3(s * (radius - .03f), -spring.y + h / 2 + .05f, -deep / 2 + (float)r.NextDouble() * deep), new Vector3(.03f, h, .3f + (float)r.NextDouble() * .4f));
+                }
+            parts.Flush(this, t, "Mould");
+            var l = new GameObject("Mould light").AddComponent<Light>(); l.transform.SetParent(t, false); l.transform.localPosition = spring + new Vector3(0, radius * .3f, -.6f);
+            l.type = LightType.Point; l.range = 5; l.intensity = .9f; l.color = MouldGlow;
+            NightLights.Add(new NightLight { light = l, dayIntensity = 0, nightIntensity = 1.1f });
         }
         /// <summary>
         /// A timber quay along the bank (front -z over the water, <paramref name="length"/> along local x, <paramref name="depth"/> out):
@@ -373,6 +466,9 @@ namespace Crulanda.World
                 Part(PrimitiveType.Cube, t, new Vector3(x, (front + back) / 2 - .2f, 0), new Vector3(.18f, .18f, d), TarredTimber, Quaternion.Euler(Mathf.Atan2(back - front, d) * Mathf.Rad2Deg, 0, 0));
             }
             float slope = Mathf.Atan2(back - front, d) * Mathf.Rad2Deg, run = Mathf.Sqrt(d * d + (back - front) * (back - front));
+            var amber = new GameObject("Stall light").AddComponent<Light>(); amber.transform.SetParent(t, false); amber.transform.localPosition = new Vector3(0, front - .9f, 0);
+            amber.type = LightType.Point; amber.range = Mathf.Min(14, w * .6f); amber.intensity = 1.2f; amber.color = new Color(1, .62f, .26f);
+            NightLights.Add(new NightLight { light = amber, dayIntensity = .25f, nightIntensity = 1.5f });
             Part(PrimitiveType.Cube, t, new Vector3(0, (front + back) / 2 + .05f, 0), new Vector3(w + .6f, .12f, run + .8f), LowSlate, Quaternion.Euler(-slope, 0, 0));
             Color[] dyes = { new Color(.55f, .2f, .14f), new Color(.24f, .3f, .4f), new Color(.5f, .42f, .2f), new Color(.3f, .38f, .24f), new Color(.42f, .26f, .38f) };
             int bays = Mathf.Max(1, Mathf.RoundToInt(w / 3));
@@ -382,6 +478,8 @@ namespace Crulanda.World
                 var counter = BoxPart(t, new Vector3(x, .5f, d / 2 - 1.6f), new Vector3(2.5f, 1, .9f), Tint(art.timber, new Color(.3f, .22f, .15f)), null, 1);
                 counter.AddComponent<BoxCollider>(); counter.AddComponent<NavBlocker>();
                 Part(PrimitiveType.Cube, t, new Vector3(x, front - .3f, -d / 2 + .05f), new Vector3(2.8f, .7f, .05f), Tint(art.cloth, dyes[(b + variant) % dyes.Length] * .85f), Quaternion.Euler(-20, 0, 0));
+                // A stall-lantern of amber horn under every other bay's awning (GAME-ONLY: the market's own light, warmer than the lamps' sickly yellow).
+                if (b % 2 == 0) Part(PrimitiveType.Cube, t, new Vector3(x + .9f, front - .75f, -d / 2 + .5f), new Vector3(.2f, .28f, .2f), Glowing(new Color(1, .64f, .24f), 1.4f));
                 for (int k = 0; k < 3; k++)
                 {
                     float wx = x - .8f + k * .8f, pick = (float)r.NextDouble();
@@ -505,18 +603,20 @@ namespace Crulanda.World
             var lantern = at + new Vector3(0, -.32f, -.6f);
             MeshPart(PropMesh("Lantern roof", () => ZoneMeshes.Cone(.27f, .2f, 4)), t, lantern + new Vector3(0, .18f, 0), SootIron, Quaternion.Euler(0, 45, 0));
             if (variant == 2) { Part(PrimitiveType.Cube, t, lantern, new Vector3(.26f, .34f, .26f), BlackWater); return; }   // snuffed: no light
-            Part(PrimitiveType.Cube, t, lantern, new Vector3(.26f, .34f, .26f), Glowing(LampOrange, 1.6f));
+            Part(PrimitiveType.Cube, t, lantern, new Vector3(.26f, .34f, .26f), Glowing(LampSickly, 1.5f));
             var l = new GameObject("Lamp light").AddComponent<Light>(); l.transform.SetParent(t, false); l.transform.localPosition = lantern + Vector3.down * .1f;
-            l.type = LightType.Point; l.range = 10; l.intensity = 1.3f; l.color = LampOrange;
+            // "the sickly, yellow light of the street lamps" (book1 ch.3:45)
+            l.type = LightType.Point; l.range = 10; l.intensity = 1.3f; l.color = LampSickly;
             NightLights.Add(new NightLight { light = l, dayIntensity = variant > 0 ? .8f : 0, nightIntensity = 1.8f });
         }
-        /// <summary>A lamp of pale shard-light (a burned memory's glow, GAME-ONLY): cold blue-white, the one light in the Lowtowns that is not orange.</summary>
+        /// <summary>A lamp of shard-light (a burned memory's glow, GAME-ONLY): violet, as the geodes glow (CANON-EXPANDED, book1 ch.3:133), the
+        /// Shard-Burners' Yard's own colour.</summary>
         void ShardLamp(Transform t, Vector3 at)
         {
             Rod(t, at + new Vector3(0, .35f, .4f), at + new Vector3(0, .35f, 0), .05f, SootIron);
-            Part(PrimitiveType.Cube, t, at, new Vector3(.22f, .3f, .22f), Glowing(new Color(.7f, .85f, 1), 1.8f), Quaternion.Euler(0, 45, 0));
+            Part(PrimitiveType.Cube, t, at, new Vector3(.22f, .3f, .22f), Glowing(ShardViolet, 1.8f), Quaternion.Euler(0, 45, 0));
             var l = new GameObject("Shard light").AddComponent<Light>(); l.transform.SetParent(t, false); l.transform.localPosition = at;
-            l.type = LightType.Point; l.range = 8; l.intensity = 1; l.color = new Color(.7f, .85f, 1);
+            l.type = LightType.Point; l.range = 9; l.intensity = 1.1f; l.color = ShardViolet;
             NightLights.Add(new NightLight { light = l, dayIntensity = .5f, nightIntensity = 1.5f });
         }
         /// <summary>A square of wet setts (<paramref name="size"/>, x across, y along) laid over the ground: a court, a yard, a market's
@@ -601,12 +701,12 @@ namespace Crulanda.World
             for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, t, new Vector3(-1.4f + k * 1.4f, 1.35f, .9f), new Vector3(.8f, .9f, .03f), Tint(art.cloth, dyes[(k + 1) % 3] * 1.1f));
             Solid(t, new Vector3(0, .6f, 0), new Vector3(4.4f, 1.2f, 1.6f));
         }
-        /// <summary>The Shard-Burners' racks (GAME-ONLY): shelves of tarred timber along local x, rows of small shards in them glowing a cold
-        /// pale blue, each a burned memory bought back for light. Solid.</summary>
+        /// <summary>The Shard-Burners' racks (GAME-ONLY): shelves of tarred timber along local x, rows of small shards in them glowing violet (the
+        /// geodes' light, CANON-EXPANDED, book1 ch.3:133), each a burned memory bought back for light. Solid.</summary>
         void ShardRack(Transform t, float length, System.Random r)
         {
             foreach (float x in new[] { -length / 2, length / 2 }) Part(PrimitiveType.Cube, t, new Vector3(x, .9f, 0), new Vector3(.12f, 1.8f, .5f), TarredTimber);
-            var glow = Glowing(new Color(.7f, .85f, 1), 1.2f);
+            var glow = Glowing(ShardViolet, 1.3f);
             foreach (float y in new[] { .5f, 1.1f, 1.7f })
             {
                 Part(PrimitiveType.Cube, t, new Vector3(0, y, 0), new Vector3(length, .05f, .48f), TarredTimber);
@@ -633,6 +733,7 @@ namespace Crulanda.World
         /// </summary>
         void LowtownEdge()
         {
+            BuildLowtownLevels();   // the town built downhill: retaining walls and step-streets (ZoneBuilder.LowtownLevels)
             var paving = new GameObject("Paving").transform; paving.SetParent(statics, false);
             foreach (var road in Zone.roads)
             {
@@ -648,6 +749,7 @@ namespace Crulanda.World
                     float w = 11 + R() * 5, d = 8, inset = Half - 7; int v = (int)(R() * 8);
                     var at = side == 0 ? new Vector2(a, -inset) : side == 1 ? new Vector2(inset, a) : side == 2 ? new Vector2(a, inset) : new Vector2(-inset, a);
                     if (NearRoad(at, w / 2 + 3) || Water.NearWater(at, w / 2 + 2) || NearProp(at, w / 2 + 2) || InBuilding(at)) continue;
+                    if (OnRampOrStair(at, w / 2 + 2)) continue;   // never across a stair or a ramp up to the edge
                     var p = new ZoneProp { kind = "tenement", at = at, rotation = side == 0 ? 0 : side == 1 ? 90 : side == 2 ? 180 : 270, size = new Vector2(w, d), variant = v, style = "back" };
                     var t = Root(p, statics); t.name = "Tenement backs"; Tenement(t, p.size, v, "back", new System.Random(Zone.seed + 77 * ++n), false);
                 }
@@ -721,6 +823,7 @@ namespace Crulanda.World
                 if (Mathf.Abs(q.x) > edge || Mathf.Abs(q.y) > edge) return false;
                 if (!road && NearRoad(q, rad + .3f)) return false;
                 if (Water.NearWater(q, rad + 1.5f) || InBuilding(q)) return false;
+                if (LowSteep(q, rad + .4f)) return false;   // not on a retaining wall's slope or a stair (ZoneBuilder.LowtownLevels)
                 for (int k = 0; k < 4; k++) if (InBuilding(q + new Vector2(k < 2 ? (k * 2 - 1) * rad : 0, k >= 2 ? (k * 2 - 5) * rad : 0))) return false;
                 foreach (var c in clear) if ((q - c.at).sqrMagnitude < (c.r + rad) * (c.r + rad)) return false;
                 foreach (var s in small) if (SegDist(q, s.a, s.b) < s.r + rad) return false;
@@ -880,7 +983,7 @@ namespace Crulanda.World
             for (int tries = 0; tries < 900 && puddles < 70; tries++)
             {
                 var q = new Vector2((R() * 2 - 1) * edge, (R() * 2 - 1) * edge); float rad = .7f + R() * 1.1f;
-                if (InBuilding(q) || Water.NearWater(q, rad + 2)) continue;
+                if (InBuilding(q) || Water.NearWater(q, rad + 2) || LowSteep(q, rad + .3f)) continue;
                 bool ok = true; foreach (var c in clear) if ((q - c.at).sqrMagnitude < c.r * c.r) { ok = false; break; }
                 if (!ok) continue;
                 Puddle(q, rad); puddles++;
@@ -898,7 +1001,7 @@ namespace Crulanda.World
                     var outV = q * new Vector3(0, 0, sz); var o2 = new Vector2(outV.x, outV.z); var c3 = q * new Vector3((R() - .5f) * size.x * .5f, 0, sz * size.y / 2); var from = p.at + new Vector2(c3.x, c3.z);
                     float span = 0; for (float s = 3.5f; s <= 9.5f; s += .5f) if (InBuilding(from + o2 * s)) { span = s; break; }
                     if (span <= 0) continue;
-                    var mid = from + o2 * (span / 2); if (strung.Exists(m => (m - mid).sqrMagnitude < 14 * 14) || Water.NearWater(mid, 2)) continue;
+                    var mid = from + o2 * (span / 2); if (strung.Exists(m => (m - mid).sqrMagnitude < 14 * 14) || Water.NearWater(mid, 2) || LowSteep(mid, span / 2)) continue;
                     bool near = false; foreach (var c in clear) if ((mid - c.at).sqrMagnitude < c.r * c.r) { near = true; break; }
                     if (near) continue;
                     var t = new GameObject("Washing line").transform; t.SetParent(root, false);

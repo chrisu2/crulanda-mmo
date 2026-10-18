@@ -52,8 +52,8 @@ namespace Crulanda.Encounter
         public bool Rolled(string item)
         {
             var d = Items?.Get(item); if (PartySims.Count == 0 || d == null) return false;
-            if (d.quality >= 2) return true;
-            return d.kind == "gear" && PartySims.Exists(c => c != null && c.RollFor(d) == RollChoice.Need);
+            // Uncommon and better only (Chris, 2026-10-18: "dont roll on common gear. i just didnt see people win rolls"): commons are taken.
+            return d.quality >= 2;
         }
         /// <summary>The trades (for a made piece's weight: SimGear.Fits), or null.</summary>
         public ProfessionDatabase LootTrades { get { return ProfessionContent(); } }

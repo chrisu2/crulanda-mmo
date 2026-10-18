@@ -86,8 +86,9 @@ namespace Crulanda.Tests
         }
 
         /// <summary>Chris, 2026-10-18: "group is not rolling on loot..if upgrade they need to get it". A common chest piece the Warrior
-        /// needs (it wears a level-1 one) is rolled for, not taken: the Warrior rolls Need, the Mage Greed, and the Warrior wears it.</summary>
-        [UnityTest] public IEnumerator A_common_upgrade_for_a_sim_is_rolled_for_and_the_sim_needs_and_wears_it()
+        /// needs (it wears a level-1 one) is rolled for: the Warrior rolls Need, the Mage Greed, and the Warrior wears it. Commons are
+        /// not rolled for (Chris, 2026-10-18: "dont roll on common gear. i just didnt see people win rolls").</summary>
+        [UnityTest] public IEnumerator An_uncommon_upgrade_for_a_sim_is_needed_won_and_worn_and_commons_are_not_rolled()
         {
             var warrior = session.PartySims.First(c => c.sim.classId == "class.warrior"); var mage = session.PartySims.First(c => c.sim.classId == "class.mage");
             warrior.sim.level = mage.sim.level = 10;
@@ -95,11 +96,11 @@ namespace Crulanda.Tests
             for (int seed = 1; seed < 300 && old == null; seed++) { var d = session.Items.Get(ItemDatabase.GearId("chest", 1, 1, seed)); if (d != null && SimGear.Fits(warrior.sim, d, session.LootTrades)) old = d.id; }
             Assert.NotNull(old, "a level-1 common chest the Warrior wears");
             SimEconomy.Wear(warrior.sim, "chest", old);
-            for (int seed = 1; seed < 300 && better == null; seed++) { var d = session.Items.Get(ItemDatabase.GearId("chest", 10, 1, seed)); if (d != null && SimGear.IsUpgrade(warrior.sim, d, session.Items, session.LootTrades)) better = d.id; }
-            Assert.NotNull(better, "a level-10 common chest better than it");
-            var def = session.Items.Get(better); Assert.AreEqual(1, def.quality, "common");
+            for (int seed = 1; seed < 300 && better == null; seed++) { var d = session.Items.Get(ItemDatabase.GearId("chest", 10, 2, seed)); if (d != null && SimGear.IsUpgrade(warrior.sim, d, session.Items, session.LootTrades)) better = d.id; }
+            Assert.NotNull(better, "a level-10 uncommon chest better than it");
+            var def = session.Items.Get(better); Assert.AreEqual(2, def.quality, "uncommon"); Assert.IsFalse(session.Rolled(old), "a common piece is simply taken");
             Assert.AreEqual(RollChoice.Need, warrior.RollFor(def), "an upgrade: Need"); Assert.AreNotEqual(RollChoice.Need, mage.RollFor(def), "not the Mage's");
-            Assert.IsTrue(session.Rolled(better), "a common piece a sim needs is rolled for");
+            Assert.IsTrue(session.Rolled(better), "an uncommon piece is rolled for");
             var e = Body(0, better); yield return null;
             session.OpenLoot(e); session.TakeLoot(0);
             Assert.NotNull(session.Roll, "a roll began"); Assert.IsFalse(Inventory.Has(session.Progress, better), "not in your bags");

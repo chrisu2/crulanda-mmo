@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-18: Hallow's Creek's Hollow as Book 1 chapter 4 shows them (branch w2-hollow; WRITTEN, NOT RUN)
+- In the Cellars the Hollow come up cellar trapdoors behind you when a camp is pulled, shift close without a step, puff choking dust that
+  makes your blows miss, crawl on in halves when cut down, and stand up again beside a violet anchor-well until you break its crystal.
+
 ## 2026-10-17 20:47: published: the Oct 17 update (OPEN until Chris checks it in game)
 - The Crown at 121 fps at noon (was 64): far townsfolk not drawn, far ivy and garden detail hidden past 100 m; trainers face the room;
   the Hall of Arms dressed; inn doorways clear (the Gilded Lantern's porch, every inn's door queues on open floor).

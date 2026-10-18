@@ -90,6 +90,8 @@ namespace Crulanda.Encounter
             inFight = true; ScaleToGroup();   // stronger for a group (EncounterEnemy.GroupScale)
             if (Move != null) nextBlowAt = Time.time + Move.first;
             if (!alarmed) { alarmed = true; session.RaiseAlarm(this, Victim, !struck); }
+            // (Hallow's Creek) a Hollow camp pulled brings more up a cellar door behind (EncounterSession.HollowCellars; b1 ch.4:161)
+            session.CampPulled(this, Victim);
         }
         void LeaveGroup() { if (Group == null) return; Group.members.Remove(this); Group = null; }
         /// <summary>Tests and capture tools: stands it on the walkable ground at a point and makes that its home (idle mobs walk back to their home).</summary>
@@ -106,6 +108,8 @@ namespace Crulanda.Encounter
             CancelBlow(); Soothe();
             // a Lowtowns Weave-Eater's blink and lighthouse start afresh next fight (EncounterEnemy.WeaveEater)
             blinkReadyAt = 0;
+            // a Hallow's Creek Hollow's glide and dust start afresh next fight (EncounterEnemy.Hollow)
+            if (hollowKnown == 1) { dustReadyAt = -1; glideUntil = 0; CancelDust(); }
         }
         /// <summary>This mob alone gives up: whole again, off home, and deaf to the fight for a few seconds.</summary>
         void GoHome() { ResetFight(); evadeUntil = Time.time + EvadeSeconds; }

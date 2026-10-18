@@ -3431,6 +3431,12 @@
       "rise": 9
     },
     {
+      "name": "the anchor-well",
+      "cave": "The Cellars",
+      "along": 103.0,
+      "aside": 0.0
+    },
+    {
       "name": "the Cut-Store",
       "cave": "The Cellars",
       "along": 61.86,
@@ -4198,7 +4204,7 @@
       "look": "hollow",
       "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
       "radius": 2,
-      "count": 3,
+      "count": 2,
       "levelMin": 18,
       "levelMax": 18,
       "respawn": 7200,
@@ -4218,7 +4224,7 @@
       "look": "hollow",
       "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
       "radius": 2.5,
-      "count": 3,
+      "count": 2,
       "levelMin": 19,
       "levelMax": 19,
       "respawn": 7200,
@@ -4260,7 +4266,7 @@
       "look": "hollow",
       "canonStatus": "CANON creature (the Hollow, book1 ch.4); GAME-ONLY camp and its origin (the cut paused)",
       "radius": 2,
-      "count": 3,
+      "count": 2,
       "levelMin": 19,
       "levelMax": 19,
       "respawn": 7200,
@@ -4732,6 +4738,48 @@
           "y": -60
         }
       ]
+    },
+    {
+      "name": "Hollow up the cellar trapdoor",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature and behaviour (the Hollow pour out of every dark cellar door, book1 ch.4:161); GAME-ONLY camp, its trapdoor and its place (Docs/REWORK_LOWTOWNS_HALLOWS.md, Hallow's Creek pick 6)",
+      "radius": 1,
+      "count": 1,
+      "levelMin": 18,
+      "levelMax": 18,
+      "respawn": 7200,
+      "center": {
+        "x": -39,
+        "y": -46
+      },
+      "wing": "cellars",
+      "cave": "The Cellars",
+      "along": 33.5,
+      "aside": 0.0,
+      "after": "pull:Hollow in the long cellar"
+    },
+    {
+      "name": "Hollow up the root-cellar trapdoor",
+      "mob": "Hallow's Creek Hollow",
+      "tag": "creekhollow",
+      "look": "hollow",
+      "canonStatus": "CANON creature and behaviour (the Hollow pour out of every dark cellar door, book1 ch.4:161); GAME-ONLY camp, its trapdoor and its place (Docs/REWORK_LOWTOWNS_HALLOWS.md, Hallow's Creek pick 6)",
+      "radius": 1,
+      "count": 1,
+      "levelMin": 19,
+      "levelMax": 19,
+      "respawn": 7200,
+      "center": {
+        "x": -41,
+        "y": -27
+      },
+      "wing": "cellars",
+      "cave": "The Cellars",
+      "along": 52.7,
+      "aside": 0.0,
+      "after": "pull:First-Cut's kin"
     }
   ],
   "bubble": {

@@ -654,6 +654,8 @@ namespace Crulanda.Encounter
                 if (stowed != null) foreach (var g in stowed) if (g != null) g.gameObject.SetActive(stow);
             }
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
+            // gliding (a Hollow's shift, EncounterEnemy.Hollow): no stride
+            if (Gliding) delta = Vector3.zero;
             float dt = Time.deltaTime, target = dt > 0 ? delta.magnitude / dt : 0;
             speed = Mathf.Lerp(speed, target, dt * 8); if (Riding) speed = 0;   // carried in a saddle: seated however fast its mount goes
             phase += dt * (2.2f + speed * 1.6f);

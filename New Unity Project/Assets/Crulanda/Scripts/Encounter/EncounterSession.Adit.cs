@@ -209,6 +209,8 @@ namespace Crulanda.Encounter
                 case "warden": return TalkToWarden(i);
                 // (Hallow's Creek's people and places, EncounterSession.Hallows) Gable's pie in the Glitch; a paused townsperson or a place looked at.
                 case "pie": TakeThePie(); return true;
+                // (Hallow's Creek, pick 6) the anchor-well in the Cellars (EncounterSession.HollowCellars; b1 ch.4:191-245)
+                case HollowRules.WellKind: UseWell(i); return true;
                 case "paused": case "look": return LookAtHallows(i);
                 case "pen": case "bar": case "hiddendoor": return UseHandGate(i);   // gates worked by hand (the Adit rework's and Hallow's Creek's)
                 case "cage":   // the lock is the Company's: without Pib's quest, the goblin only shrinks back (with it, the quest counts it and it opens)

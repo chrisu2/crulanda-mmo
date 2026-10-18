@@ -79,6 +79,8 @@ namespace Crulanda.Encounter
         /// (and the Warden keeping its door), the town asleep and grey.</summary>
         void StartHallows()
         {
+            // (pick 6) the anchor-well in the Cellars, and nobody blinded by the dust (EncounterSession.HollowCellars)
+            StartWell();
             GroundSlow = 1; wardenFreed = false; Warden = null; haveSafe = false; pausedFolk.Clear(); wokenBy = null; swingTarget = 0; ZonePost.Swing = 0; ClearSnap();
             if (Zone == null) return;
             for (int k = 0; k < Zone.PausedSpots.Count; k++) { var s = Zone.PausedSpots[k]; pausedFolk.Add(PausedFigure(s.at, s.facing, s.pose, s.name, k)); }
@@ -128,6 +130,7 @@ namespace Crulanda.Encounter
         void TickHallows()
         {
             if (Zone == null || Player == null) return;
+            TickWell();
             // The colour swing (ZonePost.Swing) toward the town's state: two seconds to wake, a second and a half to drain.
             ZonePost.Swing = Mathf.MoveTowards(ZonePost.Swing, swingTarget, Time.deltaTime / (swingTarget > ZonePost.Swing ? 2f : 1.5f));
             for (int i = 0; i < snapMarks.Count; i++)

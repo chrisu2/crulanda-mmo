@@ -98,6 +98,8 @@ namespace Crulanda.Tests
                     if (!m.Success || !events.TryGetValue(m.Groups[1].Value, out var ev)) { bad.Add(c.name + ": " + a + " is no event's wave"); continue; }
                     int n = int.Parse(m.Groups[2].Value); if (n < 1 || n > ev.waves.Length || ev.waves[n - 1].camp != c.name) bad.Add(c.name + ": " + a + " is not that wave's camp");
                 }
+                // (pick 6) a cellar trapdoor's Hollow, up when a camp there from the start is pulled (HollowRules.PullKey; b1 ch.4:161)
+                else if (a.StartsWith(HollowRules.PullKey, StringComparison.Ordinal)) { var on = zone.camps.FirstOrDefault(x => x.name == a.Substring(HollowRules.PullKey.Length)); if (on == null || !string.IsNullOrEmpty(on.after)) bad.Add(c.name + ": " + a + " is no camp there from the start"); }
                 else bad.Add(c.name + ": after '" + a + "'");
                 if (c.step > 0) bad.Add(c.name + " is released later and has a step");
             }

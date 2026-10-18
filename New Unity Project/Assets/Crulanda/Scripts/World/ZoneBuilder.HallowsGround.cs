@@ -292,6 +292,9 @@ namespace Crulanda.World
         /// <summary>The drop beside a town deck's edge (the Granary's lofts, the wall-walk, the tower's flights, the Archive's galleries
         /// and stairs) over which it gets a rail: more than a metre down to the land or the deck under it.</summary>
         public const float RailDrop = 1f;
+        /// <summary>How far round a town deck's edge point another deck at its height leaves the edge unrailed (the gap where a stair
+        /// or a landing joins it).</summary>
+        public const float NearWay = 1f;
         void PrepareParapets()
         {
             Parapets.Clear();
@@ -367,6 +370,14 @@ namespace Crulanda.World
                         if (Mathf.Abs(y - p.y) < 1.2f && at != new Vector2(far.x, far.z)) return false;
                         if (y < p.y + .3f) floor = Mathf.Max(floor, y);
                     }
+                // A metre's gap either side of where a way runs on (2026-10-18: the wall-walk's east end railed across where its stair
+                // comes up beside it, and the stair's side rail met it: the wall-walk bows' camp was sealed off). Any other deck at
+                // the walk's height within a metre of the edge point, round about, leaves the edge there open.
+                foreach (var d in new[] { Vector3.right, Vector3.left, Vector3.forward, Vector3.back })
+                {
+                    var n = p + d * NearWay;
+                    if (o.Top(new Vector2(n.x, n.z), out var yn) && Mathf.Abs(yn - p.y) < .8f) return false;
+                }
             }
             if (p.y - floor <= RailDrop) return false;
             return !HallWallBeside(p, outward);
@@ -417,7 +428,9 @@ namespace Crulanda.World
             {
                 var run = r.b - r.a; float len = run.magnitude; if (len < .3f) continue;
                 if (r.timber && !r.bridge) { TimberRail(r, town, plank, post); continue; }
-                var rot = Quaternion.LookRotation(run / len, Vector3.up); var up = rot * Vector3.up; var inward = -r.outward;
+                // (A town parapet stands just outside its deck's edge, as the Lowtowns' rails do, so the walk keeps its whole width: a
+                // 2.2 m tower flight kept 0.7 m of navmesh with the wall on it. The bridge's stand on their slabs' edges, as before.)
+                var rot = Quaternion.LookRotation(run / len, Vector3.up); var up = rot * Vector3.up; var inward = r.bridge ? -r.outward : r.outward;
                 var flatRot = Quaternion.LookRotation(new Vector3(r.outward.x, 0, r.outward.z), Vector3.up);
                 var mid = (r.a + r.b) / 2;
                 Vector3 At(float y, float inset) { return mid + inward * inset + up * y; }
@@ -460,7 +473,8 @@ namespace Crulanda.World
         {
             const float Thick = .26f, High = 1.05f;
             var run = r.b - r.a; float len = run.magnitude;
-            var rot = Quaternion.LookRotation(run / len, Vector3.up); var up = rot * Vector3.up; var inward = -r.outward;
+            // ("inward" here is out from the deck: the rail stands just outside its edge, so the walk keeps its whole width.)
+            var rot = Quaternion.LookRotation(run / len, Vector3.up); var up = rot * Vector3.up; var inward = r.outward;
             var flatRot = Quaternion.LookRotation(new Vector3(r.outward.x, 0, r.outward.z), Vector3.up);
             var mid = (r.a + r.b) / 2;
             var go = new GameObject("Rail: " + r.deck).transform; go.SetParent(parent, false);

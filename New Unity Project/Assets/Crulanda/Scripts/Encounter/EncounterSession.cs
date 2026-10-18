@@ -972,6 +972,8 @@ namespace Crulanda.Encounter
             if (UseAditThing(i)) return;   // the Sealed Adit's gates, powder and spirit stone (EncounterSession.Adit.cs)
             // the Rusty Spoon's Triad table (EncounterSession.Spoon)
             if (UseSpoonThing(i)) return;
+            // Dead Man's Drop's iron rungs (EncounterSession.NightMarket)
+            if (UseDropThing(i)) return;
             if (i.node != null && Professions != null) { TryGather(i); return; }   // a node (a seam, a windfall, a herb) is worked with its trade
             if (Quests == null) { Message("Nothing here you need."); return; }
             if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
@@ -1951,6 +1953,8 @@ namespace Crulanda.Encounter
             if (Player == null) return;
             TickDormant();
             TickNight();   // the Lowtowns' night camps up out of the drains and back down (EncounterSession.Lowtowns)
+            // the Lowtowns' Night Market keepers out after dark, and Dead Man's Drop's fall and net (EncounterSession.NightMarket)
+            TickNightMarket(); TickDrop();
             TickRiver();   // the Chemical River: its poison, and the tracking it hides you from (EncounterSession.River)
             AdvanceToast();
             // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.

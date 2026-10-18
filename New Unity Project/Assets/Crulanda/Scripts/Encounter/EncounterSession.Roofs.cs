@@ -22,6 +22,7 @@ namespace Crulanda.Encounter
         public const string SpoutLine = "You get your fingers round the rusted spout and climb, the brackets creaking, rust flaking into your eyes, and roll over the edge onto the lead of the gutter.";
         public const string EscapeLine = "You go up the fire escape two iron steps at a time, landing after landing, and out onto the lead walk along the gutter.";
         public const string LaundryLine = "You step off the gutter. Sheets and shirts slap at you, a line snaps, another catches you and lets you go, and you land on the setts in a tangle of somebody's washing. Nothing broken.";
+        public const string EscapeDownLine = "You go down the fire escape, iron ringing under your boots, landing after landing, and step off into the lane.";
         public const string TowerLine = "From the top of the water tower the Lowtowns spread out under the smog: a sea of slate roofs and chimneys, neon moss on the slopes, laundry between the blocks, and the High City's lights far above. The whole thing sways under you. You climb back down.";
 
         /// <summary>Every frame in the Lowtowns: each roof thing offered only at its own height.</summary>
@@ -42,6 +43,13 @@ namespace Crulanda.Encounter
                 if (InCombat) { Message(FightingLine); return true; }
                 bool spout = leg.name == ZoneBuilder.SpoutName;
                 StartWork(spout ? "Climbing the rain-spout" : "Climbing the fire escape", RoofClimbSeconds, () => { MoveParty(leg.b, leg.b - leg.a); Message(spout ? SpoutLine : EscapeLine); Save(false); });
+                return true;
+            }
+            // (Pick 9, the Sweep) Down the fire escape from its head on the walk, the party (and a child you lead) with you.
+            if (leg.kind == "down")
+            {
+                if (InCombat) { Message(FightingLine); return true; }
+                StartWork("Climbing down the fire escape", RoofClimbSeconds, () => { MoveParty(leg.b, leg.b - leg.a); Message(EscapeDownLine); Save(false); });
                 return true;
             }
             if (leg.kind == "drop")
@@ -66,8 +74,11 @@ namespace Crulanda.Encounter
         /// cross (a gutter walk is narrow: each finds the nearest walkable point).</summary>
         void MoveParty(Vector3 at, Vector3 way)
         {
+            // (Pick 9, the Sweep) A child you lead, near you, comes too (EncounterSession.Sweep).
+            bool child = SweepChildWithYou();
             Player.GetComponent<AdventurerMotor>().Teleport(at + Vector3.up * .1f);
             way.y = 0; var side = way.sqrMagnitude > 1e-4f ? Vector3.Cross(Vector3.up, way.normalized) : Vector3.right;
+            if (child) SweepChildTo(at, way.sqrMagnitude > 1e-4f ? way.normalized : Vector3.forward);
             void Put(NavMeshAgent agent, float off)
             {
                 if (agent == null || !agent.isOnNavMesh) return;

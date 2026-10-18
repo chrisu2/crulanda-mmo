@@ -25,7 +25,9 @@ namespace Crulanda.Encounter
                 if (!gzChecked)
                 {
                     gzChecked = true;
-                    gzModel = Resources.Load<GameObject>(GanzSeKit.ModelPath); gzMat = Resources.Load<Material>(GanzSeKit.MaterialPath);
+                    gzModel = Resources.Load<GameObject>(GanzSeKit.ModelPath); var asset = Resources.Load<Material>(GanzSeKit.MaterialPath);
+                    // Matte like the Quaternius kit's skin and cloth (.25): the pack's .5 gloss shone its flat faces pale in the noon light.
+                    if (asset != null) { gzMat = new Material(asset) { name = "GanzSe palette" }; gzMat.SetFloat("_Glossiness", GanzSeKit.Gloss); }
                     gzParts = new Dictionary<string, SkinnedMeshRenderer>();
                     if (gzModel != null) foreach (var r in gzModel.GetComponentsInChildren<SkinnedMeshRenderer>(true)) if (!gzParts.ContainsKey(r.name)) gzParts[r.name] = r;
                 }
@@ -73,28 +75,35 @@ namespace Crulanda.Encounter
             f.Model.localPosition = new Vector3(0, -1, 0); f.Model.localRotation = Quaternion.identity; f.Model.localScale = Vector3.one * (s.scale > 0 ? s.scale : 1);
             // The skeleton, copied (names and rest transforms), so the avatar's paths ("Base Character Root/spine_01/...") are the file's.
             Copy(gzModel.transform.Find(GanzSeKit.SkeletonRoot), f.Model);
-            f.Animator = go.AddComponent<Animator>();
-            var a = gzModel.GetComponent<Animator>(); if (a != null && a.avatar != null) f.Animator.avatar = a.avatar;
-            f.Animator.applyRootMotion = false; f.Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms; f.Animator.runtimeAnimatorController = null;
             f.bones = new Dictionary<string, Transform>();
             foreach (var t in go.GetComponentsInChildren<Transform>(true)) if (!f.bones.ContainsKey(t.name)) f.bones[t.name] = t;
-            var stone = new Color(.5f, .5f, .52f);
-            // The body and the face: skin tinted (the palette's skin is about the old kit's fairest, as SpecFor's tones are measured from).
-            f.GzBody = f.AddPiece(GanzSeKit.Body, s.skin);   // not the Torso: nothing dyes the pack's body (Cover); its pieces are the cover
+            // The body and the face. The skin: the figure's tone (SpecFor's, measured from the old palette's fairest) times what takes
+            // the pack's pale skin swatch to the Quaternius kit's skin, so both kits show a person in the same tone (wardrobe-ganzse-1:
+            // the swatch untinted read near white).
+            var skin = GanzSeKit.Skin(s.skin);
+            f.GzBody = f.AddPiece(GanzSeKit.Body, skin);   // not the Torso: nothing dyes the pack's body (Cover); its pieces are the cover
             int seed = Mathf.Abs(s.seed), hairColour = GanzSeKit.HairColour(s.hairColour);
-            f.AddPiece(GanzSeKit.Nose(1 + seed % GanzSeKit.Noses), s.skin);
-            f.AddPiece(GanzSeKit.EarsOf(1 + seed / 5 % GanzSeKit.Ears), s.skin);
+            f.AddPiece(GanzSeKit.Nose(1 + seed % GanzSeKit.Noses), skin);
+            f.AddPiece(GanzSeKit.EarsOf(1 + seed / 5 % GanzSeKit.Ears), skin);
             f.AddPiece(GanzSeKit.Eyes(1 + seed / 3 % GanzSeKit.FaceTypes, GanzSeKit.EyeColour(seed)), Color.white);
             var brows = f.AddPiece(GanzSeKit.Brows(1 + seed / 2 % GanzSeKit.FaceTypes, hairColour), Color.white); if (brows != null) f.Hair.Add(brows);
             int style = GanzSeKit.HairStyle(s.hair);
             if (style > 0) { var h = f.AddPiece(GanzSeKit.Hair(style, hairColour), Color.white); if (h != null) f.Hair.Add(h); }
             if (s.beard && !s.female) { var b = f.AddPiece(GanzSeKit.Beard(GanzSeKit.BeardStyle(seed), hairColour), Color.white); if (b != null) f.Hair.Add(b); }
             // The head alone, never drawn: what hats and hoods are measured against (ActorVisual.Outline), as the old kit's cut head is.
-            var head = f.AddPiece(GanzSeKit.Body, s.skin);
+            var head = f.AddPiece(GanzSeKit.Body, skin);
             if (head != null) { head.name = "Head (measure)"; head.sharedMesh = HeadOnly(head); head.forceRenderingOff = true; head.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; f.Head = head; }
             // Their own clothes: what shows in a slot no gear covers.
             if (s.outfit != null) foreach (var w in s.outfit) f.gzBase[(int)w.slot] = w.Piece;
             for (int i = 0; i < GanzSeKit.SlotCount; i++) f.ShowSlot((GanzSeKit.Slot)i);
+            // The Animator last, once the renderers are under it (wardrobe-ganzse-1, every figure in a T-pose while the Quaternius ones
+            // idled): an Animator culls by the renderers it found when it was bound, and added to a bare skeleton it found none, so with
+            // CullUpdateTransforms it counted itself never seen and never wrote a pose. The Quaternius figure's Animator comes with
+            // its file, renderers and all. Rebind after the avatar, so the bindings and the renderer list are this hierarchy's.
+            f.Animator = go.AddComponent<Animator>();
+            var a = gzModel.GetComponent<Animator>(); if (a != null && a.avatar != null) f.Animator.avatar = a.avatar;
+            f.Animator.applyRootMotion = false; f.Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms; f.Animator.runtimeAnimatorController = null;
+            f.Animator.Rebind();
             f.FindBonesGanzSe();
             f.Cloud = null;   // nothing is fitted to a cloud: the pack's pieces fit; what stays drawn hangs rigid on the frames
             return f;

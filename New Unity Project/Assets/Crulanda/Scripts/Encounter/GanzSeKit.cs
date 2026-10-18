@@ -191,20 +191,20 @@ namespace Crulanda.Encounter
         static readonly Slot[] LegsFeet = { Slot.Legs, Slot.Feet }, Clothed = { Slot.Chest, Slot.Belt, Slot.Legs, Slot.Feet }, Armoured = { Slot.Head, Slot.Chest, Slot.Arm, Slot.Belt, Slot.Legs, Slot.Feet };
         /// <summary>
         /// What a person wears where the slot is empty (their own clothes, under any gear), by look and, for villagers, by trade.
-        /// The player's classes start in breeches and boots of their weight (a bare chest, as the classic MMOs start); the world's
-        /// people are clothed. The pack has no plain shirt: the least warlike pieces (the jerkin, the hide top, the caster's coat).
+        /// Everyone is clothed (a wardrobe line-up of bare chests and shorts, wardrobe-ganzse-1): the player's classes in a top, breeches
+        /// and boots of their colours, the world's people in their own. The pack has no plain shirt: the least warlike pieces (the jerkin, the hide top, the caster's coat).
         /// </summary>
         public static Wear[] Outfit(string look, string role, int variant)
         {
             int v = Mathf.Abs(variant);
             switch (look)
             {
-                case "Warrior": return Set(1, 1, LegsFeet);
-                case "Paladin": return Set(1, 3, LegsFeet);
-                case "Ranger": return Set(5, 3, LegsFeet);
-                case "Mage": return Set(4, 1, LegsFeet);
-                case "Druid": return Set(3, 2, LegsFeet);
-                case "Healer": return Set(4, 3, LegsFeet);
+                case "Warrior": return Concat(Set(5, 1, Slot.Chest), Set(1, 1, LegsFeet));    // the jerkin in his blue, mail breeches
+                case "Paladin": return Concat(Set(5, 2, Slot.Chest), Set(1, 3, LegsFeet));
+                case "Ranger": return Set(5, 3, Slot.Chest, Slot.Legs, Slot.Feet);
+                case "Mage": return Set(4, 1, Slot.Chest, Slot.Legs, Slot.Feet);
+                case "Druid": return Set(3, 2, Slot.Chest, Slot.Legs, Slot.Feet);
+                case "Healer": return Set(4, 3, Slot.Chest, Slot.Legs, Slot.Feet);
                 case "Collector": case "Warden": return Set(1, 1, Clothed);
                 case "Sentry": return Set(1, 1, Armoured);
                 case "Outrider": return Set(5, 1, Clothed);
@@ -245,6 +245,12 @@ namespace Crulanda.Encounter
             "lumberjack", "herbalist", "elder", "stranger", "pilgrim", "councilor", "scholar", "child", "drinker" };
 
         // ------------------------------------------------------------------------------------------------- the face
+        /// <summary>The pack's skin swatch, and the Quaternius kit's skin (the mean of T_Superhero_Male_Light_BaseColor's skin): the
+        /// pack's skin is tinted by their ratio times the figure's tone, so a figure is the same tone on either kit.</summary>
+        public static readonly Color SkinSwatch = new Color(.92f, .73f, .55f), KitSkin = new Color(.655f, .454f, .316f);
+        public static Color Skin(Color tone) { return new Color(tone.r * KitSkin.r / SkinSwatch.r, tone.g * KitSkin.g / SkinSwatch.g, tone.b * KitSkin.b / SkinSwatch.b); }
+        /// <summary>The pack's material made matte (the Quaternius kit's gloss).</summary>
+        public const float Gloss = .25f;
         /// <summary>The pack's five hair colours (black, dark brown, brown, blond, grey), as the swatches read.</summary>
         static readonly Color[] HairColours = { new Color(.03f, .03f, .03f), new Color(.14f, .08f, .04f), new Color(.37f, .23f, .12f), new Color(.72f, .49f, .1f), new Color(.57f, .57f, .57f) };
         /// <summary>ActorVisual lifts its hair colours by this for the Quaternius kit's grey hair (SpecFor); taken off again here.</summary>
@@ -267,7 +273,9 @@ namespace Crulanda.Encounter
         public static int HairStyle(int style) { switch (style) { case 0: return 1; case 1: return 2; case 2: return 5; case 3: return 4; default: return 0; } }
         /// <summary>A beard's style (1 moustache, 2 thin moustache, 3 full beard, 4 short moustache, 5 goatee) by the variant: mostly the full beard.</summary>
         public static int BeardStyle(int variant) { int v = Mathf.Abs(variant); return new[] { 3, 3, 1, 5, 3, 2 }[v % 6]; }
-        /// <summary>Eyes: the shape by the variant, the colour (1 black, 2 dark brown, 3 brown, 4 blue, 5 green) mostly brown.</summary>
-        public static int EyeColour(int variant) { int v = Mathf.Abs(variant * 7 + 3); return new[] { 2, 3, 2, 4, 3, 5, 1 }[v % 7]; }
+        /// <summary>Eyes: the colour by the variant, dark only (1 black, 2 dark brown, 3 brown). The pack's blue and green swatches are
+        /// bright enough to read as glowing on a low-poly face at any distance (wardrobe-ganzse-1, where every man had them: the old
+        /// formula took every variant to the blue).</summary>
+        public static int EyeColour(int variant) { int v = Mathf.Abs(variant); return new[] { 2, 3, 2, 1, 3 }[v % 5]; }
     }
 }

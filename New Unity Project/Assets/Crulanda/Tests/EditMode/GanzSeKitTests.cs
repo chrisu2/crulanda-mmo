@@ -97,6 +97,11 @@ namespace Crulanda.Tests
             Assert.AreEqual(4, GanzSeKit.HairColour(new Color(.62f, .48f, .26f) * GanzSeKit.HairLift));
             Assert.AreEqual(5, GanzSeKit.HairColour(new Color(.7f, .68f, .64f) * GanzSeKit.HairLift));
             Assert.AreEqual(0, GanzSeKit.HairStyle(4), "bald");
+            for (int v = -20; v <= 40; v++) Assert.That(GanzSeKit.EyeColour(v), Is.InRange(1, 3), "dark eyes for variant " + v);
+            Assert.Greater(Enumerable.Range(0, 10).Select(GanzSeKit.EyeColour).Distinct().Count(), 1, "eyes vary");
+            foreach (var look in new[] { "Warrior", "Paladin", "Ranger", "Mage", "Druid", "Healer" })
+                Assert.IsTrue(GanzSeKit.Outfit(look, null, 0).Any(w => w.slot == GanzSeKit.Slot.Chest), look + " starts in a top, not bare-chested.");
+            var tone = GanzSeKit.Skin(Color.white); Assert.That(GanzSeKit.SkinSwatch.r * tone.r, Is.EqualTo(GanzSeKit.KitSkin.r).Within(.001f), "the swatch tinted to the Quaternius skin");
         }
 
         [Test] public void The_file_holds_exactly_the_tables_pieces_on_a_humanoid()
@@ -153,7 +158,10 @@ namespace Crulanda.Tests
             foreach (var f in new[] { "Arm L", "Arm R/Forearm R/Hand R", "Leg L/Shin L/Foot L", "Head frame", "Chest frame", "Hips frame" }) Assert.NotNull(v.transform.Find("Body/" + f), "the frame " + f);
             Assert.AreEqual("spine_01", m.Hips.name); Assert.AreEqual("head", m.HeadBone.name); Assert.AreEqual("forearm_r", m.LowerArmR.name);
             Assert.AreEqual(GanzSeKit.Armour(GanzSeKit.Slot.Legs, 1, 1), m.Worn(GanzSeKit.Slot.Legs), "The Warrior's own breeches.");
-            Assert.IsNull(m.Worn(GanzSeKit.Slot.Chest), "A bare chest with nothing on it.");
+            Assert.AreEqual(GanzSeKit.Armour(GanzSeKit.Slot.Chest, 5, 1), m.Worn(GanzSeKit.Slot.Chest), "His own top: nobody in underwear (wardrobe-ganzse-1).");
+            var skin = m.GzBody.sharedMaterials[0].color; Assert.Less(skin.b, .75f, "The skin tinted to his tone, not the pale swatch (" + skin + ")");
+            Assert.AreEqual(GanzSeKit.Gloss, m.GzBody.sharedMaterials[0].GetFloat("_Glossiness"), .001f, "Matte.");
+            foreach (var r in m.Renderers) if (r.name.StartsWith("Eyes Type")) StringAssert.DoesNotMatch("Color [45]$", r.name, "Dark eyes, not the bright blue or green.");
             Assert.IsTrue(m.Head != null && m.Head.forceRenderingOff, "The head cut for measuring, never drawn.");
             foreach (var r in m.Renderers) Assert.IsTrue(r.sharedMaterials.Length > 0 && r.sharedMaterials.All(x => x != null), r.name + " has its material.");
             // Gear: the pack's pieces, nothing drawn over them.
@@ -170,7 +178,7 @@ namespace Crulanda.Tests
             Assert.IsNotNull(m.Worn(GanzSeKit.Slot.Belt), "The chest piece's belt.");
             // Off again: his own clothes.
             v.ApplyGearIds(new string[0], db, looks);
-            Assert.IsNull(m.Worn(GanzSeKit.Slot.Chest)); Assert.IsNull(m.Worn(GanzSeKit.Slot.Belt));
+            Assert.AreEqual(GanzSeKit.Armour(GanzSeKit.Slot.Chest, 5, 1), m.Worn(GanzSeKit.Slot.Chest), "His own top back."); Assert.IsNull(m.Worn(GanzSeKit.Slot.Belt));
             Assert.AreEqual(GanzSeKit.Armour(GanzSeKit.Slot.Legs, 1, 1), m.Worn(GanzSeKit.Slot.Legs), "His breeches back.");
             Assert.AreEqual(1, m.Renderers.Count(r => r != null && r.name == m.Worn(GanzSeKit.Slot.Legs)), "One piece a slot, the old one gone.");
             // A hood stays drawn (the pack has none) and hides his hair.

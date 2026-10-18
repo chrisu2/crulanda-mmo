@@ -834,3 +834,6 @@ un-captures.
   polished. this guy not even sitting on a chair." (OPEN): the man in purple sits in the air, his stool beside him, not under him.
 - 238 (2026-10-18 ~20:00, on the test capture adit-85-hollow-camp-the-scriptorium: the Adit's warm orange-lit drift, candles on
   the walls, a bookcase down the passage) "i like this look." Keep that warm cave look.
+- 239 (2026-10-18 ~20:10, on the wardrobe line-up 04-sets-front, today's figures and the GanzSe ones) "helms and gauntlet still
+  tooo round" then "in the 04-sets-front" (OPEN): the drawn helms are domes and the drawn gauntlets balls; on the GanzSe bodies the
+  drawn caps and bands sit on top. Phase 8.5: helms and gauntlets from the pack's angular pieces, no round drawn ones.

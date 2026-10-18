@@ -167,6 +167,13 @@
       "subject": "herb.last_light",
       "line": "Where the fire chapel's heat seeps through the stair's wall, the ash's pale flower grows red and glows like coals.",
       "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.adit.creatures.ember-bound",
+      "chapter": "creatures",
+      "subject": "Ember-bound",
+      "line": "Red, horned things the Order keeps chained by the fire, a spiked collar on each and the chain's end in a keeper's fist. Loosed, they swing the chain before the mace.",
+      "canonStatus": "GAME-ONLY creature; CANON-EXPANDED: the Cult of Ash (book1 ch.10) and its glowing chains and collars (book1 ch.12:19-25)"
     }
   ]
 }

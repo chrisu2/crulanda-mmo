@@ -28,6 +28,8 @@ namespace Crulanda.Encounter
                 case ActorLook.RockEater: return "Bear";    // the Rock-Eater: the bear's body, grown and turned to stone (BuildModelBeast)
                 case ActorLook.Spider: return "Spider";     // ChillLands' crypt spider (Ashen Marches)
                 case ActorLook.Skeleton: return "Skeleton"; // ChillLands' ossuary knight: the risen dead
+                case ActorLook.Imp: return "Imp";           // the Bestiary kit (play note 233): on the people's clips
+                case ActorLook.Puglin: return "Puglin";
                 default: return null;
             }
         }
@@ -80,6 +82,16 @@ namespace Crulanda.Encounter
             // leathers, the rest (phong2, lambert11) its skin, eyes and teeth.
             return new ModelBeast.Coat().Map("Armas", Resources.Load<Texture2D>("CreatureSkins/OrcShaman/Weapon")).Map("CueroMAT2", Resources.Load<Texture2D>("CreatureSkins/OrcShaman/Leather02"))
                 .Map("Cuero", Resources.Load<Texture2D>("CreatureSkins/OrcShaman/Leather01")).Map("", skin);
+        }
+        /// <summary>The colourings of the Bestiary kit (Resources/Characters/Bestiary/Textures): the kit's three skins by the variant (the
+        /// Imp red, green, blue-violet; the Puglin green, red, blue), its normal map, and its eyes lit from within by the kit's emissive
+        /// mask (warm on the red and green, cold on the blue). Null when the kit is not in the build.</summary>
+        public static ModelBeast.Coat BestiaryCoat(string kind, int variant)
+        {
+            int n = Mathf.Abs(variant) % 3 + 1; string dir = ModelBeast.BestiaryPath + "Textures/T_" + kind + "_";
+            var skin = Resources.Load<Texture2D>(dir + "BaseColor_" + n); if (skin == null) return null;
+            var glow = n == 3 ? new Color(.7f, .8f, 1) * 1.8f : new Color(1, .9f, .7f) * 1.8f;   // the third skin is the blue one of both
+            return new ModelBeast.Coat().Skin(skin, Resources.Load<Texture2D>(dir + "Normal"), Color.white).Lit(Resources.Load<Texture2D>(dir + "Emissive"), glow);
         }
         /// <summary>Builds a wolf, ash hound, stag or doe as a model (when models are on and the animal is in the build); false
         /// leaves it to the old body.</summary>
@@ -187,6 +199,14 @@ namespace Crulanda.Encounter
                 else if (kind == "FantasySkeleton") coat = new ModelBeast.Coat().Map("", Resources.Load<Texture2D>("CreatureSkins/FantasySkeleton/FantasySkeleton_Albedo"));   // its own bone, stained no further: the map is already weathered   // it falls into a heap of bones as they do (Crumbles; Chris: "undead can just collapse into a pile of bones on death")
                 else if (pal != null) coat = new ModelBeast.Coat().Skin(pal, null, new Color(.84f, .86f, .76f));
                 height = elite ? 1.95f : 1.82f; walk = 1.2f; run = 3.6f; LieDepth = 0;
+            }
+            else if (look == ActorLook.Imp || look == ActorLook.Puglin)
+            {
+                coat = BestiaryCoat(kind, variant); if (coat == null) return false;
+                // The Imp a little under a man's height, the Puglin a small thing at a man's hip; an elite a size bigger. Their walk and run
+                // paced to their legs: the people's clips are made for a man's stride (a walk at 1.4 m/s, a jog at 3.6, a sprint at 6.5).
+                float man = look == ActorLook.Imp ? 1.7f : 1f; height = man * (elite ? 1.15f : 1) + Mathf.Abs(variant % 5) * .015f;
+                float leg = height / 1.8f; walk = 1.4f * leg; run = (look == ActorLook.Puglin ? 6.5f : 3.6f) * leg; LieDepth = 0;
             }
             else { bool doe = variant % 2 == 1; height = (doe ? 1.6f : 1.9f) * (elite ? 1.1f : 1); walk = 1.4f; run = 4.5f; LieDepth = .45f; }
             int seed = FigureSeed(); float shade = .94f + Mathf.Abs(seed % 13) * .01f; beastPhase = (seed & 255) * .37f;

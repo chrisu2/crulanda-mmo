@@ -725,7 +725,16 @@ def make_camps():
     # (released camps draw nothing from the camps' stream, so no other camp's draws move).
     seeps = [camp('B', ('al', a - 25, 0), mob('The grey seep (%s)' % nth, 'Greyed crawler', 'spider', 2, 11, 11, 'crawler', 2.5, canon=GB, flee=.25), 'breach',
                   after='event:greyline%d' % (n + 1), gate='none') for n, (a, nth) in enumerate(zip(GREY_LINES, ('first', 'second', 'third')))]
-    camps = head + rest + patrols + seeps + rare
+    # The Ember-bound (Chris, 2026-10-18, picking from Docs/BESTIARY_MONSTERS.md: "Ember-bound (Recommended)"; GAME-ONLY creature on the CANON
+    # cult and its glowing tethers, book1 ch.10 and ch.12:19-25): the Ember Vent's chained things in place of the plan's stand-in "ember
+    # elementals" (DUNGEON_DESIGN.md section 5), pulled one or two at a time; each pair chained at its keepers' station, the Quaternius Imp
+    # in its red skin. After the seeps and before the rare, so only the rare moves on (no other camp's draws move).
+    EB = 'GAME-ONLY creature (the Ember-bound); CANON cult and tethers (the Cult of Ash, book1 ch.10; glowing chains, book1 ch.12:19)'
+    embers = [
+        camp('V1', (146, 62), mob('Chained in the garden', 'Ember-bound', 'imp', 2, 11, 11, 'emberbound', 1.5, canon=EB, social='solitary'), 'vent', 2, aside=-12, gate=LDOOR),
+        camp('VC', (146, 152), mob('Chained at the lake of fire', 'Ember-bound', 'imp', 2, 11, 11, 'emberbound', 1.5, canon=EB, social='solitary'), 'chapel', 2, aside=-12, gate=LDOOR),
+    ]
+    camps = head + rest + patrols + seeps + embers + rare
     pinned = {5: LUSK, 13: SORREL, 16: DANNER, 21: NIX, 25: 'The Vent-Hound', 27: YSOLT, 31: FOREMAN}
     for i, m in pinned.items(): assert camps[i]['mob'] == m, (i, camps[i]['mob'])
     assert camps[-1]['mob'] == 'The Quiet Miner'

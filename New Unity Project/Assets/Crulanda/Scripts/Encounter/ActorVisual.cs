@@ -2,7 +2,7 @@
 
 namespace Crulanda.Encounter
 {
-    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater, SaltMender, Eel, Croc }
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater, SaltMender, Eel, Croc, Imp, Puglin }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
     public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump, Mine }
 
@@ -424,6 +424,7 @@ namespace Crulanda.Encounter
             if (IsBeast(look)) { BuildBeast(look); lastPosition = transform.position; return; }
             if (orc && OrcKind(look) != null && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // a whole orc (ActorVisual.Beasts.cs)
             if (look == ActorLook.Skeleton) { if (BuildModelBeast(look)) { lastPosition = transform.position; return; } look = ActorLook.Hollow; }   // the risen dead (ActorVisual.Beasts.cs); a Hollow Man without the model
+            if ((look == ActorLook.Imp || look == ActorLook.Puglin) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // the Bestiary kit's monsters (ActorVisual.Beasts.cs); without it, a plain figure
             Material skin = Mat(new Color(.76f, .6f, .48f));
             Color clothC, accentC, legC;
             switch (look)

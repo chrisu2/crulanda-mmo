@@ -1658,6 +1658,8 @@ namespace Crulanda.Encounter
                 case "croc": return ActorLook.Croc;   // and its mutated crocodile
                 case "bear": return ActorLook.Bear;
                 case "skeleton": return ActorLook.Skeleton;
+                case "imp": return ActorLook.Imp;         // the Bestiary kit (play note 233; Docs/BESTIARY_MONSTERS.md: what they are is Chris's pick)
+                case "puglin": return ActorLook.Puglin;
                 default: return veteran ? ActorLook.Warden : ActorLook.Collector;
             }
         }
@@ -1752,7 +1754,8 @@ namespace Crulanda.Encounter
                     // Only the first mob of an elite camp is the elite (its pack stays normal).
                     bool elite = camp.elite && n == 0;
                     string id = "mob." + tag + "." + zoneShort + "." + c + "." + n;
-                    var a = SpawnActor(elite ? camp.mob + " (elite)" : camp.mob, content.enemy, point, Color.grey, id, look, level);
+                    // A Puglin pack mixes the kit's three skins, green, red and blue, one after another (the Bank-snouts, Docs/BESTIARY_MONSTERS.md).
+                    var a = SpawnActor(elite ? camp.mob + " (elite)" : camp.mob, content.enemy, point, Color.grey, id, look, level, look == ActorLook.Puglin ? n : -1);
                     AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.Bear ? 4f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
                     a.GetComponent<NavMeshAgent>().areaMask &= ~(1 << EncounterNavigation.DropArea);   // (the Adit rework) a camp's mobs never take a one-way drop: they would be gone from their camp for good
                     var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;

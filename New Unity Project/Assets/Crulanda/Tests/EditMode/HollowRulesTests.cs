@@ -37,7 +37,7 @@ namespace Crulanda.Tests
             Assert.IsFalse(HollowRules.Glides(8, false, true, 10, 9), "not while drawing up dust or casting");
             Assert.IsFalse(HollowRules.Glides(8, false, false, 10, 11), "not before its glide is ready");
             Assert.AreEqual(HollowRules.GlideReach, HollowRules.GlideStep(30), 1e-4f, "never more than its reach");
-            Assert.AreEqual(8 - HollowRules.GlideStop, HollowRules.GlideStep(8), 1e-4f, "stopping short of its foe, not past it");
+            Assert.AreEqual(7 - HollowRules.GlideStop, HollowRules.GlideStep(7), 1e-4f, "stopping short of its foe, not past it");
             Assert.Greater(HollowRules.GlideSeconds, .5f, "slow, not a jerk (the Weave-Eaters' blink is instant)");
             Assert.Greater(HollowRules.GlideEvery, WeaveEaterRules.BlinkEvery, "and rarer than a Weave-Eater's blink");
         }

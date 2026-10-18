@@ -173,6 +173,12 @@ namespace Crulanda.Encounter
                 foreach (var w in open.ToArray()) if (!string.IsNullOrEmpty(w.group) && open.Contains(w) && Wanted(w)) open.RemoveAll(o => o != w && o.group == w.group && !Wanted(o));
                 // The full run takes a fork's other side before it goes on.
                 if (full && lastGroup != null && open.Exists(o => o.group == lastGroup)) open.RemoveAll(o => o.group != lastGroup);
+                // (Hallow's Creek, pick 11: "Choose the wing first") Wings open together that the data puts in a fixed order (ZoneWing.order):
+                // the lowest still with a fight standing goes first; a cleared wing (nothing standing) is passed over, so a wing the player took
+                // first is skipped, not walked.
+                int firstOrder = int.MaxValue;
+                foreach (var w in open) if (w.order > 0 && steps[w.id].Count + (extras.TryGetValue(w.id, out var xs) ? xs.Count : 0) > 0) firstOrder = Mathf.Min(firstOrder, w.order);
+                if (firstOrder < int.MaxValue) open.RemoveAll(w => w.order != firstOrder);
                 // The nearest: by the way there, and keeping to the height the party is at. A wing with nothing standing costs nothing.
                 ZoneWing pick = null; float best = float.MaxValue;
                 foreach (var w in open)

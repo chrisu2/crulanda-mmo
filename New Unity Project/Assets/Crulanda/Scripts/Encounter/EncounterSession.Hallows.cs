@@ -84,6 +84,8 @@ namespace Crulanda.Encounter
             GroundSlow = 1; wardenFreed = false; Warden = null; haveSafe = false; pausedFolk.Clear(); wokenBy = null; swingTarget = 0; ZonePost.Swing = 0; ClearSnap();
             if (Zone == null) return;
             for (int k = 0; k < Zone.PausedSpots.Count; k++) { var s = Zone.PausedSpots[k]; pausedFolk.Add(PausedFigure(s.at, s.facing, s.pose, s.name, k)); }
+            // (Pick 9) the Glitches that change the way, their spots grey and their ways shut (EncounterSession.HallowsGlitch)
+            StartGlitches();
             // Mr Gable and his pie (pick 12): at rest for good once his pie was taken in a Glitch.
             gable = pausedFolk.Find(f => f != null && f.name == GableName); pie = null; pieTaken = false; gableLook = Zone.Interactables.Find(i => i.kind == "paused" && i.name == GableName); whispers = 0; nextWhisper = nextWhisperLine = 0; glitchVoices = null;
             if (gable != null)
@@ -131,6 +133,8 @@ namespace Crulanda.Encounter
         {
             if (Zone == null || Player == null) return;
             TickWell();
+            // (Pick 11) a wing's lord fallen eases the tower (EncounterSession.HallowsGlitch)
+            TickWings();
             // The colour swing (ZonePost.Swing) toward the town's state: two seconds to wake, a second and a half to drain.
             ZonePost.Swing = Mathf.MoveTowards(ZonePost.Swing, swingTarget, Time.deltaTime / (swingTarget > ZonePost.Swing ? 2f : 1.5f));
             for (int i = 0; i < snapMarks.Count; i++)
@@ -281,6 +285,8 @@ namespace Crulanda.Encounter
             foreach (var f in pausedFolk) if (f != null && (id == WakingEvent || Flat(f.transform.position - near) < 45)) f.Wake();
             Zone.ShiftHazards(ShadowShift);
             if (id == GlitchEvent && gable != null && !gable.AtRest) { if (glitchVoices != null) StopCoroutine(glitchVoices); glitchVoices = StartCoroutine(GlitchVoices()); }
+            // (Pick 9) the great bell sets every Glitch in the town going: their ways open (EncounterSession.HallowsGlitch)
+            if (id == WakingEvent) GlitchesWithTheHour();
         }
         /// <summary>The snap's warning (EncounterSession.Release.RunEvent, its hold nearly out): a ring round every townsperson awake within 40 m
         /// of you and every ringer of the event still standing. Not while anyone of the party is held already (it waits for them). True once

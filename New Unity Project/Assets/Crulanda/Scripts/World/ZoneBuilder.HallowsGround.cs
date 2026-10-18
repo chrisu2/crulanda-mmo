@@ -501,11 +501,20 @@ namespace Crulanda.World
             var foot = OpenPoint(gd.at, gd.rise); root.SetPositionAndRotation(foot, Quaternion.Euler(0, gd.rotation, 0));
             float w = gd.width > 0 ? gd.width : 6, high = 3.4f; string kind = string.IsNullOrEmpty(gd.kind) ? "bossdoor" : gd.kind, look = string.IsNullOrEmpty(gd.look) ? "door" : gd.look;
             var stone = Dressed(new Color(.62f, .62f, .64f)); var plank = Tint(art.timber, new Color(.32f, .3f, .28f)); var iron = Tint(art.metal, new Color(.18f, .18f, .2f));
-            foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, root, new Vector3(side * (w / 2 + .35f), high / 2 + .2f, 0), new Vector3(.7f, high + .4f, .7f), stone);
-            Part(PrimitiveType.Cube, root, new Vector3(0, high + .45f, 0), new Vector3(w + 1.4f, .5f, .8f), stone);   // the lintel
+            // (Pick 9) A Glitch's thing (a stone handcart, slates hung mid-fall) stands in the way without posts or a lintel.
+            bool framed = look != "cart" && look != "slates";
+            if (framed)
+            {
+                foreach (int side in new[] { -1, 1 }) Part(PrimitiveType.Cube, root, new Vector3(side * (w / 2 + .35f), high / 2 + .2f, 0), new Vector3(.7f, high + .4f, .7f), stone);
+                Part(PrimitiveType.Cube, root, new Vector3(0, high + .45f, 0), new Vector3(w + 1.4f, .5f, .8f), stone);   // the lintel
+            }
             var bars = new GameObject("Bars").transform; bars.SetParent(root, false);
             switch (look)
             {
+                case "cart":
+                case "slates":
+                    GlitchGateLook(bars, look, w, high);
+                    break;
                 case "stockade":
                     for (float x = -w / 2 + .15f; x < w / 2; x += .3f) Part(PrimitiveType.Cylinder, bars, new Vector3(x, high / 2, 0), new Vector3(.18f, high / 2, .18f), plank);
                     Part(PrimitiveType.Cube, bars, new Vector3(0, high * .7f, -.12f), new Vector3(w, .14f, .1f), iron);
@@ -530,6 +539,8 @@ namespace Crulanda.World
             }
             var gate = root.gameObject.AddComponent<ZoneGate>(); gate.Title = gd.title; gate.Cave = null; gate.Along = 0; gate.Lord = gd.lord; gate.Grille = bars; gate.ShutsBehind = gd.behind;
             gate.Rise = high + .2f; gate.Kind = kind; gate.FromFar = gd.side == "far"; gate.OpensOn = string.IsNullOrEmpty(gd.opensOn) ? null : gd.opensOn;
+            // (Pick 9) The handcart rolls on along the lane and out of it (its face is across the lane: on along its own z); the hung slates fall and are gone into the ramp.
+            if (look == "cart") gate.Slide = new Vector3(0, 0, 6); else if (look == "slates") gate.Slide = new Vector3(0, -high - .3f, 0);
             gate.Init(new Vector3(w + .2f, high, .6f));
             Gates.Add(gate);
             string prompt = !string.IsNullOrEmpty(gd.prompt) ? gd.prompt : kind == "ward" ? "Study the ward-lock" : null;

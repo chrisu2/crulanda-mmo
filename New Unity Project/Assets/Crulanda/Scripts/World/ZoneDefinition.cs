@@ -96,6 +96,8 @@ namespace Crulanda.World
         public ZoneWing[] wings = new ZoneWing[0];
         /// <summary>A dungeon's events (<see cref="ZoneEvent"/>: the Wake).</summary>
         public ZoneEvent[] events = new ZoneEvent[0];
+        /// <summary>(Hallow's Creek, pick 9) The Glitches that change the way (<see cref="ZoneGlitch"/>).</summary>
+        public ZoneGlitch[] glitches = new ZoneGlitch[0];
         /// <summary>Trails of living lichen along the run's way (<see cref="ZoneCrumb"/>).</summary>
         public ZoneCrumb[] crumbs = new ZoneCrumb[0];
         /// <summary>A dungeon's three checkpoints, in the run's order (<see cref="ZoneCheckpoint"/>; Chris, 2026-10-16: where a fallen party wakes).</summary>
@@ -519,7 +521,26 @@ namespace Crulanda.World
     /// </summary>
     /// <remarks>(Hallow's Creek) gate: a gate on the wing's way out that the run waits at before its regroup at home, and lifts when it stands
     /// on the side the gate is worked from (the Cellars' far trapdoor, barred from below); empty: only a door its own boss's death opens.</remarks>
-    [Serializable] public sealed class ZoneWing { public string id, name, after, group, exit, home, gate; public bool optional; }
+    /// <remarks>(Hallow's Creek, pick 11: "Choose the wing first", GAME-ONLY) order: the leader's fixed order among the wings open together (1
+    /// first; 0: by the nearest, as before); a cleared wing is skipped. lord: the mob whose death marks the wing done for the tower's sake;
+    /// eases: the tower's camp it thins as it falls (easeCount of its people leave, never the last), with easeText said in the chat.</remarks>
+    [Serializable] public sealed class ZoneWing
+    {
+        public string id, name, after, group, exit, home, gate; public bool optional;
+        public int order; public string lord, eases, easeText; public int easeCount;
+    }
+    /// <summary>
+    /// (Hallow's Creek, pick 9: "Glitches that change the route", CANON-EXPANDED: the bakery's bell and its minute of sun, b1 ch.21:82-112;
+    /// "the timeline ... has begun to loop", ch.21:351; each moment GAME-ONLY) A Glitch spot: a resonant thing in the town (at, rise over the
+    /// yard) that E (or the Waking Hour's bell) sets going: a minute (hold seconds) of colour and sun round it, and the way it changes for the
+    /// rest of the visit: the gates it names (opens, by title) open and stay open (a Glitch never shuts a way). text: said as it wakes;
+    /// endText: as its minute ends. look: what stands there (handcart, slates, splash, boy).
+    /// </summary>
+    [Serializable] public sealed class ZoneGlitch
+    {
+        public string id, name, prompt, look, text, endText, opens, canonStatus;
+        public Vector2 at; public float rise, rotation, hold = 60;
+    }
     /// <summary>An event of a dungeon (GAME-ONLY: the Wake): its id and kind, the wing it belongs to and its place in that wing's run, the anchor
     /// it centres on, and its waves. (Hallow's Creek) hold: seconds the event lasts at the least (a Glitch, the Waking Hour: the town awake that
     /// long, then the loop snaps; 0: over when its last wave is down). An "escort" event's waves come at the share of the walk in hundredths

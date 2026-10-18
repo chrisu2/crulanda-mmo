@@ -90,6 +90,23 @@ namespace Crulanda.Tests
             Assert.That(EncounterSession.PuntSeconds, Is.InRange(3f, 8f), "A short crossing");
         }
 
+        [Test] public void The_weir_is_railed_both_sides_the_whole_way_across()
+        {
+            // (2026-10-18, Chris: "falling off ramps and bad pathing") Rails on both sides of the walk everywhere along the weir, none on
+            // the walk itself: the crest's edges, and over the sluice the plank's.
+            var rails = ZoneBuilder.WeirRails();
+            float half = Vector2.Distance(ZoneBuilder.WeirWest, ZoneBuilder.WeirEast) / 2, inner = ZoneBuilder.WeirSluice / 2 + .4f;
+            for (float at = -half + .05f; at < half; at += .1f)
+            {
+                bool plank = Mathf.Abs(at) < inner;
+                float left = plank ? ZoneBuilder.WeirPlankAt - ZoneBuilder.WeirPlankWide / 2 : -ZoneBuilder.WeirCrest / 2;
+                float right = plank ? ZoneBuilder.WeirPlankAt + ZoneBuilder.WeirPlankWide / 2 : ZoneBuilder.WeirCrest / 2;
+                Assert.IsTrue(rails.Any(r => r.side < 0 && r.from <= at && r.to >= at && r.across <= left + .01f && r.across >= left - .2f), "A rail on the upstream side at " + at);
+                Assert.IsTrue(rails.Any(r => r.side > 0 && r.from <= at && r.to >= at && r.across >= right - .01f && r.across <= right + .2f), "A rail on the downstream side at " + at);
+            }
+            Assert.IsTrue(rails.All(r => r.from >= -half - .01f && r.to <= half + .01f), "The banks' ends are open: the way goes on there.");
+        }
+
         [Test] public void The_Stack_stands_on_the_High_Rows_clear_of_everything()
         {
             var at = ZoneBuilder.StackAt;

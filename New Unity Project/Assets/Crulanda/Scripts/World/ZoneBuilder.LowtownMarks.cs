@@ -35,6 +35,31 @@ namespace Crulanda.World
         /// <summary>The weir: its line across the river (west end, east end), its crest's width.</summary>
         public static readonly Vector2 WeirWest = new Vector2(-10.5f, 141), WeirEast = new Vector2(11.5f, 141);
         public const float WeirCrest = 1.8f;
+        /// <summary>The sluice's width in the weir's middle, and the plank over it (its middle line's offset across the weir from the crest's,
+        /// and its width).</summary>
+        public const float WeirSluice = 2.2f, WeirPlankAt = -.4f, WeirPlankWide = .9f;
+        /// <summary>A run of rail along the weir in its own frame: across, the line its inner face stands on (metres across the weir from
+        /// its middle line, + downstream); side, which way is off the walk there (-1 or +1); from and to along it (metres from the weir's
+        /// middle toward its east end).</summary>
+        public struct WeirRail { public float across, side, from, to; }
+        /// <summary>
+        /// The weir's rails (2026-10-18, Chris: "falling off ramps and bad pathing"): timber, solid and cut out of the navmesh, just outside
+        /// the walk on both sides the whole way across. Along the crest's two lengths both its edges; over the sluice the plank's two
+        /// edges (the upstream rail runs straight on; the downstream one steps in to the plank between the sluice's piers, which stand on
+        /// the downstream half beside it). Only the banks' ends are open: that is where the way goes on.
+        /// </summary>
+        public static List<WeirRail> WeirRails()
+        {
+            float len = Vector2.Distance(WeirWest, WeirEast), half = len / 2, inner = WeirSluice / 2 + .4f;
+            float plankIn = WeirPlankAt - WeirPlankWide / 2, plankOut = WeirPlankAt + WeirPlankWide / 2;
+            return new List<WeirRail>
+            {
+                new WeirRail { across = Mathf.Min(-WeirCrest / 2, plankIn), side = -1, from = -half, to = half },
+                new WeirRail { across = WeirCrest / 2, side = 1, from = -half, to = -inner },
+                new WeirRail { across = WeirCrest / 2, side = 1, from = inner, to = half },
+                new WeirRail { across = plankOut, side = 1, from = -inner, to = inner },
+            };
+        }
 
         /// <summary>A corner the Iron Teeth may hold: its name, where its banner stands, and its two loiterers (residents) with their spots.</summary>
         public sealed class TurfCorner { public string name; public Vector2 banner, mark; public string[] folk; }
@@ -263,6 +288,14 @@ namespace Crulanda.World
                 var mid = land + outward * 3.2f; mid.y = deckY;
                 var deck = BoxPart(root, mid, new Vector3(2.2f, .2f, 4.6f), plank, Quaternion.LookRotation(outward));
                 deck.AddComponent<BoxCollider>(); deck.AddComponent<NavWalkable>(); deck.name = "Punt landing";
+                // (2026-10-18, Chris: "falling off ramps and bad pathing") A timber rail round the stage's three sides over the water,
+                // solid and cut out of the navmesh; the bank's end is open. The punt is taken with E at the landing, so the rail on its
+                // side does not stand in the way.
+                var sideV = Quaternion.LookRotation(outward) * Vector3.right; var top = mid + Vector3.up * .1f;
+                Vector3 C(float x, float zz) { return top + sideV * (x * 1.1f) + outward * (zz * 2.3f); }
+                LowRail(root, b, "Punt landing", C(-1, -1), C(-1, 1), -sideV, plank, timber, .8f, false);
+                LowRail(root, b, "Punt landing", C(1, -1), C(1, 1), sideV, plank, timber, .8f, false);
+                LowRail(root, b, "Punt landing", C(-1, 1) - sideV * .22f, C(1, 1) + sideV * .22f, outward, plank, timber, .8f, false);
                 foreach (int s in new[] { -1, 1 }) foreach (float f in new[] { 1.4f, 5.2f })
                 {
                     var pile = land + outward * f + Quaternion.LookRotation(outward) * new Vector3(s * 1.05f, 0, 0); pile.y = deckY - 1.2f;
@@ -300,7 +333,7 @@ namespace Crulanda.World
             float top = Mathf.Max(a.y, c.y) + .25f;
             var run = c - a; run.y = 0; float len = run.magnitude; var q = Quaternion.LookRotation(run / len);
             var mid = (a + c) / 2; mid.y = top;
-            float sluice = 2.2f;
+            float sluice = WeirSluice;
             // The crest: two lengths of dressed stone either side of the sluice, walkable, solid; the body of the weir under them, and the
             // downstream apron sloping into the river (only to see).
             float part = (len - sluice) / 2 - .4f;
@@ -314,18 +347,24 @@ namespace Crulanda.World
                 b.Box(wet, centre + q * new Vector3(1.6f, -1f, 0), new Vector3(2.2f, .2f, part), q * Quaternion.Euler(0, 0, -28));
             }
             // The sluice: two stone piers with grooves, the boards stacked in them (dropped in and lifted out by hand), a plank walk over.
+            // (2026-10-18) The piers stand on the downstream half only, beside the plank: across the whole crest they shut the walk.
+            float plankOut = WeirPlankAt + WeirPlankWide / 2, pierW = WeirCrest / 2 + .2f - plankOut - .05f;
             foreach (int s in new[] { -1, 1 })
             {
-                var pier = mid + q * new Vector3(0, .3f, s * (sluice / 2 + .2f));
-                var p = BoxPart(root, pier, new Vector3(WeirCrest + .4f, 1.4f, .4f), stone, q); p.AddComponent<BoxCollider>(); p.AddComponent<NavBlocker>();
+                var pier = mid + q * new Vector3(plankOut + .05f + pierW / 2, .3f, s * (sluice / 2 + .2f));
+                var p = BoxPart(root, pier, new Vector3(pierW, 1.4f, .4f), stone, q); p.AddComponent<BoxCollider>(); p.AddComponent<NavBlocker>();
             }
             for (int k = 0; k < 4; k++) b.Box(plank, mid + q * new Vector3(.3f, -.5f - k * .32f, 0), new Vector3(.12f, .3f, sluice + .1f), q);
-            var walk = BoxPart(root, mid + q * new Vector3(-.4f, .02f, 0), new Vector3(.9f, .12f, sluice + .8f), plank, q);
+            var walk = BoxPart(root, mid + q * new Vector3(WeirPlankAt, .02f, 0), new Vector3(WeirPlankWide, .12f, sluice + .8f), plank, q);
             walk.AddComponent<BoxCollider>(); walk.AddComponent<NavWalkable>(); walk.name = "The plank over the sluice";
-            // The hook-pole the sluice-keepers lift the boards with, leaning on a pier; a rope hand-line on posts along the plank.
+            // The hook-pole the sluice-keepers lift the boards with, leaning on a pier.
             b.Box(Tint(art.timber, new Color(.45f, .36f, .25f)), mid + q * new Vector3(.75f, .9f, sluice / 2 + .45f), new Vector3(.06f, 2.6f, .06f), q * Quaternion.Euler(14, 0, 8));
-            foreach (int s in new[] { -1, 1 }) b.Box(timber, mid + q * new Vector3(-.88f, .5f, s * (sluice / 2 + .3f)), new Vector3(.08f, .9f, .08f), q);
-            b.Box(Tint(art.cloth, new Color(.4f, .35f, .25f)), mid + q * new Vector3(-.88f, .9f, 0), new Vector3(.03f, .03f, sluice + .6f), q);
+            // The rails (WeirRails, 2026-10-18; they replace the rope hand-line along the plank): timber on posts down to the weir's body.
+            foreach (var rl in WeirRails())
+            {
+                var ra = mid + q * new Vector3(rl.across, .08f, rl.from); var rb = mid + q * new Vector3(rl.across, .08f, rl.to);
+                LowRail(root, b, "The weir", ra, rb, q * new Vector3(rl.side, 0, 0), plank, timber, .6f, false);
+            }
             b.Flush(this, root, "The weir");
         }
     }

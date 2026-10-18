@@ -11,7 +11,7 @@ namespace Crulanda.World
     /// ch.1:237); stairs and causeways between the levels ("a narrow, immensely twisting causeway that led ... down into the deep, dark
     /// slums", book1 ch.3:257). The levels and their names are GAME-ONLY.
     /// - Retaining walls (<see cref="LowtownWalls"/>): wherever a terrace's edge stands a metre or more over the ground beside it, soot brick
-    ///   fills the slope from under the low ground to the high (a parapet a metre over a drop of more than 1.2 m), a coping of dark stone on
+    ///   fills the slope from under the low ground to the high (a parapet a metre over a drop of more than a metre, LowWallTop), a coping of dark stone on
     ///   it, the neon moss along the top in places (CANON, book1 ch.7:17: "vibrant, unnatural neon moss") and, where the low side is sunk under
     ///   the streets (the Drain Courts), green mould glowing at the foot (CANON, book1 ch.6:129, ch.9:55). Each run of wall is solid and cut
     ///   out of the navmesh; no wall stands across a ramp or a stair (their own sides are walled instead).
@@ -237,7 +237,7 @@ namespace Crulanda.World
                         if (k0 < 0) return;
                         float from = piece * k0, to = piece * (k1 + 1), runLen = to - from;
                         var mid = W(a) + along * ((from + to) / 2);
-                        bool raised = runHigh - runLow > 1.2f; float top = runHigh + (raised ? 1 : .06f), foot = runLow - .6f, thick = blend + .3f;
+                        float top = LowWallTop(runHigh, runLow), foot = runLow - .6f, thick = blend + .3f;
                         var centre = new Vector3(mid.x + outward.x * blend / 2, (top + foot) / 2, mid.y + outward.y * blend / 2);
                         var q = toLocal * yaw;
                         brick.Add(Ashlar(L(centre), new Vector3(runLen + .02f, top - foot, thick), 2, q));
@@ -320,6 +320,53 @@ namespace Crulanda.World
             }
             Joined32("Step-street " + t.name, root, WetSetts, treads);
             Joined32("Step-street nosings " + t.name, root, SootIron, nosing);
+        }
+
+        // ---------- rails on the raised walks (2026-10-18) ----------
+        /// <summary>
+        /// The drop beside a retaining wall's top over which it gets its parapet a metre high (2026-10-18, Chris: "falling off ramps and bad
+        /// pathing": was 1.2 m, now the town's rail drop, <see cref="RailDrop"/>, so a ramp's or a stair's side a metre over the street
+        /// beside it is walled to a hand rail's height too).
+        /// </summary>
+        public const float LowParapetDrop = RailDrop, LowParapetHigh = 1f;
+        /// <summary>A retaining wall's top over the high ground beside it: the parapet over a drop of more than <see cref="LowParapetDrop"/>,
+        /// else the coping a hand over the ground.</summary>
+        public static float LowWallTop(float high, float low) { return high + (high - low > LowParapetDrop ? LowParapetHigh : .06f); }
+        /// <summary>A rail's height over the walk it guards, as the town's rails (ZoneBuilder.HallowsGround).</summary>
+        public const float LowRailHigh = 1.05f;
+        /// <summary>
+        /// A rail along an open edge of one of the Lowtowns' raised walks (the roofs' lead walks, the rope bridges, the punt landings, the
+        /// weir), from <paramref name="a"/> to <paramref name="b"/> on the walk's edge at its top, <paramref name="outward"/> the way off
+        /// it. It stands just outside the edge, so the walk keeps its whole width for the navmesh: one solid box from under the walk to the
+        /// rail's top, a NavBlocker (EncounterNavigation cuts it out of the navmesh); the look batched into <paramref name="b"/>: posts
+        /// every metre and a half reaching <paramref name="down"/> under the walk, a hand rail and a mid rail (iron: thin bars; timber:
+        /// planks). Nothing at all is built for a <paramref name="look"/> of null (a rope bridge's own ropes are its look).
+        /// </summary>
+        void LowRail(Transform parent, Batch look, string name, Vector3 a, Vector3 b, Vector3 outward, Material rail, Material post, float down, bool iron)
+        {
+            var run = b - a; float len = run.magnitude; if (len < .3f) return;
+            outward.y = 0; if (outward.sqrMagnitude < 1e-6f) return; outward.Normalize();
+            float thick = iron ? .1f : .2f;
+            var rot = Quaternion.LookRotation(run / len, Vector3.up); var flat = Quaternion.LookRotation(outward, Vector3.up);
+            var mid = (a + b) / 2 + outward * (thick / 2 + .02f);
+            float lo = Mathf.Min(a.y, b.y), hi = Mathf.Max(a.y, b.y);
+            var solid = new GameObject("Rail: " + name); solid.transform.SetParent(parent, false);
+            solid.transform.position = new Vector3(mid.x, (lo - .2f + hi + LowRailHigh) / 2, mid.z);
+            solid.transform.rotation = Quaternion.LookRotation(new Vector3(run.x, 0, run.z).sqrMagnitude > 1e-6f ? new Vector3(run.x, 0, run.z) : run, Vector3.up);
+            float flatLen = new Vector2(run.x, run.z).magnitude;
+            solid.AddComponent<BoxCollider>().size = new Vector3(thick + .04f, hi - lo + LowRailHigh + .2f, Mathf.Max(flatLen, .3f));
+            solid.AddComponent<NavBlocker>();
+            if (look == null || rail == null || post == null) return;
+            var up = Vector3.up;
+            look.Box(rail, mid + up * (LowRailHigh - .04f), new Vector3(iron ? .05f : .12f, iron ? .05f : .09f, len + .05f), rot);
+            look.Box(rail, mid + up * .5f, new Vector3(iron ? .04f : .08f, iron ? .04f : .08f, len), rot);
+            int posts = Mathf.Max(1, Mathf.CeilToInt(len / 1.5f));
+            for (int k = 0; k <= posts; k++)
+            {
+                var foot = Vector3.Lerp(a, b, k / (float)posts) + outward * (thick / 2 + .02f);
+                float tall = LowRailHigh + down;
+                look.Box(post, foot + up * (LowRailHigh - tall / 2), new Vector3(iron ? .06f : .14f, tall, iron ? .06f : .14f), flat);
+            }
         }
     }
 }

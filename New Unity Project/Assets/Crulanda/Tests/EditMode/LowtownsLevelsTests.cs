@@ -86,6 +86,29 @@ namespace Crulanda.Tests
             Assert.IsTrue(z.terraces.Any(t => t.ramp && t.name == "The twisting causeway" && t.canonStatus.Contains("ch.3:257")), "and the books' twisting causeway down to the slums.");
         }
 
+        [Test] public void Ramps_and_stairs_have_a_rail_over_every_drop_beside_them()
+        {
+            // (2026-10-18, Chris: "falling off ramps and bad pathing") Along each ramp's and stair's sides, wherever the street beside it is
+            // more than a metre down, the retaining wall there stands a parapet a rail's height over the walk.
+            Assert.LessOrEqual(ZoneBuilder.LowParapetDrop, 1f, "A drop of more than a metre gets a rail, as Hallow's Creek's decks.");
+            int railed = 0;
+            foreach (var t in z.terraces.Where(t => t.ramp))
+            {
+                float rr = t.rotation * Mathf.Deg2Rad, c = Mathf.Cos(rr), sn = Mathf.Sin(rr);
+                Vector2 W(float lx, float lz) { return new Vector2(t.center.x + lx * c + lz * sn, t.center.y - lx * sn + lz * c); }
+                foreach (int side in new[] { -1, 1 })
+                    for (float lz = -t.size.y / 2 + .5f; lz < t.size.y / 2 - .5f; lz += 1)
+                    {
+                        float walk = H(W(side * (t.size.x / 2 - .4f), lz)), beside = H(W(side * (t.size.x / 2 + Mathf.Max(.25f, t.blend) + .4f), lz));
+                        if (walk - beside <= ZoneBuilder.LowParapetDrop) continue;
+                        railed++;
+                        Assert.GreaterOrEqual(ZoneBuilder.LowWallTop(walk, beside) - walk, .95f, t.name + "'s side has a rail at " + W(side * t.size.x / 2, lz));
+                    }
+            }
+            Assert.Greater(railed, 0, "Some ramp or stair stands over the street beside it.");
+            Assert.Less(ZoneBuilder.LowWallTop(2, 1.5f), 2.1f, "A small step stays a kerb.");
+        }
+
         [Test] public void Everything_stands_on_level_ground()
         {
             foreach (var c in z.camps) Assert.LessOrEqual(Range(c.center, 1.5f), .3f, "camp " + c.name);

@@ -23,6 +23,9 @@ namespace Crulanda.Tests
     /// </summary>
     public class HallowsNavTests
     {
+        /// <summary>The valley floor under the yard (REWORK_LOWTOWNS_HALLOWS.md pick 4, 2026-10-18: the Square, the Archive and the tower stand
+        /// eight metres under the gatehouse; "The valley floor" in hallows.json's terraces).</summary>
+        const float Valley = -8;
         string root;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (s != null) s.SaveDirectoryOverride = root; }
         [UnitySetUp] public IEnumerator Setup()
@@ -55,8 +58,8 @@ namespace Crulanda.Tests
             yield return Frames(10);
             Assert.Greater(zone.DeckSpots.Count(d => d.cave == null), 40, "the open-ground decks");
             foreach (var a in new[] { "the gatehouse", "the Warden's cell", "the tower door", "the belfry stair-head", "the wagon", "the Cut-Store" }) Assert.IsTrue(zone.Anchors.ContainsKey(a), "the anchor " + a);
-            Assert.AreEqual(18, zone.Anchors["the belfry stair-head"].y - zone.Datum, .5f, "the belfry stair-head is 18 m up");
-            Assert.AreEqual(2, zone.Anchors["the Warden's cell"].y - zone.Datum, .4f, "the Warden's cell is on the Archive's floor");
+            Assert.AreEqual(18 + Valley, zone.Anchors["the belfry stair-head"].y - zone.Datum, .5f, "the belfry stair-head is 18 m over the valley floor");
+            Assert.AreEqual(2 + Valley, zone.Anchors["the Warden's cell"].y - zone.Datum, .4f, "the Warden's cell is on the Archive's floor");
             foreach (var t in new[] { "Tredway's gate", EncounterSession.WardenCell, EncounterSession.WardGate, "The yard bar", "The dark cellar door" }) Assert.IsTrue(zone.Gates.Exists(g => g.Title == t), "the gate " + t);
             Assert.Greater(zone.PausedSpots.Count, 15, "the paused townsfolk");
             // The chasm: its floor is forty metres down and out of the navmesh; the slabs carry the way from the lip to the gatehouse.
@@ -196,13 +199,13 @@ namespace Crulanda.Tests
             var s = Session(); var zone = s.Zone; zone.OpenGates(); yield return Frames(60);
             var landing = zone.DeckSpots.Find(d => d.def != null && d.def.name == "The second landing"); Assert.NotNull(landing, "the second landing's floor");
             Assert.AreEqual("floor", landing.def.style); Assert.GreaterOrEqual(landing.def.width, 7.5f, "a floor to fight on, not a corner of the stair");
-            Assert.AreEqual(9, zone.Anchors["the second landing"].y - zone.Datum, .4f, "at +9");
+            Assert.AreEqual(9 + Valley, zone.Anchors["the second landing"].y - zone.Datum, .4f, "at +9 over the valley floor");
             var door = On(zone.Anchors["the tower door"] + Vector3.up * .2f, "the tower door"); var up = On(zone.Anchors["the second landing"] + Vector3.up * .2f, "the second landing");
-            Assert.AreEqual(9, up.y - zone.Datum, .6f, "the navmesh is on the landing, not the ground under it");
+            Assert.AreEqual(9 + Valley, up.y - zone.Datum, .6f, "the navmesh is on the landing, not the ground under it");
             float walk = NavReach.Length(door, up); Assert.Less(walk, 80, "up the stairs from the door to the landing (" + walk.ToString("0") + " m)");
             Assert.Less(NavReach.Length(up, On(zone.Anchors["the belfry stair-head"] + Vector3.up * .2f, "the belfry stair-head")), 80, "and on up to the belfry");
             var kersey = s.Enemies.Find(e => e != null && e.MobName == "Pact-Captain Rowena Kersey"); Assert.NotNull(kersey);
-            Assert.AreEqual(9, kersey.transform.position.y - 1 - zone.Datum, 1.2f, "the Pact-Captain stands on the landing");
+            Assert.AreEqual(9 + Valley, kersey.transform.position.y - 1 - zone.Datum, 1.2f, "the Pact-Captain stands on the landing");
             var move = EliteMoves.For(kersey.MobName, false); Assert.AreEqual("root", move.cc); Assert.AreEqual("Form the line", move.ccName); Assert.Greater(move.ccReach, 0, "on everyone near her");
         }
 

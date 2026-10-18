@@ -4,7 +4,7 @@
   "subtitle": "The town the Wasting paused",
   "canonStatus": "CANON-EXPANDED",
   "dungeon": true,
-  "canonNote": "Hallow's Creek, the first settlement the Wasting took, paused mid-second fifty years before the books, too perfect: white houses, white picket fences without a speck of peeling paint, roses of red quartz, pristine gravel, no wind, no birds (b1 ch.17:269; ch.21:11-19), and only its people grey stone; the white fences, the baker in his doorway, the ball in the air, the townsfolk stone to the skin with living eyes, the broken bridge's slabs hanging over the chasm, the crater with the red door at its heart, the Old Archive and the hungry shadows (CANON, book1 ch.15-21; world_bible). CANON-EXPANDED: the Bureau holding the town and cutting memory-quartz from the paused (book1 ch.3: geodes are fossilised memory), the Hollow as what the cut leaves, the bell tower with a painted dial a minute short of noon (no works). GAME-ONLY: every person, camp, the wings, the Waking Hour as a worked thing, the wagon. Kept out: the Archive's vault, the red door's riddle, the Prism, Hollow children. The people of chapters 19 and 21 (Mr Gable and Martha, Mrs Miller, the children, Talla by the willow) and the Square as chapter 21 tells it: Docs/REWORK_LOWTOWNS_HALLOWS.md picks 1, 2, 3 and 12. Docs/DUNGEON2_DESIGN.md.",
+  "canonNote": "Hallow's Creek, the first settlement the Wasting took, paused mid-second fifty years before the books, too perfect: white houses, white picket fences without a speck of peeling paint, roses of red quartz, pristine gravel, no wind, no birds (b1 ch.17:269; ch.21:11-19), and only its people grey stone; the white fences, the baker in his doorway, the ball in the air, the townsfolk stone to the skin with living eyes, the broken bridge's slabs hanging over the chasm, the crater with the red door at its heart, the Old Archive and the hungry shadows (CANON, book1 ch.15-21; world_bible). CANON-EXPANDED: the Bureau holding the town and cutting memory-quartz from the paused (book1 ch.3: geodes are fossilised memory), the Hollow as what the cut leaves, the bell tower with a painted dial a minute short of noon (no works). GAME-ONLY: every person, camp, the wings, the Waking Hour as a worked thing, the wagon. Kept out: the Archive's vault, the red door's riddle, the Prism, Hollow children. The people of chapters 19 and 21 (Mr Gable and Martha, Mrs Miller, the children, Talla by the willow) and the Square as chapter 21 tells it: Docs/REWORK_LOWTOWNS_HALLOWS.md picks 1, 2, 3 and 12. Docs/DUNGEON2_DESIGN.md. A valley town seen from the lip (CANON-EXPANDED, b1 ch.19:31; ch.17:267): the gatehouse on the lip, Main Street falling eight metres to the Square on the valley floor; two roads in, the high road over the slabs and the low road from the Fallen Mason's slab along the chasm's wall and through the Cellars (GAME-ONLY): REWORK_LOWTOWNS_HALLOWS.md picks 4 and 5.",
   "size": 800,
   "levelMin": 15,
   "levelMax": 20,
@@ -621,7 +621,7 @@
       "text": "Pushed behind a row of stone books on the north gallery, where no Bureau clerk has thought to look: one loose page in a careful First Era hand.",
       "xp": 320,
       "canonStatus": "CANON-EXPANDED (High Archivist Malakor and the Archivists are CANON, book1 ch.18; this page paraphrased, GAME-ONLY)",
-      "rise": 5,
+      "rise": -3.0,
       "document": "doc.hallows.archivist_page"
     },
     {
@@ -711,57 +711,57 @@
         6.0,
         2.4,
         3.3,
-        -1.5,
+        -2.32,
         -3.0,
         14.0,
         2.6,
         3.4,
-        -3.5,
+        -5.53,
         -7.0,
         23.0,
         3,
         3.5,
-        -5.2,
+        -8.4,
         -10.0,
         35.0,
         3.5,
         3.5,
-        -6.0,
+        -10.07,
         -11.0,
         49.0,
         6,
         4.2,
-        -6.4,
+        -10.63,
         -11.0,
         59.0,
         8,
         4.5,
-        -6.5,
+        -10.73,
         -11.0,
         69.0,
         5,
         4,
-        -6.5,
+        -10.73,
         -11.0,
         79.0,
         3.5,
         3.5,
-        -6.7,
+        -10.93,
         -10.0,
         89.0,
         3.5,
         3.5,
-        -6.8,
+        -11.03,
         -9.0,
         98.0,
         3.5,
         3.5,
-        -6.8,
+        -11.03,
         -8.4,
         106.0,
         3.5,
         3.5,
-        -6.8
+        -11.03
       ],
       "style": "cellar",
       "joins": "The well-house stair"
@@ -2647,6 +2647,93 @@
       },
       "rotation": 0,
       "canonStatus": "CANON-EXPANDED (b1 ch.17:243: \"The stone ahead of them tilted. forty-five degrees.\"): it dips and groans under a foot and tips once the party is past, its walk solid (pick 10)"
+    },
+    {
+      "kind": "cavern",
+      "name": "The chasm stair",
+      "at": {
+        "x": -46.0,
+        "y": -131.0
+      },
+      "rotation": 0.0,
+      "variant": 2,
+      "plan": [
+        0,
+        -1,
+        2.2,
+        3.2,
+        0,
+        0,
+        0,
+        2.2,
+        3.2,
+        0,
+        0,
+        6,
+        2.4,
+        3.3,
+        -1.5,
+        0,
+        14,
+        2.6,
+        3.4,
+        -3.5,
+        -0.5,
+        24,
+        3,
+        3.5,
+        -6.5,
+        -1.5,
+        36,
+        3,
+        3.5,
+        -7.59,
+        -2.5,
+        48,
+        3,
+        3.5,
+        -8.68,
+        -3,
+        60,
+        3,
+        3.5,
+        -10.09,
+        -1.5,
+        72,
+        3,
+        3.5,
+        -11.87,
+        7.25,
+        84.0,
+        3.5,
+        3.5,
+        -13.15
+      ],
+      "style": "cellar",
+      "joins": "The Cellars",
+      "canonStatus": "GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 5, the low road: the Hollow's way; in the CANON chasm, b1 ch.17:189)"
+    },
+    {
+      "kind": "look",
+      "at": {
+        "x": 0,
+        "y": -116.5
+      },
+      "name": "The town below",
+      "interact": "Look down into the valley",
+      "text": "Past the gate the valley opens below you. \"Through the clearing fog, a town appeared.\" Picket fences. White houses. Main Street winds down in gentle slopes to the Square on the valley floor, and out of the Square the bell tower stands up, its painted dial a minute short of noon. Nothing down there moves.",
+      "canonStatus": "CANON (b1 ch.17:267-269: the town through the clearing fog past the bridge; ch.19:31: a valley town); the view from the gate CANON-EXPANDED"
+    },
+    {
+      "kind": "look",
+      "at": {
+        "x": -46,
+        "y": -134.2
+      },
+      "name": "The chasm stair's door",
+      "interact": "Look at the low door",
+      "text": "A low door in the lip, its lintel cut from the same grey stone as the slabs: an old way down from the street's cellars to the bridge's footings, and the ledge the masons cut along the chasm's wall. The Hollow use it. The dust on its steps has no boot prints in it, only long smooth drag marks.",
+      "canonStatus": "GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 5, the low road: the Hollow's way; in the CANON chasm, b1 ch.17:189)"
     }
   ],
   "decks": [
@@ -3053,8 +3140,8 @@
         "x": 3.9,
         "y": 120.8
       },
-      "rise": 0,
-      "rise2": 2.25,
+      "rise": -8.0,
+      "rise2": -5.75,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3070,8 +3157,8 @@
         "x": 3.9,
         "y": 123.0
       },
-      "rise": 2.25,
-      "rise2": 2.25,
+      "rise": -5.75,
+      "rise2": -5.75,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3087,8 +3174,8 @@
         "x": -2.8,
         "y": 121.9
       },
-      "rise": 2.25,
-      "rise2": 4.5,
+      "rise": -5.75,
+      "rise2": -3.5,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3104,8 +3191,8 @@
         "x": -5.0,
         "y": 121.9
       },
-      "rise": 4.5,
-      "rise2": 4.5,
+      "rise": -3.5,
+      "rise2": -3.5,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3121,8 +3208,8 @@
         "x": -3.9,
         "y": 115.2
       },
-      "rise": 4.5,
-      "rise2": 6.75,
+      "rise": -3.5,
+      "rise2": -1.25,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3138,8 +3225,8 @@
         "x": -3.9,
         "y": 113.0
       },
-      "rise": 6.75,
-      "rise2": 6.75,
+      "rise": -1.25,
+      "rise2": -1.25,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3155,8 +3242,8 @@
         "x": 2.8,
         "y": 114.1
       },
-      "rise": 6.75,
-      "rise2": 9.0,
+      "rise": -1.25,
+      "rise2": 1.0,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3172,8 +3259,8 @@
         "x": 5.0,
         "y": 114.1
       },
-      "rise": 9,
-      "rise2": 9,
+      "rise": 1.0,
+      "rise2": 1.0,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3189,8 +3276,8 @@
         "x": 1.1,
         "y": 120.8
       },
-      "rise": 9,
-      "rise2": 9,
+      "rise": 1.0,
+      "rise2": 1.0,
       "width": 7.8,
       "canonStatus": "GAME-ONLY"
     },
@@ -3206,8 +3293,8 @@
         "x": 3.9,
         "y": 123.0
       },
-      "rise": 9,
-      "rise2": 9,
+      "rise": 1.0,
+      "rise2": 1.0,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3223,8 +3310,8 @@
         "x": -2.8,
         "y": 121.9
       },
-      "rise": 9,
-      "rise2": 11.25,
+      "rise": 1.0,
+      "rise2": 3.25,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3240,8 +3327,8 @@
         "x": -5.0,
         "y": 121.9
       },
-      "rise": 11.25,
-      "rise2": 11.25,
+      "rise": 3.25,
+      "rise2": 3.25,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3257,8 +3344,8 @@
         "x": -3.9,
         "y": 115.2
       },
-      "rise": 11.25,
-      "rise2": 13.5,
+      "rise": 3.25,
+      "rise2": 5.5,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3274,8 +3361,8 @@
         "x": -3.9,
         "y": 113.0
       },
-      "rise": 13.5,
-      "rise2": 13.5,
+      "rise": 5.5,
+      "rise2": 5.5,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3291,8 +3378,8 @@
         "x": 2.8,
         "y": 114.1
       },
-      "rise": 13.5,
-      "rise2": 15.75,
+      "rise": 5.5,
+      "rise2": 7.75,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3308,8 +3395,8 @@
         "x": 5.0,
         "y": 114.1
       },
-      "rise": 15.75,
-      "rise2": 15.75,
+      "rise": 7.75,
+      "rise2": 7.75,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3325,8 +3412,8 @@
         "x": 3.9,
         "y": 120.8
       },
-      "rise": 15.75,
-      "rise2": 18.0,
+      "rise": 7.75,
+      "rise2": 10.0,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3342,8 +3429,8 @@
         "x": -1.1,
         "y": 123
       },
-      "rise": 18,
-      "rise2": 18,
+      "rise": 10.0,
+      "rise2": 10.0,
       "width": 7.8,
       "canonStatus": "GAME-ONLY"
     },
@@ -3359,8 +3446,8 @@
         "x": 3.9,
         "y": 123.0
       },
-      "rise": 18,
-      "rise2": 18,
+      "rise": 10.0,
+      "rise2": 10.0,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3376,8 +3463,8 @@
         "x": 96,
         "y": 70
       },
-      "rise": 2,
-      "rise2": 2,
+      "rise": -6.0,
+      "rise2": -6.0,
       "width": 23,
       "canonStatus": "GAME-ONLY",
       "solid": true
@@ -3394,8 +3481,8 @@
         "x": 85,
         "y": 84.2
       },
-      "rise": 2,
-      "rise2": 2,
+      "rise": -6.0,
+      "rise2": -6.0,
       "width": 5.8,
       "canonStatus": "GAME-ONLY",
       "solid": true
@@ -3412,8 +3499,8 @@
         "x": 48.4,
         "y": 70.0
       },
-      "rise": 0,
-      "rise2": 2,
+      "rise": -8.0,
+      "rise2": -6.0,
       "width": 7,
       "canonStatus": "GAME-ONLY"
     },
@@ -3429,8 +3516,8 @@
         "x": 94.5,
         "y": 80.2
       },
-      "rise": 5,
-      "rise2": 5,
+      "rise": -3.0,
+      "rise2": -3.0,
       "width": 2.8,
       "canonStatus": "GAME-ONLY"
     },
@@ -3446,8 +3533,8 @@
         "x": 94.5,
         "y": 59.8
       },
-      "rise": 5,
-      "rise2": 5,
+      "rise": -3.0,
+      "rise2": -3.0,
       "width": 2.8,
       "canonStatus": "GAME-ONLY"
     },
@@ -3463,8 +3550,8 @@
         "x": 94.4,
         "y": 80.2
       },
-      "rise": 5,
-      "rise2": 5,
+      "rise": -3.0,
+      "rise2": -3.0,
       "width": 2.8,
       "canonStatus": "GAME-ONLY"
     },
@@ -3480,8 +3567,8 @@
         "x": 90.0,
         "y": 60.4
       },
-      "rise": 2,
-      "rise2": 5,
+      "rise": -6.0,
+      "rise2": -3.0,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3497,8 +3584,8 @@
         "x": 90.0,
         "y": 79.6
       },
-      "rise": 2,
-      "rise2": 5,
+      "rise": -6.0,
+      "rise2": -3.0,
       "width": 2.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3514,8 +3601,8 @@
         "x": 113.5,
         "y": -63.4
       },
-      "rise": 4,
-      "rise2": 4,
+      "rise": 0.5,
+      "rise2": 0.5,
       "width": 3.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3531,8 +3618,8 @@
         "x": 113.5,
         "y": -76.6
       },
-      "rise": 8,
-      "rise2": 8,
+      "rise": 4.5,
+      "rise2": 4.5,
       "width": 3.2,
       "canonStatus": "GAME-ONLY"
     },
@@ -3548,8 +3635,8 @@
         "x": 78.0,
         "y": -64.6
       },
-      "rise": 0,
-      "rise2": 4,
+      "rise": -3.5,
+      "rise2": 0.5,
       "width": 2.4,
       "canonStatus": "GAME-ONLY"
     },
@@ -3565,10 +3652,95 @@
         "x": 112.6,
         "y": -75.4
       },
-      "rise": 4,
-      "rise2": 8,
+      "rise": 0.5,
+      "rise2": 4.5,
       "width": 2.4,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The ledge stair (first flight)",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -25,
+        "y": -164.6
+      },
+      "at2": {
+        "x": -25,
+        "y": -151.2
+      },
+      "rise": -13,
+      "rise2": -8,
+      "width": 3.6,
+      "canonStatus": "GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 5, the low road: the Hollow's way; in the CANON chasm, b1 ch.17:189)"
+    },
+    {
+      "name": "The ledge landing",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -25,
+        "y": -151.5
+      },
+      "at2": {
+        "x": -25,
+        "y": -139.7
+      },
+      "rise": -8,
+      "rise2": -8,
+      "width": 4,
+      "canonStatus": "GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 5, the low road: the Hollow's way; in the CANON chasm, b1 ch.17:189)"
+    },
+    {
+      "name": "The ledge stair (along the wall)",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -26.8,
+        "y": -141.6
+      },
+      "at2": {
+        "x": -44,
+        "y": -141.6
+      },
+      "rise": -8,
+      "rise2": -1,
+      "width": 3.6,
+      "canonStatus": "GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 5, the low road: the Hollow's way; in the CANON chasm, b1 ch.17:189)"
+    },
+    {
+      "name": "The ledge head",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -43.7,
+        "y": -141.6
+      },
+      "at2": {
+        "x": -48.6,
+        "y": -141.6
+      },
+      "rise": -1,
+      "rise2": -1,
+      "width": 3.6,
+      "canonStatus": "GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 5, the low road: the Hollow's way; in the CANON chasm, b1 ch.17:189)"
+    },
+    {
+      "name": "The ledge stair (up to the lip)",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": -46.15,
+        "y": -140.0
+      },
+      "at2": {
+        "x": -46.15,
+        "y": -136.9
+      },
+      "rise": -1,
+      "rise2": 0,
+      "width": 3.6,
+      "canonStatus": "GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 5, the low road: the Hollow's way; in the CANON chasm, b1 ch.17:189)"
     }
   ],
   "drops": [
@@ -3623,7 +3795,7 @@
       },
       "rotation": 0,
       "width": 2.4,
-      "rise": 2,
+      "rise": -6.0,
       "prompt": "Lift the bar",
       "opensOn": "Registrar Dunstan Pardew",
       "look": "stockade"
@@ -3713,7 +3885,7 @@
         "x": 72,
         "y": 84.5
       },
-      "rise": 2
+      "rise": -6.0
     },
     {
       "name": "the tower door",
@@ -3728,7 +3900,7 @@
         "x": 3.9,
         "y": 121.9
       },
-      "rise": 18
+      "rise": 10.0
     },
     {
       "name": "the wagon",
@@ -3743,7 +3915,7 @@
         "x": 1.1,
         "y": 118
       },
-      "rise": 9
+      "rise": 1.0
     },
     {
       "name": "the anchor-well",
@@ -4406,7 +4578,7 @@
       },
       "wing": "granary",
       "step": 3,
-      "rise": 4,
+      "rise": 0.5,
       "optional": true
     },
     {
@@ -4428,7 +4600,7 @@
       "step": 3,
       "elite": true,
       "guards": "The Picker-Master's sorters",
-      "rise": 4,
+      "rise": 0.5,
       "optional": true
     },
     {
@@ -4448,7 +4620,7 @@
       },
       "wing": "granary",
       "step": 4,
-      "rise": 8,
+      "rise": 4.5,
       "optional": true
     },
     {
@@ -4470,7 +4642,7 @@
       "step": 4,
       "elite": true,
       "guards": "Coldwell's netters",
-      "rise": 8,
+      "rise": 4.5,
       "optional": true
     },
     {
@@ -4636,7 +4808,7 @@
       },
       "wing": "archive",
       "step": 1,
-      "rise": 2
+      "rise": -6.0
     },
     {
       "name": "Clerks in the stacks",
@@ -4655,7 +4827,7 @@
       },
       "wing": "archive",
       "step": 2,
-      "rise": 2
+      "rise": -6.0
     },
     {
       "name": "Clerks at the lecterns",
@@ -4674,7 +4846,7 @@
       },
       "wing": "archive",
       "step": 3,
-      "rise": 2
+      "rise": -6.0
     },
     {
       "name": "Pardew's copyists",
@@ -4693,7 +4865,7 @@
       },
       "wing": "archive",
       "step": 4,
-      "rise": 2
+      "rise": -6.0
     },
     {
       "name": "Registrar Dunstan Pardew",
@@ -4714,7 +4886,7 @@
       "step": 4,
       "elite": true,
       "guards": "Pardew's copyists",
-      "rise": 2
+      "rise": -6.0
     },
     {
       "name": "Clerks from the cells",
@@ -4733,7 +4905,7 @@
       },
       "wing": "archive",
       "after": "loose:Registrar Dunstan Pardew",
-      "rise": 2
+      "rise": -6.0
     },
     {
       "name": "The Reader at the Desk",
@@ -4756,7 +4928,7 @@
       "social": "solitary",
       "passive": true,
       "optional": true,
-      "rise": 2
+      "rise": -6.0
     },
     {
       "name": "Pact relief on the walk",
@@ -4831,7 +5003,7 @@
       "wing": "tower",
       "step": 2,
       "gate": "The ward-lock",
-      "rise": 9
+      "rise": 1.0
     },
     {
       "name": "Pact-Captain Rowena Kersey",
@@ -4853,7 +5025,7 @@
       "elite": true,
       "guards": "Kersey's line",
       "gate": "The ward-lock",
-      "rise": 9
+      "rise": 1.0
     },
     {
       "name": "The Examiner's clerks",
@@ -4873,7 +5045,7 @@
       "wing": "tower",
       "step": 3,
       "gate": "The ward-lock",
-      "rise": 18
+      "rise": 10.0
     },
     {
       "name": "Bureau Examiner Thurstan Vowell",
@@ -4895,7 +5067,7 @@
       "elite": true,
       "guards": "The Examiner's clerks",
       "gate": "The ward-lock",
-      "rise": 18
+      "rise": 10.0
     },
     {
       "name": "Ringers on the stair (first)",
@@ -5106,5 +5278,64 @@
     "edge": 20,
     "clear": 0.6,
     "canonStatus": "CANON (b1 ch.21:19: the fog thinner, pushed back by the bubble of static reality that encased the town; no wind; no birds)"
-  }
+  },
+  "terraces": [
+    {
+      "name": "Main Street's descent",
+      "canonStatus": "CANON-EXPANDED (b1 ch.19:31 \"a ... small, ... idyllic, ... valley town\"; ch.17:267-269 the town seen \"through the clearing fog\" past the bridge, ch.17:259 \"They scrambled up the slope\"); the heights and slopes GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 4)",
+      "center": {
+        "x": 25,
+        "y": -74
+      },
+      "size": {
+        "x": 210,
+        "y": 88
+      },
+      "rotation": 0,
+      "height": 0,
+      "heightTo": -8.0,
+      "blend": 50,
+      "ramp": true,
+      "paved": false,
+      "style": "slope"
+    },
+    {
+      "name": "The valley floor",
+      "canonStatus": "CANON-EXPANDED (b1 ch.19:31 \"a ... small, ... idyllic, ... valley town\"; ch.17:267-269 the town seen \"through the clearing fog\" past the bridge, ch.17:259 \"They scrambled up the slope\"); the heights and slopes GAME-ONLY (REWORK_LOWTOWNS_HALLOWS.md pick 4)",
+      "center": {
+        "x": 25,
+        "y": 60
+      },
+      "size": {
+        "x": 210,
+        "y": 180
+      },
+      "rotation": 0,
+      "height": -8.0,
+      "heightTo": -8.0,
+      "blend": 50,
+      "ramp": false,
+      "paved": false,
+      "style": "floor"
+    },
+    {
+      "name": "The Granary's shelf",
+      "canonStatus": "GAME-ONLY (the Granary on the race, DUNGEON2_DESIGN 2.4: a shelf half way down the valley's side)",
+      "center": {
+        "x": 95,
+        "y": -85
+      },
+      "size": {
+        "x": 56,
+        "y": 62
+      },
+      "rotation": 0,
+      "height": -3.5,
+      "heightTo": -3.5,
+      "blend": 20,
+      "ramp": false,
+      "paved": false,
+      "style": "floor"
+    }
+  ]
 }

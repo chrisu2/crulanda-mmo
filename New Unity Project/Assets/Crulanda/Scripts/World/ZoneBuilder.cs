@@ -194,8 +194,11 @@ namespace Crulanda.World
             float n = Mathf.PerlinNoise(x * .035f + Zone.seed, z * .035f + Zone.seed * 2) * .75f + Mathf.PerlinNoise(x * .11f, z * .11f) * .25f;
             float h = hills * Zone.hillHeight * n + (hills > 0 ? hills * Crag(x, z) : 0) + CliffLift(x, z);   // mountain crags off the kept ways; shelves behind cliffs
             if (Zone.wasting != null && x > Zone.wasting.x - 4) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 6);  // unmade ground is dead flat
-            if (shapes != null) h = Shape(x, z, h);   // landmark ground: level pads, perches and basins (ZoneShape)
             if (Zone.terraces != null && Zone.terraces.Length > 0) h = Terraces(x, z, h);   // a city's plateau, terraces and ramps (ZoneBuilder.Crown)
+            // Landmark ground (ZoneShape: level pads, perches and basins), after the terraces (2026-10-18, Hallow's Creek's valley: the
+            // crater is sunk into the valley floor's terrace, which sets its height outright, so a shape before it was levelled away). No
+            // other zone has both (the Crown and the Lowtowns have terraces and no shapes; the rest shapes and no terraces).
+            if (shapes != null) h = Shape(x, z, h);
             // (Hallow's Creek) a chasm sunk in the land (ZonePit; ZoneBuilder.HallowsGround). After the terraces (2026-10-18, the Lowtowns'
             // Dead Man's Drop sinks into the Rust Market's shelf; a terrace sets its height outright, so a pit before it was levelled away).
             if (Zone.pits != null && Zone.pits.Length > 0) h = Pit(x, z, h);

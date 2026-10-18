@@ -402,7 +402,8 @@ namespace Crulanda.World
             {
                 float r = radius * ring / rings, a = seg * Mathf.PI * 2 / segs;
                 float x = c.x + Mathf.Cos(a) * r, z = c.z + Mathf.Sin(a) * r;
-                float hemi = Datum - deep * Mathf.Sqrt(Mathf.Max(0, 1 - (r / radius) * (r / radius)));
+                // The rim stands deep over the root (the Square's ground, ZoneBuilder.Hallows Crater).
+                float hemi = c.y + deep - deep * Mathf.Sqrt(Mathf.Max(0, 1 - (r / radius) * (r / radius)));
                 return new Vector3(x, Mathf.Max(hemi, HeightAt(x, z) + .05f), z) - c;
             }
             Mesh Band(int from, int to, string name)

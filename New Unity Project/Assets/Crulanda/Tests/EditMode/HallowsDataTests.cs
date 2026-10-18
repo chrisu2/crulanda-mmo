@@ -22,6 +22,8 @@ namespace Crulanda.Tests
     public class HallowsDataTests
     {
         static ZoneDefinition zone, oakhaven;
+        /// <summary>The valley floor under the yard (REWORK_LOWTOWNS_HALLOWS.md pick 4, 2026-10-18): the town's decks' rises are over the yard.</summary>
+        const float Valley = -8;
         static readonly Dictionary<string, Hollow> caves = new Dictionary<string, Hollow>();
         static string Content { get { return Path.Combine(Application.dataPath, "Crulanda/EncounterContent"); } }
         static ZoneDefinition Read(string file) { return JsonUtility.FromJson<ZoneDefinition>(File.ReadAllText(Path.Combine(Content, "Zones/" + file + ".json"))); }
@@ -270,12 +272,12 @@ namespace Crulanda.Tests
         [Test] public void The_pact_captain_holds_the_second_landing_on_a_floor()
         {
             var kersey = zone.camps.Single(c => c.mob == "Pact-Captain Rowena Kersey"); var line = zone.camps.Single(c => c.name == "Kersey's line");
-            Assert.AreEqual(9, kersey.rise, .01f, "the second landing (+9), not the ground floor (DUNGEON2_DESIGN 2.7)"); Assert.AreEqual(9, line.rise, .01f, "her line with her");
+            Assert.AreEqual(9 + Valley, kersey.rise, .01f, "the second landing (+9 over the valley floor), not the ground floor (DUNGEON2_DESIGN 2.7)"); Assert.AreEqual(9 + Valley, line.rise, .01f, "her line with her");
             var landing = zone.decks.Single(d => d.name == "The second landing");
-            Assert.AreEqual("floor", landing.style); Assert.AreEqual(9, landing.rise, .01f); Assert.GreaterOrEqual(landing.width, 7.5f); Assert.GreaterOrEqual(Vector2.Distance(landing.at, landing.at2), 5.5f, "a floor to fight on");
+            Assert.AreEqual("floor", landing.style); Assert.AreEqual(9 + Valley, landing.rise, .01f); Assert.GreaterOrEqual(landing.width, 7.5f); Assert.GreaterOrEqual(Vector2.Distance(landing.at, landing.at2), 5.5f, "a floor to fight on");
             foreach (var n in new[] { "The first landing", "The third landing", "The belfry floor" }) Assert.IsTrue(zone.decks.Any(d => d.name == n), n);
-            Assert.AreEqual(4.5f, zone.decks.Single(d => d.name == "The first landing").rise, .01f); Assert.AreEqual(13.5f, zone.decks.Single(d => d.name == "The third landing").rise, .01f);
-            Assert.IsTrue(zone.anchors.Any(a => a.name == "the second landing" && Mathf.Approximately(a.rise, 9)), "the anchor the nav test walks to");
+            Assert.AreEqual(4.5f + Valley, zone.decks.Single(d => d.name == "The first landing").rise, .01f); Assert.AreEqual(13.5f + Valley, zone.decks.Single(d => d.name == "The third landing").rise, .01f);
+            Assert.IsTrue(zone.anchors.Any(a => a.name == "the second landing" && Mathf.Approximately(a.rise, 9 + Valley)), "the anchor the nav test walks to");
             // No flight passes under a floor with less than 2.2 m over it: every pair of tower decks that overlap in plan are 2.2 m apart or more.
             var tower = zone.decks.Where(d => string.IsNullOrEmpty(d.cave) && Vector2.Distance((d.at + d.at2) / 2, new Vector2(0, 118)) < 9).ToList();
             var bad = new List<string>();
@@ -470,6 +472,97 @@ namespace Crulanda.Tests
                 else if (Mathf.Abs(d.at.y - pit.center.y) > pit.size.y / 2) bad.Add(p.name + " is not over the chasm");
             }
             Clean(bad, "Ash Road and bridge dressing");
+        }
+        /// <summary>
+        /// A valley town seen from the lip and two roads in (REWORK_LOWTOWNS_HALLOWS.md picks 4 and 5, 2026-10-18; b1 ch.19:31 "valley town",
+        /// ch.17:267 the town through the clearing fog past the bridge): the gatehouse on the lip at the yard's height, the Square, the
+        /// Archive and the tower eight metres under it on the valley floor, the Granary on a shelf half way down; no slope in the town
+        /// steeper than 20 degrees and the halls with floors up in them on level ground; the Cellars as deep under the street as they were;
+        /// the low road from the Fallen Mason's slab along the chasm's wall to the lip, then down the chasm stair into the Cellars.
+        /// The ground is the terraces alone (the zone is flat under them, hillHeight 0), as the builder works it out (the crater left out).
+        /// </summary>
+        [Test] public void The_town_lies_in_a_valley_under_the_gatehouse_and_a_low_road_comes_in_by_the_cellars()
+        {
+            var bad = new List<string>();
+            float H(float x, float y) { return ZoneBuilder.TerraceGround(zone.terraces, x, y, 0); }
+            Assert.AreEqual(0, zone.hillHeight, .01f, "flat under the terraces");
+            var floor = zone.terraces.Single(t => t.name == "The valley floor"); Assert.AreEqual(Valley, floor.height, .01f);
+            foreach (var t in zone.terraces) if (string.IsNullOrEmpty(t.canonStatus)) bad.Add(t.name + " has no canonStatus");
+            Assert.AreEqual(0, H(0, -128.37f), .01f, "the gatehouse on the lip");
+            Assert.AreEqual(0, H(6.3f, -122.37f), .01f, "the wall-walk stair's foot on the lip");
+            foreach (var p in new[] { new Vector2(0, 45), new Vector2(72, 70), new Vector2(0, 118), new Vector2(-33, 49), new Vector2(-44, 100) })
+                Assert.AreEqual(Valley, H(p.x, p.y), .01f, "the valley floor at " + p);
+            Assert.Less(H(95, -70), -3, "the Granary down on its shelf");
+            // No slope steeper than 20 degrees in the town, Main Street the gentlest.
+            float steep = 0, street = 0;
+            for (float x = -140; x <= 200; x += 2) for (float y = -136; y <= 200; y += 2)
+            {
+                float g = H(x, y), deg = Mathf.Atan(new Vector2(H(x + 1, y) - g, H(x, y + 1) - g).magnitude) * Mathf.Rad2Deg;
+                steep = Mathf.Max(steep, deg); if (Mathf.Abs(x) < 7 && y >= -122 && y <= 30) street = Mathf.Max(street, deg);
+            }
+            Assert.LessOrEqual(steep, 20, "the valley's sides"); Assert.LessOrEqual(street, 10, "Main Street winds down gently");
+            // The halls with floors and stairs up in them stand on level ground (their decks' rises are over the yard).
+            foreach (var p in zone.props.Where(p => p.kind == "granary" || p.kind == "archive" || p.kind == "belfry" || p.kind == "gatehouse" || p.kind == "chapel" || p.kind == "wellhouse"))
+            {
+                // Over its footprint (unturned: its walls' rectangle; turned: the circle round it), a metre at a time.
+                var half = p.size.x > 0 ? p.size / 2 : new Vector2(4, 4); float lo = float.MaxValue, hi = float.MinValue;
+                if (Mathf.Abs(p.rotation) > .01f) half = Vector2.one * half.magnitude;
+                for (float x = -half.x; x <= half.x + .01f; x += 1) for (float y = -half.y; y <= half.y + .01f; y += 1)
+                {
+                    if (Mathf.Abs(p.rotation) > .01f && new Vector2(x, y).magnitude > half.x) continue;
+                    float g = H(p.at.x + x, p.at.y + y); lo = Mathf.Min(lo, g); hi = Mathf.Max(hi, g);
+                }
+                if (hi - lo > .05f) bad.Add(p.name + " stands on ground that falls " + (hi - lo).ToString("0.00") + " m");
+            }
+            // The Cellars (and the low road's stair) keep their roofs at least 1.5 m under the street they run under.
+            foreach (var name in new[] { "The Cellars", "The chasm stair" })
+            {
+                var c = zone.props.Single(p => p.kind == "cavern" && p.name == name); Assert.AreEqual(0, c.rotation, .01f, name + " runs north");
+                float mouth = H(c.at.x, c.at.y);
+                for (int i = 0; i + 4 < c.plan.Length; i += 5)
+                {
+                    if (c.plan[i + 1] < 20) continue;
+                    float over = H(c.at.x + c.plan[i], c.at.y + c.plan[i + 1]) - (mouth + c.plan[i + 4] + c.plan[i + 3]);
+                    if (over < 1.5f) bad.Add(name + " at " + c.plan[i + 1] + " m in has " + over.ToString("0.0") + " m over its roof");
+                }
+            }
+            // The low road: the ledge stair from the Fallen Mason's slab, each flight under 25 degrees and each running on into the next, to the lip.
+            var ledge = zone.decks.Where(d => d.name.StartsWith("The ledge")).ToList(); Assert.AreEqual(5, ledge.Count, "three flights, a landing and the head");
+            foreach (var d in ledge)
+            {
+                float run = Vector2.Distance(d.at, d.at2), deg = Mathf.Atan2(Mathf.Abs(d.rise2 - d.rise), run) * Mathf.Rad2Deg;
+                if (deg > 25) bad.Add(d.name + " is " + deg.ToString("0.0") + " degrees");
+                if (d.width < 3.5f) bad.Add(d.name + " is " + d.width + " m wide");
+                if (d.style != "stone" || string.IsNullOrEmpty(d.canonStatus)) bad.Add(d.name + " is not labelled stone");
+            }
+            for (int i = 1; i < ledge.Count; i++)
+            {
+                var a = ledge[i - 1]; var b = ledge[i];
+                if (Vector2.Distance(a.at2, b.at) > Mathf.Max(a.width, b.width) / 2 + .3f || Mathf.Abs(a.rise2 - b.rise) > .3f) bad.Add(a.name + " does not run on into " + b.name);
+            }
+            var mason = zone.decks.Single(d => d.name == "The Mason's slab");
+            Assert.AreEqual(mason.rise, ledge[0].rise, .01f, "the ledge leaves the Fallen Mason's slab at its height");
+            Assert.Less(Mathf.Abs(ledge[0].at.x - mason.at.x), mason.width / 2, "on the slab"); Assert.Less(Mathf.Abs(ledge[0].at.y - mason.at2.y), .5f, "at its north end");
+            var top = ledge[ledge.Count - 1]; var pit = zone.pits.Single();
+            Assert.AreEqual(0, top.rise2, .01f, "it climbs to the lip"); Assert.Greater(top.at2.y, pit.center.y + pit.size.y / 2 - .2f, "and ends on the land");
+            // The chasm stair: its door on the lip by the ledge's head, its far end in the Cellars' passage at the Cellars' floor.
+            var stair = zone.props.Single(p => p.kind == "cavern" && p.name == "The chasm stair"); var cel = zone.props.Single(p => p.kind == "cavern" && p.name == "The Cellars");
+            Assert.AreEqual("The Cellars", stair.joins);
+            Assert.Less(Vector2.Distance(stair.at, top.at2), 7, "the door a few steps from the ledge's head");
+            int n = stair.plan.Length - 5; var end = stair.at + new Vector2(stair.plan[n], stair.plan[n + 1]); float endY = H(stair.at.x, stair.at.y) + stair.plan[n + 4];
+            float near = float.MaxValue, nearY = 0, wide = 0;
+            for (int i = 0; i + 9 < cel.plan.Length; i += 5)
+                for (float u = 0; u <= 1; u += .05f)
+                {
+                    var q = cel.at + Vector2.Lerp(new Vector2(cel.plan[i], cel.plan[i + 1]), new Vector2(cel.plan[i + 5], cel.plan[i + 6]), u);
+                    float dd = Vector2.Distance(q, end);
+                    if (dd < near) { near = dd; nearY = H(cel.at.x, cel.at.y) + Mathf.Lerp(cel.plan[i + 4], cel.plan[i + 9], u); wide = Mathf.Lerp(cel.plan[i + 2], cel.plan[i + 7], u); }
+                }
+            Assert.Less(near, wide, "the chasm stair ends inside the Cellars' passage"); Assert.AreEqual(nearY, endY, .4f, "at the Cellars' floor");
+            // The view from the gate (ch.17:267).
+            var look = zone.props.Single(p => p.kind == "look" && p.name == "The town below");
+            Assert.IsTrue(look.canonStatus.Contains("ch.17:267")); Assert.IsTrue(look.text.Contains("Through the clearing fog, a town appeared."));
+            Clean(bad, "valley and low road");
         }
     }
 }

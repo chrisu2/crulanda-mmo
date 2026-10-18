@@ -113,8 +113,9 @@ namespace Crulanda.World
         void Crater(Transform t, float rim, float wall)
         {
             var kerb = Dressed(new Color(.88f, .87f, .84f));
-            // The root stands on the bowl's floor; the rim is the yard's height.
-            float up = Datum - t.position.y;
+            // The root stands on the bowl's floor; the rim is the Square's ground just outside the bowl (the valley floor since
+            // 2026-10-18, REWORK_LOWTOWNS_HALLOWS.md pick 4; the yard's height before).
+            float up = HeightAt(t.position.x + wall + 4, t.position.z) - t.position.y;
             ObsidianBowl(t, wall - .8f, up);
             int n = 40;
             for (int k = 0; k < n; k++)
@@ -227,10 +228,11 @@ namespace Crulanda.World
             Glow(t, new Vector3(0, 1.3f, -.8f), 6, .7f, new Color(.6f, .75f, 1f), .9f);
             Solid(t, new Vector3(0, 1.1f, 0), new Vector3(.9f, 2.2f, .6f));
         }
-        /// <summary>The Warden's satchel on her cell's floor (the Archive's floor, two metres up: set down on the deck there).</summary>
+        /// <summary>The Warden's satchel on her cell's floor (the Archive's floor, two metres over the land: set down on the deck there).</summary>
         void Satchel(Transform t)
         {
-            t.position = StandAt(new Vector2(t.position.x, t.position.z), Datum + 2.5f);
+            // Half a metre over the Archive's floor, two metres over the land it stands on (the valley floor since 2026-10-18).
+            t.position = StandAt(new Vector2(t.position.x, t.position.z), HeightAt(t.position.x, t.position.z) + 2.5f);
             var leather = Tint(art.timber, new Color(.3f, .27f, .24f)); var tape = Tint(art.plaster, new Color(.62f, .62f, .64f));
             Part(PrimitiveType.Cube, t, new Vector3(0, .17f, 0), new Vector3(.5f, .34f, .2f), leather, Quaternion.Euler(0, 15, 0));
             Part(PrimitiveType.Cube, t, new Vector3(.05f, .03f, .1f), new Vector3(.3f, .06f, .22f), tape, Quaternion.Euler(0, -10, 0));

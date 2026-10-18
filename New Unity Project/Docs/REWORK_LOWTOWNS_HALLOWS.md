@@ -66,6 +66,11 @@ slates, the hounds' flank bite, the dock-rats' boat-hook, the Grey-touched's fla
 the ringers' Time-Lost echoes, crossbows on the wall, the Pact's shield-wall with spears, "Struck from the record" taking a buff off).
 ZONE_LOWTOWNS.md "The rework, pick 7" and DUNGEON2_DESIGN.md "New tricks for the Bureau and the Pact".
 
+**Built (branch rw3-valley, 2026-10-18; WRITTEN, compiles, NOT RUN):** Hallow's Creek picks 4 (the valley: the gatehouse on the lip, Main
+Street falling 8 m to the Square on the valley floor, the Granary on a shelf, the view from the gate with ch.17:267) and 5 (two roads in: the
+high road unchanged and the run's; the low road from the Fallen Mason's slab up a railed ledge stair along the chasm's wall and down the
+chasm stair into the Cellars). DUNGEON2_DESIGN.md, "A valley town seen from the lip, and two roads in".
+
 ## 1. What the books say (check at a glance)
 
 ### The Lowtowns (Argentis's lower city)

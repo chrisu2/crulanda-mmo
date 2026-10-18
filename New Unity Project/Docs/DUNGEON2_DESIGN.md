@@ -551,3 +551,62 @@ crossbowman; the near side, over the lower floor, open.
 - To run: HallowsNavTests (the bridge's parapets and the new town rails' assertions; the "no navmesh at an open edge" check now covers
   the town's rails too, and the tower's flights must still reach the belfry), HallowsDataTests, CheckpointTests, ZoneContentTests.
   Then frames of the Granary's lofts, the Archive's galleries and the tower's flights, front and side.
+
+## A valley town seen from the lip, and two roads in (2026-10-18, branch rw3-valley: REWORK_LOWTOWNS_HALLOWS.md picks 4 and 5; WRITTEN, compiles, NOT RUN in Unity; OPEN until Chris sees it)
+Chris, 2026-10-18 ~02:00, on the rework plan: "all of them" (picks 4 and 5 among them). The books: "a ... small, ... idyllic, ... valley
+town" (b1 ch.19:31); past the broken bridge "They scrambled up the slope" (ch.17:259) and "Through the clearing fog, a town appeared"
+(ch.17:267), "Picket fences. White houses. A town square." (ch.17:269). The first draft's town was flat at the yard's height.
+
+**Pick 4, the valley (CANON-EXPANDED; the heights GAME-ONLY).**
+- The ground: three `terraces` in hallows.json (ZoneDefinition.ZoneTerrace, as the Crown and the Lowtowns use; ZoneBuilder.TerraceGround):
+  **Main Street's descent**, a ramp 210 m across from the gatehouse's lip (y -118, the yard's height) down to y -30 at **-8 m**; **the valley
+  floor**, level at -8 from y -30 to 150 (the Square, the well-house, the willow, the chapel, the Archive, the tower, the ford); **the
+  Granary's shelf**, level at -3.5 (the Granary, its wagon yard and the race), half way down the valley's east side. The edges ease back
+  to the land over 50 m (20 m round the shelf): the valley's sides, never steeper than about 19 degrees; Main Street falls about 5 degrees
+  (9 at most) between the houses. The gatehouse, its wall-walk and the bridge are unchanged at the yard's height: from the gate the whole
+  town lies below, the bell tower's belfry (now +10 over the yard) standing up out of the Square.
+- **The view from the gate** (CANON, ch.17:267-269): a "look" just inside Tredway's gate, "The town below" ("Look down into the valley"),
+  with the book's line. The gatehouse's landmark view is unchanged.
+- Every rise in the town is over the yard, so every deck, camp, anchor, gate and secret up on a floor in the valley went down with it:
+  the tower's flights and landings, the Archive's floor, steps, galleries and cells by -8 (the second landing +1, the belfry +10, the
+  Archive's floor -6); the Granary's lofts and stairs and their camps by -3.5 (the north loft +0.5, the south loft +4.5). Nothing became a
+  rise of 0 (which would read as "on the ground"). The bridge, the lower orbit and the wall-walk are unchanged.
+- **The Cellars** keep their depth under the street: each row's floor (under the mouth's ground, the bakery's yard at -3.8) falls as the
+  street falls over it, so their roofs are 1.7 m or more under the paving as before, and they still meet the well-house stair (whose mouth
+  is on the valley floor) at the same floor.
+- Code: `ZoneBuilder.HeightAt` sinks the landmark shapes **after** the terraces (a terrace sets its height outright, so the crater would have
+  been levelled away; no other zone has both); the crater's rim and its obsidian skin are measured from the Square's ground instead of the
+  yard's (ZoneBuilder.Hallows `Crater`, HallowsBooks `ObsidianBowl`): the bowl is still 16 m deep, from -8 to -24; the Warden's satchel is
+  set on the Archive's floor from the land under it. Rails: the town's rails are on decks only, never on the land, so the street's slope
+  makes none; the decks moved as a whole, so their rails are as they were.
+
+**Pick 5, two roads in (GAME-ONLY).**
+- **The high road** (the Iron Pact's way): the slabs, Tredway's gate, down Main Street. Unchanged, and the run a sim leads still takes it
+  (no wing, gate or DungeonPlan order changed).
+- **The low road** (the Hollow's way): off the third slab to the lower orbit (the jump, built), then from the north end of **the Fallen
+  Mason's slab** (-13) **the ledge stair**: a flight north to **the ledge landing** at -8 under the chasm's north wall, a flight west
+  along the foot of the wall to **the ledge head** at -1, and a short flight up onto the lip west of the gatehouse (five stone decks, 3.6 m
+  wide or more, no flight over 22 degrees). Being stone decks over the chasm's fog they get the bridge's parapets on every open side
+  (railed both sides, the wall's side too). On the lip, **the chasm stair** (a new cellar-style cavern, `joins` The Cellars): a low door
+  ("Look at the low door": the Hollow's drag marks in the dust), steps down and a passage north under the back gardens west of Main Street,
+  its roof 2 m under the ground all the way, which opens into the Cellars 30 m in, at the Cellars' floor, before the Cut-Store. From there
+  the Cellars run as they did to the well-house stair, whose trapdoor lets you up onto the Square's west rim (and bars behind you).
+- **Not done:** the rework's spiral down to a ledge at -30 and a frozen fall of the creek (the Cellars lie above the Mason, so the low road
+  climbs the wall rather than going down it); no wing or gate for the low road (it is a way, not a wing); the run does not use it.
+
+**Files:** EncounterContent/Zones/hallows.json (`terraces`, the town's rises, the Cellars' floors, the ledge decks, the chasm stair, two
+looks, the canonNote), Scripts/World/ZoneBuilder.cs (HeightAt's order), ZoneBuilder.Hallows.cs (the crater's rim, the satchel),
+ZoneBuilder.HallowsBooks.cs (the obsidian skin), Tests: HallowsDataTests (new: The_town_lies_in_a_valley_under_the_gatehouse_and_a_low_road_comes_in_by_the_cellars;
+the tower's rises read over the valley floor), HallowsNavTests (the anchors' heights over the valley floor).
+
+**Risks (not run):** the crater after the reorder (it should be the same bowl sunk 8 m lower); the chasm stair's join with the Cellars (the
+navmesh across the join, and the hole in the Cellars' wall); the lip strip west of the gatehouse already let a player walk round the
+gatehouse along the chasm's edge, and the ledge makes that corner a place people go; the ford and the creek now run downhill to the north
+(the creek's levels are its own); the views and paused figures should follow the ground.
+
+**To run (lane A):** EditMode HallowsDataTests (all, the new one first), CrownZoneTests and LowtownsLevelsTests (TerraceGround unchanged,
+the order in HeightAt changed), ZoneLoreTests; PlayMode HallowsNavTests (all: the anchors, the crater's depth, the rails, every raised camp
+on its deck, the Warden's walk, the Pact-Captain's landing), CheckpointTests, ZoneContentTests (Hallow's Creek: every camp walked to),
+BuildingGroundTests (the houses on the street's slope keep their footings). Then a walk of the low road from the Mason's slab to the
+Square, and frames: from the gate (the town below, the tower), Main Street front and side, the crater from the rim, the ledge stair from
+the far Table and from the ledge, the chasm stair's door and its join in the Cellars.

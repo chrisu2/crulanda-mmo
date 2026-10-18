@@ -57,6 +57,11 @@ with the overhang as shelter, stone leaves that cut, green fissures, shadows tow
 slabs, the fifth slab that dips under a foot and tips to 45 degrees once the party is past). What was built and what is still to see:
 DUNGEON2_DESIGN.md, "The Ash Road and the bridge as chapter 17 tells them".
 
+**Built (branch w2-tricks, 2026-10-18; WRITTEN, compiles, NOT RUN):** Lowtowns pick 7 (the warders' shield-line, the Teeth's thrown
+slates, the hounds' flank bite, the dock-rats' boat-hook, the Grey-touched's flash) and Hallow's Creek pick 8 (cutters against the clock,
+the ringers' Time-Lost echoes, crossbows on the wall, the Pact's shield-wall with spears, "Struck from the record" taking a buff off).
+ZONE_LOWTOWNS.md "The rework, pick 7" and DUNGEON2_DESIGN.md "New tricks for the Bureau and the Pact".
+
 ## 1. What the books say (check at a glance)
 
 ### The Lowtowns (Argentis's lower city)

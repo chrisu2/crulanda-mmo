@@ -2332,6 +2332,321 @@
       "interact": "Look into the old well",
       "text": "The ancient town well, older than any house on the Square, its stones worn smooth by a thousand buckets. A man stood here arguing with the town's elders on the morning the sky broke. The water down in it is still, and it does not reflect you.",
       "canonStatus": "CANON (b1 ch.19:41: Aethelgard near the ancient town well); the still water GAME-ONLY"
+    },
+    {
+      "kind": "fissure",
+      "name": "A green fissure by the lip",
+      "at": {
+        "x": -4,
+        "y": -236
+      },
+      "rotation": 20,
+      "size": {
+        "x": 8,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:185: \"fissures emitting a pale green light\"; REWORK_LOWTOWNS_HALLOWS pick 7)"
+    },
+    {
+      "kind": "fissure",
+      "name": "A green fissure across the road",
+      "at": {
+        "x": -1,
+        "y": -229
+      },
+      "rotation": 80,
+      "size": {
+        "x": 9,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:185: \"fissures emitting a pale green light\"; REWORK_LOWTOWNS_HALLOWS pick 7)"
+    },
+    {
+      "kind": "fissure",
+      "name": "A green fissure by the overhang",
+      "at": {
+        "x": 5.5,
+        "y": -239
+      },
+      "rotation": -15,
+      "size": {
+        "x": 6,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:185: \"fissures emitting a pale green light\"; REWORK_LOWTOWNS_HALLOWS pick 7)"
+    },
+    {
+      "kind": "fissure",
+      "name": "A green fissure off the road",
+      "at": {
+        "x": -10,
+        "y": -226
+      },
+      "rotation": -30,
+      "size": {
+        "x": 7,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:185: \"fissures emitting a pale green light\"; REWORK_LOWTOWNS_HALLOWS pick 7)"
+    },
+    {
+      "kind": "fissure",
+      "name": "A green fissure near the bridge",
+      "at": {
+        "x": 4,
+        "y": -217
+      },
+      "rotation": 55,
+      "size": {
+        "x": 6,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:185: \"fissures emitting a pale green light\"; REWORK_LOWTOWNS_HALLOWS pick 7)"
+    },
+    {
+      "kind": "wrongshadow",
+      "name": "A stump whose shadow points at the sun",
+      "at": {
+        "x": -9.5,
+        "y": -310
+      },
+      "rotation": 0,
+      "size": {
+        "x": 7,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:11, the shadows \"an absence of time\"; lore #5, \"stretching the wrong way at noon\"); GAME-ONLY placing (pick 7)"
+    },
+    {
+      "kind": "wrongshadow",
+      "name": "A stone stump, its shadow the wrong way",
+      "at": {
+        "x": 9,
+        "y": -292
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:11, the shadows \"an absence of time\"; lore #5, \"stretching the wrong way at noon\"); GAME-ONLY placing (pick 7)"
+    },
+    {
+      "kind": "wrongshadow",
+      "name": "A shadow that lies toward the light",
+      "at": {
+        "x": -9,
+        "y": -262
+      },
+      "rotation": 0,
+      "size": {
+        "x": 7,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:11, the shadows \"an absence of time\"; lore #5, \"stretching the wrong way at noon\"); GAME-ONLY placing (pick 7)"
+    },
+    {
+      "kind": "wrongshadow",
+      "name": "A stone stump by the milestone",
+      "at": {
+        "x": 10,
+        "y": -352
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 0
+      },
+      "canonStatus": "CANON (b1 ch.17:11, the shadows \"an absence of time\"; lore #5, \"stretching the wrong way at noon\"); GAME-ONLY placing (pick 7)"
+    },
+    {
+      "kind": "stoneleaves",
+      "name": "Stone leaves west of the road",
+      "at": {
+        "x": -13,
+        "y": -300
+      },
+      "rotation": 10,
+      "size": {
+        "x": 5,
+        "y": 9
+      },
+      "canonStatus": "CANON (b1 ch.17:23: \"The leaves were sharp enough to cut skin.\"); GAME-ONLY bleed (pick 7)"
+    },
+    {
+      "kind": "stoneleaves",
+      "name": "Stone leaves east of the road",
+      "at": {
+        "x": 13.5,
+        "y": -322
+      },
+      "rotation": -8,
+      "size": {
+        "x": 6,
+        "y": 10
+      },
+      "canonStatus": "CANON (b1 ch.17:23: \"The leaves were sharp enough to cut skin.\"); GAME-ONLY bleed (pick 7)"
+    },
+    {
+      "kind": "stoneleaves",
+      "name": "Stone leaves by the yard",
+      "at": {
+        "x": -13,
+        "y": -350
+      },
+      "rotation": 0,
+      "size": {
+        "x": 5,
+        "y": 8
+      },
+      "canonStatus": "CANON (b1 ch.17:23: \"The leaves were sharp enough to cut skin.\"); GAME-ONLY bleed (pick 7)"
+    },
+    {
+      "kind": "stoneleaves",
+      "name": "Stone leaves under the stone trees",
+      "at": {
+        "x": 12,
+        "y": -272
+      },
+      "rotation": 15,
+      "size": {
+        "x": 5,
+        "y": 8
+      },
+      "canonStatus": "CANON (b1 ch.17:23: \"The leaves were sharp enough to cut skin.\"); GAME-ONLY bleed (pick 7)"
+    },
+    {
+      "kind": "stoneleaves",
+      "name": "Stone leaves by the lip",
+      "at": {
+        "x": -20,
+        "y": -240
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      },
+      "canonStatus": "CANON (b1 ch.17:23: \"The leaves were sharp enough to cut skin.\"); GAME-ONLY bleed (pick 7)"
+    },
+    {
+      "kind": "driftslab",
+      "name": "A slab hanging east of the span",
+      "at": {
+        "x": 18,
+        "y": -196
+      },
+      "rotation": 0,
+      "size": {
+        "x": 5,
+        "y": 4
+      },
+      "variant": 1,
+      "rise": 1.5,
+      "canonStatus": "CANON (b1 ch.17:193, slabs \"suspended in a chaotic arch\"; ch.17:201, \"Some stones were tilted sideways. Some were spinning slowly.\"); GAME-ONLY placing (pick 10)"
+    },
+    {
+      "kind": "driftslab",
+      "name": "A slab tilted on its side",
+      "at": {
+        "x": 23,
+        "y": -178
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 4
+      },
+      "rise": -3,
+      "canonStatus": "CANON (b1 ch.17:193, slabs \"suspended in a chaotic arch\"; ch.17:201, \"Some stones were tilted sideways. Some were spinning slowly.\"); GAME-ONLY placing (pick 10)"
+    },
+    {
+      "kind": "driftslab",
+      "name": "A slab turning over the fog",
+      "at": {
+        "x": 17,
+        "y": -161
+      },
+      "rotation": 0,
+      "size": {
+        "x": 4,
+        "y": 4
+      },
+      "variant": 1,
+      "rise": 3,
+      "canonStatus": "CANON (b1 ch.17:193, slabs \"suspended in a chaotic arch\"; ch.17:201, \"Some stones were tilted sideways. Some were spinning slowly.\"); GAME-ONLY placing (pick 10)"
+    },
+    {
+      "kind": "driftslab",
+      "name": "A slab drifting below the span",
+      "at": {
+        "x": 27,
+        "y": -148
+      },
+      "rotation": 0,
+      "size": {
+        "x": 5,
+        "y": 5
+      },
+      "variant": 1,
+      "rise": -6,
+      "canonStatus": "CANON (b1 ch.17:193, slabs \"suspended in a chaotic arch\"; ch.17:201, \"Some stones were tilted sideways. Some were spinning slowly.\"); GAME-ONLY placing (pick 10)"
+    },
+    {
+      "kind": "driftslab",
+      "name": "A slab tilted west of the span",
+      "at": {
+        "x": -31,
+        "y": -197
+      },
+      "rotation": 0,
+      "size": {
+        "x": 5,
+        "y": 4
+      },
+      "rise": 2,
+      "canonStatus": "CANON (b1 ch.17:193, slabs \"suspended in a chaotic arch\"; ch.17:201, \"Some stones were tilted sideways. Some were spinning slowly.\"); GAME-ONLY placing (pick 10)"
+    },
+    {
+      "kind": "driftslab",
+      "name": "A slab turning far to the west",
+      "at": {
+        "x": -35,
+        "y": -150
+      },
+      "rotation": 0,
+      "size": {
+        "x": 5,
+        "y": 3
+      },
+      "variant": 1,
+      "rise": -2,
+      "canonStatus": "CANON (b1 ch.17:193, slabs \"suspended in a chaotic arch\"; ch.17:201, \"Some stones were tilted sideways. Some were spinning slowly.\"); GAME-ONLY placing (pick 10)"
+    },
+    {
+      "kind": "driftslab",
+      "name": "A tilted slab over the deep fog",
+      "at": {
+        "x": -28,
+        "y": -182
+      },
+      "rotation": 0,
+      "size": {
+        "x": 4,
+        "y": 4
+      },
+      "rise": -8,
+      "canonStatus": "CANON (b1 ch.17:193, slabs \"suspended in a chaotic arch\"; ch.17:201, \"Some stones were tilted sideways. Some were spinning slowly.\"); GAME-ONLY placing (pick 10)"
+    },
+    {
+      "kind": "tipslab",
+      "name": "The fifth slab",
+      "at": {
+        "x": 8,
+        "y": -156
+      },
+      "rotation": 0,
+      "canonStatus": "CANON-EXPANDED (b1 ch.17:243: \"The stone ahead of them tilted. forty-five degrees.\"): it dips and groans under a foot and tips once the party is past, its walk solid (pick 10)"
     }
   ],
   "decks": [

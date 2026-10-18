@@ -453,3 +453,28 @@ Mr_gable_sells_his_pie_in_the_glitch_and_rests_when_it_snaps, A_paused_townspers
 the routes and the bars), ZoneContentTests (Hallow's Creek builds and every camp is walked to). Then front, back and side captures of Main
 Street, a house's roses and fence, the laundry, the crater from the rim (the mirror, the door, the knocker close), the chalk, the willow and
 Talla, the chapel, and a paused face close (the eyes); and the frame rate on Main Street and at the rim.
+
+## The Ash Road and the bridge as chapter 17 tells them (2026-10-18, branch w2-ashbridge: REWORK_LOWTOWNS_HALLOWS.md picks 7 and 10)
+WRITTEN, compiles, NOT RUN in Unity. Code: `EncounterSession.AshRoad.cs`, `ZoneBuilder.HallowsRoad.cs`, `TippingSlab.cs`; data: 22 props
+in `hallows.json`, each labelled with its chapter.
+- **The time-squall** (CANON, b1 ch.17:79-121). 75 s after you arrive and about every 170 s after, while you are on the Ash Road (16 m
+  either side of its line): a warning line and a silver shimmer coming up the road from the south for 10 s (the zone's silver squall
+  weather is forced for its look), then 20 s of falling silver sparks. Each second in the open on the road takes 4% of your health (never
+  below a sixth: it wears, it does not kill). Under the rock overhang (the book's shelter, ch.17:93) nothing. A stone sapling by the
+  overhang grows, dies and falls to ash while it falls (ch.17:121). It hurts the player only: the sims are never touched, and in a run a
+  sim leads (the group runs) it passes over the party harmlessly, so the run keeps its pace (the leader does not shelter; simpler and
+  the run cannot stall on it). Not done: the rework's "stacking weakness until a spirit stone".
+- **Stone leaves** (CANON, ch.17:23): five thickets off the road (never on it); walking through one cuts you 2% each 1.5 s (same floor).
+- **Green fissures** (CANON, ch.17:185): five cracks lit pale green along the road's last stretch to the chasm, each with a faint light.
+- **Shadows the wrong way** (CANON, ch.17:11; lore #5): four petrified stumps off the road whose dark shadow strips lie toward the
+  zone's sun, not away from it (dressing; the hungry shadows that slow you are the zone's hazards, as before).
+- **The bridge's slabs** (CANON, ch.17:193-201): seven slabs hang beside the walk over the chasm, three tilted and still, four turning
+  slowly; no colliders, all at least 1.5 m clear of every deck. The walk's own slabs do not move.
+- **The slab that tips** (CANON-EXPANDED, ch.17:243): the fifth slab. A foot on it and it dips about 4 degrees and rocks, with a line
+  ("The slab groans and dips under you ... It holds."); you keep walking. Once nobody is within 12 m of it, it tips to 45 degrees over
+  the fog, with a line if you are within 60 m; anyone coming near again and it rights itself first. Only its stone moves: its walk's
+  collider and navmesh stay flat and solid, and the parapets stay (a real tip under the party was judged too risky for the navmesh and
+  the sims). There is no sound in the game for the creak: the warning is the chat line.
+- Tests: `HallowsDataTests.The_ash_road_has_its_dangers_and_the_bridge_its_drifting_slabs` (data), `HallowsNavTests.A_time_squall_bites_
+  in_the_open_not_under_the_overhang_and_the_fifth_slab_tips_behind_you` (play). To see: the shimmer and sparks, the fissures' glow,
+  the stumps' shadows, the turning slabs from the bridge, the fifth slab tipping behind you; a group run through the road and bridge.

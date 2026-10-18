@@ -52,6 +52,11 @@ bubble of still air, no music out of doors, the whisper; no footstep audio exist
 12 (the people: Mr Gable and his pie, Martha's voice, Mrs Miller, the children, Talla). What was built and what is still to see:
 DUNGEON2_DESIGN.md, "The town as the books write it".
 
+**Built (branch w2-ashbridge, 2026-10-18; WRITTEN, compiles, NOT RUN):** Hallow's Creek picks 7 (the Ash Road's dangers: the time-squall
+with the overhang as shelter, stone leaves that cut, green fissures, shadows toward the sun) and 10 (the bridge's hanging and turning
+slabs, the fifth slab that dips under a foot and tips to 45 degrees once the party is past). What was built and what is still to see:
+DUNGEON2_DESIGN.md, "The Ash Road and the bridge as chapter 17 tells them".
+
 ## 1. What the books say (check at a glance)
 
 ### The Lowtowns (Argentis's lower city)

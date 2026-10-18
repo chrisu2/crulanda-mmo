@@ -400,5 +400,72 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, Regex.Matches(string.Join("\n", texts), "Vala Solari").Count - Regex.Matches(texts[0], "Vala Solari").Count, "Vala Solari named once, on the Warden's papers (decision 6)");
             Assert.IsTrue(all.Contains("gable"), "Gable on the baker's sign (decision 8)");
         }
+
+        /// <summary>
+        /// The Ash Road's dangers and the bridge as the book left it (Docs/REWORK_LOWTOWNS_HALLOWS.md picks 7 and 10; b1 ch.17): green
+        /// fissures along the road toward the chasm (ch.17:185), shadows pointing at the sun (ch.17:11; lore #5), thickets of stone leaves
+        /// off the road (ch.17:23), the shelter from the time-squall a cave beside the road (ch.17:93), slabs hanging and turning beside the
+        /// walk over the chasm and clear of every deck (ch.17:193-201), and one of the walk's own slabs that tips (ch.17:243). Every one
+        /// labelled with its chapter.
+        /// </summary>
+        [Test] public void The_ash_road_has_its_dangers_and_the_bridge_its_drifting_slabs()
+        {
+            var bad = new List<string>();
+            var road = zone.roads.Single(r => r.name == EncounterSession.AshRoadName);
+            float FromRoad(Vector2 p)
+            {
+                float best = float.MaxValue;
+                for (int i = 0; i + 1 < road.points.Length; i++)
+                {
+                    var a = road.points[i]; var ab = road.points[i + 1] - a; float t = Mathf.Clamp01(Vector2.Dot(p - a, ab) / ab.sqrMagnitude);
+                    best = Mathf.Min(best, Vector2.Distance(p, a + ab * t));
+                }
+                return best;
+            }
+            var kinds = new Dictionary<string, string> { { "fissure", "ch.17:185" }, { "wrongshadow", "ch.17:11" }, { "stoneleaves", "ch.17:23" }, { "driftslab", "ch.17:201" }, { "tipslab", "ch.17:243" } };
+            foreach (var kv in kinds)
+            {
+                var ps = zone.props.Where(p => p.kind == kv.Key).ToList();
+                if (ps.Count == 0) bad.Add("no " + kv.Key);
+                foreach (var p in ps)
+                {
+                    if (!ZoneBuilder.HallowsKinds.Contains(p.kind)) bad.Add(p.kind + " is not a Hallow's Creek kind");
+                    if (string.IsNullOrEmpty(p.canonStatus) || !p.canonStatus.StartsWith("CANON") || !p.canonStatus.Contains(kv.Value)) bad.Add(p.name + " is not labelled with " + kv.Value);
+                    if (p.style == "stone") bad.Add(p.name + " would count as the farm's stone");
+                }
+            }
+            Assert.GreaterOrEqual(zone.props.Count(p => p.kind == "fissure"), 4, "a few fissures");
+            foreach (var p in zone.props.Where(p => p.kind == "fissure"))
+                if (FromRoad(p.at) > 12 || p.at.y < -260 || p.at.y > -210) bad.Add(p.name + " is not along the road's last stretch to the chasm");
+            foreach (var p in zone.props.Where(p => p.kind == "stoneleaves"))
+                if (FromRoad(p.at) - Mathf.Max(p.size.x, p.size.y) / 2 < road.width / 2) bad.Add(p.name + " reaches onto the road (they cut only off it)");
+            foreach (var p in zone.props.Where(p => p.kind == "wrongshadow"))
+                if (FromRoad(p.at) < road.width / 2 + 1) bad.Add(p.name + "'s stump stands on the road");
+            // The squall's shelter: the overhang, a cave a few metres off the road.
+            Assert.IsTrue(caves.ContainsKey(EncounterSession.SquallShelter), "the overhang");
+            Assert.Less(FromRoad(zone.props.Single(p => p.kind == "cavern" && p.name == EncounterSession.SquallShelter).at), EncounterSession.SquallReach, "the overhang is within the squall's reach of the road: a run to it");
+            // The drifting slabs: over the chasm, clear of every deck's walk (nobody could stand on one, and none hangs in the way).
+            var pit = zone.pits.Single(); var spin = 0;
+            foreach (var p in zone.props.Where(p => p.kind == "driftslab"))
+            {
+                if (Mathf.Abs(p.at.y - pit.center.y) > pit.size.y / 2 - 3) bad.Add(p.name + " is not over the chasm");
+                if (p.variant == 1) spin++;
+                foreach (var d in zone.decks)
+                {
+                    var ab = d.at2 - d.at; float t = ab.sqrMagnitude < 1e-4f ? 0 : Mathf.Clamp01(Vector2.Dot(p.at - d.at, ab) / ab.sqrMagnitude);
+                    float gap = Vector2.Distance(p.at, d.at + ab * t) - d.width / 2 - Mathf.Max(p.size.x, p.size.y) * .75f;
+                    if (gap < 1.5f) bad.Add(p.name + " hangs within " + gap.ToString("0.0") + " m of " + d.name);
+                }
+            }
+            Assert.GreaterOrEqual(spin, 2, "some spinning slowly"); Assert.GreaterOrEqual(zone.props.Count(p => p.kind == "driftslab" && p.variant == 0), 2, "some tilted sideways");
+            // The slab that tips is one of the walk's own decks over the chasm.
+            foreach (var p in zone.props.Where(p => p.kind == "tipslab"))
+            {
+                var d = zone.decks.SingleOrDefault(x => x.name == p.name);
+                if (d == null) bad.Add("the tipping slab '" + p.name + "' is no deck");
+                else if (Mathf.Abs(d.at.y - pit.center.y) > pit.size.y / 2) bad.Add(p.name + " is not over the chasm");
+            }
+            Clean(bad, "Ash Road and bridge dressing");
+        }
     }
 }

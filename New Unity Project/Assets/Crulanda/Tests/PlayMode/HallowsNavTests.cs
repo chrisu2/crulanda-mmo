@@ -39,6 +39,7 @@ namespace Crulanda.Tests
             if (WorldWeather.Active != null) WorldWeather.Active.Release(true);
             WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null; EncounterSession.ReleaseDelay = 3; EncounterSession.RideSeconds = 5;
             EncounterSession.EventSpeed = 1; EncounterSession.SnapWarnSeconds = 3; EncounterSession.WhisperEvery = 22; EncounterSession.WhisperLineEvery = 75; Time.timeScale = 1;
+            EncounterSession.SquallWarnSeconds = 10; EncounterSession.SquallSeconds = 20; EncounterSession.SquallFirst = 75;
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
             yield return SceneManager.UnloadSceneAsync("Oakhaven");
@@ -355,6 +356,49 @@ namespace Crulanda.Tests
             // The queue offers it at 15-20, and its door is where Oakhaven's road into it arrives.
             var d = session.QueueDungeons().Find(z => z.id == "zone.hallows"); Assert.NotNull(d, "the queue lists Hallow's Creek");
             Assert.IsTrue(EncounterSession.QueueFits(d, 17)); Assert.Less(Vector2.Distance(session.QueueDoor(d), zone.spawns.player), 6, "the door: the yard at the milestone");
+        }
+
+        /// <summary>
+        /// The Ash Road's time-squall (REWORK_LOWTOWNS_HALLOWS pick 7; b1 ch.17:79-121): warned in words and a silver shimmer, then the
+        /// sparks fall; out on the road they bite (never below a sixth of your health), under the rock overhang they do not; and it passes.
+        /// The slab that tips (pick 10; ch.17:243): it dips under a foot, tips to forty-five once you are past, rights itself as you come
+        /// back, and its walk keeps its collider and its navmesh the whole time.
+        /// </summary>
+        [UnityTest, Timeout(120000)] public IEnumerator A_time_squall_bites_in_the_open_not_under_the_overhang_and_the_fifth_slab_tips_behind_you()
+        {
+            var s = Session(); var zone = s.Zone; yield return Frames(10);
+            var motor = s.Player.GetComponent<AdventurerMotor>();
+            EncounterSession.SquallWarnSeconds = .5f; EncounterSession.SquallSeconds = 4;
+            motor.Teleport(zone.Ground(new Vector2(0, -300), .3f)); yield return Frames(10);
+            Assert.IsTrue(s.OnAshRoad(s.Player.transform.position), "the road at z -300 is the Ash Road");
+            s.StartSquall(); Assert.AreEqual(EncounterSession.SquallState.Warned, s.Squall, "warned first");
+            StringAssert.Contains("time-squall", string.Join(" ", s.Messages), "a warning line");
+            yield return new WaitForSeconds(.8f);
+            Assert.AreEqual(EncounterSession.SquallState.Falling, s.Squall, "then the sparks fall");
+            float before = s.Player.Health.Pool.Current; yield return new WaitForSeconds(1.5f);
+            Assert.Less((float)s.Player.Health.Pool.Current, before, "out on the road they bite");
+            var cave = Hollow.All.Find(h => h.Name == EncounterSession.SquallShelter); Assert.NotNull(cave, "the overhang");
+            var inside = cave.Centre[cave.Centre.Count / 2];
+            motor.Teleport(inside + Vector3.up * .4f); yield return Frames(10);
+            Assert.IsTrue(s.Sheltered(s.Player.transform.position), "under the overhang (" + s.Player.transform.position + ")");
+            before = s.Player.Health.Pool.Current; yield return new WaitForSeconds(1.5f);
+            Assert.GreaterOrEqual((float)s.Player.Health.Pool.Current, before, "and under the overhang they do not");
+            yield return new WaitForSeconds(2.5f);
+            Assert.AreEqual(EncounterSession.SquallState.None, s.Squall, "and it passes");
+
+            var slab = s.TipSlab; Assert.NotNull(slab, "the fifth slab tips");
+            var spot = zone.DeckSpots.Find(d => d.def != null && d.def.name == "The fifth slab");
+            var walk = spot.root.Find("Walk"); Assert.NotNull(walk.GetComponent<Collider>());
+            motor.Teleport(spot.mid[spot.mid.Length / 2] + Vector3.up * .3f); yield return Frames(30);
+            Assert.IsTrue(slab.Holds(s.Player.transform.position), "standing on it");
+            Assert.Greater(slab.Angle, 1, "it dips under you"); Assert.Less(slab.Angle, 8, "a few degrees, no more");
+            motor.Teleport(zone.Ground(new Vector2(0, -120), .3f)); yield return new WaitForSeconds(3f);
+            Assert.IsTrue(slab.IsTipped, "once you are past it tips"); Assert.Greater(slab.Angle, 40, "to forty-five degrees");
+            Assert.IsTrue(walk.GetComponent<Collider>().enabled, "its walk stays solid");
+            On(spot.mid[spot.mid.Length / 2], "the tipped slab's walk");
+            var ramp = zone.DeckSpots.Find(d => d.def != null && d.def.name == "Ramp to the last slab");
+            motor.Teleport(ramp.mid[ramp.mid.Length / 2] + Vector3.up * .3f); yield return new WaitForSeconds(2.5f);
+            Assert.Less(slab.Angle, 6, "coming back, it rights itself");
         }
     }
 }

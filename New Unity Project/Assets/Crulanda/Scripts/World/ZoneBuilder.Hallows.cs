@@ -26,7 +26,9 @@ namespace Crulanda.World
     public sealed partial class ZoneBuilder
     {
         /// <summary>The prop kinds built here (BuildProps).</summary>
-        public static readonly HashSet<string> HallowsKinds = new HashSet<string> { "paused", "hangball", "laundry", "crater", "wellhouse", "stone", "gatehouse", "archive", "granary", "belfry", "copydesk", "ride", "satchel", "townlife", "look", "chapel", "hollow", "handcart" };
+        public static readonly HashSet<string> HallowsKinds = new HashSet<string> { "paused", "hangball", "laundry", "crater", "wellhouse", "stone", "gatehouse", "archive", "granary", "belfry", "copydesk", "ride", "satchel", "townlife", "look", "chapel", "hollow", "handcart",
+            // (REWORK_LOWTOWNS_HALLOWS picks 7 and 10, ZoneBuilder.HallowsRoad) the Ash Road's dangers and the bridge as the book left it
+            "fissure", "wrongshadow", "stoneleaves", "driftslab", "tipslab" };
         /// <summary>A paused townsperson's place (EncounterSession.Hallows stands a stone figure there): where, facing, the pose (the prop's
         /// variant) and the name it is known by (or null).</summary>
         public readonly List<(Vector3 at, Quaternion facing, int pose, string name)> PausedSpots = new List<(Vector3, Quaternion, int, string)>();
@@ -38,6 +40,8 @@ namespace Crulanda.World
         /// <summary>Builds a Hallow's Creek prop kind; false for any other kind.</summary>
         bool HallowsProp(ZoneProp p, Transform t)
         {
+            // The Ash Road's and the bridge's kinds (ZoneBuilder.HallowsRoad).
+            if (AshRoadProp(p, t)) return true;
             switch (p.kind)
             {
                 case "paused":

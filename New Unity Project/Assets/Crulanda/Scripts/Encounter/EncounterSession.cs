@@ -2005,6 +2005,8 @@ namespace Crulanda.Encounter
             if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
             TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
             TickLockouts(); TickQueue(); TickHallows();   // lockouts run out; the dungeon queue gathers its party, leads it and breaks it up (EncounterSession.Lockout, .Queue)
+            // (Hallow's Creek) the Ash Road's time-squalls and stone leaves, the bridge's tipping slab (EncounterSession.AshRoad)
+            TickAshRoad();
 
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
             if (!BuildOpen && EncounterInput.Press(KeyCode.P)) { SpellbookOpen = !SpellbookOpen; BookPick = null; }   // the spellbook (Docs/ACTION_BAR.md)

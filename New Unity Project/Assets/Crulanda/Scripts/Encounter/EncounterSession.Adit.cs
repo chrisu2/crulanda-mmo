@@ -37,6 +37,8 @@ namespace Crulanda.Encounter
             StartSwingLoads();   // (S7) the Foundry's swing-loads and their rope teams (AditSwingLoad)
             StartHaul();     // (S6) the barge aground in the Black Cove and the rope teams on her warps (EncounterSession.Haul.cs)
             StartHallows();  // (Hallow's Creek) the paused townsfolk, the wagon's mules, the Warden (EncounterSession.Hallows.cs)
+            // (Hallow's Creek) the Ash Road's time-squalls and stone leaves, the bridge's tipping slab (EncounterSession.AshRoad.cs)
+            StartAshRoad();
             // (the Lowtowns) the Rusty Spoon's Triad table, its window and its brawl (EncounterSession.Spoon.cs)
             StartSpoon();
             // The pressed goblins in their cages, and the doors of those opened before standing open (playtest note 125).

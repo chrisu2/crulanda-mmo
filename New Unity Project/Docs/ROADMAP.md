@@ -71,6 +71,9 @@ anywhere"); it is not needed now.
 Then found in Downloads (2026-10-18 ~18:20): "Modular Hero.unitypackage" (CHOSAN, Oct 15; the old p85-hero branch took its body)
 and "Modular Character Outfits - Fantasy[Standard].zip" (Quaternius: the same files as Resources/Characters/Outfits, nothing new). Asked
 again with CHOSAN on hand, Chris kept (verbatim) "GanzSe (Recommended)". p85-hero is superseded.
+**Chris turned GanzSe down (2026-10-18 ~20:15, verbatim): "i dont like the new characters"**, after its first line-up beside
+today's figures (ui-captures/wardrobe-ganzse-1). Branch p85-ganzse is kept but not merged. Open with it: "helms and gauntlet still
+tooo round" (play note 239) on today's figures.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

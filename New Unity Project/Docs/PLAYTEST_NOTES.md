@@ -837,3 +837,5 @@ un-captures.
 - 239 (2026-10-18 ~20:10, on the wardrobe line-up 04-sets-front, today's figures and the GanzSe ones) "helms and gauntlet still
   tooo round" then "in the 04-sets-front" (OPEN): the drawn helms are domes and the drawn gauntlets balls; on the GanzSe bodies the
   drawn caps and bands sit on top. Phase 8.5: helms and gauntlets from the pack's angular pieces, no round drawn ones.
+- 240 (2026-10-18 ~20:15, on the GanzSe line-up beside today's figures) "i dont like the new characters": GanzSe's bodies are out;
+  the p85-ganzse work stops (ROADMAP Phase 8.5).

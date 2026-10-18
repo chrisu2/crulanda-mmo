@@ -168,6 +168,20 @@ namespace Crulanda.Tests
                 Color32[] screenPx = null; int sw = 0, sh = 0; float baseScreen = -1;
                 if (screenPx != null) Save("00-screen.png", screenPx, sw, sh);
                 Debug.Log("SKYGHOST baseline " + baseline.ToString("F4") + " edges=" + baseEdges + " screen=" + baseScreen.ToString("F4") + (screenPx != null ? " (" + sw + "x" + sh + ")" : ""));
+                // Every renderer whose bounds, seen from this camera, reach into the top 12% of the frame and lie wholly in its top half:
+                // what draws in the band at the frame's top (the pale spikes left after the backdrop was lowered, 2026-10-18).
+                foreach (var hr in UnityEngine.Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+                {
+                    if (hr == null || !hr.enabled || !hr.gameObject.activeInHierarchy || hr.forceRenderingOff) continue;
+                    var bb = hr.bounds; float top = -1, bottom = 2; bool front = false;
+                    for (int c = 0; c < 8; c++)
+                    {
+                        var corner = new Vector3((c & 1) == 0 ? bb.min.x : bb.max.x, (c & 2) == 0 ? bb.min.y : bb.max.y, (c & 4) == 0 ? bb.min.z : bb.max.z);
+                        var vp = cam.WorldToViewportPoint(corner); if (vp.z <= 0) continue; front = true;
+                        top = Mathf.Max(top, vp.y); bottom = Mathf.Min(bottom, vp.y);
+                    }
+                    if (front && top > .88f && bottom > .5f) Debug.Log("SKYGHOST band " + NameOf(hr.transform) + " (" + hr.GetType().Name + ", " + (hr.sharedMaterial != null ? hr.sharedMaterial.name : "-") + ") y " + bb.min.y.ToString("0") + ".." + bb.max.y.ToString("0") + " at " + bb.center.ToString("0") + " view " + bottom.ToString("F2") + ".." + top.ToString("F2"));
+                }
 
                 // What is in the scene: each other enabled camera, anything mirrored or upside down (logged by name).
                 var cameras = UnityEngine.Object.FindObjectsByType<Camera>(FindObjectsSortMode.None).Where(c => c != cam && c.enabled && c.gameObject.activeInHierarchy).ToList();

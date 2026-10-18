@@ -269,9 +269,9 @@ namespace Crulanda.World
             ("Food/Apple", .08f), ("Food/Apple_Green", .08f), ("Food/Orange", .075f), ("Food/Bread", .15f), ("Food/Bread_Slice", .1f), ("Food/Carrot", .2f),
             ("Food/Turnip", .17f), ("Food/Lettuce_Whole", .17f), ("Food/Mushroom", .06f), ("Food/Mushroom_Sliced", .025f), ("Food/Fish", .035f), ("Food/FishBone", .05f),
             ("Food/ChickenLeg", .066f), ("Food/Steak", .036f), ("Food/Sausage_Raw", .022f), ("Food/Sausage_Cooked", .022f), ("Food/Bacon_Uncooked", .006f), ("Food/Bacon_Cooked", .006f),
-            ("Food/Egg_Whole", .055f), ("Food/Egg_Whole_White", .055f), ("Food/Egg_Fried", .012f), ("Food/Pancake", .027f), ("Food/Croissant", .06f), ("Food/CookingPot", .2f),
-            ("Food/CookingPot_Soup", .2f), ("Food/CookingPot2", .11f), ("Food/CookingPot2_Soup", .11f), ("Food/FryingPan", .04f), ("Food/Plate", .035f), ("Food/Plate2", .033f),
-            ("Food/Plate_Square", .021f), ("Food/Bottle1", .3f), ("Food/Bottle2", .3f), ("Food/Jar_Large", .25f), ("Food/Knife", .003f), ("Food/Fork", .005f),
+            ("Food/Egg_Whole", .055f), ("Food/Egg_Whole_White", .055f), ("Food/Egg_Fried", .012f), ("Food/Pancake", .027f), ("Food/Croissant", .06f), ("Food/CookingPot", .14f),
+            ("Food/CookingPot_Soup", .14f), ("Food/CookingPot2", .08f), ("Food/CookingPot2_Soup", .08f), ("Food/FryingPan", .03f), ("Food/Plate", .035f), ("Food/Plate2", .033f),
+            ("Food/Plate_Square", .021f), ("Food/Bottle1", .3f), ("Food/Bottle2", .3f), ("Food/Jar_Large", .18f), ("Food/Knife", .003f), ("Food/Fork", .005f),
             ("Food/Spoon", .008f),
         };
     }

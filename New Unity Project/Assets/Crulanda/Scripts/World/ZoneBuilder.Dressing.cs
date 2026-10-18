@@ -76,8 +76,18 @@ namespace Crulanda.World
                     int side = p.x >= 0 ? 1 : -1, best = side > 0 ? 1 : P - 2;
                     for (int k = 1; k < P - 1; k++)
                         if ((side > 0 ? k <= P / 2 : k >= P / 2) && Mathf.Abs(ring[i, k].y - c[i].y - p.y) < Mathf.Abs(ring[i, best].y - c[i].y - p.y)) best = k;
-                    var wallAt = ring[i, best]; var inward = c[i] + Vector3.up * p.y - wallAt; inward.y = 0; inward.Normalize();
-                    var foot = wallAt - inward * .02f; foot.y = c[i].y;
+                    // Hung flush on the rock the passage actually has there: a ray from the middle of the passage at the piece's height out to the
+                    // wall (the shell's collider, this cave's own), the piece's back on the hit, facing back along the ray. No hit near the wall
+                    // (a mouth into another cave, a cut face): nothing hung (frames 2026-10-18: nothing left floating off the rock).
+                    var across = ring[i, best] - c[i]; across.y = 0; if (across.sqrMagnitude < .01f) continue; across.Normalize();
+                    var from = t.TransformPoint(c[i] + Vector3.up * p.y); var dir = t.TransformDirection(across).normalized;
+                    Physics.SyncTransforms();
+                    RaycastHit wallHit = default; bool hit = false; float reach = h.Half[i] * 1.35f * Mathf.Max(.01f, t.lossyScale.x);
+                    foreach (var rh in Physics.RaycastAll(from, dir, reach, ~0, QueryTriggerInteraction.Ignore))
+                        if (rh.collider is MeshCollider && rh.collider.transform.IsChildOf(t) && rh.collider.transform.parent == t && (!hit || rh.distance < wallHit.distance)) { wallHit = rh; hit = true; }
+                    if (!hit || wallHit.distance < h.Half[i] * .6f) continue;
+                    var inward = t.InverseTransformDirection(-dir); inward.y = 0; inward.Normalize();
+                    var foot = t.InverseTransformPoint(wallHit.point) + inward * .04f; foot.y = c[i].y;
                     if (free != null && !free(foot + inward * .4f)) continue;
                     SmallPiece(WallHang(root, p.path, foot, inward, p.height, p.y));
                     continue;

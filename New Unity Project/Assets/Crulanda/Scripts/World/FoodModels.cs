@@ -48,9 +48,9 @@ namespace Crulanda.World
             { "Turnip", .17f }, { "Lettuce_Whole", .17f }, { "Mushroom", .06f }, { "Mushroom_Sliced", .025f }, { "Fish", .035f }, { "FishBone", .05f },
             { "ChickenLeg", .066f }, { "Steak", .036f }, { "Sausage_Raw", .022f }, { "Sausage_Cooked", .022f }, { "Bacon_Uncooked", .006f },
             { "Bacon_Cooked", .006f }, { "Egg_Whole", .055f }, { "Egg_Whole_White", .055f }, { "Egg_Fried", .012f }, { "Pancake", .027f },
-            { "Croissant", .06f }, { "CookingPot", .2f }, { "CookingPot_Soup", .2f }, { "CookingPot2", .11f }, { "CookingPot2_Soup", .11f },
-            { "FryingPan", .04f }, { "Plate", .035f }, { "Plate2", .033f }, { "Plate_Square", .021f }, { "Bottle1", .3f }, { "Bottle2", .3f },
-            { "Jar_Large", .25f }, { "Knife", .003f }, { "Fork", .005f }, { "Spoon", .008f } };
+            { "Croissant", .06f }, { "CookingPot", .14f }, { "CookingPot_Soup", .14f }, { "CookingPot2", .08f }, { "CookingPot2_Soup", .08f },
+            { "FryingPan", .03f }, { "Plate", .035f }, { "Plate2", .033f }, { "Plate_Square", .021f }, { "Bottle1", .3f }, { "Bottle2", .3f },
+            { "Jar_Large", .18f }, { "Knife", .003f }, { "Fork", .005f }, { "Spoon", .008f } };
         /// <summary>A food model at life size: Resources/Props/Food/&lt;name&gt;, its height.</summary>
         public static Bit F(string name, float x = 0, float z = 0, float yaw = 0, float y = 0) { return new Bit("Food/" + name, Life[name], x, z, yaw, y); }
         /// <summary>The height a food model stands at life size (0 for one not in the table).</summary>
@@ -70,7 +70,7 @@ namespace Crulanda.World
             // Oakhaven's and the Harrow's plain food
             { "food.brown_loaf", new[] { F("Bread") } },
             { "food.fresh_eggs", new[] { F("Plate_Square"), F("Egg_Whole", -.05f, .02f, 0, OnPlate), F("Egg_Whole", .05f, .03f, 40, OnPlate), F("Egg_Whole_White", 0, -.05f, 80, OnPlate) } },
-            { "food.harrow_cheese", new[] { Cheese("Cheese_1", .08f) } },
+            { "food.harrow_cheese", new[] { Cheese("Cheese_1", .045f) } },
             { "food.mountain_jerky", new[] { F("Plate_Square"), F("Bacon_Cooked", 0, -.04f, 10, OnPlate), F("Bacon_Cooked", 0, .01f, -8, OnPlate + .006f), F("Bacon_Cooked", 0, .05f, 4, OnPlate) } },
             { "food.griddle_bread", new[] { F("Plate"), F("Pancake", 0, 0, 0, OnPlate) } },
             { "food.boar_stew", new[] { F("CookingPot2_Soup"), F("Spoon", .12f, 0, 70) } },
@@ -110,10 +110,10 @@ namespace Crulanda.World
         /// may repeat between zones as small things, never the whole set (FoodModelTests: no two zones share more than half).
         /// </summary>
         public static readonly Dictionary<string, Bit[]> Fare = new Dictionary<string, Bit[]> {
-            { "zone.oakhaven", new[] { F("Bread"), F("Apple"), F("Apple_Green"), F("Egg_Whole"), Cheese("Cheese_1", .08f), F("Carrot"), F("CookingPot_Soup") } },
+            { "zone.oakhaven", new[] { F("Bread"), F("Apple"), F("Apple_Green"), F("Egg_Whole"), Cheese("Cheese_3", .05f), F("Carrot"), F("CookingPot_Soup") } },
             { "zone.khaven", new[] { F("Turnip"), F("Mushroom"), F("Mushroom_Sliced"), F("Bread_Slice"), F("Lettuce_Whole"), F("CookingPot2_Soup") } },
             { "zone.ashrim", new[] { F("Steak"), F("Bread"), F("Jar_Large"), F("FryingPan"), F("Bottle2") } },
-            { "zone.peaks", new[] { F("Bacon_Cooked"), F("Bacon_Uncooked"), F("ChickenLeg"), Cheese("Cheese_2", .08f), F("Bottle1"), F("CookingPot") } },
+            { "zone.peaks", new[] { F("Bacon_Cooked"), F("Bacon_Uncooked"), F("ChickenLeg"), Cheese("Cheese_2", .05f), F("Bottle1"), F("CookingPot") } },
             { "zone.crown", new[] { F("Croissant"), F("Orange"), F("ChickenLeg"), F("Fish"), F("Bottle1"), F("Knife"), F("Fork") } },
             { "zone.lowtowns", new[] { F("Sausage_Cooked"), F("Sausage_Raw"), F("FishBone"), F("Bread_Slice"), F("FryingPan"), F("Egg_Fried") } },
             { "zone.verdant", new[] { F("Fish"), F("Steak"), F("Pancake"), F("Mushroom"), F("Apple_Green"), F("Egg_Whole_White") } },

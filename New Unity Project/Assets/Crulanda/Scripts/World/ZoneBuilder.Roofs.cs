@@ -213,6 +213,28 @@ namespace Crulanda.World
                         }
                     }
                     var edge0 = mid + outv * (RoofDeckWide / 2);
+                    // (2026-10-18, SweepPlayTests: Lissa stopped where the first alley's bridge lands on Tolley's walk) A rope bridge landing
+                    // on this walk's end from the lane side crosses the walk's lane edge on the slant, and the walk's rail running on to the
+                    // end stood in the bridge's way: with the navmesh's half-metre agent it left about a quarter of a metre, under a voxel's
+                    // width. The walk's rail now stops where the bridge's lane-side rail meets the walk's edge: the two rails close the
+                    // corner between them and the bridge keeps its width.
+                    foreach (var o in legs)
+                    {
+                        if (o.kind != "bridge") continue;
+                        foreach (var (end, other) in new[] { (o.a, o.b), (o.b, o.a) })
+                        {
+                            float s0 = Vector3.Dot(end - mid, dir);
+                            if (Mathf.Abs(s0) < half - .5f || Mathf.Abs(s0) > half + .5f || Mathf.Abs(Vector3.Dot(end - mid, outv)) > RoofDeckWide / 2 || Vector3.Dot(other - end, outv) <= 0) continue;
+                            var bdir = other - end; bdir.y = 0; bdir.Normalize();
+                            var bAcross = Vector3.Cross(Vector3.up, bdir); if (Vector3.Dot(bAcross, outv) < 0) bAcross = -bAcross;
+                            // Where the line of the bridge's lane-side rail (end + bAcross * half its width + bdir * t) meets the walk's edge.
+                            var p0 = end + bAcross * (RoofBridgeWide / 2) - edge0; float along = Vector3.Dot(bdir, outv);
+                            if (Mathf.Abs(along) < .05f) continue;
+                            float meet = -Vector3.Dot(p0, outv) / along; float cut = Vector3.Dot(p0 + bdir * meet, dir);
+                            if (Mathf.Abs(cut) > half) continue;
+                            gaps.Add(s0 < 0 ? new Vector2(-half - 1, cut) : new Vector2(cut, half + 1));
+                        }
+                    }
                     float from = -half;
                     gaps.Sort((x, y) => x.x.CompareTo(y.x));
                     foreach (var g in gaps) { if (g.x > from) LowRail(root, b, leg.name, edge0 + dir * from, edge0 + dir * g.x, outv, rust, rust, .3f, true); from = Mathf.Max(from, g.y); }

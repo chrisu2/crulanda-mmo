@@ -73,6 +73,9 @@ namespace Crulanda.Tests
             var e = session.Enemies.Where(x => x != null && x.actor.IsAlive && !x.Game && !x.Hidden && !x.Elite && x.Inside == null)
                 .OrderBy(x => x.transform.position.sqrMagnitude).First();
             e.enabled = false; var ag = e.GetComponent<UnityEngine.AI.NavMeshAgent>(); if (ag != null && ag.isOnNavMesh) ag.isStopped = true;
+            // (2026-10-18, the run of 16:09: the Rogue 61.2 a second at 15 with 2.8 s not striking, the Scoundrel 3.0 s, on a Concord collector)
+            // A dummy has no moves: no cast (a collector's hold), no trick (a shield-line, a flash) and no elite move, whatever wakes it.
+            e.Cast = null; e.Trick = null;
             // No armour, as the balance harness's dummies (BalanceHarness.Dummy): the band is measured on them. An Oakhaven mob's armour
             // took about a tenth off every blow (the first Unity run, 2026-10-17: the level-11 Rogue 46.5 and Mage 46.4 against an aim of 51.5).
             // Its level is set with yours at each level tested (AtLevel).
@@ -108,6 +111,8 @@ namespace Crulanda.Tests
                     k.last = now; k.lastAt = Time.time;
                 }
                 if (dummy.actor.Health.Pool.Current < 1000000) dummy.actor.Health.Pool.SetCurrent(5000000);
+                // Kept still: nothing (its waking from a doze, a level change) sets it going again while the clock runs.
+                if (dummy.enabled) dummy.enabled = false;
             }
             foreach (var id in ids) rates[id] = clocks[id].Rate;
         }

@@ -825,3 +825,4 @@ un-captures.
 - 235 (2026-10-18 ~18:25) "FBX-20261018T221927Z-1-001 for foods and buff items." (OPEN): Downloads, 103 food FBX, no licence file
   (names match Quaternius's food pack; source to confirm with Chris). Only what fits the books' world: meat, fish, eggs, bread, cheese,
   fruit, roots and greens, pots, pans, plates and bottles; no burgers, pizza, sushi, ice cream, soda, sauces in bottles, doughnuts.
+  Then (verbatim): "dont use the non crulanda food but some can be used" (keep what the books and the zones support).

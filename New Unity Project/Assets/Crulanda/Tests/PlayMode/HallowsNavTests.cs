@@ -369,8 +369,8 @@ namespace Crulanda.Tests
             var s = Session(); var zone = s.Zone; yield return Frames(10);
             var motor = s.Player.GetComponent<AdventurerMotor>();
             EncounterSession.SquallWarnSeconds = .5f; EncounterSession.SquallSeconds = 4;
-            motor.Teleport(zone.Ground(new Vector2(0, -300), .3f)); yield return Frames(10);
-            Assert.IsTrue(s.OnAshRoad(s.Player.transform.position), "the road at z -300 is the Ash Road");
+            motor.Teleport(zone.Ground(new Vector2(0, -290), .3f)); yield return Frames(10);
+            Assert.IsTrue(s.OnAshRoad(s.Player.transform.position), "the road at z -290 (clear of the camps) is the Ash Road");
             s.StartSquall(); Assert.AreEqual(EncounterSession.SquallState.Warned, s.Squall, "warned first");
             StringAssert.Contains("time-squall", string.Join(" ", s.Messages), "a warning line");
             yield return new WaitForSeconds(.8f);

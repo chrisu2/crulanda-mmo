@@ -73,7 +73,14 @@ namespace Crulanda.Tests
             Assert.AreEqual(dArmour, druid.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor));
             Assert.GreaterOrEqual(wArmour, dArmour, "mail over leather");
             Assert.GreaterOrEqual(warrior.BaseHit, 12 + 4 * sims[0].level, "a player's blow at its level (it hit 6 + 2.4 a level before)");
-            Assert.Less(warrior.Hit, warrior.BaseHit, "a tank hits under its blow (Chris 2026-10-15: the tank out-damaged the damage-dealers)");
+            // The tank's damage (Chris, 2026-10-18: "should be more than healer..maybe 3/4 of dps"): about three quarters of a damage-dealer's
+            // band, over the healer's, and still under every damage-dealer's, a hybrid's 90% included (Chris, 2026-10-15: the tank had
+            // out-damaged the damage-dealers).
+            Assert.AreEqual(SimCompanion.PartyRole.Tank, warrior.Role);
+            float tankRate = warrior.Hit / warrior.Interval, band = SimCompanion.PureDps(sims[0].level);
+            Assert.That(tankRate / band, Is.InRange(.65f, .85f), "a tank deals about three quarters of a damage-dealer's band");
+            Assert.Less(tankRate, band * EncounterSession.HybridDpsShare, "never over a damage-dealer, a hybrid included");
+            if (druid.Role == SimCompanion.PartyRole.Healer) Assert.Greater(tankRate, druid.Hit / druid.Interval, "over the healer");
             yield return null;
         }
         [UnityTest] public IEnumerator No_single_blow_takes_more_than_three_fifths_of_a_members_health()

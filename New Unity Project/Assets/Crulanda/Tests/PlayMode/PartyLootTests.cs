@@ -62,6 +62,12 @@ namespace Crulanda.Tests
             session.OpenLoot(e); session.TakeLootCoins();
             Assert.AreEqual(goldBefore + 10, session.Progress.gold, "your third"); Assert.AreEqual(10, warrior.sim.coin); Assert.AreEqual(10, mage.sim.coin);
             Assert.IsTrue(session.Rolled(hauberk), "uncommon in a party is rolled for");
+            // The Warrior in a worn level-1 common chest first: a sim Needs only an upgrade (SimGear.IsUpgrade, 2026-10-18), and the
+            // chest its class dresses it in at its level can beat the hauberk.
+            string worse = null;
+            for (int seed = 1; seed < 300 && worse == null; seed++) { var d = session.Items.Get(ItemDatabase.GearId("chest", 1, 1, seed)); if (d != null && SimGear.Fits(warrior.sim, d, session.LootTrades)) worse = d.id; }
+            Assert.NotNull(worse, "a level-1 common chest the Warrior wears"); SimEconomy.Wear(warrior.sim, "chest", worse);
+            Assert.IsTrue(SimGear.IsUpgrade(warrior.sim, def, session.Items, session.LootTrades), "the hauberk is an upgrade on it");
             session.TakeLoot(0);
             Assert.NotNull(session.Roll, "a roll began"); Assert.AreEqual(3, session.Roll.members.Count);
             Assert.AreEqual(RollChoice.Need, warrior.RollFor(def), "the warrior needs mail"); Assert.AreEqual(RollChoice.Greed, mage.RollFor(def), "the mage would sell it");

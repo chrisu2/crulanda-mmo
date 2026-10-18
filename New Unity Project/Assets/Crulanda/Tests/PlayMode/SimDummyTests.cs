@@ -87,16 +87,19 @@ namespace Crulanda.Tests
         sealed class Clock { public int first = -1, last; public float firstAt, lastAt; public float Rate { get { return lastAt > firstAt ? (last - first) / (lastAt - firstAt) : 0; } } }
         static int DamageOf(EncounterSession s, string id) { foreach (var r in s.Meter.Rows) if (r.id == id) return r.damage; return 0; }
 
+        readonly Dictionary<string, float> offReach = new Dictionary<string, float>();
         /// <summary>Each sim's sustained damage a second on the dummy, per level (ids: the sims' and their pets').</summary>
         IEnumerator Measure(List<SimCompanion> party, EncounterEnemy dummy, Dictionary<string, float> rates)
         {
             var ids = new List<string>();
             foreach (var c in party) { ids.Add(c.actor.EntityId.Value); var pet = session.SimPets.Find(p => p != null && p.Master == c); if (pet != null) ids.Add(pet.actor.EntityId.Value); }
             var clocks = ids.ToDictionary(x => x, x => new Clock()); var seen = ids.ToDictionary(x => x, x => DamageOf(session, x));
-            float end = Time.time + Seconds;
+            float end = Time.time + Seconds; offReach.Clear();
             while (Time.time < end)
             {
                 yield return null;
+                // Diagnosis (2026-10-18: the melee Rogue and Scoundrel 8% under their aim at 15 only): seconds each spent not striking.
+                foreach (var c in party) if (c != null && !(c.Activity ?? "").StartsWith("Fighting") && !(c.Activity ?? "").StartsWith("Shooting")) { offReach.TryGetValue(c.sim.name, out var o); offReach[c.sim.name] = o + Time.deltaTime; }
                 foreach (var id in ids)
                 {
                     int now = DamageOf(session, id); if (now == seen[id]) continue;
@@ -143,7 +146,7 @@ namespace Crulanda.Tests
                     float own = rates[c.actor.EntityId.Value]; var pet = session.SimPets.Find(p => p != null && p.Master == c);
                     float withPet = own + (pet != null ? rates[pet.actor.EntityId.Value] : 0);
                     string who = c.sim.name + " (" + c.sim.classId.Replace("class.", "") + ", " + c.Role + ", level " + level + ")";
-                    report.Add(who + ": " + withPet.ToString("0.0") + " a second" + (pet != null ? " (its pet " + (withPet - own).ToString("0.0") + ")" : "") + "; band middle " + pure.ToString("0.0") + "; " + c.Activity);
+                    report.Add(who + ": " + withPet.ToString("0.0") + " a second" + (pet != null ? " (its pet " + (withPet - own).ToString("0.0") + ")" : "") + "; band middle " + pure.ToString("0.0") + "; " + c.Activity + "; " + (offReach.TryGetValue(c.sim.name, out var off) ? off.ToString("0.0") : "0") + " s not striking; " + Vector3.Distance(c.transform.position, dummy.transform.position).ToString("0.0") + " m off; dummy armour " + dummy.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor));
                     if (c.Role == SimCompanion.PartyRole.Damage)
                     {
                         bool hybrid = EncounterSession.Hybrid(c.sim.classId); float share = hybrid ? EncounterSession.HybridDpsShare : 1;

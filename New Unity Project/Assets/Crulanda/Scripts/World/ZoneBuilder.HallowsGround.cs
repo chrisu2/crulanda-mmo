@@ -191,9 +191,9 @@ namespace Crulanda.World
             {
                 var ab = h.b - h.a; var mid = (h.a + h.b) / 2; var rot = Quaternion.LookRotation(new Vector3(ab.x, 0, ab.y));
                 var at = new Vector3(mid.x, h.floor + .03f, mid.y);
-                var strip = Part(PrimitiveType.Cube, root, at, new Vector3(h.half * 2, .02f, ab.magnitude), dark, rot); strip.name = "Shadow: " + h.def.name;
-                var edge = Part(PrimitiveType.Cube, root, at - Vector3.up * .005f, new Vector3(h.half * 2 + 1.2f, .02f, ab.magnitude + 1.2f), dim, rot); edge.name = "Shadow's edge";
-                h.looks.Add(strip.transform); h.looks.Add(edge.transform);
+                // One flat sheet, its darkness fading out over a soft ragged edge (two dark boxes read as open graves, 2026-10-18 frames).
+                var strip = SoftShadow(root, at, rot, h.half * 2 + 1.6f, ab.magnitude + 1.6f, .92f); strip.name = "Shadow: " + h.def.name;
+                h.looks.Add(strip.transform);
             }
             // The chasm's fog floor: a still sheet of the grey's static, lit faintly violet from under.
             if (Zone.pits != null)
@@ -441,6 +441,37 @@ namespace Crulanda.World
             string prompt = !string.IsNullOrEmpty(gd.prompt) ? gd.prompt : kind == "ward" ? "Study the ward-lock" : null;
             if (prompt != null) Interactables.Add(new ZoneInteractable { name = gd.title, prompt = prompt, kind = kind, position = foot + root.forward * (gate.FromFar ? 1.2f : -1.2f), root = root, gate = gate });
             return gate;
+        }
+            static Material softShadowMat; static Texture2D softShadowTex;
+        /// <summary>A flat soft shadow lying on the ground: a quad whose darkness fades out over a ragged edge (alpha from a small
+        /// generated texture), no collider, no shadow of its own. <paramref name="w"/> across, <paramref name="l"/> along.</summary>
+        GameObject SoftShadow(Transform parent, Vector3 at, Quaternion rot, float w, float l, float strength)
+        {
+            if (softShadowTex == null)
+            {
+                const int N = 64; softShadowTex = new Texture2D(N, N, TextureFormat.RGBA32, false) { wrapMode = TextureWrapMode.Clamp, name = "Soft shadow" };
+                for (int y = 0; y < N; y++)
+                    for (int x = 0; x < N; x++)
+                    {
+                        float u = (x + .5f) / N * 2 - 1, v = (y + .5f) / N * 2 - 1;
+                        float ragged = .1f * (Mathf.PerlinNoise(x * .21f, y * .21f) - .5f);
+                        float edge = Mathf.Max(Mathf.Abs(u), Mathf.Abs(v) * .92f) + ragged;
+                        float a = 1 - Mathf.SmoothStep(.45f, 1f, edge);
+                        softShadowTex.SetPixel(x, y, new Color(0, 0, 0, Mathf.Clamp01(a)));
+                    }
+                softShadowTex.Apply();
+            }
+            if (softShadowMat == null)
+            {
+                var sh = Shader.Find("Sprites/Default") ?? Shader.Find("Unlit/Transparent");
+                softShadowMat = new Material(sh) { name = "Soft shadow", mainTexture = softShadowTex, color = new Color(.02f, .02f, .04f, 1), renderQueue = 2450 };
+            }
+            var go = GameObject.CreatePrimitive(PrimitiveType.Quad); go.transform.SetParent(parent, false);
+            Object.DestroyImmediate(go.GetComponent<Collider>());
+            go.transform.localPosition = at; go.transform.localRotation = rot * Quaternion.Euler(90, 0, 0); go.transform.localScale = new Vector3(w, l, 1);
+            var r = go.GetComponent<MeshRenderer>(); r.sharedMaterial = softShadowMat; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
+            var block = new MaterialPropertyBlock(); block.SetColor("_Color", new Color(.02f, .02f, .04f, strength)); r.SetPropertyBlock(block);
+            return go;
         }
     }
 }

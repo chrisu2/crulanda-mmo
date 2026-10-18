@@ -86,10 +86,9 @@ namespace Crulanda.World
             var rot = Quaternion.LookRotation(new Vector3(toSun.x, 0, toSun.z).normalized);
             Part(PrimitiveType.Cylinder, t, new Vector3(0, .9f, 0), new Vector3(.55f, .9f, .55f), stone);
             Part(PrimitiveType.Cylinder, t, new Vector3(.15f, 1.9f, .05f), new Vector3(.22f, .35f, .22f), stone, Quaternion.Euler(0, 0, 24));
-            var dark = Tint(art.stone, new Color(.04f, .04f, .06f)); var dim = Tint(art.stone, new Color(.11f, .11f, .14f));
             var mid = rot * new Vector3(0, .03f, length / 2);
-            var strip = Part(PrimitiveType.Cube, t, mid, new Vector3(.8f, .02f, length), dark, rot); strip.name = "A shadow toward the sun";
-            Part(PrimitiveType.Cube, t, mid - Vector3.up * .005f, new Vector3(1.4f, .02f, length + .5f), dim, rot).name = "Its soft edge";
+            // A soft flat shadow (ZoneBuilder.HallowsGround.SoftShadow): two dark boxes read as open graves (2026-10-18 frames).
+            SoftShadow(t, mid, rot, 1.6f, length + .8f, .85f).name = "A shadow toward the sun";
         }
 
         /// <summary>A thicket of stone leaves: low grey stems and blades turned to rock, thin and sharp-edged, packed over w x d.</summary>

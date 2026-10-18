@@ -978,6 +978,8 @@ namespace Crulanda.Encounter
             if (UsePuntThing(i)) return;
             // the roofs' rain-spout, fire escape, washing and water tower (EncounterSession.Roofs)
             if (UseRoofThing(i)) return;
+            // the Sweep's child, found and led (EncounterSession.Sweep)
+            if (UseSweepThing(i)) return;
             if (i.node != null && Professions != null) { TryGather(i); return; }   // a node (a seam, a windfall, a herb) is worked with its trade
             if (Quests == null) { Message("Nothing here you need."); return; }
             if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
@@ -1968,6 +1970,8 @@ namespace Crulanda.Encounter
             TickTurf();
             // the roofs' climbs and drops offered only at their own height (EncounterSession.Roofs)
             TickRoofs();
+            // the Sweep: the horns, the warders in Pell Row, the child you lead over the roofs (EncounterSession.Sweep)
+            TickSweep();
             TickRiver();   // the Chemical River: its poison, and the tracking it hides you from (EncounterSession.River)
             AdvanceToast();
             // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.

@@ -146,7 +146,10 @@ namespace Crulanda.Tests
                     float own = rates[c.actor.EntityId.Value]; var pet = session.SimPets.Find(p => p != null && p.Master == c);
                     float withPet = own + (pet != null ? rates[pet.actor.EntityId.Value] : 0);
                     string who = c.sim.name + " (" + c.sim.classId.Replace("class.", "") + ", " + c.Role + ", level " + level + ")";
-                    report.Add(who + ": " + withPet.ToString("0.0") + " a second" + (pet != null ? " (its pet " + (withPet - own).ToString("0.0") + ")" : "") + "; band middle " + pure.ToString("0.0") + "; " + c.Activity + "; " + (offReach.TryGetValue(c.sim.name, out var off) ? off.ToString("0.0") : "0") + " s not striking; " + Vector3.Distance(c.transform.position, dummy.transform.position).ToString("0.0") + " m off; dummy armour " + dummy.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor));
+                    string line = who + ": " + withPet.ToString("0.0") + " a second" + (pet != null ? " (its pet " + (withPet - own).ToString("0.0") + ")" : "") + "; band middle " + pure.ToString("0.0") + "; " + c.Activity + "; " + (offReach.TryGetValue(c.sim.name, out var off) ? off.ToString("0.0") : "0") + " s not striking; " + Vector3.Distance(c.transform.position, dummy.transform.position).ToString("0.0") + " m off; dummy armour " + dummy.actor.Stats.GetRounded(Crulanda.Core.StatType.Armor);
+                    // The line goes into the log now and into a failing assertion's message (the results XML carries the message; the log
+                    // written after the party's levels never came, as a failed assertion ends the test first).
+                    report.Add(line); Debug.Log("Sim on the dummy: " + line);
                     if (c.Role == SimCompanion.PartyRole.Damage)
                     {
                         bool hybrid = EncounterSession.Hybrid(c.sim.classId); float share = hybrid ? EncounterSession.HybridDpsShare : 1;
@@ -154,7 +157,7 @@ namespace Crulanda.Tests
                         Assert.That(aim, Is.InRange(SimCompanion.PureBandLow * scale * share, SimCompanion.PureBandHigh * scale * share), who + ": its aim is in the " + (hybrid ? "hybrid" : "pure") + " band");
                         // Within 3% of its aim (5% for the Unwriting: its unwrite ticks are a third of a blow, rounded down).
                         float within = SimCompanion.Unwriter(c.sim) ? .05f : .03f;
-                        Assert.That(withPet, Is.InRange(aim * (1 - within), aim * (1 + within)), who + " sustains its band on the dummy" + (pet != null ? ", its pet counted in" : ""));
+                        Assert.That(withPet, Is.InRange(aim * (1 - within), aim * (1 + within)), who + " sustains its band on the dummy" + (pet != null ? ", its pet counted in" : "") + " [" + line + "]");
                     }
                     // The tank: three quarters of a damage-dealer's (Chris, 2026-10-18: "maybe 3/4 of dps"; SimCompanion.TankDpsShare).
                     else if (c.Role == SimCompanion.PartyRole.Tank) Assert.That(withPet / pure, Is.InRange(.7f, .8f), who + ": a tank deals about three quarters of a damage-dealer's");

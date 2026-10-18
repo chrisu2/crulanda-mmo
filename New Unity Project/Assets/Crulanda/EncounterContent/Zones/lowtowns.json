@@ -5885,6 +5885,37 @@
       "aside": -2.5
     },
     {
+      "name": "Sweep warders",
+      "mob": "Hired warder",
+      "tag": "warder",
+      "look": "warden",
+      "canonStatus": "CANON-EXPANDED: the sweep of the Lowtowns' alleys for a sparked child when the High City's horns sound (book1 ch.1:239-261, ch.3:243; ch.13:143); the Council's hired warders do it in the game (conflict 1, Chris's yes; the Seekers are the Transit Hub's); out only while the Sweep runs (EncounterSession.Sweep, after 'sweep'), walking Pell Row's west stretch",
+      "center": {
+        "x": -154,
+        "y": -143
+      },
+      "radius": 4,
+      "count": 2,
+      "levelMin": 17,
+      "levelMax": 18,
+      "respawn": 80,
+      "after": "sweep",
+      "route": [
+        {
+          "x": -142,
+          "y": -144
+        },
+        {
+          "x": -154,
+          "y": -143
+        },
+        {
+          "x": -166,
+          "y": -142.5
+        }
+      ]
+    },
+    {
       "name": "The Lantern-Eater",
       "mob": "The Lantern-Eater",
       "tag": "lanterneater",

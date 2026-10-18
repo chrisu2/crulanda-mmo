@@ -45,6 +45,11 @@
       "description": "Gutter-hound bones, boiled once already by the look of them. Brother Aldo will boil them again."
     },
     {
+      "id": "item.sweep_chalk",
+      "name": "Lissa's chalk",
+      "description": "A stub of yellow chalk, worn to a nub, pressed into your hand at the soup-hall's side door. The Rules on the wall by the rain-spout were written with it."
+    },
+    {
       "id": "item.eater_thread",
       "name": "A Weave-Eater's thread",
       "description": "A strand of something like black silk that was a Weave-Eater's edge. It pulls at your fingers, very slightly, toward the nearest light."
@@ -727,6 +732,48 @@
         ],
         "bagItems": [
           "leaf.cask_stew"
+        ]
+      }
+    },
+    {
+      "id": "side.aldo.sweep",
+      "title": "The Sweep",
+      "kind": "side",
+      "giver": "Brother Aldo",
+      "turnIn": "Brother Aldo",
+      "zone": "zone.lowtowns",
+      "level": 17,
+      "requires": [
+        "main.lowtowns.1"
+      ],
+      "canonStatus": "CANON-EXPANDED: the High City's brass horns' two-tone wail (book1 ch.3:243); a sparked girl backed into a Lowtowns alley, black smoke at her ankles (ch.1:239-251); Rule One and Rule Two (ch.1:257-259); the fire escape and the rain-spout (ch.1:261, 297). GAME-ONLY: the Council's hired warders sweeping (conflict 1; the Seekers are the Transit Hub's, one only glimpsed far off), Lissa, the soup-hall as her hiding place, the chalk. Repeatable: the Lowtowners pay once a game day (EncounterSession.Sweep)",
+      "summary": "When the High City's horns wail, the Council's warders sweep Pell Row for a sparked child. Find her by the rain-spout at the row's dead end and take her over the roofs to Brother Aldo's soup-hall without a warder seeing her in the lane.",
+      "offer": "Brother Aldo does not look up from the copper. \"You'll hear the horns. Two notes, up and down, from the white towers. When you hear them, the Council's men come down Pell Row with a paper, and there's always a child at the dead end by the spout. There's always one.\" He sets the ladle down. \"Not through the lane. They look in the lane. Over the roofs. Bring her to my side door. Rule Two says never interfere. I've never been much good at rules.\"",
+      "progress": "\"Over the roofs. Not the lane. The lane has lanterns in it.\"",
+      "complete": "Aldo counts the heads at the tables under his breath and nods once. \"She left you this. She said you'd need it more than her, for writing the rules on walls.\" He puts a stub of yellow chalk in your hand. \"Come back when the horns go again. They will.\"",
+      "steps": [
+        {
+          "text": "When the horns wail, lead the sparked child from Pell Row's dead end over the roofs to the soup-hall.",
+          "objectives": [
+            {
+              "type": "flag",
+              "target": "key:lowtowns.sweep",
+              "text": "The child brought to the soup-hall"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 1200,
+        "gold": 60,
+        "items": [
+          "item.sweep_chalk"
+        ],
+        "reputation": [
+          {
+            "faction": "lowtowners",
+            "amount": 200
+          }
         ]
       }
     },

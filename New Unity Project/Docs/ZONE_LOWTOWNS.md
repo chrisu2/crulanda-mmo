@@ -568,3 +568,37 @@ guards on the pier (ch.6:203); carvings under the glowing moss (ch.9:55). Not in
   SecretPlacementTests for the Lowtowns. **To look at:** each mouth from the street (the heap of rock round it), the stair down, the
   hall (ribs, mould, canal, kerb), the skiff and the fence (buy something), the guards, the crawl under the river and out into the
   Drain Courts, the culvert from the bank; the market above (nothing moved, nothing poking through); fps in the hall.
+## The Sweep (rw3-sweep, 2026-10-18; pick 9; WRITTEN, compiles, NOT RUN in Unity)
+Chris's pick 9 from REWORK_LOWTOWNS_HALLOWS.md section 4, with his answers to conflict 1 (hired warders sweep; a Seeker only glimpsed far
+off, never fought) and conflict 2 (the Copper-Tithe are out: no informer). CANON-EXPANDED: the High City's brass horns, "a piercing, deep,
+two-tone wail" (b1 ch.3:243); a sparked girl of about ten backed against an alley wall, black smoke pooled at her ankles (ch.1:239-251);
+Rule One, "If you see a Seeker, exist somewhere else", and Rule Two, "Never interfere" (ch.1:257-259); the fire escape and the rain-spout
+(ch.1:261, 297); children snatched "from the dirty alleys and the gutters" (ch.13:143). GAME-ONLY: the warders doing it, the child
+**Lissa**, Brother Aldo's soup-hall as where she is hidden, the chalk. Code: `EncounterSession.Sweep` (and two lines in `EncounterSession.Roofs`).
+- **The horns:** come within 14 m of Pell Row's dead west end, at the lane's level and out of a fight, and the horns wail (a chat line and
+  a toast, "The horns"); the Rules are chalked on the wall by the spout.
+- **The warders:** a camp out only while the sweep runs (`Sweep warders`, after "sweep", 2 hired warders, 17-18), walking Pell Row's west
+  stretch (x -142 to -166) back and forth. Fight them or keep out of their way.
+- **The child:** E behind the rain-barrels by the spout finds her; she takes your hand and follows you (her own navmesh agent; a small
+  villager's figure, nothing the mobs strike). She climbs and drops with you when within 10 m (MoveParty); along the walks and the
+  rope bridges she follows on the navmesh. New: **down the fire escape** (E at its head on the far terrace's walk), so the careful way is
+  up the spout, along the row's gutters, over the rope bridge across Pell Row, and down the fire escape 27 m east of the warders' road.
+- **Seen:** a living warder within 8 m of her while she stands in the open lane (her feet under 3 m above its ground): she tears free
+  and is gone into the alleys; the lane is quiet again 40 s later, and the sweep can come again 2 minutes after that. On the roofs
+  nobody sees her.
+- **Safe:** within 5 m of Brother Aldo and he takes her in. `lowtowns.sweep` is kept for good (Progress.keys, no save change); once a game
+  day the Lowtowners pay 14 crowns and 60 standing (`lowtowns.sweep.day:<n>`, one key kept). The quest **The Sweep**
+  (`side.aldo.sweep`, Brother Aldo, after main.lowtowns.1) is a flag on that key: 1200 XP, 60 crowns, 200 standing and **Lissa's chalk**
+  (a quest item).
+- **The Seeker:** on the ridge of the nearest tenement 45-90 m from the hiding place (not one of the route's), white plate and a gold
+  mask (ch.1:241), facing the lane; a figure only (no collider, no actor). PROVISIONAL look: the plate-armoured figure, until the Transit
+  Hub gives the Seekers their own.
+- No machines: horns, lanterns, an iron fire escape, a rain-spout.
+
+**Tests:** `LowtownsSweepTests` (EditMode: the camp, its road on Pell Row, the spout's foot out of sight of it and the fire escape's well
+clear, the quest's flag and rewards and the keepsake an item, the citations, no Copper-Tithe and no machine words) and `SweepPlayTests`
+(PlayMode: the horns, warders, child and a Seeker that is only a figure; she climbs the spout with you, follows over every walk and
+bridge without coming down into the lane, comes down the fire escape and is taken in by Aldo with the day's pay; a warder near her in
+the lane fails it and it resets). **To run in the local session:** both, and LowtownsZoneTests, LowtownsRoofsTests, ZoneContentTests
+(Lowtowns). **To look at:** the horns' line and toast, the warders walking Pell Row, the child following on the rope bridges, the
+fire escape down, the Seeker on the far roof from the lane and from the walks.

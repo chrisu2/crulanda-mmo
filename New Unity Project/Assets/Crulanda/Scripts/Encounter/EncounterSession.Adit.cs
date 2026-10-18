@@ -41,6 +41,8 @@ namespace Crulanda.Encounter
             StartAshRoad();
             // (the Lowtowns) the Rusty Spoon's Triad table, its window and its brawl (EncounterSession.Spoon.cs)
             StartSpoon();
+            // (the Lowtowns, pick 9) the Sweep's hiding place and the fire escape's way down (EncounterSession.Sweep.cs)
+            StartSweep();
             // The pressed goblins in their cages, and the doors of those opened before standing open (playtest note 125).
             foreach (var i in Zone.Interactables)
             {

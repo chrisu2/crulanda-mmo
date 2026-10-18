@@ -195,8 +195,10 @@ namespace Crulanda.World
             float h = hills * Zone.hillHeight * n + (hills > 0 ? hills * Crag(x, z) : 0) + CliffLift(x, z);   // mountain crags off the kept ways; shelves behind cliffs
             if (Zone.wasting != null && x > Zone.wasting.x - 4) h *= Mathf.Clamp01((Zone.wasting.x + 2 - x) / 6);  // unmade ground is dead flat
             if (shapes != null) h = Shape(x, z, h);   // landmark ground: level pads, perches and basins (ZoneShape)
-            if (Zone.pits != null && Zone.pits.Length > 0) h = Pit(x, z, h);   // (Hallow's Creek) a chasm sunk in the land (ZonePit; ZoneBuilder.HallowsGround)
             if (Zone.terraces != null && Zone.terraces.Length > 0) h = Terraces(x, z, h);   // a city's plateau, terraces and ramps (ZoneBuilder.Crown)
+            // (Hallow's Creek) a chasm sunk in the land (ZonePit; ZoneBuilder.HallowsGround). After the terraces (2026-10-18, the Lowtowns'
+            // Dead Man's Drop sinks into the Rust Market's shelf; a terrace sets its height outright, so a pit before it was levelled away).
+            if (Zone.pits != null && Zone.pits.Length > 0) h = Pit(x, z, h);
             if (carveWater && Water != null) h = Water.Carve(x, z, h);   // creeks and lakes (see ZoneWater)
             return h;
         }

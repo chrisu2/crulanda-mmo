@@ -394,3 +394,51 @@ river by day and at night (the film, the black), the eels and the croc; walk a l
   dark seepage streak under them, soot streaks from the coping, bills at eye height, an iron wall lamp on some long runs (twelve at most),
   rubble at the foot (never on a ramp or a stair). GAME-ONLY.
 - **To look at in the local session:** the rust-market and chemical-river frames again (lowtowns-12, lowtowns-07), the river at night, fps.
+
+## Dead Man's Drop and the Night Market (w2-lowlife, 2026-10-18; picks 10 and 8)
+Chris's picks from REWORK_LOWTOWNS_HALLOWS.md section 4 ("keep all"), conflict 5's answer: the Drop in the Lowtowns as a view and a fall onto
+the nets. Built on `w2-lowlife`, compile-checked, NOT run in Unity (OPEN until Chris has walked it).
+
+**Pick 10, Dead Man's Drop (CANON; ZoneBuilder.DeadMansDrop).** The book: Valen runs "the narrow, chaotic lanes of the Rust Market" and skids
+"to a desperate halt right at the lip of Dead Man's Drop, where the street simply vanished into the yawning, bottomless abyss of the Under-City",
+loose stones clicking away into it (b1 ch.1:311-315); he falls between the towers' masonry into "a thick, rotting fungal-net suspended three
+stories down" (ch.1:345-347). The game:
+- **Drop Lane** (GAME-ONLY name) leaves Teeth Lane at z 20 and runs east between blind brick walls to the lip, on the market's level (+8).
+- **The pit** (a `ZonePit` named "Dead Man's Drop" in lowtowns.json: centre (190, 23), 12 m square, 34 m deep, sheer sides). `HeightAt` now
+  sinks pits *after* the terraces (a terrace sets its height outright, so a pit before it was levelled away; Hallow's Creek has no terraces, so
+  its chasm is unchanged). Soot brick lines the shaft to the lip with string courses and damp streaks; a dark stone coping; loose stones on
+  the setts by the gap.
+- **The railing:** rusted iron round all four sides, solid and cut out of the navmesh, with one 2.4 m gap where the lane ends (snapped rails
+  hang there). Townsfolk never reach the edge; you can step off on purpose.
+- **The net** 9.5 m down (three stories), wall to wall: grey-green rotten cords sagging, rotted through here and there, fungus and a few
+  clumps of the green glowing mould, iron pins in the walls. Under it fog sheets one below another and a black floor far down (the Under-City
+  is not this zone's: GAME-ONLY).
+- **The fall** (EncounterSession.NightMarket): landing on the net takes 8% of your health, never the last point (`DropBite`), and the line
+  "...crash heavily into a thick, rotting fungal-net suspended three stories down ... Alive. Miraculously, absurdly alive." Anyone who goes
+  past the net is set back on it.
+- **The way out** (GAME-ONLY): iron rungs up the north wall to a drain-cut; E on the net ("Climb the iron rungs", 4 s) lets you out on
+  Cooper's Row under the market (+4, `ZoneBuilder.DropOut`), the party and Mira with you. The prompt shows only on the net.
+- **The place:** landmark "Dead Man's Drop" at the lip, its text "the street vanishes into the dark of the Under-City", with a view.
+
+**Pick 8, the Night Market (CANON market, CANON lore vendors, GAME-ONLY ring; ZoneBuilder.NightMarket).** "The Rust Market did not sleep"
+(b1 ch.3:5); skewered-rat and aether-spiced wine (ch.3:7); the tales in `crulanda\lore_stories.md`: #9 "The Merchant of Nothing" (jars of
+"premium nothingness") and #6 "The Glitch" (the candlemaker's striker making "little blue butterflies made of light" that pop into sulphur
+smoke). The game, a row on the market's south edge above Skewer Lane (x 96-125, z 48-54):
+- **Three keepers** (residents, out only after dark, `WorldClock.IsNight`; parked by day): **The Merchant of Nothing**, "Seller of Jars"
+  (CANON-EXPANDED, lore #9, his tale's own words in his stories) at a counter of stoppered empty jars under a pale lamp; **Abel Snuff**,
+  Candlemaker (CANON-EXPANDED, lore #6; the name GAME-ONLY) with candles of every height and his **light-butterflies**: seven small blue
+  glowing moths wheeling round the stall at night, wings beating, now and then one popping into a yellow-grey puff while another rises from
+  the candles (`LightButterflies`); **Mother Gant**, Card-Reader (GAME-ONLY) by the **chalk ring** (GAME-ONLY: a chalk circle and star on the
+  setts, four candle stubs, an upturned crate with three Triad cards; her stories are fortunes in the Triad's suits, CANON b1 ch.1:47, 55-57).
+- **By day** each counter is lashed under a tarp; **by night** the goods, the candle-flames and a string of lanterns over the row show
+  (`NightOnly`), and night lights come up at the stalls, the ring, the lantern-string and the existing Skewers and Aether wine stalls.
+- The counters are solid (cut out of the navmesh); the rest is visual. No machines: timber, cloth, tallow, glass, chalk, rope, iron.
+- Not built (left for later if Chris wants it): a jar of nothing to buy as a curio (needs an item and a price).
+
+**Tests:** `LowtownsNightDropTests` (new, EditMode: the pit deep in the market's shelf and level round its lip, the lane to the gap, the
+place citing ch.1:313 and 347, nothing standing in or at the pit, the rungs out to a lower lane, the fall's bite never the last point, the
+three keepers labelled with their tales cited, on level ground clear of stalls, the ring clear). **To run in the local session:**
+LowtownsNightDropTests, LowtownsLevelsTests, LowtownsZoneTests, LowtownsReworkTests, HallowsDataTests and HallowsNavTests (the pit order
+change), and the PlayMode NodePlacementTests, SecretPlacementTests, ZoneContentTests, PostFacingPlayTests for the Lowtowns. **To look at:**
+the Drop from the lane (the railing, the gap, the dark), a step off (the fall, the net, the line, the bite), the rungs out; the Night Market
+by day (tarps, nobody) and at night (the keepers, the jars, the butterflies popping, the ring, the lanterns), and fps there at night.

@@ -188,9 +188,9 @@ sells his pie, and the town moves.
 5. **The Spoon as in chapter 1** (M): Triad, the Ballad of the One-Legged Goat, the brawl out through the front window. CANON (ch.1:7-133) - BUILT 2026-10-18 with Snivels at the bar (conflict 9), not yet run in Unity
 6. **The Chemical River** (S): black iridescent sludge that poisons, sludge-eels, a mutated crocodile rare, wading hides you. CANON (ch.15:335, 391; ch.16:5, 75)
 7. **New tricks for the other camps** (M): warders' shield-line, slate-throwers, hounds that circle, barge fights, the Grey-touched's flash. CANON-EXPANDED / GAME-ONLY
-8. **The Night Market** (M): the market that never sleeps, the Merchant of Nothing's jars, the candlemaker's light-butterflies, a chalk ring. CANON (ch.3:5; lore #6, #9) + GAME-ONLY ring
+8. **The Night Market** (M): the market that never sleeps, the Merchant of Nothing's jars, the candlemaker's light-butterflies, a chalk ring. CANON (ch.3:5; lore #6, #9) + GAME-ONLY ring - BUILT 2026-10-18 (w2-lowlife; ZONE_LOWTOWNS.md, "Dead Man's Drop and the Night Market"), not yet run in Unity
 9. **The Sweep** (L): the horns wail, warders sweep a lane, you take a sparked child over the roofs to the soup-hall (needs 3). CANON-EXPANDED (ch.1:239-303; ch.3:243; conflict 1)
-10. **Dead Man's Drop** (M): a street that ends in the abyss; a view down, and a fall onto the fungal nets with a ladder out. CANON (ch.1:313, 347; conflict 5)
+10. **Dead Man's Drop** (M): a street that ends in the abyss; a view down, and a fall onto the fungal nets with a ladder out. CANON (ch.1:313, 347; conflict 5) - BUILT 2026-10-18 (w2-lowlife; same section), not yet run in Unity
 11. **The smugglers' drowned vaults** (L): under the market, a black canal, a causeway, green glow, a fence's boat, a loop under the river. CANON-EXPANDED (ch.6:185-193; conflict 4)
 12. **Landmarks, turf and crossings** (M): the Stack, the Rag Bridge of houses, gang corners by the day, the punt ferry, the weir. GAME-ONLY (turf seeded by ch.7:21; conflict 3)
 

@@ -780,6 +780,9 @@ namespace Crulanda.World
         void LowtownEdge()
         {
             BuildLowtownLevels();   // the town built downhill: retaining walls and step-streets (ZoneBuilder.LowtownLevels)
+            // Dead Man's Drop and the Night Market (Lowtowns picks 10 and 8; ZoneBuilder.DeadMansDrop, ZoneBuilder.NightMarket)
+            BuildDeadMansDrop();
+            BuildNightMarket();
             var paving = new GameObject("Paving").transform; paving.SetParent(statics, false);
             foreach (var road in Zone.roads)
             {

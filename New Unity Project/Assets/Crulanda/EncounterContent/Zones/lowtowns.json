@@ -663,6 +663,24 @@
           "y": 152.3
         }
       ]
+    },
+    {
+      "name": "Drop Lane",
+      "width": 3.5,
+      "points": [
+        {
+          "x": 153.7,
+          "y": 20
+        },
+        {
+          "x": 168,
+          "y": 21.5
+        },
+        {
+          "x": 182.6,
+          "y": 23
+        }
+      ]
     }
   ],
   "water": [
@@ -1002,6 +1020,22 @@
       },
       "viewPitch": 16,
       "viewZoom": 18
+    },
+    {
+      "name": "Dead Man's Drop",
+      "text": "The lane runs on between blind brick walls and then simply stops. Past a snapped iron railing the street vanishes into the dark of the Under-City, loose stones clicking away into it, and the wind comes up cold. Three stories down a thick, rotting fungal net hangs across the shaft; under it, nothing you can see.",
+      "at": {
+        "x": 181,
+        "y": 23
+      },
+      "radius": 7,
+      "canonStatus": "CANON: Dead Man's Drop in the Rust Market's lanes, 'where the street simply vanished into the yawning, bottomless abyss of the Under-City' (book1 ch.1:313), the 'thick, rotting fungal-net suspended three stories down' (ch.1:347); the railing, the lane's name and the iron rungs out GAME-ONLY",
+      "view": {
+        "x": 168,
+        "y": 21.5
+      },
+      "viewPitch": 16,
+      "viewZoom": 14
     }
   ],
   "props": [
@@ -6036,6 +6070,54 @@
           "I'm not idling. I'm watching the market for a friend. The friend's me. I'm watching for a cheap pie.",
           "The Spoon opens at noon and so do I. Till then I lean. A man needs a wall in the Lowtowns."
         ]
+      },
+      {
+        "name": "The Merchant of Nothing",
+        "role": "stranger",
+        "title": "Seller of Jars",
+        "at": {
+          "x": 100,
+          "y": 51
+        },
+        "facing": 180,
+        "canonStatus": "CANON-EXPANDED: the street vendor of the Lowtowns' tale 'The Merchant of Nothing' (lore_stories.md #9), his words his own; out only at night in the market that 'did not sleep' (book1 ch.3:5); his stall GAME-ONLY",
+        "stories": [
+          "You want to buy a jar of The Wasting? Genuine article, pulled straight from the edge of the void. Look at it. See how empty it is? That's premium nothingness, that is.",
+          "Most nothing you buy in this market is cut with air or shadow. Not mine. Pure, unadulterated non-existence. Don't open it indoors, or you'll erase the cat.",
+          "Ten gold sovereigns. No refunds if the jar stops existing before you get home. Day trade? No. Nothing sells best in the dark, where folk can't see how little's in it."
+        ]
+      },
+      {
+        "name": "Abel Snuff",
+        "role": "stranger",
+        "title": "Candlemaker",
+        "at": {
+          "x": 108,
+          "y": 51
+        },
+        "facing": 180,
+        "canonStatus": "CANON-EXPANDED: the candlemaker of the Lowtowns' tale 'The Glitch' (lore_stories.md #6), his blue light-butterflies; his name and his night stall GAME-ONLY",
+        "stories": [
+          "I tried to light a candle the other night. Same striker I've used twenty years. Spark hit the wick, and instead of fire I got butterflies. Little blue butterflies made of light.",
+          "They fly round a while and then pop into smoke that smells of sulphur. There, see? That one. The magic is sick, friend. It's confused, like a dog that doesn't know its master any more.",
+          "One day it bites, the next day it licks your hand. And one day it's going to bite our throats out. Buy a candle. They still burn, mostly."
+        ]
+      },
+      {
+        "name": "Mother Gant",
+        "role": "stranger",
+        "title": "Card-Reader",
+        "at": {
+          "x": 119,
+          "y": 51.3
+        },
+        "facing": 180,
+        "canonStatus": "GAME-ONLY: the card-reader and her chalk ring in the Night Market; the Triad's suits, Wyrms and Coins, and the three Kings that are the Crown are CANON (book1 ch.1:47, 55-57)",
+        "stories": [
+          "Step into the chalk, love, and keep your feet inside it. Three cards. Wyrms for what's coming, Coins for what it'll cost you.",
+          "Ace of Wyrms. Somebody near you is going to fall a long way and land on something soft. Don't laugh. It happens down here more than you'd think.",
+          "Three Kings. The Crown. Nobody beats the Crown, love; you just keep out of its way. That'll be a copper, and another for the chalk."
+        ]
       }
     ],
     "households": [
@@ -7182,6 +7264,23 @@
       "ramp": true,
       "blend": 1.5,
       "style": "stair"
+    }
+  ],
+  "pits": [
+    {
+      "name": "Dead Man's Drop",
+      "center": {
+        "x": 190,
+        "y": 23
+      },
+      "size": {
+        "x": 12,
+        "y": 12
+      },
+      "rotation": 0,
+      "depth": 34,
+      "wall": 1.0,
+      "fog": 0
     }
   ]
 }

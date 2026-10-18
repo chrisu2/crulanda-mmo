@@ -439,12 +439,20 @@ namespace Crulanda.World
     public sealed class StillMirror : MonoBehaviour
     {
         float at;
-        void Start() { at = Time.time + 1.5f; }
+        /// <summary>No graphics device (-nographics batch runs): rendering the probe's cube there crashes Unity natively
+        /// (GfxDevice::DrawSharedGeometryJobs under ReflectionProbes::UpdateRealtimeProbes, r203), so the probe is switched off and never rendered.</summary>
+        static bool NoGraphics => SystemInfo.graphicsDeviceType == UnityEngine.Rendering.GraphicsDeviceType.Null;
+        void Start()
+        {
+            at = Time.time + 1.5f;
+            if (NoGraphics) { var probe = GetComponent<ReflectionProbe>(); if (probe != null) probe.enabled = false; enabled = false; }
+        }
         void Update()
         {
             if (Time.time < at) return;
-            var probe = GetComponent<ReflectionProbe>(); if (probe != null) probe.RenderProbe();
             enabled = false;
+            if (NoGraphics) return;
+            var probe = GetComponent<ReflectionProbe>(); if (probe != null && probe.isActiveAndEnabled) probe.RenderProbe();
         }
     }
 }

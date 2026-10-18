@@ -96,6 +96,13 @@ caster's coat); one palette texture, so only the skin is tinted and colours come
 are the unproven parts); then a build and the wardrobe line-up with the switch on: `Crulanda.exe --crulanda-wardrobe-capture <dir>
 --crulanda-ganzse`, front, back and side, and one figure walking (our clips on its avatar). The switch stays off until Chris has
 seen it.
+**Step 1, first run (2026-10-18, wardrobe-ganzse-1; tests 15/15):** the pieces fit and our caps and hoods sit right, but every
+GanzSe man stood in a T-pose, his skin near white, his eyes a glowing blue, and the helm rows bare-chested. Fixed, NOT RUN: the
+Animator was added to the bare copied skeleton before its renderers, so (CullUpdateTransforms) it found none to be seen by and never
+wrote a pose; it is now added after them and rebound (the import and avatar were right: the tests' Humanoid map passed). Skin: the
+figure's tone times the ratio that takes the pack's pale swatch to the Quaternius skin, the material matte (.25 gloss, as the kit's).
+Eyes: dark only (the old formula gave every variant the blue). Every class starts in a top, breeches and boots. New PlayMode test
+GanzSeAnimationTests: a GanzSe man before a camera drops his arms and moves his hands, animating always and culling as built.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

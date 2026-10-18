@@ -13,6 +13,8 @@ zone, so it is the next dungeon that can be built. It is **a built place, not a 
 a frozen town walked at street level, with its heights on stairs (a granary's lofts, a library's gallery, a bell tower), one chasm
 crossed on hanging stone, and one short cellar.
 
+- **Chris, 2026-10-18 ~01:40, verbatim:** "im not sure i like the lowlands or the harrow.seems boring just my opinion". Asked what makes them boring, he picked all four: "Looks flat and dull", "Nothing to do", "Fights feel samey", "Layout is a straight line". OPEN: a rework of both (look, things to do, fight variety, layout) before more content is built on them.
+
 ## 1. The premise (in the books' terms)
 Fifty years before the books, the Wasting began at Hallow's Creek: the Grand Mystic's working in the town square broke, and the
 valley was paused mid-second (CANON, b1 ch.17-21). The town stands perfect and grey: white fences, a baker in his doorway with a tray,

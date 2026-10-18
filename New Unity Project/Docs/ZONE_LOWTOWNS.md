@@ -5,6 +5,8 @@ Book 1 and near it; no machines; no canon person dies; Seekers, Inquisitors, Red
 the Copper-Tithe are never enemies; Lowtown names are short, with Anglo-Saxon or Germanic roots) and labels every line CANON,
 CANON-EXPANDED, GAME-ONLY or PROVISIONAL.
 
+- **Chris, 2026-10-18 ~01:40, verbatim:** "im not sure i like the lowlands or the harrow.seems boring just my opinion". Asked what makes them boring, he picked all four: "Looks flat and dull", "Nothing to do", "Fights feel samey", "Layout is a straight line". OPEN: a rework of both (look, things to do, fight variety, layout) before more content is built on them.
+
 ## 0. Chris's words (verbatim)
 - 2026-10-15 ~22:00, the question prompt: "Lowtowns & Rust Market 16-19 (Recommended)"; with "keep going finish phase 8" and "them move to 9".
 - 2026-10-07 (side chat, ROADMAP "The 16-30 road"): levels 16-30 use places already on the world map: "the Lowtowns and the Rust Market

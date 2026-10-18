@@ -197,7 +197,7 @@ sells his pie, and the town moves.
 **The Lowtowns**
 1. **Built downhill** (M): the market high under the Forge wall, lanes falling in shelves and causeways to the river. CANON-EXPANDED (ch.3:7, 257; WB:97)
 2. **Colour from the books** (S): yellow smog, orange fires, neon moss, green drain-glow, violet shard-light, the twin moons. CANON (ch.1:135, 145, 191; ch.7:17; ch.6:129)
-3. **The roofs** (L): up by rain-spouts and fire escapes, over slate and gutters, down through the laundry; rope bridges added. CANON-EXPANDED (ch.1:225, 261, 297; ch.7:35-41)
+3. **The roofs** (L): up by rain-spouts and fire escapes, over slate and gutters, down through the laundry; rope bridges added. CANON-EXPANDED (ch.1:225, 261, 297; ch.7:35-41) - BUILT 2026-10-18 (w2-roofs; ZONE_LOWTOWNS.md, "The roofs"), not yet run in Unity
 4. **Weave-Eaters as the books show them** (M): they blink, go for casters, eat wards; harpoons stop the blink, salt calcifies. CANON (ch.20:121-205) - BUILT 2026-10-18 (rw-lowlife; ZONE_LOWTOWNS.md, "The rework, picks 4 and 5"), not yet run in Unity
 5. **The Spoon as in chapter 1** (M): Triad, the Ballad of the One-Legged Goat, the brawl out through the front window. CANON (ch.1:7-133) - BUILT 2026-10-18 with Snivels at the bar (conflict 9), not yet run in Unity
 6. **The Chemical River** (S): black iridescent sludge that poisons, sludge-eels, a mutated crocodile rare, wading hides you. CANON (ch.15:335, 391; ch.16:5, 75)

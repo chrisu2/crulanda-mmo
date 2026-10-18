@@ -201,7 +201,7 @@ sells his pie, and the town moves.
 9. **The Sweep** (L): the horns wail, warders sweep a lane, you take a sparked child over the roofs to the soup-hall (needs 3). CANON-EXPANDED (ch.1:239-303; ch.3:243; conflict 1)
 10. **Dead Man's Drop** (M): a street that ends in the abyss; a view down, and a fall onto the fungal nets with a ladder out. CANON (ch.1:313, 347; conflict 5) - BUILT 2026-10-18 (w2-lowlife; same section), not yet run in Unity
 11. **The smugglers' drowned vaults** (L): under the market, a black canal, a causeway, green glow, a fence's boat, a loop under the river. CANON-EXPANDED (ch.6:185-193; conflict 4)
-12. **Landmarks, turf and crossings** (M): the Stack, the Rag Bridge of houses, gang corners by the day, the punt ferry, the weir. GAME-ONLY (turf seeded by ch.7:21; conflict 3)
+12. **Landmarks, turf and crossings** (M): the Stack, the Rag Bridge of houses, gang corners by the day, the punt ferry, the weir. GAME-ONLY (turf seeded by ch.7:21; conflict 3) - BUILT 2026-10-18 (w2-marks; ZONE_LOWTOWNS.md, "Landmarks, turf and crossings"), not yet run in Unity
 
 **Hallow's Creek**
 1. **White and perfect, not grey** (S): white houses and fences, clean gravel, red-quartz roses; only the people are grey. CANON (ch.17:269; ch.21:11-25) - fixes a CONTRADICTION

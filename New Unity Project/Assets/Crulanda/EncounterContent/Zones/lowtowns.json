@@ -6118,6 +6118,96 @@
           "Ace of Wyrms. Somebody near you is going to fall a long way and land on something soft. Don't laugh. It happens down here more than you'd think.",
           "Three Kings. The Crown. Nobody beats the Crown, love; you just keep out of its way. That'll be a copper, and another for the chalk."
         ]
+      },
+      {
+        "name": "Dace Mottle",
+        "role": "stranger",
+        "title": "Iron Teeth runner",
+        "at": {
+          "x": 16,
+          "y": -21
+        },
+        "facing": 0,
+        "canonStatus": "GAME-ONLY: an Iron Teeth runner holding the day's corner (Lowtowns pick 12, the turf by the day); the Iron Teeth and their warehouse kept as neutral ground are CANON (book1 ch.7:21; B1WB:26)",
+        "stories": [
+          "Teeth's corner today. Bridge foot's ours from sunup to sunup. You cross, you cross polite.",
+          "Tomorrow it's somebody else's. That's the trick of it: nobody holds a corner long enough to get greedy."
+        ]
+      },
+      {
+        "name": "Rusk Hollin",
+        "role": "stranger",
+        "title": "Iron Teeth runner",
+        "at": {
+          "x": 18,
+          "y": -14.5
+        },
+        "facing": 180,
+        "canonStatus": "GAME-ONLY: an Iron Teeth runner holding the day's corner (Lowtowns pick 12, the turf by the day); the Iron Teeth and their warehouse kept as neutral ground are CANON (book1 ch.7:21; B1WB:26)",
+        "stories": [
+          "Carts pay the Ward-watch at the far end. This end, they nod to us. Costs less.",
+          "See the teeth on the setts? Ochre. Same as on the warehouse roof. Means we're about."
+        ]
+      },
+      {
+        "name": "Vell Tarrow",
+        "role": "stranger",
+        "title": "Iron Teeth runner",
+        "at": {
+          "x": 156,
+          "y": 49
+        },
+        "facing": 0,
+        "canonStatus": "GAME-ONLY: an Iron Teeth runner holding the day's corner (Lowtowns pick 12, the turf by the day); the Iron Teeth and their warehouse kept as neutral ground are CANON (book1 ch.7:21; B1WB:26)",
+        "stories": [
+          "Teeth Lane. Funny how it's only ours one day in three.",
+          "The warehouse? Neutral ground, friend. Nobody's turf. Not even ours. That's why it's still standing."
+        ]
+      },
+      {
+        "name": "Brig Carrow",
+        "role": "stranger",
+        "title": "Iron Teeth runner",
+        "at": {
+          "x": 162,
+          "y": 45
+        },
+        "facing": 270,
+        "canonStatus": "GAME-ONLY: an Iron Teeth runner holding the day's corner (Lowtowns pick 12, the turf by the day); the Iron Teeth and their warehouse kept as neutral ground are CANON (book1 ch.7:21; B1WB:26)",
+        "stories": [
+          "Keep your hands where I can see them and your coin where I can't.",
+          "Up at the warehouse we trade. Down here on the corner we watch. Different jobs."
+        ]
+      },
+      {
+        "name": "Sloe Mackin",
+        "role": "stranger",
+        "title": "Iron Teeth runner",
+        "at": {
+          "x": -13,
+          "y": 138.5
+        },
+        "facing": 90,
+        "canonStatus": "GAME-ONLY: an Iron Teeth runner holding the day's corner (Lowtowns pick 12, the turf by the day); the Iron Teeth and their warehouse kept as neutral ground are CANON (book1 ch.7:21; B1WB:26)",
+        "stories": [
+          "The weir's ours today. Walk the crest if you like. Mind the plank over the sluice; it's had a few in.",
+          "Sluice-keeper lifts the boards with a hook-pole when the sludge backs up. We just stand here and look like we mean it."
+        ]
+      },
+      {
+        "name": "Jink Pellow",
+        "role": "stranger",
+        "title": "Iron Teeth runner",
+        "at": {
+          "x": -15.5,
+          "y": 143.5
+        },
+        "facing": 100,
+        "canonStatus": "GAME-ONLY: an Iron Teeth runner holding the day's corner (Lowtowns pick 12, the turf by the day); the Iron Teeth and their warehouse kept as neutral ground are CANON (book1 ch.7:21; B1WB:26)",
+        "stories": [
+          "Eels come up under the weir when the boards go in. Don't feed them. Don't be fed to them.",
+          "Ochre on the stones, a banner on the pole. Tomorrow we're on another corner and this is just a weir again."
+        ]
       }
     ],
     "households": [

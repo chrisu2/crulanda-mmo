@@ -783,6 +783,8 @@ namespace Crulanda.World
             // Dead Man's Drop and the Night Market (Lowtowns picks 10 and 8; ZoneBuilder.DeadMansDrop, ZoneBuilder.NightMarket)
             BuildDeadMansDrop();
             BuildNightMarket();
+            // The Stack, the Rag Bridge's houses, the turf by the day, the punt ferry and the weir (Lowtowns pick 12; ZoneBuilder.LowtownMarks)
+            BuildLowtownMarks();
             var paving = new GameObject("Paving").transform; paving.SetParent(statics, false);
             foreach (var road in Zone.roads)
             {

@@ -442,3 +442,25 @@ LowtownsNightDropTests, LowtownsLevelsTests, LowtownsZoneTests, LowtownsReworkTe
 change), and the PlayMode NodePlacementTests, SecretPlacementTests, ZoneContentTests, PostFacingPlayTests for the Lowtowns. **To look at:**
 the Drop from the lane (the railing, the gap, the dark), a step off (the fall, the net, the line, the bite), the rungs out; the Night Market
 by day (tarps, nobody) and at night (the keepers, the jars, the butterflies popping, the ring, the lanterns), and fps there at night.
+
+## Landmarks, turf and crossings (w2-marks, 2026-10-18; pick 12)
+Written and compiled, not yet run in Unity. Builder `ZoneBuilder.LowtownMarks.cs`, play `EncounterSession.LowtownMarks.cs`, tests
+`LowtownsMarksTests` (EditMode). No machines: brick, timber, stone, cloth, ochre, rope; the punt is poled, the sluice boards lifted by hand.
+- **The Stack** (GAME-ONLY): a leaning rookery of nine storeys at the High Rows' north-east (-62, 212), rooms added on rooms, balconies
+  on struts, washing, every window lit after dark, a crooked slate top; about 32 m, leaning east as it climbs. Only the ground storey is
+  solid (its door boarded shut); the rest is for the eye.
+- **The Rag Bridge of houses** (CANON-EXPANDED: a bridge over the Chemical River with a "rotting arch", book1 ch.15:383; "skeletons of
+  houses, crushed bridges" downstream, ch.16:255; houses on it GAME-ONLY): plank and brick houses, one and two storeys, built out over the
+  water past both parapets on piles and struts, one gap each side for the view, beams and rag lines across the walk high over it. The
+  deck is still the road; the houses are blocked off over the water.
+- **Gang turf by the day** (GAME-ONLY, seeded by the Iron Teeth's warehouse as "neutral ground", ch.7:21; conflict 3 kept, conflict 2: no
+  Copper-Tithe): three corners (the Sett Bridge's east foot, Teeth Lane at Skewer Lane, the weir's west end). Each game day the Teeth
+  hold the next in turn: an ochre banner with their black teeth on a pole, ochre teeth daubed on the setts, and two Iron Teeth runners
+  (residents, two to a corner) standing there; the other corners' runners are gone. Never at the warehouse (every corner over 40 m off).
+- **The punt ferry** (GAME-ONLY): two timber landings below the Sett Bridge (west at Wharf Walk's side, east bank opposite, z -80), a
+  flat tarred punt. E at a landing: a dock-rat poles you across (5 seconds, the punt glides over), the party with you.
+- **The weir** (GAME-ONLY, the first draft's weir kept): a low stone weir across the river at z 141 between Weir Lane and Bridgefoot, its
+  crest a walk (solid, in the navmesh), a sluice of stacked boards in stone grooves in the middle with a plank and a rope hand-line over
+  it, a hook-pole leaning on a pier. Clear of the eels' shallows and the moored barge.
+- To look at in Unity: the Stack from the market and the Gate Ward; the houses not over the deck; the weir crest and plank walkable both
+  ways; the punt both ways; the turf on two days (advance the day).

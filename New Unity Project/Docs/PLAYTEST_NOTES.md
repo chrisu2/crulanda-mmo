@@ -828,3 +828,5 @@ un-captures.
   Then (verbatim): "dont use the non crulanda food but some can be used" (keep what the books and the zones support).
   Note 233 answered (question prompt, verbatim): the Imp "Ember-bound (Recommended)" (the Adit's Ember Vent, 10-12), the Puglin
   "Bank-snouts (Recommended)" (the Lowtowns' river banks, 15-20). Docs/BESTIARY_MONSTERS.md (branch bestiary).
+- 236 (2026-10-18 ~19:20, his screenshot: the Lowtowns, a cook in a white hat standing in the river under a bridge, a pale green
+  glowing slab on the water to the left) "some professions in the water under bridge" (OPEN).

@@ -41,6 +41,17 @@
   Golden Cask, Cracked Hearth, Wain's Rest, Pilgrims' Rest, Gilded Lantern and Rusty Spoon tables and bars; Oakhaven's and the Lowtowns'
   stalls; the Night Market and the drowned vaults' pier. Check the food's colours are not washed out or near black, the dishes' sizes on
   the tables, and that a cooked dish shows by the fire and a bought one on a table. Then PropCapture for the row of new pieces.
+## 2026-10-18: no tradespeople in the Lowtowns' river (branch fix-lowtown-trades; WRITTEN, NOT RUN)
+- Chris: "some professions in the water under bridge" (PLAYTEST_NOTES 236). The baker, smith and merchant in the black river under the
+  Sett Bridge were the world capture's trades line-up: it stands them round the zone's middle (a village's green), which in the
+  Lowtowns is the river. The line-ups (trades, errands, animals, figures) now move to dry, level, open ground when the middle is wet
+  (the recovery spot, else the player's spawn). In play, villagers are no longer sent to idle in a river's shallows either (a spot
+  thrown into the water is dropped; the Lowtowns has no green, so its folk idle at thrown spots all day).
+- The pale green slab on the water was the glowing mould under the bridge's arch: toward the bridge's ends the arch comes down to
+  the river and patches lay on the water. Patches now keep 35 cm over it.
+- Standing on the water in that frame was the capture's wading shot (swimming), not a stray floor: the river has no collider.
+- `VillagePlacesWaterTests` (EditMode); compiles, not run. The lead runs it and recaptures the Lowtowns (`lowtowns-98-trades-lineup-*`,
+  `-99-errands-lineup-*`, `-98-critters-*`, `-98-figures-walk-*`, `-08-the-sett-bridge`) plus a look under the Sett and Rag Bridges.
 
 ## 2026-10-18 17:49 and 18:00: published: group runs hold the level, the drowned vaults' arches (OPEN until Chris checks it)
 - The drowned vaults are built vaults: unbroken stone rib arches, mould on the stones, no cave stalagmites. Group runs give no

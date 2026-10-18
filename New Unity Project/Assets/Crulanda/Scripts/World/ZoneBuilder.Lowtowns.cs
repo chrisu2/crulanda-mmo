@@ -352,6 +352,8 @@ namespace Crulanda.World
         /// <paramref name="width"/> wide): a shallow arch of deck slabs (walkable), brick parapets with a stone coping, piers at the ends
         /// with a lamp on each. Seated on its banks like the village bridges (SeatBridge).
         /// </summary>
+        /// <summary>How far over the water a patch of mould under a brick bridge's arch must be (metres): lower, it reads as a slab on the water.</summary>
+        public const float MouldOverWater = .35f;
         void BrickBridge(Transform t, float length, float width)
         {
             SeatBridge(t, length);
@@ -379,7 +381,12 @@ namespace Crulanda.World
             for (int k = 0; k < 14; k++)
             {
                 float a = .15f + (float)rm.NextDouble() * .7f, z = -length / 2 + length * a, y = .15f + Mathf.Sin(a * Mathf.PI) * rise - .87f;
-                under.Box(mould, new Vector3(((float)rm.NextDouble() - .5f) * (width - .6f), y, z), new Vector3(.4f + (float)rm.NextDouble() * .9f, .03f, .4f + (float)rm.NextDouble() * 1.2f));
+                var at = new Vector3(((float)rm.NextDouble() - .5f) * (width - .6f), y, z); var size = new Vector3(.4f + (float)rm.NextDouble() * .9f, .03f, .4f + (float)rm.NextDouble() * 1.2f);
+                // Only where the ring's underside stands clear of the water (play note 236, 2026-10-18: toward the bridge's ends the ring
+                // comes down to the river, and a glowing patch lay flat on the black water like a slab). Drawn either way: the stream holds.
+                var world = t.TransformPoint(at);
+                if (Water != null && Water.InDrawnWater(new Vector2(world.x, world.z), out float surface) && world.y < surface + MouldOverWater) continue;
+                under.Box(mould, at, size);
             }
             under.Flush(this, t, "Mould under the arch");
             var glow = new GameObject("Mould light").AddComponent<Light>(); glow.transform.SetParent(t, false); glow.transform.localPosition = new Vector3(0, rise - 1.4f, 0);

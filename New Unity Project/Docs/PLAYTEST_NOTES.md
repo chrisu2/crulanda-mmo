@@ -819,3 +819,6 @@ un-captures.
   Quaternius's free Bestiary (QAL licence: free use in the game, no credit needed, no reselling the files): the Imp and the Puglin, three
   colourings each, rigged on the UE-style skeleton our clips drive, no clips of their own. Names and places in the game to follow the
   books (label each), not the kit's names.
+- 234 (2026-10-18 ~18:20) "in downloads Modular Character Outfits - Fantasy" (the same files as the game's people: nothing new) and
+  "Fantasy Props MegaKit for dungeons and other places" (OPEN): the kit is in since 2026-10-07 (Resources/Props/Fantasy, 96 props) but
+  about 18 are placed; dress the dungeons and other places with the rest, each zone's own choice (every zone unique).

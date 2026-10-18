@@ -43,6 +43,9 @@ namespace Crulanda.Encounter
             // seventeen, the level it is entered at; nineteen walked over its first wings, Chris 2026-10-16: "still not balanced").
             var zd = s.Zone.Zone; int runLevel = Mathf.Clamp(zd.levelMax > 0 ? (zd.levelMin + zd.levelMax) / 2 : 11, 2, EncounterProgress.LevelCap);
             if (s.Progress.Level < runLevel) { s.Progress.experience = EncounterProgress.XpForLevel(runLevel); s.Player.SetLevel(runLevel); }
+            // Held there for the whole run, you and the sims alike (2026-10-18, hallows-11: the bot levelled 17 to 20 on full shares while the
+            // sims had half, and out-damaged the Rogue, 74.7 a second to 66.0; EncounterSession.LevelHeld).
+            s.LevelHeld = true;
             s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max); s.Player.Resource.Pool.Fill();
             // The gates the run's quests open (the singing door's sigils, the platform gate's goblin) stand open, and for the full run those worked
             // by hand (a pen's bar, a bookcase); a boss's door is left to its boss, and a bar worked from its far side stays as it is (the Adit rework).

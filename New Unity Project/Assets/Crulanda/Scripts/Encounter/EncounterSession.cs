@@ -1086,7 +1086,7 @@ namespace Crulanda.Encounter
             foreach (var l in Achievements.Pois(z))
             {
                 if (Feats.Explored(z, l) || new Vector2(p.x - l.at.x, p.z - l.at.y).magnitude > Achievements.Reach(l)) continue;
-                Feats.Explore(z, l); int before = Progress.Level, xp = Achievements.PoiXp(z);
+                Feats.Explore(z, l); int before = Progress.Level, xp = LevelHeld ? 0 : Achievements.PoiXp(z);
                 Progress.experience += xp;
                 Message("Discovered: " + l.name + "  +" + xp + " XP");
                 toasts.Enqueue(("DISCOVERED", l.name)); AdvanceToast();
@@ -2359,11 +2359,11 @@ namespace Crulanda.Encounter
             BreakOut(enemy);   // the Rock-Eater's rider jumps out (EncounterSession.RockEater.cs)
             OnKillEffects();
             int before = Progress.Level;
-            int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite || enemy.Tough);
+            int xp = LevelHeld ? 0 : EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite || enemy.Tough);   // a run capture holds the level
             if (enemy.Camp) Progress.experience += xp;
             else { if (!Progress.AwardKill(enemy.persistentId, xp)) return; if (Progress.recruited) Progress.relationship++; }
-            Message(enemy.actor.DisplayName + " defeated · " + (xp > 0 ? "+" + xp + " XP" : "no experience (too weak)") + " · press " + KeyBindings.InteractLabel + " at the body to loot.");
-            foreach (var c in PartySims) if (c != null && c.actor.IsAlive) c.GainXp(EncounterProgress.KillXp(enemy.actor.Level, c.sim.level, enemy.Elite || enemy.Tough) / 2);   // the party's kill: half shares for the sims (5.3b)
+            Message(enemy.actor.DisplayName + " defeated · " + (xp > 0 ? "+" + xp + " XP" : LevelHeld ? "no experience (the run holds your level)" : "no experience (too weak)") + " · press " + KeyBindings.InteractLabel + " at the body to loot.");
+            foreach (var c in PartySims) if (c != null && c.actor.IsAlive) c.GainXp(LevelHeld ? 0 : EncounterProgress.KillXp(enemy.actor.Level, c.sim.level, enemy.Elite || enemy.Tough) / 2);   // the party's kill: half shares for the sims (5.3b)
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(40); Message("Level " + Progress.Level + "! Health and weapon damage increased."); }
             if (Target == enemy) AutoAttack = false;
             if (Quests != null)

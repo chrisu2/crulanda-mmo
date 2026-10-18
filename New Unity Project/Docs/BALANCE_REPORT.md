@@ -623,3 +623,23 @@ out-damages the damage-dealers.
 - Test: `SimDummyTests` holds the tank to 0.70-0.80 of the pure band, each damage-dealer over the tank and the tank over the healer.
   Compiles; not run in Unity yet.
 
+## The run bot held at the party's level (2026-10-18)
+
+The level-17 Hallow's Creek group run of 16:29 (hallows-11): you (the Paladin bot, Judicator, blows x0.64) 74.7 a second, the Rogue 66.0,
+the Ranger 55.1 and its wolf 17.2. The rule is a hybrid's damage build about 10% under the pure damage-dealers (about 59 here), and the
+earlier runs had the bot at 61-64 (hallows-6, -7, -10r).
+
+- The cause: the run sets you and the sims to 17 (the middle of the zone's band) and then let the kills level you. You took full shares and
+  went 17 to 20 in every run (the scorecard's "level 20"); the sims take half shares, so they stayed behind. Each level adds weapon damage
+  and health, and a level over the mobs adds to every blow, so the bot outgrew the party it is measured against. In hallows-11 the run was
+  shorter (26 camps, 1,365 s fighting; 10r 27 camps, 1,962 s, eight minutes of it on the Bureau Examiner), so more of the bot's
+  fighting was done after it had levelled and dressed in its loot (its health topped 1,500 in 11, 1,354 in 10r).
+  The sims' rates were the same in both runs (Rogue 66.2 / 66.0, Ranger 54.0 / 55.1, Warrior 48.7 / 49.1): only yours moved. (The timing
+  of each level is read from the health in the log; the log has no level lines.)
+- Checked and not the cause: the swing's scale (`ClassKit.SwingDamageScale` returns the build's own scale for every class but the Shaman,
+  so a Paladin swing is scaled once, as before); the buff-ups (the same food, cordial and class buff in both runs); `StatusEffectRuntime.MultiplierOf`
+  (read only by the mobs' tricks, never in a damage sum); the tank's health shares (longer fights, same rates).
+- The fix: a run capture holds the level (`EncounterSession.LevelHeld`, set by `RunCapture` after it brings the party to the run's level):
+  no experience from kills or discovered places for you, none for the sims (their kill counts still go up). You and the sims fight the whole
+  run at 17, so the scorecard compares like with like. The bot still wears what it loots, as the sims wear their upgrades.
+- Expected: the bot about the harness's Judicator band at its level (59-65 at 15), near 90% of the Rogue. Compiles; not run in Unity yet.

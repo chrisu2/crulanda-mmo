@@ -91,6 +91,10 @@ namespace Crulanda.Encounter
                 return best == null ? null : ClassDef.id + "/" + best;
             }
         }
+        /// <summary>A group run capture (RunCapture) holds you and the party sims at the run's level: no experience from kills or places
+        /// while it is set. (hallows-11, 2026-10-18: the bot went 17 to 20 over the run and the sims, on half shares, stayed lower, so
+        /// its blows outgrew theirs and the level gap over the level-17 mobs; it did 74.7 a second to the Rogue's 66.0.)</summary>
+        public bool LevelHeld;
         /// <summary>The scale on the player's own blows for the lead build (cached until the ranks change).</summary>
         public float PlayerDamageScale
         {

@@ -86,8 +86,9 @@ namespace Crulanda.World
         void Update()
         {
             if (pivot == null) return;
-            // Tipping is slow and heavy (about two seconds to forty-five), righting quicker (a second and a half), the dip a moment.
-            float speed = target >= Tipped ? 24 : angle > Dip + 1 ? 32 : 10;
+            // Tipping is slow and heavy (about two seconds to forty-five), righting quicker (a second and a half), the dip a moment
+            // (about a seventh of a second, so it answers the foot at once).
+            float speed = target >= Tipped ? 24 : angle > Dip + 1 ? 32 : 30;
             angle = Mathf.MoveTowards(angle, target, speed * Time.deltaTime);
             float rock = someoneOn ? Mathf.Sin(Time.time * 2.3f) * Rock : 0;
             pivot.rotation = level * Quaternion.Euler(0, 0, angle + rock);

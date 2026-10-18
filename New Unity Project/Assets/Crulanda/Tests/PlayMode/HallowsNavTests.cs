@@ -460,7 +460,7 @@ namespace Crulanda.Tests
             var slab = s.TipSlab; Assert.NotNull(slab, "the fifth slab tips");
             var spot = zone.DeckSpots.Find(d => d.def != null && d.def.name == "The fifth slab");
             var walk = spot.root.Find("Walk"); Assert.NotNull(walk.GetComponent<Collider>());
-            motor.Teleport(spot.mid[spot.mid.Length / 2] + Vector3.up * .3f); yield return Frames(30);
+            motor.Teleport(spot.mid[spot.mid.Length / 2] + Vector3.up * .3f); yield return Frames(5); yield return new WaitForSeconds(.6f);
             Assert.IsTrue(slab.Holds(s.Player.transform.position), "standing on it");
             Assert.Greater(slab.Angle, 1, "it dips under you"); Assert.Less(slab.Angle, 8, "a few degrees, no more");
             motor.Teleport(zone.Ground(new Vector2(0, -120), .3f)); yield return new WaitForSeconds(3f);

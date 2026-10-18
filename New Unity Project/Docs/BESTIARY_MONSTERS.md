@@ -2,7 +2,32 @@
 
 Chris, play note 233 (verbatim): "in downloads use this for some different monsters. Bestiary - Dungeon Monsters Kit[Standard]".
 
-**Status: PROPOSAL. Chris picks.** No camp uses these monsters yet.
+## Decided (2026-10-18)
+Chris chose from the options below, in his words (question prompt, verbatim):
+- **Imp:** "Ember-bound (Recommended)"
+- **Puglin:** "Bank-snouts (Recommended)"
+
+What was placed:
+- **The Ember-bound, in the Sealed Adit (Ember Vent, level 11).** Two chained pairs on the Imp in its red skin:
+  - "Chained in the garden": the Ash Garden, beside the gatehouse menders.
+  - "Chained at the lake of fire": the Chapel of Embers, on the walk opposite the lake-tenders.
+  - In a fight they come one at a time (solitary). Their move is the Chain-Lash, a 2 s root.
+  - They take the place of the plan's stand-in "ember elementals", which were never in a camp, so no quest, loot or deed named them.
+  - They come after every other camp but the rare (the Quiet Miner stays last).
+  - They are written by `tools/wip/dungeon/adit_layout.py` and copied into `Zones/adit.json`.
+  - Labels: GAME-ONLY creature; CANON cult and tethers (book1 ch.10, ch.12:19).
+- **The Bank-snouts, in the Lowtowns (levels 15-19).** Four small packs on the Chemical River's banks, on the Puglin, with green, red and blue mixed in each pack:
+  - across from the quays: 3 snouts, levels 15-16;
+  - on the east mud: 4 snouts, levels 16-17;
+  - between the bridges: 3 snouts, levels 17-18;
+  - on the north bank: 3 snouts, levels 18-19.
+  - In a fight they pack, bolt at a fifth of their health, and their move is the Tusk Butt (a small knockback).
+  - They stand off the water, the walkways and the quays, before the Lantern-Eater.
+  - Labels: GAME-ONLY creature; CANON-EXPANDED from the river's "and worse" (book1 ch.15:391).
+- **Lore:** each has a line in its zone's chapter of the book of lore.
+- **Loot:** they drop from the shared tables. No loot table of their own was needed.
+
+**Before 2026-10-18 this was a PROPOSAL.** The options as they were put to Chris follow.
 
 ## What is in the game now
 - **The kit:** Quaternius, Bestiary - Dungeon Monsters Kit (Standard, the free version). QAL licence: free to use in the game, no credit needed, the assets can't be resold.

@@ -6049,6 +6049,78 @@
       ]
     },
     {
+      "name": "Bank-snouts across from the quays",
+      "mob": "Bank-snout",
+      "tag": "banksnout",
+      "look": "puglin",
+      "canonStatus": "GAME-ONLY creature (the Bank-snout, picked by Chris 2026-10-18, Docs/BESTIARY_MONSTERS.md); CANON: the Chemical River's 'and worse' (book1 ch.15:391)",
+      "center": {
+        "x": 16,
+        "y": -70
+      },
+      "radius": 4,
+      "count": 3,
+      "levelMin": 15,
+      "levelMax": 16,
+      "respawn": 80,
+      "social": "pack",
+      "flee": 0.2
+    },
+    {
+      "name": "Bank-snouts on the east mud",
+      "mob": "Bank-snout",
+      "tag": "banksnout",
+      "look": "puglin",
+      "canonStatus": "GAME-ONLY creature (the Bank-snout, picked by Chris 2026-10-18, Docs/BESTIARY_MONSTERS.md); CANON: the Chemical River's 'and worse' (book1 ch.15:391)",
+      "center": {
+        "x": 19,
+        "y": -135
+      },
+      "radius": 5,
+      "count": 4,
+      "levelMin": 16,
+      "levelMax": 17,
+      "respawn": 80,
+      "social": "pack",
+      "flee": 0.2
+    },
+    {
+      "name": "Bank-snouts between the bridges",
+      "mob": "Bank-snout",
+      "tag": "banksnout",
+      "look": "puglin",
+      "canonStatus": "GAME-ONLY creature (the Bank-snout, picked by Chris 2026-10-18, Docs/BESTIARY_MONSTERS.md); CANON: the Chemical River's 'and worse' (book1 ch.15:391)",
+      "center": {
+        "x": 20,
+        "y": 66
+      },
+      "radius": 4,
+      "count": 3,
+      "levelMin": 17,
+      "levelMax": 18,
+      "respawn": 80,
+      "social": "pack",
+      "flee": 0.2
+    },
+    {
+      "name": "Bank-snouts on the north bank",
+      "mob": "Bank-snout",
+      "tag": "banksnout",
+      "look": "puglin",
+      "canonStatus": "GAME-ONLY creature (the Bank-snout, picked by Chris 2026-10-18, Docs/BESTIARY_MONSTERS.md); CANON: the Chemical River's 'and worse' (book1 ch.15:391)",
+      "center": {
+        "x": -21,
+        "y": 184
+      },
+      "radius": 4,
+      "count": 3,
+      "levelMin": 18,
+      "levelMax": 19,
+      "respawn": 80,
+      "social": "pack",
+      "flee": 0.2
+    },
+    {
       "name": "The Lantern-Eater",
       "mob": "The Lantern-Eater",
       "tag": "lanterneater",

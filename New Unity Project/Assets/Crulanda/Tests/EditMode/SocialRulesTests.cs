@@ -51,6 +51,9 @@ namespace Crulanda.Tests
             { "dockrat", SocialKind.Call }, { "ironteeth", SocialKind.Call }, { "sifter", SocialKind.Call }, { "brannoc", SocialKind.Call }, { "warder", SocialKind.Call }, { "greytouched", SocialKind.Call },
             // The Chemical River (Lowtowns pick 6, book1 ch.15:391): the sludge-eels pack; the rare Old Croc keeps to itself.
             { "sludgeeel", SocialKind.Pack }, { "rivercroc", SocialKind.Solitary },
+            // The Bestiary kit's (Chris, 2026-10-18, Docs/BESTIARY_MONSTERS.md): the Adit's Ember-bound are chained apart and come one at a
+            // time; the Lowtowns' Bank-snouts run in packs (their data says so).
+            { "emberbound", SocialKind.Solitary }, { "banksnout", SocialKind.Pack },
             // Hallow's Creek (Docs/DUNGEON2_DESIGN.md, 2026-10-16): the Bureau's people, the Iron Pact, the Hollow and the ringers call; the Old
             // Ram, the Grey Carter, the Fallen Mason, the Lamplighter, the Long Shadow and the Reader keep to themselves.
             { "greypicker", SocialKind.Call }, { "pactsoldier", SocialKind.Call }, { "pactbow", SocialKind.Call }, { "bureaucutter", SocialKind.Call }, { "bureauclerk", SocialKind.Call },

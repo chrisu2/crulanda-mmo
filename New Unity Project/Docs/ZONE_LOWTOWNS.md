@@ -371,6 +371,11 @@ ribbon of bubbling black sludge" (ch.15:335), "agonizingly thick as curdled mola
   the shallows by the Outfall's mouth; long and low, its hide black-olive, pale bony growths where the scutes went wrong, one eye too big,
   blisters glowing the river's green; its move the Death Roll (a stun). A rare but not an elite, so the elite, loot and lockout lists are
   unchanged; the Lantern-Eater stays the last camp.
+- **Bank-snouts** (the river's "and worse", ch.15:391; the creature GAME-ONLY; Chris chose them on 2026-10-18, Docs/BESTIARY_MONSTERS.md):
+  four small packs on the banks, on the Bestiary kit's Puglin in its green, red and blue skins, mixed in each pack. Across from the quays
+  (3, 15-16), on the east mud (4, 16-17), between the bridges (3, 17-18) and on the north bank (3, 18-19); off the water, the walkways
+  and the quays. They pack, bolt at a fifth of their health, and their move is a tusk butt that knocks you back. Placed before the
+  Lantern-Eater, which stays the last camp.
 - Not in: the Rusty Bucket and Horgus (a furnace barge; machines, Book 1's people), the river's old name (a name hazard).
 
 **Tests:** `LowtownsLevelsTests` (new, EditMode: the levels fall the right way, every road climbs by a stair or a ramp under 31 degrees, all

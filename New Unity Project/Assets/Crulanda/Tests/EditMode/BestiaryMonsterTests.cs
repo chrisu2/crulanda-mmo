@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEditor;
 using UnityEngine;
@@ -12,7 +13,7 @@ namespace Crulanda.Tests
     /// are in Resources/Characters/Bestiary with their three skins, normal and emissive maps; they come in Humanoid with their own avatars
     /// (Editor/CharacterImport.cs); the camp data's "imp" and "puglin" make their looks; each is built on its human avatar, moved by the
     /// people's clips, at its height (the Imp near a man's, the Puglin small) and in the skin its variant picks, its eyes lit. Built in edit
-    /// mode (no scene, no save). What they are in the world is Chris's pick (Docs/BESTIARY_MONSTERS.md): no camp wears them yet.
+    /// mode (no scene, no save). Chris picked what they are on 2026-10-18 (Docs/BESTIARY_MONSTERS.md): the Adit's Ember-bound and the Lowtowns' Bank-snouts.
     /// </summary>
     public class BestiaryMonsterTests
     {
@@ -90,6 +91,56 @@ namespace Crulanda.Tests
                 m.Sample("walk", .3f); m.Sample("death", 5);   // the people's clips pose it without complaint
             }
             var elite = Monster(ActorLook.Imp, 0, "Imp (elite)"); Assert.Greater(elite.BeastModel.Height, 1.8f, "an elite a size bigger");
+        }
+
+        static float SegDist(Vector2 p, Vector2 a, Vector2 b) { var d = b - a; float t = d.sqrMagnitude > 0 ? Mathf.Clamp01(Vector2.Dot(p - a, d) / d.sqrMagnitude) : 0; return Vector2.Distance(p, a + d * t); }
+        static float PathDist(Vector2 p, Vector2[] pts) { float m = float.MaxValue; for (int i = 0; i + 1 < pts.Length; i++) m = Mathf.Min(m, SegDist(p, pts[i], pts[i + 1])); return m; }
+
+        /// <summary>Chris, 2026-10-18: "Ember-bound (Recommended)". The Ember Vent (the Ash Garden and the Chapel of Embers) has its chained
+        /// Ember-bound in pairs, on the Imp, at the Vent's level, solitary, each with its Chain-Lash; the plan's stand-in "ember elementals" are
+        /// in no camp; the rare stays last.</summary>
+        [Test] public void The_ember_vent_has_its_ember_bound_on_the_imp()
+        {
+            var adit = LootTestData.Zones().Single(z => z.id == "zone.adit");
+            var ember = adit.camps.Where(c => c != null && c.mob == "Ember-bound").ToList();
+            Assert.AreEqual(2, ember.Count, "two chained pairs");
+            CollectionAssert.AreEquivalent(new[] { "vent", "chapel" }, ember.Select(c => c.wing).ToArray(), "one in the Ash Garden, one at the lake of fire");
+            foreach (var c in ember)
+            {
+                Assert.AreEqual("imp", c.look, c.name); Assert.AreEqual("emberbound", c.tag, c.name); Assert.IsFalse(c.elite, c.name);
+                Assert.That(c.count, Is.InRange(1, 2), c.name + ": pulled one or two at a time (DUNGEON_DESIGN.md)");
+                Assert.AreEqual(11, c.levelMin, c.name); Assert.AreEqual(11, c.levelMax, c.name);
+                Assert.AreEqual("solitary", c.social, c.name + ": chained apart");
+                Assert.Greater(c.step, 0, c.name + " is a fight of the run"); StringAssert.StartsWith("GAME-ONLY", c.canonStatus);
+            }
+            Assert.IsFalse(adit.camps.Any(c => c != null && (c.mob ?? "").IndexOf("elemental", System.StringComparison.OrdinalIgnoreCase) >= 0), "no stand-in elementals");
+            Assert.NotNull(MobCasts.For("Ember-bound"), "its Chain-Lash"); Assert.AreEqual("root", MobCasts.For("Ember-bound").cc);
+            Assert.AreEqual("The Quiet Miner", adit.camps[adit.camps.Length - 1].mob, "the rare still last");
+            Assert.AreEqual("T_Imp_BaseColor_1", ActorVisual.BestiaryCoat("Imp", 0).Albedo.name, "a camp mob's variant (0) is the Imp's red skin");
+        }
+
+        /// <summary>Chris, 2026-10-18: "Bank-snouts (Recommended)". The Lowtowns have small packs of Bank-snouts on the Chemical River's banks: on the
+        /// Puglin, in the zone's band, packing, off the water, the walkways and the quays, before the rare Lantern-Eater.</summary>
+        [Test] public void The_lowtowns_have_bank_snout_packs_on_the_river_banks()
+        {
+            var z = LootTestData.Zones().Single(x => x.id == "zone.lowtowns");
+            var river = z.water.Single(w => w.name == "The Chemical River");
+            var snouts = z.camps.Where(c => c != null && c.mob == "Bank-snout").ToList();
+            Assert.That(snouts.Count, Is.InRange(2, 4), "two to four packs");
+            foreach (var c in snouts)
+            {
+                Assert.AreEqual("puglin", c.look, c.name); Assert.AreEqual("banksnout", c.tag, c.name); Assert.IsFalse(c.elite, c.name);
+                Assert.That(c.count, Is.InRange(3, 4), c.name + ": a small pack"); Assert.AreEqual("pack", c.social, c.name);
+                Assert.GreaterOrEqual(c.levelMin, 15, c.name); Assert.LessOrEqual(c.levelMax, 20, c.name);
+                float off = PathDist(c.center, river.points) - river.width / 2;
+                Assert.That(off, Is.InRange(c.radius - .5f, 13f), c.name + ": on the bank band, its camp clear of the water (" + off.ToString("0.0") + " m from the waterline)");
+                foreach (var road in z.roads) Assert.Greater(PathDist(c.center, road.points) - road.width / 2, c.radius + 2, c.name + ": off " + road.name);
+                foreach (var p in z.props.Where(p => p.kind == "dock" || p.kind == "brick_bridge"))
+                    Assert.Greater(Vector2.Distance(c.center, p.at), 18, c.name + ": clear of " + p.name);
+                StringAssert.Contains("book1 ch.15:391", c.canonStatus, c.name + " cites the river's 'and worse'");
+            }
+            Assert.AreEqual("The Lantern-Eater", z.camps.Last().mob, "the rare still last");
+            Assert.NotNull(MobCasts.For("Bank-snout"), "its Tusk Butt");
         }
 
         [Test] public void The_variant_picks_the_skin_and_the_eyes_glow()

@@ -307,7 +307,9 @@ the next dungeon.
 - The Ash cell feeds geodes to the fire, because they think the memories burning in them are an offering.
 - Trash:
   - Ash initiates in groups of 2-3 (one heals, one **casts fear**: plan the pull);
-  - ember elementals (non-elite, pulled 1-2).
+  - the Ember-bound (non-elite, pulled 1-2): red, horned things the cult keeps chained at the Ash Garden and the lake of fire, on the
+    Bestiary kit's Imp (GAME-ONLY creature; CANON cult and tethers, book1 ch.10, ch.12:19). Chris chose them on 2026-10-18 in place of
+    the stand-in "ember elementals" (Docs/BESTIARY_MONSTERS.md).
 - **Boss: Cinder-Warden Ysolt** (11, elite).
   - **Ember Blow:** an uppercut that **knocks the tank back** (into the lava if you stand at the edge, so fight her in the
     middle).
@@ -372,7 +374,7 @@ the next dungeon.
 | Workings | digger (non-elite), overseer, sapper | sapper's charge: step out of the circle |
 | Gallery | cave-bat, geode carrier (patrol) | bats call for help |
 | Geode Floor | cutter, goblin turncoat, rock-borer | spanner knockdown; borer repaired if left |
-| Ember Vent | Ash initiate, Ash mender, ember elemental | fear; heal; pulls of 2-3 |
+| Ember Vent | Ash initiate, Ash mender, Ember-bound | fear; heal; pulls of 2-3 |
 | Grey Breach | greyed bat, crawler, greyed bear, grey whisperer | flee at low health; sleep |
 | Rail Hall | platform guard, docker, carriage gunner | waves; the gunner fires at range from the roof |
 

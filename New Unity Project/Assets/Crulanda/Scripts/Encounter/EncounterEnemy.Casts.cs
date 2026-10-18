@@ -85,6 +85,10 @@ namespace Crulanda.Encounter
             new MobCast { mob = "Grey-touched", name = "The Forgetting", kind = "drain", cast = 2.2f, every = 15, first = 4, power = 1.8f, reach = 12 },
             // The Chemical River's (Lowtowns pick 6; CANON creatures, book1 ch.15:391): the sludge-eels' clinging bite, the mutated crocodile's roll.
             new MobCast { mob = "Sludge-eel", name = "Clinging Mouth", kind = "net", cc = "root", seconds = 1.5f, area = 0, cast = .9f, every = 15, first = 5, power = 0, reach = 3.5f },
+            // The Bestiary kit's two (Chris, 2026-10-18; Docs/BESTIARY_MONSTERS.md; GAME-ONLY): the Ember Vent's ember-bound lash the chain the cult
+            // binds them with round whoever they fight (the glowing tethers, CANON, book1 ch.12:19); the bank-snouts butt with their tusks.
+            new MobCast { mob = "Ember-bound", name = "Chain-Lash", kind = "net", cc = "root", seconds = 2, area = 0, cast = 1.2f, every = 15, first = 5, power = 0, reach = 6 },
+            new MobCast { mob = "Bank-snout", name = "Tusk Butt", kind = "bolt", cast = .9f, every = 14, first = 4, power = 1.6f, reach = 3.5f, knock = 2 },
             new MobCast { mob = "The Old Croc", name = "Death Roll", kind = "net", cc = "stun", seconds = 2, area = 0, cast = 1f, every = 14, first = 5, power = 0, reach = 4 },
             new MobCast { mob = "Mist-walker", name = "Palemist Breath", kind = "net", cc = "disorient", seconds = 2, area = 4, cast = 1.6f, every = 16, first = 5, power = 0, reach = 8 },
             new MobCast { mob = "Void-Toucher", name = "Void Pulse", kind = "blast", cast = 1.8f, every = 15, first = 5, power = 2.2f, reach = 4 },

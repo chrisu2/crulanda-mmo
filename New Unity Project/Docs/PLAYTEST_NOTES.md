@@ -832,3 +832,5 @@ un-captures.
   glowing slab on the water to the left) "some professions in the water under bridge" (OPEN).
 - 237 (2026-10-18 ~19:55, on the test capture oakhaven-99-inn-drinkers: the Golden Cask, two drinkers at a table) "inn still not
   polished. this guy not even sitting on a chair." (OPEN): the man in purple sits in the air, his stool beside him, not under him.
+- 238 (2026-10-18 ~20:00, on the test capture adit-85-hollow-camp-the-scriptorium: the Adit's warm orange-lit drift, candles on
+  the walls, a bookcase down the passage) "i like this look." Keep that warm cave look.

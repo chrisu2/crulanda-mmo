@@ -16,6 +16,10 @@ namespace Crulanda.EditorTools
     public sealed class CharacterImport : AssetPostprocessor
     {
         const string Root = "Assets/Crulanda/Resources/Characters/";
+        /// <summary>GanzSe's FREE Modular Character pack (Phase 8.5; GanzSeKit): its model comes in by the rule for every model here
+        /// (Humanoid, its avatar made from itself, readable so a head can be cut from the body for measuring hats); it has no clips
+        /// (ours play on it through the avatar). Its palette texture has its own rule (OnPreprocessTexture).</summary>
+        public const string GanzSe = Root + "GanzSe/";
         /// <summary>Bumped when the import settings change, so Unity imports the models and clips again.</summary>
         public override uint GetVersion() { return 11; }
         void OnPreprocessModel()
@@ -90,6 +94,14 @@ namespace Crulanda.EditorTools
         {
             if (!assetPath.StartsWith(Root)) return;
             var t = (TextureImporter)assetImporter; string n = Path.GetFileNameWithoutExtension(assetPath);
+            if (assetPath.StartsWith(GanzSe))
+            {
+                // GanzSe's palette (Phase 8.5): a grid of flat swatches each piece's UVs sit inside. Point-filtered, no mipmaps, not
+                // compressed, as the pack ships it: a mipmap or a block-compressed texel blends neighbouring swatches into the seams.
+                t.textureType = TextureImporterType.Default; t.sRGBTexture = true; t.mipmapEnabled = false; t.filterMode = FilterMode.Point;
+                t.textureCompression = TextureImporterCompression.Uncompressed; t.maxTextureSize = 2048; t.alphaSource = TextureImporterAlphaSource.None;
+                return;
+            }
             t.maxTextureSize = 2048; t.mipmapEnabled = true;
             if (n.EndsWith("_Normal")) t.textureType = TextureImporterType.NormalMap;
             else { t.textureType = TextureImporterType.Default; t.sRGBTexture = !(n.EndsWith("_MetalSmooth") || n.EndsWith("_Occlusion")); t.alphaSource = n.EndsWith("_MetalSmooth") ? TextureImporterAlphaSource.FromInput : TextureImporterAlphaSource.None; }

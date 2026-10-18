@@ -57,6 +57,7 @@ namespace Crulanda.Encounter
             if (shows[(int)EquipSlot.Head]) sigs[(int)EquipSlot.Head] += "|" + wornShoulders;
             if (shows[(int)EquipSlot.Feet]) sigs[(int)EquipSlot.Feet] += "|" + wornLegs;
             if (shows[(int)EquipSlot.Shoulders]) sigs[(int)EquipSlot.Shoulders] += "|" + Cloaked;
+            GanzSeChest(shows, lks, sigs);   // the pack's chest piece, which may armour the shoulders (ActorVisual.GanzSe.cs)
             for (int s = 0; s < GearSlots; s++)
             {
                 if (gearSig[s] == sigs[s]) continue;
@@ -132,6 +133,7 @@ namespace Crulanda.Encounter
             Kill(gearRoots[s]); Kill(gearStows[s]); gearRoots[s] = gearStows[s] = null; if (s == (int)EquipSlot.MainHand) mainBow = false;
             if (s == (int)EquipSlot.MainHand) handFamily[0] = null; else if (s == (int)EquipSlot.OffHand) handFamily[1] = null;
             if (gearMore[s] != null) { foreach (var t in gearMore[s]) Kill(t); gearMore[s].Clear(); }
+            GanzSeClear(s);
             Uncover((EquipSlot)s);
         }
         static void Kill(Transform[] set) { if (set != null) foreach (var t in set) Kill(t); }
@@ -168,6 +170,7 @@ namespace Crulanda.Encounter
             if (slot != EquipSlot.MainHand && slot != EquipSlot.OffHand)
             {
                 gearRoots[s] = new GameObject("Gear " + ItemDatabase.SlotNames[s]).transform; gearRoots[s].SetParent(SlotParent(slot), false);   // on a model, the head's or the chest's frame
+                if (GanzSeBuild(slot, look)) return;   // the pack's piece shows instead of the drawn one
                 BuildArmor(slot, look); return;
             }
             if (slot == EquipSlot.MainHand) mainBow = IsBow(look);

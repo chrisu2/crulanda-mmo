@@ -219,7 +219,10 @@ namespace Crulanda.Encounter
         bool BuildModel(ActorLook look, Color clothC, Color accentC, Color legC, Color skinC)
         {
             if (!Models || !Person(look) || !ModelFigure.Available) return false;
-            var m = ModelFigure.Build(body, SpecFor(look, clothC, accentC, legC, skinC));
+            var spec = SpecFor(look, clothC, accentC, legC, skinC);
+            var m = UseGanzSe(spec) ? ModelFigure.BuildGanzSe(body, GanzSeSpec(spec, look)) : null;   // Phase 8.5 (ActorVisual.GanzSe.cs), behind GanzSeKit.On
+            if (m != null && !m.Complete) { var g0 = m.Model.gameObject; if (Application.isPlaying) Destroy(g0); else DestroyImmediate(g0); m = null; }   // a bone missing: the Quaternius figure
+            if (m == null) m = ModelFigure.Build(body, spec);
             if (m == null) return false;
             if (!m.Complete) { var g = m.Model.gameObject; if (Application.isPlaying) Destroy(g); else DestroyImmediate(g); return false; }
             model = m; actorRef = GetComponent<Crulanda.Gameplay.Actor>();
@@ -229,7 +232,7 @@ namespace Crulanda.Encounter
             // What armour recolours (Cover): the shirt, the sleeves (and, for gloves, the bare hands), the breeches, the shoes.
             baseChest = new[] { m.Torso }; baseSleeves = new[] { m.Arms }; baseHands = new[] { m.Arms }; baseLegs = new[] { m.Legs }; baseBoots = new[] { m.Feet };
             baseBelt = null;   // the outfit's belts go under a chest piece (ModelFigure.ShowExtras)
-            var hair = new List<Transform>(); foreach (var r in m.Hair) if (r.name.Contains("Hair_") && !r.name.Contains("Beard")) hair.Add(r.transform);
+            var hair = new List<Transform>(); foreach (var r in m.Hair) if (r.name.Contains("Hair_") && !r.name.Contains("Beard") || GanzSeKit.IsScalpHair(r.name)) hair.Add(r.transform);
             hairParts = hair.ToArray();
             head = headFrame; torso = null;
             m.StartMotion(name);
@@ -395,7 +398,7 @@ namespace Crulanda.Encounter
             foreach (var r in model.Renderers)
             {
                 if (!(r is SkinnedMeshRenderer smr)) continue;
-                bool isEyes = r.name.Contains("Eye") && !r.name.Contains("brow"), head = r == model.Head || withHair && model.Hair.Contains(r) && r.name.Contains("Hair_") && !r.name.Contains("Beard");
+                bool isEyes = r.name.Contains("Eye") && !r.name.Contains("brow"), head = r == model.Head || withHair && model.Hair.Contains(r) && (r.name.Contains("Hair_") && !r.name.Contains("Beard") || GanzSeKit.IsScalpHair(r.name));
                 if (isEyes) eyes.AddRange(BindPoints(smr, toFrame)); else if (head) pts.AddRange(BindPoints(smr, toFrame));
             }
             if (pts.Count < 20) return null;

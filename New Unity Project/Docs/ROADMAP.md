@@ -71,6 +71,31 @@ anywhere"); it is not needed now.
 Then found in Downloads (2026-10-18 ~18:20): "Modular Hero.unitypackage" (CHOSAN, Oct 15; the old p85-hero branch took its body)
 and "Modular Character Outfits - Fantasy[Standard].zip" (Quaternius: the same files as Resources/Characters/Outfits, nothing new). Asked
 again with CHOSAN on hand, Chris kept (verbatim) "GanzSe (Recommended)". p85-hero is superseded.
+**Step 1 (GanzSe kit): WRITTEN, NOT RUN (2026-10-18, branch p85-ganzse; no Unity run, compile-checked only).** What was built:
+- The pack's Built-In files in Resources/Characters/GanzSe with their own GUIDs: "GanzSe Free Modular Character 1_1.fbx" (update 1.1:
+  every piece of 1.0 plus armour type 6), "Base Palette Material.mat" (Standard) and "Base Palette Texture.png" (LFS). Not brought: the
+  1.0 model (a subset), the 215 non-skinned part prefabs and their part models (the skinned pieces are what fit), the demo scene and
+  its script, the URP/HDRP extras. CharacterImport: the folder takes the rule every model there has (Humanoid, avatar from itself,
+  readable, no clips); its palette texture is point-filtered, no mipmaps, uncompressed (the pack's own setting; mipmaps bleed swatches).
+- GanzSeKit.cs: the switch (`GanzSeKit.On`, default off; `--crulanda-ganzse` on the command line turns it on) and the one table:
+  every armour family to a weight (cloth type 4, leather 5, hide 3, fur 6, mail 1, plate 2) and a colourway (1-3) matched to the
+  look's cloth, metal, or an epic's trim; families the pack has nothing for stay drawn (hoods, caps, scarves, masks, circlets, crowns,
+  the shoulders, the neck; every weapon and shield is ours as before); each look's and trade's own clothes where no gear is worn.
+- ModelFigure.GanzSe.cs: the body built from the pack (its skeleton copied bone by bone, its Humanoid avatar, the body, eyes, brows,
+  nose, ears, hair, a beard, one piece per slot), the bones in the same fields as the Quaternius kit's, so the frames and weapons hang
+  on it unchanged. It faces +Z in its file (not turned like the Quaternius kit). ActorVisual.GanzSe.cs: a worn piece the pack covers
+  shows the pack's piece and no drawn armour; a chest piece with armoured shoulders (types 1, 4, 6) hides the drawn shoulder piece.
+- Tests: GanzSeKitTests (EditMode): the switch is off; every armour family maps to a piece in the file or is kept drawn; cloth,
+  leather, mail and plate read differently; every look and trade wears pieces in the file; the imported file holds exactly the
+  table's pieces on a Humanoid avatar with spine_01 as its hips, facing +Z, in metres; the import rule; a man built on it wears and
+  takes off its pieces, a woman and an orc stay Quaternius.
+**What the pack cannot do (found 2026-10-18):** it has only a man's body (women and orcs keep the Quaternius figure: `GanzSeKit.Women`
+stays off); no long hair; no robe, hood, cap or plain shirt (villagers wear its least warlike pieces: the jerkin, the hide top, the
+caster's coat); one palette texture, so only the skin is tinted and colours come from the three colourways.
+**The lead must run:** in lane A, the EditMode tests GanzSeKitTests and ModelFigureTests (the avatar's auto-mapping and the facing
+are the unproven parts); then a build and the wardrobe line-up with the switch on: `Crulanda.exe --crulanda-wardrobe-capture <dir>
+--crulanda-ganzse`, front, back and side, and one figure walking (our clips on its avatar). The switch stays off until Chris has
+seen it.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

@@ -15,7 +15,7 @@ namespace Crulanda.Encounter
     /// colour and the cloth's dye are tints on the kit's textures. The model faces -Z in its file, so it is turned to face +Z.
     /// ActorVisual hangs its frames on the bones (ActorVisual.Model.cs).
     /// </summary>
-    public sealed class ModelFigure
+    public sealed partial class ModelFigure
     {
         public enum Kit { Peasant, Ranger }
         /// <summary>
@@ -28,6 +28,9 @@ namespace Crulanda.Encounter
         {
             public bool female, beard, hood, stone, bleach; public int hair; public Kit kit;
             public Color skin, hairColour, shirt, breeches, hoodColour; public float scale;
+            /// <summary>Built on GanzSe's body (ModelFigure.GanzSe.cs; Phase 8.5): its outfit (what shows where no gear is worn) and
+            /// a seed for the face (brows, eyes, nose, ears, the beard's style).</summary>
+            public bool ganzse; public GanzSeKit.Wear[] outfit; public int seed;
         }
 
         public Transform Model;
@@ -132,7 +135,7 @@ namespace Crulanda.Encounter
         /// </summary>
         public void Cover(Renderer r, Color c, bool hands)
         {
-            if (r == null) return;
+            if (r == null || spec.ganzse) return;   // the pack's pieces are its cover (ModelFigure.GanzSe.cs)
             if (!undyed.ContainsKey(r)) undyed[r] = r.sharedMaterials;
             var own = undyed[r]; var mats = r.sharedMaterials;
             var tint = Dye(c, .85f) * Mathf.Clamp(c.maxColorComponent * 1.6f, .35f, 1.1f);
@@ -243,7 +246,7 @@ namespace Crulanda.Encounter
             if (heads.TryGetValue(src, out var m) && m != null) return m;
             if (!src.isReadable) return src;
             var keep = new bool[smr.bones.Length];
-            for (int i = 0; i < keep.Length; i++) { var n = smr.bones[i] != null ? smr.bones[i].name : ""; keep[i] = n == "Head" || n.StartsWith("neck"); }
+            for (int i = 0; i < keep.Length; i++) { var n = smr.bones[i] != null ? smr.bones[i].name : ""; keep[i] = n == "Head" || n == "head" || n.StartsWith("neck"); }
             var w = src.boneWeights; var tris = src.triangles; var kept = new List<int>(tris.Length / 6);
             bool Up(int v)
             {
@@ -386,7 +389,7 @@ namespace Crulanda.Encounter
         {
             var m = new AvatarMask();
             m.AddTransformPath(Animator.transform, true);
-            for (int i = 0; i < m.transformCount; i++) { var path = m.GetTransformPath(i); m.SetTransformActive(i, path.Contains("spine_01")); }
+            for (int i = 0; i < m.transformCount; i++) { var path = m.GetTransformPath(i); m.SetTransformActive(i, path.Contains(spec.ganzse ? "spine_02" : "spine_01")); }   // the pack's spine_01 is its hips
             for (int i = 0; i < (int)AvatarMaskBodyPart.LastBodyPart; i++)
             {
                 var part = (AvatarMaskBodyPart)i;
@@ -548,7 +551,7 @@ namespace Crulanda.Encounter
         /// <summary>Puts the Ranger's hood on (once), in <paramref name="tint"/> (an old figure's round hood becomes this).</summary>
         public void AddHood(Color tint)
         {
-            if (Hood != null) return;
+            if (Hood != null || spec.ganzse) return;   // the pack has no hood
             spec.hood = true; spec.hoodColour = tint;
             Hood = Take(Resources.Load<GameObject>("Characters/Outfits/" + (spec.female ? "Female" : "Male") + "_Ranger"), "_Head_Hood");
             if (Hood != null) Retexture(Hood);

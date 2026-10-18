@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-18 16:44: the rework of the Lowtowns and Hallow's Creek finished (OPEN until Chris checks it)
+- Hallow's Creek: the valley town, two roads in, Glitches that open ways, choose your wing. The Lowtowns: the Sweep, the drowned vaults.
+  Details: CLAUDE_HANDOFF.md, Start here; REWORK_LOWTOWNS_HALLOWS.md.
+
 ## 2026-10-18: the Lowtowns and Hallow's Creek reworked from the books (waves 1-2) and Chris's play notes (OPEN until he checks them)
 - Published 03:23 (wave 1), 13:15 (wave 2), 14:34 (tank damage, loot rolls, rails, buff icons). Details: CLAUDE_HANDOFF.md, Start here;
   REWORK_LOWTOWNS_HALLOWS.md; ZONE_LOWTOWNS.md; DUNGEON2_DESIGN.md.

@@ -2,6 +2,24 @@
 
 ## Start here
 
+**Update 2026-10-18 ~16:50: the rework finished (Chris: "finish up" -> "Finish the rework").** Published 16:44 (save backup
+20261018-1643-before-rework-finish). Every pick of REWORK_LOWTOWNS_HALLOWS.md is now BUILT:
+- Hallow's Creek 4 (a valley town under the gatehouse: Main Street's descent to a -8 floor, the Granary's shelf -3.5, "The town below"
+  look), 5 (two roads: the high road over the slabs; the low road up the chasm wall by a railed ledge stair from the Mason's slab, and a
+  chasm stair under the gardens into the Cellars), 9 (four Glitches that open ways for the visit: the stone handcart's lane, the hung
+  slates' ramp to the Archive's north gallery, the ford's dark cellar door, the well-boy's key to the trapdoor), 11 (the Granary, Cellars
+  and Archive open together; the Picker-Master and First-Cut each thin the tower's guard; chat counts the wings left).
+- The Lowtowns 9 (the Sweep: the horns, hired warders on Pell Row, Lissa led over the roofs to Brother Aldo; quest side.aldo.sweep with
+  "Lissa's chalk"; a Seeker glimpsed, never fought) and 11 (the drowned vaults: a stair behind the Blind Seer's, the vaulted hall with a
+  black canal, the fence Ottie Brack's skiff, a crawl under the river to the Drain Courts and a culvert from the bank; Iron Teeth guards;
+  the carvings' secret and lore page).
+- Tests: the last rounds green apart from SimDummyTests' Scoundrel at level 15 (3 s not striking on the dummy; the Rogue passes since
+  the dummy was made inert). Run hallows-11 (valley, Glitches, wings): 26/26, no deaths; Warrior 49/s, Rogue 66, Ranger 55 + wolf 17,
+  Druid heal 46, but the bot Paladin 74.7/s, above the Rogue (a hybrid should be under): look at that next.
+- Open: the vaults' landmark capture view is on the street above (move its camera spot); the Scoundrel dummy gap; the Paladin bot's
+  damage; GitHub push (Chris's permission); ambient sound (ask).
+
+
 **Stopping point: 2026-10-18 ~14:40.** Chris: "you have 4 hours to finish and then save backup and write a handoff." Everything is committed on
 `feet-bow-adit-kit` in D:\code\mmo and backed up to E:. **Not pushed to GitHub** (the auto-mode check refuses `git push`; ask Chris to allow
 it or push himself: `git -C D:\code\mmo push origin feet-bow-adit-kit`). No worktrees left (every helper branch merged and deleted). Nothing VERIFIED until Chris

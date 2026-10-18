@@ -85,7 +85,7 @@ namespace Crulanda.Encounter
                 if (cc == null || new Vector2(cc.velocity.x, cc.velocity.z).sqrMagnitude > .5f)
                 {
                     nextLeafCut = Time.time + 1.5f;
-                    if (Bite(.02f) && Time.time - leafSaidAt > 30) { leafSaidAt = Time.time; Message("The stone leaves are sharp enough to cut skin. You come out of them with thin red lines across your hands."); }
+                    if (Bite(.02f, 1.5f) && Time.time - leafSaidAt > 30) { leafSaidAt = Time.time; Message("The stone leaves are sharp enough to cut skin. You come out of them with thin red lines across your hands."); }
                 }
             }
             // The slab that tips: everyone standing on it counted, and whether anyone is near enough to keep it level.
@@ -137,7 +137,7 @@ namespace Crulanda.Encounter
                     if (Time.time >= nextSquallBite)
                     {
                         nextSquallBite = Time.time + 1;
-                        if (onRoad && !Sheltered(p) && Player.IsAlive && !simLed && Bite(SquallBite) && !agedSaid)
+                        if (onRoad && !Sheltered(p) && Player.IsAlive && !simLed && Bite(SquallBite, 1) && !agedSaid)
                         {
                             agedSaid = true;
                             Message("A silver drop catches the back of your hand. The skin there puckers and goes thin and old. Get under the overhang!");
@@ -148,10 +148,13 @@ namespace Crulanda.Encounter
             }
         }
 
-        /// <summary>A bite of the road's (a share of the player's health), never taking it below a sixth. True when it bit.</summary>
-        bool Bite(float share)
+        /// <summary>A bite of the road's (a share of the player's health, felt over the resting mend for <paramref name="seconds"/>), never
+        /// taking it below a sixth. True when it bit.</summary>
+        bool Bite(float share, float seconds)
         {
-            var hp = Player.Health; int bite = Mathf.Max(1, Mathf.RoundToInt(hp.Pool.Max * share));
+            // Out of a fight the resting mend (RestRegen, every second) would heal it straight back (at 180 health a squall's 4% is 7,
+            // the mend's 7: it did nothing in the open, the Ash Road test of 2026-10-18), so the mend over the bite's interval is added.
+            var hp = Player.Health; int bite = Mathf.Max(1, Mathf.RoundToInt(hp.Pool.Max * share)) + (InCombat ? 0 : Mathf.CeilToInt(RestRegen * seconds));
             if (hp.Pool.Current - bite <= hp.Pool.Max / 6f) return false;
             hp.ApplyDamage(bite); return true;
         }

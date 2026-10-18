@@ -826,3 +826,5 @@ un-captures.
   (names match Quaternius's food pack; source to confirm with Chris). Only what fits the books' world: meat, fish, eggs, bread, cheese,
   fruit, roots and greens, pots, pans, plates and bottles; no burgers, pizza, sushi, ice cream, soda, sauces in bottles, doughnuts.
   Then (verbatim): "dont use the non crulanda food but some can be used" (keep what the books and the zones support).
+  Note 233 answered (question prompt, verbatim): the Imp "Ember-bound (Recommended)" (the Adit's Ember Vent, 10-12), the Puglin
+  "Bank-snouts (Recommended)" (the Lowtowns' river banks, 15-20). Docs/BESTIARY_MONSTERS.md (branch bestiary).

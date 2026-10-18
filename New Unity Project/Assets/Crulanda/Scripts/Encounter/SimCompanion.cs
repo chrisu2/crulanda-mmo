@@ -657,6 +657,32 @@ namespace Crulanda.Encounter
         readonly Dictionary<(Vector3, Vector3), float> walks = new Dictionary<(Vector3, Vector3), float>();
         /// <summary>Whether a mob is on the same floor or deck as a place (the Adit rework: a camp up on a deck is not held up by the mobs 12 m
         /// under it, nor pulled from there); a slope's fall over the distance is allowed for.</summary>
+        float closeAskedAt = -10, closeStuckSince = -1;
+        /// <summary>
+        /// Walks at its quarry (2026-10-18, hallows-8: the leader stood 27 minutes at the foot of the Bell Tower's stair "closing on" the
+        /// Pact-Captain on the landing 9 m up). The path is asked for only when the quarry has moved a metre from where the agent is going
+        /// (MobChase.Ask): asked afresh every frame, a long way up the tower's flights never finished being worked out within the frame's
+        /// share of the navmesh's search, so the agent never moved. Still stuck short of a quarry on another floor for 8 s (a partial
+        /// path), it is set on a free spot round it on its floor (RangerPet.WarpSpot), as the run's own bot is set by its leader.
+        /// </summary>
+        void CloseOn(EncounterEnemy quarry)
+        {
+            var q = quarry.transform.position;
+            if (MobChase.Ask(agent, q, closeAskedAt, Time.time)) { agent.SetDestination(q); closeAskedAt = Time.time; }
+            bool stuck = !agent.pathPending && (!agent.hasPath || agent.pathStatus != NavMeshPathStatus.PathComplete || agent.velocity.sqrMagnitude < .04f)
+                && Mathf.Abs(q.y - transform.position.y) > 2.5f;
+            if (!stuck) { closeStuckSince = -1; return; }
+            if (closeStuckSince < 0) { closeStuckSince = Time.time; return; }
+            if (Time.time - closeStuckSince < 8) return;
+            closeStuckSince = -1;
+            float floorY = NavMesh.SamplePosition(q, out var under, 3, NavMesh.AllAreas) ? under.position.y : q.y - 1;
+            System.Func<Vector3, Vector3?> floor = p => { p.y = floorY; if (!NavMesh.SamplePosition(p, out var h, .5f, NavMesh.AllAreas) || Mathf.Abs(h.position.y - floorY) > .8f) return null; return h.position; };
+            var crowd = new List<Vector3>(); foreach (var c in session.PartySims) if (c != null && c != this && c.actor != null && c.actor.IsAlive) crowd.Add(c.transform.position);
+            if (session.Player != null) crowd.Add(session.Player.transform.position);
+            if (!RangerPet.WarpSpot(q, crowd, floor, out var spot)) return;
+            Debug.Log("[SimCompanion] " + sim.name + " stuck closing on " + quarry.actor.DisplayName + " (path " + agent.pathStatus + ", " + Vector3.Distance(transform.position, q).ToString("0.0") + " m); set beside it at " + spot);
+            agent.Warp(spot); agent.SetDestination(q); closeAskedAt = Time.time;
+        }
         static bool SameFloor(Vector3 mob, Vector3 place) { var d = mob - place; return Mathf.Abs(d.y) < 5 + .45f * new Vector2(d.x, d.z).magnitude; }
         /// <summary>A step after a patrolling side boss (the Old Burrower round its pool): its mark follows the nearest of it.</summary>
         void TrackStep()
@@ -869,7 +895,8 @@ namespace Crulanda.Encounter
                 if (Role == PartyRole.Tank && quarry.Victim != null && quarry.Victim != actor && Time.time >= nextTaunt && Vector3.Distance(transform.position, quarry.transform.position) < 12)
                 { nextTaunt = Time.time + 8; quarry.threat.Taunt(actor.EntityId.Value, Time.time, 4); session.FloatText(transform.position + Vector3.up * 2, "Taunt", new Color(1, .7f, .3f)); }
                 float d = Vector3.Distance(transform.position, quarry.transform.position);
-                if (d > Reach) { agent.isStopped = false; agent.speed = 5.2f; agent.SetDestination(quarry.transform.position); Activity = "Closing on " + quarry.actor.DisplayName; return; }
+                if (d > Reach) { agent.isStopped = false; agent.speed = 5.2f; CloseOn(quarry); Activity = "Closing on " + quarry.actor.DisplayName; return; }
+                closeStuckSince = -1;
                 agent.isStopped = true;
                 StrikeAt(quarry, true);
                 return;

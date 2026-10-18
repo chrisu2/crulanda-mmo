@@ -149,7 +149,7 @@ namespace Crulanda.Encounter
         public string TappedBy { get; private set; }
         NavMeshAgent agent;
         Vector3 home;
-        float swing, baseSpeed, slowFactor = 1, slowUntil, rootUntil;
+        float swing, baseSpeed, slowFactor = 1, slowUntil, rootUntil, chaseAskedAt = -10;
         public bool Rooted { get { return Time.time < rootUntil; } }
         public bool Slowed { get { return Time.time < slowUntil && slowFactor < 1; } }
         /// <summary>What its pace is multiplied by now (1 when not slowed).</summary>
@@ -319,7 +319,9 @@ namespace Crulanda.Encounter
             if (Cast != null && TickCast()) return;   // a caster casting stands still and does not swing (EncounterEnemy.Casts)
             // A camp's trick: a shield-line, a slate, a circling hound, a boat-hook, a flash, a clock, an echo, a crossbow on the wall (EncounterEnemy.Tricks).
             if (Trick != null && TickTrick()) return;
-            if (agent.isOnNavMesh) { agent.isStopped = false; agent.SetDestination(Victim.transform.position); }
+            // The path asked for again only when its foe has moved a metre (MobChase.Ask; 2026-10-18, hallows-8: asked afresh every frame, a long
+            // way down the Bell Tower's flights was never worked out and the Pact-Captain never came down).
+            if (agent.isOnNavMesh) { agent.isStopped = false; if (MobChase.Ask(agent, Victim.transform.position, chaseAskedAt, Time.time)) { agent.SetDestination(Victim.transform.position); chaseAskedAt = Time.time; } }
             // Reach: 2.6 m across the ground and 1.6 m of height (a wading target sits lower than one on the bank).
             var gap = Victim.transform.position - transform.position; float across = new Vector2(gap.x, gap.z).magnitude;
             // (A Pact spear in a locked wall reaches further: EncounterEnemy.Tricks.)

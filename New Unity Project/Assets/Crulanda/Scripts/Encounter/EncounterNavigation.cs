@@ -27,6 +27,9 @@ namespace Crulanda.Encounter
             // (Hallow's Creek) Decks on open ground stand higher than the caves' reach: the belfry's floor 18 m over the yard, and the head-room over it.
             if (zone != null) foreach (var d in zone.DeckSpots) if (d.cave == null && d.mid != null) foreach (var m in d.mid) reach.Encapsulate(m + Vector3.up * 3);
             data = NavMeshBuilder.BuildNavMeshData(NavMesh.GetSettingsByIndex(0), sources, reach, Vector3.zero, Quaternion.identity);
+            // A bigger share of the search each frame (Unity's 100 is shared by every agent): a long way up a tower's flights is worked out
+            // in a few frames, not starved by the fight's other chasers (2026-10-18, hallows-8; MobChase).
+            NavMesh.pathfindingIterationsPerFrame = Mathf.Max(NavMesh.pathfindingIterationsPerFrame, 400);
             if (data != null) instance = NavMesh.AddNavMeshData(data);
             else Debug.LogError("Could not build encounter navigation.");
             // (The Adit rework) The caves' one-way drops (ZoneDrop): a link down off each lip, never back up. A camp's mobs keep off them

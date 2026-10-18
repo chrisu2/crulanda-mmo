@@ -422,7 +422,10 @@ namespace Crulanda.Tests
                     var gate = zone.gates.FirstOrDefault(x => x.title == t);
                     if (gate == null) { bad.Add(g.id + " opens '" + t + "', no gate"); continue; }
                     if (gate.kind != "glitch" && gate.kind != "hiddendoor" && gate.kind != "bar") bad.Add(g.id + " opens " + t + ", a " + gate.kind + " the run opens its own way");
-                    if (zone.camps.Any(c => c.gate == t)) bad.Add(t + " is a camp's way in: a Glitch must not be the only way");
+                    // A camp may wait behind a door worked by hand (E opens it too: the dark cellar's door before the Long Shadow), never
+                    // behind a Glitch gate, which nothing but its Glitch opens.
+                    bool byHand = (gate.kind == "hiddendoor" || gate.kind == "bar") && !string.IsNullOrEmpty(gate.prompt);
+                    if (!byHand && zone.camps.Any(c => c.gate == t)) bad.Add(t + " is a camp's way in: a Glitch must not be the only way");
                 }
             }
             // A Glitch gate is shut only until its Glitch goes: no camp waits behind one, no wing goes out through one.

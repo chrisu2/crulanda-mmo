@@ -108,6 +108,9 @@ namespace Crulanda.World
         public ZoneHazard[] hazards = new ZoneHazard[0];
         /// <summary>The ride home (<see cref="ZoneRide"/>: Hallow's Creek's wagon), or one with no name: none.</summary>
         public ZoneRide ride;
+        /// <summary>(Hallow's Creek, REWORK_LOWTOWNS_HALLOWS pick 2; CANON, b1 ch.21:19) A bubble of still air (<see cref="ZoneBubble"/>): inside it no
+        /// wind moves anything, no squall's dust or mist drifts in, and the fog stands further off. One with no radius: none.</summary>
+        public ZoneBubble bubble;
         // ---- a city (the Crown of Argentis, Docs/CAPITAL_HUB.md; all optional: a zone without them builds as it did) ----
         /// <summary>A safe city (the Crown of Argentis): no camps and no gathering nodes; its people are the trades' trainers, the
         /// clerks and the Council's wardens. Its levels show as "all" on the maps; the five wild zones' counts leave it out.</summary>
@@ -335,8 +338,10 @@ namespace Crulanda.World
     /// swingFrom, swingAlong (creeks only): the point its side-to-side swing is counted from, and the metres already run
     /// there. A creek lengthened upstream names its old first point, so its line downstream stays where it was
     /// (ZoneWater.Meander). 0 and 0: from the first point, as every creek was.
+    /// surface (roads only, optional): "gravel" (Hallow's Creek's "pristine gravel", b1 ch.21:19: pale, clean, no ruts, a crisp edge),
+    /// else trodden earth.
     /// </summary>
-    [Serializable] public sealed class ZonePath { public string name; public float width = 4; public Vector2[] points = new Vector2[0]; public float depth = 1.1f; public int swingFrom; public float swingAlong; }
+    [Serializable] public sealed class ZonePath { public string name, surface; public float width = 4; public Vector2[] points = new Vector2[0]; public float depth = 1.1f; public int swingFrom; public float swingAlong; }
     /// <summary>
     /// A lake or pond. radius is the mean waterline (the shore wanders up to a fifth in and out around it); depth is the
     /// water's depth in the middle (a flat bottom, a bank under about 38 degrees, a gentle shore). Deeper than about
@@ -411,6 +416,9 @@ namespace Crulanda.World
         /// it takes that kind's draws from the zone's stream and counts as that kind did for the camps' ground (ZoneBuilder.MobGround),
         /// so nothing else in the zone moves.</summary>
         public string was;
+        /// <summary>(Hallow's Creek's people and places, REWORK_LOWTOWNS_HALLOWS pick 12) What E shows at a prop that is looked at (an
+        /// "interact" prompt with this text: a paused townsperson, the crater's rim, the chalk), and the lore label of what it shows.</summary>
+        public string text, canonStatus;
     }
     /// <summary>
     /// A deck in a cave (GAME-ONLY; the Adit rework, ZoneBuilder.AditDecks): a walkable way of planks, cut stone, rope or scree, running
@@ -555,6 +563,8 @@ namespace Crulanda.World
     public sealed class ZoneInteractable
     {
         public string name, prompt, item, kind; public bool once;
+        /// <summary>What looking at it shows (ZoneProp.text), or null.</summary>
+        public string text;
         /// <summary>The kind of node it is to gather (ZoneProp.node, ZoneNode.node), or null.</summary>
         public string node;
         /// <summary>Picked or emptied things vanish (herbs regrow, crates stay empty, worked nodes come back); wagons and trees stay put.</summary>
@@ -566,6 +576,23 @@ namespace Crulanda.World
         /// <summary>The gate it works (kinds "liftgate" and "platformgate"); once the gate is open there is nothing left to use.</summary>
         public ZoneGate gate;
         public string Key(string zoneId) { return zoneId + "|" + name + "|" + Mathf.RoundToInt(position.x) + "|" + Mathf.RoundToInt(position.z); }
+    }
+    /// <summary>
+    /// A bubble of static reality (Hallow's Creek: "The fog here was thinner, pushed back by the bubble of static reality that encased the
+    /// town ... There was no wind to stir the dead leaves", b1 ch.21:19). Inside <see cref="radius"/> of <see cref="center"/> (easing out over
+    /// <see cref="edge"/> metres) the weather's wind is nothing (grass, leaves and haze hang still), no squall's dust or mist is born, falling
+    /// ash stops, and the fog's far end stands <see cref="clear"/> further off (.6: six tenths as far again). WorldWeather, WorldClock.
+    /// </summary>
+    [Serializable] public sealed class ZoneBubble
+    {
+        public Vector2 center; public float radius, edge = 20, clear = .6f; public string canonStatus;
+        /// <summary>How far inside it a point stands: 1 within the radius, easing to 0 over the edge; 0 with no radius.</summary>
+        public float StillAt(float x, float z)
+        {
+            if (radius <= 0) return 0;
+            float d = Vector2.Distance(new Vector2(x, z), center);
+            return 1 - Mathf.SmoothStep(0, 1, (d - radius) / Mathf.Max(.5f, edge));
+        }
     }
     [Serializable] public sealed class ZoneWasting
     {

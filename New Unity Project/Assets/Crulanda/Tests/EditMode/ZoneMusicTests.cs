@@ -49,6 +49,11 @@ namespace Crulanda.Tests
             Assert.AreEqual(ZoneMusic.DungeonFight, fight, "the dungeon's fight track");
             Assert.AreSame(ZoneMusic.Sets["zone.khaven"].day, ZoneMusic.TracksFor(new ZoneDefinition { id = "zone.khaven" }, at, 1, out fight), "no night set: the day's");
             Assert.AreSame(ZoneMusic.Sets["zone.oakhaven"].day, ZoneMusic.TracksFor(new ZoneDefinition { id = "zone.nowhere" }, at, 0, out fight), "an unknown zone: Oakhaven's");
+            // Hallow's Creek is silent out of doors (REWORK_LOWTOWNS_HALLOWS pick 2; b1 ch.21:19, "The unnatural silence here was absolute"),
+            // the fight track still coming up in a fight; its cellars play the dungeon's set.
+            Assert.AreSame(ZoneMusic.Silence, ZoneMusic.TracksFor(new ZoneDefinition { id = "zone.hallows" }, new Vector3(0, 1, -60), 0, out fight), "Hallow's Creek: no music on its streets");
+            Assert.AreEqual(ZoneMusic.DungeonFight, fight, "and the dungeon's fight track in a fight");
+            Assert.IsTrue(ZoneMusic.Sets["zone.hallows"].quiet);
         }
 
         [Test] public void The_volume_is_kept_between_0_and_1()

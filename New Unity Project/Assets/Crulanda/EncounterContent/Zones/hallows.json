@@ -4,7 +4,7 @@
   "subtitle": "The town the Wasting paused",
   "canonStatus": "CANON-EXPANDED",
   "dungeon": true,
-  "canonNote": "Hallow's Creek, the first settlement the Wasting took, paused mid-second fifty years before the books: the white fences, the baker in his doorway, the ball in the air, the townsfolk stone to the skin with living eyes, the broken bridge's slabs hanging over the chasm, the crater with the red door at its heart, the Old Archive and the hungry shadows (CANON, book1 ch.15-21; world_bible). CANON-EXPANDED: the Bureau holding the town and cutting memory-quartz from the paused (book1 ch.3: geodes are fossilised memory), the Hollow as what the cut leaves, the bell tower with a painted dial a minute short of noon (no works). GAME-ONLY: every person, camp, the wings, the Waking Hour as a worked thing, the wagon. Kept out: the Archive's vault, the red door's riddle, the Prism, Hollow children. Docs/DUNGEON2_DESIGN.md.",
+  "canonNote": "Hallow's Creek, the first settlement the Wasting took, paused mid-second fifty years before the books, too perfect: white houses, white picket fences without a speck of peeling paint, roses of red quartz, pristine gravel, no wind, no birds (b1 ch.17:269; ch.21:11-19), and only its people grey stone; the white fences, the baker in his doorway, the ball in the air, the townsfolk stone to the skin with living eyes, the broken bridge's slabs hanging over the chasm, the crater with the red door at its heart, the Old Archive and the hungry shadows (CANON, book1 ch.15-21; world_bible). CANON-EXPANDED: the Bureau holding the town and cutting memory-quartz from the paused (book1 ch.3: geodes are fossilised memory), the Hollow as what the cut leaves, the bell tower with a painted dial a minute short of noon (no works). GAME-ONLY: every person, camp, the wings, the Waking Hour as a worked thing, the wagon. Kept out: the Archive's vault, the red door's riddle, the Prism, Hollow children. The people of chapters 19 and 21 (Mr Gable and Martha, Mrs Miller, the children, Talla by the willow) and the Square as chapter 21 tells it: Docs/REWORK_LOWTOWNS_HALLOWS.md picks 1, 2, 3 and 12. Docs/DUNGEON2_DESIGN.md.",
   "size": 800,
   "levelMin": 15,
   "levelMax": 20,
@@ -256,7 +256,8 @@
           "x": 0,
           "y": 28
         }
-      ]
+      ],
+      "surface": "gravel"
     },
     {
       "name": "The Granary road",
@@ -270,7 +271,8 @@
           "x": 75,
           "y": -70
         }
-      ]
+      ],
+      "surface": "gravel"
     },
     {
       "name": "The wagon track",
@@ -544,8 +546,8 @@
         "x": -23.5,
         "y": -101.5
       },
-      "prompt": "Look under the stone tarpaulin",
-      "text": "The cart is packed for the road west and turned to stone with it: a chair lashed on top, a quilt, a tin box under the seat that the stone did not take, and in it a ring on a cord.",
+      "prompt": "Look under the seat",
+      "text": "The cart is packed for the road west, and nothing on it has moved in fifty years: a chair lashed on top, a quilt, and under the seat a tin box, and in it a ring on a cord.",
       "xp": 260,
       "canonStatus": "GAME-ONLY (Bet's letter is already in the game)",
       "item": "loot.hal.the_hollins_ring"
@@ -601,7 +603,7 @@
         "y": -93.2
       },
       "prompt": "Unlock the chest by the fence",
-      "text": "A blanket chest set out by the Reed house's fence for a cart that never came, the lid stone but the lock still brass. Inside: linen, a kettle-holder worked with a kingfisher, and Old Mother Reed's ring with the same bird cut in its stone.",
+      "text": "A blanket chest set out by the Reed house's fence for a cart that never came, its white paint unchipped and its lock still bright brass. Inside: linen, a kettle-holder worked with a kingfisher, and Old Mother Reed's ring with the same bird cut in its stone.",
       "xp": 300,
       "canonStatus": "GAME-ONLY (Tamsin Reed and her mother are already in the game)",
       "needs": "secret.hallows.reed-key",
@@ -948,7 +950,7 @@
         "y": 8
       },
       "variant": 1,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -961,7 +963,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -974,7 +976,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -997,7 +999,7 @@
         "y": 8
       },
       "variant": 2,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1010,7 +1012,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1023,7 +1025,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1045,7 +1047,7 @@
         "x": 9,
         "y": 8
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1058,7 +1060,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1071,7 +1073,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1094,7 +1096,7 @@
         "y": 8
       },
       "variant": 1,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1107,7 +1109,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1120,7 +1122,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1144,7 +1146,7 @@
         "y": 8
       },
       "variant": 2,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1157,7 +1159,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1170,7 +1172,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1193,7 +1195,7 @@
         "y": 8
       },
       "variant": 3,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1206,7 +1208,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1219,7 +1221,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1241,7 +1243,7 @@
         "x": 9,
         "y": 8
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1254,7 +1256,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1267,7 +1269,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1290,7 +1292,7 @@
         "y": 8
       },
       "variant": 1,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1303,7 +1305,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1316,7 +1318,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "house",
@@ -1330,7 +1332,7 @@
         "y": 8
       },
       "variant": 2,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1343,7 +1345,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1356,7 +1358,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1379,7 +1381,7 @@
         "y": 8
       },
       "variant": 3,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1392,7 +1394,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1405,7 +1407,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1428,7 +1430,7 @@
         "y": 8
       },
       "variant": 1,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1441,7 +1443,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1454,7 +1456,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1477,7 +1479,7 @@
         "y": 8
       },
       "variant": 2,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1490,7 +1492,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1503,7 +1505,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1526,7 +1528,7 @@
         "y": 8
       },
       "variant": 3,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1539,7 +1541,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1552,7 +1554,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "house",
@@ -1565,7 +1567,7 @@
         "x": 9,
         "y": 8
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1578,7 +1580,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1591,7 +1593,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1614,7 +1616,7 @@
         "y": 8
       },
       "variant": 1,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1627,7 +1629,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1640,7 +1642,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1663,7 +1665,7 @@
         "y": 8
       },
       "variant": 2,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1676,7 +1678,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1689,7 +1691,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "house",
@@ -1703,7 +1705,7 @@
         "y": 8
       },
       "variant": 3,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1716,7 +1718,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1729,7 +1731,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1751,7 +1753,7 @@
         "x": 9,
         "y": 8
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1764,7 +1766,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1777,7 +1779,7 @@
         "x": 3,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "paused",
@@ -1803,9 +1805,12 @@
         "x": -9.2,
         "y": -76.5
       },
-      "name": "The baker in his doorway",
+      "name": "Mr Gable",
       "rotation": 90,
-      "variant": 1
+      "variant": 1,
+      "interact": "Look at the baker",
+      "text": "Mr Gable, the baker, in his doorway with a tray of loaves, stone to his apron strings. His eyes are blue. Human. Wet. They shift, just a fraction, following you. Behind him on the counter is a pie: stone crust, stone smoke standing over it in a perfect spiral. You smell blueberries. The bell over his door has not rung for fifty years; it would take only a step inside.",
+      "canonStatus": "CANON (b1 ch.21:23, 32-36, 64-70: the baker in his doorway, his eyes, the pie; ch.21:VI, 368: his name)"
     },
     {
       "kind": "paused",
@@ -1823,7 +1828,7 @@
         "x": 2.5,
         "y": -60
       },
-      "name": "A man with his hat in the wind",
+      "name": "A man lifting his hat to a neighbour",
       "rotation": 30
     },
     {
@@ -1851,7 +1856,7 @@
       },
       "name": "Bet's cart",
       "rotation": 30,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "fence",
@@ -1863,7 +1868,7 @@
         "x": 10,
         "y": 0
       },
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "laundry",
@@ -1958,8 +1963,10 @@
         "x": 28,
         "y": 52
       },
-      "name": "The stone willow",
-      "scale": 1.3
+      "name": "The weeping willow",
+      "scale": 1.3,
+      "style": "willow",
+      "canonStatus": "CANON (b1 ch.19:41: the weeping willow near the town square); its quartz fronds GAME-ONLY (the flora crystallizing, b1 ch.21:351)"
     },
     {
       "kind": "belfry",
@@ -2098,7 +2105,7 @@
       },
       "name": "The Square's market",
       "variant": 1,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "townlife",
@@ -2108,7 +2115,7 @@
       },
       "name": "Main Street's yards",
       "variant": 2,
-      "style": "stone"
+      "style": "white"
     },
     {
       "kind": "townlife",
@@ -2188,6 +2195,143 @@
         "y": -232
       },
       "variant": 1
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 15.6,
+        "y": -50.6
+      },
+      "name": "Mrs Miller",
+      "rotation": 90,
+      "variant": 2,
+      "interact": "Look at the woman at the line",
+      "text": "Mrs Miller, hanging out her washing, stone from her headscarf to her shoes, a sheet half up and a peg in her fingers. The line is as rigid as steel wire. Nothing on it has stirred in fifty years: there is no wind here. Her eyes, blue and wet, are not on the sheet. They are on you.",
+      "canonStatus": "CANON (b1 ch.21:23: the woman at a laundry line as rigid as steel wire; ch.21:376: Mrs. Miller hanging laundry)"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 2.2,
+        "y": -27.4
+      },
+      "name": "A child chasing the ball",
+      "rotation": 40,
+      "variant": 5,
+      "interact": "Look at the children",
+      "text": "Two children chase a ball that hangs in the air over the gravel, their laughter silenced for fifty years. The nearer one's mouth is open on it still. A dog has leapt after the ball with them and stopped a metre off the ground.",
+      "canonStatus": "CANON (b1 ch.21:23: two children and the ball suspended in the air; ch.21:122: frozen children mid-laugh and dogs suspended in mid-air)"
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 5.0,
+        "y": -24.6
+      },
+      "rotation": 220,
+      "variant": 5
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 1.4,
+        "y": -24.4
+      },
+      "name": "A dog in mid-leap",
+      "rotation": 120,
+      "variant": 6
+    },
+    {
+      "kind": "paused",
+      "at": {
+        "x": 22.5,
+        "y": 57.5
+      },
+      "name": "Talla",
+      "rotation": 120,
+      "variant": 7,
+      "interact": "Look at the stone girl",
+      "text": "A girl of eleven or twelve, stone to the skin, thrown down over a hollow in the ash by the willow as if to shield someone small from the sky. There is no one under her now. The hollow is dug out, the ash heaped back on either side by a big pair of hands, years ago. Her eyes are open, blue and wet, and they are on the empty hollow. Someone has cut her name into the willow's stone bark beside her, in careful letters: TALLA.",
+      "canonStatus": "CANON (Chris, 2026-10-18: the stone girl by the willow is Talla, Valen's sister; b1 ch.19:39, 53: his older sister threw herself over him by the weeping willow and was petrified; Gorm dug him out ten years before the book; b1 ch.17:300: her name); the name cut in the bark GAME-ONLY; the books' contradiction (ch.17:300-374, Talla dies of the Grey Rot) settled by Chris for the game"
+    },
+    {
+      "kind": "hollow",
+      "at": {
+        "x": 23.0,
+        "y": 57.2
+      },
+      "name": "The dug-out hollow",
+      "rotation": 120,
+      "canonStatus": "CANON-EXPANDED (b1 ch.19:39: Gorm dug Valen out of the petrified ash ten years before the book)"
+    },
+    {
+      "kind": "handcart",
+      "at": {
+        "x": 7.4,
+        "y": -67.5
+      },
+      "name": "A handcart against the fence",
+      "rotation": 0,
+      "style": "white",
+      "canonStatus": "CANON-EXPANDED (b1 ch.21:11: a bicycle leaning against a post, its wheels frozen mid-spin an inch off the ground; a handcart here: nothing in the game turns by itself)"
+    },
+    {
+      "kind": "chapel",
+      "at": {
+        "x": -44,
+        "y": 100
+      },
+      "name": "The chapel",
+      "rotation": -56,
+      "size": {
+        "x": 7,
+        "y": 12
+      },
+      "canonStatus": "CANON (b1 ch.19:53: the sound of the Weave fracturing shattered the stained glass windows of the local chapel); its place and look GAME-ONLY"
+    },
+    {
+      "kind": "look",
+      "at": {
+        "x": -36.9,
+        "y": 95.2
+      },
+      "name": "The chapel's glass",
+      "interact": "Look at the hanging glass",
+      "text": "The chapel's windows are empty. Their stained glass burst outward with the sound the sky made when it tore, and it is still bursting: red, blue, gold and green shards hanging in the air before every window, a hand's breadth out and two metres out, stopped where they flew.",
+      "canonStatus": "CANON (b1 ch.19:53); the glass stopped in the air CANON-EXPANDED (the town paused, b1 ch.21)"
+    },
+    {
+      "kind": "look",
+      "at": {
+        "x": 2.3,
+        "y": 43.6
+      },
+      "name": "The crater's rim",
+      "interact": "Look down into the crater",
+      "text": "The town hall is gone. In its place is a perfect hemisphere of missing reality: smooth glassy obsidian, curving fifty feet down into the dark to a floor that is a mirror. The whole town hangs upside down in it, roofs and chimneys and the tower, and none of it moves. Out over the middle a red door stands upright on a slab of floating marble, bright, wet, impossible red, its brass knocker a face with its lips sewn shut. Round it, slowly, go chairs and desks and bricks, a stone horse, the corner of a bank vault with its rebar sticking out like broken bones, a bench, a lamppost. The wind coming up out of it smells of ozone and old paper.",
+      "canonStatus": "CANON (b1 ch.21:126-136, 188, 222-230)"
+    },
+    {
+      "kind": "look",
+      "at": {
+        "x": -11.8,
+        "y": 44.6
+      },
+      "name": "The chalked equations",
+      "interact": "Read the chalk on the paving",
+      "text": "Chalk on the paving, fifty years old and not a line of it smudged: rings within rings, spokes running in toward the crater's edge, small glyphs, and rows of working in a fast, sure hand. The middle of it went with the town hall. A High Scholar chalked it here to map the leylines under the valley; a girl touched the glyph at its centre.",
+      "canonStatus": "CANON (b1 ch.19:49: Aethelgard's equations chalked onto the town square paving stones; Elara touched the central glyph); kept by the pause CANON-EXPANDED"
+    },
+    {
+      "kind": "look",
+      "at": {
+        "x": -8.1,
+        "y": 100.3
+      },
+      "name": "The ancient town well",
+      "interact": "Look into the old well",
+      "text": "The ancient town well, older than any house on the Square, its stones worn smooth by a thousand buckets. A man stood here arguing with the town's elders on the morning the sky broke. The water down in it is still, and it does not reflect you.",
+      "canonStatus": "CANON (b1 ch.19:41: Aethelgard near the ancient town well); the still water GAME-ONLY"
     }
   ],
   "decks": [
@@ -4589,5 +4733,15 @@
         }
       ]
     }
-  ]
+  ],
+  "bubble": {
+    "center": {
+      "x": 25,
+      "y": -5
+    },
+    "radius": 140,
+    "edge": 20,
+    "clear": 0.6,
+    "canonStatus": "CANON (b1 ch.21:19: the fog thinner, pushed back by the bubble of static reality that encased the town; no wind; no birds)"
+  }
 }

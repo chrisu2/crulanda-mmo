@@ -6,11 +6,13 @@ namespace Crulanda.World
     /// <summary>
     /// Hallow's Creek's lived-in detail (2026-10-16, Chris on the first frames: a half-done look is not accepted), GAME-ONLY dressing on
     /// CANON places (Docs/DUNGEON2_DESIGN.md):
-    /// - "townlife" props: variant 1 the Square's market round the crater's rim (stalls, a draw-well, dead lamps, benches, a notice board,
-    ///   and the crowd caught looking at the blast: more paused figures for the session to stand there), variant 2 Main Street's yards
+    /// - "townlife" props: variant 1 the Square's market round the crater's rim (stalls, the ancient town well, dead lamps, benches, a
+    ///   notice board, the chalked equations, and the crowd caught looking at the blast, children among them: more paused figures for the
+    ///   session to stand there), variant 2 Main Street's yards
     ///   (barrels, crates, woodpiles, washing lines strung between the houses, handcarts, benches, hanging shop signs, dead lamps for the
     ///   Lamplighter), variant 3 the broken bridge's glass (shards along the slabs' edges, glass skins on their sides, cracks across their
-    ///   tops, glass hanging under them and chips stopped in the air). A "townlife" prop of style "stone" is turned to stone with the rest.
+    ///   tops, glass hanging under them and chips stopped in the air). A "townlife" prop of style "white" is whitewashed with the town's
+    ///   houses (ZoneBuilder.HallowsBooks): the books' town is white and perfect, only its people stone.
     /// - the Old Archive's roof (broken where the blast went through: the rafters bare over the reading hall, slates stopped falling), its
     ///   gables, windows, portal and blown-in doors, the shelf maze as real shelves of ledgers, cases along the walls, clerks' desks, papers
     ///   stopped in the air and hanging lamps (ZoneBuilder.Hallows calls these);
@@ -57,8 +59,16 @@ namespace Crulanda.World
             }
             // The dead lamps round the rim (the Lamplighter's; never lit while the town sleeps), their arms toward the crater.
             foreach (float b in new float[] { 22, 68, 112, 158, 202, 248, 292, 338 }) Lamp(TownSpot(t, "A dead lamp", Bearing(c, b, 40.5f), b + 90), 0);
-            // The draw-well on the north-west of the ring (the well-house over the cellar stair is its neighbour on the west rim).
-            Well(TownSpot(t, "The Square's well", Bearing(c, 345, 33), 345), 0);
+            // The ancient town well on the north-west of the ring (b1 ch.19:41, where Aethelgard stood that day; the well-house over the
+            // cellar stair is its neighbour on the west rim).
+            Well(TownSpot(t, "The ancient town well", Bearing(c, 345, 33), 345), 0);
+            // What is left of Aethelgard's chalked equations, up to the rim on the south-west (b1 ch.19:49; ZoneBuilder.HallowsBooks).
+            ChalkArray(t, c);
+            // Children stopped mid-laugh where Main Street comes in, and a dog stopped in the air beside them (b1 ch.21:122): pose 5, a child
+            // caught running.
+            PausedSpots.Add((Ground(Bearing(c, 184, 31.5f)), Quaternion.Euler(0, 95, 0), 5, null));
+            PausedSpots.Add((Ground(Bearing(c, 191, 33.4f)), Quaternion.Euler(0, 62, 0), 5, null));
+            StoneDogLeap(TownSpot(t, "A dog in mid-leap", Bearing(c, 187.5f, 32.4f), 75));
             foreach (float b in new float[] { 276, 308 }) CityBench(TownSpot(t, "A bench", Bearing(c, b, 38.5f), b), Vector3.zero, 0, 1.6f);
             NoticeBoard(TownSpot(t, "The Square's notice board", Bearing(c, 196, 39.5f), 196));
             // The crowd: caught where they stood when the working broke, most turned to the blast. Pose 0 caught walking, 2 mid-word,

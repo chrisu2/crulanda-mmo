@@ -47,6 +47,11 @@ be nice to see some of them come alive" ... "like the leader in crowns".
   kept in the Lowtowns' turn of the turf; 4 the drowned vaults as the Warrens' upper edge; 5 Dead Man's Drop as a view and a fall onto the
   nets; 6 blue-chalk cache marks; 7 Gorm's line and the dug-out hollow by the willow).
 
+**Built (branch rw-hallows, 2026-10-18; WRITTEN, compiles, NOT RUN):** Hallow's Creek picks 1 (white and perfect), 2 (the silence: the
+bubble of still air, no music out of doors, the whisper; no footstep audio exists in the game), 3 (the Square as chapter 21 tells it) and
+12 (the people: Mr Gable and his pie, Martha's voice, Mrs Miller, the children, Talla). What was built and what is still to see:
+DUNGEON2_DESIGN.md, "The town as the books write it".
+
 ## 1. What the books say (check at a glance)
 
 ### The Lowtowns (Argentis's lower city)

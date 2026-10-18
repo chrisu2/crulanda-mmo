@@ -38,6 +38,7 @@ namespace Crulanda.Tests
         {
             if (WorldWeather.Active != null) WorldWeather.Active.Release(true);
             WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null; EncounterSession.ReleaseDelay = 3; EncounterSession.RideSeconds = 5;
+            EncounterSession.EventSpeed = 1; EncounterSession.SnapWarnSeconds = 3; EncounterSession.WhisperEvery = 22; EncounterSession.WhisperLineEvery = 75; Time.timeScale = 1;
             SceneManager.sceneLoaded -= OnLoaded;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
             yield return SceneManager.UnloadSceneAsync("Oakhaven");
@@ -234,6 +235,100 @@ namespace Crulanda.Tests
             s.UseInteractable(wagon);
             for (float w = 0; w < 10 && Vector2.Distance(new Vector2(s.Player.transform.position.x, s.Player.transform.position.z), zone.Zone.ride.arrive) > 5; w += Time.deltaTime) yield return null;
             Assert.Less(Vector2.Distance(new Vector2(s.Player.transform.position.x, s.Player.transform.position.z), zone.Zone.ride.arrive), 5, "at the milestone");
+        }
+
+        /// <summary>
+        /// The town as the books write it (REWORK_LOWTOWNS_HALLOWS picks 1, 2, 3 and 12): white picket fences and quartz roses built, no smoke
+        /// from a chimney; the bubble of still air over Main Street (no wind, the fog further off, no music) and not over the yard; the Square's
+        /// obsidian bowl (never under the land, fifty feet deep), its mirror and its probe, the red door and its knocker, the debris orbiting; the
+        /// chalk, the willow, the chapel's glass; and the named people looked at with E.
+        /// </summary>
+        [UnityTest, Timeout(300000)] public IEnumerator The_town_is_white_and_still_and_the_square_is_the_books()
+        {
+            var s = Session(); var zone = s.Zone; yield return Frames(10);
+            var motor = s.Player.GetComponent<AdventurerMotor>();
+            // (By the objects' names: the static scenery's batching swaps their meshes.)
+            var all = GameObject.FindObjectsByType<Transform>(FindObjectsSortMode.None);
+            Assert.Greater(all.Count(t => t.name == "Picket fence"), 20, "white picket fences");
+            Assert.Greater(all.Count(t => t.name == "Quartz roses"), 20, "red-quartz roses at the houses");
+            foreach (var n in new[] { "The red door", "The knocker", "The floating marble", "The debris field", "The obsidian bowl", "The mirror floor", "The still reflection", "The chalked equations", "The weeping willow", "The chapel's glass, in the air" })
+                Assert.NotNull(GameObject.Find(n), n + " is built");
+            Assert.NotNull(GameObject.Find("The debris field").GetComponent<Spinner>(), "the debris orbits");
+            Assert.NotNull(GameObject.Find("The still reflection").GetComponent<ReflectionProbe>(), "the mirror's reflection, rendered once");
+            // The bowl: never under the land, and deep (fifty feet, b1 ch.21:134).
+            var bowl = GameObject.Find("The obsidian bowl").GetComponent<MeshFilter>(); float low = float.MaxValue; var under = new List<string>();
+            foreach (var v in bowl.sharedMesh.vertices)
+            {
+                var w = bowl.transform.TransformPoint(v); low = Mathf.Min(low, w.y);
+                if (w.y < zone.HeightAt(w.x, w.z) - .02f) under.Add(w.ToString("0.0"));
+            }
+            var mirror = GameObject.Find("The mirror floor").GetComponent<MeshFilter>(); foreach (var v in mirror.sharedMesh.vertices) low = Mathf.Min(low, mirror.transform.TransformPoint(v).y);
+            Assert.IsEmpty(under, "the land shows through the glass at " + string.Join(", ", under.Take(8)));
+            Assert.Less(low, zone.Datum - 13, "the bowl is fifty feet deep");
+            // The bubble: still on Main Street, the fog further off, no music; the yard outside it.
+            yield return Frames(30);
+            motor.Teleport(zone.Ground(new Vector2(0, -60), .3f)); yield return Frames(30);
+            Assert.AreEqual(1, WorldWeather.Still, .01f, "no wind on Main Street");
+            Assert.AreEqual(ZoneMusic.Silence, ZoneMusic.TracksFor(zone.Zone, s.Player.transform.position, 0, out _), "no music on Main Street");
+            float inside = RenderSettings.fogEndDistance;
+            motor.Teleport(zone.Ground(zone.Zone.spawns.player, .3f)); yield return Frames(30);
+            Assert.AreEqual(0, WorldWeather.Still, .01f, "the yard is outside the bubble");
+            Assert.Greater(inside, RenderSettings.fogEndDistance * 1.3f, "the fog stands further off inside it");
+            // The people, looked at with E.
+            foreach (var n in new[] { EncounterSession.GableName, "Mrs Miller", "Talla", "The crater's rim", "The chalked equations", "The ancient town well", "The chapel's glass" })
+                Assert.IsTrue(zone.Interactables.Exists(i => i.name == n && !string.IsNullOrEmpty(i.text)), n + " is looked at with E");
+            s.UseInteractable(zone.Interactables.Find(i => i.name == "Talla")); yield return null;
+            Assert.IsTrue(s.Messages.Exists(m => m.Contains("TALLA")), "the stone girl is Talla");
+            Assert.IsTrue(s.PausedFolk.Any(f => f != null && f.name == EncounterSession.GableName), "Mr Gable stands in his doorway");
+        }
+
+        /// <summary>
+        /// The bakery's Glitch (b1 ch.21:82-112, 370-454): Mr Gable wakes and holds out his pie; taken ("Take it. Break the loop."), the loop's
+        /// snap leaves him at rest for good: stone, never woken again, kept in the progress.
+        /// </summary>
+        [UnityTest, Timeout(300000)] public IEnumerator Mr_gable_sells_his_pie_in_the_glitch_and_rests_when_it_snaps()
+        {
+            var s = Session(); var zone = s.Zone; yield return Frames(30);
+            Assert.NotNull(s.Gable, "Mr Gable"); Assert.NotNull(s.Pie, "his pie");
+            Assert.Less(Time.time, s.Pie.hiddenUntil, "no pie to take while he is stone");
+            var motor = s.Player.GetComponent<AdventurerMotor>();
+            motor.Teleport(zone.Ground(new Vector2(-6.5f, -76.5f), .3f)); yield return Frames(10);
+            Assert.IsTrue(s.StartEvent(EncounterSession.GlitchEvent)); yield return Frames(5);
+            Assert.IsTrue(s.TownAwake && s.Gable.Awake, "the Glitch wakes him");
+            Assert.GreaterOrEqual(Time.time, s.Pie.hiddenUntil, "the pie is held out");
+            s.UseInteractable(s.Pie); yield return null;
+            Assert.IsTrue(s.Messages.Exists(m => m.Contains("Break the loop")), "Take it. Break the loop.");
+            Assert.IsFalse(s.GableAtRest, "not until the loop snaps");
+            // The loop runs out fast; the Hollow up the trapdoor are put down as they come.
+            EncounterSession.EventSpeed = 30; EncounterSession.SnapWarnSeconds = .3f;
+            for (float w = 0; w < 20 && s.TownAwake; w += Time.deltaTime)
+            {
+                foreach (var e in s.Enemies.ToArray()) if (e != null && e.Camp && e.actor.IsAlive && Vector3.Distance(e.transform.position, s.Player.transform.position) < 40) e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 10);
+                yield return null;
+            }
+            EncounterSession.EventSpeed = 1; EncounterSession.SnapWarnSeconds = 3;
+            Assert.IsFalse(s.TownAwake, "the loop snapped");
+            Assert.IsTrue(s.GableAtRest, "Mr Gable is at rest"); Assert.IsTrue(s.Progress.keys.Contains(EncounterSession.GableKey), "for good");
+            yield return Frames(3);
+            Assert.IsTrue(s.Gable.Stone, "stone"); s.Gable.Wake(); Assert.IsFalse(s.Gable.Awake, "and no Glitch wakes him again");
+            Assert.Less(Time.time, s.Pie.hiddenUntil, "no pie now");
+        }
+
+        /// <summary>Pass close to a paused townsperson and it whispers "Help us" (b1 ch.21:38-40).</summary>
+        [UnityTest] public IEnumerator A_paused_townsperson_whispers_help_us()
+        {
+            var s = Session(); var zone = s.Zone; yield return Frames(70);
+            foreach (var e in s.Enemies.ToArray()) if (e != null && e.Camp && e.actor.IsAlive) e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 10);
+            yield return Frames(5);
+            EncounterSession.WhisperEvery = .1f; EncounterSession.WhisperLineEvery = 0;
+            // One on Main Street's way (out of the gardens), and you a stride from it toward the middle of the street.
+            var f = s.PausedFolk.First(x => x != null && x.Stone && !x.AtRest && Mathf.Abs(x.transform.position.x) < 6 && Mathf.Abs(x.transform.position.z + 40) < 40);
+            var at = new Vector2(f.transform.position.x, f.transform.position.z); at.x += at.x > 0 ? -1.6f : 1.6f;
+            s.Player.GetComponent<AdventurerMotor>().Teleport(zone.Ground(at, .3f));
+            bool heard = false;
+            for (float w = 0; w < 3 && !heard; w += Time.deltaTime) { heard = s.Floating.Exists(t => t.text == "Help us"); yield return null; }
+            Assert.IsTrue(heard, "Help us, over the stone at your shoulder");
+            Assert.IsTrue(s.Messages.Exists(m => m.Contains("Help us")), "and in the chat, the copper taste");
         }
 
         /// <summary>A sim leads the run (DungeonPlan on open ground): road, bridge, street, the Archive, the tower; Tredway's gate opens on the way,

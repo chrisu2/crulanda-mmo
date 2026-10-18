@@ -3658,6 +3658,22 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "name": "The slates' ramp",
+      "style": "stone",
+      "rails": "none",
+      "at": {
+        "x": 56,
+        "y": 70.6
+      },
+      "at2": {
+        "x": 56,
+        "y": 78.8
+      },
+      "rise": -6.0,
+      "rise2": -3.0,
+      "width": 2.2
+    },
+    {
       "name": "The ledge stair (first flight)",
       "style": "stone",
       "rails": "none",
@@ -3841,6 +3857,41 @@
       "look": "door",
       "side": "far",
       "behind": true
+    },
+    {
+      "title": "The stone handcart",
+      "kind": "glitch",
+      "at": {
+        "x": 14,
+        "y": -83
+      },
+      "rotation": 90,
+      "width": 7.2,
+      "look": "cart"
+    },
+    {
+      "title": "The hung slates (foot)",
+      "kind": "glitch",
+      "at": {
+        "x": 56,
+        "y": 71.2
+      },
+      "rotation": 0,
+      "width": 2.4,
+      "rise": -6.0,
+      "look": "slates"
+    },
+    {
+      "title": "The hung slates (head)",
+      "kind": "glitch",
+      "at": {
+        "x": 56,
+        "y": 77.6
+      },
+      "rotation": 0,
+      "width": 2.4,
+      "rise": -3.44,
+      "look": "slates"
     }
   ],
   "anchors": [
@@ -3952,7 +4003,12 @@
       "name": "The Granary on the race",
       "after": "street",
       "exit": "walk",
-      "home": "the wagon"
+      "home": "the wagon",
+      "order": 1,
+      "lord": "Picker-Master Fulke Yelland",
+      "eases": "The tower door watch",
+      "easeCount": 1,
+      "easeText": "Word runs up Main Street ahead of you: the Granary has fallen. One of the Pact's watch at the tower door goes down the Granary road to see, and does not come back."
     },
     {
       "id": "cellars",
@@ -3961,14 +4017,21 @@
       "exit": "walk",
       "home": "the well-house",
       "optional": true,
-      "gate": "The well-house trapdoor"
+      "gate": "The well-house trapdoor",
+      "order": 2,
+      "lord": "First-Cut",
+      "eases": "Kersey's line",
+      "easeCount": 1,
+      "easeText": "Under your feet the Cellars go quiet. In the Bell Tower one of Kersey's line is sent down to the well-house to find out why, and the tower's stair is the thinner for it."
     },
     {
       "id": "archive",
       "name": "The Old Archive",
       "after": "street",
       "exit": "walk",
-      "home": "the Archive's steps"
+      "home": "the Archive's steps",
+      "order": 3,
+      "lord": "Registrar Dunstan Pardew"
     },
     {
       "id": "walk",
@@ -4068,6 +4131,73 @@
           "text": "Two more of the ringers come up the stair, their faces still stone, their hands already on the rope that is not there."
         }
       ]
+    }
+  ],
+  "glitches": [
+    {
+      "id": "cart",
+      "name": "The stone handcart",
+      "look": "cart",
+      "prompt": "Lay a hand on the handcart's wheel",
+      "at": {
+        "x": 11.6,
+        "y": -83
+      },
+      "rotation": 90,
+      "hold": 50,
+      "opens": "The stone handcart",
+      "text": "Under your hand the stone wheel turns. Colour runs up the lane: a man in a carter's apron leans into the shafts, laughing at something over his shoulder, and the handcart rolls on out of the lane between the Reed house and its neighbour, the way it was going fifty years ago.",
+      "endText": "the lane beside the Reed house stays clear, a short way through to the creek and the Granary's footbridge.",
+      "canonStatus": "CANON-EXPANDED (the Glitch: the bakery's bell and a minute of sun, book1 ch.21:82-112; the loop, ch.21:351); this moment GAME-ONLY"
+    },
+    {
+      "id": "slates",
+      "name": "The hung slates",
+      "look": "slates",
+      "prompt": "Touch the nearest of the hung slates",
+      "at": {
+        "x": 56,
+        "y": 69.6
+      },
+      "rise": -6.0,
+      "rotation": 0,
+      "hold": 50,
+      "opens": "The hung slates (foot),The hung slates (head)",
+      "text": "The slate you touch is warm. Sun pours through the broken roof, a slater's voice swears somewhere above, and the slates that have hung in the air for fifty years finish their fall: they land edge over edge on the old shelving and make a ramp of themselves up to the north gallery.",
+      "endText": "the slates' ramp stands, a second way up onto the north gallery.",
+      "canonStatus": "CANON-EXPANDED (the Glitch: the bakery's bell and a minute of sun, book1 ch.21:82-112; the loop, ch.21:351); this moment GAME-ONLY"
+    },
+    {
+      "id": "ford",
+      "name": "The ford's splash",
+      "look": "splash",
+      "prompt": "Put your hand into the stopped splash",
+      "at": {
+        "x": 5,
+        "y": 23
+      },
+      "rotation": 0,
+      "hold": 50,
+      "opens": "The dark cellar door",
+      "text": "The splash runs on. For a minute the creek is loud and brown and moving, and then it drops, a metre and more, as if something upstream had taken a breath; along the west bank the water drains out of the dark cellar's crawl and its door stands clear of the mud, open.",
+      "endText": "the dark cellar's door stands open on the drained crawl, a way into the Cellars from the town.",
+      "canonStatus": "CANON-EXPANDED (the Glitch: the bakery's bell and a minute of sun, book1 ch.21:82-112; the loop, ch.21:351); this moment GAME-ONLY"
+    },
+    {
+      "id": "well-boy",
+      "name": "The well-boy",
+      "look": "boy",
+      "prompt": "Touch the running boy's shoulder",
+      "at": {
+        "x": -27.5,
+        "y": 54
+      },
+      "rotation": 200,
+      "hold": 50,
+      "opens": "The well-house trapdoor",
+      "text": "The boy finishes his run. He is nine, perhaps, freckled, a brass key on a string round his wrist, and he skids into the well-house shouting for his mother, drops the key into the trapdoor's lock and turns it, the way he was sent to. The bar beneath lifts with a knock.",
+      "endText": "the well-house trapdoor stands unbarred, a way down into the Cellars from above.",
+      "canonStatus": "CANON-EXPANDED (the Glitch: the bakery's bell and a minute of sun, book1 ch.21:82-112; the loop, ch.21:351); this moment GAME-ONLY"
     }
   ],
   "camps": [

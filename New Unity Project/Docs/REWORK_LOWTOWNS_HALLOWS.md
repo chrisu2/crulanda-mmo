@@ -389,8 +389,24 @@ Sizes: **S** a day or less, mostly data; **M** two or three days, some new code;
    - the **bell-ringer's boy** at the tower door finishes his run and drops a key: the tower's side door, a second way up.
    Anyone still standing in a Glitch's ring when it snaps is paused (built: the books' "trapped in there"). The four moments are
    GAME-ONLY. New: a gate or deck an event opens (S), water raised by an event (M).
+   **Built 2026-10-18 (branch rw3-glitch; compiles, not yet run in Unity):** four Glitch spots (zone data `glitches`,
+   EncounterSession.HallowsGlitch): E on the thing, or the Waking Hour's bell, gives its 50 s of colour round it and opens its way for the
+   visit (never shuts one). The **stone handcart** in the lane north of the Reed house (14,-83) rolls on and opens the lane toward the
+   footbridge; the **hung slates** in the Archive (the build's own roof-fall) drop and open a slate ramp from the reading floor up to the
+   north gallery at (56,70-79), past the archivist's page; the **ford's splash** at the ford runs on, the creek drops and the **dark cellar
+   door** stands open (a way into the Cellars from town); the **well-boy** at the well-house drops the key and the **well-house
+   trapdoor** is unbarred from above (a second way down; it no longer bars behind that visit). Changed from the plan above: the tower's
+   side door is left out (a second way up the tower would let the party past the Warden's ward), and the creek's water is not moved, only
+   told (no ground or water heights touched: another worktree reshapes the valley). The minute's end is gentle (no snap rings). The
+   leader needs nothing new: the Glitch gates are navmesh carves, so a sim's path takes an opened way when it is shorter and never needs one.
 2. **Choose the wing first (S). GAME-ONLY.** From the Square the Granary, the Cellars and the Archive open together, signposted; the
    Granary down takes the Pact wave off the belfry stair, the Cellars down the Hollow wave; the Archive is needed (the Warden).
+   **Built 2026-10-18 (rw3-glitch; compiles, not run):** ZoneWing.order (Granary 1, Cellars 2, Archive 3: the leader's fixed order
+   among the open wings, a cleared wing skipped), ZoneWing.lord (the Picker-Master, First-Cut, Registrar Pardew) and eases: the
+   Granary's fall sends one of the tower door watch away, the Cellars' one of Kersey's line (never a camp's last; a lord already down
+   under the lockout counts from the start). The walk's waves still drop as before (ZoneWave.unless). The chat says "Two wings stand
+   between you and the tower" as the Square opens and as each lord falls. The Archive takes nothing off (it is always done: it would
+   only be a rebalance of every run). No dungeon-panel line yet: chat only.
 3. **The people of chapters 19 and 21 (S). CANON.** **Gable's pie**: in the bakery's Glitch, take the pie he holds out ("Take it. Break
    the loop.", ch.21:442) and the loop ends for him: his shell cracks and he is still at last (the books' wish; "break the shell, kill
    the soul", ch.17:67, made mercy). **Martha** calls from the back (ch.21:386). **Mrs Miller** at her rigid laundry (ch.21:376). The

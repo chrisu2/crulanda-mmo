@@ -172,6 +172,7 @@ namespace Crulanda.Encounter
                 case "stone": return Progress.spiritStones.Contains(i.Key(Zone.Zone.id)) ? "The spirit stone hums" : i.prompt;
                 case "weaver": return Weaver != null && Weaver.Now == AditWeaver.Stage.Waiting ? "Talk to " + AditWeaver.Name + " (walk her to the carriage)" : i.prompt;
                 case "carriage": return RideAllowed ? i.prompt + " (one ride out)" : "The carriage is loading: its lock still sings";
+                case GlitchSpotKind: return GlitchPrompt(i);   // (Hallow's Creek, pick 9) a Glitch that changes the way (EncounterSession.HallowsGlitch)
                 case "ride": case "ward": case "warden": case "pen": case "bar": case "hiddendoor": return HallowsPrompt(i);   // (Hallow's Creek, and the hand-worked gates: EncounterSession.Hallows.cs)
                 // (S6) Nothing to cut once the haul is over: a line saying how she lies (a null here fell back to the prop's own "Cut the
                 // warps", R132), and the bollards are no longer offered (EncounterSession.Haul.HideWarps).
@@ -211,6 +212,8 @@ namespace Crulanda.Encounter
                 case "warden": return TalkToWarden(i);
                 // (Hallow's Creek's people and places, EncounterSession.Hallows) Gable's pie in the Glitch; a paused townsperson or a place looked at.
                 case "pie": TakeThePie(); return true;
+                // (Hallow's Creek, pick 9) a Glitch spot set going by hand (EncounterSession.HallowsGlitch)
+                case GlitchSpotKind: return UseGlitchSpot(i);
                 // (Hallow's Creek, pick 6) the anchor-well in the Cellars (EncounterSession.HollowCellars; b1 ch.4:191-245)
                 case HollowRules.WellKind: UseWell(i); return true;
                 case "paused": case "look": return LookAtHallows(i);

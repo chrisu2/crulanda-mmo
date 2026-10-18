@@ -136,6 +136,8 @@ namespace Crulanda.Tests
                     case "bossdoor": if (!elites.Contains(g.opensOn ?? "")) bad.Add(g.title + " opens on '" + g.opensOn + "', no elite"); break;
                     case "pen": case "bar": case "hiddendoor": if (string.IsNullOrEmpty(g.prompt)) bad.Add(g.title + " is worked by hand and has no prompt"); break;
                     case "ward": break;   // the Warden unbinds it (EncounterSession.Hallows)
+                    // (Pick 9) a Glitch opens it, so a Glitch must name it
+                    case "glitch": if (!(zone.glitches ?? new ZoneGlitch[0]).Any(x => (x.opens ?? "").Split(',').Select(t => t.Trim()).Contains(g.title))) bad.Add(g.title + " is a Glitch's way that no Glitch opens"); break;
                     default: bad.Add(g.title + " is of kind '" + g.kind + "'"); break;
                 }
                 if (!string.IsNullOrEmpty(g.opensOn) && !elites.Contains(g.opensOn)) bad.Add(g.title + " opens on '" + g.opensOn + "'");
@@ -395,6 +397,78 @@ namespace Crulanda.Tests
             foreach (var p in zone.props.Where(p => !string.IsNullOrEmpty(p.canonStatus)))
                 if (!Regex.IsMatch(p.canonStatus, @"^(CANON|CANON-EXPANDED|GAME-ONLY)")) bad.Add(p.name + ": '" + p.canonStatus + "'");
             Clean(bad, "the town as the books write it");
+        }
+
+        /// <summary>
+        /// (Docs/REWORK_LOWTOWNS_HALLOWS.md pick 9, CANON-EXPANDED: b1 ch.21:82-112, 351) Four Glitches besides the bakery's, each a resonant
+        /// thing with its minute's words, each opening a way and never shutting one: the ways it names are Glitch gates (shut only until it
+        /// goes) or a hand-worked door (the dark cellar's, the well-house trapdoor), never a door the run must have opened its own way (a boss's
+        /// door, the ward-lock, the Warden's cell). The slates' ramp lands on the north gallery at its height.
+        /// </summary>
+        [Test] public void Four_glitches_open_ways_and_shut_none()
+        {
+            var bad = new List<string>(); var glitches = zone.glitches ?? new ZoneGlitch[0];
+            Assert.AreEqual(4, glitches.Length, "the handcart, the slates, the ford's splash and the well-boy");
+            CollectionAssert.AreEquivalent(new[] { "cart", "slates", "splash", "boy" }, glitches.Select(g => g.look).ToArray());
+            foreach (var g in glitches)
+            {
+                if (string.IsNullOrEmpty(g.id) || string.IsNullOrEmpty(g.name) || string.IsNullOrEmpty(g.prompt) || string.IsNullOrEmpty(g.text) || string.IsNullOrEmpty(g.endText)) bad.Add((g.id ?? "?") + " lacks its words");
+                if (g.canonStatus == null || !g.canonStatus.StartsWith("CANON-EXPANDED") || !g.canonStatus.Contains("ch.21")) bad.Add(g.id + " is not labelled CANON-EXPANDED with its chapter");
+                if (g.hold < 40 || g.hold > 60) bad.Add(g.id + "'s minute is " + g.hold + " s (40-60)");
+                var opens = (g.opens ?? "").Split(',').Select(t => t.Trim()).Where(t => t.Length > 0).ToList();
+                if (opens.Count == 0) bad.Add(g.id + " opens nothing");
+                foreach (var t in opens)
+                {
+                    var gate = zone.gates.FirstOrDefault(x => x.title == t);
+                    if (gate == null) { bad.Add(g.id + " opens '" + t + "', no gate"); continue; }
+                    if (gate.kind != "glitch" && gate.kind != "hiddendoor" && gate.kind != "bar") bad.Add(g.id + " opens " + t + ", a " + gate.kind + " the run opens its own way");
+                    if (zone.camps.Any(c => c.gate == t)) bad.Add(t + " is a camp's way in: a Glitch must not be the only way");
+                }
+            }
+            // A Glitch gate is shut only until its Glitch goes: no camp waits behind one, no wing goes out through one.
+            foreach (var gate in zone.gates.Where(x => x.kind == "glitch"))
+                if (zone.wings.Any(w => w.gate == gate.title)) bad.Add(gate.title + " is a wing's way out");
+            var ramp = zone.decks.Single(d => d.name == "The slates' ramp"); var gallery = zone.decks.Single(d => d.name == "The north gallery");
+            Assert.AreEqual(gallery.rise, ramp.rise2, .01f, "the ramp's head at the gallery's height");
+            Assert.AreEqual(gallery.at.y - gallery.width / 2, ramp.at2.y, .05f, "the ramp's head on the gallery's south edge");
+            Assert.Greater(ramp.at2.x, gallery.at.x + ramp.width / 2, "within the gallery's length");
+            Clean(bad, "glitches");
+        }
+
+        /// <summary>
+        /// (Pick 11, "Choose the wing first", GAME-ONLY) The Granary, the Cellars and the Archive open together after Main Street, in the
+        /// leader's fixed order; each has a lord, and the two side wings each thin a tower camp (never to nothing). A wing cleared before the
+        /// leader gets there is skipped: the standard run with the Granary already cleared goes straight to the Archive and still ends at the
+        /// Examiner.
+        /// </summary>
+        [Test] public void The_wings_open_together_and_each_eases_the_tower()
+        {
+            var bad = new List<string>();
+            var three = new[] { "granary", "cellars", "archive" }.Select(id => zone.wings.Single(w => w.id == id)).ToList();
+            foreach (var w in three)
+            {
+                if (w.after != "street") bad.Add(w.id + " opens after '" + w.after + "', not Main Street");
+                if (!zone.camps.Any(c => c.wing == w.id && c.elite && c.mob == w.lord)) bad.Add(w.id + "'s lord '" + w.lord + "' is no elite of the wing");
+            }
+            CollectionAssert.AreEqual(new[] { 1, 2, 3 }, three.Select(w => w.order).ToArray(), "Granary, Cellars, Archive");
+            foreach (var w in three.Where(w => !string.IsNullOrEmpty(w.eases)))
+            {
+                var camp = zone.camps.SingleOrDefault(c => c.name == w.eases);
+                if (camp == null || camp.wing != "tower") bad.Add(w.id + " eases '" + w.eases + "', no tower camp");
+                else if (camp.count <= w.easeCount) bad.Add(w.id + " would empty " + camp.name);
+                if (string.IsNullOrEmpty(w.easeText)) bad.Add(w.id + " eases the tower without a word");
+            }
+            Assert.AreEqual(2, three.Count(w => !string.IsNullOrEmpty(w.eases)), "the Granary and the Cellars each take one off the tower");
+            Clean(bad, "wings");
+            Vector3 CampAt(int c) { var cp = zone.camps[c]; return new Vector3(cp.center.x, cp.rise, cp.center.y); }
+            Vector3? AnchorAt(string n) { var a = zone.anchors.FirstOrDefault(x => x.name == n); if (a == null) return null; return string.IsNullOrEmpty(a.cave) ? new Vector3(a.at.x, a.rise, a.at.y) : caves[a.cave].At(a.along, a.aside); }
+            var order = new List<string>();
+            var run = DungeonPlan.Plan(zone, DungeonPlan.Mode.Standard, new Vector3(zone.spawns.player.x, 0, zone.spawns.player.y), CampAt, AnchorAt, Vector3.Distance, c => zone.camps[c].wing != "granary", c => false, order);
+            CollectionAssert.DoesNotContain(order, "The Granary on the race", "a cleared Granary is skipped");
+            Assert.IsTrue(run.Last(s => !s.regroup).camps.Any(i => zone.camps[i].mob == EncounterSession.ExaminerName), "and the run still ends with the Examiner");
+            Assert.Less(order.IndexOf("The Old Archive"), order.IndexOf("The Bell Tower"));
+            var fresh = new List<string>(); DungeonPlan.Plan(zone, DungeonPlan.Mode.Standard, new Vector3(zone.spawns.player.x, 0, zone.spawns.player.y), CampAt, AnchorAt, Vector3.Distance, c => true, c => false, fresh);
+            Assert.Less(fresh.IndexOf("The Granary on the race"), fresh.IndexOf("The Old Archive"), "the standard run: the Granary, then the Archive");
         }
 
         [Test] public void No_machines_and_vala_solari_named_once()

@@ -298,6 +298,48 @@ namespace Crulanda.Tests
         }
 
         /// <summary>
+        /// Pick 9, the Glitches that change the way (CANON-EXPANDED, b1 ch.21:82-112, 351): every way a Glitch gate shuts has a way round
+        /// it while it stands (a Glitch never holds the run up); E at the stone handcart sets its minute going (the town awake round it)
+        /// and the lane opens, shorter than the way round; the hung slates fall into a ramp onto the Archive's north gallery, shorter than
+        /// the apse stair. The ways stay open after the minute; the gates are shut again after for the tests that follow.
+        /// </summary>
+        [UnityTest, Timeout(300000)] public IEnumerator Glitches_open_shorter_ways_and_never_the_only_one()
+        {
+            var s = Session(); var zone = s.Zone; yield return Frames(30);
+            float Walk(Vector3 a, Vector3 b)
+            {
+                var path = new NavMeshPath();
+                if (!NavMesh.SamplePosition(a, out var ha, 3, NavMesh.AllAreas) || !NavMesh.SamplePosition(b, out var hb, 3, NavMesh.AllAreas)) return -1;
+                if (!NavMesh.CalculatePath(ha.position, hb.position, NavMesh.AllAreas, path) || path.status != NavMeshPathStatus.PathComplete) return -1;
+                float d = 0; for (int k = 1; k < path.corners.Length; k++) d += Vector3.Distance(path.corners[k - 1], path.corners[k]);
+                return d;
+            }
+            var cart = zone.Gates.Find(g => g != null && g.Title == "The stone handcart"); var foot = zone.Gates.Find(g => g != null && g.Title == "The hung slates (foot)");
+            var head = zone.Gates.Find(g => g != null && g.Title == "The hung slates (head)");
+            Assert.NotNull(cart, "the handcart"); Assert.NotNull(foot, "the slates at the ramp's foot"); Assert.NotNull(head, "and at its head");
+            Assert.IsFalse(cart.Open || foot.Open || head.Open, "shut until a Glitch");
+            Vector3 street = zone.Ground(new Vector2(6, -83), .1f), behind = zone.Ground(new Vector2(24, -83), .1f);
+            Vector3 floor = new Vector3(56, zone.Datum + Valley + 2.1f, 68.5f), gallery = new Vector3(56, zone.Datum + Valley + 5.1f, 80.2f);
+            float roundCart = Walk(street, behind), roundStair = Walk(floor, gallery);
+            Assert.Greater(roundCart, 0, "a way round the handcart while it stands"); Assert.Greater(roundStair, 0, "the apse stair up to the gallery while the slates hang");
+            var cartGlitch = zone.Zone.glitches.Single(g => g.look == "cart"); var slatesGlitch = zone.Zone.glitches.Single(g => g.look == "slates");
+            float holdCart = cartGlitch.hold, holdSlates = slatesGlitch.hold; cartGlitch.hold = slatesGlitch.hold = 5;
+            var spot = zone.Interactables.Find(i => i.kind == EncounterSession.GlitchSpotKind && i.name == cartGlitch.name); Assert.NotNull(spot, "E at the handcart");
+            s.UseInteractable(spot); yield return Frames(5);
+            Assert.IsTrue(cart.Open, "the handcart rolls out of the lane"); Assert.IsTrue(s.TownAwake, "a minute of colour round it");
+            Assert.IsTrue(s.FireGlitch(slatesGlitch, false) || foot.Open, "the slates fall");
+            yield return new WaitForSeconds(.6f);
+            float lane = Walk(street, behind), ramp = Walk(floor, gallery);
+            Debug.Log("HallowsNavTests: round the handcart " + roundCart.ToString("0.0") + " m, through the lane " + lane.ToString("0.0") + " m; up the apse stair " + roundStair.ToString("0.0") + " m, up the slates' ramp " + ramp.ToString("0.0") + " m");
+            Assert.Greater(lane, 0); Assert.Less(lane, roundCart - 3, "the lane is the shorter way");
+            Assert.Greater(ramp, 0); Assert.Less(ramp, roundStair - 3, "the ramp is the shorter way up");
+            for (float w = 0; w < 8 && s.TownAwake; w += Time.deltaTime) yield return null;
+            Assert.IsFalse(s.TownAwake, "the minute ends"); Assert.IsTrue(cart.Open && foot.Open && head.Open, "and the ways stay open");
+            cartGlitch.hold = holdCart; slatesGlitch.hold = holdSlates;
+            cart.SetOpen(false, true); foot.SetOpen(false, true); head.SetOpen(false, true);
+        }
+
+        /// <summary>
         /// The bakery's Glitch (b1 ch.21:82-112, 370-454): Mr Gable wakes and holds out his pie; taken ("Take it. Break the loop."), the loop's
         /// snap leaves him at rest for good: stone, never woken again, kept in the progress.
         /// </summary>

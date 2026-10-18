@@ -813,3 +813,9 @@ un-captures.
   (debuffs on the same row, after the helps), and the name, time and effect ("+6 Stamina, +4 Agility") on hover. Party rows sit beside
   each frame and are no wider than it (six fit: `BuffIconTests`); more than fit end in a "+N" square. Your own row is at the top, right
   of the target frame (twelve).
+- 232 (2026-10-18 ~18:10-18:20) Asked the Modular Hero pack's name: "GanzSe FREE Modular Character - Fantasy Low Poly Pack"; "i dont
+  see chosan pack anywhere"; chose "GanzSe (Recommended)" for Phase 8.5 and "Gear overhaul now (Recommended)" (ROADMAP Phase 8.5).
+- 233 (2026-10-18 ~18:15) "in downloads use this for some different monsters. Bestiary - Dungeon Monsters Kit[Standard]" (OPEN):
+  Quaternius's free Bestiary (QAL licence: free use in the game, no credit needed, no reselling the files): the Imp and the Puglin, three
+  colourings each, rigged on the UE-style skeleton our clips drive, no clips of their own. Names and places in the game to follow the
+  books (label each), not the kit's names.

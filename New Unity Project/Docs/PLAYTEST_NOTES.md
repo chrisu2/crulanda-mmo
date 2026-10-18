@@ -839,3 +839,4 @@ un-captures.
   drawn caps and bands sit on top. Phase 8.5: helms and gauntlets from the pack's angular pieces, no round drawn ones.
 - 240 (2026-10-18 ~20:15, on the GanzSe line-up beside today's figures) "i dont like the new characters": GanzSe's bodies are out;
   the p85-ganzse work stops (ROADMAP Phase 8.5).
+  Then (verbatim): "the old ones were better". Today's figures (Quaternius) stay; Phase 8.5 goes on with note 239 on them.

@@ -26,6 +26,38 @@ namespace Crulanda.Encounter
         /// <summary>What your last buff-up used, for the run's log ("Pass-fire feast (5 fed), Scree salve, Sworn to the Colours on 5").</summary>
         public string PlayerBuffNote { get; private set; }
 
+        /// <summary>The party's wipes so far this session (Recover with no fight left going on). Dying clears the buffs, so a leader whose boss
+        /// was buffed for before a wipe stops to buff up again before the next pull (2026-10-18; SimCompanion.BuffPending).</summary>
+        public int Wipes { get; private set; }
+        /// <summary>Counts a wipe (Recover; a test's).</summary>
+        public void CountWipe() { Wipes++; }
+        /// <summary>
+        /// Whether a buff-up would give the party anything (a stop again after a wipe is made only then, 2026-10-18): a living member lacks
+        /// the standing buff of a class in the party (yours or a sim's), or a sim lacks its meal or its elixir and carries one (or a feast
+        /// is carried), or you lack yours and carry one.
+        /// </summary>
+        public bool PartyWantsBuffs()
+        {
+            float now = Time.time;
+            if (Player != null && Player.IsAlive)
+            {
+                var mine = Kit != null ? Kit.PartyBuff : null; if (mine != null && WantsClassBuff(mine, Player)) return true;
+                var st = Player.GetComponent<Combatant>()?.Statuses; var carried = Carried();
+                if (st != null && BossBuffs.Wants(st, Consumables.FedId, now) && (BossBuffs.PickFeast(carried) ?? BossBuffs.PickDish(carried)) != null) return true;
+                var elixir = BossBuffs.PickElixir(PlayerRole, BossBuffs.MainStat(ClassDef != null ? ClassDef.id : null), carried);
+                if (st != null && elixir != null && BossBuffs.Wants(st, Consumables.StatusId(elixir.buff), now)) return true;
+            }
+            foreach (var c in PartySims)
+            {
+                if (c == null || c.actor == null || !c.actor.IsAlive) continue;
+                var cb = ClassBuffs.For(c.sim.classId); if (cb != null && WantsClassBuff(cb, c.actor)) return true;
+                var st = c.GetComponent<Combatant>()?.Statuses; if (st == null) continue; var carried = c.Carried();
+                if (BossBuffs.Wants(st, Consumables.FedId, now) && (BossBuffs.PickFeast(carried) ?? BossBuffs.PickDish(carried)) != null) return true;
+                var elixir = BossBuffs.PickElixir(c.Role, BossBuffs.MainStat(c.sim.classId), carried);
+                if (elixir != null && BossBuffs.Wants(st, Consumables.StatusId(elixir.buff), now)) return true;
+            }
+            return false;
+        }
         /// <summary>A leader stops to buff up: the stop's number.</summary>
         public int BeginBuffStop(SimCompanion leader) { BuffStop++; BuffLeader = leader; BuffStopSince = Time.time; return BuffStop; }
         public void EndBuffStop(SimCompanion leader) { if (BuffLeader == leader) BuffLeader = null; }

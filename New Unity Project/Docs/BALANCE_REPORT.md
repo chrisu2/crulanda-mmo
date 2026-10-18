@@ -580,3 +580,26 @@ of 51.5. That is its own blows (37.5) with nothing from its thrall: the thrall's
 where the thrall rose, or being held off just beyond its 2.2 m reach. Either way the keeper fell under its band.
 Fixed in the game (`RangerPet`): a sim's pet that has hunted for 5 s without a bite is put beside its quarry, on the navmesh, and bites.
 That covers the wolf as well. Your own pets are unchanged.
+
+## Pets beside their quarry, and buffing up again after a wipe (2026-10-18)
+
+**A Scoundrel shoved out of reach (SimDummyTests, 2026-10-17).** The level-15 Scoundrel landed 60.7 a second against its band of
+64.3-68.2; the rest passed. Suspected, not watched: the 2026-10-17 fix put the Mage's bone thrall 1.4 m off the dummy on the side it came
+from, about 1 m from the Scoundrel (1.6 m off the dummy at 40 degrees), and the two shoved the Scoundrel out of its 2.4 m reach.
+Fixed in the game (`RangerPet.WarpSpot`): the pet is put on a ring round its quarry (12 angles, 1.2-1.6 m), on the navmesh at the
+quarry's floor, at least 1.1 m from you, every party sim, Mira and the other pets, the far side from the party first. Test:
+`PetWarpSpotTests` (EditMode).
+
+**Why the thrall never got there.** A pet's agent stopped 1.9 m short of where its path ends (its width's stopping distance), and its bite
+reaches 2.2 m from the quarry's middle. Where the ground is cut away round the quarry (a dummy's post, a boss's dais) the path ends short
+of it, and the pet stood just past its bite for good. A pet's agent now stops at 0.9 m (about its width and the quarry's); it still halts at
+2.2 m to bite. This is for every pet, your own wolf and thrall too. The 5 s warp stays as a fallback.
+
+**Buffing up again after a wipe.** The leader stopped to buff up once a boss, and dying clears the buffs, so after a wipe the party pulled
+the boss bare. Now a wipe (you wake with no fight going on) is counted, and a boss already buffed for is owed a stop again: the leader
+says "Buff up again", every sim takes its turn from what it still carries, the run bot buffs, and the log reads "buff up before <boss>
+(N m short) (again, after a wipe)". If nobody would gain anything (every class's buff on, no meal or elixir to take), no stop is made.
+Once per wipe. Tests: `BossBuffTests.After_a_wipe_the_party_buffs_up_again_before_the_boss` and
+`A_wipe_with_nothing_to_take_is_not_stopped_for_again`.
+
+Not run in Unity yet: `SimDummyTests.The_other_damage_sims_sustain_theirs`, `PetWarpSpotTests`, `BossBuffTests`.

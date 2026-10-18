@@ -991,14 +991,17 @@ namespace Crulanda.Encounter
         /// Scree salve, Sworn to the Colours on 5").</summary>
         public int BuffedStop { get; private set; } = -1;
         public string BuffNote { get; private set; }
-        object buffDoneFor, leadKey; bool leadElite; float buffSince, drawBackSince = -1, nextEdge, healthEdge; int buffStop; Vector3 drawBackTo;
+        object buffDoneFor, leadKey; bool leadElite; float buffSince, drawBackSince = -1, nextEdge, healthEdge; int buffStop, buffWipes; Vector3 drawBackTo;
+        /// <summary>This stop is a second one for the same boss, after a wipe (dying cleared the buffs): said so in Party and in the run's log.</summary>
+        public bool BuffAgain { get; private set; }
         Combatant combatant; readonly object edgeSource = new object();
         StatusEffectRuntime Statuses { get { if (combatant == null) combatant = GetComponent<Combatant>(); return combatant != null ? combatant.Statuses : null; } }
         /// <summary>The step it leads to now is a boss's or an elite camp's (a dungeon's step with an elite among its camps; a run to an elite).</summary>
         bool StepIsBoss { get { return route.Count > 0 ? !route[0].regroup && route[0].boss : leadElite; } }
         object StepKey { get { return route.Count > 0 ? route[0] : leadKey; } }
         /// <summary>A boss or an elite camp ahead that the party has not yet buffed up for: nothing of it is pulled meanwhile.</summary>
-        public bool BuffPending { get { return Leading.HasValue && waitingAt == null && StepIsBoss && StepKey != null && buffDoneFor != StepKey; } }
+        /// <remarks>Buffed for once, it is owed again after a wipe (2026-10-18: the party woke unbuffed and pulled the boss bare).</remarks>
+        public bool BuffPending { get { return Leading.HasValue && waitingAt == null && StepIsBoss && StepKey != null && (buffDoneFor != StepKey || buffWipes != session.Wipes); } }
         /// <summary>
         /// The stop (in the leading, once the party is up with it): within <see cref="BossBuffs.StopShort"/> of a boss's or an elite camp it
         /// stops and says "buff up" in Party, nearer than <see cref="BossBuffs.StopMin"/> it first draws back to that distance (eight seconds at
@@ -1012,7 +1015,7 @@ namespace Crulanda.Encounter
                 float since = Time.time - buffSince;
                 bool done = session.InCombat || since >= BossBuffs.StopWait || (since >= BossBuffs.StopAtLeast && session.PartyBuffed(buffStop));
                 if (!done) { Activity = "Buffing up for " + ThePlace; agent.isStopped = true; return true; }
-                BuffingUp = false; buffDoneFor = StepKey; session.EndBuffStop(this);
+                BuffingUp = false; buffDoneFor = StepKey; buffWipes = session.Wipes; session.EndBuffStop(this);
                 if (!session.InCombat) session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "ok, pulling" : "Ready. I'm pulling " + ThePlace + ".");
                 return false;
             }
@@ -1020,6 +1023,9 @@ namespace Crulanda.Encounter
             float along = toCamp;
             if (!legging && agent.hasPath && !agent.pathPending && (leadDest - Leading.Value).sqrMagnitude < 1 && !float.IsInfinity(agent.remainingDistance)) along = Mathf.Max(toCamp, agent.remainingDistance);
             if (!BuffPending || session.InCombat || along > BossBuffs.StopShort) { drawBackSince = -1; return false; }
+            // Again after a wipe only when it would give the party something (a class's buff, or a meal or an elixir someone still carries).
+            bool again = buffDoneFor == StepKey;
+            if (again && !session.PartyWantsBuffs()) { buffWipes = session.Wipes; drawBackSince = -1; return false; }
             // Come in nearer than the stop (a step that begins close by the last fight): it draws back the way it faces from the camp to the stop's
             // distance first, where the paths go there, eight seconds at most; else it stops where it stands.
             if (along < BossBuffs.StopMin && (drawBackSince < 0 || Time.time - drawBackSince < 8))
@@ -1041,9 +1047,11 @@ namespace Crulanda.Encounter
                 }
             }
             drawBackSince = -1;
+            BuffAgain = again;
             BuffingUp = true; buffSince = Time.time; buffStop = session.BeginBuffStop(this); agent.isStopped = true;
             Activity = "Buffing up for " + ThePlace;
-            session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "buff up, " + (LeadingName ?? "boss").ToLower() + " next" : "Buff up before " + ThePlace + ". Eat, drink, and lay your blessings on us.");
+            if (again) session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "buff up again, " + (LeadingName ?? "boss").ToLower() + " next" : "Buff up again before " + ThePlace + ". We lost our blessings when we fell.");
+            else session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "buff up, " + (LeadingName ?? "boss").ToLower() + " next" : "Buff up before " + ThePlace + ". Eat, drink, and lay your blessings on us.");
             return true;
         }
         /// <summary>The consumables it carries: its goods (what it made and what it bought: SimEconomy.Stock).</summary>

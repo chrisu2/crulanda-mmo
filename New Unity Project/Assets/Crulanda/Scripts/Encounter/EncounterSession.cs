@@ -2419,6 +2419,8 @@ namespace Crulanda.Encounter
             // "a mob on a living member": at your death Nix was on you, and the three sims beside him at 7% were pulled out (R150).
             bool InIt(EncounterEnemy e) { return e != null && e.actor.IsAlive && (e.Victim != null || e.threat.Any) && PartyNear(e); }
             bool fighting = Enemies.Exists(InIt);
+            // A wipe (nobody left in a fight): the buffs went with the deaths, and the leader stops to buff up again before the boss.
+            if (!fighting) CountWipe();
             Player.Health.Revive(Player.Health.Pool.Max);
             // (Chris, 2026-10-16) In a dungeon, the latest checkpoint reached this visit; else the spirit stone or the zone's camp.
             Player.GetComponent<AdventurerMotor>().Teleport(RecoverAt);

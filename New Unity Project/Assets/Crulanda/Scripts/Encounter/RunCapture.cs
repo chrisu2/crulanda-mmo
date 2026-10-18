@@ -158,7 +158,7 @@ namespace Crulanda.Encounter
                 // A buff-up before a boss (BossBuffs): the bot buffs from its bags as you would (/buff), and every member's buffing is on the record.
                 if (s.BuffingUp && botBuffed != s.BuffStop)
                 {
-                    botBuffed = s.BuffStop; buffStops++; Log(Clock(t) + "  buff up before " + leader.LeadingName + " (" + Vector3.Distance(leader.transform.position, leader.Leading ?? leader.transform.position).ToString("0") + " m short)");
+                    botBuffed = s.BuffStop; buffStops++; Log(Clock(t) + "  buff up before " + leader.LeadingName + " (" + Vector3.Distance(leader.transform.position, leader.Leading ?? leader.transform.position).ToString("0") + " m short)" + (leader.BuffAgain ? " (again, after a wipe)" : ""));
                     var used = s.BuffUp(); Log(Clock(t) + "  buffed: you: " + (used.Count > 0 ? string.Join(", ", used) : "nothing needed"));
                 }
                 foreach (var c in s.PartySims)

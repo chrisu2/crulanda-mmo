@@ -1,3 +1,5 @@
+using System;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 using Crulanda.Gameplay;
@@ -58,11 +60,67 @@ namespace Crulanda.Encounter
         /// its keeper's damage, so a pet that never arrives leaves its keeper under its band).</summary>
         public const float NoBiteWarp = 5;
         float huntSince = -1, lastBiteAt = -1;
+        /// <summary>Its agent's stopping distance: about its own width and its quarry's, well inside BiteReach.</summary>
+        public const float HuntStop = .9f;
+        /// <summary>Where a warped pet may stand: on a ring round its quarry, no nearer than this to anyone of the party (or you).</summary>
+        public const float WarpRingNear = 1.2f, WarpRingFar = 1.6f, WarpClear = 1.1f;
+        const int WarpAngles = 12;
+
+        /// <summary>
+        /// The spot a stuck pet is put on (2026-10-18): one of 12 angles at 1.2, 1.4 or 1.6 m round its quarry, on the floor
+        /// (<paramref name="floor"/>: the navmesh point there, or null), none within WarpClear of <paramref name="others"/> (the party, you,
+        /// the other pets), the far side from them first. The first fix (2026-10-17) put it 1.4 m off on the side it came from, which in
+        /// SimDummyTests was about 1 m from the Scoundrel at the dummy: the two shoved each other and the Scoundrel was pushed out of reach.
+        /// </summary>
+        public static bool WarpSpot(Vector3 quarry, IList<Vector3> others, Func<Vector3, Vector3?> floor, out Vector3 spot)
+        {
+            spot = quarry;
+            // Away from the party: from the middle of them to the quarry.
+            var away = Vector3.zero; int n = 0;
+            if (others != null) foreach (var o in others) { var d = quarry - o; d.y = 0; if (d.sqrMagnitude > .0001f) { away += d.normalized; n++; } }
+            if (n > 0) away.Normalize();
+            float best = float.NegativeInfinity; bool found = false;
+            for (int i = 0; i < WarpAngles; i++)
+            {
+                var dir = Quaternion.Euler(0, i * 360f / WarpAngles, 0) * Vector3.forward;
+                for (float r = WarpRingNear; r <= WarpRingFar + .001f; r += .2f)
+                {
+                    var on = floor(quarry + dir * r); if (!on.HasValue) continue;
+                    var at = on.Value; bool crowded = false; float nearest = float.PositiveInfinity;
+                    if (others != null) foreach (var o in others)
+                    {
+                        var d = at - o; d.y = 0; float m = d.magnitude;
+                        if (m < WarpClear) { crowded = true; break; }
+                        nearest = Mathf.Min(nearest, m);
+                    }
+                    if (crowded) continue;
+                    // The far side first, then room from the nearest, then the nearer ring (a bite's reach is measured from the middle).
+                    float score = Vector3.Dot(dir, away) * 10 + Mathf.Min(nearest, 3) - r * .5f;
+                    if (score > best) { best = score; spot = at; found = true; }
+                }
+            }
+            return found;
+        }
+        /// <summary>Everyone the warped pet keeps clear of: you, the party sims, Mira and the other pets.</summary>
+        List<Vector3> Crowd()
+        {
+            var list = new List<Vector3>();
+            if (session.Player != null) list.Add(session.Player.transform.position);
+            if (session.Companion != null) list.Add(session.Companion.transform.position);
+            foreach (var c in session.PartySims) if (c != null && c.actor != null && c.actor.IsAlive) list.Add(c.transform.position);
+            foreach (var p in session.SimPets) if (p != null && p != this && p.actor != null && p.actor.IsAlive) list.Add(p.transform.position);
+            if (session.Pet != null && session.Pet != this && session.Pet.actor != null && session.Pet.actor.IsAlive) list.Add(session.Pet.transform.position);
+            return list;
+        }
 
         public void Init(Actor a, EncounterSession s, IPetMaster k)
         {
             actor = a; session = s; kit = k; agent = GetComponent<NavMeshAgent>(); visual = GetComponent<ActorVisual>();
             baseHealth = 90 + 18 * Mathf.Max(1, session.Progress.Level);
+            // Up close, not 1.9 m off (AddAgent's stop for its .5 m width): the agent stopped where the path ends, and where the quarry's
+            // ground is cut away round it (a dummy's post, a boss's dais) that end is short of it, and it stood 2.3 m off its 2.2 m bite for
+            // good (2026-10-18, a sim Bonecaller's thrall that never bit the dummy). It still halts at BiteReach (isStopped).
+            if (agent != null) agent.stoppingDistance = HuntStop;
             Refit(); actor.Health.ApplyHealing(actor.Health.Pool.Max);
             actor.Health.Died += h => session.Meter.Death(actor);   // the scorecard's deaths
         }
@@ -126,9 +184,16 @@ namespace Crulanda.Encounter
                 // beside the quarry, on the navmesh, and bites.
                 if (Master != null && reach > BiteReach && Time.time - Mathf.Max(huntSince, lastBiteAt) > NoBiteWarp)
                 {
-                    var side = transform.position - Quarry.transform.position; side.y = 0;
-                    var at = Quarry.transform.position + (side.sqrMagnitude > .01f ? side.normalized : -Quarry.transform.forward) * 1.4f;
-                    if (NavMesh.SamplePosition(at, out var by, 3, NavMesh.AllAreas) && Vector3.Distance(by.position, Quarry.transform.position) < BiteReach + 1) { agent.Warp(by.position); reach = Vector3.Distance(transform.position, Quarry.transform.position); }
+                    // On a free spot of a ring round it, on its own floor, clear of the party (WarpSpot); its floor is the navmesh under it.
+                    var q = Quarry.transform.position;
+                    float floorY = NavMesh.SamplePosition(q, out var under, 3, NavMesh.AllAreas) ? under.position.y : q.y - 1;
+                    Func<Vector3, Vector3?> floor = p =>
+                    {
+                        p.y = floorY;
+                        if (!NavMesh.SamplePosition(p, out var h, .5f, NavMesh.AllAreas) || Mathf.Abs(h.position.y - floorY) > .8f) return null;
+                        return h.position;
+                    };
+                    if (WarpSpot(q, Crowd(), floor, out var spot)) { agent.Warp(spot); reach = Vector3.Distance(transform.position, Quarry.transform.position); }
                     huntSince = Time.time;
                 }
                 agent.speed = 5.5f; agent.isStopped = reach <= BiteReach;

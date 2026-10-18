@@ -132,6 +132,89 @@ namespace Crulanda.Tests
             Assert.IsTrue(session.Enemies.Any(e => e != null && e.FightingParty && e.Camp), "the leader pulled (" + tank.Activity + ")");
             Assert.IsFalse(tank.BuffPending, "nothing owed now");
         }
+        /// <summary>
+        /// After a wipe the leader stops again (2026-10-18: dying clears the buffs, and the party pulled the boss bare the second time): the
+        /// party buffs up short of the elite camp, wipes before the pull (everyone dies and wakes), is led back, and the leader stops again,
+        /// says so ("again"), and everyone is buffed again from what it still carries; then no third stop is owed.
+        /// </summary>
+        [UnityTest] public IEnumerator After_a_wipe_the_party_buffs_up_again_before_the_boss()
+        {
+            EncounterEnemy elite = null; Vector3? start = null;
+            foreach (var e in session.Enemies.Where(e => e != null && e.actor.IsAlive && e.Elite && e.Camp && !e.Game && !e.Hidden).OrderBy(e => e.actor.Level))
+            { start = Approach(e.transform.position, 55); if (start != null) { elite = e; break; } }
+            Assert.NotNull(elite, "an elite camp in Oakhaven with a way to it from 55 m");
+            int level = Mathf.Max(2, elite.actor.Level);
+            // Two of each: one for each stop.
+            var tank = Join("class.warrior", level, "food.cask_stew", "food.cask_stew", "salve.tallow", "salve.tallow");
+            var healer = Join("class.druid", level, "food.cask_stew", "food.cask_stew", "potion.tincture_hearth", "potion.tincture_hearth");
+            var motor = session.Player.GetComponent<AdventurerMotor>();
+            void Place() { motor.Teleport(start.Value + Vector3.up * 1.1f); int k = 0; foreach (var c in session.PartySims) c.GetComponent<NavMeshAgent>().Warp(start.Value + Vector3.left * (1.5f + k++)); }
+            Place(); yield return null;
+            Assert.NotNull(tank.LeadTo(elite)); Assert.IsTrue(tank.BuffPending, "an elite camp: a buff-up owed");
+            // The first stop.
+            float until = Time.time + 90, nextStep = 0;
+            while (Time.time < until && !tank.BuffingUp) { if (Time.time >= nextStep) { nextStep = Time.time + .5f; Keep(motor, tank); } yield return null; }
+            Assert.IsTrue(tank.BuffingUp, "it stopped to buff up (" + tank.Activity + ")"); Assert.IsFalse(tank.BuffAgain, "the first stop");
+            session.BuffUp();
+            until = Time.time + BossBuffs.StopWait + 4;
+            while (Time.time < until && tank.BuffingUp) yield return null;
+            Assert.IsFalse(tank.BuffingUp, "the stop ends"); Assert.IsFalse(tank.BuffPending, "nothing owed after it");
+            string warriorBuff = ClassBuffs.For("class.warrior").id;
+            Assert.IsTrue(Body(healer.actor).Statuses.Has(warriorBuff), "the healer has the warrior's buff");
+            // The wipe, before the pull: everyone dies (the buffs go with it) and wakes.
+            foreach (var c in session.PartySims) c.actor.Health.ApplyDamage(c.actor.Health.Pool.Max * 10);
+            session.Player.Health.ApplyDamage(session.Player.Health.Pool.Max * 10);
+            yield return null;
+            Assert.IsFalse(Body(healer.actor).Statuses.Has(warriorBuff), "dying took the buffs");
+            int wipes = session.Wipes; session.Recover(); Assert.AreEqual(wipes + 1, session.Wipes, "a wipe counted");
+            Assert.IsTrue(session.PartySims.All(c => c.actor.IsAlive), "everyone woke");
+            Assert.IsTrue(tank.BuffPending, "a buff-up owed again");
+            // Led back: the leader stops again, says so, and the party buffs again.
+            Place(); yield return null;
+            int chats = session.Chat.Count;
+            until = Time.time + 90;
+            while (Time.time < until && !tank.BuffingUp) { if (Time.time >= nextStep) { nextStep = Time.time + .5f; Keep(motor, tank); } yield return null; }
+            Assert.IsTrue(tank.BuffingUp, "it stopped again (" + tank.Activity + ")"); Assert.IsTrue(tank.BuffAgain, "again, after the wipe");
+            Assert.IsTrue(session.Chat.Skip(chats).Any(l => l.channel == ChatChannel.Party && l.speaker == tank.sim.name && l.text.ToLower().Contains("again")), "said again in Party");
+            var used = session.BuffUp(); Assert.Greater(used.Count, 0, "you buffed again: " + session.Messages.LastOrDefault());
+            until = Time.time + BossBuffs.StopWait + 4;
+            while (Time.time < until && tank.BuffingUp) yield return null;
+            Assert.IsFalse(tank.BuffingUp, "the second stop ends");
+            foreach (var c in session.PartySims)
+            {
+                var st = Body(c.actor).Statuses;
+                Assert.IsTrue(st.Has(Consumables.FedId), c.sim.name + " fed again (" + c.BuffNote + ")");
+                Assert.IsTrue(st.Has(warriorBuff), c.sim.name + " has the warrior's buff again");
+            }
+            Assert.AreEqual(0, SimEconomy.Count(tank.sim, "food.cask_stew"), "the tank ate its second stew");
+            Assert.IsFalse(tank.BuffPending, "no third stop owed");
+        }
+        /// <summary>A wipe with nothing to gain (every buff still on, which no wipe leaves, as a stand-in for a party with nothing): no stop again.</summary>
+        [UnityTest] public IEnumerator A_wipe_with_nothing_to_take_is_not_stopped_for_again()
+        {
+            EncounterEnemy elite = null; Vector3? start = null;
+            foreach (var e in session.Enemies.Where(e => e != null && e.actor.IsAlive && e.Elite && e.Camp && !e.Game && !e.Hidden).OrderBy(e => e.actor.Level))
+            { start = Approach(e.transform.position, 55); if (start != null) { elite = e; break; } }
+            Assert.NotNull(elite);
+            var tank = Join("class.warrior", Mathf.Max(2, elite.actor.Level));
+            var motor = session.Player.GetComponent<AdventurerMotor>();
+            motor.Teleport(start.Value + Vector3.up * 1.1f); tank.GetComponent<NavMeshAgent>().Warp(start.Value + Vector3.left * 1.5f); yield return null;
+            Assert.NotNull(tank.LeadTo(elite));
+            float until = Time.time + 90, nextStep = 0;
+            while (Time.time < until && !tank.BuffingUp) { if (Time.time >= nextStep) { nextStep = Time.time + .5f; Keep(motor, tank); } yield return null; }
+            Assert.IsTrue(tank.BuffingUp, "the first stop (" + tank.Activity + ")");
+            session.BuffUp();
+            until = Time.time + BossBuffs.StopWait + 4;
+            while (Time.time < until && tank.BuffingUp) yield return null;
+            Assert.IsFalse(tank.BuffingUp);
+            // Counted as a wipe, but the buffs are all still on: nothing to take, no second stop.
+            tank.GetComponent<NavMeshAgent>().Warp(start.Value + Vector3.left * 1.5f); motor.Teleport(start.Value + Vector3.up * 1.1f);
+            session.CountWipe(); Assert.IsTrue(tank.BuffPending, "owed, until it sees there is nothing to take");
+            Assert.IsFalse(session.PartyWantsBuffs(), "nothing to take");
+            until = Time.time + 60; bool stopped = false;
+            while (Time.time < until && tank.BuffPending) { stopped |= tank.BuffingUp; if (Time.time >= nextStep) { nextStep = Time.time + .5f; Keep(motor, tank); } yield return null; }
+            Assert.IsFalse(stopped, "no second stop"); Assert.IsFalse(tank.BuffPending, "and nothing owed");
+        }
         /// <summary>You keep up with the leader: a step behind it whenever it is more than five metres off.</summary>
         static void Keep(AdventurerMotor motor, SimCompanion leader)
         {

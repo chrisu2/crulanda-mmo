@@ -501,6 +501,17 @@ namespace Crulanda.Encounter
         public bool Dead { get { return dead; } }
         /// <summary>A one-shot (an attack, a flinch) is playing.</summary>
         public bool Busy { get { return shot != null; } }
+        /// <summary>The one-shot playing now ("attack", "attack2", "hitL", "death"...), or null (captures tell a blow from a flinch by it).</summary>
+        public string Playing { get { return shot; } }
+        /// <summary>Which way its body faces now, flat (the humanoid's body as its clip poses it; the body it is built under otherwise).</summary>
+        public Vector3 Facing
+        {
+            get
+            {
+                var f = OnHumanAvatar && Animator != null && Animator.isHuman ? Animator.bodyRotation * Vector3.forward : Model != null && Model.parent != null ? Model.parent.forward : Vector3.forward;
+                f.y = 0; return f.sqrMagnitude > 1e-6f ? f.normalized : Vector3.forward;
+            }
+        }
         /// <summary>Plays a one-shot over whatever it is doing (attack, kick, hitL, hitR, jump), easing in and out.</summary>
         /// <summary>When a hit has no clip of its own (the thrall's Toon RTS undead has none), a short flinch: the model rocks back and recovers.</summary>
         float flinchAt = -1;

@@ -74,6 +74,25 @@ namespace Crulanda.Encounter
             return s;
         }
 
+        bool reachOk;
+        /// <summary>A spot about <paramref name="dist"/> m from the mob on the navmesh that it can walk to (a whole path from where it stands),
+        /// tried round it; a few metres before it if none is.</summary>
+        Vector3 Reachable(EncounterEnemy e, float dist)
+        {
+            var from = e.transform.position; reachOk = false;
+            if (UnityEngine.AI.NavMesh.SamplePosition(from, out var at, 3, UnityEngine.AI.NavMesh.AllAreas)) from = at.position;
+            var path = new UnityEngine.AI.NavMeshPath();
+            foreach (float d in new[] { dist, dist * .7f, dist * 1.4f })
+                for (int k = 0; k < 12; k++)
+                {
+                    var want = from + Quaternion.Euler(0, k * 30, 0) * e.transform.forward * d;
+                    if (!UnityEngine.AI.NavMesh.SamplePosition(want, out var hit, 1.5f, UnityEngine.AI.NavMesh.AllAreas) || Mathf.Abs(hit.position.y - from.y) > 2.5f) continue;
+                    if (!UnityEngine.AI.NavMesh.CalculatePath(from, hit.position, UnityEngine.AI.NavMesh.AllAreas, path) || path.status != UnityEngine.AI.NavMeshPathStatus.PathComplete) continue;
+                    reachOk = true; return hit.position;
+                }
+            return from + e.transform.forward * 3;
+        }
+
         public IEnumerator Run(EncounterSession s, string directory)
         {
             dir = directory; Directory.CreateDirectory(dir); session = s;
@@ -95,11 +114,14 @@ namespace Crulanda.Encounter
                 report.AppendLine(); report.AppendLine("== " + camp.name + " (" + camp.mob + ", camp " + group.Key + ", " + group.Count() + " up, levels " + camp.levelMin + "-" + camp.levelMax + ")");
                 report.AppendLine("model " + (bm != null ? bm.Kind + ", " + bm.Height.ToString("0.00") + " m, human avatar " + bm.OnHumanAvatar : "none (a plain figure: the kit or its avatar is missing)")
                     + ", skins " + string.Join(", ", group.Select(x => x.GetComponent<ActorVisual>()?.BeastModel?.Renderers.FirstOrDefault()?.sharedMaterial?.mainTexture?.name ?? "-").Distinct()));
-                // Level to the camp's band and stand off to one side, out of its reach.
+                // Level to the camp's band and stand where it can walk to you, out of its reach until pulled. (The first run stood you 22 m to
+                // one side, so the Adit's Ember-bound had you up on the land over their cave and a snout pack had you in the river: none could
+                // reach you, so none walked, none came within its move's reach, and a flinch was taken for a swing.)
                 s.Progress.experience = Math.Max(s.Progress.experience, EncounterProgress.XpForLevel(camp.levelMax)); s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max);
                 var motor = s.Player.GetComponent<AdventurerMotor>();
-                var mp = e.transform.position; var away = Quaternion.Euler(0, 90, 0) * e.transform.forward; var stand = mp + away * 22;
-                stand = s.Zone.StandAt(XZ(stand), mp.y - 1, 0); motor.Teleport(stand + Vector3.up * .3f);
+                var mp = e.transform.position; var stand = Reachable(e, 9);
+                report.AppendLine("you stand " + Vector3.Distance(stand, mp).ToString("0.0") + " m from it, " + (reachOk ? "on a walk it can take to you" : "NO walkable spot found near it (it may not come)"));
+                motor.Teleport(stand + Vector3.up * .3f);
                 var look = mp - stand; look.y = 0; motor.SetView(look.sqrMagnitude > .01f ? Quaternion.LookRotation(look).eulerAngles.y : 0, 16, 7);
                 yield return new WaitForSeconds(2.5f);
                 mp = e.transform.position; float h = bm != null ? bm.Height : 1.7f; var fwd = e.transform.forward;
@@ -121,28 +143,49 @@ namespace Crulanda.Encounter
                 else wideFrom = -fwd;
                 var centre = s.Zone.StandAt(camp.center, mp.y - 1, 0);
                 yield return Frame(centre, wideFrom, 15, 7, .5f, tag + "camp", camp.name + ": the camp from " + (river != null ? "the land side, the bank and the river behind it (nobody in the water)" : "its walk, the cave's floor and " + (lake.HasValue ? "the lake of fire's rim" : "its walls")));
-                // The fight: pulled, you healed whole every frame (you take its blows), until its move comes or 24 s pass.
+                // The fight: pulled, you healed whole every frame (you take its blows), until its blow and its move are seen or 30 s pass.
+                // Its walking is judged over fifths of a second, never across a frame's capture, only while it goes over .5 m/s and plays no
+                // blow or flinch; its facing is its body's as the clip poses it (ModelBeast.Facing), not the actor's.
                 s.Select(e); e.Receive(1, s.Player);
-                bool swung = false, cast = false, castAfter = false; float worst = 0, walked = 0; int walkSamples = 0; var last = e.transform.position;
-                for (float t = 0; t < 24 && e.actor.IsAlive; t += Time.deltaTime)
+                bool swung = false, cast = false, castAfter = false; float worst = 0, walked = 0; int walkSamples = 0;
+                float idleOff = Vector3.Angle(bm != null ? bm.Facing : e.transform.forward, e.transform.forward);
+                var last = e.transform.position; float lastAt = Time.time;
+                for (float t = 0; t < 30 && e.actor.IsAlive; t += Time.deltaTime)
                 {
                     s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max);
-                    var p = e.transform.position; var v = (p - last) / Mathf.Max(Time.deltaTime, 1e-4f); v.y = 0; last = p;
-                    if (v.magnitude > .5f && Time.deltaTime > 0) { float off = Vector3.Angle(v, e.transform.forward); worst = Mathf.Max(worst, off); walked += off; walkSamples++; }
+                    var p = e.transform.position;
+                    if (Time.time - lastAt >= .2f)
+                    {
+                        var v = (p - last) / (Time.time - lastAt); v.y = 0;
+                        if (v.magnitude > .5f && (bm == null || !bm.Busy) && !e.Casting)
+                        { float off = Vector3.Angle(v, bm != null ? bm.Facing : e.transform.forward); worst = Mathf.Max(worst, off); walked += off; walkSamples++; }
+                        last = p; lastAt = Time.time;
+                    }
                     var to = s.Player.transform.position - p; to.y = 0;
-                    if (!swung && bm != null && bm.Busy && !e.Casting)
-                    { swung = true; yield return Frame(p, Quaternion.Euler(0, 70, 0) * (to.sqrMagnitude > .01f ? to : fwd), h * 2 + 1.2f, h * .7f, h * .5f, tag + "swing", camp.mob + " mid-swing at you (its weapon in the blow, not floating)"); }
+                    bool blow = bm != null && bm.Playing != null && bm.Playing.StartsWith("attack", StringComparison.Ordinal);
+                    if (!swung && blow && !e.Casting)
+                    {
+                        swung = true; yield return Frame(p, Quaternion.Euler(0, 70, 0) * (to.sqrMagnitude > .01f ? to : fwd), h * 2 + 1.2f, h * .7f, h * .5f, tag + "swing", camp.mob + " mid-swing at you (" + bm.Playing + "; its weapon in the blow, not floating)");
+                        last = e.transform.position; lastAt = Time.time;
+                    }
                     if (!cast && e.Casting && e.CastProgress > .6f)
-                    { cast = true; yield return Frame(p, Quaternion.Euler(0, 70, 0) * (to.sqrMagnitude > .01f ? to : fwd), h * 2 + 1.5f, h * .8f, h * .5f, tag + "move", camp.mob + " winding up its " + (e.Cast != null ? e.Cast.name : "move") + " (the cast bar over it)"); }
+                    {
+                        cast = true; yield return Frame(p, Quaternion.Euler(0, 70, 0) * (to.sqrMagnitude > .01f ? to : fwd), h * 2 + 1.5f, h * .8f, h * .5f, tag + "move", camp.mob + " winding up its " + (e.Cast != null ? e.Cast.name : "move") + " (the cast bar over it)");
+                        last = e.transform.position; lastAt = Time.time;
+                    }
                     if (cast && !castAfter && !e.Casting)
                     {
                         castAfter = true; yield return new WaitForSeconds(.25f);
                         yield return Frame(s.Player.transform.position, Quaternion.Euler(0, 60, 0) * (to.sqrMagnitude > .01f ? -to : fwd), 6, 2.5f, 1, tag + "move-landed", camp.mob + "'s " + (e.Cast != null ? e.Cast.name : "move") + " landed on you (" + (camp.mob == "Ember-bound" ? "rooted: the root on your bar" : "knocked back a step or two") + ")");
+                        last = e.transform.position; lastAt = Time.time;
                     }
                     if (swung && castAfter) break;
                     yield return null;
                 }
-                report.AppendLine("fight: swing " + (swung ? "seen" : "NOT seen") + ", move " + (cast ? (castAfter ? "seen and landed" : "wound up") : "NOT seen in 24 s") + "; walking: facing off its way by " + (walkSamples > 0 ? (walked / walkSamples).ToString("0") + " degrees on average, " + worst.ToString("0") + " at worst (" + walkSamples + " frames)" : "no walking frames"));
+                report.AppendLine("fight: blow " + (swung ? "seen" : "NOT seen") + ", move " + (e.Cast != null ? e.Cast.name + " (reach " + e.Cast.reach + " m, first after " + e.Cast.first + " s) " : "(none set) ")
+                    + (cast ? (castAfter ? "seen and landed" : "wound up") : "NOT seen in 30 s") + ", it ended " + Vector3.Distance(e.transform.position, s.Player.transform.position).ToString("0.0") + " m from you");
+                report.AppendLine("facing: its body " + idleOff.ToString("0") + " degrees off its actor's forward when pulled; walking (over .5 m/s, over fifths of a second, no blow or flinch) "
+                    + (walkSamples > 0 ? (walked / walkSamples).ToString("0") + " degrees off its way on average, " + worst.ToString("0") + " at worst (" + walkSamples + " samples)" : "never: it did not walk"));
                 report.AppendLine("in the fight: " + Numbers(e));
                 // Its death.
                 var at = e.transform.position; e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 10); yield return new WaitForSeconds(2.2f);

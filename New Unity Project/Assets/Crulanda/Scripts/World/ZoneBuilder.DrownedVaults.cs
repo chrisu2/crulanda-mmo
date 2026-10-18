@@ -160,6 +160,10 @@ namespace Crulanda.World
                         var at = h.At(along + k, canal.aside - canal.half - .6f);
                         b.Box(crate, new Vector3(at.x, h.At(along + k).y + .3f, at.z), new Vector3(.6f, .6f, .6f), q);
                         b.Box(crate, new Vector3(at.x, h.At(along + k).y + .82f, at.z), new Vector3(.45f, .45f, .45f), q * Quaternion.Euler(0, 20, 0));
+                        // The fence's hoard on the stacks (the kit's, playtest note 234): coin and a purse on one, a cup and keys on the other.
+                        var top = root.InverseTransformPoint(new Vector3(at.x, h.At(along + k).y + 1.045f, at.z)); float yaw = q.eulerAngles.y;
+                        if (k < 0) { SmallPiece(ModelProp(root, "Fantasy/Chalice", top + new Vector3(.08f, 0, .05f), yaw, .2f)); SmallPiece(ModelProp(root, "Fantasy/Key_Metal", top + new Vector3(-.1f, 0, -.08f), yaw + 60, .012f)); }
+                        else { SmallPiece(ModelProp(root, "Fantasy/Coin_Pile_2", top, yaw + 20, .06f)); SmallPiece(ModelProp(root, "Fantasy/Pouch_Large", top + new Vector3(.1f, 0, .12f), yaw - 30, .13f)); }
                     }
                     // Mooring lines, bow and stern, to the pier's end posts.
                     foreach (float k in new[] { -2.4f, 2.4f })

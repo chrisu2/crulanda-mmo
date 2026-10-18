@@ -134,6 +134,9 @@ namespace Crulanda.World
             // A chamber by its anchor in this cave (ZoneAnchor, the Adit rework: the layout names it), else the widest ring in the stretch.
             int Named(string anchor, float from, float to) { var a = AnchorIn(h, anchor); return a != null ? RingAt(a.along) : Widest(from, to); }
             string part = AditPart(h);
+            // The kit's pieces by the cave's style (playtest note 234, PropDressing.Caves): the workings' tools and pails, the Pen's cage, the
+            // Scriptorium's books, the Muster Yard's weapon stand, Hallow's Creek's cellar stores. Nothing where Free says no.
+            DressCave(t, h, h.Style, c, ring, n, P, RingAt, On, Along, null, Free, Block);
             var timber = Tint(art.timber, new Color(.34f, .25f, .16f)); var dark = Tint(art.timber, new Color(.2f, .14f, .09f));
             var iron = Tint(art.metal, new Color(.22f, .21f, .2f)); var rust = Tint(art.metal, new Color(.36f, .23f, .15f));
             var stone = Tint(art.stone, new Color(.4f, .38f, .35f)); var straw = Tint(art.hay, new Color(.62f, .54f, .37f));

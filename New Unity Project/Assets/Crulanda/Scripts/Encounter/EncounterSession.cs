@@ -418,7 +418,7 @@ namespace Crulanda.Encounter
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
             CloseCapital();   // one counter at a time
             if (VendorNpc == null) bagsForShop = !InventoryOpen;
-            VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
+            VendorNpc = v.Name; vendorRole = v.Role; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
             if (Charm.Haggle(Progress, VendorNpc)) Message("You haggle with " + VendorNpc + ": a further twentieth off what you buy here today.");   // the Scoundrel (Charm.cs)
         }
         public const string FreshEggs = "food.fresh_eggs";
@@ -502,6 +502,7 @@ namespace Crulanda.Encounter
             if (Inventory.Buy(Progress, Items, item, out var why))
             {
                 Message("Bought " + ItemName(item) + "." + (d != null && d.kind == "bag" ? " Use it from your bags to wear it." : "")); Save(false);
+                ServeBought(d);   // an inn's food on its table (playtest note 235)
                 if (item == FreshEggs) { VillageLife.Active.Take("stall.eggs"); if (VillageLife.Active.Count("stall.eggs") == 0) VendorStock.Remove(item); }
                 if (d != null && d.kind == "bag") VendorStock.Remove(item);
                 // The coin goes to the seller's household (ADDENDUM C: the purses, step 7, spend it).
@@ -796,6 +797,7 @@ namespace Crulanda.Encounter
             int n = Math.Max(1, r.count);
             Message("You make " + ItemName(r.output) + (n > 1 ? " x" + n : "") + ".");
             FloatText(Player.transform.position, "+" + n + " " + ItemName(r.output), new Color(.86f, .95f, .66f));
+            ShowCooked(r);   // the dish by the fire (playtest note 235, EncounterSession.Dishes)
             Save(false);
             if (more > 0) { if (Professions.CanCraft(r, StationOk, out var stop)) StartWork(r.name, StartCraft(r), () => MakeOne(r, more - 1), r); else Message(stop); }
         }

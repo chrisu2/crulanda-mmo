@@ -1,5 +1,47 @@
 # Changelog
 
+## 2026-10-18: the Fantasy kit's unused props in the dungeons and halls, the food models (branch megakit-dress; WRITTEN, NOT RUN)
+- Chris (PLAYTEST_NOTES 234-235): "Fantasy Props MegaKit for dungeons and other places"; "FBX-20261018T221927Z-1-001 for foods and buff
+  items"; "dont use the non crulanda food but some can be used". Compiles; nothing run in Unity, no captures yet.
+- **Kit props** (`PropDressing`, `ZoneBuilder.Dressing`): Crowsfoot Hollow (the camp's pot, pan, rope, bag and bucket at the walls, a
+  weapon stand and shield at the camp's mouth, stolen apples in the Store Caves, the Quartermaster's scroll, key and purse on his desk,
+  coin, cup, purse and key spilt before the plunder chest, a cage and chain in the Echoing Hall); the Root-Mother's Deep (the Keepers'
+  urns, candles, sap vials, a book, grey caps); the Sealed Adit by cave (workings: pick, pail, rope, wall lantern, iron crate; the Pen: a
+  cage and chain; the Kennel; the Scriptorium: bookcase, cabinet, book stand, candelabrum; the Censored Room; the Muster Yard: weapon
+  stand, shield, peg rack; the Chapel; the Quiet Miner's Drift); Hallow's Creek's cellars (jars, bottles, a barrel rack, shelves); the
+  Crown's Archive (a book stand and candelabrum by the lectern, books and scrolls on the reading desks); the Night Market candlemaker's
+  candlesticks; the drowned vaults' fence's hoard (coin, purse, cup, keys on his crates). 64 of the kit's 94 models now used (was ~18).
+  Floor pieces stand at the walls (the middle of a passage stays clear, a narrow drift takes nothing solid), the nodes keep clear of them;
+  the small ones cast no shadow and are culled past 100 m (DetailCull). No machines. Each cave has its own set (a test says so).
+- **Food models**: 37 of the 103 in Resources/Props/Food (Quaternius's food pack by its names; the zip has no licence file: CC0 is assumed
+  from the pack, check). The importer brings their flat colours to gamma (Blender wrote them linear). `FoodModels.Dishes` gives every food
+  and buff item a look (21 foods, 10 tinctures and cordials, 6 draughts, 2 salves; the tinctures and salves are the kit's vials and pots).
+  Shown: a dish you cook is set by the fire for 90 s; food bought from an innkeeper is set on the nearest inn table; each zone's tables,
+  bar, kitchen board and food stalls carry its own fare (`FoodModels.Fare`): Oakhaven bread, apples, eggs, cheese, carrots and the Cask's
+  stew; Khaven turnips, grey caps, cabbage, thin broth; the Ash Rim flank, salt jars, pans; the Peaks smoked strips, a haunch, cheese; the
+  Crown pastry, oranges, fowl, fish, wine; the Lowtowns sausages, fish-bones, fried eggs; the Shore fish, venison, cakes. No new items.
+- **Kept, with the books' reason**: bread and slices (bread throughout the books), apples red and green (stolen apples in the Rust
+  Market), oranges (Crown only: "peel this city like an orange"), turnips (the Glass Coast cook's turnip cakes), the whole lettuce as a
+  cabbage (cabbages throughout the books), carrots (Oakhaven's farm crates already), mushrooms (fungus in the books, the mourner's cap in the
+  game), fish and fish-bones (the docks, the smell of rotting fish), the drumstick (hens; "roasted, spiced meat"), steak (the books' steaks;
+  the game's flanks and chops), sausages (the books know them), bacon strips (cured ham; the game's jerky and smoked loin), eggs whole and
+  fried (hens, eggs), the flat cake (turnip cakes; the game's griddle bread and hearth-cakes), the crescent pastry (the books' flaky,
+  buttery pastry; it is the Harrow pasty), stew pots and a skillet (stew pots in the Rust Market; an iron skillet), plates, bottles, a jar,
+  knife, fork and spoon.
+- **Left out**: banana, coconut, tomato, both peppers, eggplant, broccoli, the leaf lettuce, pumpkin, the octopus tentacle, the pancake
+  stack, burned bacon, egg and steak (no reason in the books or a zone), and everything on Chris's list (burgers, hot dogs, pizza, sushi,
+  ice cream, popsicles, soda, sauces, peanut butter, chocolate, doughnuts, corndog, fries, chopsticks, avocado, waffle, cupcake, cheese
+  singles). A test says none of them is in the project.
+- Tests (`FoodAndDressingTests`, EditMode): every food and buff item has a look; every model named is in the project; only the kept foods
+  are; the food models stand up; each zone's fare and each cave's set is its own; floor pieces keep off the way.
+- **For the lead to run and look at**: the EditMode set (KitPropTests too: the new kit pieces stand up), NodePlacementTests, the Adit and
+  Hallow's Creek nav tests (AditNavTests, AditCaveBuildTests: new solids by the walls). Captures, front and side: Crowsfoot Hollow's camp,
+  Store Caves and Echoing Hall; the Root-Mother's Deep's Gallery and Heart; the Adit's Workings, Pen, Scriptorium, Muster Yard, Quiet
+  Miner's Drift (the wall lanterns and peg rack face out of the wall, not into it); Hallow's Creek's Cellars; the Crown's Archive; the
+  Golden Cask, Cracked Hearth, Wain's Rest, Pilgrims' Rest, Gilded Lantern and Rusty Spoon tables and bars; Oakhaven's and the Lowtowns'
+  stalls; the Night Market and the drowned vaults' pier. Check the food's colours are not washed out or near black, the dishes' sizes on
+  the tables, and that a cooked dish shows by the fire and a bought one on a table. Then PropCapture for the row of new pieces.
+
 ## 2026-10-18 17:49 and 18:00: published: group runs hold the level, the drowned vaults' arches (OPEN until Chris checks it)
 - The drowned vaults are built vaults: unbroken stone rib arches, mould on the stones, no cave stalagmites. Group runs give no
   experience. Details: CLAUDE_HANDOFF.md, Start here.

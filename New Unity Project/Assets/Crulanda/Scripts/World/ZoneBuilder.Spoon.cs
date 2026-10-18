@@ -278,6 +278,7 @@ namespace Crulanda.World
                 parts.Box(boards, new Vector3(plan.bar.x - .1f, barTop + .04f, z), new Vector3(.36f, .08f, .3f));
             }
             for (int i = 0; i < 3; i++) ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(plan.bar.x + .15f, barTop + .015f, plan.bar.y - .8f + i * .9f), i * 70, .13f);
+            CounterFare(t, new Vector3(plan.bar.x + .15f, barTop + .015f, plan.bar.y - .35f), new Vector3(plan.bar.x + .15f, barTop + .015f, plan.bar.y + .1f), 2, 1);
             Cyl(Tint(art.timber, new Color(.15f, .1f, .07f)), new Vector3(plan.bar.x + .2f, barTop + .1f, plan.bar.y + .7f), new Vector3(.14f, .09f, .14f));
             // Behind it: the ale casks along the wall, the water butt among them (the ale's watered: Mother Sall says so), a shelf of jugs
             // over them, the cellar's trapdoor in the floor.
@@ -445,6 +446,7 @@ namespace Crulanda.World
                     }
                     ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(at.x - .2f, tableTop + .03f, at.y + .15f), n * 60, .13f);
                     Cyl(Tint(art.stone, new Color(.5f, .42f, .3f)), c + new Vector3(.22f, tableTop + .13f, -.1f), new Vector3(.16f, .11f, .16f));
+                    TableFare(t, new Vector3(at.x - .05f, tableTop + .03f, at.y - .3f), 180, n, .25f);   // the Lowtowns' fare (playtest note 235)
                 }
                 int seat = 0;
                 for (int i = 0; i < plan.seats.Count; i++) if (Vector2.Distance(plan.seats[i].face, at) < .01f) Chair(plan.seats[i].at, at, n * 4 + seat++, cards);

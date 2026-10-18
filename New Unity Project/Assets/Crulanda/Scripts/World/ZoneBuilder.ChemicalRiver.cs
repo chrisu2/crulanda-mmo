@@ -50,8 +50,8 @@ namespace Crulanda.World
                 m.SetColor("_DeepColor", new Color(.008f, .008f, .01f, 1)); m.SetColor("_MidColor", new Color(.016f, .018f, .017f, 1)); m.SetColor("_ShallowColor", new Color(.04f, .048f, .036f, 1));
                 m.SetColor("_FoamColor", new Color(.2f, .23f, .15f, .5f)); m.SetColor("_BedTint", new Color(.16f, .18f, .14f, 1));
                 void F(string key, float v) { if (m.HasProperty(key)) m.SetFloat(key, v); }
-                F("_MidDepth", .15f); F("_DeepDepth", .5f); F("_Murk", 6); F("_Glow", .02f); F("_Caustics", 0); F("_SkyTint", .45f); F("_Sparkle", .08f);
-                F("_FoamWidth", .2f); F("_FoamWaves", .04f); F("_Bump", .035f); F("_FlowSpeed", .04f); F("_Wave", .006f); F("_Refract", .001f); F("_Glare", .6f);
+                F("_MidDepth", .15f); F("_DeepDepth", .5f); F("_Murk", 6); F("_Glow", .02f); F("_Caustics", 0); F("_SkyTint", .1f); F("_Sparkle", .05f);
+                F("_FoamWidth", .2f); F("_FoamWaves", .04f); F("_Bump", .035f); F("_FlowSpeed", .04f); F("_Wave", .006f); F("_Refract", .001f); F("_Glare", .25f);
             }
             else m.color = new Color(.02f, .02f, .024f, baseMat.color.a);
             return chemicalWater = m;
@@ -69,10 +69,12 @@ namespace Crulanda.World
                 var shader = Shader.Find("Standard"); if (shader == null) return;
                 var m = new Material(shader) { name = "Oil sheen", mainTexture = OilFilm(128) };
                 // Standard's Transparent mode: the colour is faint, the reflection stays whole (the sheen at a slant).
+                // Gloss .5 and alpha .35 (were .86 and .7), the water's sky tint .1 (was .45): at full gloss the Lowtowns' yellow sky lay over the whole
+                // river and it read pale beige, not black sludge (lowtowns-11 frames, 2026-10-18).
                 m.SetFloat("_Mode", 3); m.SetOverrideTag("RenderType", "Transparent");
                 m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One); m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha); m.SetInt("_ZWrite", 0);
                 m.EnableKeyword("_ALPHAPREMULTIPLY_ON"); m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-                m.color = new Color(1, 1, 1, .7f); m.SetFloat("_Glossiness", .86f); m.SetFloat("_Metallic", 0);
+                m.color = new Color(1, 1, 1, .35f); m.SetFloat("_Glossiness", .5f); m.SetFloat("_Metallic", 0);
                 m.mainTextureScale = new Vector2(1 / 34f, 1 / 52f);
                 oilSheen = m;
             }

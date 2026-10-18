@@ -379,3 +379,18 @@ sludge-eels (pack) and the Old Croc (solitary). **To run in the local session:**
 MobMoveTests, ZoneContentTests, NodePlacementTests, SecretPlacementTests, BuildingGroundTests, CheckpointTests; then captures of the
 market's wall from the Lower Market, the twisting causeway, the Court Stair from the courts, the burners' cellar steps, a roof with moss, the
 river by day and at night (the film, the black), the eels and the croc; walk a lap through every stair and ramp; fps at the market.
+
+### Dressing pass (2026-10-18, after the lowtowns-10 captures)
+- **Neon moss** (CANON, book1 ch.7:17): no longer flat green slabs. On a little over half the roofs it grows where moss grows: creeping
+  strips along the ridge and the eaves, clumps round the stacks' feet, a cushion or two on the slope; each patch a scatter of small raised
+  pads of their own size and turn, in two greens (sick bright green, yellow-green), the glow softer. On the walls' coping in ragged strips,
+  some hanging over the edge, a drip down the brick.
+- **The Chemical River** (CANON, ch.15:335, ch.15:391, ch.16:5): the rainbow "static" is gone. Near-black water, calm (hardly any ripple,
+  no painted sparkle), a wider green-grey scum at the banks; over it a glossy film whose colour is faint and low-saturated in large smooth
+  swirls (tens of metres), drifting at a crawl, so the sheen shows where the sky slides over it at a slant; clusters of glossy black sludge
+  bubbles over the deeper water.
+- **Retaining walls** (the Rust Market's wall and every tall one; visual only, the solid boxes and the navmesh unchanged): brick pilasters
+  on stone plinths about every 7 m, a stone string course on tall faces, drain mouths with stone surrounds, glowing mould round them and a
+  dark seepage streak under them, soot streaks from the coping, bills at eye height, an iron wall lamp on some long runs (twelve at most),
+  rubble at the foot (never on a ramp or a stair). GAME-ONLY.
+- **To look at in the local session:** the rust-market and chemical-river frames again (lowtowns-12, lowtowns-07), the river at night, fps.

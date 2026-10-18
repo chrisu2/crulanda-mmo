@@ -6404,8 +6404,10 @@ namespace Crulanda.World
     /// <summary>Slowly scrolls water texture coordinates.</summary>
     public sealed class WaterDrift : MonoBehaviour
     {
+        /// <summary>How fast the texture slides along v, in texture tiles a second.</summary>
+        public float speed = .04f;
         Material m; void Start() { m = GetComponent<Renderer>().material; }
-        void Update() { if (m != null) m.mainTextureOffset = new Vector2(0, Time.time * .04f); }
+        void Update() { if (m != null) m.mainTextureOffset = new Vector2(0, Time.time * speed); }
     }
 
     /// <summary>

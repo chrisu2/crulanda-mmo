@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace Crulanda.World
@@ -35,9 +36,10 @@ namespace Crulanda.World
             }
             return false;
         }
-        Material chemicalWater, oilSheen;
-        /// <summary>The river's water: the zone's water, all of it black (a hint of green in the shallows), a dull scum at the banks, an
-        /// oily slant reflection, slow and heavy, no light through it and none on the bed.</summary>
+        Material chemicalWater, oilSheen, sludgeBubble;
+        /// <summary>The river's water: the zone's water, all of it black (a hint of green in the shallows), a dull green-grey scum at the
+        /// banks, a calm surface (no painted sparkle, hardly a ripple: "thick as curdled molasses", ch.15:391), slow, no light through it
+        /// and none on the bed.</summary>
         Material ChemicalWater()
         {
             if (chemicalWater != null) return chemicalWater;
@@ -45,18 +47,20 @@ namespace Crulanda.World
             var m = new Material(baseMat) { name = "The Chemical River" };
             if (m.HasProperty("_DeepColor"))
             {
-                m.SetColor("_DeepColor", new Color(.012f, .012f, .016f, 1)); m.SetColor("_MidColor", new Color(.025f, .028f, .026f, 1)); m.SetColor("_ShallowColor", new Color(.05f, .06f, .045f, 1));
-                m.SetColor("_FoamColor", new Color(.24f, .27f, .16f, .38f)); m.SetColor("_BedTint", new Color(.2f, .22f, .18f, 1));
+                m.SetColor("_DeepColor", new Color(.008f, .008f, .01f, 1)); m.SetColor("_MidColor", new Color(.016f, .018f, .017f, 1)); m.SetColor("_ShallowColor", new Color(.04f, .048f, .036f, 1));
+                m.SetColor("_FoamColor", new Color(.2f, .23f, .15f, .5f)); m.SetColor("_BedTint", new Color(.16f, .18f, .14f, 1));
                 void F(string key, float v) { if (m.HasProperty(key)) m.SetFloat(key, v); }
-                F("_MidDepth", .15f); F("_DeepDepth", .5f); F("_Murk", 6); F("_Glow", .04f); F("_Caustics", 0); F("_SkyTint", .6f); F("_Sparkle", .55f);
-                F("_FoamWidth", .1f); F("_FoamWaves", .15f); F("_Bump", .1f); F("_FlowSpeed", .1f); F("_Wave", .012f); F("_Refract", .004f); F("_Glare", .9f);
+                F("_MidDepth", .15f); F("_DeepDepth", .5f); F("_Murk", 6); F("_Glow", .02f); F("_Caustics", 0); F("_SkyTint", .45f); F("_Sparkle", .08f);
+                F("_FoamWidth", .2f); F("_FoamWaves", .04f); F("_Bump", .035f); F("_FlowSpeed", .04f); F("_Wave", .006f); F("_Refract", .001f); F("_Glare", .6f);
             }
-            else m.color = new Color(.03f, .03f, .035f, baseMat.color.a);
+            else m.color = new Color(.02f, .02f, .024f, baseMat.color.a);
             return chemicalWater = m;
         }
         /// <summary>
-        /// The oil film over the chemical water: the creek's own surface, 3 cm up, in a faint see-through rainbow (bands of hue that drift
-        /// slowly downstream), glossy so the sky slides over it: the books' iridescence (ch.16:5). Visual only.
+        /// The oil film over the chemical water: the creek's own surface, 3 cm up, near-black and glossy, so the sky slides over it at a
+        /// slant and the books' iridescence (ch.16:5) is only a faint, slow, low-coloured sheen in the highlights: large smooth swirls,
+        /// tens of metres across, drifting downstream at a crawl. A few slow sludge bubbles stand on it, glossy black, catching a glint.
+        /// Visual only.
         /// </summary>
         void OilSheen(Transform water, Mesh surface)
         {
@@ -64,19 +68,55 @@ namespace Crulanda.World
             {
                 var shader = Shader.Find("Standard"); if (shader == null) return;
                 var m = new Material(shader) { name = "Oil sheen", mainTexture = OilFilm(128) };
-                m.SetFloat("_Mode", 2); m.SetOverrideTag("RenderType", "Transparent");
-                m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.SrcAlpha); m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha); m.SetInt("_ZWrite", 0);
-                m.EnableKeyword("_ALPHABLEND_ON"); m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
-                m.color = new Color(1, 1, 1, .55f); m.SetFloat("_Glossiness", .92f); m.SetFloat("_Metallic", .2f);
-                m.mainTextureScale = new Vector2(1 / 9f, 1 / 15f);
+                // Standard's Transparent mode: the colour is faint, the reflection stays whole (the sheen at a slant).
+                m.SetFloat("_Mode", 3); m.SetOverrideTag("RenderType", "Transparent");
+                m.SetInt("_SrcBlend", (int)UnityEngine.Rendering.BlendMode.One); m.SetInt("_DstBlend", (int)UnityEngine.Rendering.BlendMode.OneMinusSrcAlpha); m.SetInt("_ZWrite", 0);
+                m.EnableKeyword("_ALPHAPREMULTIPLY_ON"); m.renderQueue = (int)UnityEngine.Rendering.RenderQueue.Transparent;
+                m.color = new Color(1, 1, 1, .7f); m.SetFloat("_Glossiness", .86f); m.SetFloat("_Metallic", 0);
+                m.mainTextureScale = new Vector2(1 / 34f, 1 / 52f);
                 oilSheen = m;
             }
             var go = new GameObject("Oil sheen"); go.transform.SetParent(water, false); go.transform.localPosition = Vector3.up * .03f;
             go.AddComponent<MeshFilter>().sharedMesh = surface;
             var r = go.AddComponent<MeshRenderer>(); r.sharedMaterial = oilSheen; r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; r.receiveShadows = false;
-            go.AddComponent<WaterDrift>();   // the film drifts downstream with the sludge
+            // The film drifts downstream with the sludge, at a crawl (a tile is 52 m: about 15 cm a second).
+            go.AddComponent<WaterDrift>().speed = .003f;
+            SludgeBubbles(water, surface);
         }
-        /// <summary>A tiling oil film: thin-film hues (magenta, gold, green, blue) in swirled bands, see-through between them.</summary>
+        /// <summary>A sparse scatter of sludge bubbles over the deeper water (vertex alpha under .6), flattened glossy black domes from
+        /// 8 to 30 cm in little clusters, joined into one mesh: "bubbling black sludge" (ch.15:335). Visual only; its own stream.</summary>
+        void SludgeBubbles(Transform water, Mesh surface)
+        {
+            var verts = surface.vertices; var cols = surface.colors; if (verts.Length == 0) return;
+            if (sludgeBubble == null)
+            {
+                sludgeBubble = new Material(oilSheen.shader) { name = "Sludge bubble", color = new Color(.02f, .022f, .02f) };
+                sludgeBubble.SetFloat("_Glossiness", .93f); sludgeBubble.SetFloat("_Metallic", .1f);
+            }
+            var r = new System.Random(verts.Length * 31 + 7); float R() { return (float)r.NextDouble(); }
+            var dome = ZoneMeshes.Blob(5, .05f, true, 5, 8);
+            var list = new List<CombineInstance>();
+            for (int i = 0, n = Mathf.Min(220, verts.Length / 14); i < n; i++)
+            {
+                int k = (int)(R() * verts.Length); if (cols.Length == verts.Length && cols[k].a > .6f) continue;
+                float size = .08f + R() * R() * .22f;
+                var at = verts[k] + new Vector3((R() - .5f) * .8f, .02f, (R() - .5f) * .8f);
+                // One big bubble and a few small ones beside it.
+                for (int j = 0, m = 1 + (int)(R() * 3); j < m; j++)
+                {
+                    float sj = j == 0 ? size : size * (.3f + R() * .4f);
+                    var p = at + (j == 0 ? Vector3.zero : new Vector3((R() - .5f) * size * 3, 0, (R() - .5f) * size * 3));
+                    list.Add(new CombineInstance { mesh = dome, transform = Matrix4x4.TRS(p, Quaternion.Euler(0, R() * 360, 0), new Vector3(sj, sj * .55f, sj)) });
+                }
+            }
+            if (list.Count == 0) return;
+            var mesh = new Mesh { name = "Sludge bubbles", indexFormat = UnityEngine.Rendering.IndexFormat.UInt32 }; mesh.CombineMeshes(list.ToArray(), true); mesh.RecalculateBounds();
+            var go = new GameObject("Sludge bubbles"); go.transform.SetParent(water, false);
+            go.AddComponent<MeshFilter>().sharedMesh = mesh;
+            var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = sludgeBubble; mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off;
+        }
+        /// <summary>A tiling oil film: near-black, a thin-film hue (dull violet, bronze, bottle green, slate blue) at low saturation in a
+        /// few large smooth swirls a tile, mostly see-through; no fine noise.</summary>
         static Texture2D OilFilm(int size)
         {
             var t = new Texture2D(size, size, TextureFormat.RGBA32, true) { name = "Oil film", wrapMode = TextureWrapMode.Repeat };
@@ -85,12 +125,16 @@ namespace Crulanda.World
                 for (int x = 0; x < size; x++)
                 {
                     float u = x / (float)size, v = y / (float)size;
-                    // Whole periods across the tile, so it repeats without a seam.
-                    float swirl = Mathf.Sin(Tau * (u * 2 + .35f * Mathf.Sin(Tau * (v * 3 + u))) ) + .6f * Mathf.Sin(Tau * (v * 2 + .4f * Mathf.Sin(Tau * (u * 3))));
-                    float hue = Mathf.Repeat(swirl * .35f + u + v * .5f, 1);
-                    var c = Color.HSVToRGB(hue, .65f, 1);
-                    float film = Mathf.Clamp01(.25f + .45f * (.5f + .5f * Mathf.Sin(Tau * (u + v * 2) + swirl * 2)));
-                    c.a = film * .5f;
+                    // Whole periods across the tile, so it repeats without a seam; one or two swirls each way.
+                    float warp = .18f * Mathf.Sin(Tau * (v + .3f * Mathf.Sin(Tau * u)));
+                    float swirl = Mathf.Sin(Tau * (u + warp)) * Mathf.Cos(Tau * (v - .5f * warp)) + .5f * Mathf.Sin(Tau * (u + 2 * v + warp));
+                    float hue = Mathf.Repeat(.72f + swirl * .22f, 1);
+                    var c = Color.HSVToRGB(hue, .32f, .42f);
+                    // The film thick in the swirls' bands and gone between them.
+                    float film = Mathf.SmoothStep(0, 1, Mathf.Clamp01(.5f + .6f * Mathf.Sin(Tau * (u * 2 + v) + swirl * 1.6f)));
+                    c.a = .05f + film * .2f;
+                    // Premultiplied, for Standard's Transparent mode.
+                    c.r *= c.a; c.g *= c.a; c.b *= c.a;
                     px[y * size + x] = c;
                 }
             t.SetPixels(px); t.Apply(true, true); return t;

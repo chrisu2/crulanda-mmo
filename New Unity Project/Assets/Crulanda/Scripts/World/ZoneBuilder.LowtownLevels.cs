@@ -26,7 +26,9 @@ namespace Crulanda.World
         // ---------- the books' colours (Lowtowns pick 2) ----------
         /// <summary>"vibrant, unnatural neon moss" on the slate (CANON, book1 ch.7:17): a sick bright green that glows a little by day and
         /// shows up at night.</summary>
-        static readonly Color NeonMossColour = new Color(.36f, .9f, .16f), NeonMossGlow = new Color(.22f, .75f, .1f);
+        static readonly Color NeonMossColour = new Color(.3f, .74f, .13f), NeonMossGlow = new Color(.1f, .36f, .05f);
+        /// <summary>The moss's yellow-green, mixed in so a patch is never one flat colour.</summary>
+        static readonly Color NeonMossPaleColour = new Color(.52f, .76f, .14f), NeonMossPaleGlow = new Color(.2f, .3f, .04f);
         /// <summary>The green bioluminescent mould of the under-ways (CANON, book1 ch.6:129: "the faint, greenish glow of bioluminescent mold
         /// clinging to the archways"; ch.9:55).</summary>
         static readonly Color MouldColour = new Color(.2f, .6f, .35f), MouldGlow = new Color(.2f, 1f, .5f);
@@ -41,6 +43,7 @@ namespace Crulanda.World
             lowGlows[key] = m; return m;
         }
         Material NeonMoss { get { return LowGlow(art.stone, NeonMossColour, NeonMossGlow, "neon moss"); } }
+        Material NeonMossPale { get { return LowGlow(art.stone, NeonMossPaleColour, NeonMossPaleGlow, "neon moss pale"); } }
         Material DrainMould { get { return LowGlow(art.stone, MouldColour, MouldGlow * 1.3f, "drain mould"); } }
         Material WallCoping { get { return Dressed(new Color(.29f, .28f, .27f)); } }
 
@@ -109,6 +112,109 @@ namespace Crulanda.World
             var done = new List<Vector2>(); float inside = Half - 1.5f; int runs = 0;
             Vector3 L(Vector3 world) { return root.InverseTransformPoint(world); }
             var toLocal = Quaternion.Inverse(root.rotation);
+            var mossPale = new List<CombineInstance>(); var grime = new List<CombineInstance>(); var seep = new List<CombineInstance>(); var drain = new List<CombineInstance>();
+            var bills = new List<CombineInstance>(); var iron = new List<CombineInstance>(); var glass = new List<CombineInstance>(); int lamps = 0;
+            // A run of wall dressed (visual only: nothing here is solid, nothing stands more than a hand off the face but the lamps'
+            // brackets and the rubble at the foot, which keeps off ramps and stairs). centre, yaw: the run's box; top, foot: its top and
+            // bottom; low: the low ground; fs: which side of the box is the face toward the low ground (+1 the outward side).
+            void DressWall(Vector3 centre, Quaternion yaw, Quaternion q, float runLen, float top, float foot, float low, float thick, int fs)
+            {
+                // A point on the face: x along the run, y the world height, off how far out from the brick.
+                Vector3 F(float x, float y, float off) { return centre + yaw * new Vector3(x, y - centre.y, fs * (thick / 2 + off)); }
+                void Add(List<CombineInstance> to, Vector3 world, Vector3 size, float tile = 1) { to.Add(Ashlar(L(world), size, tile, q)); }
+                float tall = top - low, half = runLen / 2;
+                // The neon moss on the coping (CANON, book1 ch.7:17), in ragged strips: pads of their own size and green, some hanging over
+                // the face's edge, a drip or two down the brick.
+                for (float x = -half + .3f; x < half - .3f; x += 1.2f + R() * 2.6f)
+                {
+                    if (R() > .4f) continue;
+                    float len = Mathf.Min(half - .2f - x, .8f + R() * 2.4f);
+                    for (float px = x; px < x + len; px += .25f + R() * .35f)
+                    {
+                        float s = .18f + R() * .32f, across = (R() - .3f) * (thick / 2 + .08f);
+                        var at = centre + yaw * new Vector3(px, top + .14f + .02f - centre.y, fs * across);
+                        Add(R() < .7f ? moss : mossPale, at, new Vector3(s * (.7f + R() * .8f), .03f + R() * .05f, s * (.6f + R() * .6f)));
+                        if (R() < .18f && tall > 1) { float dh = .12f + R() * .35f; Add(moss, F(px, top - dh / 2, .015f), new Vector3(.06f + R() * .12f, dh, .03f)); }
+                    }
+                }
+                if (tall < 1.6f) return;
+                // Brick pilasters about every 7 m, each on a stone plinth: the long face broken into bays.
+                int bays = Mathf.Max(1, Mathf.RoundToInt(runLen / 7)); float bay = runLen / bays;
+                var piers = new List<float>();
+                for (int i = 0; i <= bays; i++)
+                {
+                    float x = -half + bay * i; x = Mathf.Clamp(x, -half + .4f, half - .4f);
+                    if (runLen < 3 && (i == 0 || i == bays)) continue;
+                    piers.Add(x);
+                    Add(brick, F(x, (top + foot) / 2, .1f), new Vector3(.7f, top - foot - .02f, .2f), 2);
+                    Add(cope, F(x, low + .2f, .14f), new Vector3(.84f, .4f, .28f), 1.75f);
+                }
+                bool Clear(float x, float pad) { foreach (var p in piers) if (Mathf.Abs(p - x) < pad) return false; return true; }
+                // A string course of stone two-thirds up a tall face.
+                if (tall > 2.2f) Add(cope, F(0, low + tall * .62f, .05f), new Vector3(runLen, .12f, .1f), 1.75f);
+                // Drain mouths: a dark arch with a stone surround, the green mould glowing round it (book1 ch.6:129) and a dark seepage
+                // streak down the brick under it.
+                if (tall > 2.4f && runLen > 4)
+                    for (int k = 0, n = runLen > 14 ? 2 : 1; k < n; k++)
+                    {
+                        float x = (R() - .5f) * (runLen - 2); if (!Clear(x, 1)) continue;
+                        float y = low + .8f + R() * Mathf.Min(.8f, tall - 2.2f), wd = .6f + R() * .3f;
+                        Add(drain, F(x, y, .005f), new Vector3(wd, wd * 1.1f, .04f));
+                        Add(cope, F(x, y + wd * .6f, .04f), new Vector3(wd + .34f, .14f, .09f), 1.75f);
+                        Add(cope, F(x, y + wd * .7f, .05f), new Vector3(.18f, .22f, .1f), 1.75f);
+                        foreach (int sd in new[] { -1, 1 }) Add(cope, F(x + sd * (wd / 2 + .08f), y, .04f), new Vector3(.14f, wd * 1.1f + .1f, .09f), 1.75f);
+                        for (int m = 0, mn = 3 + (int)(R() * 4); m < mn; m++)
+                        {
+                            float a = R() * Mathf.PI * 2, rr = wd * (.6f + R() * .3f), s = .08f + R() * .22f;
+                            Add(mould, F(x + Mathf.Cos(a) * rr, y + Mathf.Sin(a) * rr * .9f, .05f), new Vector3(s, s * (.5f + R()), .03f));
+                        }
+                        float sh = y - wd * .55f - low + .05f;
+                        Add(seep, F(x + (R() - .5f) * .1f, low + sh / 2 - .05f, .012f), new Vector3(wd * (.5f + R() * .3f), sh, .02f));
+                        Add(mould, F(x, low + .02f, .3f), new Vector3(wd * 1.2f, .04f, .5f));
+                    }
+                // Soot and grime run down from the coping in streaks of their own length.
+                for (float x = -half + .3f; x < half - .3f; x += .8f + R() * 2.2f)
+                {
+                    if (R() > .6f) continue;
+                    float h = .5f + R() * Mathf.Min(2.5f, tall * .7f);
+                    Add(grime, F(x, top - h / 2, .008f), new Vector3(.12f + R() * .5f, h, .015f));
+                }
+                // Bills pasted at eye height between the piers.
+                if (tall > 2.2f)
+                    for (float x = -half + 1; x < half - 1; x += 3 + R() * 4)
+                    {
+                        if (R() > .4f || !Clear(x, .9f)) continue;
+                        float bw = .45f + R() * .3f, bh = .6f + R() * .35f;
+                        Add(bills, F(x, low + 1.4f + R() * .5f, .012f), new Vector3(bw, bh, .015f));
+                        if (R() < .4f) Add(bills, F(x + bw * .6f, low + 1.3f + R() * .6f, .018f), new Vector3(bw * .8f, bh * .9f, .015f));
+                    }
+                // An iron wall lamp on a long run now and then (a dozen at most: they are lights).
+                if (tall > 2.8f && runLen > 9 && lamps < 12 && R() < .45f)
+                {
+                    float x = (R() - .5f) * (runLen - 3); if (!Clear(x, .6f)) x = Mathf.Clamp(x + 1.2f, -half + .5f, half - .5f);
+                    float y = low + 2.7f;
+                    Add(iron, F(x, y, .03f), new Vector3(.18f, .32f, .05f));
+                    Add(iron, F(x, y + .1f, .32f), new Vector3(.05f, .05f, .6f));
+                    Add(iron, F(x, y - .02f, .58f), new Vector3(.3f, .06f, .3f));
+                    Add(glass, F(x, y - .22f, .58f), new Vector3(.22f, .32f, .22f));
+                    var l = new GameObject("Wall lamp").AddComponent<Light>(); l.transform.SetParent(root, false); l.transform.position = F(x, y - .25f, .58f);
+                    l.type = LightType.Point; l.range = 8; l.intensity = 1.1f; l.color = new Color(1, .68f, .36f); l.shadows = LightShadows.None;
+                    NightLights.Add(new NightLight { light = l, dayIntensity = 0, nightIntensity = 1.5f });
+                    lamps++;
+                }
+                // Rubble fallen at the foot: broken brick and a stone or two, never on a ramp or a stair.
+                for (float x = -half + .5f; x < half - .5f; x += 1.5f + R() * 3)
+                {
+                    if (R() > .45f) continue;
+                    for (int k = 0, n = 2 + (int)(R() * 4); k < n; k++)
+                    {
+                        float px = x + (R() - .5f) * 1.2f, off = .08f + R() * R() * .9f; var s = new Vector3(.12f + R() * .3f, .07f + R() * .14f, .1f + R() * .22f);
+                        var at = F(px, low + s.y / 2 - .03f, off);
+                        if (OnRampOrStair(new Vector2(at.x, at.z), .4f)) continue;
+                        (R() < .7f ? brick : cope).Add(Ashlar(L(at), s, 1, toLocal * yaw * Quaternion.Euler((R() - .5f) * 20, R() * 90, (R() - .5f) * 20)));
+                    }
+                }
+            }
             for (int ti = Zone.terraces.Length - 1; ti >= 0; ti--)
             {
                 var t = Zone.terraces[ti]; if (t == null) continue;
@@ -138,19 +244,12 @@ namespace Crulanda.World
                         cope.Add(Ashlar(L(new Vector3(centre.x, top + .07f, centre.z)), new Vector3(runLen + .06f, .14f, thick + .14f), 1.75f, q));
                         Blocker(root, L(centre), new Vector3(runLen, top - foot, thick), q);
                         runs++;
-                        // The neon moss along the top in places, a strip or two a run (CANON, book1 ch.7:17).
-                        for (float x = -runLen / 2 + .4f; x < runLen / 2 - .4f; x += 1.6f + R() * 2.4f)
-                        {
-                            if (R() > .38f) continue;
-                            float w = Mathf.Min(runLen / 2 - x, .8f + R() * 2.2f); if (w < .4f) continue;
-                            var at = centre + yaw * new Vector3(x + w / 2, (top - foot) / 2 + .15f, (R() - .5f) * thick * .5f);
-                            moss.Add(Ashlar(L(at), new Vector3(w, .05f, .25f + R() * thick * .5f), 1, q));
-                        }
+                        // The face toward the low ground: the band's far side when this terrace stands high, its near side when it is sunk.
+                        bool terraceHigh = HeightAt(mid.x - outward.x * .4f, mid.y - outward.y * .4f, false) > runLow + .5f;
+                        DressWall(centre, yaw, q, runLen, top, foot, runLow, thick, terraceHigh ? 1 : -1);
                         // Green mould glowing at the foot of a wall whose low side is sunk under the streets (the Drain Courts).
                         if (runLow < -1)
                         {
-                            // The face toward the low ground: the band's far side when this terrace stands high, its near side when it is sunk.
-                            bool terraceHigh = HeightAt(mid.x - outward.x * .4f, mid.y - outward.y * .4f, false) > runLow + .5f;
                             float face = terraceHigh ? thick / 2 + .02f : -thick / 2 - .02f;
                             for (float x = -runLen / 2 + .3f; x < runLen / 2 - .3f; x += .9f + R() * 1.6f)
                             {
@@ -188,6 +287,13 @@ namespace Crulanda.World
             Joined32("Retaining walls' coping", root, WallCoping, cope);
             Joined32("Neon moss on the walls", root, NeonMoss, moss);
             Joined32("Mould at the walls' foot", root, DrainMould, mould);
+            Joined32("Pale neon moss on the walls", root, NeonMossPale, mossPale);
+            Joined32("Soot on the walls", root, Dressed(new Color(.075f, .068f, .062f)), grime);
+            Joined32("Seepage under the drains", root, Dressed(new Color(.045f, .065f, .045f)), seep);
+            Joined32("Drain mouths", root, Dressed(new Color(.02f, .02f, .02f)), drain);
+            Joined32("Bills on the walls", root, Tint(art.cloth, new Color(.68f, .62f, .5f)), bills);
+            Joined32("Wall lamps' iron", root, SootIron, iron);
+            Joined32("Wall lamps' glass", root, art.glass, glass);
             return runs;
         }
 

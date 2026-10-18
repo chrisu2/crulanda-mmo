@@ -179,21 +179,67 @@ namespace Crulanda.World
         }
         /// <summary>
         /// The neon moss on a slate roof (CANON, book1 ch.7:17: "a sprawling, chaotic sea of slate rooftops, vibrant, unnatural neon moss"):
-        /// on most roofs one to three patches lying on the slope (a gable roof <paramref name="w"/> by <paramref name="d"/>, its ridge
-        /// <paramref name="roofH"/> over the eaves at <paramref name="eaves"/>), sick bright green that glows a little after dark.
+        /// on a little over half the roofs, grown where moss grows: creeping strips along the ridge and the eaves, clumps round the chimney
+        /// stacks' feet and a cushion or two on the open slope. Every patch is a scatter of small raised pads, each its own size, turn and
+        /// green (sick bright green or yellow-green), so its edge is broken; a soft glow, brighter after dark. A gable roof
+        /// <paramref name="w"/> by <paramref name="d"/> (the stacks of the terrace <paramref name="w"/> - .4 wide along its ridge), its
+        /// ridge <paramref name="roofH"/> over the eaves at <paramref name="eaves"/>. One draw from <paramref name="r"/>; the rest from a
+        /// stream of its own.
         /// </summary>
         void RoofMoss(Batch parts, float w, float d, float roofH, float eaves, System.Random r)
         {
-            if (r.NextDouble() > .62f) return;
-            float hd = d / 2, slope = Mathf.Atan2(roofH, hd) * Mathf.Rad2Deg; var moss = NeonMoss;
-            for (int k = 0, n = 1 + (int)(r.NextDouble() * 3); k < n; k++)
+            if (r.NextDouble() > .58f) return;
+            var g = new System.Random(r.Next()); float R() { return (float)g.NextDouble(); }
+            float hd = d / 2, slope = Mathf.Atan2(roofH, hd) * Mathf.Rad2Deg, xMax = w / 2 - .35f;
+            var greens = new[] { NeonMoss, NeonMossPale };
+            // A pad of moss on one side of the roof at x, u (0 the ridge, 1 the eaves), lying on the slate.
+            void Pad(int side, float x, float u, float size)
             {
-                int side = r.NextDouble() < .5f ? -1 : 1; float u = .2f + (float)r.NextDouble() * .6f, z = side * hd * u;
-                float pw = 1.2f + (float)r.NextDouble() * 3.2f, pd = .8f + (float)r.NextDouble() * 1.6f, x = ((float)r.NextDouble() - .5f) * (w - pw - .6f);
-                // Lying on its side of the roof, falling toward the eaves.
-                var tilt = Quaternion.Euler(side * slope, 0, 0);
-                parts.Box(moss, new Vector3(x, eaves + roofH * (1 - u) + .035f, z), new Vector3(pw, .04f, Mathf.Min(pd, hd * .7f)), tilt);
+                if (Mathf.Abs(x) > xMax) return;
+                u = Mathf.Clamp(u, .02f, .97f);
+                var dims = new Vector3(size * (.6f + R() * .9f), .03f + R() * .05f, size * (.5f + R() * .7f));
+                var tilt = Quaternion.Euler(side * slope, 0, 0) * Quaternion.Euler(0, (R() - .5f) * 70, 0);
+                parts.Box(greens[R() < .7f ? 0 : 1], new Vector3(x, eaves + roofH * (1 - u) + .02f + dims.y / 2, side * hd * u), dims, tilt);
             }
+            // A clump: a big pad and smaller ones scattered round it.
+            void Clump(int side, float x, float u, float spread, int n)
+            {
+                for (int i = 0; i < n; i++)
+                {
+                    float f = i == 0 ? 0 : spread * (.4f + R() * .6f), a = R() * Mathf.PI * 2;
+                    Pad(side, x + Mathf.Cos(a) * f, u + Mathf.Sin(a) * f / hd, (i == 0 ? .5f : .18f) + R() * .35f);
+                }
+            }
+            // A creeping strip along x at u: pads every half metre or so, wandering a little, thinning at its ends.
+            void Strip(int side, float x0, float x1, float u, float wander)
+            {
+                for (float x = x0; x < x1; x += .35f + R() * .45f)
+                {
+                    float end = Mathf.Min(x - x0, x1 - x) / Mathf.Max(.1f, x1 - x0);
+                    if (end < .12f && R() < .5f) continue;
+                    Pad(side, x, u + (R() - .5f) * wander, .22f + R() * .35f + end * .4f);
+                }
+            }
+            int sideA = R() < .5f ? -1 : 1;
+            // Along the ridge, often on both sides of it.
+            if (R() < .6f)
+            {
+                float len = 1.5f + R() * Mathf.Min(6, w * .5f), x0 = (R() - .5f) * (w - len);
+                Strip(sideA, x0, x0 + len, .04f, .05f);
+                if (R() < .6f) Strip(-sideA, x0 + .3f, x0 + len * (.4f + R() * .6f), .04f, .05f);
+            }
+            // Along the eaves, where the rain runs off.
+            if (R() < .7f)
+            {
+                float len = 2 + R() * Mathf.Min(7, w * .6f), x0 = (R() - .5f) * (w - len);
+                Strip(R() < .5f ? sideA : -sideA, x0, x0 + len, .9f, .08f);
+            }
+            // Round the stacks' feet (they stand on the ridge every 5.5 m from 2.2 m in).
+            float ow = w - .4f;
+            for (float x = -ow / 2 + 2.2f; x < ow / 2 - 1; x += 5.5f)
+                if (R() < .45f) foreach (int side in new[] { -1, 1 }) if (R() < .7f) Clump(side, x + (R() - .5f) * .6f, .1f + R() * .06f, .7f, 3 + (int)(R() * 3));
+            // A cushion or two on the open slope.
+            for (int k = 0, n = (int)(R() * 2.4f); k < n; k++) Clump(R() < .5f ? -1 : 1, (R() - .5f) * (w - 1.5f), .35f + R() * .4f, .8f, 4 + (int)(R() * 4));
         }
         /// <summary>Small boxes gathered by material and joined into one mesh each (a terrace's sills, lintels, panes and stoops).</summary>
         sealed class Batch

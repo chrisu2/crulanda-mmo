@@ -218,6 +218,23 @@ namespace Crulanda.World
             }
             return Vector2.zero;
         }
+        /// <summary>
+        /// Whether a point lies inside the drawn water of a creek or a lake (its surface over the map, whatever the ground under it),
+        /// and that water's surface height. A bridge's deck or a quay over it is in it too: compare a height with the surface.
+        /// Needs no ground, so the zone's data answers it without the zone being built (play note 236, 2026-10-18).
+        /// </summary>
+        public bool InDrawnWater(Vector2 p, out float surface)
+        {
+            surface = 0;
+            foreach (var k in Lakes) { var off = p - k.def.center; if (off.magnitude < k.DrawRadiusAt(off)) { surface = k.level; return true; } }
+            foreach (var c in Creeks)
+            {
+                if (c.drawHalf <= 0 || !c.box.Contains(p)) continue;
+                Project(c, p, out float d, out float level, out float wide);
+                if (d <= c.DrawHalf(wide)) { surface = level; return true; }
+            }
+            return false;
+        }
         public bool NearWater(Vector2 p, float margin)
         {
             foreach (var k in Lakes) { var off = p - k.def.center; if (off.magnitude < k.RadiusAt(off) + margin) return true; }

@@ -7,8 +7,8 @@ namespace Crulanda.Encounter
     /// A man (the pack has no woman's body; women keep the Quaternius figure unless <see cref="GanzSeKit.Women"/>), not an orc (the
     /// orc's head is hung on the Quaternius head), is built on the pack's body in the clothes of his look or trade. Worn armour in a
     /// slot the pack covers (head helms, chest, hands, legs, feet) shows the pack's piece instead of the drawn one, so nothing
-    /// doubles up; a chest piece with armoured shoulders hides the drawn shoulder piece; the rest (hoods, caps, circlets, the
-    /// shoulders, the neck, every weapon and shield) is drawn and carried as before, on the same frames.
+    /// doubles up; any pack chest piece hides the drawn shoulder piece; the rest (the cloth hood, the scarf, circlets, crowns,
+    /// the neck, every weapon and shield) is drawn and carried as before, on the same frames.
     /// </summary>
     public sealed partial class ActorVisual
     {

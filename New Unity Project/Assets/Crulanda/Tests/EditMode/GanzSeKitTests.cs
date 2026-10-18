@@ -54,6 +54,15 @@ namespace Crulanda.Tests
                     else Assert.IsNull(belt);
                 }
             }
+            // Every helm, cap, coif and mask is the pack's angular head piece (play note 239, "helms and gauntlet still tooo round");
+            // drawn only: the cloth hood, the scarf, the circlet and the crown.
+            var drawnHeads = new[] { "head.hood:cloth", "head.wrap:scarf", "head.circlet:band", "head.circlet:briar", "head.crown:tin", "head.crown:root", "head.crown:antler" };
+            foreach (var f in GearLooks.Families.Where(x => x.slot == "head"))
+                foreach (var v in f.variants)
+                    Assert.AreEqual(!drawnHeads.Contains(f.name + ":" + v), GanzSeKit.Map(EquipSlot.Head, Look(f.name, v, Color.gray, steel), out _, out _), f.name + ":" + v + (drawnHeads.Contains(f.name + ":" + v) ? " stays drawn" : " is the pack's piece"));
+            // Every hand piece is the pack's Arm piece.
+            foreach (var f in GearLooks.Families.Where(x => x.slot == "hands"))
+                foreach (var v in f.variants) Assert.IsTrue(GanzSeKit.Map(EquipSlot.Hands, Look(f.name, v, Color.gray, steel), out _, out _), f.name + ":" + v + " is the pack's Arm piece");
             // The shoulders and the neck have no slot in the pack: drawn as before.
             foreach (var f in GearLooks.Families.Where(x => x.slot == "shoulders" || x.slot == "neck"))
                 Assert.IsFalse(GanzSeKit.Map(SlotOf(f.slot), Look(f.name, f.variants[0], Color.gray, steel), out _, out _), f.name + " stays drawn.");
@@ -75,7 +84,8 @@ namespace Crulanda.Tests
             Assert.AreEqual(GanzSeKit.Armour(GanzSeKit.Slot.Chest, 2, 1), plate);
             Assert.AreEqual(GanzSeKit.Armour(GanzSeKit.Slot.Chest, 2, 3), Chest("chest.cuirass", "plate", purple, steel, 4), "Epic plate in gold.");
             // A breastplate on mail with pads, the caster's coat with its rings and fur cover the shoulders; the jerkin does not.
-            Assert.IsTrue(GanzSeKit.CoversShoulders(mail)); Assert.IsTrue(GanzSeKit.CoversShoulders(cloth)); Assert.IsFalse(GanzSeKit.CoversShoulders(leather)); Assert.IsFalse(GanzSeKit.CoversShoulders(null));
+            Assert.IsTrue(GanzSeKit.CoversShoulders(mail)); Assert.IsTrue(GanzSeKit.CoversShoulders(cloth)); Assert.IsTrue(GanzSeKit.CoversShoulders(leather)); Assert.IsFalse(GanzSeKit.CoversShoulders(null));
+            Assert.IsFalse(GanzSeKit.CoversShoulders(GanzSeKit.Armour(GanzSeKit.Slot.Legs, 1, 1)), "only a chest piece");
         }
 
         [Test] public void Every_look_and_trade_wears_pieces_the_file_holds()
@@ -144,6 +154,45 @@ namespace Crulanda.Tests
                 if (GearLooks.TrySplitGenerated(db.Get(id), out _, out var p, out _, out _) && p == piece) return id;
             }
             Assert.Fail("No generated " + piece + "."); return null;
+        }
+
+        /// <summary>Play note 239 ("helms and gauntlet still tooo round", the 04-sets-front line-up): with the switch on, every head look
+        /// of the wardrobe line-up but the cloth hood, scarf, circlet and crown is the pack's head piece with nothing drawn; every hand
+        /// look the pack's Arm piece with nothing drawn; every shoulder look hidden under the pack's chest piece.</summary>
+        [Test] public void Nothing_round_is_drawn_over_the_packs_head_hand_and_shoulder_pieces()
+        {
+            Assume.That(ModelFigure.Available && ModelFigure.GanzSeAvailable, "Both kits are in the project.");
+            ActorVisual.Models = true; GanzSeKit.On = true;
+            var db = new ItemDatabase(); var looks = GearLooks.Parse(Resources.Load<TextAsset>("Gear/looks").text);
+            string Item(string look)
+            {
+                string id = "ganzse.test." + db.Items.Count; looks.Register(id, look);
+                GearLooks.TryParseLook(look, out var family, out _, out _, out _);
+                db.Items[id] = new ItemDef { id = id, name = look, kind = "gear", slot = GearLooks.Family(family).slot, quality = 2, level = 7, canonStatus = "GAME-ONLY" };
+                return id;
+            }
+            var v = Figure(ActorLook.Warrior, 3); var m = v.Model; Assert.IsTrue(m.GanzSe);
+            var drawn = new[] { "head.hood:cloth", "head.wrap:", "head.circlet:", "head.crown:" };
+            foreach (var look in WardrobeCapture.HeadLooks)
+            {
+                v.ApplyGearIds(new[] { Item(look) }, db, looks);
+                bool keep = drawn.Any(d => look.StartsWith(d));
+                if (keep) { Assert.IsNull(m.Worn(GanzSeKit.Slot.Head), look + ": no pack piece"); Assert.Greater(v.GearParts(EquipSlot.Head), 0, look + ": drawn"); }
+                else { Assert.IsNotNull(m.Worn(GanzSeKit.Slot.Head), look + ": the pack's head piece"); Assert.AreEqual(0, v.GearParts(EquipSlot.Head), look + ": no drawn head piece"); }
+            }
+            foreach (var look in WardrobeCapture.HandLooks)
+            {
+                v.ApplyGearIds(new[] { Item(look) }, db, looks);
+                Assert.IsNotNull(m.Worn(GanzSeKit.Slot.Arm), look + ": the pack's Arm piece");
+                Assert.AreEqual(0, v.GearParts(EquipSlot.Hands), look + ": no drawn hand piece");
+            }
+            foreach (var look in WardrobeCapture.ShoulderChestLooks.Where(l => l.StartsWith("shoulder.")))
+            {
+                v.ApplyGearIds(new[] { Item(look) }, db, looks);
+                Assert.AreEqual(0, v.GearParts(EquipSlot.Shoulders), look + ": hidden under his own top's shoulders");
+            }
+            v.ApplyGearIds(new string[0], db, looks);
+            Assert.IsNull(m.Worn(GanzSeKit.Slot.Head)); Assert.IsNull(m.Worn(GanzSeKit.Slot.Arm));
         }
 
         [Test] public void A_man_is_built_on_the_pack_and_wears_its_pieces()

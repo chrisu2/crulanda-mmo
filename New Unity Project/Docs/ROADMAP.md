@@ -103,6 +103,11 @@ wrote a pose; it is now added after them and rebound (the import and avatar were
 figure's tone times the ratio that takes the pack's pale swatch to the Quaternius skin, the material matte (.25 gloss, as the kit's).
 Eyes: dark only (the old formula gave every variant the blue). Every class starts in a top, breeches and boots. New PlayMode test
 GanzSeAnimationTests: a GanzSe man before a camera drops his arms and moves his hands, animating always and culling as built.
+**Play note 239 (Chris on 04-sets-front, verbatim: "helms and gauntlet still tooo round"): fixed on the GanzSe kit, NOT RUN.** Every
+head piece the pack has a match for is its angular piece, nothing drawn: helms, coifs and kettles, caps (leather: the brimmed hat;
+flapped and leaf: the hide hood), the oilskin hood and the bone mask (the hide hood), the cult's mask (the skull helm). Drawn only: the
+cloth hood, the scarf, the circlet and the crown. Every hand piece is the pack's Arm piece (none drawn); under any pack chest piece
+the drawn shoulders are not drawn. GanzSeKitTests checks the whole line-up's head, hand and shoulder looks.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

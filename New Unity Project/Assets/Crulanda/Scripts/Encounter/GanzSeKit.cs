@@ -96,13 +96,20 @@ namespace Crulanda.Encounter
         }
         /// <summary>
         /// Every armour family's weight (GearLooks.Families; "family/variant" overrides the family). A family not here, or
-        /// <see cref="Weight.None"/>, keeps its drawn piece (the pack has nothing like it): hoods, caps, scarves, masks,
-        /// circlets and crowns on the head; the shoulders and the neck (the pack has no such slots).
+        /// <see cref="Weight.None"/>, keeps its drawn piece (the pack has nothing like it): the cloth hood, the scarf,
+        /// circlets and crowns on the head; the shoulders and the neck (the pack has no such slots; under any of its chest pieces the
+        /// drawn shoulders are not drawn).
         /// </summary>
         static readonly Dictionary<string, Weight> Weights = new Dictionary<string, Weight>(StringComparer.Ordinal) {
-            // Head: only helms. The caster's and the rogue's heads (a skull helm, a brimmed hat) are no hood or cap.
+            // Head (Chris, play note 239, the 04-sets-front line-up: "helms and gauntlet still tooo round"): every head piece the pack
+            // has a match for shows the pack's angular piece, not our drawn dome. A leather cap the rogue's brimmed hat, a flapped or
+            // leaf cap, an oilskin hood and a bone mask the hide hood with its ears and horns, the cult's mask the caster's skull helm,
+            // mail the breastplate's helm, plate the black helm. Drawn still, for what the pack truly lacks: the cloth hood, the
+            // scarf, the circlet and the crown (no domes among them).
             { "head.coif", Weight.Mail }, { "head.kettle", Weight.Mail }, { "head.barbute", Weight.Plate }, { "model.helm", Weight.Plate },
-            { "head.cap", Weight.None }, { "head.hood", Weight.None }, { "head.wrap", Weight.None }, { "head.mask", Weight.None }, { "head.circlet", Weight.None }, { "head.crown", Weight.None },
+            { "head.cap", Weight.Leather }, { "head.cap/flaps", Weight.Hide }, { "head.cap/leaf", Weight.Hide },
+            { "head.hood", Weight.None }, { "head.hood/oilskin", Weight.Hide }, { "head.mask", Weight.Hide }, { "head.mask/tear", Weight.Cloth },
+            { "head.wrap", Weight.None }, { "head.circlet", Weight.None }, { "head.crown", Weight.None },
             // Chest.
             { "chest.tunic", Weight.Cloth }, { "chest.robe", Weight.Cloth }, { "chest.jerkin", Weight.Leather }, { "chest.jerkin/hide", Weight.Hide }, { "chest.jerkin/scale", Weight.Mail },
             { "chest.coat", Weight.Mail }, { "chest.hauberk", Weight.Mail }, { "chest.cuirass", Weight.Plate }, { "chest.cuirass/bark", Weight.Hide },
@@ -177,12 +184,9 @@ namespace Crulanda.Encounter
             if (s == Slot.Chest) belt = Armour(Slot.Belt, type, colour);
             return true;
         }
-        /// <summary>A chest piece whose shoulders are armoured (pads, rings or fur): the drawn shoulder piece is not drawn over it.</summary>
-        public static bool CoversShoulders(string chestPiece)
-        {
-            if (SlotOf(chestPiece) != Slot.Chest) return false;
-            int t = TypeOf(chestPiece); return t == 1 || t == 4 || t == 6;
-        }
+        /// <summary>Any of the pack's chest pieces: each has something on its shoulders (pads, plates, rings, bone, a pauldron, fur), so
+        /// the drawn shoulder piece, a ball over the pack's shoulder (play note 239), is not drawn over it.</summary>
+        public static bool CoversShoulders(string chestPiece) { return SlotOf(chestPiece) == Slot.Chest; }
 
         // ------------------------------------------------------------------------------------------------- what people wear bare
         /// <summary>A set's pieces: slot, type, colourway.</summary>

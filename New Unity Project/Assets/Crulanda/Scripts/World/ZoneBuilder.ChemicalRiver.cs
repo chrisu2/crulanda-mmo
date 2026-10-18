@@ -26,6 +26,15 @@ namespace Crulanda.World
         {
             if (Water == null) return false;
             var q = new Vector2(p.x, p.z); float ground = float.NaN;
+            // (the drowned vaults, Lowtowns pick 11) A cave's water of the river's kind: the black canal under the market.
+            foreach (var w in caveWaters)
+            {
+                if (w.def.kind != ChemicalKind || !w.cave.FloorAt(q, out float floor)) continue;
+                float level;
+                if (w.kind == 2) { w.cave.Local(q, out float s, out _); if (s < w.s0 || s > w.s1) continue; level = w.level; }
+                else { if (BasinDip(w.cave, q) <= .12f) continue; level = WaterLevel(w, q); }
+                if (p.y - 1 < level - .05f && p.y - 1 > floor - w.depth - 1.5f) return true;
+            }
             foreach (var c in Water.Creeks)
             {
                 if (!Chemical(c.def) || c.drawHalf <= 0 || !c.box.Contains(q)) continue;

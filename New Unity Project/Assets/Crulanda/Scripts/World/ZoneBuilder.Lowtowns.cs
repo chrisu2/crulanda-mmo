@@ -789,6 +789,8 @@ namespace Crulanda.World
             BuildLowtownMarks();
             // The roofs over Pell Row (Lowtowns pick 3; ZoneBuilder.Roofs)
             BuildRoofs();
+            // The smugglers' drowned vaults under the market (Lowtowns pick 11; ZoneBuilder.DrownedVaults)
+            BuildDrownedVaults();
             var paving = new GameObject("Paving").transform; paving.SetParent(statics, false);
             foreach (var road in Zone.roads)
             {
@@ -878,6 +880,8 @@ namespace Crulanda.World
                 if (Mathf.Abs(q.x) > edge || Mathf.Abs(q.y) > edge) return false;
                 if (!road && NearRoad(q, rad + .3f)) return false;
                 if (Water.NearWater(q, rad + 1.5f) || InBuilding(q)) return false;
+                // (the drowned vaults) Nothing over a cave's mouth or where its passage runs near the surface (the ground is cut there).
+                if (Hollow.CoverAt(q, rad + 1) > 0) return false;
                 if (LowSteep(q, rad + .4f)) return false;   // not on a retaining wall's slope or a stair (ZoneBuilder.LowtownLevels)
                 for (int k = 0; k < 4; k++) if (InBuilding(q + new Vector2(k < 2 ? (k * 2 - 1) * rad : 0, k >= 2 ? (k * 2 - 5) * rad : 0))) return false;
                 foreach (var c in clear) if ((q - c.at).sqrMagnitude < (c.r + rad) * (c.r + rad)) return false;

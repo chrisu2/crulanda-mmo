@@ -225,7 +225,8 @@ namespace Crulanda.World
                 if (fm.Count == 0) continue;
                 var go = new GameObject("Cave water: " + (string.IsNullOrEmpty(w.def.name) ? h.Name : w.def.name)); go.transform.SetParent(root, false);
                 go.AddComponent<MeshFilter>().sharedMesh = fm.Make(go.name);
-                var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = mat; mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; mr.receiveShadows = false;
+                // (the drowned vaults) The black canal is the Chemical River's water.
+                var mr = go.AddComponent<MeshRenderer>(); mr.sharedMaterial = w.def.kind == ChemicalKind ? ChemicalWater() : mat; mr.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.Off; mr.receiveShadows = false;
                 if (art.waterSurface == null) go.AddComponent<WaterDrift>();
             }
         }

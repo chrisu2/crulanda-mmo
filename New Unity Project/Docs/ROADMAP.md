@@ -59,6 +59,15 @@ mapping from our items' looks to its parts, keeping the drawn pieces for what it
 (b) keep our figures and rewrite the fitting rules piece by piece. (a) is the lasting fix; (b) is the one that keeps failing.
 **Chris chose (a)** (2026-10-15 ~22:00, the question prompt, verbatim: "Rebuild on the hero pack's body (Recommended)"). The full
 package is not on disk (not in the Asset Store cache): Chris downloads "Modular Hero" (CHOSAN) in the Package Manager's My Assets first.
+**Chris changed the pack (2026-10-18 ~18:15).** Asked the CHOSAN pack's name, he answered "GanzSe FREE Modular Character - Fantasy Low
+Poly Pack" (downloaded 18:10 into the Asset Store cache: a base body, head/chest/arm/belt/legs/feet armour in 6 styles x 3 colours, hair,
+beards, eyes, faces; no weapons), and chose it at the question prompt (verbatim): "GanzSe (Recommended)". Our weapons stay. First step:
+import into a test copy, check the rig takes our animations, a wardrobe line-up; CHOSAN's partial import stays until GanzSe replaces it.
+Read from the package without Unity (2026-10-18): imported as Humanoid (animationType 3, auto-mapped); one skeleton (spine_01-04,
+neck, head, shoulder/upperarm/forearm/hand with five-finger chains, upperleg/shin/foot/toes, _l/_r) with every armour piece skinned to
+it in "GanzSe Free Modular Character 1_1.fbx" (update 1.1) and "Free Low Poly Modular Character.fbx"; 215 non-skinned part prefabs;
+a demo ModularHeroController (shows one child per category). Chris could not find CHOSAN's pack in My Assets ("i dont see chosan pack
+anywhere"); it is not needed now.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

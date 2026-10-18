@@ -32,6 +32,15 @@ namespace Crulanda.Combat
             Statuses?.Clear(); ClearBarrier();
         }
         public void ClearBarrier() { Barrier = 0; barrierUntil = 0; }
+        /// <summary>Takes up to <paramref name="amount"/> off the barrier without a blow (a Lowtowns Weave-Eater eating a ward, WeaveEaterRules);
+        /// returns how much went.</summary>
+        public int EatBarrier(int amount)
+        {
+            if (Barrier <= 0 || amount <= 0) return 0;
+            int took = Mathf.Min(Barrier, amount); Barrier -= took;
+            if (Barrier == 0) barrierUntil = 0;
+            return took;
+        }
         public bool AddBarrier(int amount, float duration)
         {
             if (actor == null || !actor.IsAlive || amount <= 0 || !(duration > 0) || float.IsInfinity(duration)) return false;

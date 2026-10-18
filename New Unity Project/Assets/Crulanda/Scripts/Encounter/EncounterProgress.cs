@@ -212,6 +212,8 @@ namespace Crulanda.Encounter
         public bool Any { get { return values.Count > 0 || forced != null; } }
         public void Remove(string id) { if (id != null) values.Remove(id); if (forced == id) { forced = null; until = 0; } }
         public bool IsEmpty { get { return values.Count == 0; } }
+        /// <summary>The highest threat anyone holds (0 for none): the Lowtowns' Weave-Eaters' lighthouse adds a share of it (WeaveEaterRules).</summary>
+        public float Top { get { float max = 0; foreach (var v in values.Values) max = Math.Max(max, v); return max; } }
         /// <summary>The threat held by one party member (0 if none); the balance harness's tank test reads it.</summary>
         public float Of(string id) { return id != null && values.TryGetValue(id, out var v) ? v : 0; }
     }

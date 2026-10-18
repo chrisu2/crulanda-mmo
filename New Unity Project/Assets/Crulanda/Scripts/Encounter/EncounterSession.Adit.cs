@@ -37,6 +37,8 @@ namespace Crulanda.Encounter
             StartSwingLoads();   // (S7) the Foundry's swing-loads and their rope teams (AditSwingLoad)
             StartHaul();     // (S6) the barge aground in the Black Cove and the rope teams on her warps (EncounterSession.Haul.cs)
             StartHallows();  // (Hallow's Creek) the paused townsfolk, the wagon's mules, the Warden (EncounterSession.Hallows.cs)
+            // (the Lowtowns) the Rusty Spoon's Triad table, its window and its brawl (EncounterSession.Spoon.cs)
+            StartSpoon();
             // The pressed goblins in their cages, and the doors of those opened before standing open (playtest note 125).
             foreach (var i in Zone.Interactables)
             {
@@ -139,7 +141,7 @@ namespace Crulanda.Encounter
             if (goblin != null) Destroy(goblin);
         }
         /// <summary>What E says at a usable prop (the HUD's prompt; the Adit's things say how things stand).</summary>
-        public string InteractPromptFor(ZoneInteractable i) { return i == null ? null : AditPrompt(i) ?? i.prompt; }
+        public string InteractPromptFor(ZoneInteractable i) { return i == null ? null : AditPrompt(i) ?? SpoonPrompt(i) ?? i.prompt; }
         ZoneCamp CampOf(EncounterEnemy e) { var camps = Zone != null ? Zone.Zone.camps : null; return e != null && camps != null && e.CampIndex >= 0 && e.CampIndex < camps.Length ? camps[e.CampIndex] : null; }
         /// <summary>The zone's keyed camps (the sigil bosses), and how many of their keys you hold.</summary>
         List<ZoneCamp> KeyCamps() { var list = new List<ZoneCamp>(); if (Zone != null && Zone.Zone.camps != null) foreach (var c in Zone.Zone.camps) if (c != null && !string.IsNullOrEmpty(c.key)) list.Add(c); return list; }

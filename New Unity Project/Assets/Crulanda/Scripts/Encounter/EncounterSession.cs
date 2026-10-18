@@ -969,6 +969,8 @@ namespace Crulanda.Encounter
             if (i.kind == "board") { OpenBoard(i); return; }
             if (i.kind == "chest") { OpenChest(i); return; }   // EncounterSession.Loot.cs
             if (UseAditThing(i)) return;   // the Sealed Adit's gates, powder and spirit stone (EncounterSession.Adit.cs)
+            // the Rusty Spoon's Triad table (EncounterSession.Spoon)
+            if (UseSpoonThing(i)) return;
             if (i.node != null && Professions != null) { TryGather(i); return; }   // a node (a seam, a windfall, a herb) is worked with its trade
             if (Quests == null) { Message("Nothing here you need."); return; }
             if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
@@ -1958,6 +1960,8 @@ namespace Crulanda.Encounter
             if (!Paused && SimPopulation.Active != null && EncounterInput.Press(KeyCode.O)) WhoOpen = !WhoOpen;
             if (!Paused && Zone != null && EncounterInput.Press(KeyCode.J)) QueueOpen = !QueueOpen;   // the dungeon queue (Gather a Party)
             if (Paused) return;
+            // the Rusty Spoon's smell, ballad and brawl (EncounterSession.Spoon)
+            TickSpoon();
             if (EncounterInput.Press(KeyCode.B)) BuildOpen = !BuildOpen;
             // Moving interrupts the player's own cast-time abilities (instant abilities are unaffected).
             abilities.Tick(Time.time, Player.IsAlive && !Player.GetComponent<AdventurerMotor>().Moving);
@@ -2200,9 +2204,11 @@ namespace Crulanda.Encounter
                 if (LootOpen) return "Take all";
                 var exit = NearbyExit; if (exit != null) return exit.name;
                 var body = LootableCorpse; if (body != null) return body.Game || body.Skinnable ? GameAnimals.SkinPrompt : "Search the body";
+                // the Spoon's Triad table, its drinkers round it
+                var cards = SpoonTableAtHand(); if (cards != null) return SpoonPrompt(cards);
                 var (villager, mira) = TalkTarget();
                 if (mira) return !Progress.recruited ? "Recruit Mira" : !Companion.actor.IsAlive ? "Revive Mira" : "Talk to Mira";
-                if (villager != null) return "Talk to " + villager.Name;
+                if (villager != null) return SpoonTalkPrompt(villager) ?? "Talk to " + villager.Name;
                 var (usable, secret) = NearestUse();
                 if (secret != null) return SecretPrompt(secret);
                 if (usable != null) return InteractPromptFor(usable);
@@ -2236,6 +2242,8 @@ namespace Crulanda.Encounter
                 }
                 return;
             }
+            // the Spoon's Triad table (EncounterSession.Spoon)
+            var cards = SpoonTableAtHand(); if (cards != null) { UseSpoonThing(cards); return; }
             var (talkTo, toMira) = TalkTarget();
             if (toMira)
             {
@@ -2246,6 +2254,8 @@ namespace Crulanda.Encounter
             }
             if (talkTo != null)
             {
+                // a brawler in the Spoon's brawl: you wade in (EncounterSession.Spoon)
+                if (SpoonJoin(talkTo)) return;
                 SelectFriendly(talkTo, false);
                 NoteMet(talkTo.Name);   // the book of lore's People
                 if (QuestTalk(talkTo.Name, talkTo.transform.position)) talkTo.FacePlayer();

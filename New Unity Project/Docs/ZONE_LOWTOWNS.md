@@ -252,3 +252,55 @@ ch.1:9); the building, its rooms and everything in them GAME-ONLY.
   room), by day and at night; watch Sall at the bar and the drinkers find their seats, and the camera under the low ceiling.
 - **Note:** `tools/wip/lowtowns/make_lowtowns.py` no longer reproduces `lowtowns.json` (the market stalls, the slag-iron nodes and some
   people were edited in the JSON after it); do not run it over the file.
+
+## The rework, picks 4 and 5: the Weave-Eaters and the Spoon as the books have them (rw-lowlife, 2026-10-18)
+Chris, 2026-10-18 (REWORK_LOWTOWNS_HALLOWS.md): "keep all"; conflict 9, "snivel is fine"; "i never said not use the name characters".
+Citations: `b1 ch.N:L` is `D:\code\crulanda\book1\chapter_N.md` at line L.
+
+**Pick 4, the Weave-Eaters as chapter 20 shows them** (`WeaveEaterRules`, `EncounterEnemy.WeaveEater.cs`; only in the Lowtowns,
+`WeaveEaterRules.BookZones`, so the Weave-Eaters of other zones keep the fights Chris settled):
+- **The blink (CANON, b1 ch.20:131):** they move by "a sudden, jerking displacement of space": every 4.5 s, with their foe more than
+  5 m off, a warp of up to 7 m toward it ("Displaces"), only onto walkable ground at the foe's level (never onto a roof or into a court).
+- **The lighthouse (CANON, ch.20:121):** a mage's aura "acted as a lighthouse in a storm": every 2 s whoever of the party within 25 m
+  works magic (a mana or a salt pool) or wears a ward gains 12% of the top threat, so they turn on the casters and healers unless the
+  tank keeps ahead (a taunt still holds them).
+- **Wards eaten (CANON, ch.20:143):** "They are eating the spell as fast as I cast it": a barrier on whoever one fights within reach
+  loses 35% of what is left (at least 5) every second ("Ward eaten").
+- **Harpoons stop the blink (CANON, ch.20:191):** the bone harpoons acted as anchors, "preventing them from displacing": a harpooned
+  Weave-Eater cannot blink for 12 s (the root itself stays 5 s). Ketta Rune sells harpoons (built).
+- **Salt calcifies (CANON, ch.20:201-205):** "solid, jagged statues of white crystal": the salt's 4 s stun, its line now says so. Tibb
+  Marrow sells the twists in the market (built).
+- Numbers GAME-ONLY. Camps unchanged (positions and levels); their labels now cite ch.20's lines.
+
+**Pick 5, the Rusty Spoon as chapter 1 tells it** (`SpoonRules`, `EncounterSession.Spoon.cs`, the brawl in `Villager` in `WorldLife.cs`):
+- **The smell (CANON, b1 ch.1:7):** "wet dog and stale beer", said on coming in (again after five minutes away); the landmark's text too.
+- **Triad (CANON, ch.1:45-57):** at the back room's card table, "Three cards. High card takes it."; the suits Stones, Cups, Swords,
+  Wyrms and Coins (ch.1:47, 71); three Kings are the Crown, unbeatable (ch.1:55-57). Stake a crown a level (at least 5); a win pays
+  double, the Crown four times, a push gives the stake back (GAME-ONLY numbers; the Ace low so the Kings top the deck). One hand in
+  twenty the dealer lays four Aces, the "Grand Emperor's Flush ... in the appendix. Page forty-two" (ch.1:87), the table goes over
+  (ch.1:89) and the brawl begins.
+- **The ballad (CANON, ch.1:59):** the corner drunk (Ottie Swale, name GAME-ONLY) sings a line of The Ballad of the One-Legged Goat
+  every half minute or so while you are in; no verses are written (the book gives only the title). A Crown at Triad stops him, as the
+  book has it ("Even the drunk in the corner stopped").
+- **Snivels Gear-Grinder (CANON, ch.1:105; ch.4:13-15):** the goblin bartender, at the bar's front end (the gap behind the bar is too
+  narrow to walk); his lines hint that he alone still knows the forgotten eastern paths, and the Reach's sweetest cider. The book loses
+  him later (ch.4:57), after the game's time. **Mother Sall stays the keeper:** the books name no keeper of the Spoon, only its
+  bartender, so nothing contradicts her (GAME-ONLY, labelled so).
+- **Gorm (CANON, ch.1:133; ch.19:39):** "The ale here tastes like rust" (built), and now: he dug a boy out of the ash at Hallow's Creek
+  ten years ago, forty years under and still five; the boy is not named (Chris's conflict 7).
+- **The brawl (CANON, ch.1:107-121; the rule GAME-ONLY):** every 7 to 11 minutes while you are near (the first a minute or two after
+  you come), the drinkers in the room fight each other for 20 s, fists and bottles only: one goes down every few seconds, knocked down,
+  never killed; Snivels cries for his vodka shelf (ch.1:105). Talk to a brawler to **wade in**: three of them turn on you for 9 s; a
+  blow every 1.4 s of 5% of your health, never taking you under 35%; you put one down every other beat; after it you sweep up what the
+  tables spilled (two crowns a level). It ends with one of them thrown "through the shattered front window" into "the cold mud of the
+  alleyway" (ch.1:119-121), by Gorm when he is in the room, and the window stays **boarded**, its glass in the lane, for 8 minutes.
+  Snivels: "And who's paying for that window?"
+- No machines. "Gear-Grinder" is the book's name, nothing more.
+- **Tests (new):** EditMode `LowtownsReworkTests` (the blink, the lighthouse, the ward-eating, the pin, the book zones, Triad's rules,
+  the brawl's floor, the ballad's lines, Snivels, the drunk, Gorm and Sall in the data, each labelled); PlayMode `SpoonPlayTests` (Snivels
+  in the Spoon, a hand of Triad, a brawl waded into that never kills and ends through the window). Compile-checked; **not run in Unity**.
+- **To run and look at in the local session (OPEN):** EditMode `LowtownsReworkTests`, `LowtownsZoneTests`, `InnLayoutTests`,
+  `EliteBalanceTests`, `MobMoveTests`, `HouseholdDataTests`; PlayMode `SpoonPlayTests`, `PostFacingPlayTests` (zone.lowtowns). In game:
+  a Weave-Eater fight at night in the Drain Courts as a caster (it should blink in and come for you; a Ward should melt), a harpoon then
+  no blink for a while; the Spoon at night: Snivels at the bar (his goblin figure, front, back and side), the drunk's lines, a hand of
+  Triad, a brawl (the poses, the bubbles, the throw through the window, the boards and glass outside).

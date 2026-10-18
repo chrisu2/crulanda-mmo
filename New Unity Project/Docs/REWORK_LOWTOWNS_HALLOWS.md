@@ -179,8 +179,8 @@ sells his pie, and the town moves.
 1. **Built downhill** (M): the market high under the Forge wall, lanes falling in shelves and causeways to the river. CANON-EXPANDED (ch.3:7, 257; WB:97)
 2. **Colour from the books** (S): yellow smog, orange fires, neon moss, green drain-glow, violet shard-light, the twin moons. CANON (ch.1:135, 145, 191; ch.7:17; ch.6:129)
 3. **The roofs** (L): up by rain-spouts and fire escapes, over slate and gutters, down through the laundry; rope bridges added. CANON-EXPANDED (ch.1:225, 261, 297; ch.7:35-41)
-4. **Weave-Eaters as the books show them** (M): they blink, go for casters, eat wards; harpoons stop the blink, salt calcifies. CANON (ch.20:121-205)
-5. **The Spoon as in chapter 1** (M): Triad, the Ballad of the One-Legged Goat, the brawl out through the front window. CANON (ch.1:7-133)
+4. **Weave-Eaters as the books show them** (M): they blink, go for casters, eat wards; harpoons stop the blink, salt calcifies. CANON (ch.20:121-205) - BUILT 2026-10-18 (rw-lowlife; ZONE_LOWTOWNS.md, "The rework, picks 4 and 5"), not yet run in Unity
+5. **The Spoon as in chapter 1** (M): Triad, the Ballad of the One-Legged Goat, the brawl out through the front window. CANON (ch.1:7-133) - BUILT 2026-10-18 with Snivels at the bar (conflict 9), not yet run in Unity
 6. **The Chemical River** (S): black iridescent sludge that poisons, sludge-eels, a mutated crocodile rare, wading hides you. CANON (ch.15:335, 391; ch.16:5, 75)
 7. **New tricks for the other camps** (M): warders' shield-line, slate-throwers, hounds that circle, barge fights, the Grey-touched's flash. CANON-EXPANDED / GAME-ONLY
 8. **The Night Market** (M): the market that never sleeps, the Merchant of Nothing's jars, the candlemaker's light-butterflies, a chalk ring. CANON (ch.3:5; lore #6, #9) + GAME-ONLY ring
@@ -436,6 +436,6 @@ Sizes: **S** a day or less, mostly data; **M** two or three days, some new code;
 - The Half-Light and its chain-ladders (the Hub's); the Blind Crow and the Rust & Ruin with its Raid Bell (the Warrens' and Book 1's);
   the Blind Seer's back room (the Copper-Tithe's); Seekers and Inquisitors fought (the Hub's); a street riot (the Sludge-Tunnels own a
   riot; the books' Shatter-Riots and bread riots stay talk, ch.1:155, lore #2).
-- Book 1's people: Valen, Rill, Silas, Veyra, Kaelen, Vala in person, Krunk and Snivels (conflict 9); Gorm only, by Chris's yes.
+- Book 1's people: Valen, Rill, Silas, Veyra, Kaelen, Vala in person, Krunk (superseded 2026-10-18: Chris, "i never said not use the name characters"; Snivels is in, conflict 9; Gorm by his earlier yes).
 - Hallow's Creek's end (ch.23: the statues screaming, the town unwritten): after the game's time.
 - "The Cabbage Rogue" custom (lore #10): after Book 1.

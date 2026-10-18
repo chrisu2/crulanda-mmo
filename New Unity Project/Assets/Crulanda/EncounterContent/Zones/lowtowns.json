@@ -761,13 +761,13 @@
     },
     {
       "name": "The Rusty Spoon",
-      "text": "A decrepit establishment known for watered-down ale and high-stakes games. The chairs are missing an inch on one leg, most of them.",
+      "text": "A decrepit establishment known for watered-down ale and high-stakes games. It smells like wet dog and stale beer. Triad at the back table, a ballad about a goat in the corner, and a brawl most nights. The chairs are missing an inch on one leg, most of them.",
       "at": {
         "x": -125,
         "y": 18
       },
       "radius": 10,
-      "canonStatus": "CANON: the Rusty Spoon (book1 ch.1:9); its rooms and people GAME-ONLY",
+      "canonStatus": "CANON: the Rusty Spoon (book1 ch.1:9), its smell (ch.1:7), Triad (ch.1:45), the ballad (ch.1:59), Snivels (ch.1:105), the brawl and the front window (ch.1:107-121); its rooms and the rest of its people GAME-ONLY",
       "view": {
         "x": -125,
         "y": -2
@@ -5452,7 +5452,7 @@
       "mob": "Weave-Eater",
       "tag": "weaveeater",
       "look": "weaveeater",
-      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY",
+      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); in the fight as ch.20 shows them: they blink (ch.20:131), go for magic (ch.20:121), eat wards (ch.20:143), are pinned by harpoons (ch.20:191) and calcified by salt (ch.20:205); the camp GAME-ONLY",
       "center": {
         "x": -150,
         "y": 132
@@ -5469,7 +5469,7 @@
       "mob": "Weave-Eater",
       "tag": "weaveeater",
       "look": "weaveeater",
-      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY",
+      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); in the fight as ch.20 shows them: they blink (ch.20:131), go for magic (ch.20:121), eat wards (ch.20:143), are pinned by harpoons (ch.20:191) and calcified by salt (ch.20:205); the camp GAME-ONLY",
       "center": {
         "x": -106,
         "y": 160
@@ -5486,7 +5486,7 @@
       "mob": "Weave-Eater",
       "tag": "weaveeater",
       "look": "weaveeater",
-      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); the camp GAME-ONLY",
+      "canonStatus": "CANON creature (Weave-Eaters: book1 ch.1:251, ch.20); in the fight as ch.20 shows them: they blink (ch.20:131), go for magic (ch.20:121), eat wards (ch.20:143), are pinned by harpoons (ch.20:191) and calcified by salt (ch.20:205); the camp GAME-ONLY",
       "center": {
         "x": -150,
         "y": 192
@@ -5762,6 +5762,7 @@
         "title": "Keeper of the Rusty Spoon",
         "place": "bar",
         "works": true,
+        "canonStatus": "GAME-ONLY: the books name no keeper of the Rusty Spoon, only its bartender, Snivels Gear-Grinder (b1 ch.1:105), who stands beside her; nothing in them contradicts her, so she keeps the house",
         "stories": [
           "The ale's watered because the water's cheaper than the ale. Everybody knows. Nobody complains. That's the Spoon's whole secret.",
           "Chairs get broken in here most nights. I keep a cellar of legs. Nobody's ever asked why there are so many legs.",
@@ -5774,10 +5775,44 @@
         "title": "Lowtown Muscle",
         "place": "inn",
         "look": "orc",
+        "canonStatus": "CANON: Gorm Rock-Wall, Valen's orc, at the Spoon (b1 ch.1:21-25); \"Ale tastes like rust\" (ch.1:133); the pier and the fishing pole (ch.1:153-159); he dug a boy out of Hallow's Creek's ash ten years before the book (ch.19:39; the boy unnamed here, Chris's conflict 7); the sap-root GAME-ONLY",
         "stories": [
           "The ale here tastes like rust. I drink it anyway. You get used to rust in the Lowtowns. You get used to most things.",
           "My mother told me of a pier in the north where the water runs clear and you can just sit. One day I'll have a pier. And a fishing pole that isn't scrap wire.",
-          "Sap-root for a split knuckle. Chew it, spit it on, don't look at it. Orc remedy. Works on you lot too, mostly."
+          "Sap-root for a split knuckle. Chew it, spit it on, don't look at it. Orc remedy. Works on you lot too, mostly.",
+          "Ten years back I dug a boy out of the ash at Hallow's Creek. Stone all round him, and him still five years old after forty years under. Don't ask me how. I don't."
+        ]
+      },
+      {
+        "name": "Snivels Gear-Grinder",
+        "role": "stranger",
+        "title": "Bartender of the Rusty Spoon",
+        "look": "goblin",
+        "at": {
+          "x": -130.5,
+          "y": 14.7
+        },
+        "canonStatus": "CANON: Snivels Gear-Grinder, the Rusty Spoon's goblin bartender (b1 ch.1:105), who knows the forgotten eastern paths and the Reach's sweetest cider (ch.4:13-15); in the book he is lost later, so before Book 1 he pours (Chris's conflict 9: \"snivel is fine\"); his lines GAME-ONLY. He stands at the bar's front end: the gap behind the bar is too narrow to walk",
+        "stories": [
+          "Snivels Gear-Grinder, at your service. Don't lean on the bar. It isn't holding itself up so much as remembering how.",
+          "The east roads? Everybody says they're gone. They're not gone. They're forgotten. There's a difference, and I'm the one who still knows where it is.",
+          "There's a village out in the Reach makes the sweetest apple cider you ever tasted. If they ever stop, I'll have to start boiling my own boots.",
+          "Every brawl in here starts at the card table and ends at my vodka shelf. Every single one."
+        ]
+      },
+      {
+        "name": "Ottie Swale",
+        "role": "stranger",
+        "title": "The Corner Drunk",
+        "at": {
+          "x": -125.6,
+          "y": 22.3
+        },
+        "canonStatus": "CANON-EXPANDED: the drunk in the Spoon's corner butchering The Ballad of the One-Legged Goat (b1 ch.1:59); his name and lines GAME-ONLY (the book gives the song's title only, so no verses are written)",
+        "stories": [
+          "You want a song? I've got one song. It's a good one. It's about a goat.",
+          "The Ballad of the One-Legged Goat has forty verses. I know three. I sing them in a different order every night so nobody notices.",
+          "Don't sit in at the card table. I sat in at the card table once. Look at me."
         ]
       },
       {

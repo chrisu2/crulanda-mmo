@@ -24,6 +24,9 @@ namespace Crulanda.World
     /// </summary>
     public sealed partial class ZoneBuilder
     {
+        /// <summary>The Spoon's front window, its boards and broken glass after a brawl, and the lane outside it where the thrown one lands
+        /// (EncounterSession.Spoon finds them by these names under the inn's frame).</summary>
+        public const string SpoonWindowName = "Spoon front window", SpoonBoardsName = "Spoon window boards", SpoonLaneName = "Spoon window lane", SpoonCardsName = "Spoon card table";
         /// <summary>Old iron gone to rust: the Spoon's sign.</summary>
         Material SpoonRust { get { return Tint(art.metal, new Color(.5f, .23f, .1f)); } }
 
@@ -82,7 +85,18 @@ namespace Crulanda.World
             for (int k = -1; k <= 1; k++) parts.Box(iron, arch + new Vector3(k * .13f, .45f, -.035f), new Vector3(.025f, .34f, .025f));
             // The taproom's front window left of the door: wide, low, barred, its glass grimed to orange (it passes through the wall).
             var win = new Vector3(-w / 2 + 2.7f, 1.45f, -d / 2);
-            Part(PrimitiveType.Cube, t, win, new Vector3(1.6f, .85f, wall + .1f), Tint(art.glass, new Color(1, .7f, .4f)));
+            Part(PrimitiveType.Cube, t, win, new Vector3(1.6f, .85f, wall + .1f), Tint(art.glass, new Color(1, .7f, .4f))).name = SpoonWindowName;
+            // (The rework, Lowtowns pick 5, 2026-10-18) The window a brawl ends through, "through the shattered front window ... into the cold mud
+            // of the alleyway" (CANON, b1 ch.1:121): planks nailed over the hole and the glass in the lane's mud, hidden until a brawl breaks it
+            // (EncounterSession.Spoon shows them, and puts the pane back when Snivels has had it glazed); where the thrown one lands, outside it.
+            {
+                var boarded = new GameObject(SpoonBoardsName).transform; boarded.SetParent(t, false);
+                for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, boarded, win + new Vector3(0, -.28f + k * .28f, -wall / 2 - .1f), new Vector3(1.8f, .2f, .04f), boards, Quaternion.Euler(0, 0, (k - 1) * 4.5f));
+                for (int k = 0; k < 7; k++) Part(PrimitiveType.Cube, boarded, new Vector3(win.x - .7f + (k * 37 % 14) * .1f, .02f, -d / 2 - .5f - (k * 53 % 9) * .12f), new Vector3(.14f + (k % 3) * .05f, .01f, .1f), Tint(art.glass, new Color(1, .7f, .4f)), Quaternion.Euler(0, k * 47, 0));
+                boarded.gameObject.SetActive(false);
+                new GameObject(SpoonLaneName).transform.SetParent(t, false);
+                t.Find(SpoonLaneName).localPosition = new Vector3(win.x, 0, -d / 2 - 1.8f);
+            }
             parts.Box(band, win + new Vector3(0, .54f, -.02f), new Vector3(1.9f, .22f, wall + .14f));
             parts.Box(band, win + new Vector3(0, -.5f, -.05f), new Vector3(1.8f, .1f, wall + .2f));
             for (int k = 0; k < 5; k++) parts.Box(iron, win + new Vector3(-.64f + k * .32f, 0, -wall / 2 - .07f), new Vector3(.03f, .92f, .03f));
@@ -400,6 +414,8 @@ namespace Crulanda.World
                     Part(PrimitiveType.Cube, t, c + new Vector3(0, 1.85f, 0), new Vector3(.22f, .26f, .22f), Tint(art.glass, new Color(1, .6f, .28f)));
                     parts.Box(iron, c + new Vector3(0, 2.0f, 0), new Vector3(.28f, .04f, .28f)); parts.Box(iron, c + new Vector3(0, 2.38f, 0), new Vector3(.02f, .7f, .02f));
                     Glow(t, c + new Vector3(0, 1.75f, 0), 4.5f, .6f, LampOrange, 1.4f).name = "Card table lamp";
+                    // Where the Triad table's game is played from (EncounterSession.Spoon; Triad, b1 ch.1:45).
+                    var cardsMark = new GameObject(SpoonCardsName).transform; cardsMark.SetParent(t, false); cardsMark.localPosition = c;
                     var box = new Vector3(plan.backRoom.xMax - .35f, 0, plan.backRoom.yMax - .3f);
                     parts.Box(boards, box + new Vector3(0, .2f, 0), new Vector3(.6f, .4f, .4f));
                     foreach (float dx in new[] { -.18f, .18f }) parts.Box(iron, box + new Vector3(dx, .2f, 0), new Vector3(.05f, .42f, .42f));

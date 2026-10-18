@@ -1215,8 +1215,12 @@ namespace Crulanda.Encounter
             // A Council warden of the Crown (look "concord"): the Concord's warden in its white tabard, friendly (ZoneBuilder.Crown; GAME-ONLY).
             bool concord = look == "concord";
             // A costume of the Crown (ActorVisual.Dress): "councilor", the High Councilor's robes of state; "scholar", a clerk's dark robe.
-            string dress = look == "councilor" || look == "scholar" ? look : VillageWork.OutfitOf(role);
-            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child", v.Keeper || concord ? null : dress, look == "orc");   // an orc resident (Gorm Rock-Wall, the Lowtowns)
+            // A goblin resident (look "goblin": Snivels Gear-Grinder behind the Rusty Spoon's bar, b1 ch.1:105): the goblins' figure, small,
+            // as the Adit's pressed goblins have it (PROVISIONAL look).
+            bool goblin = look == "goblin";
+            string dress = look == "councilor" || look == "scholar" ? look : goblin ? "goblin" : VillageWork.OutfitOf(role);
+            v.visual = ActorVisual.Attach(go, v.Keeper ? ActorLook.Keeper : concord ? ActorLook.Warden : ActorLook.Villager, v.Keeper ? (index * 2) : index * 5 + 3, role == "child" || goblin, v.Keeper || concord ? null : dress, look == "orc");   // an orc resident (Gorm Rock-Wall, the Lowtowns)
+            if (goblin) v.agent.baseOffset = .66f;
             if (v.Keeper) { v.agent.height = 2.6f; v.agent.baseOffset = 1; v.agent.speed = 1.3f; }
             v.Title = title ?? VillageLife.TitleFor(role); v.fixedPlace = fixedPlace; v.Seated = seated && fixedPlace != null; v.SeatYaw = seatYaw;
             v.Coop = coop; v.Fold = fold;
@@ -1262,6 +1266,51 @@ namespace Crulanda.Encounter
             }
         }
         public void Say(string line, float seconds) { Bubble = line; BubbleUntil = Time.time + seconds; }
+        // ---------- the Rusty Spoon's brawl (EncounterSession.Spoon; b1 ch.1:107; the rework, Lowtowns pick 5) ----------
+        float brawlUntil, brawlSwingAt; bool brawlDown; Vector3 brawlFace;
+        /// <summary>In the Spoon's brawl now (swinging, or knocked down in it).</summary>
+        public bool Brawling { get { return brawlUntil > 0; } }
+        /// <summary>Knocked down in a brawl (or thrown out of the window): flat for a while, not hurt for good.</summary>
+        public bool KnockedDown { get { return brawlUntil > 0 && brawlDown; } }
+        /// <summary>Into the brawl for <paramref name="seconds"/>: stood where they are, swinging at whoever stands toward <paramref name="face"/>.</summary>
+        public void Brawl(Vector3 face, float seconds)
+        {
+            if (brawlDown) return;
+            brawlFace = face; brawlUntil = Time.time + seconds; brawlSwingAt = Time.time + life.R01;
+            ShowTankard(false);
+            if (agent.isOnNavMesh) { agent.isStopped = true; agent.ResetPath(); agent.velocity = Vector3.zero; }
+        }
+        /// <summary>Down on the boards (fists and bottles only: "knocked down, not dead") for <paramref name="seconds"/>, then up and on with the day.</summary>
+        public void KnockDown(float seconds)
+        {
+            brawlDown = true; brawlUntil = Mathf.Max(brawlUntil, Time.time + seconds); visual.Pose = ActorPose.Slump; ShowTankard(false);
+            if (agent.isOnNavMesh) { agent.isStopped = true; agent.ResetPath(); agent.velocity = Vector3.zero; }
+        }
+        /// <summary>Thrown out through the front window into the lane's mud (b1 ch.1:121): set down at <paramref name="lane"/>, down a while.</summary>
+        public void ThrowOut(Vector3 lane, float seconds)
+        {
+            if (agent.isOnNavMesh && NavMesh.SamplePosition(lane, out var hit, 3, NavMesh.AllAreas)) agent.Warp(hit.position);
+            KnockDown(seconds);
+        }
+        /// <summary>Ends the brawl for them at once (a test, or the brawl called off).</summary>
+        public void EndBrawl() { if (brawlUntil > 0) brawlUntil = Time.time; }
+        /// <summary>A frame of the brawl: facing their man and swinging, or flat; when it is over, back to the day. True while it runs.</summary>
+        bool TickBrawl()
+        {
+            if (brawlUntil <= 0) return false;
+            if (Time.time >= brawlUntil)
+            {
+                brawlUntil = 0; brawlDown = false; visual.Pose = ActorPose.None;
+                if (agent.isOnNavMesh) agent.isStopped = false;
+                Say(life.R01 < .5f ? "...Who started that?" : "My jaw. My good jaw.", 4);
+                ChooseNext(); return false;
+            }
+            if (brawlDown) { visual.Pose = ActorPose.Slump; return true; }
+            var to = brawlFace - transform.position; to.y = 0;
+            if (to.sqrMagnitude > .01f) transform.rotation = Quaternion.Slerp(transform.rotation, Quaternion.LookRotation(to), Time.deltaTime * 6);
+            if (Time.time >= brawlSwingAt) { brawlSwingAt = Time.time + .6f + life.R01 * .9f; visual.Pose = visual.Pose == ActorPose.Hammer ? ActorPose.Talk : ActorPose.Hammer; }
+            return true;
+        }
         public void FacePlayer()
         {
             var to = life.Session.Player.transform.position - transform.position; to.y = 0;
@@ -1868,6 +1917,8 @@ namespace Crulanda.Encounter
                 if (Arrived || Stranded) { activity = "fled"; Hide(); var d = transform.position - home.position; d.y = 0; indoors = d.magnitude < 3.5f; }
                 return;
             }
+            // the Rusty Spoon's brawl (EncounterSession.Spoon)
+            if (TickBrawl()) return;
             if (danger && Role != "drinker" || danger && life.EnemyNear(transform.position, 10)) { Flee(); return; }
             // Talking with the player: stand still and face them until the conversation ends, then carry on.
             if (Attending && !PassedOut)

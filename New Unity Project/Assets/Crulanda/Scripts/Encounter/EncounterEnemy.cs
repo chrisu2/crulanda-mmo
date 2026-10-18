@@ -304,6 +304,8 @@ namespace Crulanda.Encounter
             strolling = false;
             if (Vector3.Distance(Victim.transform.position, Group != null ? Group.anchor : home) > FarLeash + 6 && Quiet) { Disengage(); return; }
             if (!inFight) Engage();   // the camp hears of it (EncounterSession.RaiseAlarm)
+            // the Lowtowns' Weave-Eaters: blink, lighthouse, ward-eating (EncounterEnemy.WeaveEater)
+            if (BookWeaveEater) TickWeaveEater();
             if (Move != null && TickElite()) return;   // an elite drawing back for its heavy blow stands still and does not swing
             if (TickFlee()) return;   // bolting at low health (EncounterEnemy.Flee)
             if (Cast != null && TickCast()) return;   // a caster casting stands still and does not swing (EncounterEnemy.Casts)

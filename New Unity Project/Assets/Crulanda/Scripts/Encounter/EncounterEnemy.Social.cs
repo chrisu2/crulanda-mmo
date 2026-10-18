@@ -104,6 +104,8 @@ namespace Crulanda.Encounter
         {
             LeaveGroup(); inFight = alarmed = struck = false; joinAt = -1; joinGroup = null; joinFor = null;
             CancelBlow(); Soothe();
+            // a Lowtowns Weave-Eater's blink and lighthouse start afresh next fight (EncounterEnemy.WeaveEater)
+            blinkReadyAt = 0;
         }
         /// <summary>This mob alone gives up: whole again, off home, and deaf to the fight for a few seconds.</summary>
         void GoHome() { ResetFight(); evadeUntil = Time.time + EvadeSeconds; }

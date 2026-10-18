@@ -26,7 +26,12 @@ namespace Crulanda.Encounter
             t.Receive(sting, Player);   // the sting first: a blow breaks a hold, so the hold goes on after it
             bool held = false;
             if (hold == "stun") held = t.actor.IsAlive && t.Apply("stun", Player, seconds) == null;
-            else if (hold == "root" && t.actor.IsAlive) { t.Root(seconds); held = true; FloatText(t.transform.position, "Pinned", new Color(.86f, .8f, .62f)); }
+            else if (hold == "root" && t.actor.IsAlive)
+            {
+                t.Root(seconds); held = true; FloatText(t.transform.position, "Pinned", new Color(.86f, .8f, .62f));
+                // The harpoon's anchor (b1 ch.20:191): a book Weave-Eater cannot displace (blink) for a while after (WeaveEaterRules.PinSeconds).
+                if (t.BookWeaveEater) t.Pin(WeaveEaterRules.PinSeconds);
+            }
             Message(WeaveEaterRules.ThrowLine(kind, t.actor.DisplayName, eater, held));
             return true;
         }

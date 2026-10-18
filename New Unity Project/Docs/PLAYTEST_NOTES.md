@@ -822,3 +822,6 @@ un-captures.
 - 234 (2026-10-18 ~18:20) "in downloads Modular Character Outfits - Fantasy" (the same files as the game's people: nothing new) and
   "Fantasy Props MegaKit for dungeons and other places" (OPEN): the kit is in since 2026-10-07 (Resources/Props/Fantasy, 96 props) but
   about 18 are placed; dress the dungeons and other places with the rest, each zone's own choice (every zone unique).
+- 235 (2026-10-18 ~18:25) "FBX-20261018T221927Z-1-001 for foods and buff items." (OPEN): Downloads, 103 food FBX, no licence file
+  (names match Quaternius's food pack; source to confirm with Chris). Only what fits the books' world: meat, fish, eggs, bread, cheese,
+  fruit, roots and greens, pots, pans, plates and bottles; no burgers, pizza, sushi, ice cream, soda, sauces in bottles, doughnuts.

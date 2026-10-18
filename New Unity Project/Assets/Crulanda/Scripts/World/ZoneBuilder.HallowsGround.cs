@@ -269,7 +269,7 @@ namespace Crulanda.World
         // ---------- the bridge's parapets ----------
         /// <summary>A stretch of parapet along an open edge of one of the bridge's decks: its ends on the deck's top at the edge, the way out
         /// over the fog (level), and whether it is the broken stretch at the jump off the third slab (a kerb a player hops up on and off).</summary>
-        public sealed class ParapetRun { public Vector3 a, b, outward; public bool broken; public string deck; }
+        public sealed class ParapetRun { public Vector3 a, b, outward; public bool broken, bridge, timber; public string deck; }
         /// <summary>
         /// The bridge's parapets (hallows-3, 2026-10-16: "people still falling off the crazy stone stair area"; the run bot was stuck and
         /// warped eight times round the slabs): every edge of a slab, a ramp or a stair over the chasm's fog that has neither land nor another
@@ -289,12 +289,19 @@ namespace Crulanda.World
             var a = s.mid[0]; var b = s.mid[s.mid.Length - 1];
             return FogFloor(new Vector2((a.x + b.x) / 2, (a.z + b.z) / 2), out _);
         }
+        /// <summary>The drop beside a town deck's edge (the Granary's lofts, the wall-walk, the tower's flights, the Archive's galleries
+        /// and stairs) over which it gets a rail: more than a metre down to the land or the deck under it.</summary>
+        public const float RailDrop = 1f;
         void PrepareParapets()
         {
             Parapets.Clear();
             foreach (var s in DeckSpots)
             {
-                if (!BridgeDeck(s)) continue;
+                if (s == null || s.cave != null || s.round || s.def == null || s.mid == null || s.mid.Length < 2) continue;
+                bool bridge = BridgeDeck(s);
+                // (2026-10-18, Chris: "falling off ramps and bad pathing": the bridge's parapets now run along every raised walk in the
+                // town too. A built-up floor (solid: the Archive's floor, the copying cells) is a hall's floor inside its walls: no rail.)
+                if (!bridge && s.def.solid) continue;
                 var a = s.mid[0]; var b = s.mid[s.mid.Length - 1]; var along = b - a; float len = along.magnitude; if (len < .5f) continue;
                 var fwd = along / len; var right = Vector3.Cross(Vector3.up, fwd).normalized; var flat = new Vector3(fwd.x, 0, fwd.z).normalized; float h = s.half;
                 ParapetEdge(s, a + right * h, b + right * h, right);
@@ -307,15 +314,21 @@ namespace Crulanda.World
         void ParapetEdge(ZoneDeckSpot s, Vector3 p0, Vector3 p1, Vector3 outward)
         {
             float L = Vector3.Distance(p0, p1); int n = Mathf.Max(1, Mathf.CeilToInt(L / .25f));
-            int start = -1; bool brokenRun = false;
+            int start = -1; bool brokenRun = false, bridge = BridgeDeck(s);
             for (int i = 0; i <= n; i++)
             {
                 bool open = false, broken = false;
-                if (i < n) { var p = Vector3.Lerp(p0, p1, (i + .5f) / n); open = OpenEdge(s, p, outward); broken = open && AtJump(p); }
+                if (i < n)
+                {
+                    var p = Vector3.Lerp(p0, p1, (i + .5f) / n);
+                    open = bridge ? OpenEdge(s, p, outward) : RailEdge(s, p, outward);
+                    broken = bridge && open && AtJump(p);
+                }
                 if (start >= 0 && (!open || broken != brokenRun))
                 {
                     var ra = Vector3.Lerp(p0, p1, start / (float)n); var rb = Vector3.Lerp(p0, p1, i / (float)n);
-                    if (Vector3.Distance(ra, rb) >= .5f) Parapets.Add(new ParapetRun { a = ra, b = rb, outward = outward, broken = brokenRun, deck = s.def.name });
+                    if (Vector3.Distance(ra, rb) >= .5f)
+                        Parapets.Add(new ParapetRun { a = ra, b = rb, outward = outward, broken = brokenRun, bridge = bridge, timber = s.def.style == "timber", deck = s.def.name });
                     start = -1;
                 }
                 if (open && start < 0) { start = i; brokenRun = broken; }
@@ -337,6 +350,44 @@ namespace Crulanda.World
             }
             return true;
         }
+        /// <summary>Whether a town deck's edge at <paramref name="p"/> wants a rail: what is under the edge a few hands beyond it (the land,
+        /// or the highest deck there no higher than the walk) is more than <see cref="RailDrop"/> down, no deck runs on at about the walk's
+        /// height there (where a stair runs into a landing or a loft), and no hall's wall stands within a metre of it (a loft or a flight
+        /// along its building's wall: the wall is its rail).</summary>
+        bool RailEdge(ZoneDeckSpot s, Vector3 p, Vector3 outward)
+        {
+            var far = p + outward * .45f; var q = p + outward * .15f;
+            float floor = HeightAt(far.x, far.z);
+            foreach (var o in DeckSpots)
+            {
+                if (o == s || o == null || o.cave != null || o.mid == null) continue;
+                foreach (var at in new[] { new Vector2(p.x, p.z), new Vector2(q.x, q.z), new Vector2(far.x, far.z) })
+                    if (o.Top(at, out var y))
+                    {
+                        if (Mathf.Abs(y - p.y) < 1.2f && at != new Vector2(far.x, far.z)) return false;
+                        if (y < p.y + .3f) floor = Mathf.Max(floor, y);
+                    }
+            }
+            if (p.y - floor <= RailDrop) return false;
+            return !HallWallBeside(p, outward);
+        }
+        /// <summary>Whether a hall's wall (the Granary's, the Archive's, the Bell Tower's, the gatehouse's) stands within a metre beyond a
+        /// point inside it: the point is in the hall's footprint and a metre out is past the wall's inner face.</summary>
+        bool HallWallBeside(Vector3 p, Vector3 outward)
+        {
+            if (Zone.props == null) return false;
+            foreach (var pr in Zone.props)
+            {
+                if (pr == null || (pr.kind != "granary" && pr.kind != "archive" && pr.kind != "belfry" && pr.kind != "gatehouse")) continue;
+                var size = pr.size; if (size.x <= 0 || size.y <= 0) continue;
+                var inv = Quaternion.Euler(0, -pr.rotation, 0);
+                var lp = inv * new Vector3(p.x - pr.at.x, 0, p.z - pr.at.y); var lo = inv * (p + outward * 1f - new Vector3(pr.at.x, p.y, pr.at.y));
+                bool inside = Mathf.Abs(lp.x) <= size.x / 2 + .05f && Mathf.Abs(lp.z) <= size.y / 2 + .05f;
+                bool past = Mathf.Abs(lo.x) > size.x / 2 - .5f || Mathf.Abs(lo.z) > size.y / 2 - .5f;
+                if (inside && past) return true;
+            }
+            return false;
+        }
         /// <summary>Whether an edge point is where a player's jump (a scenery drop on open ground) goes off.</summary>
         bool AtJump(Vector3 p)
         {
@@ -356,16 +407,21 @@ namespace Crulanda.World
         {
             if (Parapets.Count == 0) return;
             var t = new GameObject("The bridge's parapets").transform; t.SetParent(root, false);
+            // The town's rails (2026-10-18): the same runs along the lofts, the galleries, the wall-walk and the tower's flights, under
+            // their own root so the bridge's are still counted alone.
+            var town = new GameObject("The town's rails").transform; town.SetParent(root, false);
             var wall = Dressed(PausedStone * .92f); var cap = Dressed(PausedStone * 1.02f); var kerb = Dressed(PausedStone * .8f);
+            var plank = Tint(art.timber, new Color(.34f, .31f, .28f)); var post = Tint(art.timber, new Color(.28f, .26f, .24f));
             var rr = new System.Random(4421);
             foreach (var r in Parapets)
             {
                 var run = r.b - r.a; float len = run.magnitude; if (len < .3f) continue;
+                if (r.timber && !r.bridge) { TimberRail(r, town, plank, post); continue; }
                 var rot = Quaternion.LookRotation(run / len, Vector3.up); var up = rot * Vector3.up; var inward = -r.outward;
                 var flatRot = Quaternion.LookRotation(new Vector3(r.outward.x, 0, r.outward.z), Vector3.up);
                 var mid = (r.a + r.b) / 2;
                 Vector3 At(float y, float inset) { return mid + inward * inset + up * y; }
-                var go = new GameObject((r.broken ? "Broken parapet: " : "Parapet: ") + r.deck).transform; go.SetParent(t, false);
+                var go = new GameObject((r.broken ? "Broken parapet: " : "Parapet: ") + r.deck).transform; go.SetParent(r.bridge ? t : town, false);
                 float high = r.broken ? ParapetBroken : ParapetHigh;
                 // The solid: from a little under the walk to the top, the parapet's whole thickness in from the edge.
                 var solid = new GameObject("Solid: parapet"); solid.transform.SetParent(go, false);
@@ -395,6 +451,30 @@ namespace Crulanda.World
                     BoxPart(go, foot + Vector3.up * .6f, new Vector3(.5f, 1.25f, .5f), wall, flatRot);
                     BoxPart(go, foot + Vector3.up * 1.27f, new Vector3(.58f, .08f, .58f), cap, flatRot);
                 }
+            }
+        }
+
+        /// <summary>A timber rail along an open edge of a loft, a gallery or a timber stair: a solid, nav-blocking box the rail's height
+        /// over the run, posts every metre and a half, a hand rail on them and a mid rail, the town's grey timber.</summary>
+        void TimberRail(ParapetRun r, Transform parent, Material plank, Material postM)
+        {
+            const float Thick = .26f, High = 1.05f;
+            var run = r.b - r.a; float len = run.magnitude;
+            var rot = Quaternion.LookRotation(run / len, Vector3.up); var up = rot * Vector3.up; var inward = -r.outward;
+            var flatRot = Quaternion.LookRotation(new Vector3(r.outward.x, 0, r.outward.z), Vector3.up);
+            var mid = (r.a + r.b) / 2;
+            var go = new GameObject("Rail: " + r.deck).transform; go.SetParent(parent, false);
+            var solid = new GameObject("Solid: rail"); solid.transform.SetParent(go, false);
+            solid.transform.localPosition = mid + inward * Thick / 2 + up * (High - .1f) / 2; solid.transform.localRotation = rot;
+            solid.AddComponent<BoxCollider>().size = new Vector3(Thick, High + .1f, len); solid.AddComponent<NavBlocker>();
+            // The hand rail and the mid rail.
+            BoxPart(go, mid + inward * Thick / 2 + up * (High - .05f), new Vector3(.12f, .1f, len + .06f), plank, rot);
+            BoxPart(go, mid + inward * Thick / 2 + up * .5f, new Vector3(.08f, .1f, len), plank, rot);
+            int posts = Mathf.Max(1, Mathf.CeilToInt(len / 1.5f));
+            for (int k = 0; k <= posts; k++)
+            {
+                var foot = Vector3.Lerp(r.a, r.b, k / (float)posts) + inward * Thick / 2;
+                BoxPart(go, foot + Vector3.up * High / 2, new Vector3(.16f, High, .16f), postM, flatRot);
             }
         }
 

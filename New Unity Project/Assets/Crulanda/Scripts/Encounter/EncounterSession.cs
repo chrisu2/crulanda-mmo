@@ -1885,6 +1885,11 @@ namespace Crulanda.Encounter
             var collider = go.AddComponent<CapsuleCollider>(); collider.height = 2; collider.radius = radius;
             var agent = go.AddComponent<NavMeshAgent>(); agent.speed = speed; agent.angularSpeed = 540;
             agent.acceleration = 16; agent.stoppingDistance = 1.8f + (radius - .45f) * 2; agent.radius = radius; agent.height = 2; agent.baseOffset = 1;
+            // (2026-10-18, "bad pathing" on the ramps) Never wider than the navmesh was eroded for (NavAgentRadius): a wider agent's body
+            // hangs over a ramp's edge; the path is worked out again when a rail or a gate changes the way; the best avoidance, so a
+            // party bunched on a loft or a flight sidesteps along it rather than shoving one another to its edge.
+            agent.radius = Mathf.Min(radius, Crulanda.World.ZoneBuilder.NavAgentRadius);
+            agent.autoRepath = true; agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
         }
         static void SetHealth(Actor actor, int value)
         {

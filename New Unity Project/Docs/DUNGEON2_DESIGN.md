@@ -529,3 +529,25 @@ Chris: the fights "feel samey". `MobTricks` (`Scripts/Encounter/MobTricks.cs`) a
   20 m carries a helpful working (a blessing, a class buff, a meal); landed, the one with the most time left is struck off. Answer:
   interrupt. (The rework's first sketch wiped the last 5 s of damage; Chris's brief of 2026-10-18 asks for a buff taken off instead.)
 To see in game: each line shows once a fight; the rings for the echo and the slate; a cutter camp left alone breaks its shell at 18 s.
+
+## Rails on the town's raised walks (2026-10-18, branch fx-paths; WRITTEN, compiles, NOT RUN in Unity; OPEN until Chris sees it)
+Chris, 2026-10-18, verbatim: "falling off ramps and bad pathing". His frame: the Granary on the race at night, the party bunched on a
+dark timber deck with a rail on the far side only, fighting Picker-Master Fulke Yelland, the Bureau's grey-pickers and an Iron Pact
+crossbowman; the near side, over the lower floor, open.
+- The bridge's parapets (hallows-3) now run along every raised walk in the town too (ZoneBuilder.HallowsGround: PrepareParapets,
+  RailEdge, TimberRail): any edge of an open-ground deck, ramp or stair with more than a metre down beside it (to the land, or to the
+  deck under it) gets a rail, solid and a NavBlocker (cut out of the navmesh). Gaps only where a way runs on: another deck within about
+  a metre of the walk's height past the edge (a stair into a loft or a landing). No rail along a hall's own wall (the Granary, the
+  Archive, the Bell Tower, the gatehouse: an edge within a metre of the wall's inner face) and none on a built-up hall floor (the
+  Archive's floor, the copying cells). Timber decks (the Granary's lofts and stairs, the Archive's galleries and apse stairs, the
+  belfry) get timber rails (posts, a hand rail and a mid rail); stone (the wall-walk and its stair, the tower's flights and landings)
+  the bridge's stone parapet. The bridge's own parapets are unchanged (and still counted alone in HallowsNavTests).
+- Sims and mobs (EncounterSession.AddAgent): an agent is never wider than the navmesh was eroded for (0.5 m), repaths on its own, and
+  uses the best avoidance, so a party on a loft or a flight sidesteps along it. (Agents cannot walk off the navmesh; the falls were the
+  player's and the run bot's, which the rails stop.)
+- NOT DONE in this pass: the Lowtowns' raised walks (the roofs' lead walks, the weir's crest and plank, the punt landings, the Rag
+  Bridge's deck, the retaining walls' tops by the stairs) were not railed; they are built by their own code (ZoneBuilder.LowtownMarks,
+  LowtownLevels), not as decks, and need their own pass.
+- To run: HallowsNavTests (the bridge's parapets and the new town rails' assertions; the "no navmesh at an open edge" check now covers
+  the town's rails too, and the tower's flights must still reach the belfry), HallowsDataTests, CheckpointTests, ZoneContentTests.
+  Then frames of the Granary's lofts, the Archive's galleries and the tower's flights, front and side.

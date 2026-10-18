@@ -65,12 +65,23 @@ namespace Crulanda.Tests
             // The parapets (hallows-3, 2026-10-16: people fell off the stair of small slabs and the run bot was warped eight times round the
             // slabs): a wall along every open edge of the bridge's decks, solid and cut out of the navmesh, broken down to its kerb only at
             // the jump off the third slab; no agent's navmesh comes to an open edge.
-            Assert.Greater(zone.Parapets.Count, 40, "the parapets along the slabs, the ramps and the stair of small slabs");
+            var bridgeRuns = zone.Parapets.Where(r => r.bridge).ToList();
+            Assert.Greater(bridgeRuns.Count, 40, "the parapets along the slabs, the ramps and the stair of small slabs");
             var broken = zone.Parapets.Where(r => r.broken).ToList(); Assert.AreEqual(1, broken.Count, "one broken stretch: the jump"); Assert.AreEqual("The third slab", broken[0].deck);
             foreach (var name in new[] { "The first stair", "The second stair", "The third stair", "The first step-stone", "The second step-stone", "The Mason's slab", "The far Table" })
                 Assert.IsTrue(zone.Parapets.Exists(r => r.deck == name && !r.broken), name + " has a parapet");
             var parapets = GameObject.Find("The bridge's parapets"); Assert.NotNull(parapets, "the parapets are built");
-            Assert.AreEqual(zone.Parapets.Count, parapets.GetComponentsInChildren<NavBlocker>().Length, "each parapet solid and a nav blocker");
+            Assert.AreEqual(bridgeRuns.Count, parapets.GetComponentsInChildren<NavBlocker>().Length, "each parapet solid and a nav blocker");
+            // The town's rails (2026-10-18, Chris: "falling off ramps and bad pathing"): the open sides of the Granary's lofts and stairs,
+            // the Archive's galleries and stairs, the wall-walk and the tower's flights; timber on timber, stone on stone; none along a
+            // hall's wall or on the Archive's floor; each a nav blocker.
+            foreach (var name in new[] { "The north loft", "The south loft", "The loft stair", "The high stair", "The north gallery", "The apse stair (south)", "The wall-walk", "Tower flight 2", "Tower flight 6" })
+                Assert.IsTrue(zone.Parapets.Exists(r => r.deck == name && !r.bridge), name + " has a rail");
+            Assert.IsTrue(zone.Parapets.Where(r => !r.bridge).All(r => !r.broken), "no town rail is broken");
+            Assert.IsTrue(zone.Parapets.Where(r => r.deck == "The north loft").All(r => r.timber), "the loft's rails are timber");
+            Assert.IsFalse(zone.Parapets.Exists(r => r.deck == "The Archive floor" || r.deck == "The copying cells"), "no rail on the Archive's floor");
+            var townRails = GameObject.Find("The town's rails"); Assert.NotNull(townRails, "the town's rails are built");
+            Assert.AreEqual(zone.Parapets.Count(r => !r.bridge), townRails.GetComponentsInChildren<NavBlocker>().Length, "each town rail solid and a nav blocker");
             var near = new List<string>();
             foreach (var r in zone.Parapets)
             {

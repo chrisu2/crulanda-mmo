@@ -61,7 +61,7 @@ namespace Crulanda.Tests
             var counts = zones.ToDictionary(z => z.id, z => (z.secrets ?? new ZoneSecret[0]).Count(s => s != null));
             Assert.GreaterOrEqual(counts["zone.oakhaven"], 25); Assert.AreEqual(13, counts["zone.khaven"]); Assert.AreEqual(13, counts["zone.peaks"]);
             Assert.AreEqual(13, counts["zone.ashrim"]); Assert.AreEqual(14, counts["zone.verdant"]); Assert.AreEqual(13, counts["zone.adit"]);
-            Assert.AreEqual(14, counts["zone.lowtowns"], "The Lowtowns' fourteen (Phase 9.1): ten pages of the book of lore, a lookout, militia marks, a lamp-shrine and the grey-bell.");
+            Assert.AreEqual(15, counts["zone.lowtowns"], "The Lowtowns' fifteen: ten pages of the book of lore, a lookout, militia marks, a lamp-shrine, the grey-bell (Phase 9.1) and the carvings under the moss in the drowned vaults (2026-10-18).");
             Assert.AreEqual(8, counts["zone.hallows"], "Hallow's Creek's eight (2026-10-16).");
         }
 

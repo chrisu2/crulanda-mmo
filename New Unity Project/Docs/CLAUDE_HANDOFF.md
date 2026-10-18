@@ -1,6 +1,84 @@
-# Crulanda: Claude handoff (Start here rewritten 2026-10-17 ~21:00: the stopping point after the Oct 17 update)
+# Crulanda: Claude handoff (Start here rewritten 2026-10-18 ~14:40: the stopping point after the Lowtowns/Hallow's Creek rework, waves 1-2)
 
 ## Start here
+
+**Stopping point: 2026-10-18 ~14:40.** Chris: "you have 4 hours to finish and then save backup and write a handoff." Everything is committed on
+`feet-bow-adit-kit` in D:\code\mmo and backed up to E:. **Not pushed to GitHub** (the auto-mode check refuses `git push`; ask Chris to allow
+it or push himself: `git -C D:\code\mmo push origin feet-bow-adit-kit`). No worktrees left (every helper branch merged and deleted). Nothing VERIFIED until Chris
+sees it.
+
+### Chris's verdict and the rework (Docs/REWORK_LOWTOWNS_HALLOWS.md, all of it)
+- "im not sure i like the lowlands or the harrow.seems boring just my opinion"; why: all four of "Looks flat and dull", "Nothing to do",
+  "Fights feel samey", "Layout is a straight line".
+- The first plan was written without the books; Chris: "please consult the lore canon and redo / edit these choices based on my
+  descriptions in the novels" and "it should always be referenced on all design documents" (now a GAME_BRIEF standing rule and memory).
+  The redone plan cites Book 1 throughout (Hallow's Creek is canon: b1 ch.17-23; white houses, quartz roses, a valley, a glass-crater
+  town hall, no birds or wind; the Lowtowns are vertical, neon moss, yellow haze, the black Chemical River).
+- Decisions: "keep all" (Lowtowns 1-12, Hallow's Creek 1-12); the Copper-Tithe out; fifty years; the stone girl by the willow is **Talla**;
+  **Snivels** in; "i never said not use the name characters. it would be nice to see some of them come alive" ... "like the leader in
+  crowns" (canon characters welcome: GAME_BRIEF standing rule). Unanswered conflicts take the recommended answers (doc, top).
+
+### Published
+- **2026-10-18 01:36:** the re-buff after a wipe, the pets' clear spot and closer stop, the Lowtowns' soot smoke (save backup
+  20261018-0136-before-oct18-update).
+- **2026-10-18 03:23, wave 1** (save backup 20261018-0323-before-wave1), tests 110/110 + 37/37:
+  - Hallow's Creek 1, 2, 3, 12: white and perfect (lime-washed houses, white picket fences, red-quartz roses; only the people grey,
+    blue eyes), the silence (no wind, ash stopped, no music in town, "Help us" near the paused), the Square as ch.21 (the obsidian bowl
+    16 m deep, a still mirror floor, the red door on its floating slab with the sewn-lipped knocker, drifting debris, chalk equations, the
+    willow, the town well, the chapel's hanging glass), the people (Gable's Glitch and pie: "Take it. Break the loop.", Martha's voice,
+    Mrs Miller, the children's ball, the dog mid-leap, **Talla** by the hollow under the willow).
+  - The Lowtowns 1, 2, 4, 5, 6: built downhill (the Rust Market +8 at the Forge wall, the Lower Market and Burners' Yard +4, the High
+    Rows +6 over the sunk Drain Courts -3, the river and docks at 0; 13 stairs/ramps incl. the twisting causeway; dressed retaining
+    walls), the books' colours (yellow haze, orange/violet windows, sickly yellow lamps, neon moss, green drain mould, the Iron Teeth's
+    ochre mark), the Chemical River (black, poisons waders, hides you from magical tracking; sludge-eels; the Old Croc rare), the
+    Weave-Eaters as ch.20 (blink, drawn to casters, eat wards; harpoons pin; salt calcifies; Lowtowns only), the Spoon as ch.1 (Snivels
+    Gear-Grinder, Triad, the Ballad of the One-Legged Goat, the brawl out through the front window, Gorm's line about the boy he dug out).
+  - Frames: world-captures/hallows-10, lowtowns-11/-12 (river fixed from beige to black). Noon: Lowtowns ~215 fps, Hallows ~107.
+- **2026-10-18 13:15, wave 2** (save backup 20261018-1315-before-update-publish): Hallow's Creek 6, 7, 8, 10 (the Hollow as ch.4: cellar
+  trapdoors, the glide, choking dust, crawling halves, the anchor-well; the Ash Road's time-squall, cutting stone leaves, green fissures,
+  soft wrong-way shadows; the bridge's tilting/spinning slabs and the fifth slab that dips and tips behind you; new fight tricks: the
+  cutters' clock, Time-Lost echoes, crossbows on the walls, the Pact shield-wall, "Struck from the record"); the Lowtowns 3, 7, 8, 10, 12
+  (the roofs over Pell Row: rain-spout and fire escape up, lead walks, rope bridges, drops through the washing, the water tower; the
+  warders' shield-line, slate-throwers, circling hounds, the dock-rats' hook, the Grey-touched's dazzle; Dead Man's Drop with the fungal
+  net; the Night Market: the Merchant of Nothing, the candlemaker's light-butterflies, a card-reader's chalk ring; the Stack, the bridge of
+  houses, the Iron Teeth's corner by the day, the punt ferry, the weir). Also: the Bell Tower stall fixed (sims and mobs re-path at most
+  once a second; MobChase), the squall bites through out-of-fight regen. Run hallows-9: 26/26, no deaths.
+- **2026-10-18 14:34** (save backup 20261018-1434-before-update-publish), from Chris's notes while watching:
+  - "warrior doing way too low damage ... maybe 3/4 of dps": the tank sim at 75% of a damage-dealer (run: Warrior 48.7/s, Rogue 66.2,
+    Paladin 63.1, Ranger 54 + wolf 17.3, Druid 13 + heal 57.8); mobs gain a tank health share (1.8).
+  - "group is not rolling on loot..if upgrade they need to get it" then "dont roll on common gear. i just didnt see people win rolls":
+    rolls for uncommon and better only; sims Need by SimGear.IsUpgrade and wear what they win (run: the Druid, Rogue and Warrior won pieces).
+  - "falling off ramps and bad pathing": rails on every open deck/ramp/stair edge in Hallow's Creek (timber or stone, just outside the
+    edge, gaps where ways join) and the Lowtowns' raised walks (the weir also fixed: its piers blocked the plank); agents' radius capped.
+  - "for buffs need icons or something bc this is messy": buff icons with countdowns, borders and tooltips replace the text tags; your
+    own row moved next to the target frame.
+  - Run hallows-10r: 27/27, no deaths, 5 stuck warps. Noon: Lowtowns 190 fps, Hallow's Creek 111.
+
+### Next, in order
+1. Chris plays wave 2 and the 14:34 fixes; reports stay open until he confirms.
+2. The rest of the rework: Hallow's Creek 4 (a valley seen from the lip), 5 (two roads in), 9 (Glitches that change the route), 11 (choose the
+   wing first); the Lowtowns 9 (the Sweep) and 11 (the drowned vaults). See REWORK_LOWTOWNS_HALLOWS.md (picks marked BUILT).
+3. Sim Rogue and Scoundrel land ~61/s against 64-68 at level 15 only (SimDummyTests; the diagnostic line added to the report did not print:
+   check its output path). Small; other levels pass.
+4. GitHub push (Chris's permission).
+5. Ambient sound/footsteps don't exist (the books' silence is the music stopping): ask Chris whether to add.
+
+### Known limits
+- No ambient sound or footsteps exist in the game (only music): the books' silence is the music stopping. Needs sound files and a
+  footstep system (asked Chris whether to add it; no answer yet).
+- The sim Scoundrel lands ~61/s against 64-68 at level 15 (SimDummyTests); the pet wasn't the cause.
+- The pale "spikes" at the very top of the Rust Market's high capture view are gaps between mountain peaks cut by the frame's top edge
+  (not a bug; the skyline is right side up from where a player stands).
+
+### Lessons (memory holds them)
+- Hit Chris's stop time; before any stop end every background task (memory stop-on-time-no-orphans). Missed on Oct 17 (shut down at
+  01:00 instead of 22:00; a cancelled chain's watcher ran 7 h 20 m).
+- Read the books before any design doc (memory reference-the-books).
+- Helpers in their own worktrees, merged and removed the same hour (memory clean-up-worktrees).
+
+---
+
+## Oct 17 (superseded)
 
 **Stopping point: 2026-10-17 ~21:00.** Chris: "no run for another 2 hours and then create a handoff and shutdown the computer". Everything
 is committed on `feet-bow-adit-kit` in D:\code\mmo, backed up to E: (tools\Backup.ps1), and the PC shut down at his word. **Not pushed

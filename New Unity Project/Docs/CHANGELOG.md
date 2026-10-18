@@ -1,5 +1,9 @@
 # Changelog
 
+## 2026-10-18: the Lowtowns and Hallow's Creek reworked from the books (waves 1-2) and Chris's play notes (OPEN until he checks them)
+- Published 03:23 (wave 1), 13:15 (wave 2), 14:34 (tank damage, loot rolls, rails, buff icons). Details: CLAUDE_HANDOFF.md, Start here;
+  REWORK_LOWTOWNS_HALLOWS.md; ZONE_LOWTOWNS.md; DUNGEON2_DESIGN.md.
+
 ## 2026-10-18: buff icons in place of the text tags (branch fx-icons; WRITTEN, NOT RUN)
 - Chris: "for buffs need icons or something bc this is messy and hard to read screen" (PLAYTEST_NOTES 231). The buffs on you and the
   party are small square icons with the time in the corner ("12m"), a green or red border (debuffs shown too), and the name, time and

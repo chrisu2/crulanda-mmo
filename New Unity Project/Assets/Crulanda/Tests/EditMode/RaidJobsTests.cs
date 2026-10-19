@@ -100,7 +100,7 @@ namespace Crulanda.Tests
             try
             {
                 Assert.AreEqual(GroundKind.Harmful, bad.Kind); Assert.IsTrue(bad.Jagged, "harmful: a jagged, cracked edge");
-                var e = bad.EdgeColourNow; Assert.Greater(e.r, e.g + .4f); Assert.Greater(e.b, e.g + .15f, "red-violet");
+                var e = bad.BodyColourNow; Assert.Greater(e.r, .6f); Assert.Less(e.g, .15f); Assert.Less(e.b, .2f, "a deep red, not pink (tune-5)");
                 Assert.IsFalse(good.Jagged, "helpful: a smooth edge"); var ge = good.EdgeColourNow; Assert.Greater(ge.g, .7f); Assert.Greater(ge.r, ge.b, "soft gold");
                 var gg = green.EdgeColourNow; Assert.Greater(gg.g, gg.r); Assert.Greater(gg.g, gg.b, "or green");
                 Assert.Less(good.BodyColourNow.a, .2f, "low and translucent"); Assert.Less(good.BodyColourNow.a, bad.BodyColourNow.a);

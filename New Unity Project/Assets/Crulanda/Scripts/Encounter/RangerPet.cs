@@ -195,6 +195,7 @@ namespace Crulanda.Encounter
                 var feet = NavMesh.SamplePosition(transform.position, out var under, 2, NavMesh.AllAreas) ? under.position : transform.position - Vector3.up;
                 var spot = Quarry != null ? GroundMarks.StrikeSpot(transform.position, Quarry.transform.position, Quarry.BodyRadius, BiteReach) : null;
                 var go = spot ?? GroundMarks.StepOut(feet);
+                if (!go.HasValue && !GroundMarks.InHarm(player.position)) go = player.position;   // nowhere clear found: to its keeper, who stands clear
                 if (go.HasValue && agent.isOnNavMesh) { agent.isStopped = false; agent.speed = 6; agent.SetDestination(go.Value); return; }
             }   // a held brood is not bitten: the bite breaks the raid's hold (raid 6)
             if (Quarry != null)

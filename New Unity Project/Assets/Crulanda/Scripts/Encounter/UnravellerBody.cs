@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
 
@@ -23,14 +24,14 @@ namespace Crulanda.Encounter
     {
         public const string ModelPath = "Props/fantasySpider/spider_myOldOne", MaterialPath = "Props/fantasySpider/Materials/spider_black_Std", TexturePath = "Props/fantasySpider/spider_01_black";
         /// <summary>Ground to the spider's back, and the most its legs may spread across, in metres; the wrap's height.</summary>
-        public const float SpiderHeight = 3.4f, SpiderSpan = 10, CrownScale = 1;
+        public const float SpiderHeight = 3.4f * 1.15f, SpiderSpan = 10 * 1.15f, CrownScale = 1;   // 15% bigger (Chris, play note 282)
         /// <summary>The crown's blink: seconds shown (least, most), seconds gone (least, most), and its fade.</summary>
         public static readonly Vector2 CrownOn = new Vector2(.6f, 1.5f), CrownOff = new Vector2(2, 5); public const float CrownFade = .15f;
         float crownShowFrom, crownHideFrom; Renderer[] crownParts;
         /// <summary>How much of the crown shows now (0 gone, 1 whole).</summary>
         public float CrownShown { get; private set; }
         /// <summary>Her body's reach out from her centre: melee strikes her from there (EncounterEnemy.BodyRadius; raid 2).</summary>
-        public const float BodyRadius = 2.5f;
+        public const float BodyRadius = 2.5f * 1.15f;   // grown with her (play note 282)
         /// <summary>The wrap's tallest shard: never over one and a half times her body (raid 2: the seven-metre wrap hid the spider and the view).</summary>
         public const float WrapHeight = SpiderHeight * 1.2f, WrapLimit = SpiderHeight * 1.5f;
         /// <summary>The model's turn to face her forward (the file's front is not checked in a build yet: PROVISIONAL).</summary>
@@ -59,21 +60,15 @@ namespace Crulanda.Encounter
                 spider = Instantiate(src, root, false).transform; spider.name = "Spider"; spider.localRotation = Quaternion.Euler(0, FaceYaw, 0);
                 foreach (var c in spider.GetComponentsInChildren<Collider>(true)) Destroy(c);
                 var hide = HideMaterial();
-                var b = new Bounds(); bool any = false;
                 foreach (var r in spider.GetComponentsInChildren<Renderer>(true))
                 {
                     var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = hide; r.sharedMaterials = mats;
                     r.shadowCastingMode = ShadowCastingMode.On; r.lightProbeUsage = LightProbeUsage.BlendProbes;
-                    if (r is SkinnedMeshRenderer sk) sk.updateWhenOffscreen = false;
-                    if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds);
+                    if (r is SkinnedMeshRenderer sk) sk.updateWhenOffscreen = true;
                 }
-                if (any && b.size.y > .01f)
-                {
-                    float k = Mathf.Min(SpiderHeight / b.size.y, SpiderSpan / Mathf.Max(.01f, Mathf.Max(b.size.x, b.size.z)));
-                    spider.localScale *= k;
-                    float feet = (b.min.y - root.position.y) * k;   // the model's lowest point, scaled about its pivot, from her origin
-                    spider.localPosition = new Vector3(0, ground - feet, 0);
-                }
+                // Sized and stood on the floor by its mesh as posed (Chris, play note 282: "i think instead of the mobs floating but them on the
+                // ground!"; the renderers' bounds, read before the first frame, had sized and seated her wrong: she hung in the air).
+                legsBelowPivot = Fit(spider, SpiderHeight, SpiderSpan);
                 anim = spider.GetComponentInChildren<Animation>();
                 Play("idle");
             }
@@ -87,6 +82,39 @@ namespace Crulanda.Encounter
             wrap = VoidWrap.Wrap(root, WrapHeight, spider != null ? SpiderSpan * .35f : 1.8f, ground, enemy != null ? enemy.persistentId.GetHashCode() : 7);   // round her legs' and back's edge
             lastPos = transform.position;
         }
+        float legsBelowPivot, floorAt = float.NaN, floorLook;
+        /// <summary>The world points of its meshes as they stand now (skinned ones baked in their pose).</summary>
+        public static List<Vector3> Points(Transform t)
+        {
+            var l = new List<Vector3>(); if (t == null) return l;
+            foreach (var r in t.GetComponentsInChildren<Renderer>(true))
+            {
+                Mesh m; Matrix4x4 w = r.transform.localToWorldMatrix; bool baked = false;
+                if (r is SkinnedMeshRenderer sk) { if (sk.sharedMesh == null) continue; m = new Mesh(); sk.BakeMesh(m, true); baked = true; w = Matrix4x4.TRS(r.transform.position, r.transform.rotation, Vector3.one); }
+                else { var mf = r.GetComponent<MeshFilter>(); if (mf == null || mf.sharedMesh == null) continue; m = mf.sharedMesh; }
+                foreach (var v in m.vertices) l.Add(w.MultiplyPoint3x4(v));
+                if (baked) Object.Destroy(m);
+            }
+            return l;
+        }
+        /// <summary>Scales <paramref name="spider"/> (about its pivot) so its posed mesh stands <paramref name="height"/> tall and no wider than
+        /// <paramref name="span"/>; how far its lowest point lies below its pivot after (metres).</summary>
+        public static float Fit(Transform spider, float height, float span)
+        {
+            var pts = Points(spider); if (pts.Count == 0) return 0;
+            var b = new Bounds(pts[0], Vector3.zero); foreach (var p in pts) b.Encapsulate(p);
+            if (b.size.y > .01f) spider.localScale *= Mathf.Min(height / b.size.y, span / Mathf.Max(.01f, Mathf.Max(b.size.x, b.size.z)));
+            float low = float.MaxValue; foreach (var p in Points(spider)) low = Mathf.Min(low, p.y);
+            return low == float.MaxValue ? 0 : spider.position.y - low;
+        }
+        /// <summary>The floor under <paramref name="p"/>: the walkable ground there (the bar's top, the apron's setts), else the zone's ground.</summary>
+        public static float FloorUnder(Vector3 p)
+        {
+            if (UnityEngine.AI.NavMesh.SamplePosition(p, out var hit, 6, UnityEngine.AI.NavMesh.AllAreas)) return hit.position.y;
+            var zone = Crulanda.World.ZoneBuilder.Active; return zone != null ? zone.Ground(new Vector2(p.x, p.z)).y : p.y - 1;
+        }
+        /// <summary>Its lowest point now (the test: on the floor).</summary>
+        public float LowestY { get { float low = float.MaxValue; foreach (var p in Points(spider)) low = Mathf.Min(low, p.y); return low; } }
         static Material hideMat;
         /// <summary>The spider's hide turned to void: the package's Standard material (its cutout, its normal map), near black, a violet glow in it.</summary>
         static Material HideMaterial()
@@ -132,6 +160,11 @@ namespace Crulanda.Encounter
             var s = enemy.session;
             // Rising out of the river and sinking back into it: the whole body, from under the water.
             root.localPosition = new Vector3(0, s != null && s.UnravellerFoe == enemy ? s.UnravellerDepth / Mathf.Max(.01f, transform.lossyScale.y) : 0, 0);
+            // On the floor under her (the bar's top, the apron), not at a height from her actor: looked at twice a second (she is hauled).
+            if (Time.time >= floorLook || float.IsNaN(floorAt)) { floorLook = Time.time + .5f; floorAt = FloorUnder(transform.position); }
+            float depth = s != null && s.UnravellerFoe == enemy ? s.UnravellerDepth : 0;
+            if (spider != null) spider.position = new Vector3(spider.position.x, floorAt + legsBelowPivot + depth, spider.position.z);
+            if (crown != null) crown.position = new Vector3(crown.position.x, floorAt + (spider != null ? SpiderHeight * .9f : 2.6f) + depth, crown.position.z);
             TickCrown();
             if (!enemy.actor.IsAlive)
             {

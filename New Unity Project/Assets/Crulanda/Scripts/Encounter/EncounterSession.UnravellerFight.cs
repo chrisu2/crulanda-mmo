@@ -504,7 +504,12 @@ namespace Crulanda.Encounter
             if (phase >= 2 && now >= nextUnmade)
             {
                 nextUnmade = now + t.unmadeEvery;
-                var at = e.transform.position; if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
+                // Under one of the raid's ranged or healers (Chris, tune-5: the melee stood in it at her edge): they step out with room to;
+                // the melee keep a clear edge round her. With none near, where she floats.
+                var at = e.transform.position;
+                var far = PartyActors().Where(a => a != null && a.IsAlive && a != SwallowedActor && Vector3.Distance(a.transform.position, e.transform.position) > e.BodyRadius + 6 && Vector3.Distance(a.transform.position, e.transform.position) < 30).ToList();
+                if (far.Count > 0) at = far[Random.Range(0, far.Count)].transform.position;
+                if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
                 // No more than unmadeMost at once (Chris: "some reds under her are staying a long time"): the oldest goes.
                 while (unmade.Count >= t.unmadeMost) { if (unmade[0].mark != null) Destroy(unmade[0].mark.gameObject); unmade.RemoveAt(0); }
                 var m = BlowMark.Create(GroundKind.Harmful, t.unmadeWarn + t.unmadeLife + 1, Unraveller.UnmadeName); m.BodyColour = UnmadeGrey; m.Show(at, t.unmadeRadius, 0);

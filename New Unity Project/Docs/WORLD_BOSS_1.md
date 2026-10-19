@@ -801,6 +801,18 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
    not: the session was still in a fight with a straggler; the run now lets anything on the raid go and waits for the quiet). Her health
    165,000 (175,000), toward three kills in ten. The summary gives each member's damage (and healing) a living second beside a fighting
    second (wipes counted dead time against everyone).
+   **Tune-5 notes (2026-10-19; WRITTEN, NOT RUN).** Chris, verbatim: "i think instead of the mobs floating but them on the ground!", "but
+   make the main spider about 15% bigger", "still not moving out of red...it really looks pink so make it a deeper red".
+   - **On the ground:** her spider and each brood spider are sized by their posed mesh and stood on the floor under them (the walkable
+     ground: the bar's top, the apron), looked at twice a second as she is hauled, her rising and sinking on top of it; the crown sits on
+     her back from the floor up. They had been sized and seated from the renderers' bounds before the first frame, and hung in the air. A
+     PlayMode check: each spider's lowest point within 10 cm of the floor under it.
+   - **15% bigger:** about 3.9 m to her back and her legs to about 11.5 m; her body's reach for the melee grown with her (2.9 m).
+   - **Deep red:** harmful ground is a deep red now (#B0141E, its edge #6E0A10), not pink; the jagged edge kept.
+   - **Out of the red:** her unmade ground is laid under one of the raid standing off from her (a ranged member or a healer), not where she
+     floats, so the melee keep a clear edge round her; a sim leaving the red drops a mend that would not land within 0.3 s; a pet that finds
+     no clear spot goes to its keeper when its keeper stands clear. (Tune-5's first pull: the Ranger's wolf 65 s in the red, the Ranger 23,
+     the Warrior tank 19, the Rogue 11, most of it the warnings' seconds while walking out.)
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

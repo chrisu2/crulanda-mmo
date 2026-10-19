@@ -16,6 +16,8 @@ namespace Crulanda.Encounter
         /// <summary>Its length, nose to rump with its legs (metres).</summary>
         public const float Length = 1.3f;
         public static readonly Color Purple = new Color(.72f, .42f, 1f), Glow = new Color(.18f, .05f, .3f);
+        float legsBelowPivot, floorAt = float.NaN, floorLook;
+        public float LowestY { get { float low = float.MaxValue; foreach (var p in UnravellerBody.Points(spider)) low = Mathf.Min(low, p.y); return low; } }
         EncounterEnemy enemy; Transform spider; Animation anim; Renderer[] parts; Vector3 lastPos; float lastSwingIn; bool died, white;
         public bool HasSpider { get { return spider != null; } }
         public string Playing { get; private set; }
@@ -47,19 +49,13 @@ namespace Crulanda.Encounter
             spider = Instantiate(src, root, false).transform; spider.name = "Spider"; spider.localRotation = Quaternion.Euler(0, UnravellerBody.FaceYaw, 0);
             foreach (var c in spider.GetComponentsInChildren<Collider>(true)) Destroy(c);
             parts = spider.GetComponentsInChildren<Renderer>(true);
-            var b = new Bounds(); bool any = false;
             foreach (var r in parts)
             {
                 var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = Hide(); r.sharedMaterials = mats;
-                r.shadowCastingMode = ShadowCastingMode.Off;
-                if (!any) { b = r.bounds; any = true; } else b.Encapsulate(r.bounds);
+                r.shadowCastingMode = ShadowCastingMode.Off; if (r is SkinnedMeshRenderer sk) sk.updateWhenOffscreen = true;
             }
-            if (any)
-            {
-                float k = Length / Mathf.Max(.01f, Mathf.Max(b.size.x, b.size.z));
-                spider.localScale *= k;
-                spider.localPosition = new Vector3(0, -1 - (b.min.y - root.position.y) * k, 0);   // its feet on the ground (an actor stands a metre over its feet)
-            }
+            // Sized by its posed mesh, and stood on the floor under it each half second (play note 282: not floating).
+            legsBelowPivot = UnravellerBody.Fit(spider, 100, Length);
             // The Weave-Eater's tangle it was made with: hidden (the spider is its body now).
             var body = transform.Find("Body");
             if (body != null) foreach (var r in body.GetComponentsInChildren<Renderer>(true)) r.enabled = false;
@@ -80,6 +76,8 @@ namespace Crulanda.Encounter
         void LateUpdate()
         {
             if (enemy == null || spider == null) return;
+            if (Time.time >= floorLook || float.IsNaN(floorAt)) { floorLook = Time.time + .5f; floorAt = UnravellerBody.FloorUnder(transform.position); }
+            spider.position = new Vector3(spider.position.x, floorAt + legsBelowPivot, spider.position.z);
             if (!enemy.actor.IsAlive)
             {
                 if (!died) { died = true; bool shattered = enemy.Calcified || white; if (anim != null && anim["death1"] != null) { foreach (AnimationState st in anim) st.speed = 1; anim.Stop(); anim.Play("death1"); Playing = "death1"; } SetWhite(false); if (shattered) SetWhite(true); }

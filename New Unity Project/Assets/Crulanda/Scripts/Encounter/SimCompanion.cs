@@ -820,7 +820,8 @@ namespace Crulanda.Encounter
             // every 18 through three wiped pulls; the pull that won was the one she and the Ranger stood 9-10 m off.)
             if (!Melee && healing == null && StepClearOfHold()) return;
             // Out of any marked ground (GroundMarks; WORLD_BOSS_1.md 3.5, shared with the dungeons), a mend in hand landing first.
-            if (healing == null && StepOutOfGround()) return;
+            // Out of the red first, a mend in hand dropped unless it lands within a breath (Chris, tune-5: "still not moving out of red").
+            if ((healing == null || healAt - Time.time > .3f) && StepOutOfGround()) { if (healing != null) { healing = null; if (visual != null) visual.Casting = false; } return; }
             if (healing == null && BarrowWake()) return;   // a Shaman's one raising a fight (SimCompanion.Raid)
             // Its part in the Unraveller's fight: the river when hunted, the harpoons, the kicks on the Feeding, the salts (SimCompanion.Raid).
             if (healing == null && RaidTurn()) return;

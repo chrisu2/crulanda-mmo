@@ -21,7 +21,7 @@ namespace Crulanda.Encounter
     public sealed class BlowMark : MonoBehaviour
     {
         /// <summary>The harmful look: a red-violet edge and body.</summary>
-        public static readonly Color Edge = new Color(.92f, .16f, .42f, .95f), Body = new Color(.78f, .1f, .38f, .38f);
+        public static readonly Color Edge = new Color(.43f, .04f, .06f, .97f), Body = new Color(.69f, .08f, .12f, .5f);   // deep red (#6E0A10 edge, #B0141E body; Chris, tune-5: "it really looks pink so make it a deeper red")
         /// <summary>The helpful looks: soft gold (holy, a standard, fire on the foe) and green (rain, salt, growth); low and translucent.</summary>
         public static readonly Color HelpEdgeGold = new Color(1, .86f, .45f, .5f), HelpBodyGold = new Color(1, .85f, .45f, .12f), HelpEdgeGreen = new Color(.5f, .95f, .6f, .5f), HelpBodyGreen = new Color(.45f, .9f, .55f, .12f);
         Transform ring, fill; Material ringMat, fillMat;

@@ -112,7 +112,7 @@ namespace Crulanda.World
             float loss = w.dim * Mathf.Lerp(.5f, 1, lit), lift = 1 + (.08f * w.dim - .45f * w.rain) * lit + flash * .7f;   // overcast skylight is a little bright; rain is gloomy, a storm dark
             // The same light plays sun by day and moon by night; it swings across the sky with the hour.
             bool moon = Hour >= 20.2f || Hour < 5.6f;
-            // Noon height: the default arc, or the zone's own (sunHigh: Khaven's sun never climbs out of the evening).
+            // Noon height: the default arc, or the zone's own (sunHigh: Hallow's Creek's low light under its grey sky).
             float high = day.sunHigh > 0 ? day.sunHigh : Mathf.Max(day.sunPitch * 1.6f, 45);
             float elevation = moon ? 38 : Mathf.Lerp(4, high, Mathf.Sin(Mathf.Clamp01((Hour - 5.6f) / 14.6f) * Mathf.PI));
             float yaw = day.sunYaw + (moon ? 180 : (Hour - 12) * 12);

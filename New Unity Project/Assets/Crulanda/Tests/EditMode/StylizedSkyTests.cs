@@ -111,6 +111,7 @@ namespace Crulanda.Tests
             // Khaven follows the weather and the clock like the others (Chris 2026-10-19, "CHECK LORE CANON": its only canon is its map,
             // with no sky or hour; the held dusk was GAME-ONLY, dropped). Its weather never clears, so its day sky stays grey.
             Assert.IsTrue(string.IsNullOrEmpty(Zone("khaven").lighting.skyDay), "Khaven has no forced day sky");
+            Assert.AreEqual(0, Zone("khaven").lighting.sunHigh, "and no held-low sun: its light climbs with the clock");
             // The Lowtowns' yellow smog: a thick haze of its own fog colour, a yellow tint.
             var low = Zone("lowtowns").lighting; float haze = StylizedSky.ZoneHaze(low.skyHaze); var tint = StylizedSky.ZoneTint(low.skyTint);
             Assert.Greater(haze, .8f, "the smog");

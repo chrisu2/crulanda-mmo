@@ -522,12 +522,30 @@ namespace Crulanda.Encounter
 
         /// <summary>What a pose does to a model this moment: the clip's slot (null: the walk cycle), the arms' old pivot angles when the
         /// pose works them, a lean of the whole figure, a drop (swimming) and a bend of the back.</summary>
-        /// <summary>The sitting clip puts the hips this far behind where the figure stands: a seated body is moved forward by it, so a
-        /// villager placed on a stool sits on it and not beside it (playtest note 30).</summary>
+        /// <summary>A rider's seat in the saddle: the body moved forward by this much (playtest note 30's constant, kept for the mount,
+        /// whose saddle was placed with it). Everyone else seated is fitted by measurement (<see cref="SitHipsAhead"/>).</summary>
         const float SitShift = .42f;
+        /// <summary>
+        /// Seated (play note 237, 2026-10-18: "inn still not polished. this guy not even sitting on a chair"): where the hips go, ahead
+        /// of the place the sitter was put (m). The sitting clip's hips are measured every frame in the body's frame and the body moved so
+        /// the hips stand this far ahead of the place, over the seat that is there. The old fixed shift (0.42 m forward, note 30, on the
+        /// claim that the clip puts the hips that far back) put the hips 0.4 m in front of every inn seat: the clip as imported keeps them
+        /// over the feet's line, so a drinker sat in the air at the table's end with his stool behind him (the Golden Cask and the
+        /// Cracked Hearth frames, 2026-10-17). InnSeatPlayTests measures it.
+        /// </summary>
+        public const float SitHipsAhead = 0;
+        /// <summary>The seat height the sitting clip is made for (m over the floor; the drinkers on the taverns' .5 m stools sat on
+        /// them), and how far a seat higher than that (a bar stool) lifts the seated body: the place's seat top less this.</summary>
+        public const float SitClipSeat = .5f;
+        /// <summary>How far this sitter's seat stands over <see cref="SitClipSeat"/> (m; set by whoever seats them, 0 standing): the body
+        /// rises by it and the feet are let hang by it (GroundFeet).</summary>
+        public float SeatRise;
+        Vector2 sitFit; bool sitFitSet;
+        /// <summary>Tests: the hips' point in the world this frame (null without a model).</summary>
+        public Vector3? HipsPoint { get { return model != null && model.Hips != null ? model.Hips.position : (Vector3?)null; } }
         /// <summary>Kevin's ploughing clip under the hoe stroke (off: the hand-set stroke alone, as FieldWorkTests measures it).</summary>
         public static bool PloughClip;
-        struct PoseState { public string slot; public bool arms, hoe; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, twist, weight; }
+        struct PoseState { public string slot; public bool arms, hoe; public Vector3 armL, armR; public float elbowL, elbowR, lean, drop, bend, shift, side, twist, weight; }
         PoseState PoseOf(ActorPose pose, float speed, float t)
         {
             var p = new PoseState(); ploughing = false;
@@ -710,6 +728,16 @@ namespace Crulanda.Encounter
                 p.drop = swimLift;
             }
             else swimLift = 0;
+            // Seated, not in a saddle: the hips over the seat (SitHipsAhead), measured from the clip as it stands this frame (the hips
+            // in the body's frame do not move with the body), and lifted for a seat higher than the clip's (SeatRise).
+            if (p.slot == "sit" && !Riding && model.Hips != null)
+            {
+                var hips = body.InverseTransformPoint(model.Hips.position);
+                var want = new Vector2(-hips.x, SitHipsAhead - hips.z);
+                sitFit = dt > 0 && sitFitSet ? Vector2.Lerp(sitFit, want, Mathf.Min(1, dt * 6)) : want; sitFitSet = true;
+                p.side = sitFit.x; p.shift = sitFit.y; p.drop += SeatRise;
+            }
+            else sitFitSet = false;
             // A bow drawn: the chest turned side-on to the mark, the left shoulder leading, and the head kept on the mark; before the
             // arms, which are set in the body's frame.
             // The archer's clips (Kevin Iglesias) are made for an archer standing side-on, so their bow arm points to the figure's left.
@@ -753,7 +781,7 @@ namespace Crulanda.Encounter
             // otherwise the body is left to others (an elite's wind-up lean, an ambusher's crouch, a death).
             if (!dead)
             {
-                if (p.drop != 0 || p.shift != 0 || LyingLow) { body.localPosition = new Vector3(0, p.drop, p.shift); dropped = true; }
+                if (p.drop != 0 || p.shift != 0 || p.side != 0 || LyingLow) { body.localPosition = new Vector3(p.side, p.drop, p.shift); dropped = true; }
                 else if (dropped) { body.localPosition = Vector3.zero; dropped = false; }
                 if (Stagger > 0) { staggering = true; body.localEulerAngles = new Vector3(p.lean + Mathf.Sin(phase * .5f) * 6 * Stagger, archerTurn, Mathf.Sin(phase * .5f + 1.1f) * 14 * Stagger); }
                 else if (p.lean != 0 || Mathf.Abs(archerTurn) > .01f) { body.localEulerAngles = new Vector3(p.lean, archerTurn, 0); leaned = true; }

@@ -56,6 +56,27 @@ namespace Crulanda.Encounter
             }
         }
         readonly Dictionary<Vector3, Vector3> faceAt = new Dictionary<Vector3, Vector3>();
+        /// <summary>The inns' seats (their places in "inn") and each seat's top over the floor.</summary>
+        readonly Dictionary<Vector3, float> seatTopAt = new Dictionary<Vector3, float>();
+        /// <summary>The inn seat nearest a point within <paramref name="within"/> m along the floor (its place and its top), or null.</summary>
+        public (Vector3 at, float top)? SeatNear(Vector3 p, float within = .9f)
+        {
+            (Vector3, float)? best = null; float bd = within * within;
+            foreach (var kv in seatTopAt) { float dx = kv.Key.x - p.x, dz = kv.Key.z - p.z, d = dx * dx + dz * dz; if (d < bd) { bd = d; best = (kv.Key, kv.Value); } }
+            return best;
+        }
+        /// <summary>Whether someone else sits at an inn seat or is on the way to it (play note 237: two sent to one stool, one sat beside it).</summary>
+        public bool SeatTaken(Vector3 seat, Villager except = null)
+        {
+            foreach (var v in Villagers)
+            {
+                if (v == except || !v.Visible) continue;
+                if (v.Goal.HasValue && (v.Goal.Value - seat).sqrMagnitude < .04f) return true;
+                float dx = v.transform.position.x - seat.x, dz = v.transform.position.z - seat.z;
+                if (!v.Travelling && dx * dx + dz * dz < .25f) return true;
+            }
+            return false;
+        }
         readonly Dictionary<Vector3, string> placeName = new Dictionary<Vector3, string>();
         /// <summary>
         /// The open side of a fixed post (2026-10-17, the Crown's Hall of Arms: trainers facing the wall): 24 rays at chest height
@@ -708,7 +729,7 @@ namespace Crulanda.Encounter
                     {
                         int had = Places["inn"].Count;
                         AddPlace("inn", seat.at, true);
-                        if (Places["inn"].Count > had) faceAt[Places["inn"][had]] = seat.face;
+                        if (Places["inn"].Count > had) { faceAt[Places["inn"][had]] = seat.face; seatTopAt[Places["inn"][had]] = seat.top > 0 ? seat.top : ActorVisual.SitClipSeat; }
                     }
             // A city's folk wander its streets and squares: points thrown over the whole flat would land below the walls, where nobody
             // can walk to them (the Crown stands on its plateau over the Lowtowns).
@@ -841,8 +862,11 @@ namespace Crulanda.Encounter
             for (int tries = 0; tries < 8; tries++)
             {
                 var p = list[rng.Next(list.Count)];
+                if (key == "inn" && SeatTaken(p, who)) continue;   // one to a seat (play note 237)
                 if (!EnemyNear(p, KeepClear)) return p;
             }
+            if (key == "inn")   // a full room: the first free seat, else none (never a sitter without a seat)
+                foreach (var p in list) if (!SeatTaken(p, who) && !EnemyNear(p, KeepClear)) return p;
             return null;
         }
         /// <summary>How close to a living enemy nobody will stand to work or chat. (12 m shut the well while a collector stood seven metres off.)</summary>
@@ -1335,9 +1359,25 @@ namespace Crulanda.Encounter
         {
             get { var c = life.Session.Conversation; return (c != null && c.npc == Name) || Time.time < heldUntil; }
         }
+        /// <summary>Where the last walk was sent (a seat it is bound for counts as taken, VillageLife.SeatTaken), or null.</summary>
+        public Vector3? Goal { get; private set; }
+        /// <summary>
+        /// Sat down at an inn seat (play note 237, 2026-10-18: "this guy not even sitting on a chair"): a walk ends up to 0.65 m short of
+        /// its place (the agent's stopping distance and the arrival's slack), and the sitter sat down there, beside the stool or at the
+        /// table's end. Within 0.9 m of a seat they are put on it, its middle, and lifted to its top (ActorVisual.SeatRise); the pose
+        /// puts the hips over it. False when no seat is that near.
+        /// </summary>
+        bool SitAtSeat()
+        {
+            var seat = life.SeatNear(transform.position - Vector3.up * agent.baseOffset); if (!seat.HasValue) return false;
+            if (agent.isOnNavMesh) { agent.Warp(seat.Value.at); agent.isStopped = true; }
+            visual.SeatRise = Mathf.Max(0, seat.Value.top - ActorVisual.SitClipSeat);
+            return true;
+        }
         void Go(Vector3 target, float speedScale = 1)
         {
             if (!agent.enabled || !agent.isOnNavMesh) return;
+            Goal = target; visual.SeatRise = 0;
             float reel = Reeling; visual.Stagger = reel; ShowTankard(false);
             agent.speed = (Role == "child" ? 1.9f : Role == "elder" ? 1.1f : 1.6f) * speedScale * (1 - .35f * reel);
             // Through an inn's doorway by its lane (Phase 8.6 step 2, DoorwayRoute): first to the lane's end, the rest once through.
@@ -1423,7 +1463,7 @@ namespace Crulanda.Encounter
             {
                 activity = "sleep";
                 if (home != null) { Go(home.position); return; }
-                var bed = life.RandomPlace("inn");   // no house: a bench at the inn
+                var bed = life.RandomPlace("inn", this);   // no house: a bench at the inn
                 if (bed.HasValue) Go(bed.Value); else { state = State.Activity; until = Time.time + 30; }
                 return;
             }
@@ -1461,6 +1501,7 @@ namespace Crulanda.Encounter
             state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
             until = Time.time + (activity == "home" ? HomeStay : 14 + life.R01 * 30);
             visual.Pose = PoseFor(activity);
+            if ((activity == "inn" || activity == "sleep" && home == null) && visual.Pose == ActorPose.Sit) SitAtSeat();   // on the seat, not short of it
             var look = life.LookFor(transform.position);
             // Someone at a fixed post (a trainer at the racks, a clerk at a desk against the wall) faces the room, away from the prop at
             // their back (2026-10-16, Chris in the Crown's Hall of Arms: "all trainers standing backwards").
@@ -1630,7 +1671,7 @@ namespace Crulanda.Encounter
         {
             if (!life.Places.TryGetValue("inn", out var seats) || seats.Count == 0 || !agent.isOnNavMesh) return false;
             foreach (var r in renderers) r.enabled = true; CancelErrand();
-            agent.Warp(seats[seat % seats.Count]); agent.isStopped = true; state = State.Activity; until = Time.time + 60; enabled = false;
+            agent.Warp(seats[seat % seats.Count]); agent.isStopped = true; state = State.Activity; until = Time.time + 60; enabled = false; Goal = null; SitAtSeat();
             var table = life.LookFor(transform.position); if (table.HasValue) Face(table.Value);
             activity = slumped ? "passedout" : "inn"; visual.Pose = slumped ? ActorPose.Slump : ActorPose.Drink; ShowTankard(!slumped);
             return true;
@@ -1656,6 +1697,7 @@ namespace Crulanda.Encounter
         {
             foreach (var r in renderers) r.enabled = true; CancelErrand();
             if (agent.isOnNavMesh) { agent.Warp(at); agent.isStopped = true; }
+            Goal = null; visual.SeatRise = 0;
             transform.rotation = Quaternion.Euler(0, yaw, 0); visual.Pose = ActorPose.None; state = State.Activity; activity = "posed"; until = Time.time + 60; enabled = false;
         }
         /// <summary>Capture/debug: out of sight and out of the way (no body, no nameplate) until <see cref="Release"/>.</summary>
@@ -1677,7 +1719,7 @@ namespace Crulanda.Encounter
         {
             foreach (var r in renderers) r.enabled = true;
             if (agent.isOnNavMesh && NavMesh.SamplePosition(at, out var hit, 2.5f, NavMesh.AllAreas)) agent.Warp(hit.position);
-            enabled = true; state = State.Activity; until = 0; visual.Pose = ActorPose.None; ChooseNext();
+            enabled = true; state = State.Activity; until = 0; visual.Pose = ActorPose.None; Goal = null; visual.SeatRise = 0; ChooseNext();
         }
         /// <summary>What working looks like for this trade at this place.</summary>
         ActorPose PoseFor(string place)
@@ -1771,7 +1813,7 @@ namespace Crulanda.Encounter
         }
         void PassOut()
         {
-            activity = "passedout"; state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
+            activity = "passedout"; state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true; SitAtSeat();
             ShowTankard(false); visual.Pose = ActorPose.Slump; until = Time.time + 280 + life.R01 * 220; Say("Zzz...", 6); nextBark = Time.time + 20;
         }
         /// <summary>A round at the inn: a tankard off the day's cask (the village's stock, "inn.ale") and a little further gone; when the
@@ -1779,6 +1821,7 @@ namespace Crulanda.Encounter
         void DrinkRound()
         {
             state = State.Activity; if (agent.isOnNavMesh) agent.isStopped = true;
+            SitAtSeat();
             var look = life.LookFor(transform.position); if (look.HasValue) Face(look.Value);
             until = Time.time + 16 + life.R01 * 22;
             if (spent || !life.Take("inn.ale"))

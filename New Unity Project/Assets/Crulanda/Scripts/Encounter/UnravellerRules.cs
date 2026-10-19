@@ -231,9 +231,24 @@ namespace Crulanda.Encounter
             if (role != SimCompanion.PartyRole.Damage) return -1;
             switch (classId) { case "class.archivist": return 0; case "class.rogue": return 1; case "class.scoundrel": return 2; case "class.mage": return 3; case "class.druid": return 4; default: return -1; }
         }
-        /// <summary>Who takes the brood (3.4): the tank not holding her, and Party 2's damage-dealers who fight from range (run 1: the melee
-        /// chased blinking brood across the bar, the Scoundrel at 24 a second; the melee stay on her).</summary>
-        public static bool TakesBrood(SimCompanion.PartyRole role, int party, bool holdsHer, bool melee) { return role == SimCompanion.PartyRole.Tank ? !holdsHer : role == SimCompanion.PartyRole.Damage && party == 1 && !melee; }
+        /// <summary>Who takes the brood while a wave is up (raid 5, Chris: "off tank and dps kill adds while main tank stay on main spider"):
+        /// the tank not holding her (it taunts them off the healers), and every damage-dealer, in the kill order, until the wave is dead; then
+        /// back to her. The tank holding her stays on her; the healers heal. (A swap mid-wave: the tank who takes her stays, the one she leaves
+        /// goes to the brood.)</summary>
+        public static bool TakesBrood(SimCompanion.PartyRole role, int party, bool holdsHer, bool melee) { return role == SimCompanion.PartyRole.Tank ? !holdsHer : role == SimCompanion.PartyRole.Damage; }
+        /// <summary>
+        /// The brood's kill order (raid 5, Chris: "once they are cc they need to be killed systematically or they will break and eventually kill
+        /// the raid"): a free one first (it is on the healers; the nearest to breaking first among the free); then the held, Cross before Moon
+        /// before unmarked, the one whose hold runs out soonest first. The first is the Skull: the brood-takers kill it, and only it (a blow on
+        /// another held one would break it). (id, held, its mark, seconds left on its hold).
+        /// </summary>
+        public static List<string> KillOrder(IList<(string id, bool held, RaidMark mark, float holdLeft)> brood)
+        {
+            var l = new List<(string id, bool held, RaidMark mark, float holdLeft)>(); if (brood != null) l.AddRange(brood);
+            int Rank(RaidMark m) { return m == RaidMark.Skull ? 0 : m == RaidMark.Cross ? 1 : m == RaidMark.Moon ? 2 : 3; }
+            l.Sort((a, b) => a.held != b.held ? (a.held ? 1 : -1) : a.held && Rank(a.mark) != Rank(b.mark) ? Rank(a.mark).CompareTo(Rank(b.mark)) : a.holdLeft.CompareTo(b.holdLeft));
+            var ids = new List<string>(); foreach (var x in l) ids.Add(x.id); return ids;
+        }
         /// <summary>A sim misses its part of a mechanic now and then (3.5, "mistakes on purpose"): more at 18 than at 20, more when careless (rash:
         /// nerve over .75). <paramref name="roll"/> in 0..1.</summary>
         public static bool Misses(int level, float bold, float roll, UnravellerTuning t)

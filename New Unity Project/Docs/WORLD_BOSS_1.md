@@ -653,6 +653,23 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      are salted and shattered as before. With the raid's four control classes, four of five are held each wave; without them five go for the
      healers.
    - Toward 1 in 2: her health stays 195,000; the new ground and the bigger waves are the change this round. Step 6 reads raid 5's kill rate.
+   **Raid 5 (2026-10-19, watched by Chris) and what was changed (WRITTEN, NOT RUN again).** Chris, verbatim: "once they are cc they need to
+   be killed systematically or they will break and eventually kill the raid"; "sims are not attacking adds"; "off tank and dps kill adds
+   while main tank stay on main spider"; "but there still needs to be cc while they take down the adds systematically".
+   - **Why nobody killed them:** a held brood was marked Moon or Cross and "left alone", and only Party 2's ranged took brood; with all of a
+     wave held there was nothing they might strike, the holds ran out, and the control classes held them again.
+   - **The kill order** (`RaidJobs.KillOrder`, `EncounterSession.BroodKill`): the free one first (it is on the healers), then the held,
+     Cross before Moon before the rest, the one whose hold runs out soonest first. The first wears the Skull; it is the only brood the raid
+     strikes, held or not (a blow breaks its hold); the others stay held (no area blow or stray blow lands on a held brood). When it dies the
+     Skull passes on. The boss frame has a line under it: "Kill: Skull, then Cross, Moon (3 held)".
+   - **Who does what while a wave is up:** the main tank (the one she is on) stays on her alone; the off-tank takes the free one, taunting it
+     off the healers; every damage-dealer kills in the kill order (salt then the shattering blow as the fast kill), then goes back to her;
+     the control classes keep the waiting ones held (Archivist first, any that break held again; a hold is 18 s, the next 15 s on); the
+     healers heal both tanks. A swap mid-wave: the tank who takes her stays on her, the one she leaves goes to the brood.
+   - **Numbers:** brood 30% of a camp elite's health (about 1,050 at 22: a few seconds each with the raid's damage on it, so five held and
+     killed in turn take most of a wave's 30 s, and a raid that lets the holds run out or kills out of order has free brood on its healers);
+     her health 170,000 (195,000), for the damage the raid now spends on the brood.
+   - **The run's log** gives each pull's brood killed, broken free of their holds, and eaten.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

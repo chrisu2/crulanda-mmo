@@ -120,7 +120,7 @@ namespace Crulanda.Encounter
         /// <summary>Its raid mark (Ctrl+1 skull, Ctrl+2 moon, Ctrl+3 cross, Ctrl+4 clears; one mob a mark).</summary>
         public RaidMark RaidMarked { get; set; }
         /// <summary>What the party's helpers (sims, Mira, the Ranger's companion) don't hit: a held mob, or one marked moon or cross.</summary>
-        public bool LeaveAlone { get { return Incapacitated || !Brood && ((RaidMarked == RaidMark.Moon && (!Elite || Controlled)) || RaidMarked == RaidMark.Cross); } }   // her brood: left alone only while held (a marked one free again is fought, and held again: SimCompanion.Raid)   // an elite's Moon only while it is held: its one hold a fight spent, the party fights it (Chris's rule, 2026-10-15)
+        public bool LeaveAlone { get { return Incapacitated && !(Brood && RaidMarked == RaidMark.Skull) || !Brood && ((RaidMarked == RaidMark.Moon && (!Elite || Controlled)) || RaidMarked == RaidMark.Cross); } }   // her brood: left alone only while held (a marked one free again is fought, and held again: SimCompanion.Raid)   // an elite's Moon only while it is held: its one hold a fight spent, the party fights it (Chris's rule, 2026-10-15)
         /// <summary>Lets a hold or a fear go early (an Archivist binding another mob).</summary>
         public void Release() { incapUntil = 0; fearUntil = 0; }
         /// <summary>A Rogue's Vanish: this mob forgets <paramref name="who"/> (its threat on them is gone) and doesn't notice them again

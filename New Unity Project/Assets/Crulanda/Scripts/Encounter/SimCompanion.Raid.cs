@@ -139,7 +139,7 @@ namespace Crulanda.Encounter
             EncounterEnemy pick = null; float best = 25;
             foreach (var b in session.BroodNow)
             {
-                if (b == null || !b.actor.IsAlive || b.Controlled || b.Calcified || !b.Takes("incap")) continue;
+                if (b == null || !b.actor.IsAlive || b.Controlled || b.Calcified || b == session.BroodKill || !b.Takes("incap")) continue;   // never the Skull: it is being killed
                 float d = Vector3.Distance(b.transform.position, transform.position); if (d < best) { best = d; pick = b; }
             }
             if (pick == null) return false;
@@ -197,6 +197,9 @@ namespace Crulanda.Encounter
             if (Role == PartyRole.Tank && (holds || TauntsHer(e))) return e;   // holding her, or the one to take her back (a swap, a blink onto a caster)
             int party = session.InRaid ? session.Raid.PartyOf(sim.id) : 0;
             if (!RaidJobs.TakesBrood(Role, party, holds, Melee)) return null;
+            // The kill order's Skull (raid 5): only it; a blow on another held one would break it.
+            var skull = session.BroodKill;
+            if (skull != null && skull.actor.IsAlive && Vector3.Distance(skull.transform.position, transform.position) < 40) return skull;
             EncounterEnemy best = null; float bestD = 40;
             foreach (var b in session.BroodNow)
             {

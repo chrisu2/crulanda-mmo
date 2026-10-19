@@ -66,6 +66,9 @@ namespace Crulanda.Encounter
             var turn = session.HarpoonTurnLine;
             if (turn != null) Shadow(new Rect(r.x + 8, r.y + 76, 200, 20), turn, tiny, turn.StartsWith("Your") ? new Color(1, .84f, .3f) : new Color(.86f, .8f, .62f));
             if (b.Hauled) Shadow(new Rect(r.x + 210, r.y + 76, 110, 20), "Hauled", tiny, new Color(.95f, .75f, .4f));
+            // The brood's kill order (raid 5): the Skull, then the held by their marks.
+            var kill = session.BroodKillLine;
+            if (kill != null) { Fill(new Rect(r.x, r.yMax, r.width, 22), new Color(0, 0, 0, .6f)); Shadow(new Rect(r.x + 8, r.yMax + 1, r.width - 16, 20), kill, tiny, new Color(1, .9f, .9f)); }
         }
         /// <summary>The raid warning (2.4): a large centred line for 2 s, for what is about to kill you.</summary>
         void DrawRaidWarning()

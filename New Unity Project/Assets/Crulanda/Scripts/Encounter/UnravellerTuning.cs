@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     public sealed class UnravellerTuning
     {
         // ---------- her, and the clock ----------
-        public int health = 195000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
+        public int health = 170000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
         // ---------- the rules that hold all fight (3.3): the Weave-Eaters' own, scaled ----------
         public float lighthouseShare = .1f, lighthouseBeat = 2, lighthouseReach = 30;
         public float blinkEvery = 9, blinkReach = 12, touchShare = .6f, touchSilence = 3, wardReach = 10;
@@ -30,7 +30,7 @@ namespace Crulanda.Encounter
         public float broodEvery1 = 0, broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 5, broodLevel = 22;
         /// <summary>A control class's hold on a brood (raid 4): its seconds and its wait before the next.</summary>
         public float broodHoldSeconds = 18, broodHoldEvery = 15;
-        public float broodHealthShare = .12f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
+        public float broodHealthShare = .3f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
         public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .15f, unmadeRamp = .05f;
         public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 10; public int saltsToFree = 3;
         public float saltWindow = 12, calcifySeconds = 4, calcifyTaken = 1.5f;

@@ -69,6 +69,14 @@ namespace Crulanda.Tests
             CollectionAssert.AreEqual(new[] { "b" }, sims, "two salted already: one more");
         }
 
+        [Test] public void The_brood_are_killed_in_order_the_free_one_then_Cross_then_Moon()
+        {
+            var order = RaidJobs.KillOrder(new List<(string, bool, RaidMark, float)> {
+                ("moon", true, RaidMark.Moon, 4), ("cross", true, RaidMark.Cross, 12), ("free", false, RaidMark.None, 0), ("held", true, RaidMark.None, 2), ("cross2", true, RaidMark.Cross, 6) });
+            CollectionAssert.AreEqual(new[] { "free", "cross2", "cross", "moon", "held" }, order, "the free one (on the healers), then Cross (soonest to break first), Moon, the rest");
+            CollectionAssert.IsEmpty(RaidJobs.KillOrder(null));
+        }
+
         [Test] public void The_raids_control_holds_the_brood_the_Archivist_first()
         {
             var d = SimCompanion.PartyRole.Damage;
@@ -80,13 +88,13 @@ namespace Crulanda.Tests
             Assert.AreEqual(-1, RaidJobs.BroodHolder("class.archivist", SimCompanion.PartyRole.Tank));
         }
 
-        [Test] public void The_off_tank_and_Party_2s_damage_take_the_brood()
+        [Test] public void The_off_tank_and_the_damage_dealers_take_the_brood_the_main_tank_keeps_her()
         {
             Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Tank, 0, false, true), "the tank not holding her");
             Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Tank, 1, true, true), "the tank holding her keeps her");
             Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 1, false, false), "Party 2's damage from range");
-            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 1, false, true), "Party 2's melee stay on her (run 1: the Scoundrel chasing brood, 24 a second)");
-            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 0, false, false), "Party 1's stays on her");
+            Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 1, false, true), "Party 2's melee too, one brood at a time in the kill order (raid 5)");
+            Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 0, false, false), "every damage-dealer on the adds while a wave is up (raid 5: \"off tank and dps kill adds\")");
             Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Healer, 1, false, false), "healers heal");
         }
 

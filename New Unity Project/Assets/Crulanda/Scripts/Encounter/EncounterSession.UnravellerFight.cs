@@ -44,7 +44,7 @@ namespace Crulanda.Encounter
         /// <summary>The sims asked to salt her now (the three nearest with salt, less you when you are one of them).</summary>
         public readonly List<string> SaltCall = new List<string>();
         /// <summary>What happened this fight, for the log and the tests.</summary>
-        public int BroodRisen, BroodEaten, SwallowsFreed, SwallowsErased, HuntsMissed, HuntsLanded, Pulses, Feasts, HarpoonsThrown, SaltsThrown;
+        public int BroodKilled, BroodBrokeFree, BroodRisen, BroodEaten, SwallowsFreed, SwallowsErased, HuntsMissed, HuntsLanded, Pulses, Feasts, HarpoonsThrown, SaltsThrown;
         /// <summary>Unmade patches lying now (shown or warned).</summary>
         public int UnmadePatches { get { return unmade.Count; } }
         public IEnumerable<Vector3> UnmadeAt { get { return unmade.Select(u => u.at); } }
@@ -98,7 +98,7 @@ namespace Crulanda.Encounter
         void BeginUnravellerFight(EncounterEnemy e)
         {
             float now = Time.time; e.PullAt = now; e.RaidPhase = 0; feasted = false; nextBrood = now + Mathf.Max(10, UT.broodEvery1);   // phase-1 adds (off by default)
-            BroodRisen = BroodEaten = SwallowsFreed = SwallowsErased = HuntsMissed = HuntsLanded = Pulses = Feasts = HarpoonsThrown = SaltsThrown = 0;
+            BroodKilled = BroodBrokeFree = BroodRisen = BroodEaten = SwallowsFreed = SwallowsErased = HuntsMissed = HuntsLanded = Pulses = Feasts = HarpoonsThrown = SaltsThrown = 0;
             SetRotations();
             if (Unraveller.FightTrackReady) Crulanda.World.ZoneMusic.FightOverride = Unraveller.FightTrack;
             if (HarpoonRotation != null && HarpoonRotation.Order.Count > 0) Message("Harpoons, in turn: " + string.Join(", ", HarpoonRotation.Order.Select(NameOfRaidId)) + ". Interrupts on the Feeding: " + (InterruptRotation != null && InterruptRotation.Order.Count > 0 ? string.Join(", ", InterruptRotation.Order.Select(NameOfRaidId)) : "nobody") + ".");
@@ -107,7 +107,7 @@ namespace Crulanda.Encounter
         public void EndUnravellerFight(EncounterEnemy e)
         {
             foreach (var b in BroodNow) if (b != null) { Enemies.Remove(b); if (Target == b) Target = null; Destroy(b.gameObject); }
-            BroodNow.Clear();
+            BroodNow.Clear(); BroodKill = null; broodWas.Clear();
             foreach (var u in unmade) if (u.mark != null) Destroy(u.mark.gameObject);
             unmade.Clear(); groundSeconds.Clear();
             if (SwallowedActor != null) Spit(e, SwallowedActor);
@@ -126,9 +126,53 @@ namespace Crulanda.Encounter
         }
 
         // ---------- the brood (phase 2 on) ----------
+        /// <summary>The brood the raid kills now (the Skull; raid 5's kill order), or null.</summary>
+        public EncounterEnemy BroodKill { get; private set; }
+        /// <summary>The boss frame's kill-order line: "Kill: Skull, then Cross, Moon (3 held)"; null with no brood up.</summary>
+        public string BroodKillLine
+        {
+            get
+            {
+                if (BroodKill == null) return null;
+                int held = 0; var marks = new List<string>();
+                foreach (var b in BroodNow) if (b != null && b.actor.IsAlive && b != BroodKill) { if (b.Incapacitated) held++; if (b.RaidMarked == RaidMark.Cross || b.RaidMarked == RaidMark.Moon) marks.Add(b.RaidMarked.ToString()); }
+                marks.Sort((x, y) => x == y ? 0 : x == "Cross" ? -1 : 1);
+                return "Kill: Skull" + (marks.Count > 0 ? ", then " + string.Join(", ", marks) : "") + (held > 0 ? " (" + held + " held)" : "");
+            }
+        }
+        readonly Dictionary<EncounterEnemy, (bool alive, bool held)> broodWas = new Dictionary<EncounterEnemy, (bool, bool)>();
+        /// <summary>Each brood's last frame: killed (alive to dead) and broke free (its hold ran out, not the Skull's broken by the raid).</summary>
+        void CountBrood()
+        {
+            foreach (var b in BroodNow)
+            {
+                if (b == null) continue;
+                bool alive = b.actor.IsAlive, held = b.Incapacitated;
+                if (broodWas.TryGetValue(b, out var was))
+                {
+                    if (was.alive && !alive) BroodKilled++;
+                    else if (alive && was.held && !held && b != BroodKill) BroodBrokeFree++;
+                }
+                broodWas[b] = (alive, held);
+            }
+        }
+        /// <summary>The kill order kept: the Skull on the first of it (raid 5).</summary>
+        void PickBroodKill()
+        {
+            var list = new List<(string id, bool held, RaidMark mark, float holdLeft)>();
+            foreach (var b in BroodNow) if (b != null && b.actor.IsAlive) list.Add((b.persistentId, b.Incapacitated, b == BroodKill ? RaidMark.Skull : b.RaidMarked, b.Incapacitated ? b.ControlSecondsLeft : 0));
+            var order = RaidJobs.KillOrder(list);
+            var next = order.Count > 0 ? BroodNow.Find(b => b != null && b.persistentId == order[0]) : null;
+            if (next == BroodKill) return;
+            if (BroodKill != null && BroodKill.actor.IsAlive && BroodKill.RaidMarked == RaidMark.Skull) BroodKill.RaidMarked = RaidMark.None;
+            BroodKill = next; if (next != null) next.RaidMarked = RaidMark.Skull;
+        }
         void TickBrood(EncounterEnemy e, int phase, float now)
         {
             var t = UT;
+            CountBrood();
+            // The kill order: a free one first, then the held by their marks (raid 5). A dead Skull passes it on.
+            if (BroodKill == null || !BroodKill.actor.IsAlive || !BroodKill.Incapacitated && BroodKill.RaidMarked != RaidMark.Skull || BroodKill.Incapacitated && BroodNow.Exists(b => b != null && b.actor.IsAlive && !b.Incapacitated && !b.Calcified)) PickBroodKill();
             float every = t.BroodEvery(phase);
             if (every > 0 && now >= nextBrood) { nextBrood = now + every; SpawnBrood(e, t.broodCount); }
             for (int i = BroodNow.Count - 1; i >= 0; i--)

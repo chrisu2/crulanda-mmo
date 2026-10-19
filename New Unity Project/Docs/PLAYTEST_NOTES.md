@@ -952,3 +952,5 @@ un-captures.
 - 285 (2026-10-19 ~18:20, watching tune-6) "the spider needs an attack animation. maybe a jump mechanic to get away and release her brood"
   (OPEN): her attack clips seen; the Leap: a warned landing ring, a jump away, a brood wave where she lands. Then: "if she lands on
   you after jump its an insta death".
+- 286 (2026-10-19 ~18:35; tune-6 had killed her in 4:58 and 5:57) "needs to be a 10-15min kill at least" (OPEN: the feast moved to ~16:00,
+  her health raised for a 12-14 minute kill).

@@ -973,3 +973,5 @@ un-captures.
 - 296 (2026-10-19 ~20:05) "last tuning run for now then we move on to new zones, new classes, and pending phases".
 - 297 (2026-10-19 ~20:08) "just want everything up to level 20 for now with classes. can do forge district but no dungeon for now" (the cap
   stays 20; new classes up to 20; the Forge District as a zone within 20, no dungeon yet).
+  Then (verbatim): "new zone still up to lvl 22"; asked, he chose "Keep cap 20": the Forge District's mobs run to 22 (harder ground for
+  geared level-20s), no levels past 20.

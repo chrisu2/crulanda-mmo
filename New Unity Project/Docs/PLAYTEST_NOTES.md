@@ -958,3 +958,5 @@ un-captures.
   slower higher arc, a growing shadow, a raid warning). Then: "also distance is too short" (25-40 m).
 - 288 (2026-10-19 ~18:50, tune-8) "not sure what took everyone out around 40% mark" (the phase-3 change at 40%: grey ground under the
   ranged hitting 230-440 at once, spikes, the pulse) (OPEN).
+- 289 (2026-10-19 ~18:55, tune-8) "yeh still not enough time to move after telegraphing" and "i think the pet pulled the mob or was still
+  alive and restarted the raid" (OPEN: every warning long enough to walk out; a pet goes with its owner and never pulls; a wipe ends cleanly).

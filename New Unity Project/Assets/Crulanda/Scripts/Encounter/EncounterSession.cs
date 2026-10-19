@@ -2467,6 +2467,10 @@ namespace Crulanda.Encounter
         public void Recover()
         {
             if (Player.IsAlive) return;
+            // Nobody gets up while the raid fights her (tune-9: getting up mid-fight brought every fallen sim up with you, far off): only after
+            // a wipe or her death, on the apron (RaidWake).
+            if (UnravellerFighting != null && InRaid) { Message("Nobody gets up while the raid fights the Unraveller. You wake on the apron when the fight is over."); return; }
+            bool raidWake = LatestCheckpoint == null && RaidWake.HasValue;
             // A party still fighting goes on without you (2026-10-15, the run's party at Nix: you fell, got up at the stone, and every sim was
             // pulled back with you and the duo reset to full while they had it at 86%: every group run wiped there). Only the fallen come to
             // the stone with you, and only a fight with nobody left alive in it resets. A whole party down is as it always was.
@@ -2495,8 +2499,8 @@ namespace Crulanda.Encounter
             foreach (var e in Enemies)
                 if (e != null && (!fighting || !InIt(e))) e.ResetFight();
                 else if (e != null && e.Victim == Player) e.threat.Remove(Player.EntityId.Value);   // it turns to the party still at it
-            WokeAt = LatestCheckpoint != null ? LatestCheckpoint.def.name : BoundStone() != null ? "the spirit stone" : "camp";
-            Message((LatestCheckpoint != null ? "You wake at the checkpoint: " + LatestCheckpoint.def.name + "." : BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
+            WokeAt = LatestCheckpoint != null ? LatestCheckpoint.def.name : raidWake ? "the Drain Reach apron" : BoundStone() != null ? "the spirit stone" : "camp";
+            Message((LatestCheckpoint != null ? "You wake at the checkpoint: " + LatestCheckpoint.def.name + "." : raidWake ? "You wake on the Drain Reach apron, by the raid." : BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
         }
         public void Save(bool announce = true)
         {

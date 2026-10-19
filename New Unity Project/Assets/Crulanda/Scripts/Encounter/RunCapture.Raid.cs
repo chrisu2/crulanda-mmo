@@ -175,12 +175,23 @@ namespace Crulanda.Encounter
             }
             return l.OrderBy(x => x.share).Select(x => x.line).ToList();
         }
-        static float botTauntAt;
+        static float botTauntAt, botStuckSince = -1; static Vector3 botStuckFrom;
         /// <summary>The bot's frame in her fight: out of marked ground, into the river when hunted, salt on her when asked, else at her (its reach)
         /// and its abilities.</summary>
         static void BotRaidStep(EncounterSession s, EncounterEnemy e, AdventurerMotor motor, ref float nextCast)
         {
-            if (!s.Player.IsAlive) { EncounterInput.Scripted = Vector2.zero; return; }
+            if (!s.Player.IsAlive) { EncounterInput.Scripted = Vector2.zero; botStuckSince = -1; return; }
+            // Stuck 10 s far from her (tune-9, Chris: "and stuck"): put back beside the raid.
+            {
+                var at = s.Player.transform.position; float far = Vector3.Distance(at, e.transform.position);
+                if (far < 20 || botStuckSince < 0 || (at - botStuckFrom).magnitude > 1.5f) { botStuckFrom = at; botStuckSince = Time.time; }
+                else if (Time.time - botStuckSince > 10)
+                {
+                    var side = at - e.transform.position; side.y = 0; side = side.sqrMagnitude > .01f ? side.normalized : Vector3.left;
+                    if (NavMesh.SamplePosition(e.transform.position + side * (e.BodyRadius + 6), out var back, 6, NavMesh.AllAreas)) { motor.Teleport(back.position + Vector3.up * 1.05f); Debug.Log("Raid capture: the bot was stuck " + Mathf.RoundToInt(far) + " m from her: put back by the raid"); }
+                    botStuckSince = Time.time; botStuckFrom = s.Player.transform.position;
+                }
+            }
             var me = s.Player.transform.position; Vector3? goal = null; float reach; bool inRed = false;
             if (s.HuntedActor == s.Player) { goal = s.NearestWater(me, 25); reach = .5f; }
             else

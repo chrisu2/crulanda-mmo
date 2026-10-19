@@ -64,6 +64,21 @@ namespace Crulanda.Encounter
         bool Misses() { return RaidJobs.Misses(sim.level, sim.bold, Roll(), UnravellerTuning.Current); }
 
         /// <summary>Out of marked ground (any mark the game draws): true while it walks clear. Looked at four times a second.</summary>
+        Vector3 shovedTo; float shovedUntil;
+        /// <summary>Out of the patch at <paramref name="centre"/> now: to the nearest clear spot (GroundMarks), else straight away from its middle.</summary>
+        public void ShoveOut(Vector3 centre, float radius)
+        {
+            if (!actor.IsAlive || agent == null || !agent.isOnNavMesh) return;
+            var feet = NavMesh.SamplePosition(transform.position, out var under, 2, NavMesh.AllAreas) ? under.position : transform.position - Vector3.up;
+            var to = GroundMarks.StepOut(feet);
+            if (!to.HasValue)
+            {
+                var away = feet - centre; away.y = 0; if (away.sqrMagnitude < .01f) away = transform.right;
+                if (NavMesh.SamplePosition(centre + away.normalized * (radius + 2.5f), out var hit, 3, NavMesh.AllAreas)) to = hit.position;
+            }
+            if (!to.HasValue) return;
+            shovedTo = to.Value; shovedUntil = Time.time + 3; StepsOut++;
+        }
         bool StepOutOfGround()
         {
             if (session.HuntedActor == actor) return false;   // the hunted runs for the river instead (RaidTurn)

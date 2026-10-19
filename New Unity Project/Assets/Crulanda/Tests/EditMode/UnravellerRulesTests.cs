@@ -111,7 +111,8 @@ namespace Crulanda.Tests
         {
             var t = T;
             Assert.AreEqual(.03f, UnravellerRules.FeedHeal(10, t), 1e-5f, "0.3% of her a good effect eaten");
-            Assert.AreEqual(.2f, UnravellerRules.FeedGrow(10, t), 1e-5f, "2% heavier blows a good effect eaten");
+            Assert.AreEqual(.1f, UnravellerRules.FeedGrow(5, t), 1e-5f, "2% heavier blows a good effect eaten");
+            Assert.AreEqual(.02f * t.feedEatenMost, UnravellerRules.FeedGrow(38, t), 1e-5f, "at most feedEatenMost a Feeding (tune-9: 38 off a buffed raid, 77% at once)");
             Assert.IsTrue(UnravellerRules.InterruptTakes(50, -1, t), "the first interrupt takes");
             Assert.IsFalse(UnravellerRules.InterruptTakes(59.9f, 50, t), "the next within 10 s does not");
             Assert.IsTrue(UnravellerRules.InterruptTakes(60, 50, t), "after 10 s it does: interrupters take turns");

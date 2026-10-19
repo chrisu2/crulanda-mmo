@@ -797,6 +797,13 @@ namespace Crulanda.Encounter
                 if (heldKind == "root") { var q = Quarry; if (q != null && q.EdgeDistance(transform.position) <= Reach) StrikeAt(q, false); }
                 return;
             }
+            // Shoved out of her unmade ground (EncounterSession.TickUnmade): out first, whatever else.
+            if (Time.time < shovedUntil && agent.isOnNavMesh)
+            {
+                var left = shovedTo - transform.position; left.y = 0;
+                if (left.magnitude < .6f) shovedUntil = 0;
+                else { agent.isStopped = false; agent.speed = 5.6f; agent.SetDestination(shovedTo); if (visual != null) visual.Casting = false; healing = null; Activity = "Out of the unmade ground"; return; }
+            }
             float toPlayer = Vector3.Distance(transform.position, player.transform.position);
             if (Time.time >= nextCatchUp)
             {

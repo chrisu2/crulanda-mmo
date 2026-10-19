@@ -865,6 +865,16 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      - **Out of the water** (Chris: "when she is in the water hard to see the telegraphs. try to keep her out of water"): the harpoons
        now haul her toward the apron, away from the river (they hauled her toward its middle); her blink lands short of the water or not
        at all; pushed into the river any way, she is moved back onto the dry. Marks over water lie on its surface.
+   - **Tune-9** (2026-10-19, WRITTEN, NOT RUN; GAME-ONLY).
+     - **Waking by the raid** (Chris: "not sure where i respawned but not near the raid", "and stuck"): in a raid in the Lowtowns, while
+       she is up and for 5 minutes after her fight, you (and the fallen who wake with you) wake on the apron across from the bar, not at the
+       zone's camp far to the west. Nobody gets up while the raid fights her: Recover waits until a wipe or her death (getting up mid-fight
+       had brought five fallen sims up with you, far off: the log's "4/9" to "9/9" at 7:30-8:00). The run's bot, stuck 10 s far from her,
+       is put back beside the raid.
+     - **Unmade ground still killing**: the bites of 300-480 were 5-7 s stood in it (6% then 6% more a second). The log now says the
+       seconds ("Unmade ground (5 s in it) 392"), and a sim still in it a second after a bite goes straight out, whatever it was doing.
+     - **The Feeding's growth**: one landed Feeding on a fully buffed raid ate 38 good effects (77% heavier blows and 11% of her health
+       back at once). Now at most 8 count a Feeding (16% heavier, 2.4% back); `feedEatenMost` in the data file.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

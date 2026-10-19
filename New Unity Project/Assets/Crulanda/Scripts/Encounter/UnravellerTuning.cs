@@ -55,6 +55,9 @@ namespace Crulanda.Encounter
         /// her shadow growing where she will land; the ground shakes leapShake s. Phase 3 comes in quiet for phase3Lull s ("not sure what took
         /// everyone out around 40% mark"): the pulse after it, the hunt after twice it, the spikes and the unmade ground not before it.</summary>
         public float leapHeight = 6, leapShake = .4f, phase3Lull = 6;
+        /// <summary>The most good effects a landed Feeding counts for its heal and her growth (tune-9: a buffed raid gave her 38 at once, 77%
+        /// heavier blows from one Feeding).</summary>
+        public int feedEatenMost = 8;
         // ---------- the sims (3.5) ----------
         public float simRaidLift = 1.2f; public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;
         /// <summary>The chance a sim misses its part of a mechanic now and then: at 18, at 20, and what a careless one (rash: nerve over .75) adds.</summary>

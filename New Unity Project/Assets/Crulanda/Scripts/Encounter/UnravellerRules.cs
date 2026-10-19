@@ -34,8 +34,8 @@ namespace Crulanda.Encounter
         /// <summary>Blackened steel's stacks after one more blow from steel: one more, never over the most (three on her, one on a Weave-Eater).</summary>
         public static int SteelNext(int stacks, int most) { return Mathf.Clamp(stacks + 1, 1, Mathf.Max(1, most)); }
         /// <summary>The Feeding unstopped: what she heals (a share of her pool) and how much heavier her blows grow, for <paramref name="eaten"/> good effects eaten.</summary>
-        public static float FeedHeal(int eaten, UnravellerTuning t) { return t.feedHeal * Mathf.Max(0, eaten); }
-        public static float FeedGrow(int eaten, UnravellerTuning t) { return t.feedGrow * Mathf.Max(0, eaten); }
+        public static float FeedHeal(int eaten, UnravellerTuning t) { return t.feedHeal * Mathf.Clamp(eaten, 0, t.feedEatenMost); }
+        public static float FeedGrow(int eaten, UnravellerTuning t) { return t.feedGrow * Mathf.Clamp(eaten, 0, t.feedEatenMost); }   // at most feedEatenMost a Feeding (tune-9)
         /// <summary>An interrupt takes unless the last one did within <see cref="UnravellerTuning.interruptImmune"/> seconds.</summary>
         public static bool InterruptTakes(float now, float lastInterruptAt, UnravellerTuning t) { return lastInterruptAt < 0 || now - lastInterruptAt >= t.interruptImmune; }
         /// <summary>The Unravelling's pulse, the <paramref name="pulse"/>th (from 0): 1.5% of everyone's health, 0.1% more each pulse.</summary>

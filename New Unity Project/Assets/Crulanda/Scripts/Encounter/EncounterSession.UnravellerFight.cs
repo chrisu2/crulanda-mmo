@@ -192,6 +192,7 @@ namespace Crulanda.Encounter
             HuntedActor = null; huntAt = -1; if (huntMark != null) huntMark.Hide();
             RaidBossPinned = 0; RaidBossEnrage = 0; pinFreeSince = -1;
             RaidThrows.ClearAll();   // every harpoon, rope and handful gone
+            unravellerEndedAt = Time.time;
             if (Crulanda.World.ZoneMusic.FightOverride == Unraveller.FightTrack) Crulanda.World.ZoneMusic.FightOverride = null;
         }
         void EnterPhase(EncounterEnemy e, int phase)
@@ -681,7 +682,10 @@ namespace Crulanda.Encounter
                 string id = a.EntityId.Value; groundSeconds.TryGetValue(id, out int stood);
                 if (!inIt) { groundSeconds.Remove(id); continue; }
                 // The longer one stands in it the worse (raid 4, Chris: "ground damage should be increased"): 15%, then 20%, 25% ... a second.
-                Hurt(a, UnravellerRules.GroundBite(stood, t), Unraveller.UnmadeName, false); groundSeconds[id] = stood + 1;
+                Hurt(a, UnravellerRules.GroundBite(stood, t), Unraveller.UnmadeName + " (" + (stood + 1) + " s in it)", false); groundSeconds[id] = stood + 1;
+                // Bitten and still in it a second later (tune-9: healers and ranged died to 30-45% bites, five or six seconds stood): it goes out now,
+                // whatever it was doing.
+                if (stood >= 1) { var near = unmade.Where(u => now >= u.live).OrderBy(u => Flat(a.transform.position - Vector3.up - u.at)).FirstOrDefault(); a.GetComponent<SimCompanion>()?.ShoveOut(near.at, t.unmadeRadius); }
             }
             // And the swallowed, inside her, 4% a second (TickSwallow keeps them there).
             if (SwallowedActor != null && SwallowedActor.IsAlive) Hurt(SwallowedActor, t.swallowShare, null, false);
@@ -894,6 +898,21 @@ namespace Crulanda.Encounter
             if (e == null || e != UnravellerFoe || e.PullAt >= 0) return false;
             if (Target == e && AutoAttack) return false;   // you pull her
             var v = e.Victim; return v == null || !(v == Player || IsRaidTank(v));
+        }
+        float unravellerEndedAt = -999;
+        /// <summary>Where her raid wakes (Chris: "not sure where i respawned but not near the raid"): on the Drain Reach apron across from the bar,
+        /// while she is up and for 5 minutes after her fight, for anyone in a raid in the Lowtowns; null otherwise (the zone's own point).</summary>
+        public Vector3? RaidWake
+        {
+            get
+            {
+                if (!InDrainReachZone || !InRaid) return null;
+                bool up = UnravellerFoe != null && UnravellerFoe.actor != null && UnravellerFoe.actor.IsAlive;
+                if (!up && Time.time - unravellerEndedAt > 300) return null;
+                var apron = Zone.ReachApron; if (apron == null) return null; var bar = Zone.SiltBar;
+                var p = Zone.Ground(new Vector2(apron.center.x - 2, bar != null ? bar.center.y : apron.center.y), 1.1f);
+                return NavMesh.SamplePosition(p, out var h, 4, NavMesh.AllAreas) ? h.position + Vector3.up * 1.1f : p;
+            }
         }
         /// <summary>Her body and her brood's as the camera sees them (Chris: "camera gets inside the spider alot hard to see"): a ball each, round
         /// the body and its shards, that the camera keeps out of (AdventurerMotor).</summary>

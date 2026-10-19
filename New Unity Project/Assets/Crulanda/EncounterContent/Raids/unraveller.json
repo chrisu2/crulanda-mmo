@@ -109,6 +109,7 @@
   "leapHeight": 6,
   "leapShake": 0.4,
   "phase3Lull": 6,
+  "feedEatenMost": 8,
 
   "harpooners": 3,
   "harpoonLead": 2,

@@ -55,7 +55,7 @@ namespace Crulanda.Encounter
             return checkpointWake.TryGetValue(c, out var p) ? p : c.position + Vector3.up * 1.1f;
         }
         /// <summary>Where Recover wakes you: the latest checkpoint reached this visit, else the zone's recovery point (its spirit stone, its camp).</summary>
-        public Vector3 RecoverAt { get { return LatestCheckpoint != null ? CheckpointWake(LatestCheckpoint) : RecoveryPoint; } }
+        public Vector3 RecoverAt { get { return LatestCheckpoint != null ? CheckpointWake(LatestCheckpoint) : RaidWake ?? RecoveryPoint; } }   // (her raid: the apron, EncounterSession.UnravellerFight)
         /// <summary>Where one waking with you stands: <paramref name="offset"/> from where you wake, kept on the navmesh at a checkpoint (a
         /// cave's drift is narrow: two metres to the west can be rock). Elsewhere just the offset, as it always was.</summary>
         public Vector3 WakeBeside(Vector3 offset)

@@ -884,3 +884,6 @@ un-captures.
   need a better mob skin/monster skin for the boss" (OPEN). Asked how she should look, he chose (verbatim) "Both": a creature body (a model
   he picks) wrapped in the books' void-and-aether (b1 ch.20:119). Asked to pick a model: a giant leech/eel/worm, a tentacled river
   horror, or a big crawler (waiting on his download).
+  Then (verbatim): "maybe use this with the purple spike or some conglomeration. myassets free fantasy spider": Kalamona's "Free Fantasy
+  Spider" (Asset Store cache: spider_myOldOne.FBX with one animation take, textures, Standard materials) as her body, with the purple
+  spikes and the void-and-aether.

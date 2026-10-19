@@ -1,5 +1,34 @@
 # Changelog
 
+## 2026-10-19: more music in every zone, and a woodshed at Oakhaven's woodyard (branch music-vol3; WRITTEN, NOT RUN)
+- Chris (PLAYTEST_NOTES 251-252): "more music tracks for in game. myassets Free 25 Fantasy RPG Tracks Vol. 3"; "good for lumberjack in
+  myassets - Wooden Canopy". Compiles; nothing run in Unity, no captures yet.
+- **Music** (`ZoneMusic`, `Resources/Music/Fantasy3`, terms in `Resources/Music/LICENSES.md`): 25 of alkakrab's 28 pieces (the ten
+  ambient loops, five ambience, five dark, five action loops; not the Fx stings or the one-shot copies). Every zone and both dungeons
+  get pieces of their own on top of what they had, none shared: Oakhaven 2 by day and 1 at night, the Shore its 2 airiest by day and
+  1 at night, the Crown 2, the Peaks 2, Khaven 2, the Ash Rim 1 by day and 1 at night, the Lowtowns a dark piece by day and a low one at
+  night, the Sealed Adit 2 dark pieces, Hallow's Creek's cellars 2 (its streets stay silent, day and night). Fights now draw one of
+  three tracks (the old one and two action loops; field and dungeon each their own); one action loop is kept for the Unraveller's raid
+  (`ZoneMusic.WorldBossFight`, `WORLD_BOSS_1.md` 3.7). The pack's quiet pieces were mixed 20-40 dB under the rest, so they are
+  raised to the same level as the older tracks. The WAVs are NOT in git (like the older packs): after merging run
+  `python tools/import_music_vol3.py` in `D:\code\mmo` (and each lane), or copy `Resources/Music/Fantasy3/*.wav` from the
+  `D:\code\mmo-music-vol3` worktree. Vorbis .5, streamed (about 2-4 MB a piece in the build).
+- **Woodshed** (`ZoneBuilder.WoodyardCanopy`, `Resources/Props/WoodenCanopy`, icescreen, Asset Store EULA): Oakhaven's Woodyard (the
+  only lumberjack in the game; `oakhaven.json` gives it variant 1) gets the Wooden Canopy behind the chopping block, on the side away
+  from the North furrows, with four split-firewood stacks under it; the woodcutter keeps splitting at the block a step in front of it.
+  3 m tall (eaves about 1.3 m), the pack's own Standard materials, maps capped at 1024; the shed's ground is solid. The ladder is
+  unused. Over 6 m from the field, 27 m from the nearest road.
+- Tests (to run): `ZoneMusicTests` (every track is there; each zone's Vol. 3 pieces its own; all 25 used; the boss track nowhere
+  else; Hallow's Creek silent day and night; the Adit's own set), `WorkshopDataTests` (the canopy on Oakhaven's Woodyard only, off
+  fields, roads, water and other props, the stacks under its roof, the block outside it; the models load upright on Standard
+  materials at 1024), and `HallowsNavTests` (Main Street still silent).
+- To listen to: Oakhaven by day and at night (two new soft loops, one night piece), the Verdant Shore by day, the Lowtowns by day
+  (the new dark piece should sit under the smog, not over it), the Sealed Adit, Hallow's Creek's cellars (and silence on Main Street),
+  and three fights in a row in the field and in a cave (different tracks). Check the new pieces are not louder than the old ones at
+  `/music .35`, and that a new piece starts within 30 s of its cue (they are streamed; the warning "did not load" in the log if not).
+- To capture: the Woodyard from the front (the block, the shed behind it), the back and the side, by day; the woodcutter splitting
+  at the block; a walk into the shed's side (stopped at its edge, not through the roof).
+
 ## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
 - The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'
   foods in dungeons, inns and markets; every inn sitter on a real seat; window frames and a hearth at the Golden Cask and the Cracked

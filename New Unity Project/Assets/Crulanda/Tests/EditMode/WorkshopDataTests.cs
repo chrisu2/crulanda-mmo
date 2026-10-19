@@ -218,5 +218,102 @@ namespace Crulanda.Tests
             Assert.Greater(fields, 0, "Some zone has fields to check against.");
             Assert.IsEmpty(problems, string.Join("\n", problems));
         }
+
+        /// <summary>
+        /// Play note 252 (2026-10-19, "good for lumberjack in myassets - Wooden Canopy"): the canopy goes on one woodyard only, the
+        /// lumberjack's (Oakhaven's Woodyard; no other zone has a lumberjack: Khaven's six villagers stop short of the role, the Lowtowns
+        /// have no woods to cut), and every corner and edge of its ground keeps off the fields' paint, the roads and paths, the water,
+        /// the camps and the tall grass, and clear of every other prop's middle.
+        /// </summary>
+        [Test] public void The_woodyard_canopy_stands_off_paths_and_fields()
+        {
+            var dir = Path.Combine(Application.dataPath, "Crulanda", "EncounterContent", "Zones"); var with = new List<string>();
+            foreach (var file in Directory.GetFiles(dir, "*.json"))
+            {
+                var zz = JsonUtility.FromJson<ZoneDefinition>(File.ReadAllText(file));
+                foreach (var p in (zz?.props ?? new ZoneProp[0]).Where(p => p != null && p.kind == "woodpile" && p.variant == ZoneBuilder.WoodyardCanopyVariant)) with.Add(zz.id + "/" + p.name);
+            }
+            CollectionAssert.AreEqual(new[] { "zone.oakhaven/Woodyard" }, with, "the canopy is on Oakhaven's Woodyard alone");
+            var z = Oakhaven; var yard = z.props.Single(p => p != null && p.name == "Woodyard");
+            Assert.AreEqual("Osk Farrow", z.life.workshops.Single(w => w.prop == "Woodyard").who, "the Woodyard is a working yard");
+            // The canopy's ground in zone space: its corners, edge middles and middle, through the yard's turn.
+            var turn = Quaternion.Euler(0, yard.rotation, 0); var pts = new List<Vector2>(); var half = ZoneBuilder.WoodyardCanopyFoot / 2;
+            for (int i = -1; i <= 1; i++) for (int j = -1; j <= 1; j++)
+            {
+                var w = turn * (ZoneBuilder.WoodyardCanopyAt + new Vector3(i * half.x, 0, j * half.y)); pts.Add(yard.at + new Vector2(w.x, w.z));
+            }
+            var problems = new List<string>();
+            foreach (var q in pts)
+            {
+                foreach (var f in z.fields.Where(f => f != null)) if (ToField(q, f) < 1.5f) problems.Add("in the field '" + f.name + "' at " + q);
+                foreach (var r in z.roads.Where(r => r != null && r.points.Length > 1)) if (ToPath(q, r.points) < r.width / 2 + 1) problems.Add("on '" + r.name + "' at " + q);
+                foreach (var w in z.water.Where(w => w != null && w.points.Length > 1)) if (ToPath(q, w.points) < w.width / 2 + 3) problems.Add("in '" + w.name + "' at " + q);
+                foreach (var c in z.camps.Where(c => c != null)) if (Vector2.Distance(q, c.center) < c.radius + 1) problems.Add("in the camp '" + c.name + "' at " + q);
+                foreach (var c in z.tallGrass.Where(c => c != null)) if (Vector2.Distance(q, c.center) < c.radius) problems.Add("in the tall grass '" + c.name + "' at " + q);
+            }
+            // No other prop's middle under it or within 2 m of it (a house's or barn's own half size added).
+            foreach (var p in z.props.Where(p => p != null && p != yard && p.kind != "wall"))
+            {
+                var local = Quaternion.Inverse(turn) * new Vector3(p.at.x - yard.at.x, 0, p.at.y - yard.at.y) - ZoneBuilder.WoodyardCanopyAt;
+                float gap = ToBox(new Vector2(local.x, local.z), Vector2.zero, ZoneBuilder.WoodyardCanopyFoot) - Mathf.Max(p.size.x, p.size.y) / 2;
+                if (gap < 2) problems.Add("the " + p.kind + " '" + p.name + "' at " + p.at + " is " + gap.ToString("0.0") + " m from it");
+            }
+            Assert.IsEmpty(problems, "The Woodyard's canopy:\n" + string.Join("\n", problems));
+            // The lumberjack's block stays in the open in front of it, not under it.
+            var stand = new Vector3(1.4f, 0, -1.4f) - ZoneBuilder.WoodyardCanopyAt;
+            Assert.Greater(ToBox(new Vector2(stand.x, stand.z), Vector2.zero, ZoneBuilder.WoodyardCanopyFoot), .3f, "the chopping block's stand is outside the shelter");
+            Assert.Less(ToBox(new Vector2(stand.x, stand.z), Vector2.zero, ZoneBuilder.WoodyardCanopyFoot), 1.5f, "and close by it");
+            // Each firewood stack under the roof (its 1.32 x 1.1 m inside the footprint).
+            foreach (var f in ZoneBuilder.WoodyardFirewood)
+            {
+                var o = new Vector2(f.x - ZoneBuilder.WoodyardCanopyAt.x, f.y - ZoneBuilder.WoodyardCanopyAt.z);
+                Assert.LessOrEqual(Mathf.Abs(o.x) + .7f, half.x, "a firewood stack at " + f + " is under the roof (x)");
+                Assert.LessOrEqual(Mathf.Abs(o.y) + .7f, half.y, "a firewood stack at " + f + " is under the roof (z)");
+            }
+        }
+
+        /// <summary>The Wooden Canopy's prefabs load from Resources, on the pack's own Built-in Standard materials, their maps capped at
+        /// 1024 (Editor/ThirdPartyImport); placed as the Woodyard places it the shelter is 3 m tall over the ground WoodyardCanopyFoot
+        /// says, and upright: its ridge (the top fifth) is narrow, its posts (the bottom fifth) stand wide.</summary>
+        [Test] public void The_wooden_canopy_loads_upright_on_Standard_materials()
+        {
+            foreach (var path in new[] { "WoodenCanopy/Prefab/Canopy", "WoodenCanopy/Prefab/FireWood" })
+            {
+                var src = Resources.Load<GameObject>("Props/" + path); Assert.IsNotNull(src, path + " loads");
+                foreach (var r in src.GetComponentsInChildren<Renderer>(true))
+                    foreach (var m in r.sharedMaterials)
+                    {
+                        Assert.IsNotNull(m, path + ": every slot has a material");
+                        Assert.AreEqual("Standard", m.shader.name, path + ": " + m.name + " is on the Built-in Standard shader");
+                        var tex = m.mainTexture; Assert.IsNotNull(tex, m.name + " has its map");
+                        Assert.LessOrEqual(Mathf.Max(tex.width, tex.height), 1024, m.name + "'s map is capped at 1024");
+                    }
+            }
+            var holder = new GameObject("canopy test");
+            try
+            {
+                var go = ZoneBuilder.ModelProp(holder.transform, "WoodenCanopy/Prefab/Canopy", Vector3.zero, 0, ZoneBuilder.WoodyardCanopyHeight);
+                Assert.IsNotNull(go);
+                var b = ZoneBuilder.PropBounds(holder.transform);
+                Assert.AreEqual(ZoneBuilder.WoodyardCanopyHeight, b.size.y, .05f, "3 m tall");
+                Assert.AreEqual(ZoneBuilder.WoodyardCanopyFoot.x, b.size.x, .2f, "its long side along x");
+                Assert.AreEqual(ZoneBuilder.WoodyardCanopyFoot.y, b.size.z, .2f, "its short side along z");
+                Assert.AreEqual(0, b.min.y, .02f, "on the ground");
+                float lo = float.MaxValue, hi = float.MinValue, loTop = float.MaxValue, hiTop = float.MinValue;
+                foreach (var mf in holder.GetComponentsInChildren<MeshFilter>(true))
+                {
+                    Assert.IsTrue(mf.sharedMesh.isReadable, "the mesh is readable (ThirdPartyImport)");
+                    var m = holder.transform.worldToLocalMatrix * mf.transform.localToWorldMatrix;
+                    foreach (var v in mf.sharedMesh.vertices)
+                    {
+                        var p = m.MultiplyPoint3x4(v);
+                        if (p.y < b.min.y + b.size.y * .2f) { lo = Mathf.Min(lo, p.z); hi = Mathf.Max(hi, p.z); }
+                        if (p.y > b.max.y - b.size.y * .2f) { loTop = Mathf.Min(loTop, p.z); hiTop = Mathf.Max(hiTop, p.z); }
+                    }
+                }
+                Assert.Less(hiTop - loTop, (hi - lo) * .6f, "the ridge is up and the posts are down (bottom " + (hi - lo).ToString("0.00") + " m wide, top " + (hiTop - loTop).ToString("0.00") + ")");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(holder); }
+        }
     }
 }

@@ -879,3 +879,7 @@ un-captures.
   demo). Skies through the day and night, each zone's weather its own.
 - 255 (2026-10-19 ~13:15, his screenshot: a brazier, its bowl lit, the flame cone standing beside the bowl on the floor) "fire goes
   around the bazier", then "it was dancing around the brazier" (OPEN): the flame wanders round the bowl instead of burning in it.
+- 256 (2026-10-19 ~14:15, watching the first Unraveller raid; his meter: Archivist 81/s, Ranger 76, Mage 58, Rogue 50, Paladin (the bot)
+  23, Scoundrel 17, Warrior 11; Cleric, Druid and Shaman each exactly 10,637 damage, heals 50/45/25 a second) "seems a bit unbalanced and
+  need a better mob skin/monster skin for the boss" (OPEN). Asked how she should look, he chose (verbatim) "Both": a creature body (a model
+  he picks) wrapped in the books' void-and-aether (b1 ch.20:119).

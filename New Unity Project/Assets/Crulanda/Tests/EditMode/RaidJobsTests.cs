@@ -37,6 +37,15 @@ namespace Crulanda.Tests
 
         [Test] public void The_tanks_swap_at_four_stacks()
         {
+            // Run 1, with the file's Unravel of 10 s: the holder's stacks fall off while the other holds her, so the swap goes round.
+            var t = T; var u = new UnravelStacks(); float now = 0; string holder = "a", other = "b"; int swaps = 0, most = 0;
+            for (int blow = 0; blow < 60; blow++, now += t.swingEvery)
+            {
+                int n = u.Add(holder, now, t); most = Mathf.Max(most, n);
+                if (RaidJobs.TauntHer(u.Count(other, now), n, false, true, false, t.swapAt, t.erasedAt)) { var x = holder; holder = other; other = x; swaps++; }
+            }
+            Assert.Less(most, t.erasedAt, "two tanks swapping at four: nobody is erased in two minutes");
+            Assert.Greater(swaps, 6, "the swap goes round");
             int swap = T.swapAt, erased = T.erasedAt;
             Assert.IsFalse(RaidJobs.TauntHer(4, 0, true, false, true, swap, erased), "never off itself");
             Assert.IsTrue(RaidJobs.TauntHer(1, 4, false, true, false, swap, erased), "the other tank has four, this one one: taunt");
@@ -62,11 +71,12 @@ namespace Crulanda.Tests
 
         [Test] public void The_off_tank_and_Party_2s_damage_take_the_brood()
         {
-            Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Tank, 0, false), "the tank not holding her");
-            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Tank, 1, true), "the tank holding her keeps her");
-            Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 1, false), "Party 2's damage");
-            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 0, false), "Party 1's stays on her");
-            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Healer, 1, false), "healers heal");
+            Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Tank, 0, false, true), "the tank not holding her");
+            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Tank, 1, true, true), "the tank holding her keeps her");
+            Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 1, false, false), "Party 2's damage from range");
+            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 1, false, true), "Party 2's melee stay on her (run 1: the Scoundrel chasing brood, 24 a second)");
+            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Damage, 0, false, false), "Party 1's stays on her");
+            Assert.IsFalse(RaidJobs.TakesBrood(SimCompanion.PartyRole.Healer, 1, false, false), "healers heal");
         }
 
         [Test] public void A_careless_eighteen_misses_more_than_a_careful_twenty()

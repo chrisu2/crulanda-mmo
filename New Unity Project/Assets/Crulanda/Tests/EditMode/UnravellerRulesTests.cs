@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using Crulanda.Encounter;
@@ -26,7 +27,7 @@ namespace Crulanda.Tests
             var d = new UnravellerTuning();
             Assert.AreEqual(d.health, t.health); Assert.AreEqual(160000, t.health, "160,000 after the clamp (3.2)");
             Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
-            Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.18f, t.lighthouseShare, 1e-4f);
+            Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
             Assert.AreEqual(4, t.swapAt); Assert.AreEqual(7, t.erasedAt); Assert.AreEqual(3, t.saltsToFree); Assert.AreEqual(12, t.saltWindow);
             // The file and the defaults agree everywhere (a build without the file plays the same fight).
@@ -44,6 +45,9 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, UnravellerRules.Phase(1, T)); Assert.AreEqual(1, UnravellerRules.Phase(.71f, T));
             Assert.AreEqual(2, UnravellerRules.Phase(.7f, T)); Assert.AreEqual(2, UnravellerRules.Phase(.41f, T));
             Assert.AreEqual(3, UnravellerRules.Phase(.4f, T)); Assert.AreEqual(3, UnravellerRules.Phase(.01f, T));
+            // Run 1: the brood she ate healed her back over 70% and the phase went back to 1. A phase once reached holds.
+            Assert.AreEqual(2, UnravellerRules.PhaseNow(2, .72f, T), "healed back to 72%: still The Brood");
+            Assert.AreEqual(3, UnravellerRules.PhaseNow(3, .5f, T)); Assert.AreEqual(2, UnravellerRules.PhaseNow(1, .6f, T)); Assert.AreEqual(1, UnravellerRules.PhaseNow(0, 1, T), "the pull");
         }
 
         [Test] public void Each_harpoon_pins_her_a_second_shorter_down_to_seven_and_two_in_haul_her()
@@ -82,6 +86,7 @@ namespace Crulanda.Tests
         [Test] public void Unravel_stacks_on_her_target_and_seven_erase_it()
         {
             var u = new UnravelStacks(); var t = T;
+            t.unravelSeconds = 20;   // the doc's 20 s here; the file's is shorter (run 1)
             for (int i = 1; i <= 4; i++) Assert.AreEqual(i, u.Add("tank", i * 2.2f, t));
             Assert.AreEqual(4, u.Count("tank", 9)); Assert.AreEqual(0, u.Count("other", 9));
             Assert.AreEqual(-.24f, UnravellerRules.UnravelArmour(4, t), 1e-4f, "6% less armour a stack");
@@ -118,7 +123,7 @@ namespace Crulanda.Tests
         {
             var t = T;
             Assert.AreEqual(300, UnravellerRules.ShatterDamage(100, true, t)); Assert.AreEqual(100, UnravellerRules.ShatterDamage(100, false, t));
-            Assert.IsTrue(UnravellerRules.BroodEaten(3.5f, t)); Assert.IsFalse(UnravellerRules.BroodEaten(3.6f, t));
+            Assert.IsTrue(UnravellerRules.BroodEaten(2.5f, t)); Assert.IsFalse(UnravellerRules.BroodEaten(2.6f, t));
         }
 
         [Test] public void Three_salts_from_three_hands_within_twelve_seconds_free_the_swallowed()
@@ -163,6 +168,25 @@ namespace Crulanda.Tests
             Assert.AreEqual(.075f, UnravellerRules.PulseShare(60, t), 1e-5f, "about 7.5% three minutes in (sixty pulses)");
             Assert.AreEqual(540, UnravellerRules.EnrageLeft(0, t)); Assert.AreEqual(40, UnravellerRules.EnrageLeft(500, t), 1e-4f); Assert.AreEqual(0, UnravellerRules.EnrageLeft(600, t));
             Assert.IsFalse(UnravellerRules.Feast(539.9f, t)); Assert.IsTrue(UnravellerRules.Feast(540, t));
+        }
+
+        [Test] public void The_void_wrap_towers_seven_metres_on_any_body_whatever_its_scale()
+        {
+            var host = new GameObject("Wrapped body"); host.transform.localScale = Vector3.one * 2.6f;   // her actor's scale
+            try
+            {
+                var w = VoidWrap.Wrap(host.transform, 7, 2.2f, -1, 5);
+                Assert.AreEqual(1, w.transform.lossyScale.y, 1e-3f, "built in the world's metres, her scale undone");
+                Assert.AreEqual(16, w.ShardCount, "the jagged shards");
+                var rs = w.GetComponentsInChildren<Renderer>(true).Where(r => r is MeshRenderer).ToList();
+                Assert.AreEqual(32, rs.Count, "each shard a void core and an aether rim: cheap to draw");
+                var b = rs[0].bounds; foreach (var r in rs) b.Encapsulate(r.bounds);
+                Assert.That(b.size.y, Is.InRange(6f, 8.5f), "a towering silhouette, six to eight metres: " + b.size.y);
+                Assert.Less(b.min.y, host.transform.position.y - .5f, "from the ground (a metre under her origin)");
+                Assert.IsTrue(rs.All(r => r.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.Off), "no shadows from the wrap");
+                Assert.IsNotNull(w.GetComponentInChildren<ParticleSystem>(), "the ash where she moves");
+            }
+            finally { Object.DestroyImmediate(host); }
         }
 
         [Test] public void A_rotation_goes_round_passing_over_those_who_cannot()

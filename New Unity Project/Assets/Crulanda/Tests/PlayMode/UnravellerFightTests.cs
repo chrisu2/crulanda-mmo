@@ -116,6 +116,15 @@ namespace Crulanda.Tests
             var s = Session(); var e = s.UnravellerFoe;
             Assert.AreEqual(Mathf.RoundToInt(t.health * EncounterEnemy.OvermatchTaken(30, 20)), e.actor.Health.Pool.Max, "her health from the data file");
             Assert.IsNotNull(e.Cast); Assert.AreEqual(EncounterEnemy.FeedKind, e.Cast.kind, "the Feeding is her cast");
+            // Her body (play note 256): the spider, the purple crown, the void wrap, about 6-8 m tall, risen out of the water.
+            var look = e.GetComponent<UnravellerBody>(); Assert.IsNotNull(look, "her body");
+            Assert.IsTrue(look.HasSpider, "the Free Fantasy Spider came in (Resources/Props/fantasySpider)");
+            Assert.IsNotNull(look.Wrap); Assert.AreEqual(16, look.Wrap.ShardCount);
+            var parts = e.GetComponentsInChildren<Renderer>().Where(r => r.enabled && !(r is ParticleSystemRenderer)).ToList();
+            var all = parts[0].bounds; foreach (var r in parts) all.Encapsulate(r.bounds);
+            Assert.That(all.size.y, Is.InRange(5.5f, 9f), "about 6-8 m tall: " + all.size.y);
+            Assert.That(Mathf.Max(all.size.x, all.size.z), Is.GreaterThan(6f), "legs spread wide");
+            Assert.IsNotNull(look.Playing, "a clip playing (idle)");
             Time.timeScale = 4;
             Pull(s, e);
             yield return Until(() => e.PullAt >= 0, 10);

@@ -86,11 +86,12 @@ namespace Crulanda.Encounter
                 Log("Pull " + pull + " (seed " + (1000 + pull) + "): she is pulled.");
                 Shot(s, directory, "pull" + pull + "-0-pulled", ref shots, null);
                 float start = Time.time, nextCast = 0, nextLog = Time.time + 30; int phaseSeen = 1; var dead = new HashSet<string>(); string firstDeath = null;
-                bool won = false, ended = false;
+                bool won = false, ended = false; float lastRatio = 1;
                 while (Time.time - start < PullLimit)
                 {
                     float t = Time.time - start;
                     if (e == null || !e.actor.IsAlive) { won = true; break; }
+                    if (e.PullAt >= 0) lastRatio = e.actor.Health.Pool.Ratio;   // her health as the fight ends (a wipe makes her whole again)
                     if (Time.time - start > 5 && e.PullAt < 0) { ended = true; break; }   // her fight over without her death: a wipe, the feast, a reset
                     if (e.RaidPhase > phaseSeen) { phaseSeen = e.RaidPhase; Log(Clock(t) + "  phase " + phaseSeen + " (" + UnravellerRules.PhaseNames[phaseSeen] + ") at " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%"); Shot(s, directory, "pull" + pull + "-phase" + phaseSeen, ref shots, null); }
                     foreach (var a in s.PartyActors())
@@ -107,7 +108,7 @@ namespace Crulanda.Encounter
                 EncounterInput.Scripted = Vector2.zero;
                 float took = Time.time - start;
                 if (won) { wins++; killTime += took; }
-                string end = won ? "KILL in " + Clock(took) : ended ? "WIPE at " + Clock(took) + " (her at " + (e != null && e.actor != null ? Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) : 0) + "%" + (s.Feasts > 0 ? ", the feast" : "") + ")" : "CALLED at " + Clock(took) + " (stuck)";
+                string end = won ? "KILL in " + Clock(took) : ended ? "WIPE at " + Clock(took) + " (her at " + Mathf.RoundToInt(lastRatio * 100) + "%" + (s.Feasts > 0 ? ", the feast" : "") + ")" : "CALLED at " + Clock(took) + " (stuck)";
                 string counts = "brood " + s.BroodRisen + " (eaten " + s.BroodEaten + "), swallowed freed " + s.SwallowsFreed + " erased " + s.SwallowsErased + ", hunts missed " + s.HuntsMissed + " landed " + s.HuntsLanded + ", harpoons " + s.HarpoonsThrown + ", salts " + s.SaltsThrown + ", pulses " + s.Pulses;
                 Log("Pull " + pull + ": " + end + "; " + counts + (firstDeath != null ? "; first death: " + firstDeath.Trim() : ""));
                 lines.Add("Pull " + pull + ": " + end + "; deaths " + dead.Count + "; " + counts);
@@ -123,9 +124,29 @@ namespace Crulanda.Encounter
                 "Mean kill time: " + (wins > 0 ? Clock(killTime / wins) : "-") + " against the enrage at " + Clock(tune.enrageSeconds),
                 "Pulls:" };
             summary.AddRange(lines.Select(l => "  " + l));
+            summary.Add("Damage against the bands (BALANCE_REPORT.md: a pure damage-dealer the band, a hybrid 90% of it, a tank 3/4, a healer low; the band at " + level + " is " + SimCompanion.PureDps(level).ToString("0") + " a second on one target; her fight costs everyone some for moving, salting and harpooning):");
+            summary.AddRange(BandLines(s, level).Select(l => "  " + l));
             summary.Add("Scorecard:"); summary.AddRange(s.Meter.Scorecard().Select(l => "  " + l));
             RaidFinish(s, directory, log, summary);
         }
+        /// <summary>Each member's damage a second over the fighting time against what its class and part should do (the bands), worst first.</summary>
+        static List<string> BandLines(EncounterSession s, int level)
+        {
+            var l = new List<(float share, string line)>(); float secs = s.Meter.CombatSeconds, band = SimCompanion.PureDps(level);
+            foreach (var r in s.Meter.Rows)
+            {
+                string classId = null; SimCompanion.PartyRole role; var sim = s.PartySims.Find(c => c != null && c.actor != null && c.actor.EntityId.Value == r.id);
+                if (sim != null) { classId = sim.sim.classId; role = sim.Role; }
+                else if (s.Player != null && s.Player.EntityId.Value == r.id) { classId = s.ClassDef.id; role = s.PlayerRole; }
+                else continue;   // a pet: in its keeper's
+                float want = role == SimCompanion.PartyRole.Tank ? band * SimCompanion.TankDpsShare : role == SimCompanion.PartyRole.Healer ? band * .25f : band * (EncounterSession.Hybrid(classId) ? EncounterSession.HybridDpsShare : 1);
+                float dps = r.Dps(secs), share = want > 0 ? dps / want : 0;
+                string note = role == SimCompanion.PartyRole.Healer ? (dps > want * 1.2f ? "HIGH for a healer" : "ok (a healer's)") : share > 1.1f ? "OVER" : share < .7f ? "UNDER" : "in band";
+                l.Add((share, r.name + ", " + role + ": " + dps.ToString("0.0") + "/s against " + want.ToString("0") + " (" + Mathf.RoundToInt(share * 100) + "%) " + note + "; deaths " + r.deaths));
+            }
+            return l.OrderBy(x => x.share).Select(x => x.line).ToList();
+        }
+        static float botTauntAt;
         /// <summary>The bot's frame in her fight: out of marked ground, into the river when hunted, salt on her when asked, else at her (its reach)
         /// and its abilities.</summary>
         static void BotRaidStep(EncounterSession s, EncounterEnemy e, AdventurerMotor motor, ref float nextCast)
@@ -149,6 +170,9 @@ namespace Crulanda.Encounter
             }
             if (s.Target != e) s.Select(e);
             if (!s.AutoAttack) s.BeginAutoAttack();
+            // A tank bot takes her as a sim tank does (the swap at four stacks; from a caster she blinked onto): a taunt, every 8 s at most.
+            if (Time.time >= botTauntAt && s.TauntsUnraveller(s.Player, e) && Vector3.Distance(me, e.transform.position) < 15)
+            { botTauntAt = Time.time + 8; e.threat.Taunt(s.Player.EntityId.Value, Time.time, 4); s.FloatText(me + Vector3.up * 2, "Taunt", new Color(1, .7f, .3f)); }
             if (Time.time >= nextCast) { nextCast = Time.time + .4f; BotCast(s); }
             if (!goal.HasValue) { EncounterInput.Scripted = Vector2.zero; return; }
             var to = goal.Value - me; to.y = 0;

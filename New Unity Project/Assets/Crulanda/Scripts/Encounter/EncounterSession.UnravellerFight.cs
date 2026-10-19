@@ -67,7 +67,7 @@ namespace Crulanda.Encounter
             var t = UT;
             RaidBoss = e;
             // The phase, and the Feeding's beat with it.
-            int phase = UnravellerRules.Phase(e.actor.Health.Pool.Ratio, t);
+            int phase = UnravellerRules.PhaseNow(e.RaidPhase, e.actor.Health.Pool.Ratio, t);   // once reached, held (run 1: healed back over 70%, it went back to 1)
             if (phase != e.RaidPhase) EnterPhase(e, phase);
             if (e.Cast != null) e.Cast.every = t.FeedEvery(phase);
             // The hauling: two harpoons in her, a metre a second toward the river's middle.
@@ -153,8 +153,10 @@ namespace Crulanda.Encounter
                 Vector3 want;
                 if (bar != null)
                 {
-                    float side = k % 2 == 0 ? 1 : -1, along = (k / 2 - .5f) * bar.size.y * .35f + Random.Range(-3f, 3f);
-                    var off = Quaternion.Euler(0, bar.rotation, 0) * new Vector3(side * (bar.size.x / 2 + 3), 0, along);
+                    // Clear of her (run 1: risen beside the bar's middle, they passed by her on the way to the healers and she ate 23 of 36): out
+                    // of the river off the bar's corners, one side and the other, one end and the other.
+                    float side = k % 2 == 0 ? 1 : -1, end = (k / 2) % 2 == 0 ? 1 : -1;
+                    var off = Quaternion.Euler(0, bar.rotation, 0) * new Vector3(side * (bar.size.x / 2 + 3), 0, end * (bar.size.y * .5f - 2) + Random.Range(-2f, 2f));
                     want = Zone.Ground(bar.center) + off;
                 }
                 else want = mother.transform.position + Quaternion.Euler(0, k * 120, 0) * Vector3.forward * 12;
@@ -416,6 +418,20 @@ namespace Crulanda.Encounter
             }
             return l;
         }
+        /// <summary>
+        /// Whether the tank <paramref name="me"/> (you or a sim) takes her now (RaidJobs.TauntHer): the other tank is whoever else of the raid
+        /// tanks, you included (run 1: the sim tank looked only among the sims, found none with you tanking, never gave her up and was erased at
+        /// 0:21 with seven stacks).
+        /// </summary>
+        public bool TauntsUnraveller(Actor me, EncounterEnemy e)
+        {
+            if (me == null || e == null || !IsRaidTank(me)) return false;
+            var t = UT; Actor other = null;
+            foreach (var a in PartyActors()) if (a != null && a != me && a.IsAlive && IsRaidTank(a)) { other = a; break; }
+            int mine = e.UnravelOn(me), theirs = other != null ? e.UnravelOn(other) : 0;
+            bool preferred = other == null || mine < theirs || mine == theirs && string.CompareOrdinal(me.EntityId.Value, other.EntityId.Value) < 0;
+            return RaidJobs.TauntHer(mine, theirs, e.Victim == me, other != null && e.Victim == other, preferred, t.swapAt, t.erasedAt);
+        }
         /// <summary>Whether <paramref name="a"/> works magic as her lighthouse sees it (ch.20:121): you by your pool (mana, salt) or a ward; a sim
         /// by its class (a Mage, Druid, Cleric, Shaman, Salt-Mender or Archivist: the sims all carry the same pool) or a ward.</summary>
         public bool WorksMagic(Actor a)
@@ -427,7 +443,7 @@ namespace Crulanda.Encounter
             return WeaveEaterRules.DrawnTo(a.Resource != null ? a.Resource.Kind : ResourceKind.None, ward);
         }
         Actor ActorOfEntity(string id) { if (id == null) return null; foreach (var a in PartyActors()) if (a != null && a.EntityId.Value == id) return a; return null; }
-        bool IsRaidTank(Actor a) { if (a == Player) return PlayerRole == SimCompanion.PartyRole.Tank; var c = a != null ? a.GetComponent<SimCompanion>() : null; return c != null && c.Role == SimCompanion.PartyRole.Tank; }
+        public bool IsRaidTank(Actor a) { if (a == Player) return PlayerRole == SimCompanion.PartyRole.Tank; var c = a != null ? a.GetComponent<SimCompanion>() : null; return c != null && c.Role == SimCompanion.PartyRole.Tank; }
         bool IsRaidHealer(Actor a) { if (a == Player) return PlayerRole == SimCompanion.PartyRole.Healer; if (Companion != null && a == Companion.actor) return true; var c = a != null ? a.GetComponent<SimCompanion>() : null; return c != null && c.Role == SimCompanion.PartyRole.Healer; }
         string NameOfRaidId(string id) { if (id == RaidGroup.You) return "you"; var c = PartySim(id); return c != null ? c.sim.name : id; }
         /// <summary>The way toward the river's middle from <paramref name="from"/>: to the nearest chemical water within 25 m (zero: none).</summary>
@@ -442,12 +458,14 @@ namespace Crulanda.Encounter
         {
             if (Zone == null || !Zone.HasChemical) return null;
             if (Zone.ChemicalAt(from)) return from;
+            // Each spot's walkable ground, asked of at an actor's height over it (an actor stands a metre over its feet: ChemicalAt reads it so;
+            // run 1's hunted found no water, the point asked at the bank's height read dry over the river).
             for (float r = 2; r <= reach; r += 1.5f)
                 for (int k = 0; k < 16; k++)
                 {
                     var p = from + Quaternion.Euler(0, k * 22.5f, 0) * Vector3.forward * r;
-                    if (!Zone.ChemicalAt(p)) continue;
-                    if (NavMesh.SamplePosition(p, out var hit, 1.5f, NavMesh.AllAreas) && Zone.ChemicalAt(hit.position)) return hit.position;
+                    if (!NavMesh.SamplePosition(p, out var hit, 2.5f, NavMesh.AllAreas)) continue;
+                    if (Zone.ChemicalAt(hit.position + Vector3.up * 1.0f)) return hit.position;
                 }
             return null;
         }

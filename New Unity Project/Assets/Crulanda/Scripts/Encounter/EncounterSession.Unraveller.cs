@@ -140,6 +140,7 @@ namespace Crulanda.Encounter
             a.gameObject.SetActive(true); e.Initialize(); Enemies.Add(e);
             e.MakeRaidBoss(Unraveller.RaidSize);
             a.transform.localScale = Vector3.one * Unraveller.Scale;
+            UnravellerBody.Dress(e);   // the spider, the purple crown, the void wrap (Chris, play note 256)
             a.Stats.SetBase(StatType.MaxHealth, Unraveller.HealthPool);
             a.Health.ApplyHealing(a.Health.Pool.Max);
             e.HitBase = UnravellerTuning.Current.hitBase;   // the data file's (Unraveller.HitBase its default)
@@ -151,7 +152,7 @@ namespace Crulanda.Encounter
                 surfacingUp = true; surfaceFrom = Time.time; e.enabled = false; Surface(0);
                 ChatSay(ChatChannel.Say, Unraveller.Name, Unraveller.RisingLine);
             }
-            else surfaceFrom = -1;
+            else { surfaceFrom = -1; UnravellerDepth = 0; }
             return e;
         }
         /// <summary>She sinks back into the river (out of any fight), and is gone when she is under.</summary>
@@ -170,9 +171,13 @@ namespace Crulanda.Encounter
             if (Target == e) { Target = null; AutoAttack = false; }
             Enemies.Remove(e); Destroy(e.gameObject);
         }
+        /// <summary>How far under the water her body is now, in metres (0 risen); and how deep she rises from.</summary>
+        public float UnravellerDepth { get; private set; }
+        public const float UnravellerSurfaceDepth = 7;
         /// <summary>Her body set <paramref name="t"/> of the way up out of the river (0: under, 1: risen).</summary>
         void Surface(float t)
         {
+            UnravellerDepth = -UnravellerSurfaceDepth * (1 - Mathf.SmoothStep(0, 1, t));   // her body (UnravellerBody) from under the water
             var body = UnravellerFoe != null ? UnravellerFoe.transform.Find("Body") : null; if (body == null) return;
             body.localPosition = new Vector3(0, -2.4f * (1 - Mathf.SmoothStep(0, 1, t)), 0);
         }

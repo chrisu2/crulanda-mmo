@@ -549,6 +549,51 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      brings her up at once, and again after she sinks), a seed a pull; `raid-log.txt` has each pull's phases, every death with what was on
      at that moment (her health and phase, the pin, Unravel on them, the Feeding, the brood, the ground, the swallowed, the hunted) and the
      end; `run-summary.txt` the kill rate against 3.6's targets and the mechanics' counts. Out to `D:\crulanda-work\run-captures\unraveller-raid`.
+   **Run 1 (2026-10-19, `group_run.ps1 -Raid -Pulls 3` on Chris's screen; run-captures\unraveller-raid-1) and what was changed (WRITTEN,
+   NOT RUN again).** Chris (play note 256, verbatim): "seems a bit unbalanced and need a better mob skin/monster skin for the boss".
+   - **What happened:** 0 kills of 3. The Warrior tank was erased at 0:21 with seven Unravel stacks: the swap never came, because the sim
+     tank looked for the other tank only among the sims and you (the bot) were the other tank, and the bot never taunted. The brood rose beside
+     the bar's middle, passed her on the way to the healers and she ate 23 of 36, each healing 3%: she went back over 70% and the fight went
+     back to phase 1, so phase 3 (the pulse, the hunt) never came. The brood piled up (eleven at once) and the healers died under them. The
+     PlayMode hunt failed because the hunted found no water: the river was asked for at the bank's height.
+   - **Fixed in code:** a phase once reached holds (`UnravellerRules.PhaseNow`); the swap counts you as the other tank, and the run's bot
+     taunts as a sim tank does (`EncounterSession.TauntsUnraveller`); the brood rise off the bar's corners, clear of her; the river is found
+     at an actor's height over the walkable ground; the end-of-pull line gives her health as the fight ended (it said 100%: she is made whole
+     by the wipe); the run's summary lists each member's damage a second against its band.
+   - **Fixed in the data file** (`unraveller.json`, its "note" says why): the lighthouse .18 to .10 of the top threat (the tanks kept losing
+     her to the casters); Unravel 20 s to 10 s a stack (at 20 s the stacks outlast a swap at four: a test now runs two minutes of swapping and
+     nobody is erased); brood 3 to 2 a wave at 12% of a camp elite's health; eaten only within 2.5 m, for 1% and 5% heavier blows.
+   - **The meter** (Chris's: Archivist 93/s, Ranger 89, Mage 67, Rogue 66, Scoundrel 24, Warrior 24, the Paladin bot 23; the three healers
+     exactly alike). The band at 20 is 88 a second for a pure damage-dealer (`SimCompanion.PureDps`), a hybrid 90% (79), a tank 3/4 (66).
+     Why, and what changed: (1) the Archivist (a hybrid) went over its band on area blows: with her brood about her, the sims' area blow
+     struck her and the brood together; a world boss is a single target now, and no area blow lands on her from her brood. (2) The Scoundrel
+     and the Rogue were on the brood, chasing blinking Weave-Eaters across the bar: only Party 2's damage-dealers who fight from range take the
+     brood now; the melee stay on her. (3) The Warrior and the bot tank were dead most of each pull (the swap, above). (4) Blackened steel is
+     the books' (b1 ch.20:155) and hurts only those who strike her in reach: kept, but at 5% a stack (15% at three, not 30%), and it now
+     blunts a sim's blade as it blunts yours (it did nothing to the sims before; the Lowtowns' own Weave-Eaters now blunt a sim's blade 10%
+     as the book says). (5) The healers' damage is their own small blow (half the formula's, by level and practice); three healers at 20 hitting
+     her at the same pace come out alike: not a shared source. The healers' 16 a second is about a fifth of the band, as the bands want.
+   - **Her body** (Chris: "Both", then "maybe use this with the purple spike or some conglomeration. myassets free fantasy spider"):
+     `UnravellerBody` builds a conglomeration on her: Gergely Zsolnay's Free Fantasy Spider (Asset Store, Kalamona; Asset Store EULA;
+     `Resources/Props/fantasySpider`: the FBX with the package's own .meta and its legacy clips as the package split them, idle, walk,
+     attack1/2, hit1/2, taunt, jump, death1/2; `spider_01_black.tga` capped at 1024 by `ThirdPartyImport`; the normal map; the Standard
+     material; the demo scene, ground, the spinning script and the label holder left out), about 3.4 m to its back and its legs spread to
+     about ten, its hide near black with a violet light in it; the Weave-Eaters' purple threads with their burning tips (the look Chris liked)
+     as a crown three times their size on its back; and `VoidWrap` round all of it (CANON, b1 ch.20:119): a tower of jagged black shards to
+     about seven metres, each shifting on its own noise, a shimmering violet aether rim, grey ash lifting where she stands and moves, and on
+     her blink (ch.20:131) an afterimage of the shards where she was and a squash where she lands. The spider walks when she moves, strikes
+     when she swings, jolts on a blink, and dies in its own death with the crown and the wrap gone white (salt's work, ch.20:205). She rises
+     out of the river from seven metres down. `VoidWrap` goes on any body (Chris's downloaded model later). Cheap: 32 four-triangle shards on
+     the sprite shader, one small particle system, the spider's one skinned mesh. Which way the spider's file faces is not yet seen:
+     `UnravellerBody.FaceYaw`.
+   - **To capture** (front, back and side at 1920x1080, by day and by night): her rising out of the river at the bar; standing (the spider's
+     idle, the crown, the wrap's shifting edge and rim, the ash); walking; striking; a blink (the afterimage and the jolt); pinned (a harpoon in
+     her, "Pinned" on the boss frame, her standing still); her death (the spider's death, the crown and the wrap white); and the boss frame and
+     raid frames in a fight. Check the spider faces the way she moves (else set `FaceYaw`).
+   - **Tests:** `DrainReachTests.Nothing_stands_over_the_bars_walk` failed on the bestiary branch's "Bank-snouts on the north bank" camp at
+     (-25, 188), on the apron: the camp moved to (-24, 164), south of the apron, past where the river widens for the bar, on the bank band, dry and off Weir Lane (BestiaryMonsterTests' rules checked by hand; the bar untouched). New: `UnravellerRulesTests` (the phase
+     holds; the void wrap's size and parts), `RaidJobsTests` (the swap goes round at 10 s; melee off the brood); the PlayMode phase-1 test
+     checks her body (the spider in, 6-8 m, a clip playing).
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

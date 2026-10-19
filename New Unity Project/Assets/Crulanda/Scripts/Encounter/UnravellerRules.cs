@@ -15,6 +15,8 @@ namespace Crulanda.Encounter
     {
         /// <summary>Her phase at a share of her health: 1 "The Hunger" (to 70%), 2 "The Brood" (to 40%), 3 "The Unravelling".</summary>
         public static int Phase(float ratio, UnravellerTuning t) { return ratio > t.phase2At ? 1 : ratio > t.phase3At ? 2 : 3; }
+        /// <summary>Her phase now, once reached never lost (run 1: the brood she ate healed her back over 70% and the fight went back to phase 1).</summary>
+        public static int PhaseNow(int was, float ratio, UnravellerTuning t) { return Mathf.Max(was, Phase(ratio, t)); }
         public static readonly string[] PhaseNames = { "", "The Hunger", "The Brood", "The Unravelling" };
         /// <summary>How long the next harpoon pins her, <paramref name="pinsSoFar"/> having landed this fight: 12 s, then 11, 10 ... never under 7.</summary>
         public static float PinSeconds(int pinsSoFar, UnravellerTuning t) { return Mathf.Max(t.pinLeast, t.pinFirst - t.pinStep * Mathf.Max(0, pinsSoFar)); }
@@ -216,8 +218,9 @@ namespace Crulanda.Encounter
             for (int i = 0; i < l.Count && sims.Count + (you ? 1 : 0) < need; i++) { if (l[i].you) you = true; else sims.Add(l[i].id); }
             return (sims, you);
         }
-        /// <summary>Who takes the brood (3.4): the tank not holding her, and the damage-dealers of Party 2.</summary>
-        public static bool TakesBrood(SimCompanion.PartyRole role, int party, bool holdsHer) { return role == SimCompanion.PartyRole.Tank ? !holdsHer : role == SimCompanion.PartyRole.Damage && party == 1; }
+        /// <summary>Who takes the brood (3.4): the tank not holding her, and Party 2's damage-dealers who fight from range (run 1: the melee
+        /// chased blinking brood across the bar, the Scoundrel at 24 a second; the melee stay on her).</summary>
+        public static bool TakesBrood(SimCompanion.PartyRole role, int party, bool holdsHer, bool melee) { return role == SimCompanion.PartyRole.Tank ? !holdsHer : role == SimCompanion.PartyRole.Damage && party == 1 && !melee; }
         /// <summary>A sim misses its part of a mechanic now and then (3.5, "mistakes on purpose"): more at 18 than at 20, more when careless (rash:
         /// nerve over .75). <paramref name="roll"/> in 0..1.</summary>
         public static bool Misses(int level, float bold, float roll, UnravellerTuning t)

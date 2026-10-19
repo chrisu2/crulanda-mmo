@@ -167,7 +167,7 @@ namespace Crulanda.Encounter
             bool holds = e.Victim == actor;
             if (Role == PartyRole.Tank && (holds || TauntsHer(e))) return e;   // holding her, or the one to take her back (a swap, a blink onto a caster)
             int party = session.InRaid ? session.Raid.PartyOf(sim.id) : 0;
-            if (!RaidJobs.TakesBrood(Role, party, holds)) return null;
+            if (!RaidJobs.TakesBrood(Role, party, holds, Melee)) return null;
             EncounterEnemy best = null; float bestD = 40;
             foreach (var b in session.BroodNow)
             {
@@ -177,15 +177,6 @@ namespace Crulanda.Encounter
             return best;
         }
         /// <summary>Whether this tank taunts her now (the swap at four stacks; RaidJobs.TauntHer).</summary>
-        bool TauntsHer(EncounterEnemy e)
-        {
-            var t = UnravellerTuning.Current; var v = e.Victim;
-            SimCompanion other = null;
-            foreach (var c in session.PartySims) if (c != null && c != this && c.actor.IsAlive && c.Role == PartyRole.Tank) { other = c; break; }
-            int mine = e.UnravelOn(actor), theirs = other != null ? e.UnravelOn(other.actor) : 0;
-            bool onOther = other != null && v == other.actor;
-            bool preferred = other == null || mine < theirs || mine == theirs && string.CompareOrdinal(sim.id, other.sim.id) < 0;
-            return RaidJobs.TauntHer(mine, theirs, v == actor, onOther, preferred, t.swapAt, t.erasedAt);
-        }
+        bool TauntsHer(EncounterEnemy e) { return session.TauntsUnraveller(actor, e); }
     }
 }

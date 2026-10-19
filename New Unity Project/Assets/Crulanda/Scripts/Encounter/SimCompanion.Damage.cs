@@ -75,6 +75,7 @@ namespace Crulanda.Encounter
             // A pack about its quarry: this blow goes across them all (SimCompanion.Fight).
             if (Time.time >= nextArea && SwingWide(quarry) > 0) return;
             int dmg = Hit;
+            if (Melee) dmg = Mathf.Max(1, Mathf.RoundToInt(dmg * WeaveEaterRules.SteelScale(actor.GetComponent<Crulanda.Combat.Combatant>()?.Statuses, Time.time)));   // blackened steel blunts a sim's blade as yours
             if (Melee) visual?.Strike();
             else
             {

@@ -81,18 +81,29 @@ namespace Crulanda.Encounter
         /// <summary>The blunting a Weave-Eater leaves on the steel that strikes it: -10% attack power for 20 s.</summary>
         public static StatusEffectDefinition Blackened() { return Blackened(1); }
         /// <summary>Blackened steel <paramref name="stacks"/> deep (the Unraveller's three, WORLD_BOSS_1.md 3.3): -10% attack power a stack.</summary>
-        public static StatusEffectDefinition Blackened(int stacks)
+        public static StatusEffectDefinition Blackened(int stacks) { return Blackened(stacks, BlackenShare); }
+        /// <summary>Blackened steel <paramref name="stacks"/> deep at <paramref name="share"/> a stack (the Unraveller's 5%: UnravellerTuning.steelShare).</summary>
+        public static StatusEffectDefinition Blackened(int stacks, float share)
         {
             stacks = Mathf.Max(1, stacks);
             return new StatusEffectDefinition { id = BlackenedId, name = stacks > 1 ? BlackenedName + " (" + stacks + ")" : BlackenedName, duration = BlackenSeconds, incomingDamageMultiplier = 1,
-                modifiers = new[] { new StatusModifierDefinition { stat = StatType.AttackPower, operation = ModifierOp.PercentAdd, value = -BlackenShare * stacks } } };
+                modifiers = new[] { new StatusModifierDefinition { stat = StatType.AttackPower, operation = ModifierOp.PercentAdd, value = -share * stacks } } };
+        }
+        /// <summary>What a melee blow is multiplied by under blackened steel (1 with none): its attack power lost. A sim's blows read it here
+        /// (they do not use attack power), so steel goes black on a sim's blade as on yours.</summary>
+        public static float SteelScale(StatusEffectRuntime statuses, float now)
+        {
+            if (statuses == null || statuses.Remaining(BlackenedId, now) <= 0) return 1;
+            var d = statuses.DefinitionOf(BlackenedId); if (d == null || d.modifiers == null || d.modifiers.Length == 0) return 1;
+            return Mathf.Clamp01(1 + d.modifiers[0].value);
         }
         /// <summary>How deep the blackened steel on a striker is now (0: none): read off the status's own modifier.</summary>
         public static int SteelStacks(StatusEffectRuntime statuses, float now)
         {
             if (statuses == null || statuses.Remaining(BlackenedId, now) <= 0) return 0;
-            var d = statuses.DefinitionOf(BlackenedId); if (d == null || d.modifiers == null || d.modifiers.Length == 0) return 1;
-            return Mathf.Max(1, Mathf.RoundToInt(-d.modifiers[0].value / BlackenShare));
+            var d = statuses.DefinitionOf(BlackenedId); if (d == null || string.IsNullOrEmpty(d.name)) return 1;
+            int open = d.name.LastIndexOf('('), close = d.name.LastIndexOf(')');   // "Blackened steel (3)"
+            return open >= 0 && close > open && int.TryParse(d.name.Substring(open + 1, close - open - 1), out int n) ? Mathf.Max(1, n) : 1;
         }
         /// <summary>The buff row's name for a status of these rules, or null.</summary>
         public static string StatusName(string id) { return id == BlackenedId ? BlackenedName : null; }
@@ -103,16 +114,16 @@ namespace Crulanda.Encounter
         /// A blow on <paramref name="e"/> from <paramref name="source"/>: when it blackens, the status goes on (or is refreshed) on the striker.
         /// True when it is fresh (the striker had none on): the session says so once.
         /// </summary>
-        public static bool Struck(EncounterEnemy e, Actor source, float now) { return Struck(e, source, now, 1); }
+        public static bool Struck(EncounterEnemy e, Actor source, float now) { return Struck(e, source, now, 1, BlackenShare); }
         /// <summary>Struck, stacking to <paramref name="most"/> (the Unraveller: three).</summary>
-        public static bool Struck(EncounterEnemy e, Actor source, float now, int most)
+        public static bool Struck(EncounterEnemy e, Actor source, float now, int most, float share)
         {
             if (e == null || source == null || source == e.actor) return false;
             if (!Blackens(IsWeaveEater(e), Vector3.Distance(source.transform.position, e.transform.position))) return false;
             var c = source.GetComponent<Combatant>(); if (c == null || c.Statuses == null) return false;
             int had = SteelStacks(c.Statuses, now), next = UnravellerRules.SteelNext(had, most);
             if (next != had && had > 0) c.Statuses.Remove(BlackenedId);   // a deeper stack: put on afresh (Apply only refreshes the time)
-            c.Statuses.Apply(Blackened(next), now);
+            c.Statuses.Apply(Blackened(next, share), now);
             return had == 0;
         }
         /// <summary>What a throw does to a target: its sting (damage at the thrower's level), and the hold it puts on a Weave-Eater ("stun"

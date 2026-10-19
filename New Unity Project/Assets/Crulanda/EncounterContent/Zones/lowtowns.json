@@ -6112,8 +6112,8 @@
       "look": "puglin",
       "canonStatus": "GAME-ONLY creature (the Bank-snout, picked by Chris 2026-10-18, Docs/BESTIARY_MONSTERS.md); CANON: the Chemical River's 'and worse' (book1 ch.15:391)",
       "center": {
-        "x": -25,
-        "y": 188
+        "x": -24,
+        "y": 164
       },
       "radius": 3,
       "count": 3,

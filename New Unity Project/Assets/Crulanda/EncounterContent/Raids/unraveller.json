@@ -1,5 +1,5 @@
 {
-  "note": "The Unraveller's fight (Docs/WORLD_BOSS_1.md 3.2-3.5). Every number GAME-ONLY and PROVISIONAL: build step 6 (the group run tool at 10) tunes them here, and only here. Seconds, metres and shares of health (0.6 = 60%).",
+  "note": "Run 1 (2026-10-19, 0 of 3): lighthouse .18 to .1 (the tanks lost her to the casters), Unravel 20 s to 10 s (the stacks outlasted a swap), steel 5% a stack (melee not gutted), brood 3 to 2 a wave, 20% to 12% health, eaten at 2.5 m for 1% (eaten brood healed her back over the 70% line). The Unraveller's fight (Docs/WORLD_BOSS_1.md 3.2-3.5). Every number GAME-ONLY and PROVISIONAL: build step 6 (the group run tool at 10) tunes them here, and only here. Seconds, metres and shares of health (0.6 = 60%).",
   "health": 160000,
   "hitBase": 190,
   "swingEvery": 2.2,
@@ -7,7 +7,7 @@
   "phase2At": 0.7,
   "phase3At": 0.4,
 
-  "lighthouseShare": 0.18,
+  "lighthouseShare": 0.1,
   "lighthouseBeat": 2,
   "lighthouseReach": 30,
   "blinkEvery": 9,
@@ -24,8 +24,9 @@
   "haulTaken": 1.1,
 
   "steelStacks": 3,
+  "steelShare": 0.05,
 
-  "unravelSeconds": 20,
+  "unravelSeconds": 10,
   "unravelArmour": 0.06,
   "unravelTaken": 0.05,
   "swapAt": 4,
@@ -43,14 +44,14 @@
 
   "broodEvery2": 30,
   "broodEvery3": 40,
-  "broodCount": 3,
+  "broodCount": 2,
   "broodLevel": 22,
-  "broodHealthShare": 0.2,
+  "broodHealthShare": 0.12,
   "broodSalt": 4,
   "shatter": 3,
-  "broodEatenReach": 3.5,
-  "broodEatenHeal": 0.03,
-  "broodEatenGrow": 0.1,
+  "broodEatenReach": 2.5,
+  "broodEatenHeal": 0.01,
+  "broodEatenGrow": 0.05,
 
   "unmadeEvery": 20,
   "unmadeRadius": 2.5,

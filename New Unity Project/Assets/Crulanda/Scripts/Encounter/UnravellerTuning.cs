@@ -15,16 +15,18 @@ namespace Crulanda.Encounter
         // ---------- her, and the clock ----------
         public int health = 160000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
         // ---------- the rules that hold all fight (3.3): the Weave-Eaters' own, scaled ----------
-        public float lighthouseShare = .18f, lighthouseBeat = 2, lighthouseReach = 30;
+        public float lighthouseShare = .1f, lighthouseBeat = 2, lighthouseReach = 30;
         public float blinkEvery = 9, blinkReach = 12, touchShare = .6f, touchSilence = 3, wardReach = 10;
         public float pinFirst = 12, pinStep = 1, pinLeast = 7; public int haulPins = 2; public float haulPace = 1, haulTaken = 1.1f;
         public int steelStacks = 3;
+        /// <summary>Attack power lost a stack of her blackened steel (the Weave-Eaters' own is 10%, one stack: WeaveEaterRules).</summary>
+        public float steelShare = .05f;
         // ---------- phase 1 (3.4) ----------
-        public float unravelSeconds = 20, unravelArmour = .06f, unravelTaken = .05f; public int swapAt = 4, erasedAt = 7;
+        public float unravelSeconds = 10, unravelArmour = .06f, unravelTaken = .05f; public int swapAt = 4, erasedAt = 7;
         public float feedCast = 3, feedFirst = 8, feedEvery1 = 15, feedEvery2 = 20, feedEvery3 = 20, feedReach = 20, feedHeal = .003f, feedGrow = .02f, interruptImmune = 10;
         // ---------- phase 2 ----------
-        public float broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 3, broodLevel = 22;
-        public float broodHealthShare = .2f, broodSalt = 4, shatter = 3, broodEatenReach = 3.5f, broodEatenHeal = .03f, broodEatenGrow = .1f;
+        public float broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 2, broodLevel = 22;
+        public float broodHealthShare = .12f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
         public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .08f;
         public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 12; public int saltsToFree = 3;
         public float saltWindow = 12, calcifySeconds = 4, calcifyTaken = 1.5f;

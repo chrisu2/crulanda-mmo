@@ -399,7 +399,7 @@ namespace Crulanda.Encounter
             SpellFx.Struck(transform);   // struck by an ability resolving: its effect shows here
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
-            if (damage > 0 && WeaveEaterRules.Struck(this, source, Time.time, RaidBoss ? UnravellerTuning.Current.steelStacks : 1) && source == session.Player) session.Message(WeaveEaterRules.BlackenedLine);   // steel through a Weave-Eater (the Lowtowns)
+            if (damage > 0 && WeaveEaterRules.Struck(this, source, Time.time, RaidBoss ? UnravellerTuning.Current.steelStacks : 1, RaidBoss ? UnravellerTuning.Current.steelShare : WeaveEaterRules.BlackenShare) && source == session.Player) session.Message(WeaveEaterRules.BlackenedLine);   // steel through a Weave-Eater (the Lowtowns)
             // Blinded by a Hollow's dust (Hallow's Creek, b1 ch.4:177): the blow goes wide now and then.
             if (damage > 0 && source != null && session.BlindMisses(source)) { session.FloatText(transform.position, "Miss (dust)", new Color(.7f, .7f, .68f)); return; }
             // A dazzled striker's blow may go wide; a locked shield turns a frontal one (EncounterEnemy.Tricks).
@@ -427,7 +427,8 @@ namespace Crulanda.Encounter
             if (agent.isOnNavMesh) agent.isStopped = true;
             var visual = transform.Find("Body");
             if (Game) GetComponent<GameAnimal>()?.Fall();   // on its side on the ground, not tipped from an actor's height
-            else if (Figure != null && Figure.Look == ActorLook.RockEater) { }   // a modelled beast: it falls in its own death where it stood
+            else if (Figure != null && Figure.Look == ActorLook.RockEater) { }
+            else if (GetComponent<UnravellerBody>() != null) { }   // the Unraveller dies in her own way (UnravellerBody: the spider's death, crystal)   // a modelled beast: it falls in its own death where it stood
             else if (visual != null) { visual.localRotation = Quaternion.Euler(0, 0, 90); visual.localPosition = new Vector3(0, -.6f, 0); }
             respawnAt = Time.time + RespawnSeconds;
             WalkThrough(true);

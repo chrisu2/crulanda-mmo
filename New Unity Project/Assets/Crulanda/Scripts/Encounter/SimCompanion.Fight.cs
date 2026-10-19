@@ -167,13 +167,14 @@ namespace Crulanda.Encounter
         public List<EncounterEnemy> WideTargets(EncounterEnemy quarry)
         {
             if (quarry == null || Role == PartyRole.Healer || !quarry.actor.IsAlive || !quarry.FightingParty || Held(quarry) || quarry.LeaveAlone) return null;
+            if (quarry.RaidBoss) return null;   // a world boss is a single target: no area blow off her onto her brood (run 1: the Archivist topped the meter on it)
             int near = 0; var hit = new List<EncounterEnemy> { quarry };
             foreach (var e in session.Enemies)
             {
                 if (e == null || !e.actor.IsAlive || !e.FightingParty || e.Game || e.Hidden || e.Inside != null) continue;
                 if (Vector3.Distance(e.transform.position, quarry.transform.position) > AreaReach) continue;
                 near++;
-                if (e != quarry && !Held(e) && !e.LeaveAlone) hit.Add(e);
+                if (e != quarry && !Held(e) && !e.LeaveAlone && !e.RaidBoss) hit.Add(e);   // nor onto her from her brood
             }
             return near >= 3 && hit.Count >= 2 ? hit : null;
         }

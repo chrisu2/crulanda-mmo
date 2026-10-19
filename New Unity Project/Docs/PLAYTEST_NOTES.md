@@ -878,4 +878,4 @@ un-captures.
   cache, a UPM package: HDRI Noon, Noon (Cloudy), Noon (Overcast), Sunrise, Sunset, Dusk, Night, NightGalaxy, Aurora + Sky_*.mat; a URP
   demo). Skies through the day and night, each zone's weather its own.
 - 255 (2026-10-19 ~13:15, his screenshot: a brazier, its bowl lit, the flame cone standing beside the bowl on the floor) "fire goes
-  around the bazier" (OPEN): the brazier's flame is not in its bowl.
+  around the bazier", then "it was dancing around the brazier" (OPEN): the flame wanders round the bowl instead of burning in it.

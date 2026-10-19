@@ -846,3 +846,6 @@ un-captures.
   bring back what we had before. helm dont fit. most sit around the head a too large for the head. hood is awful" (OPEN). Asked, he
   chose (verbatim) "Old helms, new gloves (Recommended)": helms back as in his game, keep the new gloves and shoulder plates, then the
   hood (the oilskin hood stands out round the head like a bell).
+- 243 (2026-10-19 ~11:00) the first world boss (brief, verbatim in ROADMAP "The first world boss"): one mini world boss in the highest
+  zone, level 30, a 10-player raid, the hardest to kill, drops components for each class's legendary weapon; one piece needs the other
+  world bosses at end game (OPEN).

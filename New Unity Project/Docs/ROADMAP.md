@@ -132,6 +132,11 @@ group needed, guilds forming up); challenges (timed dungeon runs with a rating t
 rotating harder camps); rewards (set gear above the dungeons', titles, the Chronicle marking each kill). The pieces exist in small
 (elite camps and guards, group scaling, loot rolls, guilds, sim-led runs): raids and world bosses scale them up.
 
+**The first world boss (Chris, 2026-10-19 ~11:00, verbatim):** "i'd like to have one mini world boss in the highest zone. the mob is
+level 30 but needs 10 people to kill. has to be a raid. so id like to balance it but definite on the hardest skill level to kill. drop
+components for legendary weapons for each class, but only one piece will need other world bosses at end game to complete".
+Design: Docs/WORLD_BOSS_1.md (to be written from the books; his picks recorded there).
+
 **Level cap (Chris, 2026-10-07): 30 in the end, 15 now; "difficult and slow leveling, grind it out".** Round 29 (after round 28):
 the cap goes from 13 to 15 and the zones' bands stretch to Oakhaven 1-5, Khaven 5-9, Peaks 9-12, Ash Rim 12-15, Verdant Shore 13-15
 (two zones at the cap, "so endgame has more to do"; the Shore "all epic mobs, group required": every mob there elite-strength, a zone flag; the Rim "more solo friendly"); every camp, quest and loot list moves with its zone, Crowsfoot Hollow to about

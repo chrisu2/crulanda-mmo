@@ -23,13 +23,13 @@ namespace Crulanda.Tests
     /// </summary>
     public class BrazierFlamePlayTests
     {
-        string root;
+        string root; bool loaded;   // the plain [Test] loads no zone: the teardown drops only what Load loaded
         void OnLoaded(Scene scene, LoadSceneMode mode) { var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (s != null) s.SaveDirectoryOverride = root; }
         IEnumerator Load(string zone)
         {
             WorldClock.Hour = 21; ZoneBuilder.RequestedZoneId = zone;
             root = Path.Combine(Path.GetTempPath(), "Crulanda-flames-" + Guid.NewGuid().ToString("N"));
-            SceneManager.sceneLoaded += OnLoaded;
+            SceneManager.sceneLoaded += OnLoaded; loaded = true;
             yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
             for (int i = 0; i < 4; i++) yield return null;
         }
@@ -38,6 +38,8 @@ namespace Crulanda.Tests
             VillageEconomy.ResetAll();
             Time.timeScale = 1; WorldClock.Hour = 8.5f; ZoneBuilder.RequestedZoneId = null;
             SceneManager.sceneLoaded -= OnLoaded;
+            if (!loaded) yield break;
+            loaded = false;
             var empty = SceneManager.CreateScene("Empty-" + Guid.NewGuid().ToString("N")); SceneManager.SetActiveScene(empty);
             yield return SceneManager.UnloadSceneAsync("Oakhaven");
             if (root != null && Directory.Exists(root)) Directory.Delete(root, true);

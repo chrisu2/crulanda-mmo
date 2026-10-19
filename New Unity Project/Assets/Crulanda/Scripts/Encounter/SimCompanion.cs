@@ -771,7 +771,7 @@ namespace Crulanda.Encounter
                 }
                 // Rooted only its feet are held (2026-10-17, the level-17 Hallow's Creek run: the Rogue stood idle in the Fallen Mason's
                 // roots beside him): it still strikes, or shoots, what is in its reach.
-                if (heldKind == "root") { var q = Quarry; if (q != null && Vector3.Distance(transform.position, q.transform.position) <= Reach) StrikeAt(q, false); }
+                if (heldKind == "root") { var q = Quarry; if (q != null && q.EdgeDistance(transform.position) <= Reach) StrikeAt(q, false); }
                 return;
             }
             float toPlayer = Vector3.Distance(transform.position, player.transform.position);
@@ -882,7 +882,7 @@ namespace Crulanda.Encounter
             if (Time.time >= nextHoldLook) HoldOne(quarry);   // every other class's hold (SimCompanion.Fight)
             if (Interrupter && Time.time >= nextKick)
                 foreach (var e in session.Enemies)
-                    if (e != null && e.actor.IsAlive && e.Casting && e.FightingParty && !e.RaidBoss && !Silenced && e.CastProgress > .25f && Vector3.Distance(e.transform.position, transform.position) <= Reach + 1.5f)   // her Feeding is the interrupt rotation's (SimCompanion.Raid)
+                    if (e != null && e.actor.IsAlive && e.Casting && e.FightingParty && !e.RaidBoss && !Silenced && e.CastProgress > .25f && e.EdgeDistance(transform.position) <= Reach + 1.5f)   // her Feeding is the interrupt rotation's (SimCompanion.Raid)
                     {
                         // A kick that does not take (immune, or too soon after the last) waits too (2026-10-13: it was tried again every frame,
                         // and "Immune" stacked into a white column over the Cinder-Warden in the evening group run).
@@ -899,7 +899,7 @@ namespace Crulanda.Encounter
                 // A tank taunts what is on someone else (5.6): the mob turns to it for a few seconds.
                 if (Role == PartyRole.Tank && quarry.Victim != null && quarry.Victim != actor && Time.time >= nextTaunt && Vector3.Distance(transform.position, quarry.transform.position) < 12 && (!quarry.RaidBoss || TauntsHer(quarry)))   // her: the swap at four stacks (SimCompanion.Raid)
                 { nextTaunt = Time.time + 8; quarry.threat.Taunt(actor.EntityId.Value, Time.time, 4); session.FloatText(transform.position + Vector3.up * 2, "Taunt", new Color(1, .7f, .3f)); }
-                float d = Vector3.Distance(transform.position, quarry.transform.position);
+                float d = quarry.EdgeDistance(transform.position);   // from a big body's edge (raid 2: the melee could not reach her middle)
                 // Once at its quarry a melee sim holds its ground through a nudge (StandSlack): a shove from a pet or a sim walking past no
                 // longer sends it off "closing on" a quarry it is all but touching (SimDummyTests, 2026-10-18: the Scoundrel 3 s of 40 not striking).
                 if (d > Reach + (Melee && atQuarry == quarry ? StandSlack : 0)) { atQuarry = null; agent.isStopped = false; agent.speed = 5.2f; CloseOn(quarry); Activity = "Closing on " + quarry.actor.DisplayName; return; }
@@ -1162,7 +1162,10 @@ namespace Crulanda.Encounter
             if (session.InRaid) foreach (var p in session.PartySims)
                 if (p != null && p.Role == PartyRole.Tank && p.actor.IsAlive && p.actor.Health.Pool.Ratio < .6f && Vector3.Distance(p.transform.position, transform.position) <= reach) return p.actor;
             Actor best = null; float low = 1;
-            void Consider(Actor a) { if (a != null && a.IsAlive && a.Health.Pool.Ratio < low && Vector3.Distance(a.transform.position, transform.position) <= reach) { best = a; low = a.Health.Pool.Ratio; } }
+            // Not one another healer's mend is already on its way to, unless it is low (raid 2: three healers at the same most-hurt member,
+            // the Shaman's mend landing last on a full bar every time: 24 a second healed to the Druid's 44 and the Cleric's 43).
+            bool Taken(Actor a) { if (a.Health.Pool.Ratio < .35f) return false; foreach (var p in session.PartySims) if (p != null && p != this && p.healing == a) return true; return false; }
+            void Consider(Actor a) { if (a != null && a.IsAlive && a.Health.Pool.Ratio < low && Vector3.Distance(a.transform.position, transform.position) <= reach && !Taken(a)) { best = a; low = a.Health.Pool.Ratio; } }
             Consider(session.Player);
             if (session.Progress.recruited && session.Companion != null) Consider(session.Companion.actor);
             foreach (var p in session.PartySims) if (p != null) Consider(p.actor);

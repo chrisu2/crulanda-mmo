@@ -60,7 +60,7 @@ namespace Crulanda.Encounter
         {
             var e = session.UnravellerFighting; if (e == null) return false;
             var t = UnravellerTuning.Current; float now = Time.time;
-            float d = Vector3.Distance(transform.position, e.transform.position);
+            float d = e.EdgeDistance(transform.position);   // throws and kicks reach her edge
             // The hunted: into the river (it hides magic from her, b1 ch.16:75), and out 3 s after she falls.
             var hunted = session.HuntedActor;
             if (hunted != huntSeen) { huntSeen = hunted; huntIgnored = hunted == actor && Misses(); }
@@ -127,7 +127,7 @@ namespace Crulanda.Encounter
         bool InterruptReady(string id, EncounterEnemy e)
         {
             var c = session.PartySim(id);
-            return c != null && c.actor.IsAlive && c.Interrupter && Time.time >= c.nextKick && !c.Silenced && !c.HeldNow && Vector3.Distance(c.transform.position, e.transform.position) <= c.Reach + 1.5f;
+            return c != null && c.actor.IsAlive && c.Interrupter && Time.time >= c.nextKick && !c.Silenced && !c.HeldNow && e.EdgeDistance(c.transform.position) <= c.Reach + 1.5f;
         }
         /// <summary>Carries one of <paramref name="item"/>, or takes three from the apron's stock (Tibb's barrel, Ketta's rack) when it has none and they are out.</summary>
         bool Carries(string item)

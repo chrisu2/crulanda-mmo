@@ -594,6 +594,35 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      (-25, 188), on the apron: the camp moved to (-24, 164), south of the apron, past where the river widens for the bar, on the bank band, dry and off Weir Lane (BestiaryMonsterTests' rules checked by hand; the bar untouched). New: `UnravellerRulesTests` (the phase
      holds; the void wrap's size and parts), `RaidJobsTests` (the swap goes round at 10 s; melee off the brood); the PlayMode phase-1 test
      checks her body (the spider in, 6-8 m, a clip playing).
+   **Raid 2 (2026-10-19, run-captures\unraveller-raid-2; pull 1 a wipe at 7:11 with her at 19%, all three phases; pull 2 a wipe at 8:19 at
+   32%) and what was changed (WRITTEN, NOT RUN again).** Chris, verbatim: "woah too much cant even make out the spider"; "she needs adds.
+   smaller spiders with the original texture but purple"; "wipe but when down too fast when over 75% health"; "archivist now doing 80dps";
+   "shaman healing much lower than others".
+   - **The wrap** is now a thin edge, not a tower: 12 thin shards round her legs' and back's rim (none in the middle in front of her), none
+     over 1.2 times her body (a test holds it under 1.5), the void translucent (45%) with the violet rim, shifting, each now and then gone for a
+     moment. The ash at her feet and the purple crown on her back stay.
+   - **Her adds** (play note 260): her brood are small spiders now (`BroodBody`): the same Free Fantasy Spider in its own painted hide
+     (`spider_01.tga`, added) tinted purple, about 1.3 m long, scuttling on the walk clip, biting, dying; salt turns one white crystal and
+     still, and one shattered dies white. The Weave-Eaters' rules still hold them. Phase 1 has no adds (as the doc); `broodEvery1` in the
+     data file turns them on for step 6 if the fight wants them earlier (0 now, to keep the 1-in-2 target: pull 1 nearly won without).
+   - **The first deaths** (read round the first death): pull 1 the Rogue at 2:29, pull 2 the Scoundrel at 1:58, the bot tank at 2:03 and
+     the Rogue at 2:29, all just after phase 2 began, all melee, all with unmade ground under her. **The melee reach was measured from her
+     centre** (2.4 m) and her unmade ground lies at her centre, 2.5 m round: a blade could not strike her without standing in it, so the
+     melee stood in it or stepped out all fight (the Rogue at 18 a second, the Scoundrel 21: a fifth of their band). **Fixed:** her body has a
+     reach (`EncounterEnemy.BodyRadius`, 2.5 m, the spider's body): a blade, a kick, a throw, your abilities and her own swing are measured
+     from her edge; the melee now stand 2.5-4.9 m from her centre, outside the patch she lays.
+   - **The Archivist** (a control and support class: BALANCE_REPORT.md, "control and support at most 75%"): a sim Archivist in the damage
+     part was set at a hybrid's 90% of the band (79 at 20) and its unwrite ticks on while it moves (stepping out, throwing), so it led when the
+     others lost time. Now `SimCompanion.ControlDpsShare` 78% (about 69 at 20): well under the damage-dealers, just over a tank. The player's
+     Archivist kit is not changed.
+   - **The Shaman's healing**: all three sim healers mend by the same rule; the likeliest cause is that three of them chose the same most-hurt
+     member, and the Shaman's mend landed last on a full bar (the meter counts only what heals). Now a healer passes over one another
+     healer's mend is already on its way to (unless they are under 35%). The run's band lines now show each healer's healing a second, to
+     see it in the next run.
+   - **Her damage numbers** stacked in a column over her: on a raid boss your own blows float as before, the rest of the raid's are summed and
+     floated once each half second, smaller, to her side.
+   - **To capture next** (front, back, side): her with the thin wrap (the spider reads first), the crown, the brood spiders scuttling out of the
+     river, a salted one white and its shattering, the melee at her legs' edge outside the grey ground.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

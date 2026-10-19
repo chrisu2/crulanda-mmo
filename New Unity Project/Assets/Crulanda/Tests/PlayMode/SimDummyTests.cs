@@ -157,7 +157,7 @@ namespace Crulanda.Tests
                     report.Add(line); Debug.Log("Sim on the dummy: " + line);
                     if (c.Role == SimCompanion.PartyRole.Damage)
                     {
-                        bool hybrid = EncounterSession.Hybrid(c.sim.classId); float share = hybrid ? EncounterSession.HybridDpsShare : 1;
+                        bool hybrid = EncounterSession.Hybrid(c.sim.classId); float share = c.sim.classId == "class.archivist" ? SimCompanion.ControlDpsShare : hybrid ? EncounterSession.HybridDpsShare : 1;   // the Archivist: control and support (raid 2)
                         float aim = c.BandDps;
                         Assert.That(aim, Is.InRange(SimCompanion.PureBandLow * scale * share, SimCompanion.PureBandHigh * scale * share), who + ": its aim is in the " + (hybrid ? "hybrid" : "pure") + " band");
                         // Within 3% of its aim (5% for the Unwriting: its unwrite ticks are a third of a blow, rounded down).

@@ -163,6 +163,32 @@ namespace Crulanda.Encounter
             return damage;
         }
 
+        /// <summary>How far its body reaches out from its centre (0 for an ordinary mob): melee is measured from its edge, not its middle.
+        /// Raid 2: the Rogue at 18 a second and the Scoundrel at 21, a fifth of their band: a blade's 2.4 m from her centre lay inside her
+        /// ten-metre spider and inside the unmade ground she lays where she stands, so the melee were crowded out or stepping out all fight.</summary>
+        public float BodyRadius;
+        /// <summary>Metres from <paramref name="p"/> to its body's edge (its centre for an ordinary mob).</summary>
+        public float EdgeDistance(Vector3 p) { return Mathf.Max(0, Vector3.Distance(p, transform.position) - BodyRadius); }
+
+        // ---------- her damage numbers ----------
+        int raidFloatSum; float raidFloatAt;
+        /// <summary>Raid 2 (Chris's screenshot): ten members' blows floated over her as an unreadable column. On a raid boss your own blows
+        /// float as ever; the rest of the raid's are added up and floated once each half second, smaller and to her side. True when it took
+        /// the number (the caller floats nothing).</summary>
+        bool RaidFloat(int actual, Actor source)
+        {
+            if (!RaidBoss) return false;
+            if (source != null && source == session.Player) return false;
+            raidFloatSum += actual;
+            if (Time.time >= raidFloatAt)
+            {
+                raidFloatAt = Time.time + .5f;
+                if (raidFloatSum > 0) session.FloatText(transform.position + transform.right * 2.5f + Vector3.up * 1.5f, raidFloatSum.ToString(), new Color(.75f, .7f, .55f, .8f));
+                raidFloatSum = 0;
+            }
+            return true;
+        }
+
         // ---------- the Feeding ----------
         /// <summary>The Feeding lands (ch.20:143): every good effect on everyone of the party within 20 m is eaten (their wards, their buffs);
         /// each heals her and makes her blows heavier for the fight.</summary>

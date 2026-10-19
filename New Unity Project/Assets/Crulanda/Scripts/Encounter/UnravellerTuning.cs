@@ -25,7 +25,9 @@ namespace Crulanda.Encounter
         public float unravelSeconds = 10, unravelArmour = .06f, unravelTaken = .05f; public int swapAt = 4, erasedAt = 7;
         public float feedCast = 3, feedFirst = 8, feedEvery1 = 15, feedEvery2 = 20, feedEvery3 = 20, feedReach = 20, feedHeal = .003f, feedGrow = .02f, interruptImmune = 10;
         // ---------- phase 2 ----------
-        public float broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 2, broodLevel = 22;
+        /// <summary>The brood's wait in each phase; in phase 1 none (0) as the doc has it: the fight's first two minutes are the pins, the
+        /// Feeding and the swap. A step-6 knob if phase 1 wants adds (play note 260, "she needs adds").</summary>
+        public float broodEvery1 = 0, broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 2, broodLevel = 22;
         public float broodHealthShare = .12f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
         public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .08f;
         public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 12; public int saltsToFree = 3;
@@ -61,7 +63,7 @@ namespace Crulanda.Encounter
         /// <summary>The Feeding's wait in <paramref name="phase"/> (1-3).</summary>
         public float FeedEvery(int phase) { return phase >= 3 ? feedEvery3 : phase == 2 ? feedEvery2 : feedEvery1; }
         /// <summary>The brood's wait in a phase (none in phase 1: 0).</summary>
-        public float BroodEvery(int phase) { return phase >= 3 ? broodEvery3 : phase == 2 ? broodEvery2 : 0; }
+        public float BroodEvery(int phase) { return phase >= 3 ? broodEvery3 : phase == 2 ? broodEvery2 : broodEvery1; }
         /// <summary>The swallowing's wait in a phase (none in phase 1: 0).</summary>
         public float SwallowEvery(int phase) { return phase >= 3 ? swallowEvery3 : phase == 2 ? swallowEvery2 : 0; }
     }

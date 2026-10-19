@@ -170,18 +170,22 @@ namespace Crulanda.Tests
             Assert.IsFalse(UnravellerRules.Feast(539.9f, t)); Assert.IsTrue(UnravellerRules.Feast(540, t));
         }
 
-        [Test] public void The_void_wrap_towers_seven_metres_on_any_body_whatever_its_scale()
+        [Test] public void The_void_wrap_is_a_thin_edge_under_the_bodys_height_and_a_half_on_any_body()
         {
             var host = new GameObject("Wrapped body"); host.transform.localScale = Vector3.one * 2.6f;   // her actor's scale
             try
             {
-                var w = VoidWrap.Wrap(host.transform, 7, 2.2f, -1, 5);
+                var w = VoidWrap.Wrap(host.transform, UnravellerBody.WrapHeight, 3.5f, -1, 5);
                 Assert.AreEqual(1, w.transform.lossyScale.y, 1e-3f, "built in the world's metres, her scale undone");
-                Assert.AreEqual(16, w.ShardCount, "the jagged shards");
+                Assert.That(w.ShardCount, Is.InRange(10, 14), "a few jagged shards, not a forest (raid 2)");
                 var rs = w.GetComponentsInChildren<Renderer>(true).Where(r => r is MeshRenderer).ToList();
-                Assert.AreEqual(32, rs.Count, "each shard a void core and an aether rim: cheap to draw");
+                Assert.AreEqual(2 * w.ShardCount, rs.Count, "each shard a void core and an aether rim: cheap to draw");
                 var b = rs[0].bounds; foreach (var r in rs) b.Encapsulate(r.bounds);
-                Assert.That(b.size.y, Is.InRange(6f, 8.5f), "a towering silhouette, six to eight metres: " + b.size.y);
+                Assert.LessOrEqual(b.max.y - (host.transform.position.y - 1), UnravellerBody.WrapLimit, "nothing of the wrap over 1.5 times her body (raid 2: it hid her and the view)");
+                Assert.Greater(b.size.y, 1, "but there");
+                Assert.Less(VoidWrap.Void.a, .6f, "the void translucent: the body shows through");
+                var mid = new Vector2(host.transform.position.x, host.transform.position.z);
+                Assert.IsTrue(w.GetComponentsInChildren<Transform>().Where(x => x.name == "Shard").All(x => Vector2.Distance(new Vector2(x.position.x, x.position.z), mid) > 1.5f), "round her edge, none in the middle in front of her");
                 Assert.Less(b.min.y, host.transform.position.y - .5f, "from the ground (a metre under her origin)");
                 Assert.IsTrue(rs.All(r => r.shadowCastingMode == UnityEngine.Rendering.ShadowCastingMode.Off), "no shadows from the wrap");
                 Assert.IsNotNull(w.GetComponentInChildren<ParticleSystem>(), "the ash where she moves");

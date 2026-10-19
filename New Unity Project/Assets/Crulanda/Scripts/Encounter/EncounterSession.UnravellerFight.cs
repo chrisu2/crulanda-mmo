@@ -96,7 +96,7 @@ namespace Crulanda.Encounter
         /// <summary>The pull: the clock begins, the rotations are set, her track comes up.</summary>
         void BeginUnravellerFight(EncounterEnemy e)
         {
-            float now = Time.time; e.PullAt = now; e.RaidPhase = 0; feasted = false;
+            float now = Time.time; e.PullAt = now; e.RaidPhase = 0; feasted = false; nextBrood = now + Mathf.Max(10, UT.broodEvery1);   // phase-1 adds (off by default)
             BroodRisen = BroodEaten = SwallowsFreed = SwallowsErased = HuntsMissed = HuntsLanded = Pulses = Feasts = HarpoonsThrown = SaltsThrown = 0;
             SetRotations();
             if (Unraveller.FightTrackReady) Crulanda.World.ZoneMusic.FightOverride = Unraveller.FightTrack;
@@ -171,6 +171,7 @@ namespace Crulanda.Encounter
                 b.HitBase = EncounterEnemy.MobHit(t.broodLevel, false, false);
                 var goFor = healers.Count > 0 ? healers[k % healers.Count] : Player;
                 if (goFor != null) b.threat.Add(goFor.EntityId.Value, 60);
+                BroodBody.Dress(b);   // a small purple spider (Chris, play note 260)
                 BroodNow.Add(b); made.Add(b); BroodRisen++;
             }
             if (made.Count > 0) { Message(Unraveller.BroodRiseLine); if (PlayerRole == SimCompanion.PartyRole.Healer) RaidWarning(Unraveller.BroodWarning); }

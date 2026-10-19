@@ -124,7 +124,7 @@ namespace Crulanda.Encounter
                 "Mean kill time: " + (wins > 0 ? Clock(killTime / wins) : "-") + " against the enrage at " + Clock(tune.enrageSeconds),
                 "Pulls:" };
             summary.AddRange(lines.Select(l => "  " + l));
-            summary.Add("Damage against the bands (BALANCE_REPORT.md: a pure damage-dealer the band, a hybrid 90% of it, a tank 3/4, a healer low; the band at " + level + " is " + SimCompanion.PureDps(level).ToString("0") + " a second on one target; her fight costs everyone some for moving, salting and harpooning):");
+            summary.Add("Damage against the bands (BALANCE_REPORT.md: a pure damage-dealer the band, a hybrid 90% of it, the Archivist (control and support) 78%, a tank 3/4, a healer low; the band at " + level + " is " + SimCompanion.PureDps(level).ToString("0") + " a second on one target; her fight costs everyone some for moving, salting and harpooning):");
             summary.AddRange(BandLines(s, level).Select(l => "  " + l));
             summary.Add("Scorecard:"); summary.AddRange(s.Meter.Scorecard().Select(l => "  " + l));
             RaidFinish(s, directory, log, summary);
@@ -139,10 +139,10 @@ namespace Crulanda.Encounter
                 if (sim != null) { classId = sim.sim.classId; role = sim.Role; }
                 else if (s.Player != null && s.Player.EntityId.Value == r.id) { classId = s.ClassDef.id; role = s.PlayerRole; }
                 else continue;   // a pet: in its keeper's
-                float want = role == SimCompanion.PartyRole.Tank ? band * SimCompanion.TankDpsShare : role == SimCompanion.PartyRole.Healer ? band * .25f : band * (EncounterSession.Hybrid(classId) ? EncounterSession.HybridDpsShare : 1);
+                float want = role == SimCompanion.PartyRole.Tank ? band * SimCompanion.TankDpsShare : role == SimCompanion.PartyRole.Healer ? band * .25f : band * (classId == "class.archivist" ? SimCompanion.ControlDpsShare : EncounterSession.Hybrid(classId) ? EncounterSession.HybridDpsShare : 1);
                 float dps = r.Dps(secs), share = want > 0 ? dps / want : 0;
                 string note = role == SimCompanion.PartyRole.Healer ? (dps > want * 1.2f ? "HIGH for a healer" : "ok (a healer's)") : share > 1.1f ? "OVER" : share < .7f ? "UNDER" : "in band";
-                l.Add((share, r.name + ", " + role + ": " + dps.ToString("0.0") + "/s against " + want.ToString("0") + " (" + Mathf.RoundToInt(share * 100) + "%) " + note + "; deaths " + r.deaths));
+                l.Add((share, r.name + ", " + role + ": " + dps.ToString("0.0") + "/s against " + want.ToString("0") + " (" + Mathf.RoundToInt(share * 100) + "%) " + note + (r.healing > 0 ? "; heals " + r.Hps(secs).ToString("0.0") + "/s" : "") + "; deaths " + r.deaths));
             }
             return l.OrderBy(x => x.share).Select(x => x.line).ToList();
         }
@@ -159,7 +159,7 @@ namespace Crulanda.Encounter
                 var feet = NavMesh.SamplePosition(me, out var under, 2, NavMesh.AllAreas) ? under.position : me - Vector3.up;
                 var outOf = GroundMarks.StepOut(feet);
                 if (outOf.HasValue) { goal = outOf; reach = .4f; }
-                else { goal = e.transform.position; reach = MeleeClass(s) ? 2.6f : 12; }
+                else { goal = e.transform.position; reach = (MeleeClass(s) ? 2.4f : 12) + e.BodyRadius; }   // to her edge
             }
             // Salt on her when the raid warning asks it of you.
             var w = s.RaidWarningText;

@@ -12,8 +12,8 @@ namespace Crulanda.Encounter
     ///   near black with a faint violet light in it;
     /// - the purple spikes Chris liked: the Weave-Eaters' own tangle of fraying threads with burning tips (ActorVisual's Weave-Eater core)
     ///   bursting from her back as a crown, three times its size;
-    /// - the books' wrap (VoidWrap; b1 ch.20:119): jagged shifting void towering to about seven metres, a shimmering aether rim, ash where she
-    ///   moves, the jerk of her blink (ch.20:131).
+    /// - the books' wrap (VoidWrap; b1 ch.20:119): a thin translucent flickering edge of jagged void round her legs and back, a shimmering
+    ///   aether rim, ash where she moves, the jerk of her blink (ch.20:131); never over 1.5 times her height, so the spider reads first.
     /// Her rising and sinking (EncounterSession.Unraveller) lift and lower the whole; the spider walks when she moves, strikes when she swings,
     /// jolts when she blinks, and dies in its own death (the crown and the wrap gone to crystal: salt's work, ch.20:205). Built in world units
     /// under her (her actor's 2.6 scale undone). With the package missing, the crown and the wrap alone.
@@ -22,7 +22,11 @@ namespace Crulanda.Encounter
     {
         public const string ModelPath = "Props/fantasySpider/spider_myOldOne", MaterialPath = "Props/fantasySpider/Materials/spider_black_Std", TexturePath = "Props/fantasySpider/spider_01_black";
         /// <summary>Ground to the spider's back, and the most its legs may spread across, in metres; the wrap's height.</summary>
-        public const float SpiderHeight = 3.4f, SpiderSpan = 10, WrapHeight = 7, CrownScale = 3;
+        public const float SpiderHeight = 3.4f, SpiderSpan = 10, CrownScale = 3;
+        /// <summary>Her body's reach out from her centre: melee strikes her from there (EncounterEnemy.BodyRadius; raid 2).</summary>
+        public const float BodyRadius = 2.5f;
+        /// <summary>The wrap's tallest shard: never over one and a half times her body (raid 2: the seven-metre wrap hid the spider and the view).</summary>
+        public const float WrapHeight = SpiderHeight * 1.2f, WrapLimit = SpiderHeight * 1.5f;
         /// <summary>The model's turn to face her forward (the file's front is not checked in a build yet: PROVISIONAL).</summary>
         public static float FaceYaw = 0;
         public static readonly Color Hide = new Color(.16f, .12f, .22f), HideGlow = new Color(.16f, .05f, .3f);
@@ -72,7 +76,7 @@ namespace Crulanda.Encounter
             crown = new GameObject("Crown").transform; crown.SetParent(root, false);
             crown.localPosition = new Vector3(0, ground + (spider != null ? SpiderHeight * .9f : 2.6f), spider != null ? -.4f : 0); crown.localScale = Vector3.one * CrownScale;
             if (core != null) { core.SetParent(crown, false); core.localPosition = Vector3.zero; }
-            wrap = VoidWrap.Wrap(root, WrapHeight, spider != null ? 2.4f : 1.8f, ground, enemy != null ? enemy.persistentId.GetHashCode() : 7);
+            wrap = VoidWrap.Wrap(root, WrapHeight, spider != null ? SpiderSpan * .35f : 1.8f, ground, enemy != null ? enemy.persistentId.GetHashCode() : 7);   // round her legs' and back's edge
             lastPos = transform.position;
         }
         static Material hideMat;

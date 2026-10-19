@@ -328,7 +328,7 @@ namespace Crulanda.Encounter
             // Reach: 2.6 m across the ground and 1.6 m of height (a wading target sits lower than one on the bank).
             var gap = Victim.transform.position - transform.position; float across = new Vector2(gap.x, gap.z).magnitude;
             // (A Pact spear in a locked wall reaches further: EncounterEnemy.Tricks.)
-            bool inReach = across < 2.6f + TrickReach && Mathf.Abs(gap.y) < 1.6f;
+            bool inReach = across < 2.6f + TrickReach + BodyRadius && Mathf.Abs(gap.y) < 1.6f;   // a big body reaches from its edge (EncounterEnemy.Unraveller)
             // No coasting into (and through) the target after a charge or a lunge out of the grass: stop dead on arrival.
             if (agent.isOnNavMesh && !agent.pathPending && agent.remainingDistance <= agent.stoppingDistance) agent.velocity = Vector3.zero;
             // Evade: a target it cannot reach (swimming, across deep water) for 4 s makes it give up and go home whole.
@@ -414,7 +414,7 @@ namespace Crulanda.Encounter
             if (actor.IsAlive) ControlStruck();   // a hold breaks on damage (EncounterEnemy.Control)
             if (Game) { if (actor.IsAlive) GetComponent<GameAnimal>()?.Bolt(source != null ? source.transform.position : transform.position); }
             else { if (!inFight) struck = true; threat.Add(source.EntityId.Value, actual); if (inFight) ScaleToGroup(); }   // a sim joining mid-fight raises it   // struck: it was hit before it noticed anyone, so sneaking does not quieten its alarm
-            session.FloatText(transform.position, actual.ToString(), new Color(1, .86f, .4f));
+            if (!RaidFloat(actual, source)) session.FloatText(transform.position, actual.ToString(), new Color(1, .86f, .4f));   // a raid boss: yours, and the raid's merged (EncounterEnemy.Unraveller)
         }
         void OnDeath(Health health)
         {

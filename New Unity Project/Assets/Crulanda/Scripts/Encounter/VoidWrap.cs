@@ -9,10 +9,11 @@ namespace Crulanda.Encounter
     /// wrapped in the books' look). CANON, b1 ch.20:119: "towering silhouettes made of shimmering, corrupted aether and screaming void ... no
     /// faces, no discernible limbs, just jagged, shifting forms of absence. Where they stepped, the petrified ash dissolved into
     /// nothingness"; and ch.20:131, "a sudden, jerking displacement of space". GAME-ONLY in its making:
-    /// - the void: a tower of jagged black spikes (thin four-sided shards, leaning out from a core) up to <see cref="Height"/> metres, each
-    ///   shifting a little all the time (turn and stretch on slow noise), so the edge never settles;
-    /// - the aether: the same shards a touch larger behind them in a shimmering violet, so every edge has a corrupted-light rim (readable
-    ///   against the black river at night and the grey setts by day);
+    /// - the void: a thin, translucent, flickering edge of jagged black spikes (thin four-sided shards) round the body's rim, leaning out,
+    ///   none taller than <see cref="Height"/> (the body's height and a half at most), each shifting a little all the time (turn and stretch on
+    ///   slow noise) and now and then gone for a moment, so the edge never settles. The body reads first (Chris, raid 2: "woah too much cant
+    ///   even make out the spider": the first wrap was a seven-metre tower of opaque shards in front of the camera);
+    /// - the aether: the same shards a touch larger behind them in a shimmering violet, so every edge has a corrupted-light rim;
     /// - the ash: grey dust lifting and fading where it stands and more where it moves (a particle system on the ground, by distance);
     /// - the jerk: moved more than 2.5 m in a frame (a blink, a hunt's fall) it leaves a fading afterimage of its shards where it was and
     ///   lands squashed for a tenth of a second;
@@ -22,8 +23,8 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed class VoidWrap : MonoBehaviour
     {
-        public float Height = 7, Radius = 2.2f, Base = -1; public int Shards = 16;
-        public static readonly Color Void = new Color(.02f, .0f, .045f, .93f), Aether = new Color(.62f, .32f, 1f, .5f), Crystal = new Color(.92f, .94f, .97f, .92f), Ash = new Color(.42f, .4f, .44f, .75f);
+        public float Height = 4, Radius = 3, Base = -1; public int Shards = 12;
+        public static readonly Color Void = new Color(.02f, .0f, .045f, .45f), Aether = new Color(.62f, .32f, 1f, .5f), Crystal = new Color(.92f, .94f, .97f, .92f), Ash = new Color(.42f, .4f, .44f, .75f);
         /// <summary>A body's own actor: dead, the wrap goes to crystal.</summary>
         public Crulanda.Gameplay.Actor Owner;
         Transform shardRoot; readonly List<(Transform t, Quaternion rest, Vector3 scale, float seed, Renderer rim, Renderer core)> shards = new List<(Transform, Quaternion, Vector3, float, Renderer, Renderer)>();
@@ -66,12 +67,14 @@ namespace Crulanda.Encounter
             shardRoot = new GameObject("Shards").transform; shardRoot.SetParent(transform, false); shardRoot.localPosition = new Vector3(0, Base, 0);
             for (int i = 0; i < Shards; i++)
             {
-                // The tallest at the middle, shorter and leaning further out toward the edge: a towering, jagged form of absence.
-                float out01 = i == 0 ? 0 : R(.15f, 1), h = Height * Mathf.Lerp(1, .35f, out01) * R(.85f, 1.05f), lean = Mathf.Lerp(4, 38, out01), yaw = R(0, 360);
+                // Round the edge (its legs, its back's rim), evenly about it with a little wander, leaning out; thin; none at the middle and
+                // none over Height (its tip, leaning, stays under it).
+                float yaw = i * 360f / Mathf.Max(1, Shards) + R(-12, 12), lean = R(22, 50), h = Height * R(.3f, .75f);
                 var t = new GameObject("Shard").transform; t.SetParent(shardRoot, false);
-                t.localPosition = Quaternion.Euler(0, yaw, 0) * Vector3.forward * (Radius * .55f * out01);
+                t.localPosition = Quaternion.Euler(0, yaw, 0) * Vector3.forward * (Radius * R(.6f, 1));
                 var rest = Quaternion.Euler(0, yaw, 0) * Quaternion.Euler(lean, R(0, 90), 0);
-                var scale = new Vector3(Mathf.Lerp(.55f, .25f, out01) * R(.8f, 1.2f), h, Mathf.Lerp(.55f, .25f, out01) * R(.8f, 1.2f));
+                float w = R(.1f, .2f);
+                var scale = new Vector3(w, h, w * R(.8f, 1.2f));
                 t.localRotation = rest; t.localScale = scale;
                 var rim = Part(t, "Aether", rimMat, 1.12f); var core = Part(t, "Void", voidMat, 1);
                 shards.Add((t, rest, scale, R(0, 100), rim, core));
@@ -123,8 +126,11 @@ namespace Crulanda.Encounter
                 float n1 = Mathf.PerlinNoise(s.seed, t * .9f) - .5f, n2 = Mathf.PerlinNoise(s.seed + 7, t * 1.3f) - .5f, n3 = Mathf.PerlinNoise(s.seed + 13, t * 2.1f) - .5f;
                 s.t.localRotation = s.rest * Quaternion.Euler(n1 * 14, n2 * 20, n3 * 14);
                 s.t.localScale = new Vector3(s.scale.x * (1 + n2 * .35f + squash * .4f), s.scale.y * (1 + n1 * .18f - squash * .35f), s.scale.z * (1 + n3 * .35f + squash * .4f));
-                float shimmer = .3f + .45f * Mathf.PerlinNoise(s.seed + 3, t * 3.5f);
+                float shimmer = .25f + .4f * Mathf.PerlinNoise(s.seed + 3, t * 3.5f);
                 block.SetColor("_Color", new Color(Aether.r, Aether.g, Aether.b, shimmer)); s.rim.SetPropertyBlock(block);
+                // The flicker: now and then a shard is gone for a moment, its void thinner and thicker as it shifts.
+                bool on = Mathf.PerlinNoise(s.seed + 11, t * 1.7f) > .28f; s.core.enabled = on; s.rim.enabled = on;
+                block.SetColor("_Color", new Color(Void.r, Void.g, Void.b, Void.a * (.6f + .8f * Mathf.PerlinNoise(s.seed + 5, t * 2.4f)))); s.core.SetPropertyBlock(block);
             }
         }
         /// <summary>Where it was, its shards for a third of a second, fading: the jerk through space.</summary>
@@ -139,7 +145,7 @@ namespace Crulanda.Encounter
         {
             crystal = on;
             var c = on ? Crystal : Void;
-            foreach (var s in shards) { block.SetColor("_Color", c); s.core.SetPropertyBlock(block); s.rim.enabled = !on; s.t.localRotation = s.rest; s.t.localScale = s.scale; }
+            foreach (var s in shards) { block.SetColor("_Color", c); s.core.SetPropertyBlock(block); s.core.enabled = true; s.rim.enabled = !on; s.t.localRotation = s.rest; s.t.localScale = s.scale; }
             if (ash != null) { if (on) ash.Stop(true, ParticleSystemStopBehavior.StopEmitting); else ash.Play(); }
         }
         void OnDestroy()

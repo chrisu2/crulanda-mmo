@@ -119,10 +119,10 @@ namespace Crulanda.Tests
             // Her body (play note 256): the spider, the purple crown, the void wrap, about 6-8 m tall, risen out of the water.
             var look = e.GetComponent<UnravellerBody>(); Assert.IsNotNull(look, "her body");
             Assert.IsTrue(look.HasSpider, "the Free Fantasy Spider came in (Resources/Props/fantasySpider)");
-            Assert.IsNotNull(look.Wrap); Assert.AreEqual(16, look.Wrap.ShardCount);
+            Assert.IsNotNull(look.Wrap); Assert.That(look.Wrap.ShardCount, Is.InRange(10, 14));
             var parts = e.GetComponentsInChildren<Renderer>().Where(r => r.enabled && !(r is ParticleSystemRenderer)).ToList();
             var all = parts[0].bounds; foreach (var r in parts) all.Encapsulate(r.bounds);
-            Assert.That(all.size.y, Is.InRange(5.5f, 9f), "about 6-8 m tall: " + all.size.y);
+            Assert.That(all.size.y, Is.InRange(3.5f, UnravellerBody.WrapLimit + 2.5f), "the spider and its crown, the wrap under 1.5 times her: " + all.size.y);
             Assert.That(Mathf.Max(all.size.x, all.size.z), Is.GreaterThan(6f), "legs spread wide");
             Assert.IsNotNull(look.Playing, "a clip playing (idle)");
             Time.timeScale = 4;

@@ -2069,7 +2069,7 @@ namespace Crulanda.Encounter
             if (!InCombat && Time.time > nextSave) { Save(false); nextSave = Time.time + 30; }
             Floating.RemoveAll(f => f.expires < Time.time);
         }
-        public float Distance(EncounterEnemy enemy) { return Vector3.Distance(Player.transform.position, enemy.transform.position); }
+        public float Distance(EncounterEnemy enemy) { return enemy.BodyRadius > 0 ? enemy.EdgeDistance(Player.transform.position) : Vector3.Distance(Player.transform.position, enemy.transform.position); }   // to a big body's edge (the Unraveller)
         public void Select(EncounterEnemy enemy) { Target = enemy; AutoAttack = false; if (enemy != null) { FocusVillager = null; FocusMira = false; FocusSimId = null; FocusMending = false; } }
         // ---------- friendly target (left-click a villager or Mira) ----------
         /// <summary>The villager you clicked (null = none). E talks to the selected friend first when they are in reach.</summary>

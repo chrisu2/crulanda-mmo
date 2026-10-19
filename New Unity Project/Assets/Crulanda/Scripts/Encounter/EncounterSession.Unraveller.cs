@@ -140,7 +140,7 @@ namespace Crulanda.Encounter
             a.gameObject.SetActive(true); e.Initialize(); Enemies.Add(e);
             e.MakeRaidBoss(Unraveller.RaidSize);
             a.transform.localScale = Vector3.one * Unraveller.Scale;
-            UnravellerBody.Dress(e);   // the spider, the purple crown, the void wrap (Chris, play note 256)
+            UnravellerBody.Dress(e); e.BodyRadius = UnravellerBody.BodyRadius;   // the spider, the purple crown, the void wrap (Chris, play note 256)
             a.Stats.SetBase(StatType.MaxHealth, Unraveller.HealthPool);
             a.Health.ApplyHealing(a.Health.Pool.Max);
             e.HitBase = UnravellerTuning.Current.hitBase;   // the data file's (Unraveller.HitBase its default)

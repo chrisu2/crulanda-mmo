@@ -42,6 +42,7 @@
   "feedGrow": 0.02,
   "interruptImmune": 10,
 
+  "broodEvery1": 0,
   "broodEvery2": 30,
   "broodEvery3": 40,
   "broodCount": 2,

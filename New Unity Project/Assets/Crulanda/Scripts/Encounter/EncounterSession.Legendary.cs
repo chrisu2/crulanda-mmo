@@ -95,6 +95,7 @@ namespace Crulanda.Encounter
         /// <summary>Each frame: the Anchor and Exist Elsewhere (read off your health as it falls), and the sunfire patches burning.</summary>
         void TickLegend()
         {
+            TickTynara();
             if (Player == null || Legend == null) return;
             float ratio = Player.IsAlive ? Player.Health.Pool.Ratio : 0;
             if (legendLastRatio >= 0 && Player.IsAlive && ratio < legendLastRatio)
@@ -156,6 +157,18 @@ namespace Crulanda.Encounter
         }
 
         // ---------- Tynara Embercoil's night forge ----------
+        float tynaraAt; int tynaraOut = -1;
+        /// <summary>Every two seconds: Tynara at her forge from nine at night to six in the morning, gone by day (as the Night Market's keepers).</summary>
+        void TickTynara()
+        {
+            if (Time.time < tynaraAt || Zone == null) return; tynaraAt = Time.time + 2;
+            var life = VillageLife.Active; if (life == null) return;
+            var v = life.Find(LegendaryWeapons.Smith); if (v == null) return;
+            int open = LegendaryWeapons.ForgeOpen(Crulanda.World.WorldClock.Hour) ? 1 : 0; if (open == tynaraOut) return;
+            var r = Zone.Zone.life != null && Zone.Zone.life.residents != null ? System.Array.Find(Zone.Zone.life.residents, x => x != null && x.name == LegendaryWeapons.Smith) : null;
+            if (open == 0) v.Park(); else if (tynaraOut >= 0 && r != null) v.Release(Zone.Ground(r.at));
+            tynaraOut = open;
+        }
         public const string TynaraNight = "By day I work for the Council's forges. After nine the forge is mine. Come back then.";
         public const string TynaraForged = "She lays the crystal in the fire and her hands move over the glass without touching it. It comes out pale, and asleep.";
         public const string TynaraWoken = "She sets the note against the seam and the crystal in it lights from the inside. It is awake.";

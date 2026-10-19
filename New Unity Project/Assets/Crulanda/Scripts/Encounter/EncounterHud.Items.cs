@@ -80,7 +80,7 @@ namespace Crulanda.Encounter
             if (d == null) return;
             var lines = new List<string>();
             if (d.kind == "gear") lines.Add(ItemDatabase.SlotNames[ItemDatabase.SlotIndex(d.slot)] + "  ·  " + ItemDatabase.QualityNames[Mathf.Clamp(d.quality, 0, ItemDatabase.MaxQuality)]);
-            else lines.Add(d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.kind == "bag" ? "Trade bag" : d.kind == "recipe" ? "Recipe leaf" : Consumables.KindWord(d));
+            else lines.Add(d.kind == "junk" ? "Junk" : Inventory.IsHide(d) ? "Hide" : d.kind == "material" ? "Crafting material" : d.kind == "tool" ? "Tool" : d.kind == "bag" ? "Trade bag" : d.kind == "recipe" ? "Recipe leaf" : d.kind == ComponentBag.Kind ? "Legendary piece  ·  bound" : Consumables.KindWord(d));
             var stats = ItemDatabase.StatLines(d); if (stats.Length > 0) lines.Add(stats);
             if (d.kind == "recipe") lines.Add(LeafLine(d));
             if (d.kind == "bag")
@@ -90,11 +90,12 @@ namespace Crulanda.Encounter
             var holder = string.IsNullOrEmpty(d.pouch) ? null : Inventory.BagFor(session.Items, d.pouch);
             if (holder != null) lines.Add("Goes in " + Article(holder.name) + " " + LowerFirst(holder.name) + ".");
             var named = LootLines(d); if (named != null) lines.Add(named);
+            var stage = LegendaryWeapons.StageLine(session.Progress, d.id); if (stage != null) lines.Add((LegendaryWeapons.IsAwake(session.Progress, d.id) ? "<color=#ff9a30>" : "<color=#8a8a8a>") + stage + "</color>");   // asleep greyed, awake legendary (WORLD_BOSS_1.md 4.6)
             if (!string.IsNullOrEmpty(d.classOnly))   // a class set's piece (loot DESIGN.md 3.8): red when it is not your class
             { bool yours = Inventory.ClassMayWear(d, session.Progress.classId); lines.Add((yours ? "" : "<color=#ff5544>") + "Class: " + SimRoster.ClassName(d.classOnly) + (yours ? "" : "</color>")); }
             if (d.level > 1) lines.Add((d.level > session.Progress.Level ? "<color=#ff5544>" : "") + "Requires level " + d.level + (d.level > session.Progress.Level ? "</color>" : ""));
             if (!string.IsNullOrEmpty(d.description)) lines.Add("<i>" + d.description + "</i>");
-            lines.Add("Sells for " + Charm.Pay(session.Progress, d.value) + " crowns");   // the Scoundrel's charm (Charm.cs)
+            lines.Add(ComponentBag.IsComponent(d) ? "Kept in your Legendary pieces: never sold or traded" : "Sells for " + Charm.Pay(session.Progress, d.value) + " crowns");   // the Scoundrel's charm (Charm.cs)
             if (compare && d.kind == "gear")
             {
                 var worn = session.Progress.equipment[ItemDatabase.SlotIndex(d.slot)];
@@ -145,6 +146,8 @@ namespace Crulanda.Encounter
             bagsExtra = extra; var w = BagsRect;
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(.3f, .22f, .12f, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
             Shadow(new Rect(w.x + 14, w.y + 8, 200, 28), "BAGS", heading, gold);
+            if (GUI.Button(new Rect(w.x + 82, w.y + 10, 70, 22), legendTab ? "Bags" : "Legendary", micro)) legendTab = !legendTab;   // the component bag (EncounterHud.Legendary)
+            if (legendTab) { DrawLegendTab(w); return; }
             Shadow(new Rect(w.x + 150, w.y + 12, 210, 24), p.gold + " crowns  ·  " + Inventory.FreeSlots(p) + " free", text, new Color(1, .86f, .4f));
             var e = Event.current; var mouse = e.mousePosition;
             for (int i = 0; i < p.bag.Count && i < Inventory.BagSize; i++)

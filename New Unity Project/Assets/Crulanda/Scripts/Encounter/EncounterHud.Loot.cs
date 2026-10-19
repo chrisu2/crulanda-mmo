@@ -81,7 +81,7 @@ namespace Crulanda.Encounter
             int best = session.BestQuality(items); var edge = best >= 2 ? LootBeacon.Colour(best) * .8f : new Color(.3f, .22f, .12f);
             Fill(new Rect(w.x - 3, w.y - 3, w.width + 6, w.height + 6), new Color(edge.r, edge.g, edge.b, .98f)); Fill(w, new Color(.08f, .075f, .07f, .97f));
             Shadow(new Rect(w.x + 14, w.y + 8, w.width - 28, 24), body != null ? body.actor.DisplayName : "Loot", lootTitle, gold);
-            Shadow(new Rect(w.x + 14, w.y + 30, w.width - 28, 20), "Click a row to take it", lootSub, new Color(.7f, .66f, .58f));
+            Shadow(new Rect(w.x + 14, w.y + 30, w.width - 28, 20), body != null && body.RaidBoss ? session.LegendCounters : "Click a row to take it", lootSub, new Color(.7f, .66f, .58f));   // her body: your counters (WORLD_BOSS_1.md 4.4)
             var e = Event.current; var mouse = e.mousePosition; float y = w.y + LootTop;
             if (coins > 0)
             {

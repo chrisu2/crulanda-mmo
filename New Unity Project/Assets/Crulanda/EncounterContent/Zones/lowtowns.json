@@ -6768,6 +6768,22 @@
           "Everything on my boat fell off something. Off a wagon, off a barge, off a dead man. Nobody up there misses it enough to come down here.",
           "Hear that? Water on a hull. Some nights a crew sings coming up the canal, old sea songs nobody down here has any business knowing. The Teeth keep the pier. I pay them, they stand there looking like teeth. Don't start anything on my planks."
         ]
+      },
+      {
+        "name": "Tynara Embercoil",
+        "role": "stranger",
+        "title": "Smith of the night forge",
+        "at": {
+          "x": 197.5,
+          "y": -14
+        },
+        "facing": 270,
+        "canonStatus": "CANON-EXPANDED: Tynara Embercoil, Forgeborn, who can telekinetically manipulate metal (book1 world_bible.md:31; world_bible.md:36); she serves the Spoke's works by day (book1 ch.2:7) and by book 3 is 'tired of iron' (book3 ch.1:74). Her night forge and what she remakes there: GAME-ONLY (WORLD_BOSS_1.md 4.6)",
+        "stories": [
+          "By day I work the Council's forges. At night the fire is mine, and so is what I put in it.",
+          "Bring me what the river could not eat and the crystal that held her, and I'll give it back its shape. Salt's in the crystal. Nothing unmakes it twice.",
+          "The Spoke eats too. Slower than she does, and with paperwork. I'd rather feed my own fire."
+        ]
       }
     ],
     "households": [
@@ -7560,6 +7576,16 @@
       },
       "rotation": 200,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "kind": "forge",
+      "name": "Tynara's night forge",
+      "at": {
+        "x": 201,
+        "y": -14
+      },
+      "rotation": 270,
+      "canonStatus": "CANON-EXPANDED: Tynara Embercoil, Forgeborn, shapes metal by will (book1 world_bible.md:31); her night forge by the Forge District's wall at its gate (the Rust Market against the walls, book1 ch.3:5-7) is GAME-ONLY, until the Forge District opens and it moves inside the gate (WORLD_BOSS_1.md 4.6)"
     }
   ],
   "shoals": [

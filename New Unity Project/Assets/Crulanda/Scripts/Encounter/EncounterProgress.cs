@@ -79,6 +79,13 @@ namespace Crulanda.Encounter
         public List<string> questItems = new List<string>();
         /// <summary>One-shot interactables already emptied ("zone|name|x|z"), e.g. a crate you took the iron from.</summary>
         public List<string> usedInteractables = new List<string>();
+        // ---------- the legendary pieces (save format 12; older saves load with both empty; before the lockouts, so payloads still end as they did and the recipes still come before the discoveries) ----------
+        /// <summary>The component bag (WORLD_BOSS_1.md 5.1; ComponentBag): the Brood-Crystals, the class's uneaten blank, the Heart, the Verses
+        /// and the Note, by id and count, outside the bags (no slot; the bags' Legendary tab).</summary>
+        public List<ItemStack> components = new List<ItemStack>();
+        /// <summary>The bad-luck counters (UnravellerLoot): source = the component's id, kills = her kills it was rolled on, dry = the kills
+        /// in a row without it (never more than five: the sixth is certain).</summary>
+        public List<LootLuck> componentLuck = new List<LootLuck>();
         // ---------- lockouts (save format 11, with the found recipes; older saves load with this empty; here, not at the end, so payloads still end as they did) ----------
         /// <summary>The bosses and elites killed and not yet to be looted again (Chris, 2026-10-15: "bosses/elites will not respawn"): each
         /// one's key and when its lockout ends, as UTC ticks (Lockouts; run-out ones are dropped as the session goes).</summary>
@@ -87,13 +94,6 @@ namespace Crulanda.Encounter
         /// <summary>The found recipes learned from a leaf, by recipe id, in the order learned (Phase 8.6 step 5). Taught recipes are not
         /// listed: they follow from the skill. See ProfessionLog.UseLeaf.</summary>
         public List<string> recipes = new List<string>();
-        // ---------- the legendary pieces (save format 12; older saves load with both empty; here, not at the end, so payloads still end as they did) ----------
-        /// <summary>The component bag (WORLD_BOSS_1.md 5.1; ComponentBag): the Brood-Crystals, the class's uneaten blank, the Heart, the Verses
-        /// and the Note, by id and count, outside the bags (no slot; the bags' Legendary tab).</summary>
-        public List<ItemStack> components = new List<ItemStack>();
-        /// <summary>The bad-luck counters (UnravellerLoot): source = the component's id, kills = her kills it was rolled on, dry = the kills
-        /// in a row without it (never more than five: the sixth is certain).</summary>
-        public List<LootLuck> componentLuck = new List<LootLuck>();
         // ---------- discoveries (save format 7; older saves load with this empty) ----------
         /// <summary>Hidden finds already found, by id ("secret.&lt;zone&gt;.&lt;slug&gt;"): each pays out once, ever. See DiscoveryLog.</summary>
         public List<string> discoveries = new List<string>();

@@ -151,7 +151,7 @@ namespace Crulanda.Tests
                 p.lockouts.Add(new Lockout { id = "mob.lusk.adit.5", until = 9 }); p.lockouts.Add(new Lockout { id = "mob.unknown.fakeraid.2", until = At(22, 6).Ticks });
                 var save = new EncounterSave(root, TestTalents.Warrior()); save.Write(p);
                 Assert.IsTrue(new SaveFileStore(root).TryRead("encounter", out var envelope, out _));
-                Assert.AreEqual(11, envelope.formatVersion, "format 11, with the recipes: no twelfth");
+                Assert.AreEqual(EncounterSave.FormatVersion, envelope.formatVersion, "the current format (11 had the recipes and the lockouts together; 12 the component bag)");
                 StringAssert.Contains("\"lockouts\":[{\"id\":\"mob.lusk.adit.5\",\"until\":" + At(17, 6).Ticks + "}", envelope.payloadJson, "UTC ticks");
                 StringAssert.Contains("],\"recipes\":[],\"discoveries\":[]", envelope.payloadJson, "before the recipes, so the recipes still come before the discoveries");
                 StringAssert.EndsWith("\"lootLuck\":[]}", envelope.payloadJson, "a payload still ends as it did");
@@ -170,7 +170,7 @@ namespace Crulanda.Tests
         /// owner's format-10 save loads with both empty and everything else as it was, and a format-11 payload needs nothing from it.</summary>
         [Test] public void A_format_10_save_migrates_to_11_with_the_lockouts()
         {
-            var step = new AddRecipesMigration(); Assert.AreEqual(10, step.FromVersion); Assert.AreEqual(11, step.ToVersion); Assert.AreEqual(11, EncounterSave.FormatVersion);
+            var step = new AddRecipesMigration(); Assert.AreEqual(10, step.FromVersion); Assert.AreEqual(11, step.ToVersion); Assert.GreaterOrEqual(EncounterSave.FormatVersion, 11);
             string v10 = new SteeperCurveMigration().Migrate(new AddArmouryMigration().Migrate(OwnerSaveFixtures.V8Payload)), v11 = step.Migrate(v10);
             Assert.AreEqual(v10.Substring(0, v10.Length - 1) + ",\"recipes\":[],\"lockouts\":[]}", v11, "every character of the v10 payload kept");
             Assert.AreEqual(v11, step.Migrate(v11));

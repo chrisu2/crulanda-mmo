@@ -906,3 +906,5 @@ un-captures.
   blink on and off randomly" and "ground damage should be increased" (OPEN): her purple crown smaller, flickering in and out at
   random; the grey ground hits harder.
 - 265 (2026-10-19 ~15:25, watching raid 4) "more brood per wave..need CC baby" (OPEN): bigger brood waves that crowd control must hold.
+  Then (verbatim): "once they are cc they need to be killed systematically or they will break and eventually kill the raid" (a kill
+  order on the held brood; holds break; a raid that lets them run out is overrun).

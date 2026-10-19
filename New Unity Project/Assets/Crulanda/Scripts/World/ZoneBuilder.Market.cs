@@ -23,7 +23,7 @@ namespace Crulanda.World
             ("plate large", "Fantasy2/plate_001", .07f, false), ("plate small", "Fantasy2/plate_002", .07f, false), ("plate", "Fantasy2/plate_003", .07f, false),
             ("sack", "Fantasy2/bag_001", .57f, false), ("sack 2", "Fantasy2/bag_002", .57f, false), ("sack 3", "Fantasy2/bag_003", .57f, false), ("sack 4", "Fantasy2/bag_004", .57f, false),
             ("box", "Fantasy2/box_001", .54f, false), ("box flat", "Fantasy2/box_001_001", .34f, false), ("tray", "Fantasy2/box_002", .17f, false), ("box low", "Fantasy2/box_003", .32f, false),
-            ("bucket", "Fantasy2/bucket_001", .48f, false), ("barrel", "Fantasy2/barrel_001", .73f, true), ("hanging frame", "Fantasy2/holder_001", 2.01f, true), ("signpost", "Fantasy2/pointer_001", 2.17f, true),
+            ("bucket", "Fantasy2/bucket_001", .48f, false), ("barrel", WoodBarrelPath, .73f, true), ("hanging frame", "Fantasy2/holder_001", 2.01f, true), ("signpost", "Fantasy2/pointer_001", 2.17f, true),
             ("log store", "Fantasy2/log_001", 1.81f, true), ("stump", "Fantasy2/log_002", .74f, false), ("log", "Fantasy2/log_003", .32f, false), ("logs", "Fantasy2/log_004", .54f, false),
             ("hand cart", "Fantasy2/cart_001", 1.16f, true),
         };

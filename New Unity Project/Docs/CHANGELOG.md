@@ -1,5 +1,28 @@
 # Changelog
 
+## 2026-10-19: every wooden barrel is the Simple Wood Barrel (branch wood-barrel; WRITTEN, NOT RUN)
+- Chris (play note 247): "replace all wooden barrels with this in myassets . simple wood barrel". Compiles; nothing run in Unity, no
+  captures yet.
+- **The model**: Kraken XR's Simple Wood Barrel (Asset Store EULA) in `Resources/Props/WoodBarrel` (the FBX and its three maps, the
+  package's own GUIDs; not its prefab or sample scene). Its own material is swapped for `WoodBarrel.mat` (Built-in Standard: albedo,
+  normal, metallic-smoothness); the 4096 px maps are capped at 1024 by `ThirdPartyImport`. The file's node is turned half round, so the
+  game drops that turn and stands it on its foot. 1.0 m tall, 0.68 across in the file.
+- **Where it stands now** (each at the height the old one stood): every `ZoneBuilder.Barrel` (inn fronts, bars and the city inn, yards,
+  the smithy, the cook's and the simpler's shops, the Crown court's goods, Hallow's Creek yards, the training yard, workshops, the forge
+  node's water cask, the "barrels" props of six zones), the market stalls' barrel and the market pack's barrel piece, the simpler's
+  spirit cask (was the Medieval beer barrel), the Adit's camp, Foreman's and platform barrels (were the Dungeon kit's), the Adit's two
+  powder kegs, the Store Caves' desk (a plank on two barrels) and the camp chamber's barrels, the Lowtowns' street clutter, the Rusty
+  Spoon's tap-casks on the bar (on their sides), its ale casks and water butt, its dice-pit kegs (.44 m: the seats stay at their height)
+  and its cask table, Tolley's water tower's tank (fitted to the old 2.4 x 2.6 m), Crowsfoot Hollow's barrel of apples (now the barrel
+  with apples heaped on its head) and Hallow's Creek's cellar barrel rack (a timber cradle with the barrel lying on it).
+- **Kept as they were**: the Golden Cask's sign (a gilded cask, a painted emblem, not a barrel); the dyers' vats; the salt-cask shield.
+  The painted barrel stays only as the fallback when the model is missing. The old barrel models stay in their packs, unused.
+- Tests (`WoodBarrelTests`, EditMode): no old barrel model is named in the code; the barrel loads, stands .95 m on its foot, upright;
+  its material is Built-in Standard with the three maps, each capped at 1024; the pit kegs' tops are at the seat height (.44).
+- To check in game (captures front, back, side): the Golden Cask's front barrels and bar (Oakhaven); Oakhaven's market stalls; the Lowtowns'
+  barrels; the Adit camp's barrels and the powder kegs; the Rusty Spoon's bar casks, dice pit (sit on a keg) and cask table; the
+  Lowtowns' street clutter and the water tower; Crowsfoot's apple barrel and Hallow's Creek's cellar rack.
+
 ## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
 - The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'
   foods in dungeons, inns and markets; every inn sitter on a real seat; window frames and a hearth at the Golden Cask and the Cracked

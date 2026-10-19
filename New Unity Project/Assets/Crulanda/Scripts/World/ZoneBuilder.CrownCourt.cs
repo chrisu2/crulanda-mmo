@@ -475,7 +475,7 @@ namespace Crulanda.World
                     });
                     Rod(t, new Vector3(-w / 2 + .4f, 2.35f, -1.7f), new Vector3(-.2f, 2.35f, -1.7f), .04f, oak);
                     for (int k = 0; k < 6; k++) HerbBundle(t, new Vector3(-w / 2 + .6f + k * .4f, 2.33f, -1.7f), k + r.Next(3), .9f);
-                    if (ModelProp(t, "Medieval/Prefabs/BeerBarrelV1", new Vector3(-w / 2 + .65f, .04f, -1.35f), 90, .8f) == null) Barrel(t, new Vector3(-w / 2 + .65f, .04f, -1.35f), .8f);
+                    if (ModelProp(t, WoodBarrelPath, new Vector3(-w / 2 + .65f, .04f, -1.35f), 90, .8f) == null) Barrel(t, new Vector3(-w / 2 + .65f, .04f, -1.35f), .8f);   // the wood barrel (play note 247), .8 m as the beer barrel stood
                     Blocker(t, new Vector3(-w / 2 + .65f, .4f, -1.35f), new Vector3(.75f, .8f, .75f));
                     break;
                 }

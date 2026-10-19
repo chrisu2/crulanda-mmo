@@ -917,12 +917,16 @@ namespace Crulanda.World
                     foreach (int sy in new[] { -1, 1 }) Box(batten, c + turn * new Vector3(0, sy * s * .42f, 0), new Vector3(s + .03f, s * .1f, s + .03f), turn);
                 }
             }
+            // The barrels are the wood barrel (play note 247, 2026-10-19), .91 m as the painted ones stood, joined into the clutter's mesh.
+            var cask = WoodBarrelMesh; var caskWood = WoodBarrelMaterial;
             void Barrels(Vector3 at, Quaternion q)
             {
                 int n = 1 + (int)(R() * 3);
                 for (int i = 0; i < n; i++)
                 {
                     var c = at + q * new Vector3((i - (n - 1) / 2f) * .72f, 0, (i % 2) * .3f - .15f);
+                    float turn = (c.x * 37 + c.z * 53 + i * 70) % 360;   // not from R: the clutter after it stays where it was
+                    if (cask != null && caskWood != null) { parts.AddMesh(cask, caskWood, WoodBarrelFit(cask, c, Quaternion.Euler(0, turn, 0), .91f)); continue; }
                     Shape(cyl, stave, c + Vector3.up * .45f, new Vector3(.62f, .45f, .62f), Quaternion.identity);
                     foreach (float y in new[] { .16f, .74f }) Shape(cyl, SootIron, c + Vector3.up * y, new Vector3(.655f, .025f, .655f), Quaternion.identity);
                     Shape(cyl, batten, c + Vector3.up * .905f, new Vector3(.56f, .01f, .56f), Quaternion.identity);

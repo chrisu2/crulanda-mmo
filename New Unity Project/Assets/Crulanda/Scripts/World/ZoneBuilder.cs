@@ -2784,11 +2784,14 @@ namespace Crulanda.World
             var mesh = PropMesh("Post " + w + "x" + h, () => Turned(new[] { new Vector2(r * 1.16f, 0), new Vector2(r, .22f), new Vector2(r * .94f, top - r * 1.5f), new Vector2(r * 1.3f, top - r * 1.3f), new Vector2(r * 1.3f, top - r * .45f), new Vector2(r * .85f, top - r * .1f), new Vector2(0, top) }, 6));
             return MeshPart(mesh, t, foot, m, rot);
         }
-        /// <summary>A coopered barrel standing on <paramref name="foot"/>, a metre tall and .72 across the bilge at size 1: bulged staves, a recessed head and three iron hoops.</summary>
+        /// <summary>A wooden barrel standing on <paramref name="foot"/>, .95 m tall at size 1: the Simple Wood Barrel (play note 247,
+        /// 2026-10-19; <see cref="WoodBarrelPath"/>), at the height the Fantasy kit's barrel stood. <paramref name="painted"/> (the inn sign's
+        /// gilded cask, recoloured and turned) and a scene without the model take the painted one: a metre tall and .72 across the bilge at
+        /// size 1, bulged staves, a recessed head and three iron hoops.</summary>
         GameObject Barrel(Transform t, Vector3 foot, float size = 1, float yaw = 0, bool painted = false)
         {
-            if (!painted) { var model = ModelProp(t, "Fantasy/Barrel", foot, yaw, .95f * size); if (model != null) return model; }   // the kit's barrel (2026-10-07), the painted one when the kit is not there
-            var mesh = PropMesh("Barrel", () => TwoTone(
+            if (!painted) { var model = ModelProp(t, WoodBarrelPath, foot, yaw, .95f * size); if (model != null) return model; }
+            var mesh = PropMesh("Coopered barrel", () => TwoTone(
                 Turned(new[] { new Vector2(0, 0), new Vector2(.3f, 0), new Vector2(.345f, .28f), new Vector2(.36f, .5f), new Vector2(.345f, .72f), new Vector2(.3f, 1), new Vector2(.27f, 1), new Vector2(.27f, .95f), new Vector2(0, .95f) }, 12),
                 Joined(Piece(Turned(new[] { new Vector2(.315f, .12f), new Vector2(.335f, .12f), new Vector2(.348f, .2f), new Vector2(.328f, .2f) }, 12)),
                     Piece(Turned(new[] { new Vector2(.355f, .46f), new Vector2(.376f, .46f), new Vector2(.376f, .54f), new Vector2(.355f, .54f) }, 12)),
@@ -3904,9 +3907,9 @@ namespace Crulanda.World
         void Stall(Transform t, int variant)
         {
             bool hide = variant == 3;
-            // The kit's crates of apples and carrots in front of a produce stall, a barrel by the others (2026-10-07).
+            // The kit's crates of apples and carrots in front of a produce stall, a barrel by the others (2026-10-07; the wood barrel, note 247).
             if (!hide && Mathf.Abs(variant) % 3 == 0) { GroundProp(t, "Fantasy/FarmCrate_Apple", new Vector3(-1.05f, 0, -1.35f), 14, .34f); GroundProp(t, "Fantasy/FarmCrate_Carrot", new Vector3(-.4f, 0, -1.4f), -9, .34f); }
-            else if (!hide) GroundProp(t, "Fantasy/Barrel", new Vector3(1.75f, 0, -.3f), 30, .95f);
+            else if (!hide) GroundProp(t, WoodBarrelPath, new Vector3(1.75f, 0, -.3f), 30, .95f);
             var colors = hide ? new[] { new Color(.56f, .43f, .29f), new Color(.64f, .52f, .36f) } : Awnings[Mathf.Abs(variant) % Awnings.Length];
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                 if (hide) Part(PrimitiveType.Cylinder, t, new Vector3(sx * 1.4f, sz > 0 ? 1.25f : 1.1f, sz * .9f), new Vector3(.13f, sz > 0 ? 1.25f : 1.1f, .13f), Bone);
@@ -4900,7 +4903,8 @@ namespace Crulanda.World
             for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, t, new Vector3(4.4f + (k % 2) * .7f, FloorY(4.6f, 9.8f) + .35f, 9.5f + k * .45f), new Vector3(.8f, .7f, .7f), sack, Quaternion.Euler(0, k * 40, k * 8));
             Part(PrimitiveType.Sphere, t, new Vector3(3.6f, FloorY(3.6f, 9.4f) + .12f, 9.4f), new Vector3(1.1f, .22f, .8f), Tint(art.hay, new Color(.8f, .72f, .5f)));   // spilt grain
             for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, t, new Vector3(-3.9f + (k == 2 ? .45f : k * .9f), FloorY(-3.5f, 15.6f) + (k == 2 ? 1.35f : .45f), 15.6f), Vector3.one * .9f, crate, Quaternion.Euler(0, 12, 0));
-            for (int k = 0; k < 2; k++) Part(PrimitiveType.Cylinder, t, new Vector3(5.1f, FloorY(5.1f, 13.6f) + .5f, 13.2f + k * .8f), new Vector3(.7f, .5f, .7f), wood);
+            for (int k = 0; k < 2; k++)   // two barrels, a metre tall (the wood barrel, play note 247), else painted
+                if (ModelProp(t, WoodBarrelPath, new Vector3(5.1f, FloorY(5.1f, 13.6f), 13.2f + k * .8f), k * 75, 1) == null) Part(PrimitiveType.Cylinder, t, new Vector3(5.1f, FloorY(5.1f, 13.6f) + .5f, 13.2f + k * .8f), new Vector3(.7f, .5f, .7f), wood);
             Banner(t, new Vector3(-4.6f, FloorY(-4.6f, 9.8f), 9.8f), 20, sand, wood, 2.9f);
             // The low passage: a dropped sack, a spent torch.
             Part(PrimitiveType.Sphere, t, new Vector3(-7.4f, FloorY(-7.4f, 20.6f) + .3f, 20.6f), new Vector3(.7f, .55f, .6f), sack, Quaternion.Euler(0, 30, 20));
@@ -4956,7 +4960,8 @@ namespace Crulanda.World
                     KeepClear(t, at + q0 * new Vector3(0, 0, .5f), 1.2f);   // the stack and its sack
                 }
                 var desk = On(s0 + 1.5f, -h.Half[store] * .45f); KeepClear(t, desk, 1.3f);
-                foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(b * .7f, .45f, 0), new Vector3(.55f, .45f, .55f), wood);
+                foreach (int b in new[] { -1, 1 })   // the two barrels (the wood barrel, note 247; .9 m, the plank's height), else painted ones
+                    if (ModelProp(t, WoodBarrelPath, desk + q0 * new Vector3(b * .7f, 0, 0), q0.eulerAngles.y + b * 35, .9f) == null) Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(b * .7f, .45f, 0), new Vector3(.55f, .45f, .55f), wood);
                 Part(PrimitiveType.Cube, t, desk + Vector3.up * .95f, new Vector3(2, .08f, .8f), wood, q0);
                 Part(PrimitiveType.Cube, t, desk + q0 * new Vector3(-.3f, 1.03f, 0), new Vector3(.4f, .06f, .3f), Tint(art.cloth, new Color(.4f, .22f, .14f)), q0 * Quaternion.Euler(0, 8, 0));   // the ledger
                 Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(.5f, 1.1f, .1f), new Vector3(.06f, .08f, .06f), Tint(art.plaster, new Color(.9f, .86f, .75f)));   // a candle

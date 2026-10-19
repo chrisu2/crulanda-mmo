@@ -409,9 +409,15 @@ namespace Crulanda.World
                 b.Box(timber, (p + q) / 2, new Vector3(.1f, .1f, (q - p).magnitude), Quaternion.LookRotation(q - p));
             }
             b.Box(timber, tower.TransformPoint(new Vector3(0, floorY, 0)), new Vector3(2.8f, .16f, 3.1f), tower.rotation);
-            // The barrel: staves, three iron hoops, a shallow cone of a lid.
-            var tank = Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 1.4f, 0), new Vector3(2.4f, 1.3f, 2.4f), staves); tank.name = "The tank";
-            foreach (float y in new[] { .35f, 1.4f, 2.45f }) Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + y, 0), new Vector3(2.46f, .05f, 2.46f), iron);
+            // The barrel: the wood barrel (play note 247, 2026-10-19) fitted to the old tank, 2.6 m tall and 2.4 across (a squat butt);
+            // else staves and three iron hoops. A shallow cone of a lid.
+            var tank = ModelProp(tower, WoodBarrelPath, new Vector3(0, floorY + .1f, 0), 0, 2.6f, false, null, new Vector3(2.4f, 2.6f, 2.4f));
+            if (tank == null)
+            {
+                tank = Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 1.4f, 0), new Vector3(2.4f, 1.3f, 2.4f), staves);
+                foreach (float y in new[] { .35f, 1.4f, 2.45f }) Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + y, 0), new Vector3(2.46f, .05f, 2.46f), iron);
+            }
+            tank.name = "The tank";
             Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 2.78f, 0), new Vector3(2.6f, .06f, 2.6f), timber);
             Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 2.95f, 0), new Vector3(1.6f, .12f, 1.6f), timber);
             Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 3.1f, 0), new Vector3(.7f, .1f, .7f), timber);

@@ -21,8 +21,10 @@ namespace Crulanda.World
         public struct Piece
         {
             public string path, anchor; public float height, x, y, z, yaw; public Place place; public bool solid;
+            /// <summary>For the wood barrel: <see cref="BarrelApples"/> or <see cref="BarrelRack"/>, else null (the model as it is).</summary>
+            public string dress;
             public Piece(string path, float height, string anchor, float x, float z, float yaw = 0, Place place = Place.Floor, float y = 0, bool solid = false)
-            { this.path = path; this.height = height; this.anchor = anchor; this.x = x; this.z = z; this.yaw = yaw; this.place = place; this.y = y; this.solid = solid; }
+            { this.path = path; this.height = height; this.anchor = anchor; this.x = x; this.z = z; this.yaw = yaw; this.place = place; this.y = y; this.solid = solid; dress = null; }
         }
         /// <summary>A cave's floor pieces keep out of the middle of the passage: |x| at least this share of the half-width.</summary>
         public const float CaveWay = .55f;
@@ -31,6 +33,12 @@ namespace Crulanda.World
         static Piece S(string kit, float h, string a, float x, float z, float yaw = 0) { return new Piece("Fantasy/" + kit, h, a, x, z, yaw, Place.Floor, 0, true); }
         static Piece W(string kit, float h, string a, float x, float z, float up) { return new Piece("Fantasy/" + kit, h, a, x, z, 0, Place.Wall, up); }
         static Piece T(string kit, float h, string a, float x, float z, float up, float yaw = 0) { return new Piece("Fantasy/" + kit, h, a, x, z, yaw, Place.Top, up); }
+        /// <summary>The kit's barrel pieces are the wood barrel now (play note 247, 2026-10-19: every wooden barrel the Simple Wood Barrel):
+        /// "apples", its head heaped with apples (the kit's apple barrel, .9 m to the apples' top); "rack", lying on a timber cradle (the
+        /// kit's barrel holder, 1.2 m to the barrel's top). ZoneBuilder.DressingProp builds them.</summary>
+        public const string BarrelApples = "apples", BarrelRack = "rack";
+        static Piece B(string dress, float h, string a, float x, float z, float yaw = 0, bool solid = false)
+        { var p = new Piece(ZoneBuilder.WoodBarrelPath, h, a, x, z, yaw, Place.Floor, 0, solid); p.dress = dress; return p; }
         static Piece Food(string n, string a, float x, float z, float yaw = 0) { return new Piece("Food/" + n, FoodModels.LifeHeight(n), a, x, z, yaw); }
 
         public static readonly Dictionary<string, Piece[]> Caves = new Dictionary<string, Piece[]> {
@@ -40,7 +48,7 @@ namespace Crulanda.World
                 Food("CookingPot", "camp", .72f, -1.8f), Food("FryingPan", "camp", .74f, -1.1f, 40), Food("Sausage_Raw", "camp", .7f, -.6f, 15),
                 P("Bag", .55f, "camp", -.78f, 2.4f, 30), P("Rope_2", .06f, "camp", .76f, 2.6f), P("Bucket_Wooden_1", .3f, "camp", .8f, -2.6f),
                 S("WeaponStand", 1.1f, "camp", -.82f, -2.8f, 90), P("Shield_Wooden", .6f, "camp", -.78f, -1.9f, 80),
-                P("Barrel_Apples", .9f, "store", .8f, 3.6f), P("Pickaxe_Bronze", 1.0f, "store", -.78f, -3.4f, 10),
+                B(BarrelApples, .9f, "store", .8f, 3.6f), P("Pickaxe_Bronze", 1.0f, "store", -.78f, -3.4f, 10),
                 S("Cage_Small", .85f, "hall", .78f, -6.5f, 15), P("Chain_Coil", .08f, "hall", .74f, -5.2f), P("Bucket_Wooden_1", .3f, "hall", .8f, -7.6f),
             } },
             // The Root-Mother's Deep: the Keepers' offerings, earthenware and candles at the walls, sap in stoppered vials by the Heart, grey caps.
@@ -67,7 +75,7 @@ namespace Crulanda.World
             { "quiet", new[] { P("Pickaxe_Bronze", 1.0f, "", .8f, .5f, 30), P("Pot_1", .2f, "", -.78f, .55f), Food("Bread_Slice", "", -.76f, .58f, 20), W("Lantern_Wall", .55f, "", -.9f, .4f, 1.5f) } },
             // Hallow's Creek's cellars: the town's stores, stopped as the town stopped.
             { "cellar", new[] {
-                Food("Jar_Large", "", .8f, .3f), Food("Jar_Large", "", .82f, .34f, 50), Food("Bottle2", "", .78f, .37f), S("Barrel_Holder", 1.2f, "", -.82f, .6f, -90),
+                Food("Jar_Large", "", .8f, .3f), Food("Jar_Large", "", .82f, .34f, 50), Food("Bottle2", "", .78f, .37f), B(BarrelRack, 1.2f, "", -.82f, .6f, -90, true),
                 P("Shelf_Small_Bottles", .65f, "", -.8f, .45f, 90), W("Shelf_Simple", .3f, "", .9f, .55f, 1.3f),
             } },
             { "darkcellar", new[] { P("Rope_1", .08f, "", .75f, .5f), P("Bucket_Wooden_1", .3f, "", -.75f, .4f), P("Candle_1", .13f, "", .75f, .3f) } },

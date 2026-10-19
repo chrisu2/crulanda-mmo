@@ -24,6 +24,14 @@ namespace Crulanda.EditorTools
             if (!Ours) return;
             var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") ? 1024 : 512; t.mipmapEnabled = true;
             if ((assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Village/")) && assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;   // (ends with: Bark_NormalTree.png and Leaves_NormalTree_C.png are colour)
+            // The Simple Wood Barrel (Kraken XR, Asset Store EULA; Resources/Props/WoodBarrel, play note 247, 2026-10-19): three 4096 px maps
+            // (17-19 MB each) for a prop a metre tall, capped at 1024; its normal map a normal map, its metallic-smoothness map linear.
+            if (assetPath.StartsWith(Props + "WoodBarrel/"))
+            {
+                t.maxTextureSize = 1024;
+                if (assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;
+                if (assetPath.EndsWith("_MetallicSmoothness.png")) t.sRGBTexture = false;
+            }
         }
         void OnPreprocessModel()
         {

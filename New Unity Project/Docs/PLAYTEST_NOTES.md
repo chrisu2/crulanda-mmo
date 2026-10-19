@@ -954,3 +954,5 @@ un-captures.
   you after jump its an insta death".
 - 286 (2026-10-19 ~18:35; tune-6 had killed her in 4:58 and 5:57) "needs to be a 10-15min kill at least" (OPEN: the feast moved to ~16:00,
   her health raised for a 12-14 minute kill).
+- 287 (2026-10-19 ~18:45, watching tune-8) "leaps are too quick and not properly telegraphed" (OPEN: a wind-up, rings shown ~4 s ahead, a
+  slower higher arc, a growing shadow, a raid warning).

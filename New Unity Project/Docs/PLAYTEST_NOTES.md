@@ -851,3 +851,6 @@ un-captures.
   world bosses at end game (OPEN).
 - 244 (2026-10-19 ~11:35, on wardrobe-angular-3 06-helms-b: the new cloth hood and coif, the old scarf and kettle) "these look
   pitiful. not sure why we keep going back and forth and get poor results. do i need to download more helms?? or can you design" (OPEN).
+- 245 (2026-10-19 ~11:40) "weapons . KayKit : Fantasy Weapons Bits" (OPEN): Downloads\KayKit_FantasyWeaponsBits_1.0_FREE.zip (Kay
+  Lousberg, CC0): 31 models (swords A-E, axes A-C, hammers A-C, daggers A-B, bows A-B with strings, staffs A-B, wand, spear, halberd,
+  fist weapons, arrows, shields A-C). Bring them in as the weapons people carry (Phase 8.5).

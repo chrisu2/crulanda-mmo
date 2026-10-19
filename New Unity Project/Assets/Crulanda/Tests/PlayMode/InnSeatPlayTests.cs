@@ -71,10 +71,15 @@ namespace Crulanda.Tests
             }
             // Then a villager sat at each, as the drinkers are, the hips measured.
             var life = VillageLife.Active; Assert.NotNull(life, zoneId + " has village life.");
+            var places = life.Places["inn"];
+            Assert.IsNotEmpty(places, zoneId + ": the inn's seats are places to sit.");
             var sitters = life.Villagers.Where(v => v != null && v.Visible && !v.Resident && v.GetComponent<ActorVisual>() != null && v.GetComponent<ActorVisual>().Model != null).Take(4).ToList();
-            if (sitters.Count == 0) { Assert.Inconclusive(zoneId + ": no modelled villager to sit (models off?)"); yield break; }
+            // A zone with too few folk of its own to sit (the Ash Rim's Wain's Rest, the Hearth-Tree's Keepers): sitters made for the test.
+            var made = new List<Villager>();
+            for (int k = sitters.Count; k < 4; k++) { var v = Villager.Spawn(life, "Seat tester " + k, "drinker", 900 + k, null, places[0]); made.Add(v); if (v.GetComponent<ActorVisual>().Model != null) sitters.Add(v); }
+            if (sitters.Count == 0) { foreach (var v in made) UnityEngine.Object.Destroy(v.gameObject); Assert.Inconclusive(zoneId + ": no modelled figure to sit (models off)"); yield break; }
             foreach (var v in sitters) v.GetComponent<ActorVisual>().Model.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
-            var places = life.Places["inn"]; var heights = new List<(string what, float h)>();
+            var heights = new List<(string what, float h)>();
             Assert.AreEqual(seats.Count, places.Count, zoneId + ": every registered seat is a place to sit (on the navmesh).");
             for (int from = 0; from < places.Count; from += sitters.Count)
             {
@@ -101,7 +106,8 @@ namespace Crulanda.Tests
                 if (median < 0 || median > .3f) problems.Add("The hips sit " + median.ToString("0.00") + " m over the seats' tops (median): not on them (0 to 0.3 m)");
                 foreach (var (what, h) in heights) if (Mathf.Abs(h - median) > .1f) problems.Add(what + ": the hips " + h.ToString("0.00") + " m over the seat, the others " + median.ToString("0.00") + " (sunk into it or over it)");
             }
-            for (int k = 0; k < sitters.Count; k++) sitters[k].Release(sitters[k].transform.position);
+            for (int k = 0; k < sitters.Count; k++) if (!made.Contains(sitters[k])) sitters[k].Release(sitters[k].transform.position);
+            foreach (var v in made) UnityEngine.Object.Destroy(v.gameObject);
             Assert.IsEmpty(problems, zoneId + ":\n" + string.Join("\n", problems));
         }
     }

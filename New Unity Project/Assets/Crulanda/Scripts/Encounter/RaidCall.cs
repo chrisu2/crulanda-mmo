@@ -11,12 +11,12 @@ namespace Crulanda.Encounter
     public sealed class RaidCandidate
     {
         public string id, name, classId, zone, guild;
-        public int level;
+        public int level, gearBonus;
         public float bold, chatty;
         public bool online, friend, rival, withYou;
         public static RaidCandidate Of(SimAdventurer s, float hour, bool withYou)
         {
-            return new RaidCandidate { id = s.id, name = s.name, classId = s.classId, zone = s.zone, guild = s.guild ?? "", level = s.level, bold = s.bold, chatty = s.chatty,
+            return new RaidCandidate { id = s.id, name = s.name, classId = s.classId, zone = s.zone, guild = s.guild ?? "", level = s.level, gearBonus = s.gearBonus, bold = s.bold, chatty = s.chatty,
                 online = s.IsOnlineAt(hour), friend = s.friend || SimMemory.Of(s) == SimMemory.Standing.Friend, rival = SimMemory.Refuses(s), withYou = withYou };
         }
     }
@@ -42,6 +42,9 @@ namespace Crulanda.Encounter
     public static class RaidCall
     {
         public const float BoldBelow = .3f;
+        /// <summary>Who answers the call (Chris: "that is the point of a raid"): level 20, and geared (two or more bought upgrades: a rare in most
+        /// slots, SimGear.QualityFor).</summary>
+        public const int CallLevel = 20, CallGear = 2;
         /// <summary>An answer from someone in the zone: 20-60 s; one from another zone travels: 60-120 s (section 2.3).</summary>
         public const float AnswerFrom = 20, AnswerTo = 60, TravelFrom = 60, TravelTo = 120;
         /// <summary>What a sim answering buys on the way (section 2.3): three twists of salt and three bone harpoons (Tibb Marrow's and Ketta
@@ -64,7 +67,7 @@ namespace Crulanda.Encounter
             var asked = new HashSet<string>();
             SimCompanion.PartyRole? Fill(string classId) { foreach (var r in RaidGroup.RolesFor(classId)) if (lack[r] > 0) return r; return null; }
             float Delay(bool travels) { double t = rng.NextDouble(); return travels ? (float)(TravelFrom + t * (TravelTo - TravelFrom)) : (float)(AnswerFrom + t * (AnswerTo - AnswerFrom)); }
-            bool Able(RaidCandidate c) { return c != null && c.online && !c.withYou && !c.rival && !raid.Has(c.id) && c.level >= RaidGroup.MinSimLevel && !asked.Contains(c.id); }
+            bool Able(RaidCandidate c) { return c != null && c.online && !c.withYou && !c.rival && !raid.Has(c.id) && c.level >= CallLevel && c.gearBonus >= CallGear && !asked.Contains(c.id); }
             void Take(RaidCandidate c, RaidSource src)
             {
                 if (places <= 0) return;

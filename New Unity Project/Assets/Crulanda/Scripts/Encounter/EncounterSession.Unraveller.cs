@@ -27,7 +27,7 @@ namespace Crulanda.Encounter
         int WorldSeed { get { return SimPopulation.Active != null && SimPopulation.Active.World != null ? SimPopulation.Active.World.seed : 0; } }
         bool InDrainReachZone { get { return ZoneId == Unraveller.Zone && Zone != null && Zone.SiltBar != null; } }
         /// <summary>Rising out of the river (true) or sinking into it (false), from this time; -1 when neither.</summary>
-        float surfaceFrom = -1; bool surfacingUp; bool unravellerOnParty; bool reachWarnedHere;
+        float surfaceFrom = -1, unravellerDeadAt = -1; bool surfacingUp; bool unravellerOnParty; bool reachWarnedHere;
         readonly List<(Villager v, Vector3 at)> sentIndoors = new List<(Villager, Vector3)>();
         readonly List<(Villager v, Vector3 at)> stockKeepers = new List<(Villager, Vector3)>();
         /// <summary>She is rising out of the river now.</summary>
@@ -51,6 +51,7 @@ namespace Crulanda.Encounter
         void TickUnraveller()
         {
             TickRaidFeast();   // the raid's stewpot (EncounterSession.UnravellerFight)
+            TickHelpfulGround();   // every class's helpful ground, shown and expired (play note 275)
             var s = WorldBossNow; if (s == null) return;
             if (!nowDone && ZoneId == Unraveller.Zone && NowRequested) { nowDone = true; UnravellerSoon(30); }
             var beat = WorldBossClock.Tick(s, Mathf.Min(Time.deltaTime, .5f), WorldSeed);
@@ -194,7 +195,9 @@ namespace Crulanda.Encounter
                 if (surfacingUp) { surfaceFrom = -1; e.enabled = true; }
                 else { RemoveUnraveller(); return; }
             }
-            if (!e.actor.IsAlive) return;
+            // Killed: her body (white crystal) lies 60 s, then she is gone (nothing of the fight stays on screen).
+            if (!e.actor.IsAlive) { if (unravellerDeadAt < 0) unravellerDeadAt = Time.time; else if (Time.time - unravellerDeadAt > 60) { unravellerDeadAt = -1; RemoveUnraveller(); } return; }
+            unravellerDeadAt = -1;
             if (e.FightingParty) { unravellerOnParty = true; TickUnravellerFight(e); return; }   // her fight (EncounterSession.UnravellerFight)
             if (!unravellerOnParty) return;
             unravellerOnParty = false;

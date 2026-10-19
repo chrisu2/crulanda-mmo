@@ -41,7 +41,7 @@ namespace Crulanda.Encounter
         void BeginHoldWarn()
         {
             holdWarnFrom = Time.time; holdWarnAt = Time.time + Move.ccWarn;
-            if (holdMark == null) holdMark = BlowMark.Create();
+            if (holdMark == null) holdMark = BlowMark.Create(GroundKind.Harmful, Move.ccWarn + 2, Move.ccName ?? "A hold");
             ShowHoldMark();
             session.FloatText(transform.position + Vector3.up * .5f, (Move.ccName ?? Move.cc) + "...", BlowColor);
             if (!string.IsNullOrEmpty(Move.ccWarnText)) session.Message(Move.ccWarnText);

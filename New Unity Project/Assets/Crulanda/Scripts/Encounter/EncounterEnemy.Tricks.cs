@@ -69,7 +69,7 @@ namespace Crulanda.Encounter
                 if (hits == 0) session.FloatText(p.at + Vector3.up * .3f, p.name + " misses", new Color(.8f, .8f, .8f));
             }
         }
-        BlowMark TrickRing() { if (spareMarks.Count > 0) { var m = spareMarks[spareMarks.Count - 1]; spareMarks.RemoveAt(spareMarks.Count - 1); return m; } return BlowMark.Create(); }
+        BlowMark TrickRing() { if (spareMarks.Count > 0) { var m = spareMarks[spareMarks.Count - 1]; spareMarks.RemoveAt(spareMarks.Count - 1); return m; } return BlowMark.Create(GroundKind.Harmful, 12, "A trick's ring"); }
         void Spare(BlowMark m) { if (m == null) return; m.Hide(); spareMarks.Add(m); }
         void Lay(Vector3 at, float delay, float radius, float power, float knock, string name)
         {

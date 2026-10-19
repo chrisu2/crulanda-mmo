@@ -305,7 +305,7 @@ namespace Crulanda.Encounter
         }
         /// <summary>Whether the snap's warning has run its seconds.</summary>
         bool SnapWarned() { return snapWarnFrom >= 0 && Time.time - snapWarnFrom >= SnapWarnSeconds; }
-        void AddSnapRing(Vector3 feet, Transform follow) { snapAt.Add(feet); snapFollow.Add(follow); var m = BlowMark.Create(); m.Show(feet, SnapRing, 0); snapMarks.Add(m); }
+        void AddSnapRing(Vector3 feet, Transform follow) { snapAt.Add(feet); snapFollow.Add(follow); var m = BlowMark.Create(GroundKind.Harmful, SnapWarnSeconds + 3, "The loop's snap"); m.Show(feet, SnapRing, 0); snapMarks.Add(m); }
         void ClearSnap()
         {
             foreach (var m in snapMarks) if (m != null) Destroy(m.gameObject);

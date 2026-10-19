@@ -21,7 +21,7 @@ namespace Crulanda.Encounter
         public static List<(Vector2 c, float r, float y)> Now()
         {
             var l = new List<(Vector2, float, float)>();
-            foreach (var m in BlowMark.Live) if (m != null && m.Showing && m.Reach > 0) l.Add((new Vector2(m.Feet.x, m.Feet.z), m.Reach, m.Feet.y));
+            foreach (var m in BlowMark.Live) if (m != null && m.Showing && m.Reach > 0 && m.Kind == GroundKind.Harmful) l.Add((new Vector2(m.Feet.x, m.Feet.z), m.Reach, m.Feet.y));
             return l;
         }
         /// <summary>The deepest mark <paramref name="p"/> stands in (its index), or -1 for none.</summary>

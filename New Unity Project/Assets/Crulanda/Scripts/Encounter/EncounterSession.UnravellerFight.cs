@@ -65,6 +65,8 @@ namespace Crulanda.Encounter
             if (e == null || !e.actor.IsAlive || !e.FightingParty) return;
             float now = Time.time;
             if (e.PullAt < 0) BeginUnravellerFight(e);
+            // The whole raid down: the pull is over (a wipe); she is whole again and goes home, and nobody gets up until it is.
+            if (!PartyActors().Exists(x => x != null && x.IsAlive)) { e.ResetFight(); return; }
             var t = UT;
             RaidBoss = e;
             // The phase, and the Feeding's beat with it.
@@ -144,7 +146,7 @@ namespace Crulanda.Encounter
         void BeginSpikes(EncounterEnemy e, List<Vector3> spots)
         {
             if (spots.Count == 0) { nextSpike = Time.time + 1; return; }
-            foreach (var p in spots) { var m = BlowMark.Create(); m.Show(p, UT.spikeRadius, 0); spikeSpots.Add((p, m)); }
+            foreach (var p in spots) { var m = BlowMark.Create(GroundKind.Harmful, UT.spikeWarn + 1, "Violet cracks"); m.Show(p, UT.spikeRadius, 0); spikeSpots.Add((p, m)); }
             spikeAt = Time.time + UT.spikeWarn;
             if (Player != null && spots.Exists(p => Flat(Player.transform.position - Vector3.up - p) <= UT.spikeRadius + .5f)) RaidWarning(Unraveller.SpikesWarning);
         }
@@ -156,7 +158,7 @@ namespace Crulanda.Encounter
             var held = BroodNow.Where(b => b != null && b.actor.IsAlive && b.Incapacitated).Select(b => new Vector2(b.transform.position.x, b.transform.position.z)).ToList();
             if (!UnravellerRules.SpikeSpotClear(new Vector2(at.x, at.z), held, UT)) return;
             if (spikeAt < 0) BeginSpikes(UnravellerFighting, new List<Vector3> { at });
-            else { var m = BlowMark.Create(); m.Show(at, UT.spikeRadius, 0); spikeSpots.Add((at, m)); }
+            else { var m = BlowMark.Create(GroundKind.Harmful, UT.spikeWarn + 1, "Violet cracks"); m.Show(at, UT.spikeRadius, 0); spikeSpots.Add((at, m)); }
         }
         /// <summary>The pull: the clock begins, the rotations are set, her track comes up.</summary>
         void BeginUnravellerFight(EncounterEnemy e)
@@ -171,7 +173,7 @@ namespace Crulanda.Encounter
         public void EndUnravellerFight(EncounterEnemy e)
         {
             foreach (var b in BroodNow) if (b != null) { Enemies.Remove(b); if (Target == b) Target = null; Destroy(b.gameObject); }
-            BroodNow.Clear(); BroodKill = null; broodWas.Clear();
+            BroodNow.Clear(); BroodKill = null; broodWas.Clear(); broodDeadAt.Clear();
             foreach (var u in unmade) if (u.mark != null) Destroy(u.mark.gameObject);
             unmade.Clear(); groundSeconds.Clear();
             foreach (var s in spikeSpots) if (s.mark != null) Destroy(s.mark.gameObject);
@@ -270,6 +272,48 @@ namespace Crulanda.Encounter
             int n = 0; foreach (var id in ClassBuffs.ClassIds) { var b = ClassBuffs.For(id); if (b != null && st.Has(b.id)) n++; }
             return (n, st.Has(Consumables.FedId), st.Has(Consumables.ElixirId) || st.Has(Consumables.SalveId));
         }
+        /// <summary>Her unmade ground's grey (it keeps it under the harmful red-violet edge: play note 275).</summary>
+        public static readonly Color UnmadeGrey = new Color(.42f, .4f, .46f, .55f);
+        // ---------- helpful ground (play note 275): one look for every friendly ground effect ----------
+        readonly List<(BlowMark mark, Vector3 at, float radius, float until, Actor owner)> helpful = new List<(BlowMark, Vector3, float, float, Actor)>();
+        /// <summary>A helpful ground effect, shown as one (soft gold or green, smooth, calm), for <paramref name="seconds"/>, gone with its owner's
+        /// death; an ally's fainter. Every class's ground ability lays its look here.</summary>
+        public BlowMark HelpfulGround(Vector3 at, float radius, float seconds, string label, Actor owner, bool green)
+        {
+            if (seconds <= 0 || radius <= 0) return null;
+            var feet = at - Vector3.up; if (NavMesh.SamplePosition(at, out var hit, 2.5f, NavMesh.AllAreas)) feet = hit.position;
+            var m = BlowMark.Create(GroundKind.Helpful, seconds + 1, label, green); m.Ally = owner != Player; m.Show(feet, radius, 1);
+            helpful.Add((m, feet, radius, Time.time + seconds, owner));
+            return m;
+        }
+        void TickHelpfulGround()
+        {
+            for (int i = helpful.Count - 1; i >= 0; i--)
+            {
+                var h = helpful[i];
+                if (h.mark == null || Time.time >= h.until || h.owner != null && !h.owner.IsAlive) { if (h.mark != null) Destroy(h.mark.gameObject); helpful.RemoveAt(i); continue; }
+                h.mark.Show(h.at, h.radius, 1);
+            }
+        }
+        /// <summary>The HUD's line by your health (play note 275): the harmful ground you stand in, in red ("Unmade ground: move!"), else the
+        /// helpful ground, in green ("In Consecrated ground"); null for neither.</summary>
+        public (string line, bool harmful)? GroundUnderYou
+        {
+            get
+            {
+                if (Player == null || !Player.IsAlive) return null;
+                var feet = Player.transform.position - Vector3.up; var p = new Vector2(feet.x, feet.z);
+                BlowMark help = null;
+                foreach (var m in BlowMark.Live)
+                {
+                    if (m == null || !m.Showing || m.Reach <= 0 || Mathf.Abs(m.Feet.y - feet.y) > GroundMarks.Height) continue;
+                    if (Vector2.Distance(p, new Vector2(m.Feet.x, m.Feet.z)) > m.Reach) continue;
+                    if (m.Kind == GroundKind.Harmful) return ((m.Label ?? "Danger") + ": move!", true);
+                    if (help == null) help = m;
+                }
+                return help != null ? ("In " + (help.Label ?? "blessed ground"), false) : ((string, bool)?)null;
+            }
+        }
         /// <summary>Raisings this session (the Shaman's Barrow-wake; the run's log).</summary>
         public int Rezzes;
         /// <summary>The fallen one a Shaman at <paramref name="from"/> raises (RaidJobs.RezPick: a tank, a healer, a damage-dealer; not in marked ground).</summary>
@@ -320,6 +364,7 @@ namespace Crulanda.Encounter
                 return "Kill: Skull" + (marks.Count > 0 ? ", then " + string.Join(", ", marks) : "") + (held > 0 ? " (" + held + " held)" : "");
             }
         }
+        readonly Dictionary<EncounterEnemy, float> broodDeadAt = new Dictionary<EncounterEnemy, float>();
         readonly Dictionary<EncounterEnemy, (bool alive, bool held)> broodWas = new Dictionary<EncounterEnemy, (bool, bool)>();
         /// <summary>Each brood's last frame: killed (alive to dead) and broke free (its hold ran out, not the Skull's broken by the raid).</summary>
         void CountBrood()
@@ -358,7 +403,8 @@ namespace Crulanda.Encounter
             for (int i = BroodNow.Count - 1; i >= 0; i--)
             {
                 var b = BroodNow[i]; if (b == null) { BroodNow.RemoveAt(i); continue; }
-                if (!b.actor.IsAlive) continue;
+                // A dead brood (its white crystal) is gone 8 s on: nothing of the fight stays on screen ("nothing should be permanent onscreen").
+                if (!b.actor.IsAlive) { if (!broodDeadAt.TryGetValue(b, out var died)) broodDeadAt[b] = now; else if (now - died > 8) { BroodNow.RemoveAt(i); broodDeadAt.Remove(b); broodWas.Remove(b); Enemies.Remove(b); if (Target == b) Target = null; Destroy(b.gameObject); } continue; }
                 if (!UnravellerRules.BroodEaten(Vector3.Distance(b.transform.position, e.transform.position), t)) continue;
                 // A brood that reaches her is eaten: she heals 3% and her blows grow 10%.
                 BroodNow.RemoveAt(i); Enemies.Remove(b); if (Target == b) Target = null; Destroy(b.gameObject); BroodEaten++;
@@ -411,10 +457,13 @@ namespace Crulanda.Encounter
             {
                 nextUnmade = now + t.unmadeEvery;
                 var at = e.transform.position; if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
-                var m = BlowMark.Create(); m.Show(at, t.unmadeRadius, 0);
+                var m = BlowMark.Create(GroundKind.Harmful, t.unmadeWarn + t.unmadeLife + 1, Unraveller.UnmadeName); m.BodyColour = UnmadeGrey; m.Show(at, t.unmadeRadius, 0);
                 unmade.Add((at, now + t.unmadeWarn, m));
                 if (Player != null && Flat(Player.transform.position - at) <= t.unmadeRadius + 1) RaidWarning(Unraveller.UnmadeWarning);
             }
+            // Each patch lasts unmadeLife after it bites (Chris, the tuning batch: "also should not stay on the ground permanently": seventeen patches
+            // for good had run into one great disc over the bar).
+            for (int i = unmade.Count - 1; i >= 0; i--) { var u = unmade[i]; if (now >= u.live + t.unmadeLife) { if (u.mark != null) Destroy(u.mark.gameObject); unmade.RemoveAt(i); } }
             for (int i = 0; i < unmade.Count; i++) { var u = unmade[i]; if (u.mark != null) u.mark.Show(u.at, t.unmadeRadius, Mathf.Clamp01(1 - (u.live - now) / Mathf.Max(.01f, t.unmadeWarn))); }
             if (now < nextGroundBite) return;
             nextGroundBite = now + 1;
@@ -554,7 +603,7 @@ namespace Crulanda.Encounter
             nextHunt = now + t.huntEvery;
             var pick = UnravellerRules.HuntPick(Candidates(e)); var who = ActorOfEntity(pick); if (who == null) return;
             HuntedActor = who; huntAt = now + t.huntWarn;
-            if (huntMark == null) huntMark = BlowMark.Create();
+            if (huntMark == null) huntMark = BlowMark.Create(GroundKind.Harmful, UT.huntWarn + 1, "Her hunt");
             huntMark.Show(who.transform.position - Vector3.up, t.huntRadius, 0);
             FloatText(who.transform.position + Vector3.up * 1.2f, "Hunted", new Color(.62f, .55f, .8f));
             if (who == Player) RaidWarning(Unraveller.HuntedYou);

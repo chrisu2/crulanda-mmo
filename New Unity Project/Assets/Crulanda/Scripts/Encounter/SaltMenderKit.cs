@@ -305,6 +305,7 @@ namespace Crulanda.Encounter
         {
             return Start(a, () => {
                 circleAt = s.Player.transform.position; circleUntil = Now + CircleSeconds; circleNext = Now;
+                s.HelpfulGround(circleAt, CircleReach, CircleSeconds, "The salt circle", s.Player, true);
                 DrawCircle(); s.FloatText(circleAt, "Salt Circle", SaltWhite);
             });
         }

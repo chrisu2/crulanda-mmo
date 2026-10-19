@@ -186,6 +186,13 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, s.Feasts, "the feast at the enrage");
             Assert.AreEqual(wipesBefore + 1, w.wipes, "a wipe counted");
             Assert.IsFalse(s.PartySims.Any(c => c.actor.IsAlive && !ZoneBuilder.Active.ChemicalAt(c.transform.position) && Vector3.Distance(c.transform.position, e.transform.position) < 20), "nobody left standing on the bar");
+            // Nothing of the fight stays on screen (Chris: "nothing should be permanent onscreen"): her harmful marks, the brood, the cracks,
+            // the afterimages, all cleared with the fight's end.
+            for (float waited = 0; waited < 3; waited += Time.deltaTime) yield return null;
+            Assert.AreEqual(0, BlowMark.Live.Count(m => m != null && m.Showing && m.Kind == GroundKind.Harmful), "no harmful mark left on the ground");
+            Assert.AreEqual(0, s.BroodNow.Count, "no brood left"); Assert.AreEqual(0, s.UnmadePatches, "no unmade ground left");
+            Assert.IsNull(GameObject.Find("Void afterimage"), "no afterimage left");
+            Assert.IsNull(s.SwallowedActor); Assert.IsNull(s.HuntedActor);
         }
     }
 }

@@ -223,6 +223,9 @@ namespace Crulanda.Encounter
         void ClearRaidFight()
         {
             if (!RaidBoss) return;
+            // Her fight over unkilled (a wipe, everyone lost in the river, the feast): she is whole again, so a pull never goes on from where a
+            // wiped one stopped (Chris, the tuning batch: "all respawned while main spider at half health").
+            if (actor.IsAlive && PullAt >= 0) actor.Health.ApplyHealing(actor.Health.Pool.Max);
             Pins.Clear(); Unravel.Clear(); PullAt = -1; RaidPhase = 0; Growth = 0; BlowScale = 1; lastInterruptAt = -1; CalcifiedUntil = 0;
             Eaten = FeedingsLanded = FeedingsStopped = 0; pinnedUntil = 0;
             if (Cast != null) Cast.every = T.feedEvery1;

@@ -249,6 +249,7 @@ namespace Crulanda.Encounter
         {
             return Start(a, () => {
                 consecrateCentre = s.Player.transform.position; consecrateUntil = Now + a.duration;
+                s.HelpfulGround(consecrateCentre, ConsecrateRadius, a.duration, "Consecrated ground", s.Player, false);   // the helpful look (play note 275)
                 int per = Dmg(a.power + Level / 2f), sanctuary = R("sa-sanctuary");
                 periodic.Add("consecrate", s.Player, Now, 1, Mathf.RoundToInt(a.duration), per, (e, i) => {
                     foreach (var o in s.Enemies) if (o.actor.IsAlive && Vector3.Distance(o.transform.position, consecrateCentre) <= ConsecrateRadius) Hit(o, e.value);
@@ -317,6 +318,7 @@ namespace Crulanda.Encounter
         {
             return Start(a, () => {
                 coloursCentre = s.Player.transform.position; float seconds = a.duration + R("va-colours-held"); coloursUntil = Now + seconds;
+                s.HelpfulGround(coloursCentre, ColoursReach, seconds, "Under the Colours", s.Player, false);
                 float mult = 1 - a.power / 100f; int rampart = R("va-rampart"); float reach = ColoursReach;
                 underColours.Clear();
                 periodic.Add("colours", s.Player, Now, 1, Mathf.Max(1, Mathf.RoundToInt(seconds)), 0, (e, i) => {

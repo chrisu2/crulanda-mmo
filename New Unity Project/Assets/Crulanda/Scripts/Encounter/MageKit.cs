@@ -200,6 +200,7 @@ namespace Crulanda.Encounter
             return Start(a, () => {
                 if (!t.actor.IsAlive) return;
                 fieldCentre = t.transform.position; int seconds = Mathf.RoundToInt(a.duration) + 2 * R("hw-long-burn"); fieldUntil = Now + seconds;
+                s.HelpfulGround(fieldCentre, FieldRadius, seconds, "Your burning field", s.Player, false);   // it burns foes, never friends: helpful to the party
                 int per = Dmg((a.power + Level / 2f) * (1 + .1f * R("hw-cinders"))); float slow = FieldSlow;   // Embers Underfoot, Thick Smoke
                 periodic.Add("cinder", s.Player, Now, 1, seconds, per, (e, i) => {
                     foreach (var o in s.Enemies)

@@ -139,9 +139,9 @@ namespace Crulanda.Tests
             var pop = SimPopulation.Active;
             foreach (var x in pop.World.sims) { x.onlineFrom = 0; x.onlineHours = 0; x.friend = false; x.regard = 0; x.guild = ""; }   // nobody about...
             var sims = pop.World.sims.Take(4).ToList();
-            var tank = Near(s, sims[0], "class.warrior", 19, 0); tank.coin = 500;
-            var healer = Near(s, sims[1], "class.cleric", 20, 1); healer.coin = 500;
-            var timid = Near(s, sims[2], "class.druid", 19, 2); timid.bold = .1f;
+            var tank = Near(s, sims[0], "class.warrior", 20, 0); tank.coin = 500; tank.gearBonus = RaidCall.CallGear;   // the call: geared level-20 sims only
+            var healer = Near(s, sims[1], "class.cleric", 20, 1); healer.coin = 500; healer.gearBonus = RaidCall.CallGear;
+            var timid = Near(s, sims[2], "class.druid", 20, 2); timid.bold = .1f; timid.gearBonus = RaidCall.CallGear;
             var green = Near(s, sims[3], "class.rogue", 15, 3);
             yield return null;
             EncounterSession.RaidCallTimeScale = .02f;

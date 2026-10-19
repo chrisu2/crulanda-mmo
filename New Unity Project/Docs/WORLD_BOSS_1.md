@@ -726,6 +726,31 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      it), a 3 s call at 30 m that raises a fallen one of the raid at 40% health and a third of its pool. On the bar's 13th slot, from level 10
      (the highest a class's unlock may be), no talent; its icon the Barrow-call's for now. A Shaman sim uses it on the most needed of the
      fallen within reach: a tank, then a healer, then a damage-dealer, never one lying in marked ground. The run's log counts the raisings.
+   **Before the next batch (2026-10-19; WRITTEN, NOT RUN).** Chris, verbatim: "all members should have lvl 20 gear", "or at least good gear",
+   "that is the point of a raid"; "also should not stay on the ground permanently"; "mage doesnt look balanced now"; "cleric almost twice
+   the healing as well"; "how can you tell which is good and which are bad. no way to know to get out or stand in it" (play note 275);
+   "nothing should be permanent onscreen"; "all respawned while main spider at half health".
+   - **The meter's "over the band" was its clock:** the meter counted fighting time only while you (the bot) were alive; the bot died early
+     in most pulls and the sims fought on, so the tune-1 batch counted 687 s of 1,732. By the real time the damage-dealers were at about 74
+     (Mage), 56 (Ranger), 51 (Archivist), 48 (Rogue, Scoundrel) a second against the band of 88 (with the time spent on adds, harpoons and
+     ground), and the healers about 41 (Cleric), 27 (Shaman), 23 (Druid). The clock now runs while you lie dead. The Cleric's lead is real
+     but smaller (it shares a party with the tank you play); the healers' spread rule stays.
+   - **The great orange disc** was her unmade ground: seventeen patches for good, run together over the bar. Each patch now lasts 40 s after
+     it bites (`unmadeLife`).
+   - **One look for all ground** (play note 275): harmful marks red-violet, a jagged cracked edge, pulsing, filling as the warning runs out
+     (her unmade ground keeps its grey body under the red-violet edge); helpful ground soft gold or green, a smooth edge, low and translucent,
+     a slow shimmer, an ally's fainter and smaller (a Paladin's Consecrate and Colours, a Cleric's Sanctuary, a Salt-Mender's circle, a
+     Shaman's rain, a Mage's burning field). A mark must name its kind and its lifetime to be made at all. The sims step out of harmful marks
+     only. By your health a red line names the harmful ground you stand in ("Unmade ground: move!"), a green one the helpful ("In
+     Consecrated ground").
+   - **Nothing permanent:** every mark hides itself past its lifetime or 1.5 s after nothing shows it; dead brood are gone 8 s after they
+     fall; her body 60 s after her death; the pot 60 s; everything of her fight is cleared when it ends (her death, a wipe, a reset, her
+     sinking). The PlayMode fight test sweeps for leftovers after the feast.
+   - **No getting up mid-fight:** in her fight nobody rises but by the Shaman's Barrow-wake; the whole raid down ends the pull; and her
+     fight ending unkilled makes her whole (a pull had gone on from 50% with the raid up again).
+   - **Raid gear:** the tuning runs dress every member (the bot and the nine) in a rare piece of level 20 in every slot (`SimGear.RaidGear`),
+     logged per member; the bot tank has the sim tank's edges and health on top. In play, only level-20 sims with two or more bought
+     upgrades (rare in most slots) answer the call to arms (`RaidCall.CallLevel`, `CallGear`).
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

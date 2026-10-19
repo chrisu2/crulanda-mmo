@@ -772,7 +772,7 @@ namespace Crulanda.Encounter
                 Activity = "Fallen"; if (agent.isOnNavMesh) agent.isStopped = true;
                 if (downSince < 0) downSince = Time.time;
                 // Up again once the fight is over (a sim runs back from its own graveyard in a later phase).
-                if (!session.InCombat && Time.time - downSince > 6) { actor.Health.Revive(Mathf.RoundToInt(actor.Health.Pool.Max * .4f)); downSince = -1; session.Message(sim.name + " gets back up."); }
+                if (!session.InCombat && session.UnravellerFighting == null && Time.time - downSince > 6) { actor.Health.Revive(Mathf.RoundToInt(actor.Health.Pool.Max * .4f)); downSince = -1; session.Message(sim.name + " gets back up."); }
                 return;
             }
             if (Time.time >= nextEdge) { nextEdge = Time.time + .5f; RefreshEdge(); }   // its buffs' health (BossBuffs)

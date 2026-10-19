@@ -61,6 +61,7 @@
   "unmadeWarn": 3,
   "unmadeShare": 0.15,
   "unmadeRamp": 0.05,
+  "unmadeLife": 40,
 
   "swallowEvery2": 35,
   "swallowEvery3": 40,

@@ -2012,6 +2012,9 @@ namespace Crulanda.Encounter
             TickLoot();
             // (A dungeon's checkpoints) reached by a party member near one, you alive or not.
             TickCheckpoints();
+            // The meter's clock runs while you lie dead too (the raids: the bot down at 2:30 of a nine-minute pull, the clock stopped while the
+            // sims fought on, so 687 s were counted of 1,732: every damage-dealer read two to three times its band; Chris: "mage doesnt look balanced").
+            Meter.Tick(InCombat, Time.deltaTime);
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
             TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickFeats(); TickNodes(); TickWork(); TickCastPose();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
@@ -2050,7 +2053,7 @@ namespace Crulanda.Encounter
             else
                 for (int slot = 0; slot < (marking ? 4 : BarSlots); slot++)   // the chosen bar: 1-0, then the slots bought with AA (EncounterSession.Bar)
                     if (!BuildOpen && slot < 14 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else { int kit = BarKitSlot(slot); if (kit >= 0) UseAbility(kit); } }
-            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime); TickDuo(); TendSpirit(); TendTraining();
+            Kit.Tick(InCombat); TickDuo(); TendSpirit(); TendTraining();
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)

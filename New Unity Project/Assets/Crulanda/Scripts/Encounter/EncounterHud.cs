@@ -190,6 +190,9 @@ namespace Crulanda.Encounter
             if (!string.IsNullOrEmpty(session.Progress.title)) Shadow(new Rect(96, 4, 300, 18), "\u201C" + session.Progress.title + "\u201D", tiny, gold);   // the title worn (Achievements)
             UnitBar(new Rect(96, 45, 244, 18), p.Health.Pool.Ratio, HealthGreen, p.Health.Pool.Current + " / " + p.Health.Pool.Max);
             UnitBar(new Rect(96, 66, 244, 13), p.Resource.Pool.Ratio, ResourceColor(cls.resource), p.Resource.Pool.Current + " " + ResourceShort(cls));
+            // The ground under you (play note 275): harmful in red, helpful in green.
+            var ground = session.GroundUnderYou;
+            if (ground.HasValue) Shadow(new Rect(350, 45, 300, 20), ground.Value.line, tiny, ground.Value.harmful ? new Color(1, .3f, .3f) : new Color(.55f, 1, .6f));
             var status = session.Kit.StatusLine;
             if (!string.IsNullOrEmpty(status)) Shadow(new Rect(96, 84, 300, 20), status, tiny, new Color(1, .92f, .75f));
         }

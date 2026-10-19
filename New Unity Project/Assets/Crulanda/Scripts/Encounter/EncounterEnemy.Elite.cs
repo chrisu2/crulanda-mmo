@@ -66,7 +66,7 @@ namespace Crulanda.Encounter
         {
             blowStart = Time.time; blowAt = Time.time + Move.windup;
             var body = transform.Find("Body"); if (body != null) { bodyRest = body.localRotation; leaning = true; }
-            if (mark == null) mark = BlowMark.Create();
+            if (mark == null) mark = BlowMark.Create(GroundKind.Harmful, Move.windup + 2, Move.name);
             mark.Show(transform.position - Vector3.up, Move.reach, 0);
             session.FloatText(transform.position + Vector3.up * .5f, Move.name + "!", BlowColor);
             session.Message(Name + " draws back: " + Move.name + "! Step out of the mark" + (session.Warrior != null ? ", or raise Guard." : "."));

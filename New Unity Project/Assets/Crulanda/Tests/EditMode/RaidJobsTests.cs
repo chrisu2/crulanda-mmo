@@ -92,6 +92,26 @@ namespace Crulanda.Tests
             CollectionAssert.Contains(ShamanKit.BarIds, "shaman.barrow_wake", "on the Shaman's bar (slot 13, from level 10, no talent)");
         }
 
+        [Test] public void Every_ground_mark_is_harmful_or_helpful_looks_it_and_has_a_lifetime()
+        {
+            // Play note 275: "how can you tell which is good and which are bad"; and "nothing should be permanent onscreen".
+            var bad = BlowMark.Create(GroundKind.Harmful, 3, "Unmade ground"); var good = BlowMark.Create(GroundKind.Helpful, 10, "Consecrated ground");
+            var green = BlowMark.Create(GroundKind.Helpful, 10, "The rain", true);
+            try
+            {
+                Assert.AreEqual(GroundKind.Harmful, bad.Kind); Assert.IsTrue(bad.Jagged, "harmful: a jagged, cracked edge");
+                var e = bad.EdgeColourNow; Assert.Greater(e.r, e.g + .4f); Assert.Greater(e.b, e.g + .15f, "red-violet");
+                Assert.IsFalse(good.Jagged, "helpful: a smooth edge"); var ge = good.EdgeColourNow; Assert.Greater(ge.g, .7f); Assert.Greater(ge.r, ge.b, "soft gold");
+                var gg = green.EdgeColourNow; Assert.Greater(gg.g, gg.r); Assert.Greater(gg.g, gg.b, "or green");
+                Assert.Less(good.BodyColourNow.a, .2f, "low and translucent"); Assert.Less(good.BodyColourNow.a, bad.BodyColourNow.a);
+                Assert.AreEqual(3, bad.Lifetime, 1e-4f, "every mark has its lifetime");
+                Assert.IsFalse(BlowMark.Expired(10, 12, 12.5f, 3)); Assert.IsTrue(BlowMark.Expired(10, 12.9f, 13.1f, 3), "past its lifetime: gone");
+                Assert.IsTrue(BlowMark.Expired(10, 10.2f, 12f, 30), "nothing showing it for a while (its owner gone): gone");
+                Assert.IsFalse(BlowMark.Expired(-1, 0, 100, 3), "not out: nothing to expire");
+            }
+            finally { Object.DestroyImmediate(bad.gameObject); Object.DestroyImmediate(good.gameObject); Object.DestroyImmediate(green.gameObject); }
+        }
+
         [Test] public void The_raids_control_holds_the_brood_the_Archivist_first()
         {
             var d = SimCompanion.PartyRole.Damage;

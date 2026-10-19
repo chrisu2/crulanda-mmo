@@ -31,7 +31,7 @@ namespace Crulanda.Encounter
         /// <summary>A control class's hold on a brood (raid 4): its seconds and its wait before the next.</summary>
         public float broodHoldSeconds = 18, broodHoldEvery = 15;
         public float broodHealthShare = .3f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
-        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .15f, unmadeRamp = .05f;
+        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .15f, unmadeRamp = .05f, unmadeLife = 40;
         public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 10; public int saltsToFree = 3;
         public float saltWindow = 12, calcifySeconds = 4, calcifyTaken = 1.5f;
         // ---------- phase 3 ----------

@@ -131,6 +131,7 @@ namespace Crulanda.Encounter
         {
             return Start(With(a, Mathf.Max(0, a.cost - 2 * R("rs-soft-rain")), a.castTime), () => {   // Soft Rain: cheaper
                 var at = s.Player.transform.position; int ticks = Mathf.RoundToInt(Mathf.Max(3, a.duration / 2)) + R("rs-long-rain");
+                s.HelpfulGround(at, RainRadius, ticks * 2, "The rain", s.Player, true);
                 periodic.Add("rain", s.Player, Now, 2, ticks, Dmg((a.power + Level) * (1 + .05f * R("rs-deep-rain"))), (e, i) => {
                     foreach (var who in Party().ToList()) if (who != null && Vector3.Distance(who.transform.position, at) <= RainRadius) Mend(who, e.value); return true; });
             });

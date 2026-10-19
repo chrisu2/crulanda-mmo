@@ -36,8 +36,8 @@ namespace Crulanda.Encounter
             int level = EncounterProgress.LevelCap;
             s.Progress.experience = EncounterProgress.XpForLevel(level); s.Player.SetLevel(level); s.LevelHeld = true;
             Log("Your talents: " + SpendForRole(s) + ".");
-            SimCompanion.KitPlayerLike(s, new SimAdventurer { classId = s.ClassDef.id, level = level, gearSeed = 7, gearBonus = 2 }, s.PlayerRole == SimCompanion.PartyRole.Tank);   // a tank's kit for the tank bot
-            { var w = new SimAdventurer { classId = "class.warrior", level = level, gearSeed = 7, gearBonus = 2 };
+            SimCompanion.KitPlayerLike(s, new SimAdventurer { classId = s.ClassDef.id, level = level, gearSeed = 7, gearBonus = SimGear.RaidGear }, s.PlayerRole == SimCompanion.PartyRole.Tank);   // a tank's kit for the tank bot
+            { var w = new SimAdventurer { classId = "class.warrior", level = level, gearSeed = 7, gearBonus = SimGear.RaidGear };
               Log("Your kit (" + s.PlayerRole + "): " + s.Player.Health.Pool.Max + " health, armour " + s.Player.Stats.GetRounded(Crulanda.Core.StatType.Armor) + "; a Warrior sim tank of " + level + " in the same pieces: " + SimCompanion.MaxHealthFor(w, s.Items) + " health, armour " + SimCompanion.ArmourFor(w, s.Items) + "."); }
             Inventory.Add(s.Progress, s.Items, Unraveller.SaltItem, 6); Inventory.Add(s.Progress, s.Items, Unraveller.HarpoonItem, 6);
             // The bot's raid food, elixirs and draughts (raid 6: none were used), enough for every pull.
@@ -61,12 +61,13 @@ namespace Crulanda.Encounter
             if (NavMesh.SamplePosition(stand, out var standHit, 4, NavMesh.AllAreas)) stand = standHit.position;
             var motor = s.Player.GetComponent<AdventurerMotor>(); motor.Teleport(stand + Vector3.up * 1.05f);
             int k = 0;
-            foreach (var x in chosen) { x.zone = s.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = level; x.bold = .5f + .05f * (k % 5); x.gearBonus = 2; x.coin = Mathf.Max(x.coin, 400); var at = stand + Quaternion.Euler(0, k * 40, 0) * Vector3.forward * 3; x.x = at.x; x.z = at.z; k++; SimEconomy.Stock(x, s.Items); RaidCall.BuyKit(x, id => s.Items?.Get(id)?.value ?? 1); }
+            foreach (var x in chosen) { x.zone = s.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = level; x.bold = .5f + .05f * (k % 5); x.gearBonus = Mathf.Max(x.gearBonus, SimGear.RaidGear); /* raid gear: a rare of its level in every slot */ x.coin = Mathf.Max(x.coin, 400); var at = stand + Quaternion.Euler(0, k * 40, 0) * Vector3.forward * 3; x.x = at.x; x.z = at.z; k++; SimEconomy.Stock(x, s.Items); RaidCall.BuyKit(x, id => s.Items?.Get(id)?.value ?? 1); }
             pop.Refresh(); yield return new WaitForSeconds(.5f);
             s.FormRaid();
             foreach (var x in chosen) if (!s.Invite(x.id, true)) Log("could not invite " + x.name);
             if (s.InRaid) s.Raid.Arrange();
             yield return new WaitForSeconds(.5f);
+            Log("Gear: " + string.Join("; ", s.PartySims.Where(c => c != null).Select(c => { var ids = SimGear.For(c.sim, s.Items); var ds = ids.Select(id => s.Items.Get(id)).Where(d => d != null).ToList(); return c.sim.name.Split(' ')[0] + " " + ds.Count + " pieces, level " + (ds.Count > 0 ? ds.Average(d => d.level).ToString("0.0") : "-") + ", " + ds.Count(d => d.quality >= 3) + " rare+"; })) + ".");
             Log("The raid: you (" + s.ClassDef.displayName + ", " + you + ", " + s.Player.Health.Pool.Max + " health), " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " (" + SimRoster.ClassName(c.sim.classId) + ", " + c.Role + ", party " + (s.InRaid ? s.Raid.PartyOf(c.sim.id) + 1 : 1) + ", " + c.actor.Health.Pool.Max + " health)")) + ".");
             int pulls = PullsArg, wins = 0; var lines = new List<string>(); float killTime = 0; var buffLines = new List<string>();
             var tune = UnravellerTuning.Current;
@@ -131,7 +132,7 @@ namespace Crulanda.Encounter
                 Log("Pull " + pull + ": " + end + "; " + counts + (firstDeath != null ? "; first death: " + firstDeath.Trim() : ""));
                 lines.Add("Pull " + pull + ": " + end + "; deaths " + dead.Count + "; " + counts);
                 Shot(s, directory, "pull" + pull + "-end-" + (won ? "kill" : "wipe"), ref shots, null);
-                if (!won && e != null && e.actor.IsAlive && e.Engaged) e.ResetFight();
+                if (!won && e != null && e.actor.IsAlive && (e.Engaged || e.actor.Health.Pool.Ratio < 1)) e.ResetFight();   // a wipe: she is whole for the next pull
                 yield return new WaitForSeconds(8);   // the sims get up, out of the fight
             }
             EncounterInput.Scripted = null; Time.timeScale = 1;

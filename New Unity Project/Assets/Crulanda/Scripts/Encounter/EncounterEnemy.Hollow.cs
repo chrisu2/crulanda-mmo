@@ -78,7 +78,7 @@ namespace Crulanda.Encounter
             if (HollowRules.Puffs(gap, Rooted, busy, now, dustReadyAt) && !Half)
             {
                 dustReadyAt = now + HollowRules.DustEvery; dustAt = now + HollowRules.DustWindup;
-                if (dustMark == null) dustMark = BlowMark.Create();
+                if (dustMark == null) dustMark = BlowMark.Create(GroundKind.Harmful, HollowRules.DustWindup + 2, "Choking dust");
                 dustMark.Show(transform.position - Vector3.up, HollowRules.DustReach, 0);
                 if (agent != null && agent.isOnNavMesh) { agent.isStopped = true; agent.velocity = Vector3.zero; }
                 session.FloatText(transform.position, "Grey dust rising", new Color(.7f, .7f, .68f));

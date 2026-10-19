@@ -169,7 +169,7 @@ namespace Crulanda.Encounter
                     if (R("ch-answer") > 0) Grace(2 * R("ch-answer")); return true; });
             });
         }
-        bool Sanctuary(AbilityDefinition a) { return Start(a, () => { sanctuaryAt = s.Player.transform.position; sanctuaryUntil = Now + Mathf.Max(6, a.duration); }); }
+        bool Sanctuary(AbilityDefinition a) { return Start(a, () => { sanctuaryAt = s.Player.transform.position; sanctuaryUntil = Now + Mathf.Max(6, a.duration); s.HelpfulGround(sanctuaryAt, SanctuaryRadius, Mathf.Max(6, a.duration), "Sanctuary", s.Player, false); }); }
         public bool InSanctuary(Actor who) { return Now < sanctuaryUntil && who != null && Vector3.Distance(who.transform.position, sanctuaryAt) <= SanctuaryRadius; }
 
         // ---------- Censure ----------

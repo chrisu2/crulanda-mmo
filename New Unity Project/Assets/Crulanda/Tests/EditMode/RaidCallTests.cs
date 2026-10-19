@@ -16,25 +16,25 @@ namespace Crulanda.Tests
         const string Low = "zone.lowtowns";
         static RaidCandidate C(string id, string classId, int level, string zone, float bold = .6f, string guild = "", bool friend = false, bool online = true, bool rival = false)
         {
-            return new RaidCandidate { id = id, name = id, classId = classId, level = level, zone = zone, bold = bold, guild = guild, friend = friend, online = online, rival = rival };
+            return new RaidCandidate { id = id, name = id, classId = classId, level = level, gearBonus = RaidCall.CallGear, zone = zone, bold = bold, guild = guild, friend = friend, online = online, rival = rival };
         }
         static RaidGroup Alone() { return RaidGroup.Form(new RaidMember { name = "You", classId = "class.mage", level = 20 }, null); }
         static List<RaidCandidate> Roster()
         {
             return new List<RaidCandidate> {
-                C("g1", "class.warrior", 19, "zone.ashrim", guild: "Ember Oath"),        // guild, away: travels
-                C("g2", "class.cleric", 18, Low, guild: "Ember Oath"),                    // guild, here
-                C("g3", "class.mage", 17, Low, guild: "Ember Oath"),                      // guild, too green
+                C("g1", "class.warrior", 20, "zone.ashrim", guild: "Ember Oath"),        // guild, away: travels
+                C("g2", "class.cleric", 20, Low, guild: "Ember Oath"),                    // guild, here
+                C("g3", "class.mage", 19, Low, guild: "Ember Oath"),                      // guild, under 20: too green
                 C("z1", "class.paladin", 20, Low, bold: .8f),                             // the second tank
-                C("z2", "class.druid", 19, Low, bold: .2f),                               // too timid: declines with a line
-                C("z3", "class.shaman", 18, Low, bold: .5f),                              // a healer
+                C("z2", "class.druid", 20, Low, bold: .2f),                               // too timid: declines with a line
+                C("z3", "class.shaman", 20, Low, bold: .5f),                              // a healer
                 C("z4", "class.rogue", 20, Low, bold: .9f),
-                C("z5", "class.ranger", 19, Low, bold: .6f),
+                C("z5", "class.ranger", 20, Low, bold: .6f),
                 C("z6", "class.warrior", 20, Low, bold: .7f),                             // the tanks are full by then: nothing said
-                C("z7", "class.mage", 15, Low, bold: .9f),                                // too green
-                C("z8", "class.rogue", 19, Low, online: false),                           // asleep
+                C("z7", "class.mage", 19, Low, bold: .9f),                                // too green
+                C("z8", "class.rogue", 20, Low, online: false),                           // asleep
                 C("z9", "class.scoundrel", 20, Low, rival: true),                         // a rival
-                C("f1", "class.saltmender", 18, "zone.verdant", friend: true),            // a friend away: the third healer
+                C("f1", "class.saltmender", 20, "zone.verdant", friend: true),            // a friend away: the third healer
                 C("f2", "class.ranger", 20, "zone.crown", friend: true, bold: .1f),       // a friend comes whatever its nerve
             };
         }
@@ -53,7 +53,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(SimCompanion.PartyRole.Healer, comes["f1"].role, "the friend Salt-Mender is the third healer");
             Assert.AreEqual(SimCompanion.PartyRole.Damage, comes["f2"].role);
             // The gates.
-            Assert.IsFalse(answers.Any(a => a.id == "g3" || a.id == "z7"), "under 18 do not answer");
+            Assert.IsFalse(answers.Any(a => a.id == "g3" || a.id == "z7"), "under 20 do not answer (Chris: the raid is for geared level-20 players)");
             Assert.IsFalse(answers.Any(a => a.id == "z8"), "nobody asleep answers");
             Assert.IsFalse(answers.Any(a => a.id == "z9"), "a rival does not answer");
             Assert.IsFalse(answers.Any(a => a.id == "z6"), "a third tank is not wanted, and says nothing");
@@ -69,10 +69,20 @@ namespace Crulanda.Tests
             Assert.AreEqual(8, RaidCall.Comers(answers)); Assert.IsTrue(RaidCall.Short(g, answers));
         }
 
+        [Test] public void Only_geared_level_twenty_sims_answer_the_call()
+        {
+            var g = Alone();
+            var bare = C("x1", "class.rogue", 20, Low); bare.gearBonus = 0;
+            var green = C("x2", "class.rogue", 19, Low);
+            var ready = C("x3", "class.rogue", 20, Low);
+            var answers = RaidCall.Answers(g, new List<RaidCandidate> { bare, green, ready }, Low, "", 5);
+            CollectionAssert.AreEqual(new[] { "x3" }, answers.Where(a => a.comes).Select(a => a.id).ToList(), "level " + RaidCall.CallLevel + " and geared (" + RaidCall.CallGear + "+ bought upgrades)");
+        }
+
         [Test] public void The_guild_comes_before_a_bolder_sim_of_the_zone_for_the_last_tank()
         {
             var g = RaidGroup.Form(new RaidMember { name = "You", classId = "class.warrior", level = 20 }, null);   // you tank: one tank wanted
-            var roster = new List<RaidCandidate> { C("zw", "class.warrior", 20, Low, bold: 1f), C("gw", "class.warrior", 18, "zone.peaks", guild: "Ember Oath") };
+            var roster = new List<RaidCandidate> { C("zw", "class.warrior", 20, Low, bold: 1f), C("gw", "class.warrior", 20, "zone.peaks", guild: "Ember Oath") };
             var answers = RaidCall.Answers(g, roster, Low, "Ember Oath", 1);
             Assert.AreEqual("gw", answers.Single(a => a.comes).id, "your guild first");
             Assert.IsFalse(answers.Any(a => a.id == "zw"));
@@ -84,7 +94,7 @@ namespace Crulanda.Tests
         {
             var g = Alone();
             var many = new List<RaidCandidate>();
-            for (int i = 0; i < 30; i++) many.Add(C("d" + i.ToString("00"), i % 3 == 0 ? "class.warrior" : i % 3 == 1 ? "class.cleric" : "class.rogue", 19, Low));
+            for (int i = 0; i < 30; i++) many.Add(C("d" + i.ToString("00"), i % 3 == 0 ? "class.warrior" : i % 3 == 1 ? "class.cleric" : "class.rogue", 20, Low));
             var a = RaidCall.Answers(g, many, Low, "", 42);
             Assert.AreEqual(9, RaidCall.Comers(a));
             Assert.AreEqual(2, a.Count(x => x.comes && x.role == SimCompanion.PartyRole.Tank));
@@ -99,7 +109,7 @@ namespace Crulanda.Tests
         {
             // The real kind of roster: sims online in the day (8:00 for eight hours), asked at 3 am.
             var sims = new List<SimAdventurer>();
-            for (int i = 0; i < 12; i++) sims.Add(new SimAdventurer { id = "sim" + i, name = "Sim " + i, classId = i % 2 == 0 ? "class.warrior" : "class.cleric", level = 19, zone = Low, bold = .9f, onlineFrom = 8, onlineHours = 8 });
+            for (int i = 0; i < 12; i++) sims.Add(new SimAdventurer { id = "sim" + i, name = "Sim " + i, classId = i % 2 == 0 ? "class.warrior" : "class.cleric", level = 20, gearBonus = RaidCall.CallGear, zone = Low, bold = .9f, onlineFrom = 8, onlineHours = 8 });
             var g = Alone();
             var night = RaidCall.Answers(g, sims.Select(s => RaidCandidate.Of(s, 3f, false)).ToList(), Low, "", 3);
             Assert.AreEqual(0, RaidCall.Comers(night), "nobody is about at 3 am");

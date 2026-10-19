@@ -23,6 +23,8 @@
   platform stands; the crossbeam is lashed to the trunk and rests on that limb, the rope and a noose hang from its end over the
   platform; its collider fits the thicker trunk. The big dead oaks (Khaven, Oakhaven, the Shore) now pick from the three stout
   trees (Dry8872, Dry6524, Dry5818), broadened by a third; the grey husks and snags stay as they were (scenery, not landmarks).
+  After art2 (the beam read as floating behind the tree, no rope seen): the beam's free end now hangs over the platform's middle,
+  a 4 cm rope from it and a noose whose foot is 1.75 m over the boards (GallowsPlan; the test holds the noose over the boards).
   To capture: khaven-03 again, and the Shore's and Oakhaven's dead oaks.
 - **Tests** (DryTreeTests, EditMode, files only): no nature-kit dead tree or painted dead tree is built; every pick is one of the seven;
   the pack's GUIDs and full metas, Built-in materials, no demo files, the texture cap; heights within the old range.

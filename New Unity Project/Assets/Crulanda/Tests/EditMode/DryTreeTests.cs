@@ -118,6 +118,23 @@ namespace Crulanda.Tests
             StringAssert.Contains("GallowsDryTree, 9, 1.35f", body, "the stoutest tree, 9 m, broadened");
             StringAssert.Contains("GallowsLimb(", body, "the crossbeam rests on a limb measured from the mesh");
             StringAssert.Contains("StoutDryTrees[", src, "the massive dead oaks pick from the stout trees");
+            // (preview-1019 art2: the rope unseen, the platform off the beam's end.) The noose hangs from the beam's free end, its foot at
+            // head height over the middle of the boards; the rope reads (3-4 cm); the boards stand clear of the trunk.
+            StringAssert.Contains("GallowsPlan(limb)", body, "the gallows is laid out by GallowsPlan");
+            Assert.That(ZoneBuilder.GallowsRope, Is.InRange(.03f, .045f), "a rope thick enough to see");
+            foreach (var limb in new[] { new Vector3(2.6f, 4.1f, 0), new Vector3(1.6f, 3.4f, 0), new Vector3(3.6f, 5.5f, 0), new Vector3(1.2f, 2.8f, 0) })
+            {
+                var g = ZoneBuilder.GallowsPlan(limb); string where = "limb " + limb;
+                float half = ZoneBuilder.GallowsBoards / 2;
+                Assert.Less(Mathf.Abs(g.noose.x - g.platform.x), half * .5f, where + ": the noose over the middle of the boards (x)");
+                Assert.Less(Mathf.Abs(g.noose.z - g.platform.z), half * .5f, where + ": the noose over the middle of the boards (z)");
+                Assert.That(g.noose.y - ZoneBuilder.GallowsDeck, Is.InRange(1.5f, 2f), where + ": the noose's foot at head height over the deck");
+                Assert.That(g.ropeTop.x, Is.InRange(g.beamFrom.x, g.beamTo.x), where + ": the rope hangs from the beam");
+                Assert.Less(g.ropeTop.y, g.beamTo.y, where + ": under it"); Assert.Greater(g.ropeTop.y - g.knot.y, .3f, where + ": a length of rope shows");
+                Assert.Less(g.beamTo.x - g.ropeTop.x, .25f, where + ": near the beam's free end");
+                Assert.Greater(g.platform.x - half, .8f, where + ": the boards clear of the trunk");
+                Assert.AreEqual(g.beamFrom.y, g.beamTo.y, 1e-4f, where + ": the beam level, at the limb");
+            }
         }
 
         [Test] public void Heights_are_within_the_old_range()

@@ -130,6 +130,25 @@ namespace Crulanda.World
             foreach (var p in bins[best]) limb += p; limb /= bins[best].Count; return true;
         }
 
+        /// <summary>The gallows' rope (4 cm through, so it reads from the camera), the noose's loop (radius), the platform's deck height and
+        /// its boards' width.</summary>
+        public const float GallowsRope = .04f, GallowsLoop = .17f, GallowsDeck = .575f, GallowsBoards = 2.4f;
+        /// <summary>The gallows laid out from its limb (the gallows' space, the tree turned so the limb lies along +x).</summary>
+        public struct GallowsLayout { public Vector3 beamFrom, beamTo, ropeTop, knot, noose, platform; }
+        /// <summary>
+        /// The crossbeam from the trunk along the limb at its height to 0.7 m past it; the rope from just under the beam's free end (0.1 m
+        /// short of it) to its knot 2.1 m over the deck, so the noose's foot hangs some 1.75 m over the boards (head height); the platform
+        /// centred under the rope (its near edge well clear of the trunk). Pure: the test reads it.
+        /// </summary>
+        public static GallowsLayout GallowsPlan(Vector3 limb)
+        {
+            float reach = Mathf.Max(1.6f, new Vector2(limb.x, limb.z).magnitude), y = Mathf.Max(3.2f, limb.y);
+            var g = new GallowsLayout { beamFrom = new Vector3(.2f, y, 0), beamTo = new Vector3(reach + .7f, y, 0) };
+            float x = reach + .6f; g.ropeTop = new Vector3(x, y - .08f, 0); g.knot = new Vector3(x, Mathf.Min(y - .5f, GallowsDeck + 2.1f), 0);
+            g.noose = g.knot + Vector3.down * 2 * GallowsLoop; g.platform = new Vector3(x, 0, 0);
+            return g;
+        }
+
         static readonly Dictionary<int, (Mesh mesh, Matrix4x4 unit)> dryFar = new Dictionary<int, (Mesh, Matrix4x4)>();
         /// <summary>
         /// The lowest-detail copy of dry tree <paramref name="pick"/> for the backdrop's merged meshes, with the matrix that stands it up as

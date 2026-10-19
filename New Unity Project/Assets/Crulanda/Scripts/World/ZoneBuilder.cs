@@ -3393,22 +3393,21 @@ namespace Crulanda.World
                 // The tree turned on its trunk so that limb points along the gallows' own +x, where the platform always stood (clear of
                 // the yard's houses as the zone file placed it).
                 tree.localRotation = Quaternion.Euler(0, Mathf.Atan2(limb.z, limb.x) * Mathf.Rad2Deg, 0); limb = new Vector3(new Vector2(limb.x, limb.z).magnitude, limb.y, 0);
-                var rope = Tint(art.cloth, new Color(.45f, .38f, .28f)); var flat = new Vector3(limb.x, 0, limb.z); float reach = flat.magnitude; var dir = flat / Mathf.Max(.01f, reach);
-                var end = dir * (reach + .55f) + Vector3.up * limb.y;
-                Rod(t, dir * .2f + Vector3.up * limb.y, end, .13f, art.bark);                                                   // the crossbeam: trunk to past the limb
-                Rod(t, dir * .25f + Vector3.up * (limb.y - .35f), dir * .25f + Vector3.up * (limb.y + .2f), .16f, rope);          // lashed to the trunk
-                float knot = Mathf.Min(limb.y - .6f, 2.25f); var hang = dir * (reach + .4f);
-                Rod(t, hang + Vector3.up * (limb.y - .1f), hang + Vector3.up * knot, .028f, rope);                              // the rope
-                var side = Vector3.Cross(Vector3.up, dir);
-                for (int k = 0; k < 8; k++)                                                                                     // the noose
+                // (preview-1019 art2: the rope too thin to see, the platform off the beam's end.) GallowsPlan lays it out: the beam's free
+                // end over the platform's middle, a 4 cm rope from it, the noose's foot at head height over the boards.
+                var plan = GallowsPlan(limb); var rope = Tint(art.cloth, new Color(.45f, .38f, .28f));
+                Rod(t, plan.beamFrom, plan.beamTo, .13f, art.bark);                                                              // the crossbeam: trunk, limb, out
+                Rod(t, plan.beamFrom + Vector3.down * .35f, plan.beamFrom + Vector3.up * .2f, .17f, rope);                       // lashed to the trunk
+                Rod(t, plan.ropeTop, plan.knot, GallowsRope, rope);                                                               // the rope
+                for (int k = 0; k < 10; k++)                                                                                     // the noose, a loop across the beam
                 {
-                    float a0 = k * Mathf.PI / 4, a1 = (k + 1) * Mathf.PI / 4;
-                    Vector3 P(float a) { return hang + Vector3.up * (knot - .17f) + side * Mathf.Sin(a) * .15f + Vector3.up * Mathf.Cos(a) * .17f; }
-                    Rod(t, P(a0), P(a1), .025f, rope);
+                    float a0 = k * Mathf.PI / 5, a1 = (k + 1) * Mathf.PI / 5;
+                    Vector3 P(float a) { return plan.knot + Vector3.down * GallowsLoop + Vector3.forward * Mathf.Sin(a) * GallowsLoop * .85f + Vector3.up * Mathf.Cos(a) * GallowsLoop; }
+                    Rod(t, P(a0), P(a1), GallowsRope, rope);
                 }
-                var face = Quaternion.LookRotation(dir); var mid = dir * (reach + .9f);
-                Part(PrimitiveType.Cube, t, mid + Vector3.up * .5f, new Vector3(2.4f, .15f, 2.4f), art.timber, face);
-                foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, mid + face * new Vector3(sx, .25f, sz), new Vector3(.18f, .5f, .18f), art.timber, face);
+                Part(PrimitiveType.Cube, t, plan.platform + Vector3.up * (GallowsDeck - .075f), new Vector3(GallowsBoards, .15f, GallowsBoards), art.timber);
+                foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
+                    Part(PrimitiveType.Cube, t, plan.platform + new Vector3(sx * (GallowsBoards / 2 - .2f), (GallowsDeck - .15f) / 2, sz * (GallowsBoards / 2 - .2f)), new Vector3(.18f, GallowsDeck - .15f, .18f), art.timber);
                 return;
             }
             Part(PrimitiveType.Cylinder, t, new Vector3(1.6f, 3.6f, 0), new Vector3(.28f, 1.7f, .28f), art.bark, Quaternion.Euler(0, 0, 80));

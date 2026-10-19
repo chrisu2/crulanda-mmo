@@ -47,6 +47,16 @@ namespace Crulanda.Encounter
                 return list.ToArray();
             }
         }
+        /// <summary>The line-up's looks whose rare and epic pieces wear the PBR steel (KayKitWeapons.Pbr, play note 249).</summary>
+        public static string[] PbrLooks
+        {
+            get
+            {
+                var list = new List<string>();
+                foreach (var l in KayKitLooks) if (GearLooks.TryParseLook(l, out var f, out var v, out _, out _) && KayKitWeapons.Pbr.ContainsKey(f + ":" + v)) list.Add(l);
+                return list.ToArray();
+            }
+        }
         static bool WearsKayKit(string look) { return GearLooks.TryParseLook(look, out var f, out var v, out _, out _) && KayKitWeapons.ModelFor(f, v) != null; }
         /// <summary>The four views of each KayKit piece: in hand (HoldOverride 1) and put away (2), from the front and from its side.</summary>
         public static readonly (string name, int hold, bool side)[] KayKitViews = { ("held-front", 1, false), ("held-side", 1, true), ("stowed-front", 2, false), ("stowed-side", 2, true) };
@@ -206,10 +216,11 @@ namespace Crulanda.Encounter
         }
 
         /// <summary>
-        /// Shots 19 (play note 245): every KayKit weapon (and the Ranger's own bow) and every KayKit shield, rare at level 8 so the
-        /// accent shows, in each of the four views: held or put away (HoldOverride, whatever the game would do out of a fight), from
-        /// the front (facing the camera) and from the side its hand is on (a weapon's right, a shield's or bow's left). Then the
-        /// arming sword in every palette, held, to judge the tint.
+        /// Shots 19 (play notes 245, 249 and 250): every mapped weapon (and the Ranger's own bow) and shield, uncommon at level 8
+        /// (19-kaykit-main-*, -off-*), then every PBR steel piece and every one of the twenty Sky Den axes at the quality, level band
+        /// and palette that gives it (19-kaykit-steel-*, labelled with the model), each in the four views: held or put away (HoldOverride, whatever the game would do out of a
+        /// fight), from the front (facing the camera) and from the side its hand is on (a weapon's right, a shield's or bow's left).
+        /// Then the arming sword in every palette, held, to judge the tint.
         /// </summary>
         IEnumerator KayKitShots(string directory)
         {
@@ -219,10 +230,27 @@ namespace Crulanda.Encounter
                 foreach (var (view, hold, side) in KayKitViews)
                 {
                     var row = Entries(list.ToArray(), null, 8);
-                    foreach (var e in row) { db.Items[e.ids[0]].quality = 3; e.hold = hold; e.yaw = !side ? 180 : part == "main" ? 90 : -90; }
+                    foreach (var e in row) { var d = db.Items[e.ids[0]]; d.quality = 2; e.hold = hold; e.yaw = !side ? 180 : d.slot == "mainhand" ? 90 : -90; }
                     if (ranger) row.Add(new Entry { ids = new string[0], look = ActorLook.Ranger, title = "Ranger's own bow", sub = KayKitWeapons.ClassBow, hold = hold, yaw = side ? -90 : 180 });
                     yield return Shots(directory, "19-kaykit-" + part + "-" + view, row, new Framing(), 12);
                 }
+            // The PBR steel and the Sky Den axes: one figure per model, at the first quality, band and palette that gives it.
+            int[] bandLevel = { 0, 6, 10, 12, 14, 15 };   // the required level whose curve level (level + 1) falls in each band (GearLooks.BandOf)
+            var steel = KayKitWeapons.Wearable.FindAll(w => KayKitWeapons.IsPbr(w.model) || KayKitWeapons.IsAxes(w.model));
+            var shown = new HashSet<string>();
+            foreach (var (view, hold, side) in KayKitViews)
+            {
+                var row = new List<Entry>(); shown.Clear();
+                foreach (var w in steel)
+                {
+                    if (!shown.Add(w.model)) continue;
+                    string id = "wardrobe." + db.Items.Count, look = w.family + ":" + w.variant + "/" + w.palette; looks.Register(id, look);
+                    var slot = GearLooks.Family(w.family).slot;
+                    db.Items[id] = new ItemDef { id = id, name = look, kind = "gear", slot = slot, quality = w.quality, level = bandLevel[w.tier], canonStatus = "GAME-ONLY" };
+                    row.Add(new Entry { ids = new[] { id }, title = w.model.Replace(KayKitWeapons.AxesPrefix, "").Replace(KayKitWeapons.PbrPrefix, "PBR "), sub = w.family + ":" + w.variant + ", " + ItemDatabase.QualityNames[w.quality] + ", band " + w.tier + ", " + w.palette, hold = hold, yaw = !side ? 180 : slot == "mainhand" ? 90 : -90 });
+                }
+                yield return Shots(directory, "19-kaykit-steel-" + view, row, new Framing(), 12);
+            }
             var palettes = new List<string>(); foreach (var p in looks.PaletteIds) palettes.Add("sword.arming:straight/" + p);
             var tinted = Entries(palettes.ToArray(), "mainhand", 8); foreach (var e in tinted) { e.hold = 1; e.yaw = 115; }
             yield return Shots(directory, "19-kaykit-palettes", tinted, new Framing(), 12);

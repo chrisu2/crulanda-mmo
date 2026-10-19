@@ -19,7 +19,7 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed partial class ActorVisual
     {
-        static readonly Dictionary<string, Bounds> kayKitBounds = new Dictionary<string, Bounds>();
+        static readonly Dictionary<GameObject, Bounds> kayKitBounds = new Dictionary<GameObject, Bounds>();
         static readonly Dictionary<string, Material> kayKitMats = new Dictionary<string, Material>();
         static Material kayKitAtlas;
 
@@ -27,7 +27,8 @@ namespace Crulanda.Encounter
         public static bool KayKitBounds(GameObject src, out Bounds b)
         {
             b = default; if (src == null) return false;
-            if (kayKitBounds.TryGetValue(src.name, out b)) return true;
+            var key = src;
+            if (kayKitBounds.TryGetValue(key, out b)) return true;
             bool any = false; var inv = src.transform.worldToLocalMatrix;
             foreach (var mf in src.GetComponentsInChildren<MeshFilter>(true))
             {
@@ -41,7 +42,7 @@ namespace Crulanda.Encounter
                         if (!any) { b = new Bounds(p, Vector3.zero); any = true; } else b.Encapsulate(p);
                     }
             }
-            if (any) kayKitBounds[src.name] = b;
+            if (any) kayKitBounds[key] = b;
             return any;
         }
 
@@ -53,7 +54,7 @@ namespace Crulanda.Encounter
         /// How to lay a KayKit model in a weapon, shield or bow frame: the rotation, the offset and the scale that put its grip (its
         /// pivot) at the frame's origin and its length at <paramref name="length"/> (see the class summary for the axes).
         /// </summary>
-        public static (Quaternion rot, Vector3 offset, float scale) KayKitFit(Bounds b, KayKitWeapons.Kind kind, float length)
+        public static (Quaternion rot, Vector3 offset, float scale) KayKitFit(Bounds b, KayKitWeapons.Kind kind, float length, Vector3? grip = null)
         {
             var size = b.size; var order = new List<int> { 0, 1, 2 }; order.Sort((x, y) => size[y].CompareTo(size[x]));
             int lng = order[0], mid = order[1], thin = order[2];
@@ -69,24 +70,58 @@ namespace Crulanda.Encounter
             var up = Axis(lng, Further(b, lng)); var edge = Axis(mid, Further(b, mid));
             var rot = Quaternion.Inverse(Quaternion.LookRotation(edge, up));   // edge to +Z, length to +Y
             if (kind == KayKitWeapons.Kind.Bow) rot = Quaternion.Euler(0, 90, 0) * rot;   // the bow's depth (toward its tips and string) to +X
-            return (rot, Vector3.zero, length / Mathf.Max(.01f, size[lng]));
+            float scale = length / Mathf.Max(.01f, size[lng]);
+            return (rot, grip.HasValue ? -(rot * grip.Value) * scale : Vector3.zero, scale);   // a PBR weapon's measured grip to the origin
+        }
+
+        /// <summary>
+        /// Where the hand closes on a model whose pivot is not its grip (the PBR weapons): <paramref name="along"/> of its length up from
+        /// the butt, on the line through the middle of the butt's end (its haft or pommel, which the grip shares).
+        /// </summary>
+        public static Vector3 ModelGrip(GameObject src, Bounds b, float along)
+        {
+            var size = b.size; int lng = size.x >= size.y && size.x >= size.z ? 0 : size.y >= size.z ? 1 : 2;
+            float dir = Further(b, lng), butt = dir > 0 ? b.min[lng] : b.max[lng];
+            var grip = b.center; grip[lng] = butt + dir * along * size[lng];
+            var inv = src.transform.worldToLocalMatrix; bool any = false; var end = new Bounds();
+            foreach (var mf in src.GetComponentsInChildren<MeshFilter>(true))
+            {
+                var mesh = mf.sharedMesh; if (mesh == null || !mesh.isReadable) continue; var m = inv * mf.transform.localToWorldMatrix;
+                foreach (var v in mesh.vertices)
+                {
+                    var p = m.MultiplyPoint3x4(v); if (Mathf.Abs(p[lng] - butt) > size[lng] * .06f) continue;
+                    if (!any) { end = new Bounds(p, Vector3.zero); any = true; } else end.Encapsulate(p);
+                }
+            }
+            if (any) for (int i = 0; i < 3; i++) if (i != lng) grip[i] = end.center[i];
+            return grip;
+        }
+
+        /// <summary>A weapon model by its id (KayKitWeapons.PathOf): the loaded asset, or its node for an axe of the Sky Den set; null when missing.</summary>
+        public static GameObject LoadWeaponModel(string model)
+        {
+            var src = Resources.Load<GameObject>(KayKitWeapons.PathOf(model)); var node = KayKitWeapons.NodeOf(model);
+            if (src == null || node == null) return src;
+            var t = src.transform.Find(node); return t != null ? t.gameObject : null;
         }
 
         /// <summary>The model under <paramref name="frame"/>, fitted, in the item's colours (null palette: the pack's own). Null when the model is not in the build.</summary>
         public static Transform PlaceKayKit(Transform frame, string model, KayKitWeapons.Kind kind, float length, Color? metal = null, Color? wood = null)
         {
-            var src = Resources.Load<GameObject>(KayKitWeapons.Folder + model);
+            var src = LoadWeaponModel(model);
             if (src == null || !KayKitBounds(src, out var b)) return null;
-            var go = Instantiate(src, frame, false); go.name = "KayKit " + model;
+            var go = Instantiate(src, frame, false); go.name = "KayKit " + model.Replace(KayKitWeapons.PbrPrefix, "PBR ").Replace(KayKitWeapons.AxesPrefix, "").Trim();
             foreach (var c in go.GetComponentsInChildren<Component>(true))
                 if (!(c is Transform) && !(c is MeshFilter) && !(c is MeshRenderer)) { if (Application.isPlaying) Destroy(c); else DestroyImmediate(c); }
-            var mat = KayKitMaterial(metal, wood);
+            var mat = KayKitWeapons.IsPbr(model) ? Resources.Load<Material>(KayKitWeapons.MaterialOf(model))   // a PBR piece keeps its own steel
+                : KayKitWeapons.IsAxes(model) ? null : KayKitMaterial(metal, wood);                               // the Sky Den axes their FBX's own materials
             foreach (var r in go.GetComponentsInChildren<MeshRenderer>(true))
             {
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true;
                 if (mat != null) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = mat; r.sharedMaterials = mats; }
             }
-            var fit = KayKitFit(b, kind, length);
+            Vector3? grip = null; var along = KayKitWeapons.GripAlong(model); if (kind == KayKitWeapons.Kind.Weapon && along.HasValue) grip = ModelGrip(src, b, along.Value);
+            var fit = KayKitFit(b, kind, length, grip);
             go.transform.localRotation = fit.rot; go.transform.localScale = Vector3.one * fit.scale; go.transform.localPosition = fit.offset;
             return go.transform;
         }
@@ -94,7 +129,7 @@ namespace Crulanda.Encounter
         /// <summary>A drawn family's piece as its KayKit model, with its quality's accents; false (nothing built) when it has none or it is missing.</summary>
         bool KayKitGear(GearKit k, Transform root)
         {
-            string model = KayKitWeapons.ModelFor(k.l.family, k.l.variant); if (model == null) return false;
+            string model = KayKitWeapons.ModelFor(k.l.family, k.l.variant, k.l.quality, k.l.tier, k.l.palette); if (model == null) return false;
             var kind = KayKitWeapons.KindOf(k.l.family); float length = KayKitWeapons.LengthOf(k.l.family);
             var t = PlaceKayKit(root, model, kind, length, k.l.metal, k.l.wood); if (t == null) return false;
             if (kind == KayKitWeapons.Kind.Shield)
@@ -103,9 +138,11 @@ namespace Crulanda.Encounter
                 Accent(k, 2, root, Sphere, V(length * .32f, .05f, 0), V(.045f, .03f, .045f));   // and one at the top
                 return true;
             }
-            KayKitBounds(Resources.Load<GameObject>(KayKitWeapons.Folder + model), out var b);
+            KayKitBounds(LoadWeaponModel(model), out var b);
             int lng = b.size.x >= b.size.y && b.size.x >= b.size.z ? 0 : b.size.y >= b.size.z ? 1 : 2;
-            float butt = -length * Mathf.Abs(Further(b, lng) > 0 ? b.min[lng] : b.max[lng]) / Mathf.Max(.01f, b.size[lng]);   // where the pommel or butt ends, below the fist
+            var along = KayKitWeapons.GripAlong(model);
+            float butt = along.HasValue ? -length * along.Value   // where the pommel or butt ends, below the fist
+                : -length * Mathf.Abs(Further(b, lng) > 0 ? b.min[lng] : b.max[lng]) / Mathf.Max(.01f, b.size[lng]);
             Accent(k, 1, root, Sphere, V(0, .1f, 0), V(.05f, .04f, .05f));                      // a stone just above the fist, at the guard
             Accent(k, 2, root, Sphere, V(0, butt, 0), S(.045f));                                // and one at the pommel
             return true;

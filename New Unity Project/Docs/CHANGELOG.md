@@ -1,5 +1,25 @@
 # Changelog
 
+## 2026-10-19: PBR steel and twenty axes on top of the KayKit weapons (branch kaykit-weapons; WRITTEN, NOT RUN)
+- Chris (play note 249): "here are some more weapon types in my assets - pbr medievel weapons"; (play note 250): "here are some axes
+  in myassets - mid poly axes collection". Both packs are in Resources/Props (PBRWeapons, MidPolyAxes) with their own .metas and
+  GUIDs (models, materials, textures; no scenes or prefabs); maps capped at 1024. The PBR pack's materials were URP Lit: rebuilt
+  on the built-in Standard shader from their own albedo, normal, metallic-smoothness and AO maps. The axes were already Standard.
+- PBR steel (rare and epic only; common and uncommon keep KayKit): the arming sword (straight, disc) and the steel greatsword
+  wear the PBR sword; the flanged mace the PBR mace; the spear the PBR spear; the round shield (boards, hide) the PBR shield. The
+  heater keeps KayKit's heater (the PBR shield is round). Rare bearded and crescent axes wear the PBR war axe.
+- The Sky Den axes (one FBX, the node Axe01 to Axe20 picked at run time), by level band, quality and zone palette: wedge hand axe
+  Axe03 (bands 1-2), Axe04 (3-4), Axe05 (5-6), Axe18 at rare and epic; hatchet Axe07, Axe10, Axe08 (band 5), Axe09 (band 6);
+  bearded Axe06 (bands 1-2), then Axe16; hooked bearded Axe17; crescent Axe11 (bands 1-3), Axe14 after, Axe20 in a dark palette
+  (Khaven, Ashwalker, Cult); spiked crescent Axe12, Axe01 in a dark palette; epic: bearded Axe13, crescent Axe02 (gold; Axe19 in a
+  dark palette), spiked Axe15. The cleaver keeps KayKit's axe_C. All twenty are worn by something.
+- Fit: both packs' pivots are not at the grip, so the grip is measured: a fraction up the length from the butt, on the line through
+  the butt's own middle (sword 15%, axes and mace 20%, spear 31%), then laid and scaled as the KayKit ones. Tests: every piece maps,
+  loads (PBR on Standard with its maps; the axes on their Axe-P materials), every model at every quality, band and palette is within
+  15% of its family's length with the fist round the grip. Compiles; not run in Unity.
+- To capture: the same `--crulanda-wardrobe-kaykit` run now also takes 19-kaykit-steel-* (one figure per PBR piece and per axe,
+  labelled with the model, held and put away, front and side). Look for the grip in the fist on the axes (their hafts vary).
+
 ## 2026-10-19: weapons and shields as KayKit models (branch kaykit-weapons; WRITTEN, NOT RUN)
 - Chris (play note 245): "weapons . KayKit : Fantasy Weapons Bits". The pack (Kay Lousberg, CC0; 31 models, one swatch atlas, the
   licence) is in Resources/Props/KayKitWeapons, imported as the KayKit dungeon pack is (its Unity FBX, full importer metas). 41 of the

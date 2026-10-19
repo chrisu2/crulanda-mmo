@@ -37,6 +37,30 @@ namespace Crulanda.Tests
                     if (KayKitWeapons.ModelFor(f.name, v) != null) Assert.IsTrue(KayKitWeapons.Lengths.ContainsKey(f.name), f.name + " has its drawn length.");
                 }
             foreach (var key in KayKitWeapons.Map.Keys) Assert.IsTrue(keys.Contains(key), key + " is a drawn hand variant (no stale entries).");
+            // The PBR steel (play note 249): only for variants that wear a KayKit model below rare, and only at rare and epic.
+            foreach (var e in KayKitWeapons.Pbr)
+            {
+                var fv = e.Key.Split(':');
+                Assert.IsNotNull(KayKitWeapons.ModelFor(fv[0], fv[1]), e.Key + " wears a KayKit model below rare.");
+                Assert.AreEqual(e.Value, KayKitWeapons.ModelFor(fv[0], fv[1], KayKitWeapons.PbrQuality), e.Key + " wears " + e.Value + " at rare.");
+                Assert.AreEqual(e.Value, KayKitWeapons.ModelFor(fv[0], fv[1], 4), e.Key + " and at epic.");
+                Assert.AreNotEqual(e.Value, KayKitWeapons.ModelFor(fv[0], fv[1], 2), e.Key + ": not at uncommon.");
+                if (KayKitWeapons.KindOf(fv[0]) == KayKitWeapons.Kind.Weapon) Assert.IsTrue(KayKitWeapons.GripAlong(e.Value).HasValue, e.Value + " has its measured grip.");
+            }
+            // The Sky Den axes (play note 250): every axe family's variant wears one at every quality but rare (the PBR war axe for
+            // bearded and crescent), the level band and the zone's palette choosing which; all twenty are used, the cleaver stays KayKit's.
+            var axes = new HashSet<string>();
+            foreach (var f in new[] { "axe.hand", "axe.bearded", "axe.crescent" })
+                foreach (var v in GearLooks.Family(f).variants)
+                    for (int q = 0; q <= 4; q++) for (int t = 0; t <= 5; t++) foreach (var p in new[] { "oakhaven", "khaven" })
+                    {
+                        var m = KayKitWeapons.ModelFor(f, v, q, t, p); string what = f + ":" + v + " q" + q + " band " + t + " " + p;
+                        if (q == 3 && f != "axe.hand") { Assert.AreEqual("pbr/Axe", m, what + ": the PBR war axe"); continue; }
+                        Assert.IsTrue(KayKitWeapons.IsAxes(m), what + " is a Sky Den axe (" + m + ")"); axes.Add(m);
+                        Assert.AreEqual(KayKitWeapons.AxeGrip, KayKitWeapons.GripAlong(m), what + ": its grip measured up the haft");
+                    }
+            Assert.AreEqual(20, axes.Count, "all twenty axes are worn by something: " + string.Join(", ", axes.OrderBy(a => a)));
+            Assert.AreEqual("axe_C", KayKitWeapons.ModelFor("cleaver", "slab", 4, 5, "khaven"), "the cleaver keeps KayKit's broad blade");
             int mapped = KayKitWeapons.Map.Values.Count(m => m.Length > 0);
             TestContext.WriteLine(mapped + " of " + keys.Count + " variants wear a KayKit model.");
             Assert.GreaterOrEqual(mapped, 40, "Most weapons and shields wear a model; the drawings are kept only where the look is the point.");
@@ -46,8 +70,19 @@ namespace Crulanda.Tests
         {
             foreach (var m in KayKitWeapons.Models)
             {
-                var src = Resources.Load<GameObject>(KayKitWeapons.Folder + m);
-                Assert.NotNull(src, m + " is in Resources/" + KayKitWeapons.Folder);
+                var src = ActorVisual.LoadWeaponModel(m);
+                Assert.NotNull(src, m + " is in Resources/" + KayKitWeapons.PathOf(m) + (KayKitWeapons.NodeOf(m) != null ? " (node " + KayKitWeapons.NodeOf(m) + ")" : ""));
+                if (KayKitWeapons.IsAxes(m)) foreach (var r in src.GetComponentsInChildren<MeshRenderer>(true)) foreach (var mat in r.sharedMaterials)
+                {
+                    Assert.NotNull(mat, m + ": the FBX's own materials are remapped to the pack's"); Assert.AreEqual("Standard", mat.shader.name, m + ": on the built-in Standard shader");
+                    StringAssert.StartsWith("Axe-P", mat.name, m + ": the pack's Axe-P1 or Axe-P2 material");
+                }
+                if (KayKitWeapons.IsPbr(m))
+                {
+                    var mat = Resources.Load<Material>(KayKitWeapons.MaterialOf(m)); Assert.NotNull(mat, m + "'s own material");
+                    Assert.AreEqual("Standard", mat.shader.name, m + ": rebuilt on the built-in Standard shader (the pack's were URP Lit)");
+                    Assert.NotNull(mat.mainTexture, m + ": its albedo"); Assert.NotNull(mat.GetTexture("_BumpMap"), m + ": its normal map"); Assert.NotNull(mat.GetTexture("_MetallicGlossMap"), m + ": its metal and smoothness");
+                }
                 var filters = src.GetComponentsInChildren<MeshFilter>(true);
                 Assert.AreEqual(1, filters.Length, m + " is one mesh, as the pack builds them.");
                 Assert.NotNull(filters[0].sharedMesh, m + " has its mesh"); Assert.IsTrue(filters[0].sharedMesh.isReadable, m + " is readable (the bow's string is cut from it, the tests measure it).");
@@ -91,7 +126,8 @@ namespace Crulanda.Tests
 
         [Test] public void Each_model_is_held_at_its_familys_length_with_the_fist_round_its_grip()
         {
-            var checks = KayKitWeapons.Map.Where(e => e.Value.Length > 0).Select(e => (e.Key, e.Value, KayKitWeapons.KindOf(e.Key.Split(':')[0]), KayKitWeapons.LengthOf(e.Key.Split(':')[0]))).ToList();
+            // Every model every variant can wear (KayKit's, the PBR steel at rare and epic, the Sky Den axes by band and palette).
+            var checks = KayKitWeapons.Wearable.Select(w => (w.family + ":" + w.variant + " q" + w.quality + " band " + w.tier + " " + w.palette, w.model, KayKitWeapons.KindOf(w.family), KayKitWeapons.LengthOf(w.family))).ToList();
             checks.Add(("the Ranger's bow", KayKitWeapons.ClassBow, KayKitWeapons.Kind.Bow, KayKitWeapons.BowLength));
             foreach (var (what, model, kind, length) in checks)
             {
@@ -99,7 +135,8 @@ namespace Crulanda.Tests
                 var t = ActorVisual.PlaceKayKit(frame, model, kind, length); Assert.NotNull(t, what + ": " + model + " is placed.");
                 var verts = FrameVertices(frame, t); var b = new Bounds(verts[0], Vector3.zero); foreach (var p in verts) b.Encapsulate(p);
                 string say = what + " (" + model + ", bounds " + b.min.ToString("0.00") + " to " + b.max.ToString("0.00") + ")";
-                Assert.Less(frame.InverseTransformPoint(t.position).magnitude, .03f, say + ": its pivot, the grip, is at the frame's origin.");
+                if (!KayKitWeapons.GripAlong(model).HasValue)   // a PBR or Sky Den weapon's grip is measured (its pivot is elsewhere): the cross-section below is its check
+                    Assert.Less(frame.InverseTransformPoint(t.position).magnitude, .03f, say + ": its pivot, the grip, is at the frame's origin.");
                 if (kind == KayKitWeapons.Kind.Shield)
                 {
                     Assert.Less(b.size.y, Mathf.Min(b.size.x, b.size.z), say + ": lies flat on the forearm, its face toward +Y (outward).");
@@ -166,6 +203,8 @@ namespace Crulanda.Tests
         {
             var shown = new HashSet<string>(WardrobeCapture.KayKitLooks.Select(l => { GearLooks.TryParseLook(l, out var f, out var v, out _, out _); return f + ":" + v; }));
             foreach (var e in KayKitWeapons.Map) if (e.Value.Length > 0) Assert.IsTrue(shown.Contains(e.Key), e.Key + " is in the KayKit line-up (19-kaykit).");
+            var pbr = new HashSet<string>(WardrobeCapture.PbrLooks.Select(l => { GearLooks.TryParseLook(l, out var f, out var v, out _, out _); return f + ":" + v; }));
+            foreach (var key in KayKitWeapons.Pbr.Keys) Assert.IsTrue(pbr.Contains(key), key + " is in the PBR line-up (19-kaykit-pbr).");
             Assert.AreEqual(4, WardrobeCapture.KayKitViews.Length, "in hand and put away, each from the front and the side");
         }
     }

@@ -68,18 +68,126 @@ namespace Crulanda.Encounter
             { "shield.buckler", .38f }, { "shield.round", .58f }, { "shield.heater", .53f }, { "shield.kite", .66f }, { "shield.leaf", .6f },
         };
 
-        /// <summary>The KayKit model for this look, or null for the old drawing (a fallback, a family that is not a weapon, an unknown one).</summary>
-        public static string ModelFor(string family, string variant)
+        // ---------- the PBR weapons (Cody Dream Studios, "PBR medieval Weapons", Asset Store EULA; play note 249) ----------
+        // Five realistic steel pieces with their own PBR materials (Resources/Props/PBRWeapons): a long cross-hilted sword, a
+        // bearded war axe, a flanged mace, a war spear and a domed round steel shield. They are the heavier steel tier: a rare or
+        // epic piece of these variants wears one in place of its KayKit model (the cartoon look stays for common and uncommon).
+        // Their pivots are not at the grip (the pack's own placing): the grip is measured along the length from the butt, on the
+        // line of the butt's own middle (ActorVisual.ModelGrip), from their meshes (2026-10-19): the sword's wrapped grip between
+        // the pommel and the guard 15% up, the axe's and the mace's hand 20% up the haft, the spear's 31% up as the old polearm's.
+        public const string PbrPrefix = "pbr/";
+        public const string PbrModels = "Props/PBRWeapons/Models/", PbrMaterials = "Props/PBRWeapons/Matereal/";
+        public const int PbrQuality = 3;   // rare and epic
+        public static readonly Dictionary<string, string> Pbr = new Dictionary<string, string>
         {
-            return family != null && Map.TryGetValue(family + ":" + variant, out var m) && m.Length > 0 ? m : null;
+            { "sword.arming:straight", "pbr/Sword" }, { "sword.arming:disc", "pbr/Sword" }, { "sword.great:steel", "pbr/Sword" },
+            { "mace.flanged:six", "pbr/Mace" },
+            { "polearm:spear", "pbr/Spear" },
+            { "shield.round:boards", "pbr/shield " }, { "shield.round:hide", "pbr/shield " },   // the pack's shield is round (a heater keeps KayKit's heater)
+            // The PBR war axe is the rare bearded and crescent axe; at epic the ornate Sky Den axes take over (AxeFor).
+        };
+        public static bool IsPbr(string model) { return model != null && model.StartsWith(PbrPrefix); }
+
+        // ---------- the Mid poly Axes Collection (Sky Den Games, Asset Store EULA; play note 250) ----------
+        // Twenty axes in one FBX (Resources/Props/MidPolyAxes/Axes.fbx), one node each, Axe01 to Axe20, every one with its pivot at
+        // the butt and its head up +Y (measured from the FBX, 2026-10-19), on the pack's two Standard materials. Picked by family,
+        // variant, quality, level band and zone palette (AxeFor): plain wooden-hafted axes and hatchets for the low bands, steel
+        // bearded and crescent axes higher up, the dark ones for the dark palettes (Khaven, the Ashwalkers, the Cult), the ornate
+        // ones at epic. The grip is 20% up the haft from the butt, as the drawn axes held it.
+        public const string AxesPrefix = "axes/", AxesSet = "Props/MidPolyAxes/Axes";
+        public const float AxeGrip = .2f;
+        public static bool IsAxes(string model) { return model != null && model.StartsWith(AxesPrefix); }
+        static bool Dark(string palette) { return palette == "khaven" || palette == "ashwalker" || palette == "cult"; }
+        /// <summary>
+        /// The axe for an axe family's piece (null: not one of the axe families; the cleaver stays KayKit's). Hand axes by level band:
+        /// wedge Axe03, Axe04, then Axe05, the steel-bitted Axe18 at rare and better; hatchet Axe07, Axe10, Axe08, then Axe09 (the top band). Bearded: Axe06
+        /// in the first two bands, Axe16 after, the hooked one Axe17; crescent: Axe11, then Axe14 from the fourth band, the dark Axe20
+        /// in a dark palette; spiked: Axe12, the dark spiked Axe01. Rare bearded and crescent axes are the PBR war axe; epic ones the
+        /// ornate: the bearded Axe13, the gold double-bit Axe02 (the bone Axe19 in a dark palette), the spiked round Axe15.
+        /// </summary>
+        public static string AxeFor(string family, string variant, int quality, int tier, string palette)
+        {
+            bool dark = Dark(palette);
+            switch (family)
+            {
+                case "axe.hand":
+                    if (variant == "hatchet") return AxesPrefix + (tier <= 1 ? "Axe07" : tier <= 3 ? "Axe10" : tier == 4 ? "Axe08" : "Axe09");
+                    return AxesPrefix + (quality >= 3 ? "Axe18" : tier <= 1 ? "Axe03" : tier <= 3 ? "Axe04" : "Axe05");
+                case "axe.bearded":
+                    if (quality == 3) return "pbr/Axe";
+                    if (quality >= 4) return AxesPrefix + "Axe13";
+                    return AxesPrefix + (variant == "hooked" ? "Axe17" : tier <= 1 ? "Axe06" : "Axe16");
+                case "axe.crescent":
+                    if (quality == 3) return "pbr/Axe";
+                    if (quality >= 4) return AxesPrefix + (variant == "spiked" ? "Axe15" : dark ? "Axe19" : "Axe02");
+                    if (variant == "spiked") return AxesPrefix + (dark ? "Axe01" : "Axe12");
+                    return AxesPrefix + (dark ? "Axe20" : tier <= 2 ? "Axe11" : "Axe14");
+            }
+            return null;
+        }
+
+        /// <summary>A model's grip as a fraction of its length from the butt, where its pivot is not the grip (the PBR and Sky Den weapons); null for KayKit's.</summary>
+        public static float? GripAlong(string model)
+        {
+            if (IsAxes(model)) return AxeGrip;
+            switch (model) { case "pbr/Sword": return .15f; case "pbr/Axe": return .2f; case "pbr/Mace": return .2f; case "pbr/Spear": return .31f; }
+            return null;
+        }
+        /// <summary>The Resources path of a model id (a KayKit name, "pbr/" and the PBR model's name, or "axes/" and the axe's node).</summary>
+        public static string PathOf(string model) { return IsPbr(model) ? PbrModels + model.Substring(PbrPrefix.Length) : IsAxes(model) ? AxesSet : Folder + model; }
+        /// <summary>The node inside the loaded model to use (an axe of the Sky Den set); null for the whole model.</summary>
+        public static string NodeOf(string model) { return IsAxes(model) ? model.Substring(AxesPrefix.Length) : null; }
+        /// <summary>A PBR model's own material (built-in Standard, rebuilt from the pack's URP ones); null for KayKit's and the axes' (they keep the FBX's).</summary>
+        public static string MaterialOf(string model)
+        {
+            if (!IsPbr(model)) return null; string n = model.Substring(PbrPrefix.Length).Trim();
+            return PbrMaterials + (n == "shield" ? "Shield" : n);
+        }
+
+        /// <summary>
+        /// The model for this look (an axe family's from AxeFor; a rare or epic steel piece's PBR one; else KayKit's), or null for the
+        /// old drawing. <paramref name="tier"/> is the level band (GearLook.tier), <paramref name="palette"/> the zone's palette.
+        /// </summary>
+        public static string ModelFor(string family, string variant, int quality = 0, int tier = 0, string palette = null)
+        {
+            if (family == null) return null; string key = family + ":" + variant;
+            if (!Map.TryGetValue(key, out var m) || m.Length == 0) return null;
+            var axe = AxeFor(family, variant, quality, tier, palette); if (axe != null) return axe;
+            if (quality >= PbrQuality && Pbr.TryGetValue(key, out var p)) return p;
+            return m;
         }
         public static bool IsShield(string family) { return family != null && family.StartsWith("shield."); }
         public static Kind KindOf(string family) { return IsShield(family) ? Kind.Shield : Kind.Weapon; }
         public static float LengthOf(string family) { return family != null && Lengths.TryGetValue(family, out var l) ? l : .95f; }
-        /// <summary>Every model the map uses, and the Ranger's bow.</summary>
+        static readonly string[] SamplePalettes = { "oakhaven", "khaven" };
+        /// <summary>
+        /// Every model a mapped variant can wear, with the first quality, level band and palette that gives it (for the tests and the
+        /// wardrobe): (family, variant, quality, tier, palette, model).
+        /// </summary>
+        public static List<(string family, string variant, int quality, int tier, string palette, string model)> Wearable
+        {
+            get
+            {
+                var list = new List<(string, string, int, int, string, string)>(); var seen = new HashSet<string>();
+                foreach (var key in Map.Keys)
+                {
+                    var fv = key.Split(':');
+                    for (int q = 0; q <= 4; q++) for (int t = 0; t <= 5; t++) foreach (var p in SamplePalettes)
+                    {
+                        var m = ModelFor(fv[0], fv[1], q, t, p); if (m != null && seen.Add(key + "=" + m)) list.Add((fv[0], fv[1], q, t, p, m));
+                    }
+                }
+                return list;
+            }
+        }
+        /// <summary>Every model any variant wears, and the Ranger's bow.</summary>
         public static IEnumerable<string> Models
         {
-            get { var seen = new HashSet<string>(); foreach (var m in Map.Values) if (m.Length > 0 && seen.Add(m)) yield return m; if (seen.Add(ClassBow)) yield return ClassBow; }
+            get
+            {
+                var seen = new HashSet<string>(); foreach (var w in Wearable) if (seen.Add(w.model)) yield return w.model;
+                if (seen.Add(ClassBow)) yield return ClassBow;
+            }
         }
 
         // ---------- the atlas's swatches (weapons_bits_texture.png: 8 columns by 4 rows of vertical gradients) ----------

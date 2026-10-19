@@ -926,3 +926,5 @@ un-captures.
 - 272 (2026-10-19 ~16:08) "one class. the shaman needs 1 in raid resurection" (OPEN): the Shaman gets one combat resurrection per boss
   fight.
   Then (verbatim): "give the pally some hear. he's down again" and "gear" (the Paladin tank to wear full level-20 tank gear).
+- 273 (2026-10-19 ~16:12) "all members should have lvl 20 gear. no need to test the fight if all members are BIS" (the raid's tuning runs
+  with all ten in level-20 best-in-slot gear for their part).

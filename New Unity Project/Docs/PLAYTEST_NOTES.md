@@ -872,3 +872,5 @@ un-captures.
   compress on import). Spread over the zones, dungeons and fights, each zone its own.
 - 252 (2026-10-19 ~12:35) "good for lumberjack in myassets - Wooden Canopy" (OPEN): icescreen's "Wooden Canopy" (Asset Store cache:
   Canopy.fbx (a timber shelter), Stair.fbx, FireWood.fbx (a log stack); big TGA maps: cap at 1024). For the lumberjack's woodyard.
+- 253 (2026-10-19 ~12:40) "assets for alchemy - myassets Free Alchemy and Magic Pack" (OPEN): StormBringer Studios' pack (Asset Store
+  cache: Mortar, Cristal_Flask, Flask). For the alchemy trade's benches and the potions' looks.

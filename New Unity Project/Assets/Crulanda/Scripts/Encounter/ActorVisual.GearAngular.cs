@@ -5,361 +5,303 @@ using M = Crulanda.Encounter.GearMeshes;
 namespace Crulanda.Encounter
 {
     /// <summary>
-    /// Helms, gloves, gauntlets, wraps, pauldrons and spaulders built on the model figure itself (play note 239, 2026-10-18,
+    /// Gloves, gauntlets, wraps, pauldrons, spaulders and hoods built on the model figure itself (play note 239, 2026-10-18,
     /// Chris: "helms and gauntlet still tooo round" / "in the 04-sets-front"; 2026-10-10: "we really need a complete overhaul on
     /// armor/weapons/helms, all seem to not fit properly"). On the old figure these were lathed domes and balls drawn round its
     /// ball head and mitten hands; on a model they were scaled over the head (SeatHead, HatFit) or warped onto the hand's box
-    /// (ModelArmour), so a helm was a round dome and a glove a ball bigger than the fist.
+    /// (ModelArmour), so a glove was a ball bigger than the fist and a hood a bell round the head.
     ///
-    /// Here each is measured from the model: a helm is a stack of faceted rings round the head's own outline (the bind pose's
-    /// head, or head and hair, per height: HeadOutline), each a few millimetres outside every point of the head between its
-    /// neighbours, closed in a point just high enough that its gores clear the skull (AngularShell). It comes down over the skull
-    /// to the brow, the ears or the jaw by the family, never perched; plates are flat, with ridges, a nasal bar, cheek guards, a
-    /// brim of sloping plates; a mail coif opens round the face and drapes to the shoulders. A glove is the hand's own skin stood
-    /// off it (ModelArmour.HandShell), a cuff, a wrap's band or a lame a ring of plates round the forearm or upper arm, a pauldron
-    /// a faceted cap over the shoulder. Every family keeps its look's materials (the quality ladder, the zones' palettes) and
-    /// its tier's extras; only the shapes and the fit are new. The smooth figure (models off) keeps the old drawings.
+    /// Here each is measured from the model: a glove is the hand's own skin stood off it (ModelArmour.HandShell), a cuff, a
+    /// wrap's band or a lame a ring of plates round the forearm or upper arm, a pauldron a faceted cap over the shoulder, a hood
+    /// cloth laid round the skull and down onto the shoulders (play note 242). Every family keeps its look's materials (the
+    /// quality ladder, the zones' palettes) and its tier's extras; only the shapes and the fit are new. The smooth figure
+    /// (models off) keeps the old drawings.
+    ///
+    /// The helms built round the head here (2026-10-18) were taken out again on 2026-10-19 (play note 242, Chris: "i think we
+    /// have reverted too much bring back what we had before. helm dont fit. most sit around the head a too large for the head");
+    /// caps, kettle hats, barbutes and coifs are drawn and seated as before (ActorVisual.GearArmor, SeatHead and HatFit).
     /// GAME-ONLY designs.
     /// </summary>
     public sealed partial class ActorVisual
     {
-        bool AngularHead { get { return model != null && headOutline != null && headFrame != null; } }
         bool AngularArms { get { return model != null && model.Cloud != null && model.Arms is SkinnedMeshRenderer; } }
         static readonly bool[] Sides = { false, true };
         static readonly Matrix4x4 I = Matrix4x4.identity;
 
-        // ------------------------------------------------------------------------------------------------ the head
-        /// <summary>A head measured for a helm: the outline its walls clear (the head, or head and hair), metres per head-frame
-        /// unit along x, y and z, the eye line, the skull's height over the eyes, the outline's top and axis.</summary>
-        sealed class Helm
-        {
-            public Vector3 s; public float eyes, H, top, z0; public string key;
-            /// <summary>The points the walls clear: metres about the axis, with their frame heights.</summary>
-            public List<(Vector2 q, float y)> pts;
-            /// <summary>Metres as head-frame height.</summary>
-            public float Y(float metres) { return metres / s.y; }
-            /// <summary>A point of a ring's plane (metres about the axis) at frame height y, in the head frame.</summary>
-            public Vector3 At(Vector2 q, float y) { return new Vector3(q.x / s.x, y, z0 + q.y / s.z); }
-        }
+        // ------------------------------------------------------------------------------------------------ the hood
         /// <summary>
-        /// A head measured for a helm, from its own vertices in the bind pose (2026-10-18, second run: the outline's rows, 8 mm apart
-        /// and each the hull of three, stood the crown out 3-4 cm). <paramref name="hairBelow"/>: the hair's points under that
-        /// frame height count too (a cap or kettle hat: the hair above it is cut away, <see cref="CutHair"/>, and what hangs under the
-        /// rim stays); NaN for none (a barbute or a coif hides the hair).
+        /// A head measured for a hood, in the model root's space (the cloud's bind pose; the figure faces -z there): the skull's
+        /// axis, its top, eye line, brow and jaw, the neck's base, the shoulders' half-width (joint to joint), the bones that
+        /// carry the cloth, and the points it lies over (the head; the neck, the shoulders and the upper chest and back, never
+        /// further out than the shoulder joints).
         /// </summary>
-        Helm HelmOn(float hairBelow)
+        sealed class HoodFit
         {
-            var sc = headFrame.lossyScale; bool hair = !float.IsNaN(hairBelow);
-            var h = new Helm { s = new Vector3(Mathf.Abs(sc.x), Mathf.Abs(sc.y), Mathf.Abs(sc.z)), eyes = headOutline.eyes, z0 = headOutline.z0, pts = new List<(Vector2, float)>() };
-            h.H = HeadH; float top = float.MinValue;
-            void Take(Vector3 p) { h.pts.Add((new Vector2(p.x * h.s.x, (p.z - h.z0) * h.s.z), p.y)); top = Mathf.Max(top, p.y); }
-            if (helmHead != null && helmHead.Count > 0) foreach (var p in helmHead) Take(p);
-            else { h.pts.AddRange(OutlinePoints(headOutline, h)); top = headOutline.top; }
-            if (hair && helmHair != null) foreach (var (_, at) in helmHair) foreach (var p in at) if (p.y <= hairBelow) Take(p);
-            h.top = top == float.MinValue ? headOutline.top : top;
-            h.key = OutlineKey(headOutline) + "." + (hair ? K(hairBelow) + "." + helmHairKey : "bare") + "." + K(h.s.x, h.s.y, h.s.z);
-            return h;
+            public Vector3 axis; public float top, eyes, brow, jaw, neck, half, pm;
+            public int head, neckBone, chest, clavL, clavR;
+            public readonly List<Vector3> headPts = new List<Vector3>(), bodyPts = new List<Vector3>();
+            public Vector3 At(float y) { return new Vector3(axis.x, y, axis.z); }
+            /// <summary>Metres as root units.</summary>
+            public float M(float metres) { return metres * pm; }
         }
-        /// <summary>The skull's height over the eyes (head-frame units).</summary>
-        float HeadH { get { return Mathf.Max(.05f, headOutline.top - headOutline.eyes); } }
-        /// <summary>The head's and the hair's vertices in the head frame, taken with the outlines in the bind pose (ActorVisual.Model,
-        /// Frames); the hair per renderer, every vertex, for cutting it under a cap.</summary>
-        List<Vector3> helmHead; List<(SkinnedMeshRenderer smr, Vector3[] at)> helmHair; string helmHairKey = "";
-        readonly Dictionary<SkinnedMeshRenderer, Mesh> wholeHair = new Dictionary<SkinnedMeshRenderer, Mesh>();
-        static readonly Dictionary<(Mesh, int), Mesh> cutHairs = new Dictionary<(Mesh, int), Mesh>();
-        void MeasureHelm()
+        /// <summary>The cloth laid round the head and down onto the shoulders: rows of points from the crown down (24 round each,
+        /// point 0 to the front), the crown's point, which rows the face opening spans, and the meshes.</summary>
+        sealed class HoodGrid
         {
-            if (model == null || headFrame == null) return;
-            var toFrame = headFrame.worldToLocalMatrix; helmHead = null; helmHair = new List<(SkinnedMeshRenderer, Vector3[])>(); var key = new System.Text.StringBuilder();
-            if (model.Head is SkinnedMeshRenderer hs) helmHead = BindPoints(hs, toFrame);
-            foreach (var r in model.Hair)
+            public readonly List<Vector3[]> rows = new List<Vector3[]>(); public Vector3 apex; public int brow, jaw, neck; public Mesh shell, hem;
+        }
+        const int HoodN = 24;
+        static readonly Dictionary<string, HoodFit> hoodFits = new Dictionary<string, HoodFit>();
+        static readonly Dictionary<string, HoodGrid> hoodGrids = new Dictionary<string, HoodGrid>();
+        /// <summary>Column k's direction round the head (k = 0 straight ahead: -z in the root).</summary>
+        static Vector3 HoodDir(int k) { float a = 2 * Mathf.PI * k / HoodN; return new Vector3(Mathf.Sin(a), 0, -Mathf.Cos(a)); }
+        /// <summary>How far ahead column k faces (1 straight ahead, -1 straight back).</summary>
+        static float HoodAhead(float k) { return Mathf.Cos(2 * Mathf.PI * k / HoodN); }
+        static int BoneOf(ModelArmour.Cloud c, Transform t)
+        {
+            if (t == null) return -1;
+            for (int i = 0; i < c.bones.Length; i++) if (string.Equals(c.bones[i], t.name, System.StringComparison.OrdinalIgnoreCase)) return i;
+            return -1;
+        }
+        /// <summary>How far the points within <paramref name="band"/> of height y reach from the axis along d (their support), or
+        /// <paramref name="none"/>.</summary>
+        static float HoodReach(List<Vector3> pts, Vector3 axis, float y, float band, Vector3 d, float none)
+        {
+            float best = float.MinValue;
+            foreach (var p in pts) { if (Mathf.Abs(p.y - y) > band) continue; float r = (p.x - axis.x) * d.x + (p.z - axis.z) * d.z; if (r > best) best = r; }
+            return best == float.MinValue ? none : best;
+        }
+
+        HoodFit MeasureHood()
+        {
+            var c = model.Cloud; if (c == null || c.p == null || c.part == null) return null;
+            float pm = PerMetre; string key = c.GetHashCode() + "." + K(pm);
+            if (hoodFits.TryGetValue(key, out var done)) return done;
+            var h = new HoodFit { pm = pm }; hoodFits[key] = null;
+            h.head = BoneOf(c, model.HeadBone); if (h.head < 0) return null;
+            h.neckBone = BoneOf(c, model.Neck); if (h.neckBone < 0) h.neckBone = h.head;
+            h.chest = BoneOf(c, model.Chest); if (h.chest < 0) h.chest = h.neckBone;
+            var aL = ModelArmour.Arm(c, true); var aR = ModelArmour.Arm(c, false); if (!aL.ok || !aR.ok) return null;
+            h.clavL = aL.clavicle >= 0 ? aL.clavicle : h.chest; h.clavR = aR.clavicle >= 0 ? aR.clavicle : h.chest;
+            Vector3 hb = c.bind[h.head].GetColumn(3); h.top = float.MinValue;
+            for (int i = 0; i < c.p.Length; i++) if (c.part[i] == ModelArmour.Part.Head) { h.headPts.Add(c.p[i]); h.top = Mathf.Max(h.top, c.p[i].y); }
+            if (h.headPts.Count < 50) return null;
+            float H = h.top - hb.y; if (H < h.M(.05f)) return null;
+            // The eyes about 10 cm over the Head bone (ActorVisual.Model, Frames), the brow a little over them, the jaw at the bone.
+            h.eyes = hb.y + Mathf.Min(h.M(.1f), .5f * H); h.brow = h.eyes + h.M(.035f); h.jaw = hb.y - h.M(.01f);
+            float x = 0, zLo = float.MaxValue, zHi = float.MinValue; int nx = 0;
+            foreach (var p in h.headPts) if (p.y >= h.eyes) { x += p.x; nx++; zLo = Mathf.Min(zLo, p.z); zHi = Mathf.Max(zHi, p.z); }
+            if (nx == 0) return null;
+            h.axis = new Vector3(x / nx, 0, (zLo + zHi) / 2);
+            h.half = Mathf.Abs(aL.shoulder.x - aR.shoulder.x) / 2; float shoulderY = (aL.shoulder.y + aR.shoulder.y) / 2;
+            float neckY = h.neckBone != h.head ? c.bind[h.neckBone].m13 : Mathf.Lerp(shoulderY, hb.y, .4f);
+            h.neck = Mathf.Max(shoulderY + h.M(.02f), Mathf.Min(neckY, h.jaw - h.M(.03f)));
+            // What the cowl lies on: the neck, the shoulders and the upper chest and back; an arm only within the shoulder joint
+            // (in a T pose the arms stand out level with the shoulders: they are no part of what the cloth falls on).
+            float reach = h.half + h.M(.015f), low = h.neck - h.M(.25f);
+            for (int i = 0; i < c.p.Length; i++)
             {
-                if (!(r is SkinnedMeshRenderer smr) || !r.name.Contains("Hair_") || r.name.Contains("Beard")) continue;
-                var mesh = smr.sharedMesh; if (mesh == null || !mesh.isReadable) continue;
-                var v = mesh.vertices; var w = mesh.boneWeights; var bp = mesh.bindposes; var bones = smr.bones; if (w.Length != v.Length || bp.Length != bones.Length) continue;
-                var skin = new Matrix4x4[bones.Length]; for (int i = 0; i < bones.Length; i++) skin[i] = toFrame * (bones[i] != null ? bones[i].localToWorldMatrix : Matrix4x4.identity) * bp[i];
-                var at = new Vector3[v.Length];
-                for (int i = 0; i < v.Length; i++) { var b = w[i]; at[i] = skin[b.boneIndex0].MultiplyPoint3x4(v[i]) * b.weight0 + skin[b.boneIndex1].MultiplyPoint3x4(v[i]) * b.weight1 + skin[b.boneIndex2].MultiplyPoint3x4(v[i]) * b.weight2 + skin[b.boneIndex3].MultiplyPoint3x4(v[i]) * b.weight3; }
-                helmHair.Add((smr, at)); key.Append(mesh.name).Append(';');
+                var p = c.p[i]; var part = c.part[i];
+                if (part == ModelArmour.Part.LegL || part == ModelArmour.Part.LegR || p.y < low || p.y > h.jaw) continue;
+                float dx = p.x - h.axis.x, dz = p.z - h.axis.z; if (dx * dx + dz * dz > reach * reach) continue;
+                h.bodyPts.Add(p);
             }
-            helmHairKey = key.ToString();
+            hoodFits[key] = h; return h;
         }
-        /// <summary>The hair cut at a frame height under a cap or kettle hat: only its triangles wholly under it are drawn (the rest
-        /// would stand through the crown). Given back whole when the head piece comes off (<see cref="WholeHair"/>).</summary>
-        void CutHair(float below)
+
+        /// <summary>
+        /// The hood's cloth (play note 242, 2026-10-19, Chris: "hood is awful"; the old hood, a lathed bell drawn round the old ball
+        /// head and scaled over the model's, stood out round the head with a wide flat collar disc). Laid on the model's own
+        /// points: round the skull about 1 cm off (a little more at the back, where cloth gathers), a face opening from the brow
+        /// to the chin, falling from the ears and the back of the head to the jaw (not clinging in under them), sagging in onto
+        /// the neck, and on over the shoulders and the upper chest and back, a few centimetres longer at the back, short over
+        /// the shoulder points; soft folds in the cowl, no rims. <paramref name="shortHem"/>: tucked short under shoulder armour.
+        /// <paramref name="peak"/>: the oilskin's cloth stands a little forward over the brow.
+        /// </summary>
+        HoodGrid HoodOn(HoodFit h, bool shortHem, bool peak)
         {
-            if (helmHair == null) return;
-            foreach (var (smr, at) in helmHair)
+            string key = h.GetHashCode() + "." + shortHem + "." + peak;
+            if (hoodGrids.TryGetValue(key, out var g)) return g;
+            g = new HoodGrid(); float gap = h.M(.011f), pull = h.M(.005f);
+            var ys = new List<float>();
+            float y0 = h.top - h.M(.006f);
+            for (int i = 0; i <= 6; i++) ys.Add(Mathf.Lerp(y0, h.brow, i / 6f)); g.brow = ys.Count - 1;
+            for (int i = 1; i <= 4; i++) ys.Add(Mathf.Lerp(h.brow, h.jaw, i / 4f)); g.jaw = ys.Count - 1;
+            for (int i = 1; i <= 3; i++) ys.Add(Mathf.Lerp(h.jaw, h.neck, i / 3f)); g.neck = ys.Count - 1;
+            var prev = new float[HoodN];
+            // Round the skull: each row the head's reach there (half the rows' spacing up and down) and the gap; from the eyes to the
+            // jaw the cloth falls from what is above it (it hangs, it does not cling under the skull, the ears or the chin); under the
+            // jaw it sags in toward the neck and the body, half the way each row (cloth lies on what is under it).
+            for (int r = 0; r < ys.Count; r++)
             {
-                if (smr == null) continue;
-                if (!wholeHair.TryGetValue(smr, out var whole)) wholeHair[smr] = whole = smr.sharedMesh;
-                var ck = (whole, Mathf.RoundToInt(below * 2000));
-                if (!cutHairs.TryGetValue(ck, out var cut) || cut == null)
+                float y = ys[r], band = r == 0 ? h.M(.006f) : Mathf.Abs(ys[r] - ys[r - 1]) * .5f + h.M(.002f);
+                bool onBody = r > g.jaw; var row = new Vector3[HoodN];
+                for (int k = 0; k < HoodN; k++)
                 {
-                    cut = Instantiate(whole); cut.name = whole.name + " (under a helm)";
-                    for (int s = 0; s < whole.subMeshCount; s++)
-                    {
-                        var t = whole.GetTriangles(s); var keep = new List<int>();
-                        for (int i = 0; i + 2 < t.Length; i += 3) if (at[t[i]].y <= below && at[t[i + 1]].y <= below && at[t[i + 2]].y <= below) { keep.Add(t[i]); keep.Add(t[i + 1]); keep.Add(t[i + 2]); }
-                        cut.SetTriangles(keep, s);
-                    }
-                    cutHairs[ck] = cut;
+                    var d = HoodDir(k); float ahead = HoodAhead(k);
+                    float rr = HoodReach(onBody ? h.bodyPts : h.headPts, h.axis, y, band, d, 0);
+                    if (onBody) rr = Mathf.Max(rr, HoodReach(h.headPts, h.axis, y, band, d, 0));
+                    rr += gap + pull * Mathf.Max(0, -ahead);
+                    if (peak && r == g.brow) rr += h.M(.012f) * Mathf.Max(0, ahead) * Mathf.Max(0, ahead);
+                    if (peak && r == g.brow - 1) rr += h.M(.006f) * Mathf.Max(0, ahead) * Mathf.Max(0, ahead);
+                    if (onBody) rr = Mathf.Max(rr, (rr + prev[k]) / 2);   // under the jaw it sags in toward the neck, half the way a row
+                    else if (y < h.eyes && r > 0) rr = Mathf.Max(rr, prev[k]);
+                    rr = Mathf.Max(rr, h.M(.012f)); prev[k] = rr;
+                    row[k] = h.At(y) + d * rr;
                 }
-                smr.sharedMesh = cut;
+                g.rows.Add(row);
             }
-        }
-        void WholeHair() { foreach (var kv in wholeHair) if (kv.Key != null) kv.Key.sharedMesh = kv.Value; wholeHair.Clear(); }
-        /// <summary>The outline's sampled points (a figure whose head mesh could not be read).</summary>
-        static List<(Vector2, float)> OutlinePoints(HeadOutline o, Helm h)
-        {
-            var list = new List<(Vector2, float)>();
-            for (int iy = 0; iy < o.ny; iy++) for (int ia = 0; ia < HeadAngles; ia++)
+            // The cowl: from the neck's base down onto the shoulders, the chest and the back. Each column its own length: longest at
+            // the back, short over the shoulder points; it never stands wider than the shoulders.
+            const int cowlRows = 6; float limit = h.half + h.M(.02f);
+            for (int i = 1; i <= cowlRows; i++)
             {
-                float r = o.r[iy, ia]; if (r <= 0) continue; float a = 2 * Mathf.PI * ia / HeadAngles;
-                list.Add((new Vector2(Mathf.Sin(a) * r * h.s.x, Mathf.Cos(a) * r * h.s.z), o.y0 + iy * HeadStep));
+                float t = i / (float)cowlRows; var row = new Vector3[HoodN];
+                for (int k = 0; k < HoodN; k++)
+                {
+                    var d = HoodDir(k); float ahead = HoodAhead(k), a = Mathf.Abs(ahead);
+                    float drop = Mathf.Lerp(.045f, ahead >= 0 ? .12f : .14f, Mathf.Pow(a, 1.5f)) * (shortHem ? .5f : 1);
+                    float y = Mathf.Lerp(h.neck, h.neck - h.M(drop), t), band = h.M(drop) / cowlRows * .5f + h.M(.004f);
+                    float own = HoodReach(h.bodyPts, h.axis, y, band, d, 0) + h.M(.01f), rr = Mathf.Max(own, (own + prev[k]) / 2);
+                    prev[k] = rr;
+                    rr += h.M(.007f) * t * a * (.5f + .5f * Mathf.Sin(2 * Mathf.PI * k * 5f / HoodN));   // soft folds, front and back
+                    rr = Mathf.Min(rr, limit / Mathf.Max(.2f, Mathf.Abs(d.x)));   // no wider than the shoulders
+                    row[k] = h.At(y) + d * rr;
+                }
+                g.rows.Add(row);
             }
-            return list;
-        }
-        /// <summary>A short hash of an outline (built meshes are shared by heads of one shape).</summary>
-        static string OutlineKey(HeadOutline o)
-        {
-            if (o.key != null) return o.key;
-            ulong hash = 14695981039346656037UL;
-            void Mix(float x) { hash ^= (uint)Mathf.RoundToInt(x * 2000); hash *= 1099511628211UL; }
-            Mix(o.y0); Mix(o.z0); Mix(o.eyes); Mix(o.top); foreach (var r in o.r) Mix(r);
-            return o.key = hash.ToString("x16");
-        }
-        /// <summary>The head's points between two heights (metres about the axis, with their frame heights).</summary>
-        static List<(Vector2 q, float y)> HelmPoints(Helm h, float y0, float y1)
-        {
-            var list = new List<(Vector2, float)>(); foreach (var p in h.pts) if (p.y >= y0 && p.y <= y1) list.Add(p);
-            return list;
-        }
-        static float[] HelmSupport(Helm h, float y0, float y1, int n, float gap) { return AngularShell.Support(HelmPoints(h, y0, y1).ConvertAll(p => p.q), n, gap); }
-        static float[] Plus(float[] a, float by) { var r = new float[a.Length]; for (int k = 0; k < a.Length; k++) r[k] = a[k] + by; return r; }
-        static float[] Wider(float[] a, float[] b, float by) { var r = new float[a.Length]; for (int k = 0; k < a.Length; k++) r[k] = Mathf.Max(a[k], b[k]) + by; return r; }
-        /// <summary>
-        /// A helm's shell: rings at frame heights <paramref name="ys"/> (ascending), each <paramref name="n"/> flat facets
-        /// (facet 0 to the front) <paramref name="gap"/> plus <paramref name="extra"/>[i] metres outside the head between its
-        /// neighbours' heights, or as <paramref name="given"/>; closed with <paramref name="apex"/> in a point
-        /// <paramref name="lift"/> metres over what it must clear (and no lower than <paramref name="minApex"/>). Cached per head shape.
-        /// </summary>
-        Mesh HelmShell(Helm h, string key, float[] ys, float[] extra, int n, float gap, float thick, System.Func<int, int, bool> open, bool apex, float lift,
-            out float[][] sup, out Vector3[][] rings, out Vector3 apexAt, float[][] given = null, float minApex = float.MinValue)
-        {
-            int R0 = ys.Length; var gaps = new float[R0]; for (int i = 0; i < R0; i++) gaps[i] = gap + (extra != null ? extra[i] : 0);
-            var ysA = ys; var givenA = given;
-            if (apex)
+            g.apex = h.At(h.top + gap * .8f) + Vector3.forward * h.M(.008f);   // the crown's point a little back (+z)
+            int brow = g.brow, jaw = g.jaw;
+            bool Open(int s, int k) { return s >= brow && s < jaw && Mathf.Abs(Mathf.DeltaAngle(0, 360f * (k + .5f) / HoodN)) < 55; }
+            float thick = h.M(.004f);
+            g.shell = ModelArmour.Skin(model.Cloud, HoodLoft(g.rows, g.apex, h.axis, thick, Open), p => HoodWeight(h, p));
+            // The hem's binding: the cowl's last fifth, a hair proud of it.
+            var hemRows = new List<Vector3[]>(); int last = g.rows.Count - 1;
+            foreach (float u in new[] { .55f, 1f })
             {
-                // The crown (2026-10-18, first run: a cone's point over the last ring stood half a metre up on a coif): one more ring
-                // the gap over the top of the head (or hair), starting round the top's own points, then a low point just over it.
-                float yTop = Mathf.Max(h.top + h.Y(gap), minApex - h.Y(lift));
-                ysA = new float[R0 + 1]; System.Array.Copy(ys, ysA, R0); ysA[R0] = yTop;
-                var g2 = new float[R0 + 1]; System.Array.Copy(gaps, g2, R0); g2[R0] = gaps[R0 - 1]; gaps = g2;
-                givenA = new float[R0 + 1][]; if (given != null) System.Array.Copy(given, givenA, R0);
-                givenA[R0] = HelmSupport(h, Mathf.Lerp(ys[R0 - 1], h.top, .5f), h.top, n, gaps[R0]);
+                var row = new Vector3[HoodN];
+                for (int k = 0; k < HoodN; k++) { var p = Vector3.Lerp(g.rows[last - 1][k], g.rows[last][k], u); var o = p - h.At(p.y); row[k] = p + o.normalized * h.M(.0015f); }
+                hemRows.Add(row);
             }
-            int R = ysA.Length; rings = new Vector3[R][]; var centres = new Vector3[R];
-            sup = AngularShell.Fit(ysA, HelmPoints(h, ysA[0], ysA[R - 1]), n, gaps, false, givenA);
-            for (int i = 0; i < R; i++) { centres[i] = new Vector3(0, ysA[i], h.z0); var c = AngularShell.Corners(sup[i]); rings[i] = new Vector3[n]; for (int k = 0; k < n; k++) rings[i][k] = h.At(c[k], ysA[i]); }
-            apexAt = Vector3.zero; Vector3? top = null;
-            if (apex) { apexAt = new Vector3(0, ysA[R - 1] + h.Y(lift), h.z0); top = apexAt; }
-            var rr = rings; var cc = centres; var tp = top; float th = thick / h.s.x;
-            return M.Cached("h." + key + "." + h.key + "." + K(ys) + "|" + (minApex > float.MinValue ? K(minApex) : ""), () => AngularShell.Build(rr, cc, th, open, tp));
-        }
-        /// <summary>The middle of facet k of a ring (supports <paramref name="sup"/>) at frame height y, <paramref name="outBy"/> metres outside it.</summary>
-        static Vector3 OnFacet(Helm h, float[] sup, int k, float y, float outBy) { var d = AngularShell.Normal(k, sup.Length); return h.At(d * (sup[k] + outBy), y); }
-        static float FacetYaw(int k, int n) { return 360f * k / n; }
-        /// <summary>A box at a point of the head frame, turned to face yaw, its size in metres.</summary>
-        static Matrix4x4 HelmBox(Helm h, Vector3 at, float yaw, Vector3 metres, float roll = 0)
-        {
-            return Matrix4x4.TRS(at, Quaternion.Euler(0, yaw, 0), new Vector3(metres.x / h.s.x, metres.y / h.s.y, metres.z / h.s.z)) * Matrix4x4.Rotate(Quaternion.Euler(0, 0, roll));
-        }
-        /// <summary>A flat bar from a to b (head frame) standing <paramref name="tall"/> metres out along <paramref name="up"/>: a comb or a ridge.</summary>
-        static Matrix4x4 HelmBar(Helm h, Vector3 a, Vector3 b, Vector3 up, float wide, float tall)
-        {
-            var d = b - a; var rot = Quaternion.LookRotation(d, up);
-            return Matrix4x4.TRS((a + b) / 2 + up.normalized * h.Y(tall) * .5f, rot, new Vector3(wide / h.s.x, h.Y(tall), d.magnitude));
-        }
-        /// <summary>
-        /// A comb or a seam up facet k's middle, from ring <paramref name="from"/> over every ring above to the point: bar by bar on
-        /// the plates (2026-10-18, third run: one straight bar from the lower ring to the point cut inside the crown, so a kettle's
-        /// comb stood 3 cm into the head).
-        /// </summary>
-        static void Ridge(Fit f, string role, Helm h, float[][] sup, Vector3[][] rings, Vector3 apex, int k, int from, float wide, float tall)
-        {
-            int n = sup[0].Length; var pts = new List<Vector3>();
-            for (int i = from; i < sup.Length; i++) pts.Add(OnFacet(h, sup[i], k, rings[i][0].y, .001f));
-            pts.Add(apex);
-            for (int i = 0; i + 1 < pts.Count; i++) f.Add(OnBody, role, Cube, HelmBar(h, pts[i], pts[i + 1], FacetUp(k, n), wide, tall));
-        }
-        static Vector3 FacetUp(int k, int n, float lean = .6f) { var d = AngularShell.Normal(k, n); return new Vector3(d.x, lean, d.y); }
-        /// <summary>A small diamond (a gem, a stud) on a helm.</summary>
-        static Matrix4x4 Gem(Helm h, Vector3 at, float yaw, float metres) { return HelmBox(h, at, yaw, new Vector3(metres, metres, metres * .45f), 45); }
-
-        /// <summary>
-        /// A leather (or cloth) skull-cap: eight gores over the head and hair from just above the brows to a low point, a band round
-        /// the brim. Flaps: plates hanging over the ears. Leaf: leaves stitched round the band and a sprig on top.
-        /// </summary>
-        void AngularCap(Fit f)
-        {
-            f.onHead = true; const int n = 8;
-            float rim = headOutline.eyes + .22f * HeadH;   // just over the brows (HatAboveEyes left it 6.5 cm under the top: perched)
-            float cut = rim + .008f / Mathf.Abs(headFrame.lossyScale.y); CutHair(cut); var h = HelmOn(cut); float top = h.top;
-            string main = f.v == "leaf" || f.tier == 0 ? "cloth" : "leather", band = f.tier >= 1 ? "trim" : "cloth2";
-            var ys = new[] { rim, Mathf.Lerp(rim, top, .4f), Mathf.Lerp(rim, top, .7f), Mathf.Lerp(rim, top, .88f) };
-            f.Add(OnBody, main, HelmShell(h, "cap", ys, null, n, .004f, .003f, null, true, .002f, out var sup, out var rings, out var apex), I);
-            var bs = Wider(sup[0], sup[1], .0045f);
-            f.Add(OnBody, band, HelmShell(h, "cap.band", new[] { rim - h.Y(.002f), rim + h.Y(.012f) }, null, n, 0, .003f, null, false, 0, out _, out _, out _, new[] { bs, bs }), I);
-            if (f.v == "flaps") f.Add(OnBody, main, HelmShell(h, "cap.flaps", new[] { h.eyes - .45f * h.H, rim + h.Y(.01f) }, null, n, .006f, .004f, (s, k) => k != 2 && k != 6, false, 0, out _, out _, out _), I);
-            if (f.v == "leaf")
-            {
-                var leaves = new List<Matrix4x4>();
-                for (int k = 0; k < n; k++) if (k != n / 2) leaves.Add(Fit.At(OnFacet(h, bs, k, rim + h.Y(.004f), .002f), V(-25, FacetYaw(k, n), 0), One));
-                f.Add(OnBody, "green", M.Many("a.cap.leaves." + h.key, Leaf, leaves.ToArray()), I);
-                f.Add(OnBody, "green", M.Many("a.cap.sprig", Leaf, M.At(V0, V(0, 0, 0), One), M.At(V0, V(0, 0, 35), V(.8f, .8f, .8f)), M.At(V0, V(0, 0, -35), V(.8f, .8f, .8f))), Fit.At(apex, V(-15, 0, 0), One));
-            }
-            if (f.tier >= 1 || f.l.extra) f.Add(OnBody, band, Cube, HelmBox(h, apex, 45, new Vector3(.012f, .007f, .012f)));   // the button on top
-            if (f.l.extra) Ridge(f, "trim", h, sup, rings, apex, 0, 0, .005f, .003f);   // a raised seam up the front gore
-            f.Glow(1, OnBody, Cube, Gem(h, OnFacet(h, bs, 0, rim + h.Y(.005f), .002f), 0, .012f));
-            f.Glow(2, OnBody, Cube, Gem(h, apex + V(0, h.Y(.004f), 0), 0, .012f));
-            f.Rust(OnBody, OnFacet(h, sup[1], 1, ys[1], .001f), new Vector3(.014f / h.s.x, .01f / h.s.y, .003f / h.s.z), V(0, FacetYaw(1, n), 0));
-            Mark(f, OnBody, OnFacet(h, bs, 1, rim + h.Y(.006f), .002f), V(0, FacetYaw(1, n), 0));
+            g.hem = ModelArmour.Skin(model.Cloud, HoodLoft(hemRows, null, h.axis, thick, null), p => HoodWeight(h, p));
+            hoodGrids[key] = g; return g;
         }
 
         /// <summary>
-        /// A kettle hat: eight steel (or boiled leather) gores rising to a point over the hair, a rim band, and a brim of sloping
-        /// plates. Half: no brim, a lower rim and a nasal bar down to the nose. Plate cheek guards from the third band, rivets from
-        /// the third, a comb from the fourth (taller at the fifth).
+        /// Cloth through rows of points (top down, the same count round each), closed over the top in <paramref name="apex"/> when
+        /// given, <paramref name="thick"/> deep (drawn in toward the axis), shaded smooth; <paramref name="open"/>(segment, k)
+        /// leaves out the face between rows s and s + 1 and columns k and k + 1; every edge left bare gets a thin wall.
         /// </summary>
-        void AngularKettle(Fit f)
+        static Mesh HoodLoft(List<Vector3[]> rows, Vector3? apex, Vector3 axis, float thick, System.Func<int, int, bool> open)
         {
-            f.onHead = true; const int n = 8; bool half = f.v == "half";
-            string main = f.tier >= 1 ? "plate" : "leather2", hk = half ? "kettle.half" : "kettle";
-            float rim = headOutline.eyes + (half ? .17f : .22f) * HeadH;
-            float cut = rim + .008f / Mathf.Abs(headFrame.lossyScale.y); CutHair(cut); var h = HelmOn(cut); float top = h.top;
-            var ys = new[] { rim, Mathf.Lerp(rim, top, .4f), Mathf.Lerp(rim, top, .7f), Mathf.Lerp(rim, top, .88f) };
-            f.Add(OnBody, main, HelmShell(h, hk, ys, null, n, .006f, .004f, null, true, half ? .005f : .01f, out var sup, out var rings, out var apex), I);
-            var rs = Wider(sup[0], sup[1], .005f);
-            f.Add(OnBody, "trim", HelmShell(h, hk + ".rim", new[] { rim - h.Y(.002f), rim + h.Y(.011f) }, null, n, 0, .003f, null, false, 0, out _, out _, out _, new[] { rs, rs }), I);
-            if (!half)
+            int R = rows.Count, n = rows[0].Length, segs = R - 1;
+            var v = new List<Vector3>(); var t = new List<int>();
+            Vector3 In(Vector3 p) { var o = p - new Vector3(axis.x, p.y, axis.z); return o.sqrMagnitude > 1e-12f ? p - o.normalized * Mathf.Min(thick, o.magnitude * .5f) : p - Vector3.up * thick; }
+            Vector3 Out(Vector3 p) { return p - new Vector3(axis.x, p.y, axis.z); }
+            for (int r = 0; r < R; r++) foreach (var p in rows[r]) v.Add(p);
+            int inner = v.Count; for (int r = 0; r < R; r++) foreach (var p in rows[r]) v.Add(In(p));
+            int ap = -1, api = -1; if (apex.HasValue) { ap = v.Count; v.Add(apex.Value); api = v.Count; v.Add(apex.Value - Vector3.up * thick); }
+            int O(int r, int k) { return r * n + (k % n + n) % n; }
+            void Tri(int a, int b, int c, Vector3 outward)
             {
-                // The brim: plates sloping out and down from the rim, its edge rolled at the better bands.
-                var outer = Plus(rs, .04f);
-                f.Add(OnBody, main, HelmShell(h, "kettle.brim", new[] { rim - h.Y(.017f), rim + h.Y(.001f) }, null, n, 0, .004f, null, false, 0, out _, out _, out _, new[] { outer, rs }), I);
-                var edge = Plus(outer, .002f);
-                f.Fancy(OnBody, HelmShell(h, "kettle.brim.edge", new[] { rim - h.Y(.021f), rim - h.Y(.014f) }, null, n, 0, .003f, null, false, 0, out _, out _, out _, new[] { edge, edge }), I);
-                if (f.tier >= 2 && main == "plate")   // cheek guards under the brim
-                    f.Add(OnBody, main, HelmShell(h, "kettle.cheeks", new[] { h.eyes - .5f * h.H, rim + h.Y(.004f) }, null, n, .008f, .004f, (s, k) => k != 2 && k != 6, false, 0, out _, out _, out _), I);
+                var nrm = Vector3.Cross(v[b] - v[a], v[c] - v[a]);
+                if (Vector3.Dot(nrm, outward) >= 0) { t.Add(a); t.Add(b); t.Add(c); } else { t.Add(a); t.Add(c); t.Add(b); }
             }
+            void Quad(int a, int b, int c, int d, Vector3 outward) { Tri(a, b, c, outward); Tri(a, c, d, outward); }
+            void Wall(Vector3 a, Vector3 b, Vector3 from)
+            {
+                int i = v.Count; v.Add(a); v.Add(b); v.Add(In(b)); v.Add(In(a)); var mid = (a + b) / 2;
+                Quad(i, i + 1, i + 2, i + 3, mid - from);
+            }
+            bool Shut(int s, int k) { return s < 0 || s >= segs || (open != null && open(s, (k % n + n) % n)); }
+            if (apex.HasValue)
+                for (int k = 0; k < n; k++)
+                {
+                    Tri(ap, O(0, k), O(0, k + 1), Vector3.up); Tri(api, inner + O(0, k), inner + O(0, k + 1), Vector3.down);
+                }
+            for (int s = 0; s < segs; s++)
+                for (int k = 0; k < n; k++)
+                {
+                    if (Shut(s, k)) continue;
+                    Vector3 a = rows[s][k], b = rows[s][(k + 1) % n], c = rows[s + 1][(k + 1) % n], d = rows[s + 1][k];
+                    var mid = (a + b + c + d) / 4; var outward = Out(mid);
+                    Quad(O(s, k), O(s, k + 1), O(s + 1, k + 1), O(s + 1, k), outward);
+                    Quad(inner + O(s, k), inner + O(s, k + 1), inner + O(s + 1, k + 1), inner + O(s + 1, k), -outward);
+                    if (Shut(s, k - 1)) Wall(a, d, mid);
+                    if (Shut(s, k + 1)) Wall(b, c, mid);
+                    if (Shut(s - 1, k) && !(s == 0 && apex.HasValue)) Wall(a, b, mid);
+                    if (Shut(s + 1, k)) Wall(d, c, mid);
+                }
+            var m = new Mesh { name = "Hood cloth" }; m.SetVertices(v); m.SetTriangles(t, 0); m.RecalculateNormals(); m.RecalculateBounds();
+            return m;
+        }
+
+        /// <summary>The cloth's bones: the head over the jaw; the head giving way to the neck down to its base; under it the neck,
+        /// the chest and, out toward each shoulder, that collarbone.</summary>
+        static BoneWeight HoodWeight(HoodFit h, Vector3 p)
+        {
+            var w = new Dictionary<int, float>();
+            void Add(int b, float x) { if (b < 0 || x <= 0) return; w.TryGetValue(b, out float o); w[b] = o + x; }
+            if (p.y >= h.jaw) Add(h.head, 1);
+            else if (p.y >= h.neck) { float u = (p.y - h.neck) / Mathf.Max(1e-5f, h.jaw - h.neck); Add(h.head, u); Add(h.neckBone, 1 - u); }
             else
             {
-                float nose = h.eyes - .35f * h.H; float front = HelmSupport(h, nose, rim, n, .006f)[0];
-                f.Add(OnBody, main, Cube, HelmBox(h, h.At(new Vector2(0, front + .003f), (rim + nose) / 2), 0, new Vector3(.016f, (rim - nose) * h.s.y, .006f)));   // the nasal
-                var band2 = Wider(sup[0], sup[1], .002f); float y2 = Mathf.Lerp(rim, top, .3f);
-                f.Fancy(OnBody, HelmShell(h, "kettle.half.band", new[] { y2, y2 + h.Y(.007f) }, null, n, 0, .002f, null, false, 0, out _, out _, out _, new[] { band2, band2 }), I);
+                float s = Mathf.Clamp01((h.neck - p.y) / h.M(.06f)), side = Mathf.Clamp01(Mathf.Abs(p.x - h.axis.x) / Mathf.Max(1e-5f, h.half)) * .7f;
+                Add(h.neckBone, 1 - s); Add(h.chest, s * (1 - side)); Add(p.x > h.axis.x ? h.clavL : h.clavR, s * side);   // the model's left is +x
             }
-            if (f.tier >= 2)
-            {
-                var rivets = new Matrix4x4[n]; for (int k = 0; k < n; k++) rivets[k] = HelmBox(h, OnFacet(h, rs, k, rim + h.Y(.0045f), .0015f), FacetYaw(k, n), new Vector3(.006f, .006f, .003f));
-                f.Add(OnBody, "dark", M.Many("a.kettle.rivets." + hk + "." + h.key, Cube, rivets), I);
-            }
-            if (f.tier >= 3)
-            {
-                float tall = f.tier >= 4 ? .024f : .014f;
-                Ridge(f, "trim", h, sup, rings, apex, 0, 1, .005f, tall); Ridge(f, "trim", h, sup, rings, apex, n / 2, 1, .005f, tall);
-            }
-            f.Glow(1, OnBody, Cube, Gem(h, OnFacet(h, rs, 0, rim + h.Y(.0045f), .002f), 0, .012f));
-            f.Glow(2, OnBody, Cube, Gem(h, apex + V(0, h.Y(.005f), 0), 0, .013f));
-            f.Rust(OnBody, OnFacet(h, sup[1], 1, ys[1], .001f), new Vector3(.014f / h.s.x, .012f / h.s.y, .003f / h.s.z), V(0, FacetYaw(1, n), 0));
-            Mark(f, OnBody, OnFacet(h, rs, 1, rim + h.Y(.005f), .002f), V(0, FacetYaw(1, n), 0));
+            var list = new List<KeyValuePair<int, float>>(w); list.Sort((a, b) => b.Value.CompareTo(a.Value));
+            float sum = 0; for (int i = 0; i < list.Count && i < 4; i++) sum += list[i].Value; if (sum <= 0) return new BoneWeight { boneIndex0 = Mathf.Max(0, h.head), weight0 = 1 };
+            var bw = new BoneWeight();
+            if (list.Count > 0) { bw.boneIndex0 = list[0].Key; bw.weight0 = list[0].Value / sum; }
+            if (list.Count > 1) { bw.boneIndex1 = list[1].Key; bw.weight1 = list[1].Value / sum; }
+            if (list.Count > 2) { bw.boneIndex2 = list[2].Key; bw.weight2 = list[2].Value / sum; }
+            if (list.Count > 3) { bw.boneIndex3 = list[3].Key; bw.weight3 = list[3].Value / sum; }
+            return bw;
         }
 
         /// <summary>
-        /// A barbute: twelve steel plates closed round the head from the jaw to a low point, a T opening (an eye slit and a slot to
-        /// the chin), a collar of plates (mail below the fifth band). Epic: the slit's edges glow. Fifth band (or extra): a brow
-        /// band; fifth: a comb and cheek rivets. Rimed: frost on the rims, icicles at the jaw.
+        /// A hood (or the Cult's bone mask in a hood) on a model, laid on its own head and shoulders (<see cref="HoodOn"/>). Its
+        /// materials and its tier's extras as before: the hem's binding (trim from the second band), a clasp at the throat from the
+        /// third or with the extra, glows, wear, the mark. Mask: a bone face in the opening with two eye holes and a brow ridge;
+        /// tear: its weeping violet light. False when the head could not be measured (the old drawing is used).
         /// </summary>
-        void AngularBarbute(Fit f)
+        bool AngularHood(Fit f, bool mask)
         {
-            f.onHead = true; var h = HelmOn(float.NaN); const int n = 12; float e = h.eyes, H = h.H;
-            var ys = new[] { e - .85f * H, e - .5f * H, e - .15f * H, e + .15f * H, e + .45f * H, e + .75f * H, e + .9f * H };
-            bool Open(int s, int k) { return s <= 1 && k == 0 || s == 2 && (k == 11 || k == 0 || k == 1); }
-            f.Add(OnBody, "plate", HelmShell(h, "barbute", ys, null, n, .007f, .004f, Open, true, .004f, out var sup, out var rings, out var apex), I);
-            var g0 = sup[0];
-            f.Add(OnBody, f.tier >= 4 ? "plate" : "mail", HelmShell(h, "barbute.gorget", new[] { e - 1.35f * H, e - 1.1f * H, ys[0] + h.Y(.004f) }, null, n, 0, .004f, null, false, 0, out _, out _, out _,
-                new[] { Plus(g0, .03f), Plus(g0, .012f), Plus(g0, .003f) }), I);
+            if (model == null || model.Cloud == null) return false;
+            var h = MeasureHood(); if (h == null) return false;
+            var g = HoodOn(h, f.shoulders, f.v == "oilskin");
+            f.onHead = true;
+            string main = f.v == "oilskin" ? "oil" : "cloth", hemRole = f.tier >= 1 ? "trim" : "cloth2";
+            f.Built(OnBody, main, g.shell);
+            f.Built(OnBody, hemRole, g.hem);
+            var fwd = HoodDir(0); var up = Vector3.up;
+            // The throat: the front column halfway down the neck.
+            int throatRow = (g.jaw + g.neck + 1) / 2; var throat = g.rows[throatRow][0] + fwd * h.M(.004f);
+            if (f.tier >= 2 || f.l.extra) Stud(f, OnBody, "trim", Sphere, throat, fwd, up, new Vector3(.02f, .02f, .012f), h.neckBone);
+            if (mask)
+            {
+                float front = HoodReach(h.headPts, h.axis, h.eyes, h.M(.02f), fwd, h.M(.09f)), wide = HoodReach(h.headPts, h.axis, h.eyes, h.M(.02f), Vector3.right, h.M(.07f));
+                var face = h.At(h.eyes - h.M(.02f)) + fwd * (front - h.M(.025f));
+                Stud(f, OnBody, "bone", Sphere, face, fwd, up, new Vector3(2 * wide * .8f / h.pm, .14f, .07f), h.head);
+                foreach (float sx in new[] { -1f, 1f })
+                    Stud(f, OnBody, "slot", Sphere, h.At(h.eyes) + fwd * (front + h.M(.006f)) + Vector3.right * h.M(.026f) * sx, fwd, up, new Vector3(.028f, .017f, .01f), h.head);
+                if (f.v == "tear") Stud(f, OnBody, "lit", Cube, h.At(h.eyes - h.M(.035f)) + fwd * (front + h.M(.004f)) + Vector3.right * h.M(.034f), fwd, up, new Vector3(.01f, .04f, .004f), h.head, 5);
+                else Stud(f, OnBody, "bone", Cube, h.At(h.eyes + h.M(.024f)) + fwd * (front + h.M(.002f)), fwd, up, new Vector3(.09f, .012f, .01f), h.head);
+                if (f.l.accents >= 1) Stud(f, OnBody, "glow", Cube, h.At(h.eyes + h.M(.04f)) + fwd * (front + h.M(.002f)), fwd, up, new Vector3(.012f, .012f, .005f), h.head, 45);
+            }
+            else if (f.l.accents >= 1) Stud(f, OnBody, "glow", Cube, throat + fwd * h.M(.004f) - up * h.M(.02f), fwd, up, new Vector3(.012f, .012f, .005f), h.neckBone, 45);
             if (f.l.accents >= 2)
-                foreach (int k in new[] { 11, 0, 1 })
-                {
-                    float w = 2 * sup[3][k] * Mathf.Tan(Mathf.PI / n);
-                    f.Add(OnBody, "glow", Cube, HelmBox(h, OnFacet(h, sup[3], k, ys[3] + h.Y(.002f), .0005f), FacetYaw(k, n), new Vector3(w, .004f, .004f)));
-                    f.Add(OnBody, "glow", Cube, HelmBox(h, OnFacet(h, sup[2], k, ys[2] - h.Y(.002f), .0005f), FacetYaw(k, n), new Vector3(w, .004f, .004f)));
-                }
-            if (f.tier >= 4 || f.l.extra)
             {
-                var bb = Wider(sup[3], sup[4], .004f);
-                f.Add(OnBody, "trim", HelmShell(h, "barbute.brow", new[] { ys[3] + h.Y(.004f), ys[3] + h.Y(.016f) }, null, n, 0, .003f, null, false, 0, out _, out _, out _, new[] { bb, bb }), I);
+                if (mask) Stud(f, OnBody, "glow", Cube, throat + fwd * h.M(.004f), fwd, up, new Vector3(.011f, .011f, .005f), h.neckBone, 45);
+                else Stud(f, OnBody, "glow", Cube, g.rows[g.brow - 1][0] + fwd * h.M(.002f), fwd, up, new Vector3(.011f, .011f, .005f), h.head, 45);
             }
-            if (f.tier >= 4)
+            if (f.l.worn)
             {
-                Ridge(f, "trim", h, sup, rings, apex, 0, 4, .005f, .02f); Ridge(f, "trim", h, sup, rings, apex, n / 2, 2, .005f, .02f);
-                var rivets = new List<Matrix4x4>(); foreach (int k in new[] { 2, 3, 9, 10 }) rivets.Add(HelmBox(h, OnFacet(h, sup[1], k, ys[1], .0015f), FacetYaw(k, n), new Vector3(.006f, .006f, .003f)));
-                f.Add(OnBody, "dark", M.Many("a.barbute.rivets." + h.key, Cube, rivets.ToArray()), I);
+                int k = HoodN * 3 / 8; var d = HoodDir(k);
+                Stud(f, OnBody, "rust", Cube, g.rows[g.brow - 2][k] + d * h.M(.002f), d, up, new Vector3(.03f, .025f, .002f), h.head);
             }
-            if (f.v == "rimed")
-            {
-                var frost = new List<Matrix4x4>(); for (int k = 0; k < n; k += 2) { frost.Add(HelmBox(h, OnFacet(h, g0, k, ys[0] + h.Y(.006f), .002f), FacetYaw(k, n), new Vector3(.02f, .007f, .006f))); frost.Add(HelmBox(h, OnFacet(h, sup[4], k + 1, ys[4], .002f), FacetYaw(k + 1, n), new Vector3(.02f, .006f, .006f))); }
-                f.Add(OnBody, "rime", M.Many("a.barbute.rime." + h.key, Cube, frost.ToArray()), I);
-                var icicles = new List<Matrix4x4>(); for (int k = 4; k <= 8; k++) icicles.Add(Matrix4x4.TRS(OnFacet(h, g0, k, ys[0] - h.Y(.002f), .0f), Quaternion.Euler(180, 0, 0), new Vector3(.007f / h.s.x, h.Y(.012f + (k % 3) * .005f), .007f / h.s.z)));
-                f.Add(OnBody, "rime", M.Many("a.barbute.icicles." + h.key, M.Cone(6), icicles.ToArray()), I);
-            }
-            f.Glow(1, OnBody, Cube, Gem(h, OnFacet(h, sup[4], 0, ys[4], .002f), 0, .013f));
-            f.Rust(OnBody, OnFacet(h, sup[4], 10, ys[4], .001f), new Vector3(.014f / h.s.x, .012f / h.s.y, .003f / h.s.z), V(0, FacetYaw(10, n), 0));
-            Mark(f, OnBody, OnFacet(h, sup[1], 3, ys[1], .002f), V(0, FacetYaw(3, n), 0));
-        }
-
-        /// <summary>
-        /// A mail coif: twelve panels of mail in rows (every other ring stands a little proud) round the head, open round the face
-        /// from the chin to the brow, draping to the shoulders, a collar at the hem. Third band: a brow band; fourth: a steel
-        /// skull-plate; fifth: a nasal. Extra: studs round the collar.
-        /// </summary>
-        void AngularCoif(Fit f)
-        {
-            f.onHead = true; var h = HelmOn(float.NaN); const int n = 12; float e = h.eyes, H = h.H, chin = e - .9f * H;
-            var ys = new[] { chin - .62f * H, chin - .32f * H, chin, e - .55f * H, e - .2f * H, e + .2f * H, e + .5f * H, e + .75f * H, e + .9f * H };
-            var chinSup = HelmSupport(h, chin, e - .55f * H, n, .005f);
-            var given = new float[ys.Length][]; given[0] = Plus(chinSup, .05f); given[1] = Plus(chinSup, .02f);
-            var extra = new float[ys.Length]; for (int i = 2; i < ys.Length; i++) extra[i] = i % 2 == 0 ? .0015f : 0;
-            bool Open(int s, int k) { return s >= 2 && s <= 4 && (k == 11 || k == 0 || k == 1); }
-            f.Add(OnBody, "mail", HelmShell(h, "coif", ys, extra, n, .005f, .004f, Open, true, .002f, out var sup, out _, out var apex, given), I);
-            var collar = Plus(given[0], .004f);
-            f.Add(OnBody, f.tier >= 1 ? "leather" : "cloth2", HelmShell(h, "coif.collar", new[] { ys[0] - h.Y(.003f), ys[0] + h.Y(.012f) }, null, n, 0, .004f, null, false, 0, out _, out _, out _, new[] { collar, collar }), I);
-            if (f.tier >= 2)
-            {
-                var bb = Wider(sup[5], sup[6], .004f);
-                f.Add(OnBody, "trim", HelmShell(h, "coif.brow", new[] { ys[5], ys[5] + h.Y(.012f) }, null, n, 0, .003f, null, false, 0, out _, out _, out _, new[] { bb, bb }), I);
-            }
-            if (f.tier >= 3)
-            {
-                float y0 = e + .45f * H, y1 = e + .62f * H, y2 = e + .82f * H;
-                f.Add(OnBody, "plate", HelmShell(h, "coif.plate", new[] { y0, y1, y2 }, null, n, .0135f, .004f, null, true, .004f, out _, out _, out _,
-                    new[] { Wider(sup[5], sup[6], .006f), Wider(sup[6], sup[7], .006f), Wider(sup[7], sup[8], .006f) }, apex.y + h.Y(.006f)), I);
-            }
-            if (f.tier >= 4)
-            {
-                float nose = e - .35f * H, brow = e + .25f * H, front = HelmSupport(h, nose, brow, n, .009f)[0];
-                f.Add(OnBody, "plate", Cube, HelmBox(h, h.At(new Vector2(0, front + .003f), (brow + nose) / 2), 0, new Vector3(.016f, (brow - nose) * h.s.y, .006f)));
-            }
-            if (f.l.extra)
-            {
-                var studs = new List<Matrix4x4>(); for (int k = 1; k < n; k += 2) studs.Add(HelmBox(h, OnFacet(h, collar, k, ys[0] + h.Y(.0045f), .002f), FacetYaw(k, n), new Vector3(.006f, .006f, .003f), 45));
-                f.Add(OnBody, "trim", M.Many("a.coif.studs." + h.key, Cube, studs.ToArray()), I);
-            }
-            f.Glow(1, OnBody, Cube, Gem(h, OnFacet(h, collar, 0, ys[0] + h.Y(.0045f), .002f), 0, .013f));
-            f.Glow(2, OnBody, Cube, Gem(h, f.tier >= 2 ? OnFacet(h, Wider(sup[5], sup[6], .004f), 0, ys[5] + h.Y(.006f), .002f) : apex + V(0, h.Y(.004f), 0), 0, .013f));
-            f.Rust(OnBody, OnFacet(h, sup[4], 10, ys[4], .001f), new Vector3(.014f / h.s.x, .014f / h.s.y, .003f / h.s.z), V(0, FacetYaw(10, n), 0));
-            Mark(f, OnBody, OnFacet(h, collar, 2, ys[0] + h.Y(.005f), .002f), V(0, FacetYaw(2, n), 0));
+            { int k = HoodN - 3, r = g.rows.Count - 2; var d = HoodDir(k); MarkOn(f, OnBody, g.rows[r][k] + d * h.M(.003f), d, up, h.chest, .6f, false); }
+            return true;
         }
 
         // ------------------------------------------------------------------------------------------------ the arms

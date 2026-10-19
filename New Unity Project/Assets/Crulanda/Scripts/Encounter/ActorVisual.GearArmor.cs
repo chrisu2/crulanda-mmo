@@ -441,7 +441,7 @@ namespace Crulanda.Encounter
         {
             switch (slot)
             {
-                case EquipSlot.Head: ShowHair(true); Tuck(false); DruidHood(true); WholeHair(); break;
+                case EquipSlot.Head: ShowHair(true); Tuck(false); DruidHood(true); break;
                 case EquipSlot.Chest: Bare(baseChest); Bare(baseSleeves); if (baseBelt != null) baseBelt.enabled = true; HangCloak(false); break;
                 case EquipSlot.Hands: Bare(baseHands); break;
                 case EquipSlot.Legs: Bare(baseLegs); break;
@@ -474,11 +474,10 @@ namespace Crulanda.Encounter
         /// </summary>
         void ModelHelm(Fit f)
         {
-            // Chosan's Modular Hero helmets (note 88) were nodes of that pack's rig pinned to our heads: they perched on the skull,
-            // tilted (wardrobe 06-helms-f, 2026-10-18), and no seat could fix it (ROADMAP Phase 8.5). Retired 2026-10-18 for the
-            // helms built round the head (ActorVisual.GearAngular); no item wore them, only the wardrobe line-up.
+            // A piece of a modular kit (Chosan's Modular Hero, note 88): one node of the pack's armour FBX, by name.
             GameObject src; Transform node = null;
-            src = f.v.StartsWith("Headgear.") ? null : Resources.Load<GameObject>("Weapons/" + f.v);
+            if (f.v.StartsWith("Headgear.")) { var kit = Resources.Load<GameObject>("Props/ModularHero/Models/Armor Parts/Armor Parts"); node = kit != null ? FindDeep(kit.transform, f.v) : null; src = node != null ? node.gameObject : null; }
+            else src = Resources.Load<GameObject>("Weapons/" + f.v);
             if (src == null) return;
             var root = gearRoots[(int)EquipSlot.Head]; var go = Instantiate(src, root, false); go.name = "Model " + f.v;
             if (node != null) { go.transform.localPosition = Vector3.zero; go.transform.localRotation = Quaternion.identity; go.transform.localScale = Vector3.one; }
@@ -507,7 +506,6 @@ namespace Crulanda.Encounter
         /// </summary>
         void Cap(Fit f)
         {
-            if (AngularHead) { AngularCap(f); return; }
             string main = f.v == "leaf" || f.tier == 0 ? "cloth" : "leather", band = f.tier >= 1 ? "trim" : "cloth2";
             var back = V(0, 0, -.012f);
             // The crown is a squat half-ellipse (.19 across, .15 high) so the seam over it can follow it.
@@ -534,6 +532,7 @@ namespace Crulanda.Encounter
         /// </summary>
         void Hood(Fit f, bool mask)
         {
+            if (AngularHood(f, mask)) return;   // on a model: cloth laid on its own head and shoulders (ActorVisual.GearAngular, play note 242)
             var rings = new List<Vector4>(); var gaps = new List<float>();
             if (!f.shoulders) { rings.Add(Rg(.39f, .5f, .25f, -.03f)); rings.Add(Rg(.37f, .56f, .24f, -.03f)); gaps.Add(0); gaps.Add(0); }
             rings.AddRange(new[] { Rg(.3f, .64f, .21f, -.03f), Rg(.2f, .69f, .18f, -.03f), Rg(.19f, .76f, .19f, -.025f), Rg(.19f, .85f, .2f, -.03f), Rg(.175f, .95f, .19f, -.04f), Rg(.115f, 1.025f, .135f, -.05f), Rg(0, 1.055f, 0, -.06f) });
@@ -560,7 +559,6 @@ namespace Crulanda.Encounter
         /// <summary>A mail coif: rows of rings over the head and down to a collar, open round the face. Better ones add a brow band, a steel skull-plate, a nasal.</summary>
         void Coif(Fit f)
         {
-            if (AngularHead) { AngularCoif(f); return; }
             var st = new[] { Rg(.215f, .635f, .17f, -.01f), Rg(.185f, .68f, .165f, -.01f), Rg(.192f, .74f, .18f, -.01f), Rg(.196f, .84f, .195f, -.01f), Rg(.18f, .94f, .18f, -.02f) };
             var rows = M.Rows(st, .022f, .0045f, false, new[] { 0f, 20, 60, 100, 70 }, out var rowGaps);
             f.Add("mail", Shell("a.coif", Cat(rows, new[] { Rg(.11f, 1.015f, .115f, -.02f), Rg(0, 1.04f, 0, -.02f) }), .016f, 2.2f, Cat(rowGaps, new[] { 0f, 0 }), 90, 28), V0, One);
@@ -598,7 +596,6 @@ namespace Crulanda.Encounter
         /// </summary>
         void Kettle(Fit f)
         {
-            if (AngularHead) { AngularKettle(f); return; }
             bool half = f.v == "half"; string main = f.tier >= 1 ? "plate" : "leather2";
             float top = half ? 1.06f : 1.07f;
             if (half) f.Add(main, M.Lathe("a.kettle.half", Pts(.186f, .892f, .19f, .925f, .178f, .975f, .136f, 1.025f, .06f, 1.055f, 0, 1.06f), 16, true), V0, One);
@@ -634,7 +631,6 @@ namespace Crulanda.Encounter
         /// </summary>
         void Barbute(Fit f)
         {
-            if (AngularHead) { AngularBarbute(f); return; }
             f.Add("plate", M.Lathe("a.barbute", Pts(.15f, .652f, .196f, .664f, .205f, .73f, .207f, .81f, .198f, .9f, .165f, .97f, .1f, 1.025f, 0, 1.046f), 20, true), V0, One);
             string slot = f.l.accents >= 2 ? "glow" : "slot";
             f.Add(slot, M.Arc("a.barbute.slit", .2f, .2105f, 54, 126, .026f), V(0, .842f, 0), One);

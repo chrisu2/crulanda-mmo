@@ -56,7 +56,8 @@ namespace Crulanda.Encounter
             "head.cap:plain/oakhaven", "head.cap:flaps/khaven", "head.cap:leaf/veridian", "head.hood:cloth/pilgrim", "head.hood:oilskin/oakhaven", "head.coif:mail/tollroad",
             "head.wrap:scarf/sandthrone", "head.kettle:plain/tollroad", "head.kettle:half/sandthrone", "head.barbute:plain/tollroad", "head.barbute:rimed/pale+glow",
             "head.mask:bone/ashwalker", "head.mask:tear/cult+glow", "head.circlet:band/concord", "head.circlet:briar/veridian", "head.crown:tin/sandthrone", "head.crown:root/veridian+glow", "head.crown:antler/veridian",
-            "model.helm:Ashen_gth_equi_sentinel_helm/ashwalker"
+            "model.helm:Ashen_gth_equi_sentinel_helm/ashwalker",
+            "model.helm:Headgear.B.012/tollroad", "model.helm:Headgear.B.013/tollroad", "model.helm:Headgear.B.014/tollroad", "model.helm:Headgear.B.015/tollroad", "model.helm:Headgear.B.016/tollroad", "model.helm:Headgear.DS.011/tollroad", "model.helm:Headgear.DS.012/tollroad", "model.helm:Headgear.DS.013/tollroad", "model.helm:Headgear.DS.014/tollroad", "model.helm:Headgear.DS.015/tollroad", "model.helm:Headgear.G.011/tollroad", "model.helm:Headgear.G.012/tollroad", "model.helm:Headgear.G.013/tollroad", "model.helm:Headgear.G.014/tollroad", "model.helm:Headgear.G.015/tollroad", "model.helm:Headgear.I.011/tollroad", "model.helm:Headgear.I.012/tollroad", "model.helm:Headgear.I.013/tollroad", "model.helm:Headgear.I.014/tollroad", "model.helm:Headgear.I.015/tollroad", "model.helm:Headgear.M.011/tollroad", "model.helm:Headgear.M.012/tollroad", "model.helm:Headgear.M.013/tollroad", "model.helm:Headgear.M.014/tollroad", "model.helm:Headgear.M.015/tollroad"
         };
         public static readonly string[] ShoulderChestLooks = {
             "shoulder.mantle:cloth/oakhaven", "shoulder.mantle:fur/pilgrim", "shoulder.mantle:hide/ashwalker", "shoulder.mantle:frayed/khaven", "shoulder.mantle:shawl/pale",

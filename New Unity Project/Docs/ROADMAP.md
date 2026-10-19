@@ -114,6 +114,26 @@ shoulders are now built from the model's own measurements instead of drawn round
   when the cap comes off) and the cap fits the skull plus that hair; the test checks pokes per point and gaps within 3 mm/6 degrees,
   and its rays allow for seams. The model measured, every hair style (parted, buzzed, long, buns, none): cap worst gap 1.2-1.6 cm,
   kettle 1.5-1.8, barbute 1.4, nothing poking through; the egg 1.2 cm. WRITTEN, NOT RUN.
+- **Play note 242 (2026-10-19, Chris on wardrobe-angular-2, verbatim): "i think we have reverted too much bring back what we had
+  before. helm dont fit. most sit around the head a too large for the head. hood is awful".** Asked, he chose "Old helms, new gloves
+  (Recommended)". Done on this branch (WRITTEN, NOT RUN: compiled offline only, no Unity run, no capture):
+  - Helms back exactly as in his game (feet-bow-adit-kit): caps, kettle hats, barbutes and coifs drawn and seated as before (SeatHead,
+    HatFit), the hair as before (no cutting under caps), GearLooks.ModelHelms and the wardrobe line-up's helm entries as before (the
+    Modular Hero helmets are back in the list). The built-helm code and its test are gone.
+  - Kept: the new gloves, gauntlets and wraps, the new pauldrons and spaulders, and their tests.
+  - The hood remade as cloth (hoods, the oilskin hood, and the Cult's bone and tear masks, which wear one): laid on the model's own
+    head and shoulder points (bind pose), about 1 cm round the skull (a little more at the back), a face opening from brow to chin,
+    falling from the ears and the back of the head to the jaw, sagging in onto the neck, then a cowl over the shoulders, the upper
+    chest and the back (longest at the back, short over the shoulder points, never wider than the shoulders), soft folds, smooth
+    shading, no rims. Skinned: the head carries the hood, the neck, chest and collarbones the cowl. Oilskin: the cloth stands a
+    little forward over the brow. The bone mask sits in the opening, measured to the face. Materials and tier extras as before
+    (hem binding, throat clasp, glows, wear, mark). The smooth figure keeps the old hood.
+  - Test (EditMode AngularGearTests, Hoods_lie_close_round_the_head_and_fall_onto_the_shoulders): round the skull's top 8 cm every
+    point within 3 cm of the head and none of the head through it; closed over the top within 3.5 cm; under the neck's base every
+    point within 4 cm of the body; down at least 3 cm under the neck's base; no wider than the shoulder joints and 4 cm. Today's bell
+    and collar disc fail it by its logic.
+  - **The lead must run** AngularGearTests, GearVisualTests and ModelFigureTests, then capture 06-helms (all) and 04-sets front,
+    back and side, with a close look at the oilskin hood and the bone mask, before Chris sees it.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

@@ -6,13 +6,14 @@ using Crulanda.Encounter;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// Helms, hand pieces and shoulders that fit (play note 239, 2026-10-18, Chris: "helms and gauntlet still tooo round" / "in
-    /// the 04-sets-front"; 2026-10-10: "all seem to not fit properly"). Pure measuring, no looking: a faceted shell built round
-    /// points stands outside every one of them and close to them; on a model figure every helm comes down over the skull and
-    /// stands within 2 cm of the head (or hair) all round its top, none perched; a glove or gauntlet is no bigger than a hand
-    /// and a quarter; a pauldron sits on the shoulder; and none of their main parts is round (a sphere, a lathed dome: the share
-    /// of smooth-shaded triangles, AngularShell.Roundness). Today's pieces fail these by their logic: the domes and balls are
-    /// smooth-shaded, the mitten ball is half again a hand deep, and the pack's helms stood above the skull.
+    /// Hand pieces, shoulders and hoods that fit (play note 239, 2026-10-18, Chris: "helms and gauntlet still tooo round" / "in
+    /// the 04-sets-front"; 2026-10-10: "all seem to not fit properly"; play note 242, 2026-10-19: "hood is awful"). Pure
+    /// measuring, no looking: a faceted shell built round points stands outside every one of them and close to them; on a model
+    /// figure a glove or gauntlet is no bigger than a hand and a quarter; a pauldron sits on the shoulder; none of their main
+    /// parts is round (a sphere, a lathed dome: the share of smooth-shaded triangles, AngularShell.Roundness); and a hood lies
+    /// close round the skull and falls onto the shoulders, no wider than them. Today's pieces failed these by their logic: the
+    /// mitten ball was half again a hand deep, and the hood a bell with a collar disc drawn for the old ball head. The helms
+    /// built round the head were taken out again (play note 242: the old helms are back), and their test with them.
     /// </summary>
     public class AngularGearTests
     {
@@ -34,7 +35,7 @@ namespace Crulanda.Tests
             db.Items[id] = new ItemDef { id = id, name = look, kind = "gear", slot = slot, quality = 3, level = level, canonStatus = "GAME-ONLY" };
             return id;
         }
-        static readonly string[] HelmLooks = { "head.cap:plain/oakhaven", "head.cap:flaps/khaven", "head.cap:leaf/veridian", "head.kettle:plain/tollroad", "head.kettle:half/sandthrone", "head.barbute:plain/tollroad", "head.barbute:rimed/pale+glow", "head.coif:mail/tollroad" };
+        static readonly string[] HoodLooks = { "head.hood:cloth/pilgrim", "head.hood:oilskin/oakhaven", "head.mask:bone/ashwalker" };
         static readonly string[] HandLooks = { "hands.gloves:plain/oakhaven", "hands.gloves:fingerless/sandthrone", "hands.gloves:mitts/pilgrim", "hands.gauntlets:plate/tollroad", "hands.gauntlets:bone/ashwalker", "hands.gauntlets:glass/pale+glow" };
         static readonly string[] ShoulderLooks = { "shoulder.pauldron:dome/tollroad", "shoulder.pauldron:bone/ashwalker", "shoulder.spaulder:lames/tollroad", "shoulder.spaulder:bark/veridian" };
 
@@ -116,62 +117,67 @@ namespace Crulanda.Tests
         }
 
         // ------------------------------------------------------------------------------------------------ on a model
+        // The helm test (every helm built round the head, within 2 cm of it) went with those helms on 2026-10-19: play note 242,
+        // Chris: "i think we have reverted too much bring back what we had before. helm dont fit. most sit around the head a too
+        // large for the head". He chose the old helms back (drawn and seated as before: SeatHead, HatFit) with the new gloves and
+        // shoulder plates kept, so no built helm is left to measure; the pack-helm retirement test went too (they are back).
+
         /// <summary>
-        /// Every helm on a model: it comes down at least 7 cm under the top of the skull (not perched), and round the top 5 cm of the
-        /// skull every ray out from the head's axis meets its inside no nearer than the head and hair and no more than 2 cm beyond
-        /// them; straight up it closes within 4.5 cm (a kettle's point included). Its main part is not round.
+        /// Hoods on a model (play note 242, 2026-10-19, Chris: "hood is awful": the old hood stood out round the head like a bell
+        /// with a wide flat collar disc). The cloth: every point of it round the top 8 cm of the skull within 3 cm of the head, and
+        /// no point of the head through it there (the back half; the face is open); closed over the top within 3.5 cm; under the
+        /// neck's base every point within 4 cm of the body (lying on the shoulders, the chest and the back, not standing off them);
+        /// down at least 3 cm under the neck's base (onto the shoulders); and nothing of it wider than the shoulders (the shoulder
+        /// joints and 4 cm). Today's hood fails by its logic: its bell and collar disc were drawn for the old ball head and scaled
+        /// over the model's, so they stand off its head and out over its shoulders.
         /// </summary>
-        [Test] public void Helms_come_down_over_the_skull_and_stand_close_all_round()
+        [Test] public void Hoods_lie_close_round_the_head_and_fall_onto_the_shoulders()
         {
             Assume.That(ModelFigure.Available, "The character kits are in the project (Resources/Characters).");
             var db = new ItemDatabase(); var looks = Looks(); var fails = new List<string>();
-            foreach (var look in HelmLooks)
+            foreach (var look in HoodLooks)
             {
                 var v = Figure(ActorLook.Warrior); var m = v.Model;
                 v.ApplyGearIds(new[] { Item(db, looks, look, "head", 13) }, db, looks);
                 v.Preview(ActorPose.None, 0, 0);
-                var root = v.GearRoot(EquipSlot.Head); var up = root.parent.up;
-                var tris = new List<Vector3>(); foreach (var r in root.GetComponentsInChildren<Renderer>(true)) Triangles(r, tris);
-                var head = Points(m.Head); var body = new List<Vector3>(head);
-                foreach (var r in m.Hair) if (r != null && r.gameObject.activeInHierarchy && r.enabled && r.name.Contains("Hair_") && !r.name.Contains("Beard")) body.AddRange(Points(r));
-                var centre = Vector3.zero; foreach (var p in head) centre += p; centre /= head.Count;
+                var main = Main(new[] { v.GearRoot(EquipSlot.Head) });
+                if (main == null) { fails.Add(look + ": nothing built"); continue; }
+                var cloth = Points(main); var tris = new List<Vector3>(); Triangles(main, tris);
+                var head = Points(m.Head); var body = new List<Vector3>(head); body.AddRange(Points(m.Torso)); body.AddRange(Points(m.Arms));
+                var up = v.transform.up; var centre = Vector3.zero; foreach (var p in head) centre += p; centre /= head.Count;
                 float H(Vector3 p) { return Vector3.Dot(p - centre, up); }
                 float skullTop = float.MinValue; foreach (var p in head) skullTop = Mathf.Max(skullTop, H(p));
-                float bodyTop = float.MinValue; foreach (var p in body) bodyTop = Mathf.Max(bodyTop, H(p));
-                float low = float.MaxValue; for (int i = 0; i < tris.Count; i++) low = Mathf.Min(low, H(tris[i]));
-                if (low > skullTop - .07f) { fails.Add(look + ": perched, its lowest edge only " + (skullTop - low).ToString("0.000") + " m under the skull's top"); continue; }
-                var side = Vector3.Cross(up, Vector3.forward).sqrMagnitude > .1f ? Vector3.Cross(up, Vector3.forward).normalized : Vector3.right; var fwd = Vector3.Cross(side, up);
-                float worstIn = 0, worstGap = 0; int missed = 0;
-                // Poking through: every point of the head and hair round the skull's top 5 cm, on its own ray out from the axis.
-                foreach (var p in body)
+                var mid = (m.UpperArmL.position + m.UpperArmR.position) / 2; var side = Vector3.ProjectOnPlane(m.UpperArmL.position - m.UpperArmR.position, up);
+                float half = side.magnitude / 2; side.Normalize();
+                // Forward: across the shoulders and up, turned to where the face is (the nose stands furthest from the axis).
+                var fwd = Vector3.Cross(side, up); float ahead = float.MinValue, behind = float.MinValue;
+                foreach (var p in head) { float d = Vector3.Dot(p - centre, fwd); ahead = Mathf.Max(ahead, d); behind = Mathf.Max(behind, -d); }
+                if (behind > ahead) fwd = -fwd;
+                float neckH = m.Neck != null ? H(m.Neck.position) : Mathf.Lerp(H(mid), H(m.HeadBone.position), .4f);
+                float Nearest(Vector3 p, List<Vector3> pts) { float best = float.MaxValue; foreach (var q in pts) best = Mathf.Min(best, (p - q).sqrMagnitude); return Mathf.Sqrt(best); }
+                float offHead = 0, offBody = 0, wide = 0, low = float.MaxValue;
+                foreach (var p in cloth)
                 {
-                    float hp = H(p); if (hp > skullTop - .01f || hp < skullTop - .05f) continue;
-                    var o = centre + up * hp; var q = Vector3.ProjectOnPlane(p - o, up); float r = q.magnitude; if (r < 1e-3f) continue;
-                    float hit = Hit(tris, o, q / r); if (float.IsInfinity(hit)) { missed++; continue; }
-                    worstIn = Mathf.Max(worstIn, r - hit);
+                    float hp = H(p); low = Mathf.Min(low, hp);
+                    if (hp >= skullTop - .08f) offHead = Mathf.Max(offHead, Nearest(p, head));
+                    if (hp < neckH - .01f) offBody = Mathf.Max(offBody, Nearest(p, body));
+                    wide = Mathf.Max(wide, Mathf.Abs(Vector3.Dot(p - mid, side)));
                 }
-                // Standing off: on rays every 15 degrees, the inside against the head or hair right there (within 3 mm up or down, 6 degrees round).
-                for (float dh = .01f; dh <= .05f; dh += .01f)
-                    for (int ia = 0; ia < 24; ia++)
-                    {
-                        float a = ia * 15 * Mathf.Deg2Rad, h = skullTop - dh; var dir = side * Mathf.Sin(a) + fwd * Mathf.Cos(a); var o = centre + up * h;
-                        float surf = 0; bool any = false;
-                        foreach (var p in body)
-                        {
-                            if (Mathf.Abs(H(p) - h) > .003f) continue; var q = Vector3.ProjectOnPlane(p - o, up); float r = q.magnitude; if (r < 1e-4f) continue;
-                            if (Vector3.Dot(q / r, dir) < Mathf.Cos(6 * Mathf.Deg2Rad)) continue; surf = Mathf.Max(surf, r); any = true;
-                        }
-                        if (!any) continue;
-                        float hit = Hit(tris, o, dir); if (float.IsInfinity(hit)) { missed++; continue; }
-                        worstGap = Mathf.Max(worstGap, hit - surf);
-                    }
-                float upHit = Hit(tris, centre + up * (bodyTop - .01f), up);
-                if (missed > 0) fails.Add(look + ": " + missed + " rays round the skull's top meet no helm");
+                if (offHead > .03f) fails.Add(look + ": round the skull it stands " + offHead.ToString("0.000") + " m off the head (over 3 cm)");
+                if (offBody > .04f) fails.Add(look + ": under the neck it stands " + offBody.ToString("0.000") + " m off the shoulders, chest or back (over 4 cm)");
+                if (low > neckH - .03f) fails.Add(look + ": it ends " + (low - neckH).ToString("0.000") + " m from the neck's base, not on the shoulders");
+                if (wide > half + .04f) fails.Add(look + ": " + wide.ToString("0.000") + " m out to the side, wider than the shoulders (" + (half + .04f).ToString("0.000") + ")");
+                // Through it: the back half of the head round the top 8 cm, each point on its own ray out from the axis.
+                float worstIn = 0;
+                foreach (var p in head)
+                {
+                    float hp = H(p); if (hp < skullTop - .08f || hp > skullTop - .01f) continue;
+                    var o = centre + up * hp; var q = Vector3.ProjectOnPlane(p - o, up); float r = q.magnitude; if (r < 1e-3f || Vector3.Dot(q, fwd) > 0) continue;
+                    float hit = Hit(tris, o, q / r); if (!float.IsInfinity(hit)) worstIn = Mathf.Max(worstIn, r - hit);
+                }
                 if (worstIn > .002f) fails.Add(look + ": the head pokes " + worstIn.ToString("0.000") + " m through");
-                if (worstGap > .02f) fails.Add(look + ": stands " + worstGap.ToString("0.000") + " m off the head (over 2 cm)");
-                if (float.IsInfinity(upHit) || upHit - .01f > .045f) fails.Add(look + ": the top is open or stands " + (upHit - .01f).ToString("0.000") + " m over the head");
-                var main = Main(new[] { root }); float round = main != null ? AngularShell.Roundness(MeshOf(main)) : 1;
-                if (round > .15f) fails.Add(look + ": its main part is round (" + round.ToString("0.00") + " of it smooth-shaded)");
+                float upHit = Hit(tris, centre + up * (skullTop - .01f), up);
+                if (float.IsInfinity(upHit) || upHit - .01f > .035f) fails.Add(look + ": the top is open or stands " + (upHit - .01f).ToString("0.000") + " m over the head");
             }
             Assert.IsEmpty(fails, string.Join("\n", fails));
         }
@@ -260,14 +266,6 @@ namespace Crulanda.Tests
                 float round = AngularShell.Roundness(MeshOf(main)); if (round > .15f) fails.Add(look + ": round (" + round.ToString("0.00") + ")");
             }
             Assert.IsEmpty(fails, string.Join("\n", fails));
-        }
-
-        /// <summary>The Modular Hero helmets (pinned out of another rig, perched and tilted) are out of the helm pool; the sentinel
-        /// helm, which an Ash Rim drop wears, stays.</summary>
-        [Test] public void The_pack_helms_that_perched_are_retired()
-        {
-            CollectionAssert.AreEqual(new[] { "Ashen_gth_equi_sentinel_helm" }, GearLooks.ModelHelms);
-            foreach (var look in WardrobeCapture.HeadLooks) StringAssert.DoesNotContain("Headgear.", look);
         }
     }
 }

@@ -285,8 +285,13 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(bx, .9f, .5f), new Vector3(.6f, .07f, 2.2f), art.timber);
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(bx + sx * .24f, .43f, .5f + sz * 1.02f), new Vector3(.08f, .86f, .08f), dark);
             Part(PrimitiveType.Cube, t, new Vector3(bx, .35f, .5f), new Vector3(.5f, .04f, 2.04f), dark);
-            MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(bx, .935f, 1.3f), Tint(art.stone, new Color(.62f, .6f, .56f)));
-            Rod(t, new Vector3(bx, 1, 1.3f), new Vector3(bx - .1f, 1.16f, 1.22f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            // (play note 253) the alchemy pack's mortar at the back, a crystal flask on its stand between the jars and the still; else painted
+            if (ModelProp(t, AlchemyMortar, new Vector3(bx, .935f, 1.3f), 200, MortarHeight) == null)
+            {
+                MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(bx, .935f, 1.3f), Tint(art.stone, new Color(.62f, .6f, .56f)));
+                Rod(t, new Vector3(bx, 1, 1.3f), new Vector3(bx - .1f, 1.16f, 1.22f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            }
+            ModelProp(t, AlchemyCrystal, new Vector3(bx + .04f, .935f, .1f), -30, CrystalHeight);
             Jar(t, new Vector3(bx + .05f, .935f, .85f), new Color(.62f, .4f, .28f));
             Jar(t, new Vector3(bx - .08f, .935f, .6f), new Color(.5f, .46f, .36f), .85f);
             Jar(t, new Vector3(bx + .06f, .935f, .36f), new Color(.36f, .44f, .4f), 1.15f);
@@ -295,7 +300,7 @@ namespace Crulanda.World
             foreach (int k in new[] { 0, 1, 2 }) Rod(t, new Vector3(bx + Mathf.Cos(k * 2.094f) * .12f, .99f, -.25f + Mathf.Sin(k * 2.094f) * .12f), new Vector3(bx + Mathf.Cos(k * 2.094f) * .1f, 1.1f, -.25f + Mathf.Sin(k * 2.094f) * .1f), .02f, iron);   // the trivet
             MeshPart(PropMesh("Still", () => Turned(new[] { new Vector2(0, 0), new Vector2(.09f, 0), new Vector2(.13f, .08f), new Vector2(.12f, .16f), new Vector2(.05f, .24f), new Vector2(.07f, .3f), new Vector2(.03f, .36f), new Vector2(0, .37f) }, 10)), t, new Vector3(bx, 1.1f, -.25f), copper);
             Rod(t, new Vector3(bx, 1.42f, -.25f), new Vector3(bx - .04f, 1.12f, -.62f), .025f, copper);
-            Jar(t, new Vector3(bx - .04f, .935f, -.66f), new Color(.4f, .5f, .46f), .8f);
+            if (ModelProp(t, AlchemyFlask, new Vector3(bx - .04f, .935f, -.66f), 0, FlaskHeight) == null) Jar(t, new Vector3(bx - .04f, .935f, -.66f), new Color(.4f, .5f, .46f), .8f);   // the still's flask (play note 253)
             Glow(t, new Vector3(bx - .25f, 1.15f, -.25f), 3.5f, .9f, new Color(1, .6f, .3f), 1.5f);
             // A shelf of jars on the back wall; a stool, two baskets of cut herbs and a sack in the back corner.
             Part(PrimitiveType.Cube, t, new Vector3(-.7f, 1.45f, d / 2 - .2f), new Vector3(2.2f, .04f, .24f), dark);

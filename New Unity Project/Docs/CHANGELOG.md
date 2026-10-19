@@ -1,5 +1,30 @@
 # Changelog
 
+## 2026-10-19: the Free Alchemy and Magic Pack for the alchemy trade (branch wood-barrel; WRITTEN, NOT RUN)
+- Chris (play note 253): "assets for alchemy - myassets Free Alchemy and Magic Pack". Compiles; nothing run in Unity, no captures yet.
+- **The pack**: StormBringer Studios' Free Alchemy and Magic Pack (Asset Store EULA) in `Resources/Props/Alchemy`: its mortar and
+  pestle, round glass flask and crystal flask on a brass stand (meshes, prefabs, materials, 1024 px maps; the package's own GUIDs; not
+  its sample scene). Its materials are already Built-in (Standard; the glass Standard (Specular setup)), so they are kept; its clear
+  glass is too clear to read as a potion, so placed flasks wear `PotionGlass.mat` (the same shader and normal map, pale green at half
+  alpha). `ThirdPartyImport` keeps its maps at 1024 (unlisted packs fall to 512).
+- **Benches, each zone its own** (`ZoneBuilder.Alchemy.BenchSets`): Mother Vane's salt-bench (the Ash Rim) a mortar and two flasks of
+  brine; Wenna Coyle's (Khaven) the mortar at the back, three flasks along the front; the Moss-Lantern's (the Verdant) the crystal
+  flask on its stand and a mortar; the dyer's vats bench (the Lowtowns) a mortar for the madder and a flask of mordant. Lisbet's drying
+  hut (Oakhaven): the mortar at the back of the bench, a crystal flask between the jars and the still, the still's flask a round flask.
+  The Crown's Court Still-room: the still-table's mortar and the flask cooling in its basin, the shop counter's crystal flask (was the
+  Medieval bottle) and a round flask. The painted mortar, vials and flasks stay as the fallback when the pack is missing.
+- **Potions' look** (`FoodModels.Dishes`): the cordials are the crystal flask; the healing draughts (minor, healing, Tarnwater,
+  dewfern, clean-blood: new looks) and the restoring draughts (clear-head, second-wind, steady-hand, bold-heart, deep-breath) the round
+  flask. Kept from the Fantasy kit: the tinctures' small stoppered vials (the pack has nothing that small), the brine draught's and
+  the salt tonic's plain bottle, the salves' pots, the Court still's row of small vials and the Root-Mother's sap vials. Only a dish cooked
+  at a fire is shown in the world; a brewed potion is not set down (no change there).
+- Tests (`AlchemyPackTests`, EditMode): the three models load and stand at life size on their foot; every material is a Built-in shader,
+  the maps capped at 1024, placed glass is the potion glass; every potion item's look names models in the project (cordials and
+  draughts the pack's flasks); each zone's bench has its own set, on the bench.
+- To check in game (captures front, back, side): Lisbet's drying hut bench (Oakhaven); Wenna Coyle's bench (Khaven); Mother Vane's
+  salt-bench (the Ash Rim); the Moss-Lantern's bench (the Verdant); the dyer's bench (the Lowtowns); the Court Still-room's still-table
+  and counter (the Crown). That the flasks read as glass with something in it, the mortar's stone and pestle, nothing floating or sunk.
+
 ## 2026-10-19: every wooden barrel is the Simple Wood Barrel (branch wood-barrel; WRITTEN, NOT RUN)
 - Chris (play note 247): "replace all wooden barrels with this in myassets . simple wood barrel". Compiles; nothing run in Unity, no
   captures yet.

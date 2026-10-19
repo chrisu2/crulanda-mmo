@@ -155,6 +155,7 @@ namespace Crulanda.World
                 foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = KayKitAtlas; r.sharedMaterials = mats; }
             if (path.StartsWith("WoodBarrel/") && WoodBarrelMaterial != null)
                 foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = WoodBarrelMaterial; r.sharedMaterials = mats; }
+            if (path.StartsWith("Alchemy/")) DressAlchemy(go);
             if (path.StartsWith("DungeonModular/")) DressDungeonModular(go, path.Substring(path.LastIndexOf('/') + 1));
             if (path.StartsWith("Nature/")) DressNature(go);
             if (solid) { var col = go.AddComponent<BoxCollider>(); col.center = b.center; col.size = b.size; go.AddComponent<NavBlocker>(); }
@@ -287,6 +288,8 @@ namespace Crulanda.World
             ("Fantasy2/box_003", .32f), ("Fantasy2/bucket_001", .48f), ("Fantasy2/holder_001", 2.01f), ("Fantasy2/pointer_001", 2.17f), ("Fantasy2/log_001", 1.81f),
             ("Fantasy2/log_002", .74f), ("Fantasy2/log_003", .32f), ("Fantasy2/log_004", .54f), ("Fantasy2/cart_001", 1.16f),
             // The Fantasy kit's pieces the dungeons and rooms took up (playtest note 234, PropDressing) and the food models (note 235, FoodModels).
+            // The Free Alchemy and Magic Pack (play note 253, ZoneBuilder.Alchemy).
+            (AlchemyMortar, MortarHeight), (AlchemyFlask, FlaskHeight), (AlchemyCrystal, CrystalHeight),
             ("Fantasy/SmallBottle", .12f), ("Fantasy/Book_7", .07f), ("Fantasy/Cabinet", 1f), ("Fantasy/Shelf_Simple", .3f),
             ("Fantasy/Bag", 0.55f), ("Fantasy/Rope_1", 0.08f), ("Fantasy/Rope_2", 0.06f), ("Fantasy/Rope_3", 0.1f), ("Fantasy/Bucket_Wooden_1", 0.3f), ("Fantasy/Shield_Wooden", 0.6f),
             ("Fantasy/Pickaxe_Bronze", 1f), ("Fantasy/Cage_Small", 0.85f), ("Fantasy/Chain_Coil", 0.08f), ("Fantasy/Vase_2", 0.5f),

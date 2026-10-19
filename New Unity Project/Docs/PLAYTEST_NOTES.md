@@ -967,3 +967,5 @@ un-captures.
   gets inside the spider alot hard to see" (OPEN).
 - 292 (2026-10-19 ~19:08, tune-8) "when she is in the water hard to see the telegraphs. try to keep her out of water" (OPEN).
 - 293 (2026-10-19 ~19:30, tune-9) "jumped a little too far..maybe down 1/4th of total distance" (done: 35-55 m to 30-41 m). Then: "not sure where i respawned but not near the raid" (a recovery point by the apron for her raid).
+- 294 (2026-10-19 ~19:45, tune-10) "when she leaps she would target on raid member and if that member does not move out of the range
+  theyll die" (OPEN: the leap marks one member; the rings under them; out before she lands or die).

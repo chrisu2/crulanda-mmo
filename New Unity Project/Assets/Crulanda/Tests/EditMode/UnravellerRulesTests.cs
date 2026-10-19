@@ -1,0 +1,180 @@
+using System.Collections.Generic;
+using System.IO;
+using NUnit.Framework;
+using UnityEngine;
+using Crulanda.Encounter;
+
+namespace Crulanda.Tests
+{
+    /// <summary>
+    /// The Unraveller's fight, rule by rule (Docs/WORLD_BOSS_1.md 3.3-3.4; build steps 4 and 5; UnravellerRules, UnravellerTuning), without a
+    /// scene: the numbers come from EncounterContent/Raids/unraveller.json; the phases at 70% and 40%; the harpoons' pins shortening 12, 11 ...
+    /// 7 and the hauling with two in; her touch on whom she blinks to (the top of her threat, not one hidden in the river); Unravel's stacks
+    /// and the erasing at seven; blackened steel three deep; the Feeding's meal and the 10 s interrupt immunity; the brood shattering three
+    /// times over; the three salts that free the swallowed (three different hands within 12 s), and the erasing at 12 s; the hunt and the
+    /// river; the Unravelling's growing pulse; the feast at 9:00.
+    /// </summary>
+    public class UnravellerRulesTests
+    {
+        static UnravellerTuning T { get { return new UnravellerTuning(); } }
+        const string File_ = "Assets/Crulanda/EncounterContent/Raids/unraveller.json";
+
+        [Test] public void The_numbers_come_from_the_raid_file_and_only_what_it_says_changes()
+        {
+            Assert.IsTrue(File.Exists(File_), "the data file");
+            var t = UnravellerTuning.Parse(File.ReadAllText(File_));
+            var d = new UnravellerTuning();
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(160000, t.health, "160,000 after the clamp (3.2)");
+            Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
+            Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.18f, t.lighthouseShare, 1e-4f);
+            Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
+            Assert.AreEqual(4, t.swapAt); Assert.AreEqual(7, t.erasedAt); Assert.AreEqual(3, t.saltsToFree); Assert.AreEqual(12, t.saltWindow);
+            // The file and the defaults agree everywhere (a build without the file plays the same fight).
+            Assert.AreEqual(JsonUtility.ToJson(d), JsonUtility.ToJson(t), "the file's numbers are the defaults' (UnravellerTuning)");
+            var tuned = UnravellerTuning.Parse("{\"health\": 90000, \"pinLeast\": 6}");
+            Assert.AreEqual(90000, tuned.health); Assert.AreEqual(6, tuned.pinLeast); Assert.AreEqual(12, tuned.pinFirst, "the rest as the defaults");
+            Assert.AreEqual(160000, UnravellerTuning.Parse("not json").health, "a broken file plays the defaults");
+            Assert.AreEqual(15, t.FeedEvery(1)); Assert.AreEqual(20, t.FeedEvery(2)); Assert.AreEqual(20, t.FeedEvery(3));
+            Assert.AreEqual(0, t.BroodEvery(1)); Assert.AreEqual(30, t.BroodEvery(2)); Assert.AreEqual(40, t.BroodEvery(3));
+            Assert.AreEqual(0, t.SwallowEvery(1)); Assert.AreEqual(35, t.SwallowEvery(2)); Assert.AreEqual(40, t.SwallowEvery(3));
+        }
+
+        [Test] public void Three_phases_at_seventy_and_forty()
+        {
+            Assert.AreEqual(1, UnravellerRules.Phase(1, T)); Assert.AreEqual(1, UnravellerRules.Phase(.71f, T));
+            Assert.AreEqual(2, UnravellerRules.Phase(.7f, T)); Assert.AreEqual(2, UnravellerRules.Phase(.41f, T));
+            Assert.AreEqual(3, UnravellerRules.Phase(.4f, T)); Assert.AreEqual(3, UnravellerRules.Phase(.01f, T));
+        }
+
+        [Test] public void Each_harpoon_pins_her_a_second_shorter_down_to_seven_and_two_in_haul_her()
+        {
+            var p = new PinTrack(); var t = T; float now = 100;
+            var got = new List<float>();
+            for (int i = 0; i < 8; i++) { got.Add(p.Harpoon(now, t)); now += got[i]; }
+            CollectionAssert.AreEqual(new[] { 12f, 11, 10, 9, 8, 7, 7, 7 }, got, "12, 11, 10 ... never under 7");
+            var q = new PinTrack(); Assert.IsFalse(q.Pinned(0), "free before any harpoon");
+            q.Harpoon(0, t); Assert.IsTrue(q.Pinned(5)); Assert.AreEqual(7, q.Left(5), 1e-4f, "the pin's timer");
+            Assert.AreEqual(1, q.In(5)); Assert.IsFalse(UnravellerRules.Hauled(q.In(5), t), "one harpoon: pinned, not hauled");
+            q.Harpoon(10, t);   // a second before the first shakes loose (11 s from 10)
+            Assert.AreEqual(2, q.In(10.5f)); Assert.IsTrue(UnravellerRules.Hauled(q.In(10.5f), t), "two in at once: hauled");
+            Assert.AreEqual(1, q.In(12.5f), "the first shaken loose at 12"); Assert.IsFalse(UnravellerRules.Hauled(q.In(12.5f), t));
+            Assert.AreEqual(21, q.PinnedUntil, 1e-4f, "pinned till the second's 11 s are out");
+            Assert.AreEqual(1.1f, UnravellerRules.TakenScale(true, false, t), 1e-4f, "hauled: 10% more");
+            Assert.AreEqual(1.5f, UnravellerRules.TakenScale(false, true, t), 1e-4f, "calcified: 50% more");
+            Assert.AreEqual(1, UnravellerRules.TakenScale(false, false, t), 1e-4f);
+        }
+
+        [Test] public void She_blinks_onto_the_top_of_her_threat_and_her_touch_erases_any_but_a_tank()
+        {
+            var all = new List<UnravellerCandidate> {
+                new UnravellerCandidate { id = "tank", threat = 900, distance = 3, tank = true },
+                new UnravellerCandidate { id = "mage", threat = 1200, distance = 14, magic = true },
+                new UnravellerCandidate { id = "healer", threat = 1500, distance = 18, magic = true, inRiver = true },
+                new UnravellerCandidate { id = "dead", threat = 5000, distance = 5, alive = false } };
+            Assert.AreEqual("mage", UnravellerRules.BlinkTarget(all), "the top she can see: the healer is hidden in the river, the dead are not hers");
+            all[2].distance = 2.5f;
+            Assert.AreEqual("healer", UnravellerRules.BlinkTarget(all), "in the river but within touching: not hidden");
+            Assert.AreEqual(600, UnravellerRules.TouchDamage(1000, false, T), "60% of a member's health");
+            Assert.AreEqual(0, UnravellerRules.TouchDamage(1000, true, T), "a tank takes her as a tank does");
+            Assert.IsNull(UnravellerRules.BlinkTarget(new List<UnravellerCandidate>()));
+        }
+
+        [Test] public void Unravel_stacks_on_her_target_and_seven_erase_it()
+        {
+            var u = new UnravelStacks(); var t = T;
+            for (int i = 1; i <= 4; i++) Assert.AreEqual(i, u.Add("tank", i * 2.2f, t));
+            Assert.AreEqual(4, u.Count("tank", 9)); Assert.AreEqual(0, u.Count("other", 9));
+            Assert.AreEqual(-.24f, UnravellerRules.UnravelArmour(4, t), 1e-4f, "6% less armour a stack");
+            Assert.AreEqual(1.2f, UnravellerRules.UnravelTaken(4, t), 1e-4f, "5% more taken a stack");
+            Assert.AreEqual(3, u.Count("tank", 2.2f + 20.01f), "each stack falls off 20 s after it went on");
+            Assert.AreEqual(0, u.Count("tank", 8.8f + 20.01f), "all gone 20 s after the last");
+            Assert.IsFalse(UnravellerRules.Erased(6, t)); Assert.IsTrue(UnravellerRules.Erased(7, t), "no swap: seven and the tank is erased");
+        }
+
+        [Test] public void Steel_goes_black_three_stacks_deep_on_her_and_one_on_a_Weave_Eater()
+        {
+            Assert.AreEqual(1, UnravellerRules.SteelNext(0, 3)); Assert.AreEqual(2, UnravellerRules.SteelNext(1, 3)); Assert.AreEqual(3, UnravellerRules.SteelNext(2, 3));
+            Assert.AreEqual(3, UnravellerRules.SteelNext(3, 3), "never past three");
+            Assert.AreEqual(1, UnravellerRules.SteelNext(1, 1), "a Weave-Eater's: refreshed, never stacked (as built)");
+            Assert.AreEqual(-.3f, WeaveEaterRules.Blackened(3).modifiers[0].value, 1e-4f, "-10% attack power a stack");
+            Assert.AreEqual(-.1f, WeaveEaterRules.Blackened().modifiers[0].value, 1e-4f, "the Weave-Eaters' as it was");
+            Assert.AreEqual("Blackened steel (3)", WeaveEaterRules.Blackened(3).name);
+        }
+
+        [Test] public void The_Feeding_feeds_her_and_an_interrupt_makes_her_immune_ten_seconds()
+        {
+            var t = T;
+            Assert.AreEqual(.03f, UnravellerRules.FeedHeal(10, t), 1e-5f, "0.3% of her a good effect eaten");
+            Assert.AreEqual(.2f, UnravellerRules.FeedGrow(10, t), 1e-5f, "2% heavier blows a good effect eaten");
+            Assert.IsTrue(UnravellerRules.InterruptTakes(50, -1, t), "the first interrupt takes");
+            Assert.IsFalse(UnravellerRules.InterruptTakes(59.9f, 50, t), "the next within 10 s does not");
+            Assert.IsTrue(UnravellerRules.InterruptTakes(60, 50, t), "after 10 s it does: interrupters take turns");
+            Assert.AreEqual(EncounterEnemy.FeedKind, EncounterEnemy.FeedingCast(t).kind);
+            Assert.AreEqual(3, EncounterEnemy.FeedingCast(t).cast, 1e-4f, "a 3 s channel");
+            CollectionAssert.Contains(MobCasts.Kinds, EncounterEnemy.FeedKind);
+        }
+
+        [Test] public void A_salted_brood_shatters_at_three_times_and_one_that_reaches_her_is_eaten()
+        {
+            var t = T;
+            Assert.AreEqual(300, UnravellerRules.ShatterDamage(100, true, t)); Assert.AreEqual(100, UnravellerRules.ShatterDamage(100, false, t));
+            Assert.IsTrue(UnravellerRules.BroodEaten(3.5f, t)); Assert.IsFalse(UnravellerRules.BroodEaten(3.6f, t));
+        }
+
+        [Test] public void Three_salts_from_three_hands_within_twelve_seconds_free_the_swallowed()
+        {
+            var t = T; var s = new SwallowSalts();
+            Assert.IsFalse(s.Salt("a", 0, t), "salt with nobody swallowed does nothing");
+            s.Begin("victim", 0);
+            Assert.IsFalse(s.Salt("a", 1, t)); Assert.IsFalse(s.Salt("a", 2, t), "the same hand twice counts once");
+            Assert.AreEqual(1, s.Salts(2, t));
+            Assert.IsFalse(s.Salt("victim", 2.5f, t), "the swallowed salts nothing from inside");
+            Assert.IsFalse(s.Salt("b", 3, t));
+            Assert.IsTrue(s.Salt("c", 4, t), "the third hand frees them");
+            var late = new SwallowSalts(); late.Begin("v", 0);
+            late.Salt("a", 0, t); late.Salt("b", 5, t);
+            Assert.IsFalse(late.Salt("c", 12.5f, t), "the first salt out of the 12 s window: two, not three");
+            Assert.IsFalse(late.Erased(11.9f, t)); Assert.IsTrue(late.Erased(12, t), "12 s inside her and they are erased");
+        }
+
+        [Test] public void The_hunt_falls_on_the_brightest_and_the_river_makes_her_miss()
+        {
+            var all = new List<UnravellerCandidate> {
+                new UnravellerCandidate { id = "tank", threat = 3000, tank = true, victim = true },
+                new UnravellerCandidate { id = "rogue", threat = 2500, magic = false, distance = 2 },
+                new UnravellerCandidate { id = "mage", threat = 1800, magic = true, distance = 15 },
+                new UnravellerCandidate { id = "cleric", threat = 1200, magic = true, distance = 22 } };
+            Assert.AreEqual("mage", UnravellerRules.HuntPick(all), "the most magic: never her target, never one who works none");
+            all[2].swallowed = true; Assert.AreEqual("cleric", UnravellerRules.HuntPick(all), "nor the swallowed");
+            Assert.AreEqual("rogue", UnravellerRules.SwallowPick(all), "she swallows the nearest who is not her target");
+            var t = T;
+            Assert.IsTrue(UnravellerRules.HuntMissed(true)); Assert.IsFalse(UnravellerRules.HuntMissed(false));
+            Assert.AreEqual(0, UnravellerRules.HuntDamage(1000, 0, true, true, t), "the hunted in the river is not struck");
+            Assert.AreEqual(800, UnravellerRules.HuntDamage(1000, 0, true, false, t), "on the bank: 80%");
+            Assert.AreEqual(800, UnravellerRules.HuntDamage(1000, 4.9f, false, true, t), "one who stood with them and did not move");
+            Assert.AreEqual(0, UnravellerRules.HuntDamage(1000, 5.1f, false, false, t), "out of the 5 m");
+            Assert.AreEqual(1000, EncounterEnemy.CapBlow(1000, 1000, true, true), "the hunt's blow passes the 60% cap");
+        }
+
+        [Test] public void The_Unravelling_grows_each_pulse_and_the_feast_comes_at_nine_minutes()
+        {
+            var t = T;
+            Assert.AreEqual(.015f, UnravellerRules.PulseShare(0, t), 1e-5f, "1.5% at first");
+            Assert.AreEqual(.075f, UnravellerRules.PulseShare(60, t), 1e-5f, "about 7.5% three minutes in (sixty pulses)");
+            Assert.AreEqual(540, UnravellerRules.EnrageLeft(0, t)); Assert.AreEqual(40, UnravellerRules.EnrageLeft(500, t), 1e-4f); Assert.AreEqual(0, UnravellerRules.EnrageLeft(600, t));
+            Assert.IsFalse(UnravellerRules.Feast(539.9f, t)); Assert.IsTrue(UnravellerRules.Feast(540, t));
+        }
+
+        [Test] public void A_rotation_goes_round_passing_over_those_who_cannot()
+        {
+            var r = new RaidRotation(new[] { "a", "b", "c" });
+            Assert.AreEqual("a", r.Current(null));
+            r.Took("a"); Assert.AreEqual("b", r.Current(null));
+            Assert.AreEqual("c", r.Current(id => id != "b"), "b is down or swallowed: c's turn");
+            r.Took("c"); Assert.AreEqual("a", r.Current(null), "round again");
+            r.Skip(); Assert.AreEqual("b", r.Current(null), "a turn passed on (you away from the keys)");
+            Assert.IsNull(r.Current(id => false), "nobody able");
+            Assert.IsNull(new RaidRotation(null).Current(null));
+        }
+    }
+}

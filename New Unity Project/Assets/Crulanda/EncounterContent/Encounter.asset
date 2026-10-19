@@ -2485,6 +2485,8 @@ MonoBehaviour:
   - {fileID: 4900000, guid: b8126f3a4d2e4577b07f8dfa311fe007, type: 3}
   - {fileID: 4900000, guid: 862e84e9204241cc9ad606979102c0fb, type: 3}
   - {fileID: 4900000, guid: ba7539547ffd4ad6a8d667d979eaecce, type: 3}
+  raidFiles:
+  - {fileID: 4900000, guid: d34d9f006ab7485893d250a70daf94c3, type: 3}
   playerStats:
     baseHealth: 180
     healthPerLevel: 25

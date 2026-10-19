@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
     /// from its bags as /buff does (the run gives it a feast, a dish, its part's elixir and its draught of its level's tier at the start;
     /// the sims carry packs bought with their coin), and the log has a "buffed:" line for each member at each stop.
     /// </summary>
-    public sealed class RunCapture : MonoBehaviour
+    public sealed partial class RunCapture : MonoBehaviour   // the raid at 10: RunCapture.Raid
     {
         public const string Flag = "--crulanda-run-capture", ModeFlag = "--crulanda-run-mode";
         /// <summary>The run asked for (--crulanda-run-mode quick|full), or null for the standard run.</summary>
@@ -34,6 +34,7 @@ namespace Crulanda.Encounter
 
         public IEnumerator Run(EncounterSession s, string directory)
         {
+            if (RaidRequested) { yield return RaidRun(s, directory); yield break; }   // --crulanda-raid: the group run at 10 against the Unraveller
             Directory.CreateDirectory(directory);
             var log = new List<string>(); Action<string> Log = line => { log.Add(line); Debug.Log("Run capture: " + line); };
             string Clock(float t) { int m = (int)(t / 60); return m + ":" + ((int)(t % 60)).ToString("00"); }

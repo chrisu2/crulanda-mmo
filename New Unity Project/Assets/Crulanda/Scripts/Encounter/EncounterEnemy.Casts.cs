@@ -28,7 +28,7 @@ namespace Crulanda.Encounter
     public static class MobCasts
     {
         /// <summary>The kinds <see cref="EncounterEnemy"/> lands (its Land switch), and a net's holds (EncounterSession.HoldPlayer, SimCompanion.HoldUntil).</summary>
-        public static readonly string[] Kinds = { "heal", "bolt", "drain", "blast", "net" }, Holds = { "root", "stun", "disorient", "fear" };
+        public static readonly string[] Kinds = { "heal", "bolt", "drain", "blast", "net", "feed" }, Holds = { "root", "stun", "disorient", "fear" };
         public static readonly MobCast[] All = {
             new MobCast { mob = "Ash mender", name = "Ember Mend", kind = "heal", cast = 2.5f, every = 9, first = 3, power = .35f },
             new MobCast { mob = "Ash initiate", name = "Cinder Bolt", kind = "bolt", cast = 2f, every = 8, first = 4, power = 2.5f },
@@ -241,6 +241,9 @@ namespace Crulanda.Encounter
                             if (Cast.knock > 0 && who.IsAlive) Knock(who, Cast.knock);   // a pole's or a halberd's sweep throws them back (2026-10-15)
                         }
                     session.FloatText(transform.position + Vector3.up, string.IsNullOrEmpty(Cast.landText) ? Cast.name + "!" : Cast.landText, new Color(1, .45f, .2f));
+                    break;
+                case EncounterEnemy.FeedKind:   // the Unraveller's Feeding (EncounterEnemy.Unraveller)
+                    FeedLand();
                     break;
                 default:
                     Debug.LogWarning("[MobCast] " + Cast.mob + "'s " + Cast.name + ": no such kind \"" + Cast.kind + "\" (MobCasts.Kinds).");

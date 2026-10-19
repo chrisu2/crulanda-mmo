@@ -20,6 +20,8 @@ namespace Crulanda.EditorTools
         const string OakhavenJson = "Assets/Crulanda/EncounterContent/Zones/oakhaven.json";
         public const string ProfessionsFolder = "Assets/Crulanda/EncounterContent/Professions";
         public const string LoreFolder = "Assets/Crulanda/EncounterContent/Lore";
+        /// <summary>The raids' numbers (the Unraveller's, UnravellerTuning; WORLD_BOSS_1.md 3.2).</summary>
+        public const string RaidsFolder = "Assets/Crulanda/EncounterContent/Raids";
 
         [MenuItem("Crulanda/World/Build Oakhaven")]
         public static void BuildOakhaven()
@@ -76,6 +78,16 @@ namespace Crulanda.EditorTools
                 }
             lore.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
             content.loreFiles = lore.ToArray();
+            // The raids' numbers (EncounterContent/Raids, the Unraveller's fight): the folder may be missing in an older checkout.
+            var raids = new System.Collections.Generic.List<TextAsset>();
+            if (AssetDatabase.IsValidFolder(RaidsFolder))
+                foreach (var guid in AssetDatabase.FindAssets("t:TextAsset", new[] { RaidsFolder }))
+                {
+                    string path = AssetDatabase.GUIDToAssetPath(guid);
+                    if (path.EndsWith(".json")) raids.Add(AssetDatabase.LoadAssetAtPath<TextAsset>(path));
+                }
+            raids.Sort((a, b) => string.CompareOrdinal(a.name, b.name));
+            content.raidFiles = raids.ToArray();
             EditorUtility.SetDirty(content);
             Debug.Log("Registered " + files.Count + " quest files and " + items.Count + " item files.");
             Debug.Log("Registered " + trades.Count + " profession files.");

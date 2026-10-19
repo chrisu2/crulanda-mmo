@@ -34,7 +34,9 @@ namespace Crulanda.Encounter
                     Shadow(new Rect(r.x + 20, r.y, r.width - 28, 18), (m.id == raid.LeaderId ? "* " : "") + m.name, tiny, alive ? ClassColour(m.classId) : new Color(.55f, .55f, .55f));
                     UnitBar(new Rect(r.x + 4, r.y + 19, r.width - 12, 10), a != null ? a.Health.Pool.Ratio : 0, HealthGreen, "");
                     if (m.role == SimCompanion.PartyRole.Healer && a != null && a.Resource != null) UnitBar(new Rect(r.x + 4, r.y + 31, r.width - 12, 4), a.Resource.Pool.Ratio, ResourceColor(Crulanda.Core.ResourceKind.Mana), "");
-                    // r.y + 36: the row kept for the fight's marks on this member (Unravel stacks, Hunted, Swallowed, blackened steel: steps 4-5).
+                    // The fight's marks on this member (Unravel stacks, Hunted, Swallowed, blackened steel: EncounterSession.RaidMarksOf).
+                    var marks = alive ? session.RaidMarksOf(a) : null;
+                    if (marks != null) Shadow(new Rect(r.x + 4, r.y + 27, r.width - 10, 16), marks, tiny, marks.Contains("Swallowed") || marks.Contains("Hunted") ? new Color(1, .45f, .4f) : new Color(.8f, .72f, 1));
                     if (!m.player && GUI.Button(r, GUIContent.none, GUIStyle.none)) session.SelectSim(m.id);   // click to target
                 }
             }
@@ -45,10 +47,11 @@ namespace Crulanda.Encounter
         /// state ("Pinned 8 s" or "Free") and the clock against the enrage.</summary>
         void DrawBossFrame()
         {
+            DrawRaidWarning();
             if (!session.InRaid) return;
             var b = session.RaidBoss ?? (session.Target != null && session.Target.Elite ? session.Target : null);
             if (b == null || b.actor == null) return;
-            var a = b.actor; var r = new Rect(560, 100, 330, 78);
+            var a = b.actor; var r = new Rect(560, 100, 330, b.RaidBoss ? 98 : 78);
             Fill(r, new Color(0, 0, 0, .6f));
             Shadow(new Rect(r.x + 8, r.y + 2, 220, 20), a.DisplayName, frameName, new Color(1, .55f, .45f));
             Shadow(new Rect(r.x + 230, r.y + 2, 92, 20), RaidFrames.Clock(session.RaidBossEnrage), tiny, new Color(1, .84f, .45f));
@@ -56,7 +59,22 @@ namespace Crulanda.Encounter
             if (b.Casting) UnitBar(new Rect(r.x + 8, r.y + 44, r.width - 16, 10), b.CastProgress, new Color(.95f, .7f, .2f), "");
             string pin = RaidFrames.PinText(session.RaidBossPinned);
             Shadow(new Rect(r.x + 8, r.y + 56, 160, 20), pin, tiny, session.RaidBossPinned > 0 ? new Color(.95f, .85f, .55f) : new Color(1, .45f, .4f));
-            Shadow(new Rect(r.x + 170, r.y + 56, 150, 20), "Phase " + (a.Health.Pool.Ratio > .7f ? 1 : a.Health.Pool.Ratio > .35f ? 2 : 3), tiny, new Color(.85f, .85f, .85f));
+            int phase = b.RaidBoss && b.RaidPhase > 0 ? b.RaidPhase : UnravellerRules.Phase(a.Health.Pool.Ratio, UnravellerTuning.Current);
+            Shadow(new Rect(r.x + 170, r.y + 56, 150, 20), "Phase " + phase + (b.RaidBoss ? ": " + UnravellerRules.PhaseNames[phase] : ""), tiny, new Color(.85f, .85f, .85f));
+            if (!b.RaidBoss) return;
+            // Whose harpoon is next (yours in gold), and the hauling.
+            var turn = session.HarpoonTurnLine;
+            if (turn != null) Shadow(new Rect(r.x + 8, r.y + 76, 200, 20), turn, tiny, turn.StartsWith("Your") ? new Color(1, .84f, .3f) : new Color(.86f, .8f, .62f));
+            if (b.Hauled) Shadow(new Rect(r.x + 210, r.y + 76, 110, 20), "Hauled", tiny, new Color(.95f, .75f, .4f));
+        }
+        /// <summary>The raid warning (2.4): a large centred line for 2 s, for what is about to kill you.</summary>
+        void DrawRaidWarning()
+        {
+            var w = session.RaidWarningText; if (w == null) return;
+            var keep = GUI.matrix; At(null);
+            var style = new GUIStyle(heading) { alignment = TextAnchor.MiddleCenter, fontSize = 30, wordWrap = true };
+            Shadow(new Rect(220, 200, 1000, 50), w, style, new Color(1, .35f, .3f));
+            GUI.matrix = keep;
         }
 
         /// <summary>The raid window (/raid): the roster by party, each one's part, class, level and gear level; your lockout; the call to arms,

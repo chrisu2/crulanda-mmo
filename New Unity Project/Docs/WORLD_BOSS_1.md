@@ -480,6 +480,75 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
    dungeons), throwing salt and harpoons, the harpoon and interrupt rotations, the swap. Tests: EditMode each rule; PlayMode a phase-1 fight.
 5. **Phases 2 and 3** (M): the brood (salt and shatter), unmade ground, Swallowed and its three salts, Unravelling, Hunted and the river, the
    feast; the sims' parts for each. Tests as step 4.
+
+   **Steps 4-5: WRITTEN, NOT RUN** (2026-10-19, branch `wb-fight` = `wb-raid` + `wb-reach`; compiled outside Unity, no test run yet, nothing
+   seen in game). Every rule is the books' (CANON: b1 ch.20:111-207 the blink, the lighthouse, the eaten spell, the erasing touch, steel gone
+   black, the harpoons that pin and are hauled, the salt that calcifies, the shattering; b1 ch.16:75 the river that hides from magic; B1WB:121
+   the mothers' unravelling) and every number GAME-ONLY, PROVISIONAL, in one data file.
+   - **The numbers:** `EncounterContent/Raids/unraveller.json` (`UnravellerTuning`; registered on the content as `raidFiles`, by Build
+     Oakhaven too). Balancing (step 6) edits only that file. Her health (160,000 after the clamp) and swing (190) now come from it.
+   - **The all-fight rules** (`EncounterEnemy.WeaveEater` reads her numbers, not a second copy; `EncounterEnemy.Unraveller`;
+     `UnravellerRules`): the lighthouse at 18% of the top threat every 2 s within 30 m (her lighthouse knows a sim's craft by its class: the
+     sims all carry one pool); the blink every 9 s, up to 12 m onto the top of her threat, and where it lands on one who is not a tank, 60% of
+     their health and 3 s of silence (you: no spells; a sim: no mends, no kicks); wards eaten off everyone within 10 m; each harpoon pins her
+     (no blink, no move) 12 s, then 11 ... never under 7, and two in at once haul her a metre a second toward the river and she takes 10%
+     more; steel black three stacks deep (-10% each); Unravel a stack a blow on whom she strikes (-6% armour, +5% taken, 20 s each), seven and
+     the tank is erased; the Feeding, her cast (the cast bar, interruptible): 3 s, landed it eats every good effect and every ward within 20 m,
+     0.3% of her health and 2% heavier blows each; an interrupt that stops it makes her immune to the next for 10 s (no diminishing returns
+     on her interrupts); a harpoon landing in it breaks it ("Bone holds"). She takes no long hold (incap, fear) and no sim's hold.
+   - **Phase 2** (`EncounterSession.UnravellerFight`): three brood every 30 s out of the river on both sides of the bar, level 22, a fifth of a
+     camp elite's health, the Weave-Eaters' book rules, going for the healers; salt calcifies one 4 s and the next blow shatters it (x3); one
+     that reaches her (3.5 m) is eaten: she heals 3% and her blows grow 10%. Unmade ground every 20 s where she floats (5 m across, a ground
+     mark filling for 3 s, then 8% of health a second, for the fight). Swallowed every 35 s: the nearest who is not her target, held inside her
+     at 4% a second; three salts from three hands within 12 s calcify her 4 s (she takes 50% more) and she spits them out; 12 s and they are
+     erased. Salt on her with nobody inside: "too big to calcify on a handful", nothing.
+   - **Phase 3:** the Unravelling's pulse every 3 s on everyone within 60 m, 1.5% and 0.1% more each; Hunted every 20 s, the one working the
+     most magic (never her target), a ground mark following them 3 s, then she falls on where they stand, pinned or not: 80% (passing the 60%
+     cap) to all within 5 m; the hunted in the river is not struck and she misses her meal (stunned 2 s). The brood and the swallowing every
+     40 s. **The feast** at 9:00 from the pull: everyone of the party out of the river erased, a wipe counted, she is whole again (the second
+     wipe: she sinks, fed).
+   - **The frames:** the boss frame's pin timer ("Pinned 8 s" / "Free"), the enrage clock, the phase by name, whose harpoon is next ("Your
+     harpoon!" in gold) and "Hauled"; the raid frames' row: Unravel n, Steel n, Hunted, Swallowed. **The raid warning**, a large red line for
+     2 s: hunted, swallowed, salt her, unmade ground under you, four Unravels on you, the brood (to a healer).
+   - **Her action track:** a hook, as the music is on another branch: `ZoneMusic.FightOverride` takes the fight track while she fights the
+     raid, from `Unraveller.FightTrack` ("Music/WorldBoss/WorldBossFight"), played only if that clip is in Resources. On merging the music
+     branch, point `Unraveller.FightTrack` at `ZoneMusic.WorldBossFight`.
+   - **The sims** (`SimCompanion.Raid`, choices in `RaidJobs`): **out of marked ground** (new, shared with the dungeons: `GroundMarks`, every
+     mark the game draws: a heavy blow's, a warned hold's, a trick's ring, a Hollow's dust, the loop's snap, her ground and her hunt; every sim,
+     melee and tanks too, a mend in hand landing first). **This changes the dungeons' fights** (the sims now step out of a boss's heavy-blow mark):
+     the dungeon group runs should be seen again. **The harpoon rotation:** set at the pull, three damage-dealers (archers and casters first),
+     each throwing on its turn when her pin has 2 s left, passed over when down, swallowed or held; you join with `/raid harpoon` (your turn on
+     the boss frame; passed on after 1.5 s free). **The interrupt rotation** on the Feeding (three with a kick); when the kick on turn will not
+     do, the harpooner on turn throws into it. **The tank swap** (`RaidJobs.TauntHer`): the other tank takes her at four stacks when it has
+     fewer, or when the holder is one blow from erased; the tank with fewer stacks takes her back from a caster. **Salt on the swallowed:** the
+     three nearest with salt (two and the warning to you when you are one of them), asked again each second until freed. **The brood:** the
+     tank not holding her and Party 2's damage-dealers; salt, then the shattering blow. **The hunted** runs for the nearest black water and
+     stays 3 s after she falls; the others step out of the hunt's mark. **Kit:** three salt and three harpoons bought on the way (step 2);
+     when out, three more from Tibb's barrel or Ketta's rack on the apron (on credit if the purse is short). **Mistakes on purpose:** a late
+     harpoon, a salt not thrown, a hunt not run from (12% at 18, 4% at 20, 6% more when rash), from the data file.
+   - **Not built, or built differently (say if it matters):** the brood are not marked Moon and Cross by the game (a Cross or a held Moon is
+     "leave alone" to the sims today; you can still mark them); the erased can be raised as anyone dead (no "not until the fight ends"); the
+     Feeding eats statuses and wards, not heals over time kept outside the status list; bone and glass-steel weapons still blacken (step 8);
+     Unravel's 20 s outlasts a swap at four, so the swap is "four and fewer than the holder" (step 6 may shorten it to about 12 s).
+   - **Tests (each fails on today's code: the types and the sims' parts do not exist there):** EditMode `UnravellerRulesTests` (12: the data
+     file, phases, the shortening pins and the hauling, whom she blinks to and the touch, Unravel and the erasing, steel three deep, the
+     Feeding and the 10 s immunity, the shattering and the eating, the three salts and the erasing, the hunt and the river, the pulse and the
+     feast, the rotation) and `RaidJobsTests` (7: when a harpooner throws, the answer to the Feeding, the swap, the three salts, who takes the
+     brood, the careless 18 against the careful 20, the step out of marked ground); PlayMode `UnravellerFightTests` (2, ten in a raid at the
+     Drain Reach at four times speed, her health made deep and her waits shortened: phase 1, and phases 2 and 3 to the feast).
+   - **To run and look at (the lead):** the three test files, the old `LowtownsReworkTests`, `RaidFormTests`, `UnravellerRiseTests`,
+     `WorldBossTests`, and a dungeon PlayMode set (the sims' new step out of marks). Then in a build, `group_run.ps1 -Raid -Pulls 1` (below)
+     and **capture each mechanic visible**, front at 1920x1080 and from the side: the pin (a harpoon in her, "Pinned 11 s" on the boss frame,
+     a second harpoon and "Hauled"); blackened steel (Steel 3 on a melee member's raid frame and its buff row); the Feeding's cast bar and
+     "Interrupted!" / "Bone holds"; Unravel 4 on a tank's frame and the swap; the brood rising out of the river at the bar's sides, a salted
+     one white and its shattering; the unmade ground's grey patches on the bar and the sims stepping out; the swallowed player or sim inside
+     her (the raid warning "Salt her!") and the spitting out; the Unravelling's pulse numbers; the hunted caster's mark and the caster in the
+     river with her landing on empty water ("Missed her meal"); the feast. *Chris looks: the mechanics.*
+   - **Step 6 is ready to run:** `tools\validation\group_run.ps1 -Raid [-Pulls 10] [-Class class.paladin]` takes the raid of ten to her
+     (`--crulanda-raid`: zone.lowtowns, you and nine sims at 20, salt and harpoons, the raid formed on the apron; `--crulanda-unraveller-now`
+     brings her up at once, and again after she sinks), a seed a pull; `raid-log.txt` has each pull's phases, every death with what was on
+     at that moment (her health and phase, the pin, Unravel on them, the Feeding, the brood, the ground, the swallowed, the hunted) and the
+     end; `run-summary.txt` the kill rate against 3.6's targets and the mechanics' counts. Out to `D:\crulanda-work\run-captures\unraveller-raid`.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

@@ -18,6 +18,14 @@ namespace Crulanda.Encounter
         public float Reach { get; private set; }
         public float Filled { get; private set; }
         public bool Showing { get { return gameObject.activeSelf; } }
+        /// <summary>Where it lies (the feet it was shown at), on the flat.</summary>
+        public Vector3 Feet { get; private set; }
+        /// <summary>Every mark showing now (GroundMarks: the sims step out of marked ground, any mark the game draws; WORLD_BOSS_1.md 3.5).
+        /// Every mark the game lays is ground to be out of (a heavy blow, a warned hold, a trick's ring, a Hollow's dust, a snapping loop, the
+        /// Unraveller's unmade ground and her hunt).</summary>
+        public static readonly HashSet<BlowMark> Live = new HashSet<BlowMark>();
+        void OnEnable() { Live.Add(this); }
+        void OnDisable() { Live.Remove(this); }
 
         public static BlowMark Create()
         {
@@ -40,7 +48,7 @@ namespace Crulanda.Encounter
         /// <summary>Lays the mark at the elite's feet: <paramref name="reach"/> metres wide each way, <paramref name="progress"/> full.</summary>
         public void Show(Vector3 feet, float reach, float progress)
         {
-            Reach = reach; Filled = Mathf.Clamp01(progress);
+            Reach = reach; Filled = Mathf.Clamp01(progress); Feet = feet;
             var up = Vector3.up; float lift = .09f; var zone = Crulanda.World.ZoneBuilder.Active;
             if (zone != null && Mathf.Abs(zone.HeightAt(feet.x, feet.z) - feet.y) < .35f)
             {
@@ -57,7 +65,7 @@ namespace Crulanda.Encounter
             if (!gameObject.activeSelf) gameObject.SetActive(true);
         }
         public void Hide() { Reach = 0; Filled = 0; if (gameObject.activeSelf) gameObject.SetActive(false); }
-        void OnDestroy() { if (ringMat != null) Destroy(ringMat); if (fillMat != null) Destroy(fillMat); }
+        void OnDestroy() { Live.Remove(this); if (ringMat != null) Destroy(ringMat); if (fillMat != null) Destroy(fillMat); }
 
         static Mesh ringMesh, discMesh;
         /// <summary>A band at the edge of a unit circle (bright, soft on both sides) over a faint wash of the whole circle.</summary>

@@ -1,0 +1,167 @@
+using System;
+using System.Collections;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using UnityEngine;
+using UnityEngine.AI;
+
+namespace Crulanda.Encounter
+{
+    /// <summary>
+    /// The group run at 10 (Docs/WORLD_BOSS_1.md 3.6 point 3, build step 6): Crulanda.exe --crulanda-run-capture &lt;folder&gt;
+    /// --crulanda-zone zone.lowtowns --crulanda-raid [--crulanda-raid-pulls 10] [--crulanda-unraveller-now] (tools\validation\group_run.ps1
+    /// -Raid). You (the bot) at 20 and nine sims at 20 (2 tanks, 3 healers, 5 damage with you; the best Lowtowns gear the sims' kit gives, each
+    /// with three salt and three harpoons), formed into a raid on the Drain Reach's apron; she is brought up at once; then pull after pull, a
+    /// seed each, until the pulls are done (a wipe or the feast ends one; she is brought up again after she sinks). The bot fights her: it
+    /// keeps her targeted, steps out of marked ground, runs for the river when hunted, salts her when someone is swallowed and it is asked.
+    /// raid-log.txt has every pull's phases, deaths (with what was on at the time: the read round the first death) and end; run-summary.txt
+    /// the kill rate against the targets of 3.6 and the mechanics' counts. RUN_CAPTURE_DONE in the log.
+    /// </summary>
+    public sealed partial class RunCapture
+    {
+        public const string RaidFlag = "--crulanda-raid", PullsFlag = "--crulanda-raid-pulls";
+        public static bool RaidRequested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), RaidFlag) >= 0; } }
+        static int PullsArg { get { var a = Environment.GetCommandLineArgs(); int i = Array.IndexOf(a, PullsFlag); return i >= 0 && i + 1 < a.Length && int.TryParse(a[i + 1], out var n) ? Mathf.Clamp(n, 1, 50) : 10; } }
+        /// <summary>The game minutes one pull may take before it is called (the enrage is 9: a pull past 10 is stuck).</summary>
+        public const float PullLimit = 10 * 60;
+
+        public IEnumerator RaidRun(EncounterSession s, string directory)
+        {
+            Directory.CreateDirectory(directory);
+            var log = new List<string>(); Action<string> Log = line => { log.Add(line); Debug.Log("Raid capture: " + line); };
+            string Clock(float t) { int m = (int)(t / 60); return m + ":" + ((int)(t % 60)).ToString("00"); }
+            Crulanda.World.WorldClock.Hour = 11; EncounterHud.UiScale = 1; EncounterHud.DefaultPanels = true; s.MeterOpen = true;
+            if (s.ZoneId != Unraveller.Zone || s.Zone == null || s.Zone.SiltBar == null) { Log("Not in the Lowtowns' Drain Reach (run with --crulanda-zone zone.lowtowns)."); RaidFinish(s, directory, log, new List<string> { "No raid: not in the Lowtowns." }); yield break; }
+            int level = EncounterProgress.LevelCap;
+            s.Progress.experience = EncounterProgress.XpForLevel(level); s.Player.SetLevel(level); s.LevelHeld = true;
+            Log("Your talents: " + SpendForRole(s) + ".");
+            SimCompanion.KitPlayerLike(s, new SimAdventurer { classId = s.ClassDef.id, level = level, gearSeed = 7, gearBonus = 2 });
+            Inventory.Add(s.Progress, s.Items, Unraveller.SaltItem, 6); Inventory.Add(s.Progress, s.Items, Unraveller.HarpoonItem, 6);
+            // The nine: two tanks, three healers, five damage with you, from the roster, all at 20 in the Lowtowns.
+            var pop = SimPopulation.Active; if (pop == null) { Log("No sims."); RaidFinish(s, directory, log, new List<string> { "No sims." }); yield break; }
+            var you = s.PlayerRole;
+            var want = new List<string>();
+            for (int i = 0; i < 2 - (you == SimCompanion.PartyRole.Tank ? 1 : 0); i++) want.Add("class.warrior");
+            string[] heal = { "class.cleric", "class.druid", "class.shaman" };
+            for (int i = 0; i < 3 - (you == SimCompanion.PartyRole.Healer ? 1 : 0); i++) want.Add(heal[i]);
+            string[] dps = { "class.ranger", "class.mage", "class.rogue", "class.scoundrel", "class.archivist" };
+            for (int i = 0; i < 5 - (you == SimCompanion.PartyRole.Damage ? 1 : 0); i++) want.Add(dps[i]);
+            var chosen = new List<SimAdventurer>();
+            foreach (var c in want) { var x = pop.World.sims.Find(y => y.classId == c && !chosen.Contains(y)); if (x != null) chosen.Add(x); else Log("no sim of " + c + " in the roster"); }
+            var apron = s.Zone.ReachApron; var bar = s.Zone.SiltBar;
+            var stand = s.Zone.Ground(apron != null ? apron.center : bar.center);
+            if (NavMesh.SamplePosition(stand, out var standHit, 4, NavMesh.AllAreas)) stand = standHit.position;
+            var motor = s.Player.GetComponent<AdventurerMotor>(); motor.Teleport(stand + Vector3.up * 1.05f);
+            int k = 0;
+            foreach (var x in chosen) { x.zone = s.ZoneId; x.onlineFrom = 0; x.onlineHours = 24; x.friendly = .9f; x.level = level; x.bold = .5f + .05f * (k % 5); x.gearBonus = 2; x.coin = Mathf.Max(x.coin, 400); var at = stand + Quaternion.Euler(0, k * 40, 0) * Vector3.forward * 3; x.x = at.x; x.z = at.z; k++; SimEconomy.Stock(x, s.Items); RaidCall.BuyKit(x, id => s.Items?.Get(id)?.value ?? 1); }
+            pop.Refresh(); yield return new WaitForSeconds(.5f);
+            s.FormRaid();
+            foreach (var x in chosen) if (!s.Invite(x.id, true)) Log("could not invite " + x.name);
+            if (s.InRaid) s.Raid.Arrange();
+            yield return new WaitForSeconds(.5f);
+            Log("The raid: you (" + s.ClassDef.displayName + ", " + you + ", " + s.Player.Health.Pool.Max + " health), " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " (" + SimRoster.ClassName(c.sim.classId) + ", " + c.Role + ", party " + (s.InRaid ? s.Raid.PartyOf(c.sim.id) + 1 : 1) + ", " + c.actor.Health.Pool.Max + " health)")) + ".");
+            int pulls = PullsArg, wins = 0; var lines = new List<string>(); float killTime = 0;
+            var tune = UnravellerTuning.Current;
+            Log("Her numbers (EncounterContent/Raids/unraveller.json): health " + tune.health + ", enrage " + tune.enrageSeconds + " s, blink every " + tune.blinkEvery + " s, pins " + tune.pinFirst + " to " + tune.pinLeast + " s.");
+            Time.timeScale = Speed; int shots = 0;
+            for (int pull = 1; pull <= pulls; pull++)
+            {
+                UnityEngine.Random.InitState(1000 + pull);
+                // Her up, everyone whole and on the apron.
+                if (s.UnravellerFoe == null || !s.UnravellerFoe.actor.IsAlive) s.UnravellerSoon(5);
+                float waitFrom = Time.time;
+                while ((s.UnravellerFoe == null || s.UnravellerRising || !s.UnravellerFoe.actor.IsAlive) && Time.time - waitFrom < 120) yield return null;
+                var e = s.UnravellerFoe; if (e == null) { Log("Pull " + pull + ": she did not rise."); break; }
+                if (!s.Player.IsAlive) s.Recover();
+                motor.Teleport(stand + Vector3.up * 1.05f);
+                foreach (var c in s.PartySims) if (c != null) { if (!c.actor.IsAlive) c.actor.Health.Revive(c.actor.Health.Pool.Max); c.actor.Health.ApplyHealing(c.actor.Health.Pool.Max); c.actor.Resource?.Pool.Fill(); RaidCall.BuyKit(c.sim, id => s.Items?.Get(id)?.value ?? 1); var ag = c.GetComponent<NavMeshAgent>(); if (ag != null && ag.isOnNavMesh && NavMesh.SamplePosition(stand + UnityEngine.Random.insideUnitSphere * 4, out var h, 4, NavMesh.AllAreas)) ag.Warp(h.position); }
+                s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max); s.Player.Resource.Pool.Fill();
+                if (Inventory.Count(s.Progress, Unraveller.SaltItem) < 3) Inventory.Add(s.Progress, s.Items, Unraveller.SaltItem, 3);
+                yield return new WaitForSeconds(1);
+                // The pull: the tanks go first; the bot follows a moment after.
+                var tanks = s.PartySims.Where(c => c != null && c.Role == SimCompanion.PartyRole.Tank).ToList();
+                foreach (var tk in tanks) e.threat.Add(tk.actor.EntityId.Value, 50 - 10 * tanks.IndexOf(tk));
+                s.Select(e); s.BeginAutoAttack();
+                Log("Pull " + pull + " (seed " + (1000 + pull) + "): she is pulled.");
+                Shot(s, directory, "pull" + pull + "-0-pulled", ref shots, null);
+                float start = Time.time, nextCast = 0, nextLog = Time.time + 30; int phaseSeen = 1; var dead = new HashSet<string>(); string firstDeath = null;
+                bool won = false, ended = false;
+                while (Time.time - start < PullLimit)
+                {
+                    float t = Time.time - start;
+                    if (e == null || !e.actor.IsAlive) { won = true; break; }
+                    if (Time.time - start > 5 && e.PullAt < 0) { ended = true; break; }   // her fight over without her death: a wipe, the feast, a reset
+                    if (e.RaidPhase > phaseSeen) { phaseSeen = e.RaidPhase; Log(Clock(t) + "  phase " + phaseSeen + " (" + UnravellerRules.PhaseNames[phaseSeen] + ") at " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%"); Shot(s, directory, "pull" + pull + "-phase" + phaseSeen, ref shots, null); }
+                    foreach (var a in s.PartyActors())
+                    {
+                        if (a == null || a.IsAlive || !dead.Add(a.EntityId.Value)) continue;
+                        string who = a == s.Player ? "you" : a.DisplayName;
+                        string line = Clock(t) + "  DEATH " + who + " (" + dead.Count + " down; her " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%, phase " + e.RaidPhase + "; pin " + e.PinLeft.ToString("0.0") + " s, unravel on it " + e.UnravelOn(a) + ", feeding " + (e.Feeding ? "yes" : "no") + ", brood up " + s.BroodNow.Count(b => b != null && b.actor.IsAlive) + ", unmade " + s.UnmadePatches + (s.SwallowedActor != null ? ", swallowed " + s.SwallowedActor.DisplayName : "") + (s.HuntedActor != null ? ", hunting " + s.HuntedActor.DisplayName : "") + ")";
+                        Log(line); if (firstDeath == null) firstDeath = line;
+                    }
+                    if (Time.time >= nextLog) { nextLog = Time.time + 30; Log(Clock(t) + "  her " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%, enrage in " + Clock(s.RaidBossEnrage) + ", pin " + e.PinLeft.ToString("0") + " s (harpoons " + s.HarpoonsThrown + "), feedings landed " + e.FeedingsLanded + " stopped " + e.FeedingsStopped + ", grown " + Mathf.RoundToInt(e.Growth * 100) + "%; " + s.PartySims.Count(c => c != null && c.actor.IsAlive) + "/" + s.PartySims.Count + " sims up"); }
+                    BotRaidStep(s, e, motor, ref nextCast);
+                    yield return null;
+                }
+                EncounterInput.Scripted = Vector2.zero;
+                float took = Time.time - start;
+                if (won) { wins++; killTime += took; }
+                string end = won ? "KILL in " + Clock(took) : ended ? "WIPE at " + Clock(took) + " (her at " + (e != null && e.actor != null ? Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) : 0) + "%" + (s.Feasts > 0 ? ", the feast" : "") + ")" : "CALLED at " + Clock(took) + " (stuck)";
+                string counts = "brood " + s.BroodRisen + " (eaten " + s.BroodEaten + "), swallowed freed " + s.SwallowsFreed + " erased " + s.SwallowsErased + ", hunts missed " + s.HuntsMissed + " landed " + s.HuntsLanded + ", harpoons " + s.HarpoonsThrown + ", salts " + s.SaltsThrown + ", pulses " + s.Pulses;
+                Log("Pull " + pull + ": " + end + "; " + counts + (firstDeath != null ? "; first death: " + firstDeath.Trim() : ""));
+                lines.Add("Pull " + pull + ": " + end + "; deaths " + dead.Count + "; " + counts);
+                Shot(s, directory, "pull" + pull + "-end-" + (won ? "kill" : "wipe"), ref shots, null);
+                if (!won && e != null && e.actor.IsAlive && e.Engaged) e.ResetFight();
+                yield return new WaitForSeconds(8);   // the sims get up, out of the fight
+            }
+            EncounterInput.Scripted = null; Time.timeScale = 1;
+            var summary = new List<string> {
+                "Group run at 10: the Unraveller (" + DateTime.Now.ToString("yyyy-MM-dd HH:mm") + ")",
+                "Raid: you (" + s.ClassDef.displayName + ", " + you + ") and " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " the " + SimRoster.ClassName(c.sim.classId) + " (" + c.Role + ")")),
+                "Kills: " + wins + " of " + pulls + " (" + Mathf.RoundToInt(100f * wins / Mathf.Max(1, pulls)) + "%); the target with the bot playing well is about 50% (WORLD_BOSS_1.md 3.6), sims alone 30-40%",
+                "Mean kill time: " + (wins > 0 ? Clock(killTime / wins) : "-") + " against the enrage at " + Clock(tune.enrageSeconds),
+                "Pulls:" };
+            summary.AddRange(lines.Select(l => "  " + l));
+            summary.Add("Scorecard:"); summary.AddRange(s.Meter.Scorecard().Select(l => "  " + l));
+            RaidFinish(s, directory, log, summary);
+        }
+        /// <summary>The bot's frame in her fight: out of marked ground, into the river when hunted, salt on her when asked, else at her (its reach)
+        /// and its abilities.</summary>
+        static void BotRaidStep(EncounterSession s, EncounterEnemy e, AdventurerMotor motor, ref float nextCast)
+        {
+            if (!s.Player.IsAlive) { EncounterInput.Scripted = Vector2.zero; return; }
+            var me = s.Player.transform.position; Vector3? goal = null; float reach;
+            if (s.HuntedActor == s.Player) { goal = s.NearestWater(me, 25); reach = .5f; }
+            else
+            {
+                var feet = NavMesh.SamplePosition(me, out var under, 2, NavMesh.AllAreas) ? under.position : me - Vector3.up;
+                var outOf = GroundMarks.StepOut(feet);
+                if (outOf.HasValue) { goal = outOf; reach = .4f; }
+                else { goal = e.transform.position; reach = MeleeClass(s) ? 2.6f : 12; }
+            }
+            // Salt on her when the raid warning asks it of you.
+            var w = s.RaidWarningText;
+            if (s.SwallowedActor != null && s.SwallowedActor != s.Player && w != null && w.StartsWith("Salt her") && !s.Swallow.SaltedBy(s.Player.EntityId.Value) && Vector3.Distance(me, e.transform.position) <= WeaveEaterRules.ThrowRange)
+            {
+                int bag = s.Progress.bag.FindIndex(b => !b.Empty && b.item == Unraveller.SaltItem);
+                if (bag >= 0) { s.Select(e); s.UseItem(bag); }
+            }
+            if (s.Target != e) s.Select(e);
+            if (!s.AutoAttack) s.BeginAutoAttack();
+            if (Time.time >= nextCast) { nextCast = Time.time + .4f; BotCast(s); }
+            if (!goal.HasValue) { EncounterInput.Scripted = Vector2.zero; return; }
+            var to = goal.Value - me; to.y = 0;
+            if (to.magnitude <= reach || s.PlayerStunned || s.PlayerRooted) { EncounterInput.Scripted = Vector2.zero; return; }
+            motor.SetView(Mathf.Atan2(to.x, to.z) * Mathf.Rad2Deg, 14, 7);
+            EncounterInput.Scripted = Vector2.up;
+        }
+        void RaidFinish(EncounterSession s, string directory, List<string> log, List<string> summary)
+        {
+            File.WriteAllLines(Path.Combine(directory, "run-summary.txt"), summary);
+            File.WriteAllLines(Path.Combine(directory, "raid-log.txt"), log);
+            Debug.Log("RUN_CAPTURE_DONE " + string.Join(" | ", summary));
+            Application.Quit(0);
+        }
+    }
+}

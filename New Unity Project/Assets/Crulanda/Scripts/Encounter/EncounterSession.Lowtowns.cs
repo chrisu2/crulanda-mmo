@@ -20,19 +20,12 @@ namespace Crulanda.Encounter
             if (t == null || t.actor == null || !t.actor.IsAlive || t.Game) { Message(WeaveEaterRules.NoTargetLine); return false; }
             if (Distance(t) > WeaveEaterRules.ThrowRange) { Message("Too far to throw. Come within " + WeaveEaterRules.ThrowRange + " metres."); return false; }
             Inventory.Remove(Progress, d.id, 1);
-            Bolt(t, kind == WeaveEaterRules.Harpoon ? BoneYellow : SaltWhite, kind == WeaveEaterRules.Harpoon ? .14f : .22f, kind == WeaveEaterRules.Harpoon);
-            bool eater = WeaveEaterRules.IsWeaveEater(t);
-            var (sting, hold, seconds) = WeaveEaterRules.Throw(kind, Player.Level, eater);
-            t.Receive(sting, Player);   // the sting first: a blow breaks a hold, so the hold goes on after it
-            bool held = false;
-            if (hold == "stun") held = t.actor.IsAlive && t.Apply("stun", Player, seconds) == null;
-            else if (hold == "root" && t.actor.IsAlive)
-            {
-                t.Root(seconds); held = true; FloatText(t.transform.position, "Pinned", new Color(.86f, .8f, .62f));
-                // The harpoon's anchor (b1 ch.20:191): a book Weave-Eater cannot displace (blink) for a while after (WeaveEaterRules.PinSeconds).
-                if (t.BookWeaveEater) t.Pin(WeaveEaterRules.PinSeconds);
-            }
-            Message(WeaveEaterRules.ThrowLine(kind, t.actor.DisplayName, eater, held));
+            bool eater = WeaveEaterRules.IsWeaveEater(t), boss = t.RaidBoss;
+            // The throw's rules, the same for a sim's (EncounterSession.UnravellerFight.ThrowAt): the sting, then the hold; on the Unraveller a
+            // harpoon pins her (the shortening pin), salt counts toward freeing the swallowed; on her brood salt calcifies it to shatter.
+            bool held = ThrowAt(t, kind, Player, Player.Level);
+            if (kind == WeaveEaterRules.Harpoon && boss) HarpoonTaken(RaidGroup.You);
+            if (!boss || kind == WeaveEaterRules.Harpoon) Message(WeaveEaterRules.ThrowLine(kind, t.actor.DisplayName, eater, held));
             return true;
         }
         float nightCheckAt;

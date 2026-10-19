@@ -50,11 +50,15 @@ namespace Crulanda.Encounter
         /// <see cref="BlinkMin"/>), and its blink ready.</summary>
         public static bool Blinks(float gap, bool rooted, bool pinned, float now, float readyAt) { return !rooted && !pinned && gap > BlinkMin && now >= readyAt; }
         /// <summary>How far a blink goes toward a foe <paramref name="gap"/> m off: up to <see cref="BlinkReach"/>, stopping short of it.</summary>
-        public static float BlinkStep(float gap) { return Mathf.Clamp(gap - 1.8f, 0, BlinkReach); }
+        public static float BlinkStep(float gap) { return BlinkStep(gap, BlinkReach); }
+        /// <summary>A blink of another reach (the Unraveller's 12 m, UnravellerTuning).</summary>
+        public static float BlinkStep(float gap, float reach) { return Mathf.Clamp(gap - 1.8f, 0, reach); }
         /// <summary>Whether one of the party draws a Weave-Eater (the lighthouse): a pool of magic (mana, the Salt-Mender's salt) or a ward on.</summary>
         public static bool DrawnTo(ResourceKind pool, int barrier) { return pool == ResourceKind.Mana || pool == ResourceKind.Salt || barrier > 0; }
         /// <summary>The threat the lighthouse adds to a magic-worker each beat: a share of the top threat on the Weave-Eater (at least 1).</summary>
-        public static float LighthouseThreat(float top) { return Mathf.Max(1, top * LighthouseShare); }
+        public static float LighthouseThreat(float top) { return LighthouseThreat(top, LighthouseShare); }
+        /// <summary>The lighthouse's threat at another <paramref name="share"/> (the Unraveller's stronger draw, UnravellerTuning).</summary>
+        public static float LighthouseThreat(float top, float share) { return Mathf.Max(1, top * share); }
         /// <summary>How much of a ward one second's eating takes (all of it when little is left).</summary>
         public static int WardBite(int barrier) { return barrier <= 0 ? 0 : Mathf.Min(barrier, Mathf.Max(WardEatFloor, Mathf.CeilToInt(barrier * WardEatShare))); }
         public const string BlackenedId = "debuff.blackened_steel", BlackenedName = "Blackened steel";
@@ -75,10 +79,20 @@ namespace Crulanda.Encounter
             return IsWeaveEater(e.MobName, look != null && look.Look == ActorLook.WeaveEater);
         }
         /// <summary>The blunting a Weave-Eater leaves on the steel that strikes it: -10% attack power for 20 s.</summary>
-        public static StatusEffectDefinition Blackened()
+        public static StatusEffectDefinition Blackened() { return Blackened(1); }
+        /// <summary>Blackened steel <paramref name="stacks"/> deep (the Unraveller's three, WORLD_BOSS_1.md 3.3): -10% attack power a stack.</summary>
+        public static StatusEffectDefinition Blackened(int stacks)
         {
-            return new StatusEffectDefinition { id = BlackenedId, name = BlackenedName, duration = BlackenSeconds, incomingDamageMultiplier = 1,
-                modifiers = new[] { new StatusModifierDefinition { stat = StatType.AttackPower, operation = ModifierOp.PercentAdd, value = -BlackenShare } } };
+            stacks = Mathf.Max(1, stacks);
+            return new StatusEffectDefinition { id = BlackenedId, name = stacks > 1 ? BlackenedName + " (" + stacks + ")" : BlackenedName, duration = BlackenSeconds, incomingDamageMultiplier = 1,
+                modifiers = new[] { new StatusModifierDefinition { stat = StatType.AttackPower, operation = ModifierOp.PercentAdd, value = -BlackenShare * stacks } } };
+        }
+        /// <summary>How deep the blackened steel on a striker is now (0: none): read off the status's own modifier.</summary>
+        public static int SteelStacks(StatusEffectRuntime statuses, float now)
+        {
+            if (statuses == null || statuses.Remaining(BlackenedId, now) <= 0) return 0;
+            var d = statuses.DefinitionOf(BlackenedId); if (d == null || d.modifiers == null || d.modifiers.Length == 0) return 1;
+            return Mathf.Max(1, Mathf.RoundToInt(-d.modifiers[0].value / BlackenShare));
         }
         /// <summary>The buff row's name for a status of these rules, or null.</summary>
         public static string StatusName(string id) { return id == BlackenedId ? BlackenedName : null; }
@@ -89,14 +103,17 @@ namespace Crulanda.Encounter
         /// A blow on <paramref name="e"/> from <paramref name="source"/>: when it blackens, the status goes on (or is refreshed) on the striker.
         /// True when it is fresh (the striker had none on): the session says so once.
         /// </summary>
-        public static bool Struck(EncounterEnemy e, Actor source, float now)
+        public static bool Struck(EncounterEnemy e, Actor source, float now) { return Struck(e, source, now, 1); }
+        /// <summary>Struck, stacking to <paramref name="most"/> (the Unraveller: three).</summary>
+        public static bool Struck(EncounterEnemy e, Actor source, float now, int most)
         {
             if (e == null || source == null || source == e.actor) return false;
             if (!Blackens(IsWeaveEater(e), Vector3.Distance(source.transform.position, e.transform.position))) return false;
             var c = source.GetComponent<Combatant>(); if (c == null || c.Statuses == null) return false;
-            bool fresh = c.Statuses.Remaining(BlackenedId, now) <= 0;
-            c.Statuses.Apply(Blackened(), now);
-            return fresh;
+            int had = SteelStacks(c.Statuses, now), next = UnravellerRules.SteelNext(had, most);
+            if (next != had && had > 0) c.Statuses.Remove(BlackenedId);   // a deeper stack: put on afresh (Apply only refreshes the time)
+            c.Statuses.Apply(Blackened(next), now);
+            return had == 0;
         }
         /// <summary>What a throw does to a target: its sting (damage at the thrower's level), and the hold it puts on a Weave-Eater ("stun"
         /// for salt, "root" for a harpoon) and for how long; nothing held on anything else.</summary>

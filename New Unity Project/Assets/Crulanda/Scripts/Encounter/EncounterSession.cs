@@ -1445,6 +1445,7 @@ namespace Crulanda.Encounter
         void Start()
         {
             if (content == null) { Debug.LogError("Encounter content missing."); enabled = false; return; }
+            UnravellerTuning.LoadFrom(content.raidFiles);   // the Unraveller's numbers (EncounterContent/Raids/unraveller.json)
             // Who keeps a staff in hand on the run (playtest note 19): an enemy while engaged; anyone else while the player fights.
             // Who has a weapon out (ActorVisual: sheathed otherwise, playtest note 79): a mob while engaged; you, Mira and a party sim while
             // the party fights or you auto-attack; a sim out in the world while it hunts; anyone else (villagers, guards) never.
@@ -2148,6 +2149,7 @@ namespace Crulanda.Encounter
             if (PlayerFeared) { Message("You are running: nothing comes to hand."); return false; }
             if (PlayerDisoriented) { Message("The cave swims: you can't make the move."); return false; }
             if (PlayerDisarmed && WeaponMove(index)) { Message("Your weapon is locked."); return false; }
+            if (PlayerSilenced && !WeaponMove(index)) { Message("Silenced: the Weave will not answer you."); return false; }   // the Unraveller's touch (EncounterSession.UnravellerFight)
             if (CooldownRemaining(index) > 0) return false;
             bool used = Kit.Use(index);
             if (used) CancelWork(true);   // an ability that goes off takes the hands off the work (the work only ends in TickWork, so it gathers nothing)

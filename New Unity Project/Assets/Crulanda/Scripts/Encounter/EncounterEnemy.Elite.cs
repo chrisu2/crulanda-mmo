@@ -17,7 +17,7 @@ namespace Crulanda.Encounter
         /// <summary>Seconds until it may next draw back (0 = at its next swing).</summary>
         public float NextBlowIn { get { return Move == null ? float.MaxValue : Mathf.Max(0, nextBlowAt - Time.time); } }
         /// <summary>Seconds between its swings: the content's interval, shorter once it is enraged.</summary>
-        public float SwingInterval { get { return session.content.enemySwingInterval * (Enraged && Move != null ? Move.enrageHaste : 1); } }
+        public float SwingInterval { get { return RaidSwingEvery > 0 ? RaidSwingEvery : session.content.enemySwingInterval * (Enraged && Move != null ? Move.enrageHaste : 1); } }   // a raid boss's own beat (UnravellerTuning)
         /// <summary>What its swing is multiplied by and what the party's blows on it are multiplied by, when it outlevels the player.
         /// Every mob counts it now, a normal one more steeply (Chris, 2026-10-05: a level 10 at level 7 "was way too easy...should
         /// kill me"); an elite as before (EliteBalance's paper fights).</summary>

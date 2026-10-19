@@ -335,6 +335,8 @@ namespace Crulanda.Encounter
         {
             get
             {
+                // In the Unraveller's fight, its part first: the tank holding her keeps her, the brood's takers take the brood (SimCompanion.Raid).
+                var raid = RaidQuarry(); if (raid != null) return raid;
                 // A tank's first care (5.6): whatever is on someone who is not a tank.
                 if (Role == PartyRole.Tank)
                 {
@@ -794,6 +796,10 @@ namespace Crulanda.Encounter
             // it. (hallows-6, 2026-10-17: nothing read the warning; the Druid stood 4-8 m off in the Examiner's ring and was stone 3 s of
             // every 18 through three wiped pulls; the pull that won was the one she and the Ranger stood 9-10 m off.)
             if (!Melee && healing == null && StepClearOfHold()) return;
+            // Out of any marked ground (GroundMarks; WORLD_BOSS_1.md 3.5, shared with the dungeons), a mend in hand landing first.
+            if (healing == null && StepOutOfGround()) return;
+            // Its part in the Unraveller's fight: the river when hunted, the harpoons, the kicks on the Feeding, the salts (SimCompanion.Raid).
+            if (healing == null && RaidTurn()) return;
             // Its turn at a buff-up (BossBuffs): a beat after the leader stops, each in its slot's turn, out of a fight.
             if (session.BuffingUp && BuffedStop != session.BuffStop && !session.InCombat && healing == null && Time.time >= session.BuffStopSince + .8f + .7f * slot) BuffUpNow();
             // Mending first, for the healers: the most hurt of the party under 60%. A cast of a second (the spell pose held, playtest
@@ -814,7 +820,7 @@ namespace Crulanda.Encounter
             // 60% in a fight, every 6 s. (Playtest note 122, Chris, 2026-10-11: "the druids are still not healing party members!". They
             // had mended only under 60%, only in a fight, every 6 s and for a small flat sum; nobody at all while the most hurt was out of
             // reach; and never out of a fight, the sim's own mending each second holding the same timer back.)
-            else if (Healer && Time.time >= nextHeal && (session.InCombat || Role == PartyRole.Healer))
+            else if (Healer && !Silenced && Time.time >= nextHeal && (session.InCombat || Role == PartyRole.Healer))
             {
                 bool mender = Role == PartyRole.Healer;
                 var hurt = MostHurt(HealReach);
@@ -876,7 +882,7 @@ namespace Crulanda.Encounter
             if (Time.time >= nextHoldLook) HoldOne(quarry);   // every other class's hold (SimCompanion.Fight)
             if (Interrupter && Time.time >= nextKick)
                 foreach (var e in session.Enemies)
-                    if (e != null && e.actor.IsAlive && e.Casting && e.FightingParty && e.CastProgress > .25f && Vector3.Distance(e.transform.position, transform.position) <= Reach + 1.5f)
+                    if (e != null && e.actor.IsAlive && e.Casting && e.FightingParty && !e.RaidBoss && !Silenced && e.CastProgress > .25f && Vector3.Distance(e.transform.position, transform.position) <= Reach + 1.5f)   // her Feeding is the interrupt rotation's (SimCompanion.Raid)
                     {
                         // A kick that does not take (immune, or too soon after the last) waits too (2026-10-13: it was tried again every frame,
                         // and "Immune" stacked into a white column over the Cinder-Warden in the evening group run).
@@ -891,7 +897,7 @@ namespace Crulanda.Encounter
             if (quarry != null)
             {
                 // A tank taunts what is on someone else (5.6): the mob turns to it for a few seconds.
-                if (Role == PartyRole.Tank && quarry.Victim != null && quarry.Victim != actor && Time.time >= nextTaunt && Vector3.Distance(transform.position, quarry.transform.position) < 12)
+                if (Role == PartyRole.Tank && quarry.Victim != null && quarry.Victim != actor && Time.time >= nextTaunt && Vector3.Distance(transform.position, quarry.transform.position) < 12 && (!quarry.RaidBoss || TauntsHer(quarry)))   // her: the swap at four stacks (SimCompanion.Raid)
                 { nextTaunt = Time.time + 8; quarry.threat.Taunt(actor.EntityId.Value, Time.time, 4); session.FloatText(transform.position + Vector3.up * 2, "Taunt", new Color(1, .7f, .3f)); }
                 float d = Vector3.Distance(transform.position, quarry.transform.position);
                 // Once at its quarry a melee sim holds its ground through a nudge (StandSlack): a shove from a pet or a sim walking past no

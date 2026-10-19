@@ -66,6 +66,15 @@ namespace Crulanda.World
         /// grey, night or day set.</summary>
         public static string[] TracksFor(ZoneDefinition zone, Vector3 at, float darkness, out string fight)
         {
+            var tracks = TracksForPlace(zone, at, darkness, out fight);
+            if (FightOverride != null) fight = FightOverride;
+            return tracks;
+        }
+        /// <summary>A fight's own track over the place's (the world boss's action track while she fights the raid: EncounterSession.UnravellerFight
+        /// sets it, and clears it when the fight ends); null for the place's.</summary>
+        public static string FightOverride;
+        static string[] TracksForPlace(ZoneDefinition zone, Vector3 at, float darkness, out string fight)
+        {
             var set = SetFor(zone != null ? zone.id : null);
             if (set.quiet && !Hollow.InsideAny(at, 1)) { fight = set.combat ?? FieldFight; return Silence; }
             if (set.day == DungeonTracks || Hollow.InsideAny(at, 1)) { fight = DungeonFight; return DungeonTracks; }

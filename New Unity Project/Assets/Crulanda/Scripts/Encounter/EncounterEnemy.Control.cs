@@ -41,7 +41,7 @@ namespace Crulanda.Encounter
         }
         /// <summary>Whole seconds left until <paramref name="until"/>, rounded up, with a hair of slack: now + 10 read back in float can be 10.000008, and that must say 10, not 11.</summary>
         static int Left(float until) { return Mathf.CeilToInt(until - Time.time - .005f); }
-        bool IsBoss { get { return Elite && Move != null && Move.boss; } }
+        bool IsBoss { get { return Elite && Move != null && Move.boss || RaidBoss; } }   // a raid boss too (the Unraveller: no long hold, no sim's hold)
         /// <summary>A dungeon's boss (an elite whose move says so): the party's sims put no hold of theirs on it (SimCompanion.Fight).</summary>
         public bool Boss { get { return IsBoss; } }
         /// <summary>Whether a hold of this kind would take now, without trying it (a sim checks before it spends its move, so "Immune" is not
@@ -70,8 +70,12 @@ namespace Crulanda.Encounter
         public string Apply(string kind, Actor by, float seconds)
         {
             if (!actor.IsAlive || Game || seconds <= 0) return "Nothing to hold";
+            // A raid boss takes no long hold, and an interrupt within 10 s of the last that stopped her Feeding does not take (EncounterEnemy.Unraveller).
+            if (RaidBoss && (kind == "incap" || kind == "fear")) { session.FloatText(transform.position, "Immune", Color.white); return "Immune"; }
+            if (RaidBoss && kind == "silence" && InterruptImmune) { session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }
+            bool wasFeeding = Feeding;
             if (Elite && kind != "silence") { if (!OnceAFight(kind, ref seconds)) return "Immune (once a fight)"; }   // Chris's rule (CC_DESIGN.md); an interrupt is not a hold
-            else
+            else if (!(RaidBoss && kind == "silence"))   // her interrupts are her own 10 s immunity's (InterruptImmune), not the diminishing returns
             {
                 var d = diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow ? (Time.time, was.n + 1) : (Time.time, 0);
                 if (d.Item2 >= 2) { diminish[kind] = (was.at, was.n); session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }
@@ -88,6 +92,7 @@ namespace Crulanda.Encounter
                 default: return "No such hold";
             }
             CancelBlow(); CancelCast(true); wasHeld = Controlled;
+            if (RaidBoss && wasFeeding && !Feeding) Interrupted();   // the Feeding stopped: immune to the next interrupt for 10 s
             session.FloatText(transform.position, kind == "incap" ? "Held" : kind == "stun" ? "Stunned" : kind == "fear" ? "Fleeing" : "Silenced", new Color(.75f, .85f, 1));
             return null;
         }

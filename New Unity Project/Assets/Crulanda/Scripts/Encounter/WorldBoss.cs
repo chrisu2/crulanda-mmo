@@ -104,7 +104,7 @@ namespace Crulanda.Encounter
         /// (EncounterEnemy.OvermatchTaken(30, 20) = 0.7). PROVISIONAL until the harness (step 6).</summary>
         public const int EffectiveHealth = 160000;
         /// <summary>Her health pool: <see cref="EffectiveHealth"/> times what she takes at +5 against the level cap.</summary>
-        public static int HealthPool { get { return UnityEngine.Mathf.RoundToInt(EffectiveHealth * EncounterEnemy.OvermatchTaken(Level, EncounterProgress.LevelCap)); } }
+        public static int HealthPool { get { return UnityEngine.Mathf.RoundToInt(UnravellerTuning.Current.health * EncounterEnemy.OvermatchTaken(Level, EncounterProgress.LevelCap)); } }   // the data file's health (EffectiveHealth its default)
         /// <summary>Her swing's base before the +5 clamp's 1.6 and the tank's armour (about 300 on a level-20 tank, 3.2). PROVISIONAL.</summary>
         public const float HitBase = 190;
         /// <summary>How much bigger than a Weave-Eater she stands (three times a man's height, 1.2).</summary>
@@ -128,6 +128,30 @@ namespace Crulanda.Encounter
         public static string KilledSystem(string leader, string guild) { return (string.IsNullOrEmpty(leader) ? "You" : leader) + " and " + (string.IsNullOrEmpty(guild) ? "your raid" : guild) + " have salted the Unraveller. The Lowtowns' drains are quiet."; }
         // ---------- her own lines (the chat, pale grey; no voice) ----------
         public const string RisingLine = "...hungry...", WipeLine = "...fed...";
+        // ---------- her fight (WORLD_BOSS_1.md 3.3-3.4; build steps 4 and 5; GAME-ONLY lines) ----------
+        public const string FeedingName = "The Feeding", BroodName = "Weave-Eater brood", UnmadeName = "Unmade ground", HuntName = "Erased", PulseName = "Unravelling";
+        public const string SaltItem = "throw.salt_twist", HarpoonItem = "throw.bone_harpoon";
+        public const string BroodLine = "...the little ones are hungry too...", MoreLine = "...more...", FeastLine = "...all of it...";
+        public static string PhaseSystem(int phase) { return phase == 2 ? "The Brood: the river boils at the bar's edges, and her children come up out of it." : phase == 3 ? "The Unravelling: the air itself comes apart round her." : "The Hunger."; }
+        public const string BroodRiseLine = "Weave-Eaters rise out of the black water on both sides of the bar. They go for whoever works the Weave.";
+        public const string BroodWarning = "The brood are coming for the healers: salt them, then break them!";
+        public const string EatsBroodFloat = "Eats her brood", EatsBroodLine = "The Unraveller takes one of her brood back into herself, and swells.";
+        public const string UnmadeWarning = "Grey nothing under you: step out!";
+        public const string SwallowedYou = "You are SWALLOWED: three salts will free you!";
+        public static string SaltHer(string who) { return "Salt her! " + who + (who == "you" ? " are" : " is") + " swallowed!"; }
+        public const string SaltIdleLine = "The salt hisses on her and is gone: she is too big to calcify on a handful.";
+        public static string SpatOutLine(string who) { return "Salt from three hands: she goes white and rigid, and spits " + who + " out whole. Strike her while she is crystal!"; }
+        public static string SwallowErasedLine(string who) { return who + (who == "You" ? " are" : " is") + " gone: unmade inside her, as if never there."; }
+        public static string ErasedLine(string who) { return who + (who == "You" ? " come" : " comes") + " apart under her: unravelled to grey dust. The other tank should have taken her."; }
+        public const string SwapWarning = "Four Unravels on you: the other tank must take her now!";
+        public const string HuntedYou = "She is hunting YOU: get in the river!";
+        public static string HuntedLine(string who) { return "She turns toward " + who + ". Out of the way, and into the river with them!"; }
+        public const string MissedFloat = "Missed her meal", MissedLine = "She falls on empty black water and casts about, lost: the river hides them from her.";
+        public const string FeastSystem = "The Feast: the Unraveller takes the bar whole.";
+        public static string FedLine(int eaten) { return "The Feeding: she eats " + eaten + " of the raid's wards and blessings, and grows."; }
+        /// <summary>Her action track (the music branch's ZoneMusic.WorldBossFight; a hook until it is here: played only when the clip is in Resources).</summary>
+        public const string FightTrack = "Music/WorldBoss/WorldBossFight";
+        public static bool FightTrackReady { get { return UnityEngine.Resources.Load<UnityEngine.AudioClip>(FightTrack) != null; } }
         /// <summary>A line of hers as the chat shows it.</summary>
         public static string Says(string line) { return Name + ": " + line; }
     }

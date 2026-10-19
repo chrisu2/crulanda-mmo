@@ -106,6 +106,7 @@ namespace Crulanda.Encounter
         {
             LeaveGroup(); inFight = alarmed = struck = false; joinAt = -1; joinGroup = null; joinFor = null;
             CancelBlow(); Soothe();
+            ClearRaidFight();   // the Unraveller's fight forgotten (EncounterEnemy.Unraveller)
             // a Lowtowns Weave-Eater's blink and lighthouse start afresh next fight (EncounterEnemy.WeaveEater)
             blinkReadyAt = 0;
             // a Hallow's Creek Hollow's glide and dust start afresh next fight (EncounterEnemy.Hollow)

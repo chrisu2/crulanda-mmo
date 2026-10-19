@@ -36,9 +36,22 @@ namespace Crulanda.Encounter
         public bool UnravellerSinking { get { return UnravellerFoe != null && surfaceFrom >= 0 && !surfacingUp; } }
 
         /// <summary>Each frame of play (not paused): the clock, what it brings, and the zone made to match it.</summary>
+        /// <summary>--crulanda-unraveller-now (the group run at 10, and tests of her in a build): in the Lowtowns, the clock is set so the warning
+        /// comes at once and she rises 30 s after. Once a run.</summary>
+        public const string NowFlag = "--crulanda-unraveller-now";
+        static bool nowDone;
+        public static bool NowRequested { get { return System.Array.IndexOf(System.Environment.GetCommandLineArgs(), NowFlag) >= 0; } }
+        /// <summary>Brings her rising to within <paramref name="seconds"/> (the warning at once), if she is not warned or up already.</summary>
+        public void UnravellerSoon(float seconds)
+        {
+            var s = WorldBossNow; if (s == null || s.state != WorldBossState.Waiting) return;
+            if (s.riseAt < 0) s.riseAt = WorldBossClock.RollRise(WorldSeed, s.cycles);
+            s.played = Mathf.Max(s.played, s.riseAt - Mathf.Max(.1f, seconds));
+        }
         void TickUnraveller()
         {
             var s = WorldBossNow; if (s == null) return;
+            if (!nowDone && ZoneId == Unraveller.Zone && NowRequested) { nowDone = true; UnravellerSoon(30); }
             var beat = WorldBossClock.Tick(s, Mathf.Min(Time.deltaTime, .5f), WorldSeed);
             if (beat == WorldBossClock.Beat.Warned) UnravellerWarned();
             else if (beat == WorldBossClock.Beat.Rose) UnravellerRose();
@@ -129,7 +142,9 @@ namespace Crulanda.Encounter
             a.transform.localScale = Vector3.one * Unraveller.Scale;
             a.Stats.SetBase(StatType.MaxHealth, Unraveller.HealthPool);
             a.Health.ApplyHealing(a.Health.Pool.Max);
-            e.HitBase = Unraveller.HitBase;
+            e.HitBase = UnravellerTuning.Current.hitBase;   // the data file's (Unraveller.HitBase its default)
+            e.Cast = EncounterEnemy.FeedingCast(UnravellerTuning.Current);   // the Feeding: a cast bar to interrupt (EncounterEnemy.Unraveller)
+            if (InRaid) RaidBoss = e;
             UnravellerFoe = e; unravellerOnParty = false;
             if (rising)
             {
@@ -151,6 +166,7 @@ namespace Crulanda.Encounter
         {
             var e = UnravellerFoe; UnravellerFoe = null; surfaceFrom = -1; unravellerOnParty = false;
             if (e == null) return;
+            EndUnravellerFight(e); if (RaidBoss == e) RaidBoss = null;
             if (Target == e) { Target = null; AutoAttack = false; }
             Enemies.Remove(e); Destroy(e.gameObject);
         }
@@ -173,7 +189,7 @@ namespace Crulanda.Encounter
                 else { RemoveUnraveller(); return; }
             }
             if (!e.actor.IsAlive) return;
-            if (e.FightingParty) { unravellerOnParty = true; return; }
+            if (e.FightingParty) { unravellerOnParty = true; TickUnravellerFight(e); return; }   // her fight (EncounterSession.UnravellerFight)
             if (!unravellerOnParty) return;
             unravellerOnParty = false;
             if (Player != null && Player.IsAlive) return;   // the fight broke off another way (out of reach, the leash)

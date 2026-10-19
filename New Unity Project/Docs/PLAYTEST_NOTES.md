@@ -970,3 +970,4 @@ un-captures.
 - 294 (2026-10-19 ~19:45, tune-10) "when she leaps she would target on raid member and if that member does not move out of the range
   theyll die" (OPEN: the leap marks one member; the rings under them; out before she lands or die).
 - 295 (2026-10-19 ~20:00; tune-10's first pull reached the feast at 15:53 with her at 31%) "cut about 10% health" (done: 340,000 to 306,000).
+- 296 (2026-10-19 ~20:05) "last tuning run for now then we move on to new zones, new classes, and pending phases".

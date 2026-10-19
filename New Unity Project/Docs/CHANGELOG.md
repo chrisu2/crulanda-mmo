@@ -17,6 +17,13 @@
   time. Each trunk is set on its own foot (the models are not centred on the trunk) and sunk under the lowest ground round it, so none
   stands on air on a slope. Charred darker in the ash, greyed in Khaven's gloom, as before. The woods still stop drawing far trees.
   Only the full-detail copy of each tree is used in the world (the static merge would draw all four copies at once).
+- **After the preview-1019 frames** (khaven-03: the Gallows Tree a spindly dry tree, its beam in the air beside it): the Gallows
+  Tree (CANON landmark on Chris's Khaven map: a big gnarled dead tree, a noose from a limb) is the stoutest dry tree (Dry8872), 9 m
+  tall and broadened by a third, turned so its heaviest low limb (read from the mesh: about 4 m up, 2.6 m out) points where the
+  platform stands; the crossbeam is lashed to the trunk and rests on that limb, the rope and a noose hang from its end over the
+  platform; its collider fits the thicker trunk. The big dead oaks (Khaven, Oakhaven, the Shore) now pick from the three stout
+  trees (Dry8872, Dry6524, Dry5818), broadened by a third; the grey husks and snags stay as they were (scenery, not landmarks).
+  To capture: khaven-03 again, and the Shore's and Oakhaven's dead oaks.
 - **Tests** (DryTreeTests, EditMode, files only): no nature-kit dead tree or painted dead tree is built; every pick is one of the seven;
   the pack's GUIDs and full metas, Built-in materials, no demo files, the texture cap; heights within the old range.
 - **To run and look at** (local session): DryTreeTests, then a build; capture Oakhaven's woods (a snag and a fallen trunk), the Ash Rim

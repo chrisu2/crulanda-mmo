@@ -103,6 +103,23 @@ namespace Crulanda.Tests
             StringAssert.Contains("assetPath.Contains(\"/DryTrees/\")", File.ReadAllText(Path.Combine(Root, "Editor", "ThirdPartyImport.cs")), "ThirdPartyImport caps the pack's textures");
         }
 
+        /// <summary>The preview-1019 frame (khaven-03): the Gallows Tree stood as a spindly dry tree with its beam in the air beside it. The
+        /// landmark is the stoutest tree, tall and broadened, its crossbeam on a limb read from the mesh; the dead oaks are stout trees.</summary>
+        [Test] public void The_Gallows_Tree_and_the_dead_oaks_are_stout()
+        {
+            Assert.AreEqual(7, ZoneBuilder.DryTrunk.Length);
+            int stoutest = System.Array.IndexOf(ZoneBuilder.DryTrunk, ZoneBuilder.DryTrunk.Max());
+            Assert.AreEqual(stoutest, ZoneBuilder.GallowsDryTree, "the gallows is the stoutest tree");
+            Assert.AreEqual(3, ZoneBuilder.StoutDryTrees.Distinct().Count()); CollectionAssert.Contains(ZoneBuilder.StoutDryTrees, stoutest);
+            foreach (int k in ZoneBuilder.StoutDryTrees) Assert.That(k, Is.InRange(0, 6));
+            string src = File.ReadAllText(Path.Combine(Root, "Scripts", "World", "ZoneBuilder.cs"));
+            int at = src.IndexOf("void Gallows(Transform t)", System.StringComparison.Ordinal); Assert.Greater(at, 0);
+            string body = src.Substring(at, src.IndexOf("\n        }", at, System.StringComparison.Ordinal) - at);
+            StringAssert.Contains("GallowsDryTree, 9, 1.35f", body, "the stoutest tree, 9 m, broadened");
+            StringAssert.Contains("GallowsLimb(", body, "the crossbeam rests on a limb measured from the mesh");
+            StringAssert.Contains("StoutDryTrees[", src, "the massive dead oaks pick from the stout trees");
+        }
+
         [Test] public void Heights_are_within_the_old_range()
         {
             var height = Method("DryTreeHeight"); Assert.NotNull(height, "ZoneBuilder.DryTreeHeight");

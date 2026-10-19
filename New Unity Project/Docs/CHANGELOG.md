@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-10-19: every dead tree is one of the Dry Trees (branch dry-trees; WRITTEN, NOT RUN)
+- Chris, play note 248: "replace all dead trees with this pack in myassets - dry trees". Compiles; nothing run in Unity, no captures yet.
+- **The pack** (DigitalAntichrist's Dry Trees, Asset Store EULA) in Resources/Props/DryTrees: the seven trees (Dry3333 to Dry8872, named
+  for their triangles: 3,300 to 8,900, about the nature kit's dead tree's 6,000), the bark and its normal map, with the pack's own GUIDs.
+  Its material was HDRP (pink here): Bark.mat is now Built-in Standard (bark and normal, matte), same GUID. Left out: the HDRP demo scene
+  and its profiles, the prefabs, the mask map (its AO channel is near black under Standard). Textures capped at 1024 (ThirdPartyImport).
+  *.tif added to Git LFS.
+- **Where** (one builder, `DeadTree`, so all of them): the woods' snags, the dead groves (Khaven's Stillwood, the Ash Rim, Hallow's
+  Creek, the Shore's and Oakhaven's few), the dead oaks (Khaven, Oakhaven, the Shore; they were painted), the grey
+  husks by the Wasting, the Gallows Tree (Khaven, the Peaks), and the woods' fallen trunks (a dry tree laid down). Past the zone's edge the
+  near wood and the first three silhouette rows (to 22 m out) have dry trees (their lowest-detail copy); the rows beyond, in the fog, keep
+  the old spire shapes (a dry tree in every row was about a million triangles round Khaven). Ask Chris if he wants those too.
+- **Kept**: every position, count and collider (the old ones), the heights (the old range, 0.9 to 1.1 of the old size), the zone's draws
+  (nothing else in any zone moves). Which of the seven and its turn come from the tree's own spot, so a zone grows the same trees every
+  time. Each trunk is set on its own foot (the models are not centred on the trunk) and sunk under the lowest ground round it, so none
+  stands on air on a slope. Charred darker in the ash, greyed in Khaven's gloom, as before. The woods still stop drawing far trees.
+  Only the full-detail copy of each tree is used in the world (the static merge would draw all four copies at once).
+- **Tests** (DryTreeTests, EditMode, files only): no nature-kit dead tree or painted dead tree is built; every pick is one of the seven;
+  the pack's GUIDs and full metas, Built-in materials, no demo files, the texture cap; heights within the old range.
+- **To run and look at** (local session): DryTreeTests, then a build; capture Oakhaven's woods (a snag and a fallen trunk), the Ash Rim
+  (the dead groves and the edge past the Wasting), Hallow's Creek (the dead groves and the willow's square), the Shore (the dead oaks),
+  Khaven's Stillwood and the Gallows Tree: trunks on the ground on slopes, no pink, no doubled trees, the edge's dead trees standing.
+  Check the frame rate in Khaven and the Ash Rim (most dead trees).
+
 ## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
 - The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'
   foods in dungeons, inns and markets; every inn sitter on a real seat; window frames and a hearth at the Golden Cask and the Cracked

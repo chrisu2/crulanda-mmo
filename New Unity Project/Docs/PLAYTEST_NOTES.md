@@ -870,3 +870,5 @@ un-captures.
 - 251 (2026-10-19 ~12:30) "more music tracks for in game. myassets Free 25 Fantasy RPG Tracks Vol. 3" (OPEN): alkakrab's pack (Asset
   Store cache): Tracks (Ambient 1-10, Ambience 1-5, Dark 1-5, Action 1-5, Fx 1-3) and Loops (Ambient 1-10, Action 1-5), WAV (~800 MB:
   compress on import). Spread over the zones, dungeons and fights, each zone its own.
+- 252 (2026-10-19 ~12:35) "good for lumberjack in myassets - Wooden Canopy" (OPEN): icescreen's "Wooden Canopy" (Asset Store cache:
+  Canopy.fbx (a timber shelter), Stair.fbx, FireWood.fbx (a log stack); big TGA maps: cap at 1024). For the lumberjack's woodyard.

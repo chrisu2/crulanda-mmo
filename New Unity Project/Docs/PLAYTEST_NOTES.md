@@ -877,3 +877,5 @@ un-captures.
 - 254 (2026-10-19 ~12:45) "some better sky boxes in my assets Stylized Skyboxes | FREE" (OPEN): Staggart Creations' pack (Asset Store
   cache, a UPM package: HDRI Noon, Noon (Cloudy), Noon (Overcast), Sunrise, Sunset, Dusk, Night, NightGalaxy, Aurora + Sky_*.mat; a URP
   demo). Skies through the day and night, each zone's weather its own.
+- 255 (2026-10-19 ~13:15, his screenshot: a brazier, its bowl lit, the flame cone standing beside the bowl on the floor) "fire goes
+  around the bazier" (OPEN): the brazier's flame is not in its bowl.

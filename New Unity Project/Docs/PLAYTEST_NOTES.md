@@ -899,3 +899,6 @@ un-captures.
 - 261 (2026-10-19 ~15:10, watching raid 2, pull 2; pull 1 had reached her 19%) "wipe but when down too fast when over 75% health" (OPEN).
 - 262 (2026-10-19 ~15:15, watching raid 2) "archivist now doing 80dps" and "shaman healing much lower than others" (Druid 44/s, Cleric 43,
   Shaman 24) (OPEN).
+- 263 (2026-10-19 ~15:15, watching raid 3; meter: Ranger 86/s, Archivist 85, Scoundrel 61, Rogue 59, Mage 52, Warrior 43, Paladin 32;
+  heals Shaman 49, Cleric 48, Druid 46) "seems too easy now. dont make the purple spikes permanently coming out of ground. randomly
+  every 5-7secs" (OPEN).

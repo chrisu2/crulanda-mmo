@@ -925,3 +925,4 @@ un-captures.
   his kit or armor?" (OPEN): the run bot's Paladin tank enters with 1,111 health against the Warrior tank's 1,303.
 - 272 (2026-10-19 ~16:08) "one class. the shaman needs 1 in raid resurection" (OPEN): the Shaman gets one combat resurrection per boss
   fight.
+  Then (verbatim): "give the pally some hear. he's down again" and "gear" (the Paladin tank to wear full level-20 tank gear).

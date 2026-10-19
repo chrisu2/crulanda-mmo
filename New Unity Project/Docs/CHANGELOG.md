@@ -17,7 +17,10 @@
   only lumberjack in the game; `oakhaven.json` gives it variant 1) gets the Wooden Canopy behind the chopping block, on the side away
   from the North furrows, with four split-firewood stacks under it; the woodcutter keeps splitting at the block a step in front of it.
   3 m tall (eaves about 1.3 m), the pack's own Standard materials, maps capped at 1024; the shed's ground is solid. The ladder is
-  unused. Over 6 m from the field, 27 m from the nearest road.
+  unused. Over 6 m from the field, 27 m from the nearest road. Fix after the first lane B frame (oakhaven-15-woodyard: the shed lay
+  on its side, one roof slope on the grass, the firewood on its ends): the pack's meshes are Z up (a 3ds Max GeometricRotation Unity
+  does not bake), so the canopy, firewood and ladder now get the -90 turn (`ZoneBuilder.PropTurns`); the test now measures the post
+  feet on the ground in two rows with open ground between, the ridge narrow on top, and the stacks lying flat.
 - Tests (to run): `ZoneMusicTests` (every track is there; each zone's Vol. 3 pieces its own; all 25 used; the boss track nowhere
   else; Hallow's Creek silent day and night; the Adit's own set), `WorkshopDataTests` (the canopy on Oakhaven's Woodyard only, off
   fields, roads, water and other props, the stacks under its roof, the block outside it; the models load upright on Standard

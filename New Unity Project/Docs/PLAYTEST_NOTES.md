@@ -858,3 +858,5 @@ un-captures.
   MyDreamGameStudio's pack (Asset Store cache, 839 MB): 10 houses, a tavern, a blacksmith, an animal shed, 21 props, "aged" 2048 textures,
   URP materials (the project is Built-in: rebuild them). The water wheel and windmill stay out (no machines). These go to the Lowtowns
   only (every zone unique).
+  Built on `lowtowns-village` (2026-10-19, WRITTEN, NOT RUN): the pack's own Built-in materials were in it (a nested package); 147
+  terraces rebuilt with its houses, the roof route's four kept; ZONE_LOWTOWNS.md "The houses". OPEN until Chris sees it in his build.

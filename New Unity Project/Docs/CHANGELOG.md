@@ -1,5 +1,20 @@
 # Changelog
 
+## 2026-10-19: the Lowtowns' houses from the Medieval Village Pack (branch lowtowns-village; WRITTEN, NOT RUN)
+- Chris (PLAYTEST_NOTES 246): "i like this better for lowtowns look and feel. Free Medieval Village Pack Vol.1 it is in myassets".
+  Compiles; nothing run in Unity, no captures yet. Details: ZONE_LOWTOWNS.md "The houses".
+- **The pack** in `Resources/Props/MedievalVillage1`: ten houses, the Blacksmith and 15 props, on the pack's own Built-in materials
+  (not pink), each file with the pack's own .meta; textures cut to 1024/512 (119 MB). The windmill and water wheel left out (no
+  machines), and the tavern, animal shed and demo. Used by the Lowtowns only.
+- **The Lowtowns rebuilt with it:** 147 of the zone's terraces are now rows of the pack's houses, doors on the street, scaled to the
+  street, mixed and mirrored; the four-storey ones stand on two storeys of soot brick, others on one storey or as the pack's tall houses,
+  a timber gallery along the brick for the upper doors. The smith's shop by the Rust Market hearth is the pack's Blacksmith with its
+  anvil, table and weapon stand. Soot on every house, a few windows lit orange or violet, neon moss on the roofs, chimney smoke,
+  lanterns. Kept as they were: the Rusty Spoon, the roof route's four terraces over Pell Row (the lead walks stand on them), the edge's
+  blind backs, the other buildings, the ground, roads, stairs, river, docks and camps. Same colliders, so the navmesh is unchanged.
+- **Tests (new):** LowtownsVillageTests (EditMode), LowtownsVillagePlayTests (PlayMode). **To capture:** the Rust Market, the High
+  Rows, the docks and the Night Market, by day and at night.
+
 ## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
 - The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'
   foods in dungeons, inns and markets; every inn sitter on a real seat; window frames and a hearth at the Golden Cask and the Cracked

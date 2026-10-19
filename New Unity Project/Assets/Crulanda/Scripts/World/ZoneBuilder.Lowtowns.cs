@@ -78,7 +78,7 @@ namespace Crulanda.World
             var r = LowRng(p);
             switch (p.kind)
             {
-                case "tenement": Tenement(t, LowtownSize(p), p.variant, p.style, r, !string.IsNullOrEmpty(p.name) && p.name != p.kind); break;
+                case "tenement": if (!VillageTerrace(t, p, r)) Tenement(t, LowtownSize(p), p.variant, p.style, r, !string.IsNullOrEmpty(p.name) && p.name != p.kind); break;   // the pack's houses where they fit (ZoneBuilder.LowtownVillage)
                 case "warehouse": Warehouse(t, LowtownSize(p), p.variant); break;
                 case "lane_wall": LaneWall(t, p.size.x > 0 ? p.size.x : 10, p.size.y > 0 ? p.size.y : 2.6f, p.variant, r); break;
                 case "brick_bridge": BrickBridge(t, p.size.x > 0 ? p.size.x : 22, p.size.y > 0 ? p.size.y : 6); break;
@@ -862,6 +862,7 @@ namespace Crulanda.World
             var parts = new Batch(); float edge = Half - 12;
             var clear = new List<(Vector2 at, float r)>();
             foreach (var d in Doors) clear.Add((new Vector2(d.position.x, d.position.z), 2.4f));
+            foreach (var v in villageDoorClear) clear.Add((v, 1.1f));   // the fronts of the pack's houses: their doors (ZoneBuilder.LowtownVillage)
             foreach (var n in Zone.nodes) if (n != null) clear.Add((n.at, 3));
             foreach (var s in Zone.secrets) if (s != null) clear.Add((s.at, s.radius + 2.5f));
             if (Zone.stations != null) foreach (var s in Zone.stations) if (s != null) clear.Add((s.at, 3));
@@ -1072,7 +1073,10 @@ namespace Crulanda.World
                     if (near) continue;
                     var t = new GameObject("Washing line").transform; t.SetParent(root, false);
                     t.position = new Vector3(mid.x, HeightAt(mid.x, mid.y), mid.y); t.rotation = Quaternion.LookRotation(Vector3.Cross(Vector3.up, outV));
-                    WashingLine(t, span, 5.4f + R() * 2.2f, r); strung.Add(mid); lines++;
+                    // Under the eaves at both ends (the pack's houses are lower than the old terraces; ZoneBuilder.LowtownVillage).
+                    float high = Mathf.Min(5.4f + R() * 2.2f, Mathf.Min(VillageLineCap(from), VillageLineCap(from + o2 * span)));
+                    if (high < 3.4f) { DestroyImmediate(t.gameObject); continue; }
+                    WashingLine(t, span, high, r); strung.Add(mid); lines++;
                 }
             }
             // Lamp posts where a lane runs dark: on its verge, none within 22 m of another.

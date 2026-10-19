@@ -921,3 +921,5 @@ un-captures.
 - 269 (2026-10-19 ~15:52) "i want it extremely hard but not impossible" (the Unraveller's target: a disciplined raid wins about 1 in 4,
   near the end of the clock; any sloppiness wipes; replaces "1 in 2").
 - 270 (2026-10-19 ~16:00, watching the tuning batch) "the spikes are launching in the air. not on the ground" (OPEN).
+- 271 (2026-10-19 ~16:05, watching the tuning batch) "paladin always seems to be the first one to die every round. something wrong with
+  his kit or armor?" (OPEN): the run bot's Paladin tank enters with 1,111 health against the Warrior tank's 1,303.

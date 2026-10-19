@@ -61,6 +61,10 @@
   middle; seats carry their top and a higher seat (bar stools .67-.79 m) lifts the sitter and lets the feet hang; one sitter to a seat
   (a full room sends nobody to sit beside a stool). Every inn seat (tables, bar, bench, booths, kegs, stumps) has a seat mark the test
   holds sitters to.
+- After the lane A run (Oakhaven and the Lowtowns failed: sitters 0.3-0.66 m off five table seats): those seats stand off the navmesh's
+  edge (by a wall, the Spoon's partitions), so their place was snapped up to 1.2 m off the stool and the agent can stand no nearer.
+  Seated, the body is now set on the seat's own registered middle (the agent left where it is, not driving the body until the next
+  walk). InnSeatPlayTests makes its own sitters where a zone has too few (it was Inconclusive in the Ash Rim and the Verdant Shore).
 - The Golden Cask and the Cracked Hearth inside: each ground-floor window framed on the inner wall with glazing bars and a sill (pale oak
   and a deep sill in the Cask; soot-dark timber under a stone lintel in the Hearth); the hearths a dark firebox with a grate and two
   logs; the Cask's oak mantel with candles and a mug, the Hearth's lintel split and dropped with soot up the stone.

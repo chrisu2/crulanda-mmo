@@ -79,6 +79,9 @@ namespace Crulanda.Tests
             for (int k = sitters.Count; k < 4; k++) { var v = Villager.Spawn(life, "Seat tester " + k, "drinker", 900 + k, null, places[0]); made.Add(v); if (v.GetComponent<ActorVisual>().Model != null) sitters.Add(v); }
             if (sitters.Count == 0) { foreach (var v in made) UnityEngine.Object.Destroy(v.gameObject); Assert.Inconclusive(zoneId + ": no modelled figure to sit (models off)"); yield break; }
             foreach (var v in sitters) v.GetComponent<ActorVisual>().Model.Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            // Everyone else out of the way (the inn's own drinkers sit there by 11:00): only the sitters under test at the seats.
+            var others = life.Villagers.Where(v => v != null && v.Visible && !sitters.Contains(v)).ToList(); var othersAt = others.ConvertAll(v => v.transform.position);
+            foreach (var v in others) v.Park();
             var heights = new List<(string what, float h)>();
             Assert.AreEqual(seats.Count, places.Count, zoneId + ": every registered seat is a place to sit (on the navmesh).");
             for (int from = 0; from < places.Count; from += sitters.Count)
@@ -93,7 +96,7 @@ namespace Crulanda.Tests
                     var hips = look.HipsPoint.Value;
                     var mark = marks.Count > 0 ? marks.OrderBy(m => Flat(m, hips)).First() : hips;
                     float off = Flat(mark, hips);
-                    if (off > .25f) problems.Add(what + ": the hips are " + off.ToString("0.00") + " m from the nearest seat (sat " + Flat(v.transform.position, reg.seat.at).ToString("0.00") + " m from the place)");
+                    if (off > .25f) problems.Add(what + ": the hips are " + off.ToString("0.00") + " m from the nearest seat (the body " + Flat(v.transform.position, reg.seat.at).ToString("0.00") + " m from the seat's middle; seated by: " + (v.SeatedBy ?? "nothing") + ")");
                     else heights.Add((what, hips.y - mark.y));
                     var face = reg.seat.face - reg.seat.at; face.y = 0; var fwd = v.transform.forward; fwd.y = 0;
                     if (face.sqrMagnitude > .01f && Vector3.Angle(face, fwd) > 25) problems.Add(what + ": faces " + Vector3.Angle(face, fwd).ToString("0") + " degrees off its " + (reg.kind == "table" ? "table" : reg.kind == "bar" ? "bar" : "fire"));
@@ -108,6 +111,7 @@ namespace Crulanda.Tests
             }
             for (int k = 0; k < sitters.Count; k++) if (!made.Contains(sitters[k])) sitters[k].Release(sitters[k].transform.position);
             foreach (var v in made) UnityEngine.Object.Destroy(v.gameObject);
+            for (int k = 0; k < others.Count; k++) others[k].Release(othersAt[k]);
             Assert.IsEmpty(problems, zoneId + ":\n" + string.Join("\n", problems));
         }
     }

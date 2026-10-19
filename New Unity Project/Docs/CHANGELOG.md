@@ -1,5 +1,11 @@
 # Changelog
 
+## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
+- The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'
+  foods in dungeons, inns and markets; every inn sitter on a real seat; window frames and a hearth at the Golden Cask and the Cracked
+  Hearth; villagers out of the river shallows; glowing mould off the water. Save backup 20261019-1152-before-props-monsters-publish.
+  Helms unchanged (Chris: the drawn ones look poor; waiting on modelled helms).
+
 ## 2026-10-18: the Fantasy kit's unused props in the dungeons and halls, the food models (branch megakit-dress; WRITTEN, NOT RUN)
 - Chris (PLAYTEST_NOTES 234-235): "Fantasy Props MegaKit for dungeons and other places"; "FBX-20261018T221927Z-1-001 for foods and buff
   items"; "dont use the non crulanda food but some can be used". Compiles; nothing run in Unity, no captures yet.

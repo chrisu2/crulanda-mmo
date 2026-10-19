@@ -152,7 +152,12 @@ namespace Crulanda.Tests
                 var centre = near.Aggregate(Vector3.zero, (s, p) => s + p) / near.Count;
                 Assert.Less(Radius(centre), .03f, say + ": the handle is centred on the hand's axis (within 3 cm).");
                 if (kind == KayKitWeapons.Kind.Bow) { Assert.Greater(b.max.x, -b.min.x, say + ": the string is toward +X, the archer's body."); continue; }
-                Assert.Less(section.Max(Radius), .06f, say + ": nothing but the handle at the fist, thin enough to close round.");
+                if (KayKitWeapons.KnuckleBow.Contains(model))
+                {
+                    var outer = section.Where(p => Radius(p) >= .06f).ToList();   // the knuckle bow: one bar, on one side of the fist
+                    Assert.IsTrue(outer.All(p => p.z > 0) || outer.All(p => p.z < 0) || outer.All(p => p.x > 0) || outer.All(p => p.x < 0), say + ": past the grip only the knuckle bow, on one side of the fist");
+                }
+                else Assert.Less(section.Max(Radius), .06f, say + ": nothing but the handle at the fist, thin enough to close round.");
                 Assert.GreaterOrEqual(b.max.z, -b.min.z - .005f, say + ": the edge or head is toward +Z.");
             }
         }
@@ -164,11 +169,13 @@ namespace Crulanda.Tests
             var go = new GameObject("KayKit figure"); new GameObject("Body").transform.SetParent(go.transform, false); made.Add(go);
             var v = ActorVisual.Attach(go, ActorLook.Warrior);
             v.ApplyGearIds(new[] { Item("sword.arming:straight/tollroad", "mainhand"), Item("shield.heater:plain/tollroad", "offhand") }, db, looks);
-            foreach (var (slot, model) in new[] { (EquipSlot.MainHand, "sword_B"), (EquipSlot.OffHand, "shield_B") })
+            // Rare (for the accent): the arming sword is the PBR steel at rare (play note 249), the heater keeps KayKit's heater.
+            Assert.AreEqual("pbr/Sword", KayKitWeapons.ModelFor("sword.arming", "straight", 3)); Assert.AreEqual("shield_B", KayKitWeapons.ModelFor("shield.heater", "plain", 3));
+            foreach (var (slot, model) in new[] { (EquipSlot.MainHand, "pbr/Sword"), (EquipSlot.OffHand, "shield_B") })
                 foreach (bool slung in new[] { false, true })
                 {
                     var root = v.GearRoot(slot, slung); Assert.NotNull(root, slot + (slung ? " put away" : " in hand"));
-                    Assert.NotNull(root.Find("KayKit " + model), slot + (slung ? " put away" : " in hand") + " is the KayKit " + model + ".");
+                    Assert.NotNull(root.Find(KayKitWeapons.NodeName(model)), slot + (slung ? " put away" : " in hand") + " is the model " + model + ".");
                     Assert.Greater(root.GetComponentsInChildren<Renderer>(true).Count(r => r.name == ActorVisual.AccentName), 0, "a rare piece keeps its glowing accent on the weapon root");
                 }
             v.ApplyGearIds(new[] { Item("knife:glass/pale+glow", "mainhand") }, db, looks);

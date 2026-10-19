@@ -53,8 +53,11 @@ namespace Crulanda.Encounter
         /// <summary>
         /// How to lay a KayKit model in a weapon, shield or bow frame: the rotation, the offset and the scale that put its grip (its
         /// pivot) at the frame's origin and its length at <paramref name="length"/> (see the class summary for the axes).
+        /// The scale is per axis of the model: a weapon's length is scaled to its family's, and its head across to at most
+        /// KayKitWeapons.HeadAcross of that length (the first captures, 2026-10-19: a war hammer's block and a hatchet's head scaled
+        /// with the haft came out as big as the man's torso); its thickness follows its head.
         /// </summary>
-        public static (Quaternion rot, Vector3 offset, float scale) KayKitFit(Bounds b, KayKitWeapons.Kind kind, float length, Vector3? grip = null)
+        public static (Quaternion rot, Vector3 offset, Vector3 scale) KayKitFit(Bounds b, KayKitWeapons.Kind kind, float length, Vector3? grip = null)
         {
             var size = b.size; var order = new List<int> { 0, 1, 2 }; order.Sort((x, y) => size[y].CompareTo(size[x]));
             int lng = order[0], mid = order[1], thin = order[2];
@@ -65,13 +68,15 @@ namespace Crulanda.Encounter
                 var face = Axis(thin); var top = Axis(lng, Mathf.Abs(b.max[lng]) <= Mathf.Abs(b.min[lng]) ? 1 : -1);
                 var rotS = Quaternion.LookRotation(Vector3.up, Vector3.right) * Quaternion.Inverse(Quaternion.LookRotation(face, top));   // face to +Y, top to +X
                 float sc = length / Mathf.Max(.01f, size[lng]);
-                return (rotS, Vector3.down * .02f, sc);   // the handle a little in toward the forearm
+                return (rotS, Vector3.down * .02f, Vector3.one * sc);   // the handle a little in toward the forearm
             }
             var up = Axis(lng, Further(b, lng)); var edge = Axis(mid, Further(b, mid));
             var rot = Quaternion.Inverse(Quaternion.LookRotation(edge, up));   // edge to +Z, length to +Y
             if (kind == KayKitWeapons.Kind.Bow) rot = Quaternion.Euler(0, 90, 0) * rot;   // the bow's depth (toward its tips and string) to +X
-            float scale = length / Mathf.Max(.01f, size[lng]);
-            return (rot, grip.HasValue ? -(rot * grip.Value) * scale : Vector3.zero, scale);   // a PBR weapon's measured grip to the origin
+            float along = length / Mathf.Max(.01f, size[lng]), across = along;
+            if (kind == KayKitWeapons.Kind.Weapon) across = Mathf.Min(along, KayKitWeapons.HeadAcross * length / Mathf.Max(.01f, size[mid]));
+            var scale = Vector3.one * across; scale[lng] = along;
+            return (rot, grip.HasValue ? -(rot * Vector3.Scale(grip.Value, scale)) : Vector3.zero, scale);   // a measured grip (PBR, Sky Den) to the origin
         }
 
         /// <summary>
@@ -110,7 +115,7 @@ namespace Crulanda.Encounter
         {
             var src = LoadWeaponModel(model);
             if (src == null || !KayKitBounds(src, out var b)) return null;
-            var go = Instantiate(src, frame, false); go.name = "KayKit " + model.Replace(KayKitWeapons.PbrPrefix, "PBR ").Replace(KayKitWeapons.AxesPrefix, "").Trim();
+            var go = Instantiate(src, frame, false); go.name = KayKitWeapons.NodeName(model);
             foreach (var c in go.GetComponentsInChildren<Component>(true))
                 if (!(c is Transform) && !(c is MeshFilter) && !(c is MeshRenderer)) { if (Application.isPlaying) Destroy(c); else DestroyImmediate(c); }
             var mat = KayKitWeapons.IsPbr(model) ? Resources.Load<Material>(KayKitWeapons.MaterialOf(model))   // a PBR piece keeps its own steel
@@ -122,7 +127,7 @@ namespace Crulanda.Encounter
             }
             Vector3? grip = null; var along = KayKitWeapons.GripAlong(model); if (kind == KayKitWeapons.Kind.Weapon && along.HasValue) grip = ModelGrip(src, b, along.Value);
             var fit = KayKitFit(b, kind, length, grip);
-            go.transform.localRotation = fit.rot; go.transform.localScale = Vector3.one * fit.scale; go.transform.localPosition = fit.offset;
+            go.transform.localRotation = fit.rot; go.transform.localScale = fit.scale; go.transform.localPosition = fit.offset;
             return go.transform;
         }
 
@@ -187,13 +192,13 @@ namespace Crulanda.Encounter
                     px[y * N + x] = c;
                 }
             var tex = new Texture2D(N, N, TextureFormat.RGBA32, true) { name = "KayKitWeapons tinted", wrapMode = TextureWrapMode.Clamp, filterMode = FilterMode.Bilinear };
-            tex.SetPixels32(px); tex.Apply(true, true);
+            tex.SetPixels32(px); tex.Apply(true, false);   // kept readable (small; the tests read it back)
             return tex;
         }
         static Color Lean(Color c, Color to, float k)
         {
             float lum = c.grayscale, tl = Mathf.Max(.12f, to.grayscale);
-            var t = to * Mathf.Lerp(lum / tl, 1, .3f); t.a = c.a;
+            var t = to * Mathf.Lerp(lum / tl, 1, .6f); t.a = c.a;   // more of the palette's own brightness (the first captures: dark and bronze palettes still read as white steel)
             var o = Color.Lerp(c, t, k); o.r = Mathf.Clamp01(o.r); o.g = Mathf.Clamp01(o.g); o.b = Mathf.Clamp01(o.b); return o;
         }
     }

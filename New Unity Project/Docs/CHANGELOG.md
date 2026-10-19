@@ -1,5 +1,19 @@
 # Changelog
 
+## 2026-10-19: the first weapon captures read, four test fails fixed (branch kaykit-weapons; WRITTEN, NOT RUN)
+- From the 58 frames (ui-captures/wardrobe-kaykit-1): grips sit in the fist, blades run along the forearm's line forward and a
+  little down as the drawn ones did, shields face out with the top up the arm, stowed swords hang hilt over the right shoulder and
+  knives at the hip. Lengths match the drawings (measured off the side frames: short sword about 0.9 m, arming sword 1.1 m); in the
+  front frames the blades point at the camera, so they look short. The old 01 weapon-rack frames show every weapon put away (the
+  mannequins are never "fighting"), so they are no reference for a held sword; the 19 frames force it (HoldOverride).
+- Wrong and fixed: the war hammer's block and the chunky hatchets' heads (Axe07, Axe10, Axe01) scaled with the haft came out
+  torso-sized: a weapon's head across is now capped at 45% of its length (the head narrowed, the haft kept). The disc-guarded
+  arming sword was a rapier with a white cup (sword_D): it is sword_B now; sword_D stays for the officer's sabre, whose knuckle
+  bow it matches. The tint was too weak (dark and bronze palettes read as white steel): more of the palette's own brightness.
+  The Sky Den axes' blades flared white in the sun: their gloss 0.6.
+- Tests: the knuckle-bow hilt may ring the fist on one side; the figure test expects the PBR sword at rare; the tinted atlas stays
+  readable; the off-hand knives are in the line-up (02 and 19-off). Compiles; not run.
+
 ## 2026-10-19: PBR steel and twenty axes on top of the KayKit weapons (branch kaykit-weapons; WRITTEN, NOT RUN)
 - Chris (play note 249): "here are some more weapon types in my assets - pbr medievel weapons"; (play note 250): "here are some axes
   in myassets - mid poly axes collection". Both packs are in Resources/Props (PBRWeapons, MidPolyAxes) with their own .metas and

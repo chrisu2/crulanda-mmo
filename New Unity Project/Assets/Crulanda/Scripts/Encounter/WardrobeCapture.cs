@@ -80,7 +80,8 @@ namespace Crulanda.Encounter
             "shield.round:boards/oakhaven", "shield.round:hide/sandthrone", "shield.round:cask/ashwalker", "shield.round:lid/sandthrone",
             "shield.heater:plain/tollroad", "shield.heater:striped/concord", "shield.heater:glass/pale+glow",
             "shield.kite:plain/veridian", "shield.kite:slab/tollroad+glow", "shield.leaf:bronze/veridian", "shield.leaf:bark/veridian",
-            "offhand.hung:lantern/oakhaven", "offhand.hung:shuttered/sandthrone+glow", "offhand.hung:moss/veridian+glow", "offhand.hung:censer/cult+glow", "offhand.hung:scale/concord"
+            "offhand.hung:lantern/oakhaven", "offhand.hung:shuttered/sandthrone+glow", "offhand.hung:moss/veridian+glow", "offhand.hung:censer/cult+glow", "offhand.hung:scale/concord",
+            "knife.off:hooked/sandthrone", "knife.off:needle/tollroad", "knife.off:glass/pale+glow", "knife.off:sickle/ashwalker+glow"   // the Rogue's second knife (2026-10-11)
         };
         /// <summary>Every armour family and variant, by slot, in the palette its named pieces mostly wear.</summary>
         public static readonly string[] HeadLooks = {

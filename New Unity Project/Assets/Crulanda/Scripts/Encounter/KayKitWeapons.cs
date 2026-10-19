@@ -25,10 +25,10 @@ namespace Crulanda.Encounter
         /// <summary>family:variant to model ("" = the old drawing). Every drawn main-hand and off-hand variant is here (KayKitWeaponTests).</summary>
         public static readonly Dictionary<string, string> Map = new Dictionary<string, string>
         {
-            // Swords: sword_B the plain steel one-hander, sword_C the slim single-edged blade, sword_D the cup-hilted one, sword_E the
+            // Swords: sword_B the plain steel one-hander (the disc-guarded arming sword too: sword_D is a rapier), sword_C the slim single-edged blade, sword_D the cup-hilted one for the officer's sabre, sword_E the
             // two-hander, sword_A the wooden one.
             { "sword.short:plain", "sword_B" }, { "sword.short:notched", "sword_B" },
-            { "sword.arming:straight", "sword_B" }, { "sword.arming:curved", "sword_C" }, { "sword.arming:disc", "sword_D" },
+            { "sword.arming:straight", "sword_B" }, { "sword.arming:curved", "sword_C" }, { "sword.arming:disc", "sword_B" },
             { "sword.falchion:clipped", "sword_C" }, { "sword.falchion:heavy", "sword_C" },
             { "sword.sabre:officer", "sword_D" }, { "sword.sabre:broken", "" },           // the glowing seam where it was forged whole again
             { "sword.leaf:bronze", "sword_B" }, { "sword.leaf:root", "" },                 // the root-wood hilt
@@ -156,6 +156,12 @@ namespace Crulanda.Encounter
             if (quality >= PbrQuality && Pbr.TryGetValue(key, out var p)) return p;
             return m;
         }
+        /// <summary>The name of a placed model's object under the gear root ("KayKit sword_B", "KayKit PBR Sword", "KayKit Axe03").</summary>
+        public static string NodeName(string model) { return "KayKit " + model.Replace(PbrPrefix, "PBR ").Replace(AxesPrefix, "").Trim(); }
+        /// <summary>A weapon's head across (the model's second extent) at most this share of its length; past it the head is narrowed, not the haft shortened.</summary>
+        public const float HeadAcross = .45f;
+        /// <summary>Hilts with a knuckle bow or a cup round the hand: the guard rings the fist, so the fist's cross-section is wider than the grip.</summary>
+        public static readonly HashSet<string> KnuckleBow = new HashSet<string> { "sword_D" };
         public static bool IsShield(string family) { return family != null && family.StartsWith("shield."); }
         public static Kind KindOf(string family) { return IsShield(family) ? Kind.Shield : Kind.Weapon; }
         public static float LengthOf(string family) { return family != null && Lengths.TryGetValue(family, out var l) ? l : .95f; }

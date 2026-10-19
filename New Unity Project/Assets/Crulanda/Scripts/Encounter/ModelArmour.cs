@@ -18,7 +18,7 @@ namespace Crulanda.Encounter
     /// by distance), so it moves exactly as the cloth under it; a skirt's hem, well clear of the legs, keeps some of the hips'.
     /// The head's pieces (helmets, hoods) stay rigid on the head's frame.
     /// </summary>
-    public static class ModelArmour
+    public static partial class ModelArmour
     {
         /// <summary>Which frame a piece hangs on, and so which cage warps it.</summary>
         public enum Frame { Body, ArmL, ArmR, LegL, LegR }

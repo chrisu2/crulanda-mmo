@@ -382,7 +382,7 @@ namespace Crulanda.Encounter
         // ------------------------------------------------------------------------------------------------- hats
         /// <summary>The model's head and hair in the head frame's space (bind pose): its outline per height round the head's axis,
         /// and its eye line.</summary>
-        sealed class HeadOutline { public float y0, z0, eyes, top; public int ny; public float[,] r; }
+        sealed class HeadOutline { public float y0, z0, eyes, top; public int ny; public float[,] r; public string key; }
         HeadOutline headOutline, hairOutline;
         const float HeadStep = .01f; const int HeadAngles = 36;
         /// <summary>How far above the eyes a hat's rim sits (old head units, about 5 cm on a model), and how far its crown stands

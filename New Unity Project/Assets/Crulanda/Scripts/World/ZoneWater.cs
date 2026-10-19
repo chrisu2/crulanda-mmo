@@ -58,6 +58,11 @@ namespace Crulanda.World
         }
         public readonly List<Creek> Creeks = new List<Creek>();
         public readonly List<Lake> Lakes = new List<Lake>();
+        /// <summary>Ground raised in or beside a creek (ZoneShoal: the Lowtowns' silt bar and apron), with the creek it lies in and its level top.</summary>
+        public sealed class Shoal { public ZoneShoal def; public Creek creek; public float top; }
+        public readonly List<Shoal> Shoals = new List<Shoal>();
+        /// <summary>How far past a shoal's ends its creek's widening eases back to the creek's own width.</summary>
+        public const float ShoalWidenEase = 10;
 
         /// <summary>Prepares levels from the uncarved height function. Call before any carved height is asked for.</summary>
         public void Prepare(ZoneDefinition zone, Func<float, float, float> uncarved)
@@ -95,6 +100,7 @@ namespace Crulanda.World
                 c.box = Rect.MinMaxRect(xmin - m, ymin - m, xmax + m, ymax + m);
                 Creeks.Add(c);
             }
+            PrepareShoals(zone);
             if (zone.lakes != null)
                 foreach (var l in zone.lakes)
                 {
@@ -129,8 +135,68 @@ namespace Crulanda.World
                 }
         }
 
+        /// <summary>
+        /// The zone's shoals (ZoneShoal), each given to the creek whose line passes nearest its centre (within that creek's carved width): its
+        /// top is the water's level there plus its rise, and where its widen is over 1 the creek's rows beside it are widened to it (eased
+        /// back over <see cref="ShoalWidenEase"/> past its ends), so the bed and the drawn water run round it on both sides.
+        /// </summary>
+        void PrepareShoals(ZoneDefinition zone)
+        {
+            if (zone.shoals == null) return;
+            foreach (var s in zone.shoals)
+            {
+                if (s == null || s.size.x <= 0 || s.size.y <= 0) continue;
+                Creek best = null; float bestD = float.MaxValue, level = 0;
+                foreach (var c in Creeks)
+                {
+                    Project(c, s.center, out float d, out float lv, out float w);
+                    if (d < c.width * Mathf.Max(w, s.widen) + s.size.x && d < bestD) { best = c; bestD = d; level = lv; }
+                }
+                if (best == null) continue;
+                Shoals.Add(new Shoal { def = s, creek = best, top = level + s.rise });
+                if (s.widen <= 1) continue;
+                for (int i = 0; i < best.pts.Length; i++)
+                {
+                    ShoalFrame(s, best.pts[i].x, best.pts[i].y, out float lx, out float lz);
+                    if (Mathf.Abs(lx) > s.size.x / 2 + best.width) continue;
+                    float past = Mathf.Abs(lz) - s.size.y / 2, f = past <= 0 ? 1 : 1 - Mathf.SmoothStep(0, 1, past / ShoalWidenEase);
+                    if (f > 0) best.wide[i] = Mathf.Max(best.wide[i], Mathf.Lerp(best.wide[i], s.widen, f));
+                }
+            }
+        }
+        /// <summary>A point in a shoal's own frame (x across, z along, from its centre), as a terrace's (ZoneBuilder.TerraceFrame).</summary>
+        public static void ShoalFrame(ZoneShoal s, float x, float z, out float lx, out float lz)
+        {
+            float r = s.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), sn = Mathf.Sin(r), dx = x - s.center.x, dz = z - s.center.y;
+            lx = dx * c - dz * sn; lz = dx * sn + dz * c;
+        }
+        /// <summary>How far a point lies outside a shoal's rectangle (0 inside).</summary>
+        public static float ShoalOut(ZoneShoal s, float x, float z)
+        {
+            ShoalFrame(s, x, z, out float lx, out float lz);
+            float ox = Mathf.Abs(lx) - s.size.x / 2, oz = Mathf.Abs(lz) - s.size.y / 2;
+            return ox > 0 || oz > 0 ? new Vector2(Mathf.Max(0, ox), Mathf.Max(0, oz)).magnitude : 0;
+        }
+        /// <summary>The ground at a point under a shoal whose top is <paramref name="top"/>: level inside it, easing back to the carved ground
+        /// <paramref name="h"/> over its blend.</summary>
+        public static float ShoalGround(ZoneShoal s, float top, float x, float z, float h)
+        {
+            float blend = Mathf.Max(.25f, s.blend), reach = (s.size.x + s.size.y) / 2 + blend;
+            if (Mathf.Abs(x - s.center.x) > reach || Mathf.Abs(z - s.center.y) > reach) return h;
+            float d = ShoalOut(s, x, z); if (d >= blend) return h;
+            return Mathf.Lerp(h, top, 1 - Mathf.SmoothStep(0, 1, d / blend));
+        }
+        /// <summary>The shoal under a point (inside its rectangle), or null.</summary>
+        public Shoal ShoalAt(Vector2 p) { foreach (var s in Shoals) if (ShoalOut(s.def, p.x, p.y) <= 0) return s; return null; }
+
         /// <summary>Carved height at a point, from its natural height h.</summary>
         public float Carve(float x, float z, float h)
+        {
+            h = CarveCreeks(x, z, h);
+            foreach (var s in Shoals) h = ShoalGround(s.def, s.top, x, z, h);   // a silt bar, an apron (ZoneShoal), over the creek's bed
+            return CarveLakes(x, z, h);
+        }
+        float CarveCreeks(float x, float z, float h)
         {
             var p = new Vector2(x, z);
             foreach (var c in Creeks)
@@ -151,6 +217,11 @@ namespace Crulanda.World
                 foreach (var k in Lakes) { var off = p - k.def.center; if (off.magnitude <= k.DrawRadiusAt(off) + .5f) hh = Mathf.Max(hh, k.level - .02f); }
                 h = Mathf.Min(h, hh);
             }
+            return h;
+        }
+        float CarveLakes(float x, float z, float h)
+        {
+            var p = new Vector2(x, z);
             foreach (var k in Lakes)
             {
                 var off = p - k.def.center; float d = off.magnitude;

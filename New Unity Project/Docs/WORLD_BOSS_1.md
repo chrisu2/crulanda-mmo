@@ -419,6 +419,38 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
    no group scaling; the play-time timer in the world slot (format 3, save backed up first); the warning (the still water, the courts' lamps,
    Tibb's and Ketta's lines and their barrel and rack, the sims' chat), the System lines, her sinking. Tests: EditMode timer and world-save
    round-trip; PlayMode her rising at the bar. *Chris looks: her and the reach, by day and night.*
+   **WRITTEN, NOT RUN (2026-10-19, branch `wb-reach`; compiles, no Unity run yet).** What is in it:
+   - **The reach (measured):** the river's north reach is flat street level (0) on both banks from the Rag Bridge to the zone's edge, the
+     river's line about x -7.4 from y 180 to 205, 16 m half-width, 2.4 m deep. The silt bar (`lowtowns.json` "shoals", `ZoneShoal`;
+     GAME-ONLY) is 16 m by 30 m centred at (-7.4, 192), its top 0.3 m over the water; the river is widened to 1.3 there (eased over 10 m
+     past the bar's ends) so a wadeable channel about 5-7 m wide runs on each side. A neck of mud (8 by 6 m at y 183) joins it to the
+     apron, 9 by 30 m of wet setts on the west bank (x -31.5 to -22.5) at street level. The sootwort node at (-30, 200) moved to (-36, 202)
+     to keep it off the apron. Dressed in `ZoneBuilder.DrainReach.cs` (black mud and brick rubble, setts).
+   - **The rank:** `ActorClassification.Boss` now used (`Actor.SetClassification`); `EncounterEnemy.Raid.cs`: a skull before her name on the
+     plate and on her portrait, "Raid (10)" in her frame's status line; the +5 clamp as an elite's (x1.6, x0.7); `CapBlow`'s cap-passing
+     flag (only a raid boss's blows may carry it; none does yet: steps 4-5); no group scaling. A locked character still sees her rise
+     (no loot); her lockout is a world boss's week.
+   - **Her (placeholder):** the Weave-Eater's look at 2.6 times, level 30, pool 112,000 (160,000 after the clamp), swing base 190, the
+     Weave-Eaters' book rules (blink, lighthouse, wards eaten, harpoons, salt, blackened steel); no phases. She rises out of the river at
+     the bar over 4 s ("...hungry..." in the chat) and sinks over 5 s.
+   - **The timer:** `WorldBossClock` (3 h of play, any zone, not paused; a moment of the next 30 min; the warning 5 min before; 45 min up;
+     two wipes and she sinks, "...fed..."; a kill or sinking starts the next 3 h), saved in the world slot, **format 3**
+     (`AddWorldBossMigration`; SAVE_FORMAT.md). **Back up Chris's save before any build with it.**
+   - **The warning (Lowtowns only):** the System line; the reach's water stilled grey; every lamp in the Drain Courts and within 70 m of the
+     bar out; Tibb Marrow and Ketta Rune call in Zone chat and stand by their salt barrel and harpoon rack at the apron's ends (talk to them:
+     their own shops); villagers within 60 m go indoors; up to three sims call the raid in Zone chat. On rising, a kill or her sinking: the
+     System lines in every zone.
+   - **Not in it yet:** the eels' camp emptied while she is up (it is 55 m south of the bar, by the weir); the map's skull; the
+     Chronicle's line; the sims' guilds trying her while you are away; her brood, phases and loot (steps 4-7).
+   - **Tests:** EditMode `WorldBossTests` (the clock: 3 h, the 30-minute window, the 5-minute warning, 45 minutes, kill, two wipes,
+     paused; the world slot's round trip at format 3; migration from formats 2 and 1; the rank's numbers and the cap flag) and
+     `DrainReachTests` (the bar level, dry and in the river with wadeable chemical water both sides, the neck and apron dry and level,
+     nothing over them, the river elsewhere unchanged); PlayMode `UnravellerRiseTests` (the bar walkable from the apron, the warning's
+     lines, still water, lamps, Tibb and Ketta at the stock, her rising at the bar with the rank, then her sinking after 45 minutes and
+     the reach put back). `LowtownsLevelsTests` must still pass (the node moved; no terrace touched). `ExchangeTests` updated for format 3.
+   - **To capture (Chris looks):** her risen on the bar from the apron and from the Rag Bridge, by day (11:00) and by night (21:00); the
+     reach stilled during the warning by night (the Drain Courts' lamps out); Tibb's barrel and Ketta's rack with the two of them by
+     them; her plate and target frame (skull, "Raid (10)"). Front, back and side of her at the bar.
 4. **Phase 1 and the all-fight rules** (M): the stronger lighthouse, the 9 s blink and its erasing touch, the shortening pins and the hauling,
    three-stack blackened steel, Unravel and the swap, the Feeding with its two answers; for the sims: leaving ground marks (new, shared with the
    dungeons), throwing salt and harpoons, the harpoon and interrupt rotations, the swap. Tests: EditMode each rule; PlayMode a phase-1 fight.

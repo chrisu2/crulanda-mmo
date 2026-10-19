@@ -56,11 +56,12 @@ namespace Crulanda.Encounter
     }
 
     /// <summary>The world's own save (slot "world", beside the characters' slots): the sims, and since format 2 (2026-10-15) the
-    /// Exchange's lots and what waits at its clerk (<see cref="exchange"/>; <see cref="AddExchangeMigration"/>).</summary>
+    /// Exchange's lots and what waits at its clerk (<see cref="exchange"/>; <see cref="AddExchangeMigration"/>), and since format 3
+    /// (2026-10-19) the world boss's timer (<see cref="unraveller"/>; <see cref="AddWorldBossMigration"/>).</summary>
     [Serializable]
     public sealed class WorldSave
     {
-        public const int FormatVersion = 2;
+        public const int FormatVersion = 3;
         public const string PayloadType = "CrulandaWorld";
         public int seed;
         public List<SimAdventurer> sims = new List<SimAdventurer>();
@@ -70,6 +71,29 @@ namespace Crulanda.Encounter
         public int guildedUpTo;
         /// <summary>Format 2: the Exchange (the capital's market; Exchange.cs).</summary>
         public ExchangeState exchange = new ExchangeState();
+        /// <summary>Format 3: the Unraveller's timer (WorldBossClock; Docs/WORLD_BOSS_1.md 1.4, 5.1).</summary>
+        public WorldBossState unraveller = new WorldBossState();
+    }
+
+    /// <summary>
+    /// World format 2 → 3 (2026-10-19, the world boss): inserts <c>"unraveller":{}</c> before the payload's closing brace and leaves every other
+    /// character of the format-2 payload as it was (the sims, the party, the guilds, the Exchange come through unchanged). An empty timer reads
+    /// as waiting, nothing played, its moment rolled at the first tick: a world from before starts its first 3 hours on its first play. A
+    /// payload that already has it is left alone; one that is not a JSON object is refused.
+    /// </summary>
+    public sealed class AddWorldBossMigration : ISaveMigration
+    {
+        public int FromVersion { get { return 2; } }
+        public int ToVersion { get { return 3; } }
+        static readonly System.Text.RegularExpressions.Regex Has = new System.Text.RegularExpressions.Regex("\"unraveller\"\\s*:");
+        public string Migrate(string payloadJson)
+        {
+            string json = (payloadJson ?? "").Trim();
+            if (json.Length < 2 || json[0] != '{' || json[json.Length - 1] != '}') throw new SaveMigrationException("The world save's payload is not a JSON object.");
+            if (Has.IsMatch(json)) return payloadJson;
+            string body = json.Substring(0, json.Length - 1).TrimEnd();
+            return body + (body.EndsWith("{") ? "" : ",") + "\"unraveller\":{}}";
+        }
     }
 
     /// <summary>
@@ -151,11 +175,12 @@ namespace Crulanda.Encounter
             if (env.payloadType != WorldSave.PayloadType || env.formatVersion < 1 || env.formatVersion > WorldSave.FormatVersion) { message = "Unsupported world save."; return null; }
             try
             {
-                var steps = new SaveMigrator(); steps.Register(new AddExchangeMigration());   // 1 → 2: the Exchange
+                var steps = new SaveMigrator(); steps.Register(new AddExchangeMigration()); steps.Register(new AddWorldBossMigration());   // 1 → 2: the Exchange; 2 → 3: the world boss's timer
                 var w = JsonUtility.FromJson<WorldSave>(steps.MigrateToVersion(env, WorldSave.FormatVersion).payloadJson);
                 if (w == null || w.sims == null || w.sims.Count == 0) { message = "Empty world save."; return null; }
                 foreach (var s in w.sims) if (s == null || string.IsNullOrEmpty(s.id) || string.IsNullOrEmpty(s.name) || Array.IndexOf(ClassIds, s.classId) < 0 || s.level < 1 || s.level > EncounterProgress.LevelCap) { message = "Invalid sim in the world save."; return null; }
                 Exchange.Ensure(w);
+                if (w.unraveller == null) w.unraveller = new WorldBossState();
                 return w;
             }
             catch (Exception e) { message = e.Message; return null; }

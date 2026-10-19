@@ -23,8 +23,9 @@ namespace Crulanda.Encounter
         /// kill me"); an elite as before (EliteBalance's paper fights).</summary>
         /// <summary>The level of whom it fights (a sim on its own fights at its own level), else yours.</summary>
         int FoeLevel { get { return Victim != null ? Victim.Level : session.Player.Level; } }
-        float OverHitNow { get { return session.Player == null ? 1 : Move != null ? OvermatchHit(actor.Level, FoeLevel) : OvermatchHitNormal(actor.Level, FoeLevel); } }
-        float OverTakenNow { get { return session.Player == null ? 1 : Move != null ? OvermatchTaken(actor.Level, FoeLevel) : OvermatchTakenNormal(actor.Level, FoeLevel); } }
+        // A raid boss counts the gap as an elite does, five levels at most (WORLD_BOSS_1.md 3.1: at +10 she hits x1.6 and takes x0.7).
+        float OverHitNow { get { return session.Player == null ? 1 : Move != null || RaidBoss ? OvermatchHit(actor.Level, FoeLevel) : OvermatchHitNormal(actor.Level, FoeLevel); } }
+        float OverTakenNow { get { return session.Player == null ? 1 : Move != null || RaidBoss ? OvermatchTaken(actor.Level, FoeLevel) : OvermatchTakenNormal(actor.Level, FoeLevel); } }
         float blowAt = -1, blowStart, nextBlowAt;
         bool rallied, leaning; Quaternion bodyRest; Vector3 calmScale;
         BlowMark mark;

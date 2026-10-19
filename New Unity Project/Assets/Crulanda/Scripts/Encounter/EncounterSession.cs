@@ -1985,6 +1985,8 @@ namespace Crulanda.Encounter
             if (!Paused && SimPopulation.Active != null && EncounterInput.Press(KeyCode.O)) WhoOpen = !WhoOpen;
             if (!Paused && Zone != null && EncounterInput.Press(KeyCode.J)) QueueOpen = !QueueOpen;   // the dungeon queue (Gather a Party)
             if (Paused) return;
+            // the world boss's play-time clock, its warning, her rising and sinking (EncounterSession.Unraveller)
+            TickUnraveller();
             // the Rusty Spoon's smell, ballad and brawl (EncounterSession.Spoon)
             TickSpoon();
             if (EncounterInput.Press(KeyCode.B)) BuildOpen = !BuildOpen;
@@ -2339,6 +2341,7 @@ namespace Crulanda.Encounter
         {
             if (restoring) return;
             if (enemy.Game) { GameDied(enemy); return; }   // no experience, no coin, no "zone clear" (EncounterSession.Hunt)
+            if (enemy.RaidBoss) UnravellerKilled(enemy);   // the world boss down, whoever brought her down: the next 3 hours begin (EncounterSession.Unraveller)
             OpenGatesOf(enemy);   // (the Adit rework) a boss's door opens as he falls, whoever brought him down
             GreySeepOnDeath(enemy);   // (S7) the Foreman's death stops the Grey Spreads (EncounterSession.GreySpread.cs)
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).

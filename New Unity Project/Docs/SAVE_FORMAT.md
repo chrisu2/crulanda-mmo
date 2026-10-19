@@ -235,6 +235,17 @@ File: the same root, slot "profile" (profile.save.json, .bak kept), payloadType 
   new one and writes it (the format-2 world survives one save as world.save.json.bak). Do not run an older build after this one.
 - Back up the whole `CrulandaEncounter` folder (every character save, `profile.save.json`, `world.save.json` and their `.bak` files)
   to `work\save-backups\<date>-pre-p9-exchange` before the first run of this build. The character format (10) is unchanged.
+## The world slot, format 3 (2026-10-19, wb-reach; WORLD_BOSS_1.md build step 3): the world boss's timer
+`WorldSave.FormatVersion = 3`. One new field at the end, `unraveller` (`WorldBossState`, WorldBoss.cs): `state` ("waiting", "warned",
+"up"), `played` (play-seconds since her last kill or sinking, any zone, paused time not counted), `riseAt` (the play-second of this cycle
+she rises at: 3 hours and a moment of the next 30 minutes, -1 until rolled), `upFor` (seconds she has been up), `wipes` (this rising),
+`cycles` (risings ended: the stream each moment is drawn from), `kills`.
+- Migration 2 → 3 is `AddWorldBossMigration` (in `SimAdventurers.cs`), run by `SimRoster.Load` after 1 → 2: it inserts `"unraveller":{}`
+  before the closing brace and leaves every other character (the sims, the party, the guilds, the Exchange) as it was. An empty timer
+  reads as waiting with nothing played: an older world starts its first 3 hours on its first play.
+- An older build refuses a format-3 world (as with format 2). Do not run an older build after this one.
+- Back up the whole `CrulandaEncounter` folder to `work\save-backups\<date>-pre-world-format-3` before the first run of a build with it.
+  The character format (11) is unchanged.
 ## Format 11 (2026-10-15, Phase 8.6 step 5): found recipes
 One new list, for the found recipes (Docs/PHASE8_6_LIVING_WORLD.md 3c; one format bump, one migration):
 - `recipes`: `List<string>`, the found recipes learned from a leaf (an item of kind `recipe` whose `teaches` names the recipe;

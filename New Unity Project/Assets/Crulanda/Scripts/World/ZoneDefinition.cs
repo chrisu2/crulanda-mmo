@@ -120,6 +120,20 @@ namespace Crulanda.World
         /// <summary>Level ground in rectangles over the land (<see cref="ZoneTerrace"/>; ZoneBuilder.Crown): a plateau on its wall, a
         /// terrace above it, a ramp between them. Applied after the shapes, in order, a later one over an earlier.</summary>
         public ZoneTerrace[] terraces = new ZoneTerrace[0];
+        /// <summary>Ground raised in or beside a river (<see cref="ZoneShoal"/>: the Lowtowns' silt bar and brick apron in the Drain Reach;
+        /// ZoneWater, ZoneBuilder.DrainReach).</summary>
+        public ZoneShoal[] shoals = new ZoneShoal[0];
+    }
+    /// <summary>
+    /// Ground raised in or beside a river (GAME-ONLY; the Lowtowns' Drain Reach, WORLD_BOSS_1.md 1.3): a rectangle of <see cref="size"/> (x across,
+    /// y along) round <see cref="center"/>, turned <see cref="rotation"/> degrees as a terrace is (ZoneBuilder.TerraceFrame), whose ground stands
+    /// <see cref="rise"/> metres over the nearest river's water, level, easing down into the river bed over <see cref="blend"/> metres outside it.
+    /// <see cref="widen"/> (over 1) widens that river's bed and water where the shoal lies along it (eased over 10 m past its ends), so the water
+    /// runs round it on both sides. kind: "silt" (black mud and brick rubble: a silt bar and its neck) or "apron" (wet setts on the bank).
+    /// </summary>
+    [Serializable] public sealed class ZoneShoal
+    {
+        public string name, kind = "silt", canonStatus; public Vector2 center, size; public float rotation, rise = .3f, blend = 1.5f, widen;
     }
     /// <summary>
     /// A terrace (ZoneBuilder.Crown; GAME-ONLY ground): a rectangle size (x across, y along) round center, turned rotation degrees,

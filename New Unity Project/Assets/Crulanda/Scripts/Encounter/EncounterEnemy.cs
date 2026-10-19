@@ -379,11 +379,7 @@ namespace Crulanda.Encounter
         public const float MaxBlowShare = .6f;
         /// <summary>Its blows scaled by what drives it (the Rock-Eater goaded by Nix: 1.5; EncounterSession.TickDuo).</summary>
         public float BlowScale = 1;
-        public int CappedBlow(Actor victim, int raw)
-        {
-            if (victim == null || victim.Health == null || session.PartyActor(victim.EntityId.Value) == null) return raw;
-            return Mathf.Min(raw, Mathf.Max(1, Mathf.RoundToInt(victim.Health.Pool.Max * MaxBlowShare)));
-        }
+        public int CappedBlow(Actor victim, int raw) { return CappedBlow(victim, raw, false); }   // the cap-passing flag: EncounterEnemy.Raid
         /// <summary>How far from home a mob in a fight may be drawn (40 m at least), and how long without a blow before it gives up.</summary>
         public float FarLeash { get { return Mathf.Max(40, session != null ? session.Leash : 30); } }
         public const float QuietSeconds = 5;

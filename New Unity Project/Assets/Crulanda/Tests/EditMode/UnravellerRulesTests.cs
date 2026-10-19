@@ -293,7 +293,7 @@ namespace Crulanda.Tests
             float longest = RangerKit.BowRange;
             foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(asset, @"\brange: ([0-9.]+)"))
                 longest = UnityEngine.Mathf.Max(longest, float.Parse(m.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture));
-            Assert.GreaterOrEqual(t.leapRangeMin, longest + 5, "she lands beyond the longest reach (" + longest + " m) and 5 m more");
+            Assert.GreaterOrEqual(t.leapRangeMin, longest, "she lands at least the longest reach (" + longest + " m) away: everyone must move (Chris, 2026-10-19: \"jumped a little too far..maybe down 1/4th of total distance\": 35-55 m to 30-41)");
             Assert.Greater(t.leapRangeMax, t.leapRangeMin + 10, "room on the bar and the apron to find such a spot");
             Assert.Less(t.leapShare, EncounterEnemy.MaxBlowShare); Assert.Greater(t.leapRangeMin, t.leapRadius * 2, "far enough to make the raid move");
         }

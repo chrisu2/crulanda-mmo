@@ -25,7 +25,7 @@ clears threat, casts, personal cooldowns, global cooldowns and temporary Guard s
 The shared ability runtime does not change the persistent schema, so no version bump is required.
 Unsupported format/type or invalid payloads are rejected. An unreadable startup save blocks overwrite.
 
-## Format history (current EncounterSave.FormatVersion = 11; formats 4-11 are described at the end)
+## Format history (current EncounterSave.FormatVersion = 12; formats 4-12 are described at the end)
 - 1: no class/talents. Read migrates to classId class.warrior with an empty talent list.
 - 2: classId + talents using the 9-node prototype ids (tank.armor, dps.power, ...). Read maps them through
   EncounterSave.LegacyTalentIds to the data-driven ids; if the mapped allocation is illegal under the new tier
@@ -38,9 +38,9 @@ Transient talent state (weapon pressure, Exposed, barriers, intercept, standard)
 ## Generic infrastructure
 SaveFileStore handles envelope I/O/backups. SaveMigrator chains ISaveMigration steps on the payload text.
 EncounterSave uses it from format 6 on: it registers one step per format (6 → 7: `AddDiscoveriesMigration`,
-7 → 8: `AddProfessionsMigration`, 8 → 9: `AddArmouryMigration`, 9 → 10: `SteeperCurveMigration`, 10 → 11: `AddRecipesMigration`) and runs the chain in memory before reading the payload. Formats 1-5 are older than the chain and are still upgraded in memory in
+7 → 8: `AddProfessionsMigration`, 8 → 9: `AddArmouryMigration`, 9 → 10: `SteeperCurveMigration`, 10 → 11: `AddRecipesMigration`, 11 → 12: `AddComponentsMigration`) and runs the chain in memory before reading the payload. Formats 1-5 are older than the chain and are still upgraded in memory in
 `EncounterSave.Read`. Versions above the current one are rejected.
-To change saved fields, add the next step (11 → 12) and bump `FormatVersion`. No migration is needed for combat tuning.
+To change saved fields, add the next step (12 → 13) and bump `FormatVersion`. No migration is needed for combat tuning.
 
 ## The world slot (2026-10-06, Phase 5.2)
 File: the same root, slot "world" (world.save.json, .bak kept), payloadType CrulandaWorld, formatVersion 1, DTO WorldSave:
@@ -298,3 +298,22 @@ and the same step as the recipes (no format 12):
 - Formats 1-10 load with the list empty. A format-11 save written by the p86-craft build (recipes, no lockouts) also loads with it empty.
 - Not saved: the dungeon queue's run (which dungeon, which sims it brought: kept in memory across the dungeon's load only) and which
   bosses are put away this visit (that follows from the list).
+
+## Format 12 (2026-10-19, branch wb-loot; WORLD_BOSS_1.md build step 7): the legendary pieces
+WRITTEN, NOT RUN (compiled outside Unity; no test run yet). Back up Chris's save before any build with it (the lead does it:
+`D:\crulanda-work\save-backups\<date>-pre-format-12`).
+- `components`: the component bag (ComponentBag; WORLD_BOSS_1.md 5.1), `[{ "item": id, "count": n }]`: the Calcified Brood-Crystals,
+  the class's uneaten blank, the Unraveller's Heart, the Verses and the Note. Outside the bags: no slot, never sold, traded or banked
+  (item kind `component`; `Inventory.Add` puts such an item here).
+- `componentLuck`: the bad-luck counters (UnravellerLoot), `[{ "source": component id, "kills": n, "dry": kills in a row without it }]`;
+  `dry` never above 5 (the sixth kill is certain).
+- Both sit before `lockouts` (so a payload still ends with `"lootLuck":[]}` and the recipes still come before the discoveries).
+- The weapons need no field: a forged weapon is an ordinary item, and two progress keys in `keys` mark it: `legend.forged:<item id>`
+  (made: the blank and the Heart stop dropping) and `legend.awake:<item id>` (woken by a Note of the Original Song).
+- Migration 11 → 12 is `AddComponentsMigration`: `"components":[]` and `"componentLuck":[]` before the payload's closing brace, each only
+  when it is missing; every other character kept. `LegendaryTests.A_format_11_save_migrates_to_12_...` checks it, and a format-6 save
+  runs all six steps in one read.
+- On read: a blank id, an empty stack and a repeat are dropped or merged; an unknown id is kept; a negative count or counter is refused.
+- What to expect on Chris's save: the two empty lists appear before `lockouts`; nothing else changes.
+- The sims' own pieces and counters are `SimAdventurer.components` and `componentLuck` in the world slot (no world format change:
+  JsonUtility reads them empty from an older slot).

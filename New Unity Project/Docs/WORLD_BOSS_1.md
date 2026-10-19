@@ -891,6 +891,77 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
 8. **The forge and the weapons** (L): Tynara's night forge, the eleven weapons' data, looks and effects, the epic stage, the awake key (a test
    fixture gives a Note until the Verses' bosses exist), awake weapons ignoring blackened steel. Tests: EditMode each effect within its band;
    the harness measures effects with a test Note at 30 later.
+   **Steps 7-8: WRITTEN, NOT RUN** (2026-10-19, branch `wb-loot` = `wb-fight` + the loot; compiled outside Unity, no test run yet,
+   nothing seen in game). The books: what a Weave-Eater cannot eat (bone and amber, b1 ch.20:181), salt's white crystal (ch.20:205),
+   glass-steel (b1 ch.7:149), Tynara Embercoil (B1WB:31; b3 ch.1:74), the Original Song (WB:74-78). Every number GAME-ONLY.
+   - **The data:** `EncounterContent/Items/legendary.json` (not `loot.legendary.json`: the `loot.*` files are held to the zones' named-gear
+     rules by LootDataTests, ids `loot.<zone>.*`; this file is held by `LegendaryTests`): 17 components (`comp.brood_crystal`, a stack of 99;
+     `comp.unraveller_heart`; eleven `comp.blank.<class>`; three `comp.verse.*` and `comp.note_original_song`, PROVISIONAL), the eleven
+     weapons (`legend.<name>`) and her eight epics (`raid.unr.*`, 4.7), with looks and a source each (the weapons' a new source kind,
+     `forge:Tynara Embercoil`: "Remade at Tynara Embercoil's night forge"). Registered in `Encounter.asset` (a new .meta, fresh guid).
+   - **The component kind and its bag** (`Legendary.cs`, `ComponentBag`): kind `"component"`, value 0 (a priced one is refused), bound;
+     `Inventory.Add` puts one in `EncounterProgress.components`, never the bags, so it can't be sold, traded, banked or listed. The bags'
+     window has a **Legendary** button (`EncounterHud.Legendary.cs`): the pieces, the counters, your weapon's stage and what is still
+     wanting. `/legend` lists them in the chat.
+   - **The drops** (`UnravellerLoot`, 4.4): her body holds coins, **two of her eight epics** (need and greed among the raid, as any epic)
+     and **your own pieces** (never rolled for: `PartyLoot.Rolled`): a crystal always; the blank 25%, 15% more a dry kill; the Heart 20%,
+     15% more; the sixth dry kill certain (the counters, `componentLuck`, never pass five). A piece you hold, or your weapon forged, stops
+     that piece's roll (one weapon a character); crystals keep coming. Each sim of the raid rolls its own on its own counters
+     (`SimAdventurer.components`, the world slot; a Party chat line when one gets its blank or Heart). The loot window's second line shows
+     your counters ("Blank: 40% next kill · Heart: 35% next kill · Brood-Crystals 2/3"). Locked out for her week, her body is empty for you
+     (and the sims roll nothing then either). The Drain Reach Waders halve the river's bite on you (`EncounterSession.River`).
+   - **The save, format 12** (`AddComponentsMigration`; SAVE_FORMAT.md): `components` and `componentLuck`, before `lockouts`. **Back up
+     Chris's save before any build with it.**
+   - **Tynara Embercoil's night forge** (CANON-EXPANDED person, GAME-ONLY place): a resident and a `forge` station in `lowtowns.json` at
+     (197.5, -14) and (201, -14), on the Rust Market's level ground under the Forge District's wall, 14 m from the Forge District Gate. She
+     is there 21:00-06:00 and gone by day (as the Night Market's keepers). Talk to her: with everything (three crystals, the blank, the
+     Heart, **500 crowns**, PROVISIONAL for "a week's coin", and a slag-iron bar) she forges the weapon asleep; short of anything she names
+     what is wanting. **When the Forge District zone (being built on another branch) opens, move her and the station inside its gate** (the
+     forge needs only a resident named `LegendaryWeapons.Smith`).
+   - **The eleven weapons** (`LegendaryWeapons`, 4.3): epic, level 20, main hand, the class's only, unique, 70 weapon damage (the curve at
+     20, x2.1), 63 stat points (an epic's budget at 20). **Awake** (a Note at the same forge; the key `legend.awake:<item>` in `keys`, and
+     `legend.forged:<item>` once made): its effect works, blackened steel does not take on you (`SteelProof`), the tooltip line turns
+     orange; from level 30 its damage is a legendary's (123, `AwakeBonus`: nothing until the cap is raised). Three Verses bind into a Note
+     at the forge. **The test fixture:** `LegendaryWeapons.GiveTestNote`, and `/legend note` in game (a tester's, as `/level`), until the
+     Verses' bosses exist.
+   - **Looks now, and the model each should get** (the project's own looks; KayKit's axes are not on this branch): Second Truth
+     `model.weapon:Sword8_White/pale+glow` (its own glass-steel longsword later); the Iron Anchor `model.weapon:Mace2H_Epic` (a glass-steel
+     war hammer); the Two Rules `model.weapon:Sics_Dagger` in the main hand, the off hand keeps its dirk (a matched pair later); the Song of
+     Sifting `model.weapon:Ashen_nth_equi_rondel_dagger` (a thin stiletto); the Salt-Wall Bow `model.weapon:Bow_Epic` (bone and
+     glass-steel, amber string); the Sun-Staff `model.tall:Staff_Epic/sandthrone` (double-ended, a dark haft); the Amber-Wood Crook the drawn
+     `staff:crook/veridian`; the First Verse `model.tall:Cartoon_Staff_05` (a bone staff with an echo-jar); Mender's First Tool the drawn
+     `hammer.war:maul/pale` (salt-stone); Grohl's Harpoon the drawn `polearm:harpoon/ashwalker`; the Hill-Shrine Lantern
+     `model.weapon:Mace1H_Epic/concord` (a mace with a hung lantern). Each look different, none a named piece's already. Asleep and awake
+     look the same for now (the look's own glow): the dim-to-glowing seam waits for the models.
+   - **The effects** (`LegendEffects`, `LegendState`; carried out in `EncounterSession.Legendary`), the doc's numbers: Afterimage on every
+     5th landed swing, 40% again; the Anchor under 30% health, rooted with 25% off for 6 s, once a minute; Exist Elsewhere on a blow over a
+     fifth of your health, 5 m behind your target, once in 30 s; Sifting, your holds 1.2 times as long and 30% on the blow that breaks one;
+     Salt-Tipped every 6th auto-shot, 50% more and a good effect stripped (two from a Weave-Eater); Sunfire, a spell at full Heat leaves a
+     3 m patch for 4 s (10 a second on each foe at 20, by level); Amber, every 20 s a heal's ward of 5% (no Weave-Eater eats it) or a
+     swing's 1.5 s root; Echo-Jar, the spell after every 8th again at 50%; Salt Line, a spell at a foe calcifies it 2 s, once in 20 s;
+     Grounding, a spell at a foe pins and roots it 3 s (a Weave-Eater silenced too), once in 20 s; Kept Light, overheal kept as a ward up to
+     10% of the target's health for 8 s. **Worth:** each estimated at 2-6% of its build's output from stated shares
+     (`LegendEffects.EstimatedShare`: swings 45% of a weapon build, spells 60% of a caster, full Heat one spell in twelve, 30% overheal); the
+     harness with a test Note at the cap replaces the estimates. Sunfire shows by a float only (no ground mark yet); the Feeding still eats
+     an amber ward (it eats every ward).
+   - **Not built, or built differently:** the forged weapon goes into the bags (no hand-over scene); her epics and the weapons sit in the
+     Armoury's "World" list (their sources have no zone); the icons are copies of kin icons (`tools/art/make_icons.py` now has the
+     components' specs but needs numpy, not on this PC: run it once and they are repainted, guids kept); the weapons' item icons are the
+     model icons, copied.
+   - **Tests (each fails on the code before it: the types, the kind and format 12 do not exist there):** EditMode `LegendaryTests` (11: the
+     counters' table; 10,000 kills for each class, a crystal every kill, never more than six kills for the blank or the Heart, the average
+     waits; a held piece and a forged weapon stop the drops; her epics, two of eight on the epic curve; the component bag and kind; the
+     format-12 round trip; the step from 11 and a format-11 file read; the eleven weapons' stats, looks and labels; each effect's numbers and
+     worth in band; each effect firing as its words say; the recipe at the forge, the Note and the awake key; Tynara and her forge by the
+     gate). `SaveMigratorTests` and `LockoutTests` now run their 6-11 chains to 11 and read the current format.
+   - **To run and look at (the lead):** `LegendaryTests`, `SaveMigratorTests`, `LockoutTests`, `DiscoveryLogTests`, `LootDataTests`,
+     `IconCoverageTests`, `ItemTests`, `LowtownsLevelsTests` (her spot level), `LowtownsVaultsTests`, `DrainReachTests`, `ExchangeTests`.
+     Then in a preview build with its own save folder (never Chris's save) at 20 in a raid, **capture**: her body's loot window (the two
+     epics, your pieces, the counters line) and a need/greed roll on an epic; the bags' Legendary tab with pieces and counters; Tynara at
+     her forge by the Forge District Gate by night (21:00) and gone by day (11:00), front and side; `/legend note`, the forging and waking
+     lines and the LEGENDARY toast; each weapon in hand, front, back and side (the eleven looks); an awake effect's float in a fight for each
+     class (Afterimage, The Anchor, Exist Elsewhere, Salt-Tipped, Sunfire, Amber, Echo-Jar, Salt line, Grounded, Kept Light), and no
+     "Blackened steel" on the Unraveller with an awake weapon. *Chris looks: the weapons.*
 9. **Chris plays it** (a preview build with its own save folder and a .bat): call a raid, kill her, forge the epic. Not done until he has.
 
 ---

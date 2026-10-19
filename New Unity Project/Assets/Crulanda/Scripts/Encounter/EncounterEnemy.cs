@@ -233,6 +233,7 @@ namespace Crulanda.Encounter
                 var p = centre + Random.insideUnitCircle * reach;
                 var point = session.Zone != null ? session.Zone.StandAt(p, home.y) : new Vector3(p.x, home.y, p.y);
                 if (Across(point - transform.position) < 1.2f || !ClearOfCamp(point)) continue;
+                if (KeepDry && session.NearWater(point)) continue;   // a dry camp strolls on dry ground only (EncounterSession.Dry)
                 // On the floor itself, and straight there: not over lava or in a wall, and not the long way round a lake (the Ember Vent's
                 // camps by its lava had walked round it and out of their camps).
                 if (!NavMesh.SamplePosition(point, out var at, 1, NavMesh.AllAreas) || Mathf.Abs(at.position.y - home.y) > 1) continue;   // on its own floor, not a ledge or a column's top
@@ -265,6 +266,8 @@ namespace Crulanda.Encounter
         public void Root(float seconds) { if (actor.IsAlive && seconds > 0 && OnceAFight("root", ref seconds)) rootUntil = Mathf.Max(rootUntil, Time.time + seconds); }
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Enemy");
+        /// <summary>Its camp keeps to dry ground (ZoneCamp.dry): it is stood, strolls and comes back only off the water (EncounterSession.Dry).</summary>
+        public bool KeepDry;
         void Update() { using (perfMark.Auto()) UpdateTimed(); }
         void UpdateTimed()
         {
@@ -457,6 +460,9 @@ namespace Crulanda.Encounter
             respawnAt = float.MaxValue;
             var at = session.Zone != null ? session.Zone.StandAt(CampCenter + Random.insideUnitCircle * CampRadius * (Ambusher ? AmbushSpread(CampRadius) : 1), home.y) : home;   // a cave camp respawns on its floor
             for (int k = 0; k < 5 && session.Zone != null && !ClearOfCamp(at); k++) at = session.Zone.StandAt(CampCenter + Random.insideUnitCircle * Mathf.Max(CampRadius, Gap), home.y);   // not on top of another (note 131)
+            // A dry camp's (the Bank-snouts) never comes back in or by the water (EncounterSession.Dry): another spot, or its centre.
+            for (int k = 0; k < 8 && KeepDry && session.Zone != null && session.NearWater(at); k++) at = session.Zone.StandAt(CampCenter + Random.insideUnitCircle * CampRadius, home.y);
+            if (KeepDry && session.Zone != null && session.NearWater(at)) at = session.Zone.StandAt(CampCenter, home.y);
             if (Patrol != null && Patrol.Length > 0) { at = Patrol[0]; patrolAt = 0; patrolStep = 1; }   // a patrol comes back at the head of its road
             if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
             if (agent.isOnNavMesh) agent.Warp(at); else transform.position = at + Vector3.up;

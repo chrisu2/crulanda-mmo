@@ -268,6 +268,9 @@ namespace Crulanda.World
         /// <summary>A night camp (the Lowtowns' Drain Courts, Phase 9.1; GAME-ONLY): its mobs come up after dark (WorldClock.IsNight) and are
         /// gone by day, back down the drains; one fighting stays until the fight is done (EncounterEnemy.Night).</summary>
         public bool night;
+        /// <summary>Its mobs keep to dry ground (the Lowtowns' Bank-snouts on the river's banks, 2026-10-18): where they stand, stroll and roam
+        /// is never in the zone's water nor within EncounterSession.DryMargin of it.</summary>
+        public bool dry;
     }
     /// <summary>Walk into the radius and press E to travel; you arrive at <see cref="arrive"/> in the other zone.</summary>
     [Serializable] public sealed class ZoneExit { public string to, name; public Vector2 at, arrive; public float radius = 5; }

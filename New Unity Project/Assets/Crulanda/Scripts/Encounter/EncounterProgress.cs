@@ -87,6 +87,13 @@ namespace Crulanda.Encounter
         /// <summary>The found recipes learned from a leaf, by recipe id, in the order learned (Phase 8.6 step 5). Taught recipes are not
         /// listed: they follow from the skill. See ProfessionLog.UseLeaf.</summary>
         public List<string> recipes = new List<string>();
+        // ---------- the legendary pieces (save format 12; older saves load with both empty; here, not at the end, so payloads still end as they did) ----------
+        /// <summary>The component bag (WORLD_BOSS_1.md 5.1; ComponentBag): the Brood-Crystals, the class's uneaten blank, the Heart, the Verses
+        /// and the Note, by id and count, outside the bags (no slot; the bags' Legendary tab).</summary>
+        public List<ItemStack> components = new List<ItemStack>();
+        /// <summary>The bad-luck counters (UnravellerLoot): source = the component's id, kills = her kills it was rolled on, dry = the kills
+        /// in a row without it (never more than five: the sixth is certain).</summary>
+        public List<LootLuck> componentLuck = new List<LootLuck>();
         // ---------- discoveries (save format 7; older saves load with this empty) ----------
         /// <summary>Hidden finds already found, by id ("secret.&lt;zone&gt;.&lt;slug&gt;"): each pays out once, ever. See DiscoveryLog.</summary>
         public List<string> discoveries = new List<string>();

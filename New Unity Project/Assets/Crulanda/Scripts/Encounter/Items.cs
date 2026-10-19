@@ -17,7 +17,7 @@ namespace Crulanda.Encounter
         public LootTableDef[] loot = new LootTableDef[0];
     }
     /// <summary>
-    /// kind: gear | junk | consumable | material | tool | bag | recipe. slot: head, neck, shoulders, chest, hands, legs, feet, mainhand, offhand (gear only).
+    /// kind: gear | junk | consumable | material | tool | bag | recipe | component (a legendary piece: the component bag, bound; ComponentBag). slot: head, neck, shoulders, chest, hands, legs, feet, mainhand, offhand (gear only).
     /// quality: 0 poor (grey), 1 common (white), 2 uncommon (green), 3 rare (blue), 4 epic (purple).
     /// value: sell price in gold (merchants charge 4x). heal: consumables restore this much health (potions) or over 10 s out of combat (food).
     /// material: something gathered or refined that recipes use (quality 1, so "Sell junk" leaves it). trade: the village stock a sale of
@@ -85,6 +85,7 @@ namespace Crulanda.Encounter
                     if (i.kind == "gear" && SlotIndex(i.slot) < 0) errors.Add("Item '" + i.id + "' has no valid slot.");
                     if (i.kind == "bag" && (string.IsNullOrEmpty(i.holds) || i.slots < 1 || i.slots > Inventory.BagSize)) errors.Add("Bag '" + i.id + "' needs holds and 1-" + Inventory.BagSize + " slots.");
                     if (i.kind == "recipe" && string.IsNullOrEmpty(i.teaches)) errors.Add("Leaf '" + i.id + "' teaches no recipe.");
+                    if (i.kind == ComponentBag.Kind && i.value != 0) errors.Add("Component '" + i.id + "' is bound: it has no value.");
                     Consumables.Check(i, errors);
                     if (i.stack < 1) i.stack = 1;
                     db.Items[i.id] = i;
@@ -326,6 +327,7 @@ namespace Crulanda.Encounter
         public static int Add(EncounterProgress p, ItemDatabase db, string item, int count)
         {
             Ensure(p); var d = db.Get(item); if (d == null || count <= 0) return count;
+            if (ComponentBag.IsComponent(d)) return ComponentBag.Add(p, d, count);   // a legendary piece: the component bag, not the bags (WORLD_BOSS_1.md 5.1)
             var pouches = Pouches(p, db);
             for (int i = 0; i < p.bag.Count; i++)
             {
@@ -347,6 +349,7 @@ namespace Crulanda.Encounter
         public static int Room(EncounterProgress p, ItemDatabase db, string item)
         {
             Ensure(p); var d = db?.Get(item); if (d == null) return 0;
+            if (ComponentBag.IsComponent(d)) return Math.Max(0, Math.Max(1, d.stack) - ComponentBag.Count(p, item));
             var pouches = Pouches(p, db); int n = 0;
             for (int i = 0; i < p.bag.Count; i++)
             {
@@ -458,6 +461,7 @@ namespace Crulanda.Encounter
                 var d = s.Empty ? null : db.Get(s.item); if (d == null) continue;
                 t.armor += d.armor; t.stamina += d.stamina; t.strength += d.strength; t.agility += d.agility; t.intellect += d.intellect; t.spirit += d.spirit; t.weaponDamage += d.weaponDamage;
             }
+            t.weaponDamage += LegendaryWeapons.AwakeBonus(p);   // an awake legendary in hand, from level 30: a legendary's damage (WORLD_BOSS_1.md 4.6)
             return t;
         }
     }

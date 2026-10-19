@@ -47,6 +47,9 @@ namespace Crulanda.Encounter
         /// improve their dps"). Each session there closes a sixth of the gap to 1; at 1 it hits <see cref="PracticeEdge"/> harder. An older
         /// world slot reads 0 (format 1 still).</summary>
         public float practice;
+        /// <summary>Its legendary pieces and their bad-luck counters (WORLD_BOSS_1.md 4.4: the sims keep their own; UnravellerLoot). An older
+        /// world slot reads them empty (no format change: JsonUtility fills missing lists).</summary>
+        public List<ItemStack> components = new List<ItemStack>(); public List<LootLuck> componentLuck = new List<LootLuck>();
         /// <summary>The most practice adds to a sim's blows and spells: a tenth.</summary>
         public const float PracticeEdge = .1f;
         /// <summary>Its damage made more by its practice.</summary>

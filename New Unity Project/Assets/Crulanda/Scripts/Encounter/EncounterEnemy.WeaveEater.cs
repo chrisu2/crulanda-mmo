@@ -65,7 +65,7 @@ namespace Crulanda.Encounter
                 nextWardBiteAt = now + 1;
                 foreach (var a in session.PartyActors())
                 {
-                    if (a == null || !a.IsAlive || Vector3.Distance(a.transform.position, transform.position) > T.wardReach) continue;
+                    if (a == null || !a.IsAlive || Vector3.Distance(a.transform.position, transform.position) > T.wardReach || session.AmberWarded(a)) continue;   // amber resists the Unmaking (book1 ch.20:181)
                     var ward = a.GetComponent<Combatant>(); int b = ward != null ? WeaveEaterRules.WardBite(ward.Barrier) : 0;
                     if (b > 0 && ward.EatBarrier(b) > 0) session.FloatText(a.transform.position, "Ward eaten " + b, new Color(.62f, .55f, .8f));
                 }
@@ -74,7 +74,7 @@ namespace Crulanda.Encounter
             {
                 nextWardBiteAt = now + 1;
                 var guard = v.GetComponent<Combatant>();
-                int bite = guard != null ? WeaveEaterRules.WardBite(guard.Barrier) : 0;
+                int bite = guard != null && !session.AmberWarded(v) ? WeaveEaterRules.WardBite(guard.Barrier) : 0;   // amber: not eaten
                 if (bite > 0 && guard.EatBarrier(bite) > 0)
                 {
                     session.FloatText(v.transform.position, "Ward eaten " + bite, new Color(.62f, .55f, .8f));

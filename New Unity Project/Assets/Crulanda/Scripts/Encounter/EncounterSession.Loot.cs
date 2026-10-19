@@ -57,6 +57,7 @@ namespace Crulanda.Encounter
             Player.Stats.RemoveModifiersFromSource(gearEffectSource);
             GearFx = GearEffects.Compute(Progress, Items, Loot, gearEffectSource);
             if (GearFx.modifiers.Count > 0) Player.Stats.AddModifiers(GearFx.modifiers);
+            RefreshLegend();   // an awake legendary in hand (EncounterSession.Legendary)
         }
         /// <summary>A kill's gear effects: health and resource back, while you stand.</summary>
         void OnKillEffects()
@@ -81,8 +82,10 @@ namespace Crulanda.Encounter
         void ResolveWithGear(Crulanda.Abilities.AbilityDefinition a, System.Action effect)
         {
             float was = GearPowerNow, scale = GearEffects.PowerScale(GearFx, a != null ? a.id : null);
+            bool fullHeat = FullHeat;   // the Sun-Staff's Sunfire: cast at full Heat (read before the spell spends it)
             GearPowerNow = was * scale;
             try { effect(); } finally { GearPowerNow = was; }
+            LegendSpell(a, effect, fullHeat, was * scale);   // an awake legendary's spell effects (EncounterSession.Legendary)
             if (a == null || GearFx.abilities.Count == 0) return;
             var procs = GearEffects.Proc(GearFx, a.id, gearRng.NextDouble);
             ApplyGearProcs(procs);
@@ -159,6 +162,7 @@ namespace Crulanda.Encounter
             int coins = 1 + corpse.actor.Level * 2 + Random.Range(0, corpse.actor.Level + 2);
             if (corpse.Elite) coins *= 3;
             if (GearFx.coins > 0) coins = Mathf.RoundToInt(coins * (1 + GearFx.coins));
+            if (corpse.RaidBoss) { PutLoot(corpse, coins, UnravellerDrops(corpse)); return; }   // her two epics and your components (EncounterSession.Legendary)
             var drops = new List<LootDrop>();
             if (Items != null)
             {
@@ -257,6 +261,7 @@ namespace Crulanda.Encounter
             // In a party, uncommon and better is rolled for (Round 25, note 72): off the body and into the roll.
             if (Rolled(drop.item)) { body.Drops[i] = new LootDrop(drop.item, 0); QueueRoll(drop.item, drop.count, body.actor.DisplayName); return 0; }
             int left = Items != null ? Inventory.Add(Progress, Items, drop.item, drop.count) : drop.count;
+            if (drop.count - left > 0 && ComponentBag.IsComponent(Items?.Get(drop.item))) TookComponent(drop.item);
             if (drop.count - left > 0) { Received(drop.item, drop.count - left); Meter.Loot(ItemName(drop.item) + (drop.count - left > 1 ? " x" + (drop.count - left) : ""), body.Name, "You"); }
             body.Drops[i] = new LootDrop(drop.item, left);
             return left;

@@ -82,6 +82,7 @@ namespace Crulanda.Encounter
                 diminish[kind] = d;
                 if (d.Item2 == 1) seconds *= .5f;
             }
+            if (by != null && session.Player != null && by == session.Player && kind != "silence") seconds *= session.LegendHoldScale;   // the Song of Sifting's longer holds
             float until = Time.time + seconds;
             switch (kind)
             {

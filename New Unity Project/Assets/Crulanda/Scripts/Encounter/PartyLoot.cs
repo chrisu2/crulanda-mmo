@@ -52,6 +52,7 @@ namespace Crulanda.Encounter
         public bool Rolled(string item)
         {
             var d = Items?.Get(item); if (PartySims.Count == 0 || d == null) return false;
+            if (ComponentBag.IsComponent(d)) return false;   // a legendary piece is each member's own roll (WORLD_BOSS_1.md 2.5)
             // Uncommon and better only (Chris, 2026-10-18: "dont roll on common gear. i just didnt see people win rolls"): commons are taken.
             return d.quality >= 2;
         }

@@ -12,16 +12,16 @@ namespace Crulanda.Encounter
     /// what the character has already done). v1 (no talents) and v2 (9-node prototype ids) migrate on read; the migrated
     /// form is written on the next save. From format 6 on, each format step is a SaveMigrator step on the payload text
     /// (6 → 7: <see cref="AddDiscoveriesMigration"/>, 7 → 8: <see cref="AddProfessionsMigration"/>, 8 → 9: <see cref="AddArmouryMigration"/>,
-    /// 9 → 10: <see cref="SteeperCurveMigration"/>, 10 → 11: <see cref="AddRecipesMigration"/>), run before the payload is read.
+    /// 9 → 10: <see cref="SteeperCurveMigration"/>, 10 → 11: <see cref="AddRecipesMigration"/>, 11 → 12: <see cref="AddComponentsMigration"/>), run before the payload is read.
     /// </summary>
     public sealed class EncounterSave
     {
-        public const int FormatVersion = 11;   // 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck). 10: the cap-15 curve (experience migrated again, round 29). 11: found recipes and lockouts (recipes, Phase 8.6; lockouts, 2026-10-15)
+        public const int FormatVersion = 12;   // 12: the legendary pieces (components, componentLuck; WORLD_BOSS_1.md step 7). 5: level curve (experience migrated). 6: bag + equipment slots (old item list moved in). 7: discoveries. 8: trades (professions, pouches). 9: the Armoury (armoury, looks, lootLuck). 10: the cap-15 curve (experience migrated again, round 29). 11: found recipes and lockouts (recipes, Phase 8.6; lockouts, 2026-10-15)
         /// <summary>The most trade bags a save may list as worn.</summary>
         public const int MaxPouches = 8;
         /// <summary>The payload steps from format 6 on. Formats 1-5 are older than this chain and are upgraded in memory in Read.</summary>
         static readonly SaveMigrator Steps = CreateSteps();
-        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); m.Register(new SteeperCurveMigration()); m.Register(new AddRecipesMigration()); return m; }
+        static SaveMigrator CreateSteps() { var m = new SaveMigrator(); m.Register(new AddDiscoveriesMigration()); m.Register(new AddProfessionsMigration()); m.Register(new AddArmouryMigration()); m.Register(new SteeperCurveMigration()); m.Register(new AddRecipesMigration()); m.Register(new AddComponentsMigration()); return m; }
         /// <summary>9-node prototype ids (format 2) -> the nodes they became in the data-driven Warrior tree.</summary>
         public static readonly Dictionary<string, string> LegacyTalentIds = new Dictionary<string, string>(StringComparer.Ordinal) {
             { "tank.armor", "tk-tempered-armor" }, { "tank.challenge", "tk-steady-challenge" }, { "tank.bulwark", "tk-bulwark" },
@@ -123,6 +123,16 @@ namespace Crulanda.Encounter
                 // Format 11 too: the lockouts (Lockouts). Formats 1-10 have none. A blank key, an expiry of zero or less and a repeat are
                 // dropped; one that has run out is kept until the session prunes it; a key this content doesn't know is kept.
                 Lockouts.Normalize(p);
+                // Format 12: the component bag and its bad-luck counters (WORLD_BOSS_1.md 5.1). Formats 1-11 have neither. A blank id, an empty
+                // stack and a repeat are dropped or merged; an id this content doesn't know is kept (content can change); a negative count is not
+                // a save this game wrote.
+                if (p.components == null) p.components = new List<ItemStack>();
+                if (p.componentLuck == null) p.componentLuck = new List<LootLuck>();
+                foreach (var s in p.components) if (s != null && s.count < 0) throw new InvalidOperationException("Invalid component data.");
+                ComponentBag.Normalize(p.components);
+                p.componentLuck.RemoveAll(l => l == null || string.IsNullOrEmpty(l.source));
+                foreach (var l in p.componentLuck) if (l.kills < 0 || l.dry < 0) throw new InvalidOperationException("Invalid component data.");
+                var counted = new HashSet<string>(StringComparer.Ordinal); p.componentLuck.RemoveAll(l => !counted.Add(l.source));
                 foreach (var list in new[] { p.armoury, p.looks, p.keys, p.spiritStones, p.recipes }) { list.RemoveAll(string.IsNullOrEmpty); var once = new HashSet<string>(StringComparer.Ordinal); list.RemoveAll(id => !once.Add(id)); }
                 p.lootLuck.RemoveAll(l => l == null || string.IsNullOrEmpty(l.source));
                 foreach (var l in p.lootLuck) if (l.kills < 0 || l.dry < 0) throw new InvalidOperationException("Invalid loot data.");
@@ -279,6 +289,29 @@ namespace Crulanda.Encounter
         public int ToVersion { get { return 11; } }
         static readonly string[] Lists = { "recipes", "lockouts" };
         static readonly Regex[] Has = { new Regex("\"recipes\"\\s*:"), new Regex("\"lockouts\"\\s*:") };
+        public string Migrate(string payloadJson)
+        {
+            string json = (payloadJson ?? "").Trim();
+            if (json.Length < 2 || json[0] != '{' || json[json.Length - 1] != '}') throw new SaveMigrationException("The save's payload is not a JSON object.");
+            bool all = true; foreach (var h in Has) all &= h.IsMatch(json);
+            if (all) return payloadJson;
+            string body = json.Substring(0, json.Length - 1).TrimEnd();
+            for (int i = 0; i < Lists.Length; i++) if (!Has[i].IsMatch(json)) body += (body.EndsWith("{") ? "" : ",") + "\"" + Lists[i] + "\":[]";
+            return body + "}";
+        }
+    }
+    /// <summary>
+    /// Save format 11 → 12 (WORLD_BOSS_1.md step 7, the Unraveller's loot): adds the empty <c>components</c> (the component bag) and
+    /// <c>componentLuck</c> (its bad-luck counters) lists, each only when it is missing, as <see cref="AddRecipesMigration"/> does: an edit on
+    /// the payload text before the closing brace, every other character of the format-11 payload kept. One that isn't a JSON object is
+    /// refused (the save is then not loaded, not changed). The awake weapons need nothing: their key goes in <c>keys</c>.
+    /// </summary>
+    public sealed class AddComponentsMigration : ISaveMigration
+    {
+        public int FromVersion { get { return 11; } }
+        public int ToVersion { get { return 12; } }
+        static readonly string[] Lists = { "components", "componentLuck" };
+        static readonly Regex[] Has = { new Regex("\"components\"\\s*:"), new Regex("\"componentLuck\"\\s*:") };
         public string Migrate(string payloadJson)
         {
             string json = (payloadJson ?? "").Trim();

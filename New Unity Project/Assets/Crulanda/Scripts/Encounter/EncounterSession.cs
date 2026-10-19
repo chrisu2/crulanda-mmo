@@ -2011,6 +2011,7 @@ namespace Crulanda.Encounter
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F11)) { Crulanda.World.WorldClock.Advance(1); Message("Time skips ahead: " + Crulanda.World.WorldClock.Text + " (dev)."); }
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             TickLoot();
+            TickLegend();   // an awake legendary's effect (EncounterSession.Legendary)
             // (A dungeon's checkpoints) reached by a party member near one, you alive or not.
             TickCheckpoints();
             // The meter's clock runs while you lie dead too (the raids: the bot down at 2:30 of a nine-minute pull, the clock stopped while the
@@ -2064,7 +2065,7 @@ namespace Crulanda.Encounter
                 // A swing takes the kit's own swing scale (the Shaman's: its build scales were tuned on its spells; ClassKit.SwingDamageScale).
                 int swing = WeaponDamage; float build = PlayerDamageScale, own = Kit.SwingDamageScale(build);
                 if (!Mathf.Approximately(own, build)) swing = Mathf.Max(1, Mathf.RoundToInt(swing * own / Mathf.Max(.01f, build)));
-                Target.Receive(swing, Player); Kit.OnAutoHit(); GearSwingProcs();   // a class set's procs on a landed swing (loot DESIGN.md 3.8)
+                Target.Receive(swing, Player); Kit.OnAutoHit(); GearSwingProcs(); LegendSwing(swing);   // a class set's procs on a landed swing (loot DESIGN.md 3.8)
             }
             if (Time.time >= nextRegen)
             {
@@ -2303,6 +2304,7 @@ namespace Crulanda.Encounter
                 SelectFriendly(talkTo, false);
                 NoteMet(talkTo.Name);   // the book of lore's People
                 if (QuestTalk(talkTo.Name, talkTo.transform.position)) talkTo.FacePlayer();
+                else if (TynaraTalk(talkTo)) talkTo.FacePlayer();   // Tynara Embercoil's night forge (EncounterSession.Legendary)
                 else if (HallTalk(talkTo)) talkTo.FacePlayer();   // the capital's halls: the audience, the Archive, a guild, a trainer (EncounterSession.Halls)
                 else if (CapitalTalk(talkTo)) { }   // the Treasury's banker, the Exchange's auctioneer (EncounterSession.Capital.cs)
                 else if (IsVendor(talkTo)) { OpenVendor(talkTo); talkTo.FacePlayer(); }

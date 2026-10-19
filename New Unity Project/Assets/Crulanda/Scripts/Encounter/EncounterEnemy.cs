@@ -400,7 +400,7 @@ namespace Crulanda.Encounter
             SpellFx.Struck(transform);   // struck by an ability resolving: its effect shows here
             if (Hidden) Pounce();
             if (TappedBy == null && source != null && !Game) TappedBy = source.EntityId.Value;
-            if (damage > 0 && WeaveEaterRules.Struck(this, source, Time.time, RaidBoss ? UnravellerTuning.Current.steelStacks : 1, RaidBoss ? UnravellerTuning.Current.steelShare : WeaveEaterRules.BlackenShare) && source == session.Player) session.Message(WeaveEaterRules.BlackenedLine);   // steel through a Weave-Eater (the Lowtowns)
+            if (damage > 0 && !session.SteelProof(source) && WeaveEaterRules.Struck(this, source, Time.time, RaidBoss ? UnravellerTuning.Current.steelStacks : 1, RaidBoss ? UnravellerTuning.Current.steelShare : WeaveEaterRules.BlackenShare) && source == session.Player) session.Message(WeaveEaterRules.BlackenedLine);   // steel through a Weave-Eater (the Lowtowns)
             // Blinded by a Hollow's dust (Hallow's Creek, b1 ch.4:177): the blow goes wide now and then.
             if (damage > 0 && source != null && session.BlindMisses(source)) { session.FloatText(transform.position, "Miss (dust)", new Color(.7f, .7f, .68f)); return; }
             // A dazzled striker's blow may go wide; a locked shield turns a frontal one (EncounterEnemy.Tricks).
@@ -408,7 +408,7 @@ namespace Crulanda.Encounter
             int struckFor = damage; damage = TrickTaken(damage, source);
             // A blow gone wide: nothing reaches it, but it knows who swung.
             if (struckFor > 0 && damage <= 0) { if (!Game && source != null) threat.Add(source.EntityId.Value, 1); return; }
-            int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * session.DamageScaleFor(source)));
+            int actual = actor.GetComponent<Combatant>().Damage(Mathf.RoundToInt(damage * session.Kit.PartyDamageMultiplier(this) * OverTakenNow * session.DamageScaleFor(source) * session.LegendBreakScale(this, source)));   // the Song of Sifting's blow on a held foe
             if (!Game && source != null) session.Meter.Damage(source, actual);
             if (!Game) session.SpreadBlow(this, source, actual);   // an area build's blows splash onto foes near this one (EncounterSession.Spread)
             if (actor.IsAlive && Figure != null) Figure.Flinch();

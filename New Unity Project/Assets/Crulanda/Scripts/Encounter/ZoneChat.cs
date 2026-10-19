@@ -164,6 +164,7 @@ namespace Crulanda.Encounter
                         if (arg.Length == 0) { QueueOpen = !QueueOpen; return; }
                         if (string.Equals(arg, "leave", StringComparison.OrdinalIgnoreCase)) { if (QueuedFor != null) LeaveQueue(); else if (QueueRunZone != null) DisbandQueue("You leave the queued party."); else Message("You are not queued."); return; }
                         JoinQueue(arg); return;
+                    case "/legend": LegendCommand(arg); return;   // your legendary pieces and counters; "note" a tester's (EncounterSession.Legendary)
                     case "/lockouts": case "/lockout": if (string.Equals(arg, "clear", StringComparison.OrdinalIgnoreCase)) TesterClearLockouts(); else ListLockouts(); return;   // the bosses and elites locked for you (Lockouts); "clear" is a tester's, as /level
                     case "/exit": case "/quit": Quit(); return;   // Chris 2026-10-14: "all need an exit command to close the .exe"
                     case "/scorecard": ScorecardOpen = !ScorecardOpen; if (ScorecardOpen && ScorecardTitle == null) ScorecardTitle = (Meter.RunName ?? "The run") + " so far"; return;

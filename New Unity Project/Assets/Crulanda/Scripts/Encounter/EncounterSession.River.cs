@@ -23,6 +23,7 @@ namespace Crulanda.Encounter
                 if (!wet) continue;
                 // The poison: a bite each tick, never the last of anyone's health.
                 var hp = a.Health; int bite = ChemicalRiver.BiteFrom(hp.Pool.Current, hp.Pool.Max);
+                if (a == Player && bite > 0 && Inventory.IsEquipped(Progress, UnravellerLoot.Waders)) bite = Mathf.Max(1, Mathf.RoundToInt(bite * UnravellerLoot.WadersPoison));   // the Drain Reach Waders (WORLD_BOSS_1.md 4.7)
                 if (bite > 0) { hp.ApplyDamage(bite); if (a == Player) FloatText(a.transform.position, "-" + bite, new Color(.55f, .85f, .3f)); }
                 // Hidden from what tracks by magic: a Weave-Eater beyond touching, a far-reaching caster beyond a few strides.
                 for (int i = 0; i < Enemies.Count; i++)

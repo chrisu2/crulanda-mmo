@@ -903,4 +903,5 @@ un-captures.
   heals Shaman 49, Cleric 48, Druid 46) "seems too easy now. dont make the purple spikes permanently coming out of ground. randomly
   every 5-7secs" (OPEN).
 - 264 (2026-10-19 ~15:20, watching raid 4) "something needs to be done about the swirling bowl spike above the mob..make it smaller and
-  blink on and off randomly" (OPEN): her purple crown smaller, flickering in and out at random.
+  blink on and off randomly" and "ground damage should be increased" (OPEN): her purple crown smaller, flickering in and out at
+  random; the grey ground hits harder.

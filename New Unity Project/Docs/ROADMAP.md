@@ -99,6 +99,12 @@ shoulders are now built from the model's own measurements instead of drawn round
 - **The lead must capture** (one Unity job, lane A or B): wardrobe 04-sets front, 05-sets back, 06-helms, 07-shoulders-chests,
   08-hands-legs-feet-neck, each front, back and side, plus 11-in-motion (a walking figure) with gauntlets and a pauldron on; then a
   close look at a barbute's T and a coif's face opening, and a gauntlet gripping a sword and a staff. Not shown to Chris before that.
+- **First run (wardrobe-angular-1, EditMode 10/13):** gloves good (hand-shaped, cuffs, fingerless shows the fingers: kept). Helms and
+  shoulders wrong for one cause: the closing point was set by a cone rule that, when the widest point sat just above the last ring,
+  pushed the point metres out (a coif half a metre tall, a barbute's top 1.76 m up, a spike a metre out of each shoulder, which also
+  pulled the pauldron's middle off the shoulder). Fixed: a crown ring the gap over the head's (or shoulder's) highest point, fitted
+  round the top's own points, then a low point just over it (a flat-faceted crown, not a cone); caps and kettles come down to just
+  over the brows (they stopped 6.5 cm under the top); small rigid parts (horns, spikes) are flat-faceted. WRITTEN, NOT RUN again.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

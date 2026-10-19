@@ -943,3 +943,5 @@ un-captures.
 - 279 (2026-10-19 ~16:42) "hybrids 75% of target" (the hybrids' damage at 75% of the pure damage band; replaces "a bit lower", 90%).
 - 280 (2026-10-19 ~16:45, watching tune-2) "people still standing in red areas. they need to evacuate" and "some reds under her are
   staying a long time and pets just standing in it" (OPEN).
+- 281 (2026-10-19 ~16:50) "need some type of mechanism to trap the brook..someone that can do an extra job" (OPEN): a salt-ring snare
+  (salt and bone hold Weave-Eaters, b1 ch.20; no machines) laid by an assigned Trapper (the Ranger by default) on the brood's path.

@@ -275,7 +275,7 @@ namespace Crulanda.Encounter
         {
             return Start(a, () => {
                 int heal = Dmg((a.power + Level) * (1 + .06f * R("md-sealing-hands")));
-                foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) Mend(who, heal);
+                foreach (var who in Party()) if (who != null && who.IsAlive && s.PartyWide(who) && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) Mend(who, heal);
             });
         }
         /// <summary>Close the Cut: a handful of salt pressed into the worst wound in the party (Sealing Hands: more; Answered: quicker while you chant).</summary>
@@ -331,7 +331,7 @@ namespace Crulanda.Encounter
                 else
                 {
                     pool.SetCurrent(pool.Current - ChantCost); Verses++;
-                    foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= ChantReach) Mend(who, ChantTick);
+                    foreach (var who in Party()) if (who != null && who.IsAlive && s.PartyWide(who) && Vector3.Distance(who.transform.position, s.Player.transform.position) <= ChantReach) Mend(who, ChantTick);
                 }
             }
             if (CircleDown && Now >= circleNext)

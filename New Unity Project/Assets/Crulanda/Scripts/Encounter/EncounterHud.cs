@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         {
             var p = ScreenToCanvas(point.x, point.y);
             Vector2 fr = p - PanelOffset("frames"), mm = p - PanelOffset("minimap"), tr = p - PanelOffset("tracker"), br = p - PanelOffset("bar");   // each panel where it was put
-            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || HallUiBlocks(p) || QueueUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
+            return paused || buildVisible || mapVisible || uiUnlocked || QuestUiBlocks(p) || WhoUiBlocks(p) || RaidUiBlocks(p) || HallUiBlocks(p) || QueueUiBlocks(p) || ItemUiBlocks(p) || TradesUiBlocks(p) || LootUiBlocks(p) || br.y > 795 || new Rect(10, 10, 350, 190).Contains(fr) ||
                 (targetVisible && new Rect(365, 10, 350, 130).Contains(fr)) || new Rect(1215, 0, 225, 240).Contains(mm) ||
                 (partySims > 0 && new Rect(10, 196, 400, 46 * partySims).Contains(fr)) || chatRect.Contains(p) ||   // the chat
                 new Rect(1110, 236, 330, 200).Contains(tr) || false;
@@ -85,12 +85,12 @@ namespace Crulanda.Encounter
             inventoryVisible = session.InventoryOpen; paused = session.Paused; buildVisible = session.BuildOpen;
             mapVisible = session.MapOpen; targetVisible = session.Target != null || session.HasFriendlyFocus; partySims = session.PartySims.Count; whoVisible = session.WhoOpen; queueVisible = session.QueueOpen; bookVisible = session.QuestBookOpen; talkVisible = session.Conversation != null; hallVisible = session.Hall != null;
             bagsVisible = session.InventoryOpen; charVisible = session.CharacterOpen; vendorVisible = session.VendorNpc != null; tradesVisible = session.TradesOpen;
-            bankVisible = session.BankOpen; exchangeVisible = session.ExchangeOpen;
+            bankVisible = session.BankOpen; exchangeVisible = session.ExchangeOpen; raidVisible = session.RaidOpen;
             GUI.matrix = CanvasMatrix;   // even and centred (playtest note 94; EncounterHud.Display)
             GUI.color = Color.white;
             using (mWorld.Auto()) DrawWorldLabels();
             // The movable panels (playtest note 97): each drawn where the player put it (EncounterHud.Display, PanelOffset).
-            using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); DrawBuffs(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); }
+            using (mFrames.Auto()) { At("frames"); DrawPlayerFrame(); DrawPartyFrame(); DrawBuffs(); if (session.Target != null) DrawTargetFrame(); else if (session.HasFriendlyFocus) DrawFriendFrame(); DrawBossFrame(); }
             using (mMap.Auto()) { At("minimap"); maps.DrawMinimap(session, gold); }
             using (mPanels.Auto()) { At("tracker"); DrawQuestTracker(); At(null); DrawChat(); DrawCenter(); At("bar"); DrawActionBar(); At(null); if (session.SpellbookOpen) DrawSpellbook(); At("pet"); DrawPetBar(); At("nerve"); DrawNervePanel(); At("bar"); DrawMicroMenu(); DrawXpBar(); At(null); }
             var windows = mWindows.Auto();
@@ -104,6 +104,7 @@ namespace Crulanda.Encounter
             if (session.MapOpen) maps.DrawWindow(session, gold, ink);
             if (session.QuestBookOpen) DrawQuestBook();
             if (session.WhoOpen) DrawWho();
+            if (session.RaidOpen) DrawRaidWindow();   // the raid window (/raid; EncounterHud.Raid)
             if (session.QueueOpen) DrawQueue();   // the dungeon queue (Gather a Party, J)
             if (session.MeterOpen && !BigWindowOpen) { At("meter"); DrawMeter(); At(null); }   // not over a big window (Chris, 2026-10-13: it lay over the talents)
             if (session.ScorecardOpen) DrawScorecard();
@@ -194,6 +195,7 @@ namespace Crulanda.Encounter
         }
         void DrawPartyFrame()
         {
+            if (session.InRaid) { DrawRaidFrames(); return; }   // a raid's frames hide the party frames (WORLD_BOSS_1 2.4; EncounterHud.Raid)
             var m = session.Companion; if (m == null) return;
             var a = m.actor;
             Fill(new Rect(48, 118, 214, 44), new Color(0, 0, 0, .5f));
@@ -256,8 +258,8 @@ namespace Crulanda.Encounter
             foreach (var (name, remaining) in kit.PartyBuffs()) party.Add(new BuffEntry { name = name, remaining = remaining, kind = BuffKind.Song, classId = session.Progress.classId });
             BuffRow(new Rect(716, 24, BuffIcons.PlayerRowWidth, BuffIcons.Size), Buffs(session.Player, party));
             var m = session.Companion;
-            if (m != null && m.actor != null && session.Progress.recruited) BuffRow(new Rect(268, 124, BuffIcons.PartyFrameWidth, BuffIcons.Size), Buffs(m.actor, party));
-            for (int i = 0; i < session.PartySims.Count; i++)
+            if (m != null && m.actor != null && session.Progress.recruited && !session.InRaid) BuffRow(new Rect(268, 124, BuffIcons.PartyFrameWidth, BuffIcons.Size), Buffs(m.actor, party));
+            for (int i = 0; i < session.PartySims.Count && !session.InRaid; i++)   // in a raid the raid frames carry no buff rows (their marks row is the fight's)
             {
                 var c = session.PartySims[i]; if (c == null || c.actor == null) continue;
                 BuffRow(new Rect(388, 200 + 46 * i + 6, BuffIcons.PartyFrameWidth, BuffIcons.Size), Buffs(c.actor, party));

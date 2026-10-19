@@ -124,6 +124,7 @@ namespace Crulanda.Encounter
         {
             if (Zone == null || Player == null) { Message("There is no dungeon to queue for here."); return false; }
             if (InCombat) { Message("Not while you are fighting."); return false; }
+            if (InRaid) { Message("The dungeons are for a party of five: leave the raid first (/raid leave)."); return false; }   // WORLD_BOSS_1 2.2
             if (QueuedFor != null) { Message("You are already queued for " + ZoneName(QueuedFor) + "."); return false; }
             if (queueRun != null) { Message("You are in a queued run of " + ZoneName(queueRun.zone) + ": leave its party first (the queue window, J)."); return false; }
             int level = Progress.Level; ZoneDefinition d;

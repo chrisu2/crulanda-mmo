@@ -270,7 +270,7 @@ namespace Crulanda.Encounter
         {
             return Start(a, () => {
                 int heal = Mathf.RoundToInt((a.power + Level) * (1 + .04f * R("sa-devotion")));
-                foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) HealActor(who, heal);
+                foreach (var who in Party()) if (who != null && who.IsAlive && s.PartyWide(who) && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) HealActor(who, heal);
             });
         }
         bool Mend(AbilityDefinition a)

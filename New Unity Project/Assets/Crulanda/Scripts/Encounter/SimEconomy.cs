@@ -70,6 +70,7 @@ namespace Crulanda.Encounter
             var d = items.Get(item); if (d == null || d.kind != "consumable") return 0;
             if (BossBuffs.IsFeast(d)) { var f = BossBuffs.FeastFor(s.level, items); return f != null && f.id == item ? 1 : 0; }
             foreach (var (id, count) in BossBuffs.Pack(s.classId, s.level, items)) if (id == item) return count;
+            if (s.level >= RaidGroup.MinSimLevel) foreach (var (id, count) in RaidCall.Kit) if (id == item) return count;   // its salt and harpoons for the raid (WORLD_BOSS_1 2.3)
             return 0;
         }
         /// <summary>

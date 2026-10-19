@@ -41,7 +41,8 @@ namespace Crulanda.Encounter
             if (s == null) return "Nobody to invite.";
             if (InParty(s.id)) return s.name + " is already in your party.";
             if (InCombat) return "Not while you are fighting.";
-            if (PartySims.Count >= MaxPartySims) return "Your party is full.";
+            if (PartySims.Count >= MaxGroupSims) return InRaid ? "The raid is full." : "Your party is full.";
+            if (InRaid && s.level < RaidGroup.MinSimLevel) return s.name + " is too green for the raid (level " + RaidGroup.MinSimLevel + " and over).";   // the level gate (WORLD_BOSS_1 2.2)
             var fig = SimPopulation.Active?.Find(s.id);
             if (fig != null && fig.Hidden) return s.name + " is inside the inn.";   // where it is comes before its mood (a full run of 2026-10-07 caught the order)
             if (fig != null && fig.InFight) return s.name + " is busy fighting.";
@@ -54,7 +55,7 @@ namespace Crulanda.Encounter
         public bool Invite(string simId, bool returning = false)
         {
             var pop = SimPopulation.Active; var s = pop?.World.sims.Find(x => x.id == simId);
-            var why = returning ? (s == null ? "Nobody to invite." : InParty(s.id) ? s.name + " is already in your party." : PartySims.Count >= MaxPartySims ? "Your party is full." : null) : InviteRefusal(s);   // a sim coming back to the party it was in (round 27) is not asked again
+            var why = returning ? (s == null ? "Nobody to invite." : InParty(s.id) ? s.name + " is already in your party." : PartySims.Count >= MaxGroupSims ? (InRaid ? "The raid is full." : "Your party is full.") : InRaid && s.level < RaidGroup.MinSimLevel ? s.name + " is too green for the raid (level " + RaidGroup.MinSimLevel + " and over)." : null) : InviteRefusal(s);   // a sim coming back to the party it was in (round 27) is not asked again
             if (why != null) { Message(why); return false; }
             var fig = pop.Find(s.id); if (fig == null) { Message(s.name + " is not here."); return false; }
             var at = fig.transform.position; pop.Figures.Remove(fig); Destroy(fig.gameObject);
@@ -63,10 +64,10 @@ namespace Crulanda.Encounter
             AddAgent(a.gameObject, 4.6f);
             var c = a.gameObject.AddComponent<SimCompanion>(); a.gameObject.SetActive(true); c.Init(a, this, s, FreeSlot());
             SimGear.Dress(a.GetComponent<ActorVisual>(), s, Items);
-            PartySims.Add(c);
+            PartySims.Add(c); RaidJoined(c);   // in a raid it takes its part and party (EncounterSession.Raid)
             if (s.classId == "class.ranger") SummonSimWolf(c);   // a sim Ranger brings its wolf (2026-10-11)
             else if (s.classId == "class.mage" && SimCompanion.Bonecaller(s)) SummonSimWolf(c, ActorLook.Skeleton);   // a Bonecaller its bone thrall (2026-10-12)
-            if (!returning) Message(s.name + " has joined your party.");
+            if (!returning) Message(s.name + (InRaid ? " has joined the raid." : " has joined your party."));
             return true;
         }
         /// <summary>The party sims' wolves (a sim Ranger's), party members the enemies can turn on (PartyActor).</summary>
@@ -161,7 +162,7 @@ namespace Crulanda.Encounter
         float pendingUntil;
         public void InvitedBy(SimAdventurer s)
         {
-            if (s == null || InParty(s.id) || PartySims.Count >= MaxPartySims || PendingInvite != null) return;
+            if (s == null || InParty(s.id) || PartySims.Count >= MaxPartySims || InRaid || PendingInvite != null) return;
             PendingInvite = s; PendingGuild = null; pendingUntil = Time.time + 30;
             Message(s.name + " invites you to a group. (Accept or decline above the bars.)");
         }
@@ -222,8 +223,8 @@ namespace Crulanda.Encounter
             DismissSimWolf(c);
             foreach (var e in Enemies) if (e != null && e.Victim == c.actor) e.ResetFight();
             c.sim.x = c.transform.position.x; c.sim.z = c.transform.position.z;
-            PartySims.Remove(c); Destroy(c.gameObject);
-            Message(c.sim.name + " leaves your party.");
+            PartySims.Remove(c); RaidLeft(c.sim.id); Destroy(c.gameObject);
+            Message(c.sim.name + (InRaid ? " leaves the raid." : " leaves your party."));
             SimPopulation.Active?.Refresh();
         }
         /// <summary>After you recover: the party comes to the stone with you, healed; while some of it is still fighting, only the fallen

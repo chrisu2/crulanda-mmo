@@ -414,6 +414,30 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
    *Chris looks: the frames.*
 2. **The call to arms** (S): Zone chat call; guild, the Lowtowns, friends; boldness and level gates; sims' own raids; sims buying salt and
    harpoons. Tests: EditMode on a fixed roster (who answers, by role; the 3 am empty zone).
+
+   **Step 1-2: WRITTEN, NOT RUN** (2026-10-19, branch `wb-raid`; compiled outside Unity, no test run yet, nothing seen in game):
+   - **What is built.** `RaidGroup.cs` (the ten: Form, Join with Party 2 first, Leave, Move, Arrange, the part and level gates, Reaches,
+     the LFM line, the ready check; `RaidReach`, the tags; `RaidFrames`, the frames' words and cells). `RaidCall.cs` (who answers, in
+     order: guild, the zone by nerve, friends; the 3 am line; `BuyKit`, 3 `throw.salt_twist` and 3 `throw.bone_harpoon`, Tibb's and Ketta's
+     items that already exist). `EncounterSession.Raid.cs` (the raid on the session: `PartySims` holds all nine sims, each with its part and
+     party; `/raid`, `/raid form|call|ready|arrange|leave`; the call's coroutine). `EncounterHud.Raid.cs` (the raid frames in place of the
+     party frames, the boss frame, the raid window). A party of five is unchanged: `MaxPartySims` stays 4, the queue refuses a raid.
+   - **The tags (what reaches whom), as built:** a class's standing buff is raid-wide (all ten); a feast feeds the eater's party; the heals
+     that go out round the healer are party-wide (a Cleric's mending round, Chorus and Answering Hills, a Paladin's and Archivist's party
+     heals, a Salt-Mender's chant and party heal, an Archivist's kept vow, a Rogue's Encore, a sim's Salt Cairn); single heals and circles
+     laid on the ground reach anyone in the raid. Songs are tagged party-wide but the kits' song code is unchanged (still the whole group):
+     settle in step 4 if a fight shows it matters.
+   - **Loot for ten:** need and greed already rolls among everyone in `PartySims`, so ten roll (the PlayMode test checks it); coin splits ten
+     ways. The components are step 7. The boss frame's pin state reads `RaidBossPinned` (0 shows "Free") and its clock `RaidBossEnrage`:
+     step 4 sets them. Her lockout key is `RaidGroup.BossLockKey` (`mob.worldboss.lowtowns.unraveller`): step 3 gives her that key.
+   - **Not built here:** the sims' own raids (a sim leader calling in Zone chat), left for step 3 with her warning. Open-world mobs scale for
+     a group of ten as for any group (`GroupScale`); step 3 turns scaling off for her only.
+   - **Tests (each fails on today's code: the raid types and rules do not exist there):** EditMode `RaidGroupTests` (10) and
+     `RaidCallTests` (5); PlayMode `RaidFormTests` (2: ten formed in the Lowtowns, and the call to arms at 1/50 speed).
+   - **To run and look at (the lead):** the three test files; then in a build in the Lowtowns at level 20: `/raid`, Form raid, invite or call
+     ten, **capture the raid frames** (two columns of five, role marks, health, the healers' mana slivers, ready-check bars during a
+     check), the raid window (roster by party, parts, gear levels, the lockout line, the four buttons) and the boss frame on an elite
+     target, front at 1920x1080. *Chris looks: the frames.*
 3. **The Drain Reach and her rising** (M): measure the north reach; build the silt bar and the apron (`LowtownsLevelsTests` keeps the river
    chemical and the ground level; nothing over the bar); the raid-boss rank (skull, "Raid (10)"), the +5 clamp kept with the cap-passing flag,
    no group scaling; the play-time timer in the world slot (format 3, save backed up first); the warning (the still water, the courts' lamps,

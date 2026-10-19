@@ -750,8 +750,16 @@ namespace Crulanda.Encounter
             // thrown or snapped into the door's apron is dropped, so the line to go in and the way out stay clear. Placed spots (the
             // seats, the workplaces) are exact and kept, and so is a resident's own post.
             if (!exact && !key.StartsWith("post:") && InDoorApron(hit.position)) return;
+            // Nor to loiter in water (play note 236, 2026-10-18, Chris in the Lowtowns: "some professions in the water under bridge"): a
+            // thrown spot ("wander" over the whole flat, where the Lowtowns' "green" falls back to) that lands in a river's shallows, or is
+            // snapped from its deep middle onto them, is dropped. The shallows are walkable (the eels', the croc's, a chaser's), so the
+            // navmesh alone kept them. A spot on a bridge's deck or a quay over the water is dry and kept.
+            if (!exact && !key.StartsWith("post:") && (Wet(Zone.Water, hit.position) || (hit.mask & (1 << EncounterNavigation.ShallowsArea)) != 0)) return;
             Places[key].Add(hit.position);
         }
+        /// <summary>Whether a standing spot (feet) is in a creek's or a lake's water, under its surface; a deck over it is not
+        /// (<see cref="ZoneWater.InDrawnWater"/>). Pure data: VillagePlacesWaterTests.</summary>
+        public static bool Wet(ZoneWater water, Vector3 feet) { return water != null && water.InDrawnWater(new Vector2(feet.x, feet.z), out float surface) && feet.y < surface + .3f; }
         /// <summary>
         /// Each inn's two lines (going in, going out) fitted to the floor round its door (2026-10-17, Chris: "people stuck getting into
         /// inn"; PostFacingPlayTests: the Golden Cask's first two places in line stood in its porch post's hole in the navmesh, the

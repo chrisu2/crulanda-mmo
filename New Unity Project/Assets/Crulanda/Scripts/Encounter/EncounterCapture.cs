@@ -483,6 +483,56 @@ namespace Crulanda.Encounter
             if (sel != null) { var f = Face(sel, 7f); while (f.MoveNext()) yield return f.Current; }
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "16-tracker.png")); yield return new WaitForSeconds(.4f);
         }
+        /// <summary>Where the line-ups (the trades', the errands', the animals', the figures') stand: the zone's middle, as in a
+        /// village, unless it is in water (play note 236, 2026-10-18: in the Lowtowns the middle is the Chemical River under the Sett
+        /// Bridge, and the trades were lined up waist-deep in it); then the first of the recovery spot, the player's spawn and the
+        /// companion's that is dry, level, open to the sky and clear of walls.</summary>
+        Vector2 lineup;
+        /// <summary>A point of a line-up, from the line-up's ground (<see cref="lineup"/>).</summary>
+        Vector2 G(float x, float y) { return lineup + new Vector2(x, y); }
+        /// <summary>The points a line-up uses round its ground: the row (x -4 to 4, y -7 to -11) and the camera's (to y -18).</summary>
+        public static readonly Vector2[] LineupPoints = BuildLineupPoints();
+        static Vector2[] BuildLineupPoints()
+        {
+            var l = new List<Vector2>();
+            foreach (float y in new[] { -7f, -8, -9, -11, -13, -15, -16.5f, -18 }) foreach (float x in new[] { -4.5f, -2.25f, 0, 2.25f, 4.5f }) l.Add(new Vector2(x, y));
+            return l.ToArray();
+        }
+        /// <summary>Whether a line-up at <paramref name="origin"/> keeps out of the zone's water (pure data: VillagePlacesWaterTests).</summary>
+        public static bool LineupDry(Crulanda.World.ZoneWater water, Vector2 origin)
+        {
+            if (water == null) return true;
+            foreach (var p in LineupPoints) if (water.InDrawnWater(origin + p, out _)) return false;
+            return true;
+        }
+        static Vector2 LineupGround(Crulanda.World.ZoneBuilder zone)
+        {
+            var z = zone.Zone; var tries = new List<Vector2> { Vector2.zero };
+            if (z.spawns != null) { tries.Add(z.spawns.recovery); tries.Add(z.spawns.player); tries.Add(z.spawns.companion); }
+            Physics.SyncTransforms();
+            foreach (var o in tries)
+            {
+                if (!LineupDry(zone.Water, o)) continue;
+                if (o == Vector2.zero) return o;   // the zone's middle, where every village has always lined up, is held only to the water
+                float base0 = zone.Ground(o + LineupPoints[0]).y; bool clear = true;
+                foreach (var p in LineupPoints)
+                {
+                    var g = zone.Ground(o + p);
+                    // Level (no terrace edge or stair in it), nothing standing in it at chest height (a wall, a cart) and open sky over
+                    // it (no bridge deck, no roof).
+                    if (Mathf.Abs(g.y - base0) > .5f || Solid(g + Vector3.up * 1.2f) || Physics.Raycast(g + Vector3.up * .3f, Vector3.up, 8, ~0, QueryTriggerInteraction.Ignore)) { clear = false; break; }
+                }
+                if (clear) return o;
+            }
+            return Vector2.zero;
+        }
+        /// <summary>Something built at a point (a wall, a cart): people and creatures do not count.</summary>
+        static bool Solid(Vector3 at)
+        {
+            foreach (var c in Physics.OverlapSphere(at, .4f, ~0, QueryTriggerInteraction.Ignore))
+                if (!(c is CharacterController) && c.GetComponentInParent<Villager>() == null && c.GetComponentInParent<Crulanda.Gameplay.Actor>() == null) return true;
+            return false;
+        }
         /// <summary>
         /// The animals' line-up (playtest notes 4 and 7: the sheep, the cats' tails): a black-faced, a white-faced and a dark sheep
         /// (one walking, head up), a cat standing with its tail hung and one at a trot with it up, side on from five metres at
@@ -491,6 +541,7 @@ namespace Crulanda.Encounter
         /// </summary>
         IEnumerator CaptureCritters(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
         {
+            lineup = LineupGround(zone);
             var motor = session.Player.GetComponent<AdventurerMotor>();
             var row = new GameObject("Critter line-up").transform; var animals = new List<(CritterBody body, float v)>();
             var spec = new[] { ("sheep", .2f, 3f, 0f), ("sheep", .6f, 1f, .5f), ("sheep", .5f, 11f, 0f), ("cat", .1f, 2f, 0f), ("cat", .5f, 4f, 3f) };   // kind, colour, seed, pace (0: standing)
@@ -498,14 +549,15 @@ namespace Crulanda.Encounter
             {
                 var (kind, r, seed, v) = spec[i];
                 var t = new GameObject(kind).transform; t.SetParent(row, false);
-                t.position = zone.Ground(new Vector2(-3.4f + i * 1.7f, -11)); t.rotation = Quaternion.Euler(0, 90, 0);   // facing +X: side on to the camera
+                t.position = zone.Ground(G(-3.4f + i * 1.7f, -11)); t.rotation = Quaternion.Euler(0, 90, 0);   // facing +X: side on to the camera
                 animals.Add((CritterBody.Build(t, kind, r, seed), v));
             }
             var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), x => x.enabled); foreach (var x in body) x.enabled = false;
-            motor.Teleport(zone.Ground(new Vector2(0, -18), 1.1f)); motor.enabled = false; var view = session.View.transform;
+            motor.Teleport(zone.Ground(G(0, -18), 1.1f)); motor.enabled = false; var view = session.View.transform;
             foreach (var (shot, eye, focus) in new[] { ("lineup", new Vector3(0, 1.3f, -16), new Vector3(0, .35f, -11)), ("cats", new Vector3(2.55f, .75f, -13.4f), new Vector3(2.55f, .25f, -11)) })
             {
-                var cam = new Vector3(eye.x, zone.Ground(new Vector2(eye.x, eye.z)).y + eye.y, eye.z); var at = new Vector3(focus.x, zone.Ground(new Vector2(focus.x, focus.z)).y + focus.y, focus.z);
+                var e2 = G(eye.x, eye.z); var f2 = G(focus.x, focus.z);
+                var cam = new Vector3(e2.x, zone.Ground(e2).y + eye.y, e2.y); var at = new Vector3(f2.x, zone.Ground(f2).y + focus.y, f2.y);
                 var look = Quaternion.LookRotation(at - cam);
                 for (float w = 0; w < 1.4f; w += Time.deltaTime)
                 {
@@ -522,11 +574,11 @@ namespace Crulanda.Encounter
             foreach (var (look, variant, role, x, pace) in new[] { (ActorLook.Villager, 3, "farmer", -2.2f, 1.4f), (ActorLook.Warrior, 0, (string)null, 0f, 1.7f), (ActorLook.Villager, 8, "herbalist", 2.2f, 0f) })
             {
                 var go = new GameObject("Figure " + look); go.transform.SetParent(people, false); new GameObject("Body").transform.SetParent(go.transform, false);
-                var from = zone.Ground(new Vector2(x - pace * .9f, -11)) + Vector3.up; go.transform.SetPositionAndRotation(from, Quaternion.Euler(0, 90, 0));
+                var from = zone.Ground(G(x - pace * .9f, -11)) + Vector3.up; go.transform.SetPositionAndRotation(from, Quaternion.Euler(0, 90, 0));
                 var fig = ActorVisual.Attach(go, look, variant, false, role); if (pace == 0) fig.Pose = ActorPose.Sit;
                 walkers.Add((go.transform, from, pace));
             }
-            var eyeAt = zone.Ground(new Vector2(0, -14.6f)) + Vector3.up * 1.15f; var lookAt = Quaternion.LookRotation(zone.Ground(new Vector2(0, -11)) + Vector3.up * .95f - eyeAt);
+            var eyeAt = zone.Ground(G(0, -14.6f)) + Vector3.up * 1.15f; var lookAt = Quaternion.LookRotation(zone.Ground(G(0, -11)) + Vector3.up * .95f - eyeAt);
             float walked = 0;
             for (int shot = 1; shot <= 2; shot++)
             {
@@ -769,6 +821,7 @@ namespace Crulanda.Encounter
             var life = VillageLife.Active;
             if (zone != null && life != null)
             {
+                lineup = LineupGround(zone);
                 string prefix = zone.Zone.id.Replace("zone.", "") + "-";
                 Crulanda.World.WorldClock.Hour = 11;
                 EncounterHud.Hidden = false;
@@ -806,10 +859,10 @@ namespace Crulanda.Encounter
                 for (int g = 0; g * 4 < line.Count; g++)
                 {
                     for (int i = g * 4; i < Mathf.Min(line.Count, g * 4 + 4); i++)
-                        line[i].StandAt(zone.Ground(new Vector2((i - g * 4 - 1.5f) * 2.6f, -8)), 180);
+                        line[i].StandAt(zone.Ground(G((i - g * 4 - 1.5f) * 2.6f, -8)), 180);
                     // The others step out of sight (a parking row at -40,-40 turned up in the water shots, heaped on one bank).
                     for (int i = 0; i < line.Count; i++) if (i < g * 4 || i >= g * 4 + 4) line[i].Park();
-                    motor.Teleport(zone.Ground(new Vector2(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
+                    motor.Teleport(zone.Ground(G(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
                     yield return new WaitForSeconds(1.2f);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "98-trades-lineup-" + (g + 1) + ".png"));
                     yield return new WaitForSeconds(.4f);
@@ -827,9 +880,9 @@ namespace Crulanda.Encounter
                     for (int i = 0; i < carriers.Count; i++)
                     {
                         if (i < g * 4 || i >= g * 4 + 4) { carriers[i].Item1.Park(); continue; }
-                        carriers[i].Item1.StandAt(zone.Ground(new Vector2((i - g * 4 - 1.5f) * 2.6f, -8)), 180); carriers[i].Item1.ShowLoad(carriers[i].Item2, carriers[i].Item3);
+                        carriers[i].Item1.StandAt(zone.Ground(G((i - g * 4 - 1.5f) * 2.6f, -8)), 180); carriers[i].Item1.ShowLoad(carriers[i].Item2, carriers[i].Item3);
                     }
-                    motor.Teleport(zone.Ground(new Vector2(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
+                    motor.Teleport(zone.Ground(G(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
                     yield return new WaitForSeconds(1.2f);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "99-errands-lineup-" + (g + 1) + ".png"));
                     yield return new WaitForSeconds(.4f);

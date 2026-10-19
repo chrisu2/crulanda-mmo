@@ -909,3 +909,6 @@ un-captures.
   Then (verbatim): "once they are cc they need to be killed systematically or they will break and eventually kill the raid" (a kill
   order on the held brood; holds break; a raid that lets them run out is overrun).
   Then: "sims are not attacking adds" and "off tank and dps kill adds while main tank stay on main spider" (the raid's split on a wave).
+  Then: "but there still needs to be cc while they take down the adds systematically" and "if all is cc'd then the tank still needs to
+  grab ONE and the dps assist him and not break other cc" (the off-tank pulls one held add at a time, the damage assists the off-tank,
+  no area damage near the held ones).

@@ -87,6 +87,10 @@ namespace Crulanda.Encounter
                 {
                     var want = from + Quaternion.Euler(0, k * 30, 0) * e.transform.forward * d;
                     if (!UnityEngine.AI.NavMesh.SamplePosition(want, out var hit, 1.5f, UnityEngine.AI.NavMesh.AllAreas) || Mathf.Abs(hit.position.y - from.y) > 2.5f) continue;
+                    // On dry ground only: the fourth tour stood you in the river by two snout camps (the first try is along its facing, and the
+                    // navmesh runs out over the shallows), where you swam: the pack won't follow a swimmer (EncounterEnemy's evade), and
+                    // the current carried you 244 m downstream.
+                    if (session.NearWater(hit.position, 2)) continue;
                     if (!UnityEngine.AI.NavMesh.CalculatePath(from, hit.position, UnityEngine.AI.NavMesh.AllAreas, path) || path.status != UnityEngine.AI.NavMeshPathStatus.PathComplete) continue;
                     reachOk = true; return hit.position;
                 }
@@ -121,7 +125,14 @@ namespace Crulanda.Encounter
                 var motor = s.Player.GetComponent<AdventurerMotor>();
                 var mp = e.transform.position; var stand = Reachable(e, 9);
                 report.AppendLine("you stand " + Vector3.Distance(stand, mp).ToString("0.0") + " m from it, " + (reachOk ? "on a walk it can take to you" : "NO walkable spot found near it (it may not come)"));
-                motor.Teleport(stand + Vector3.up * .3f);
+                // Stood on the ground itself (the land, a cave's floor or a deck nearest the navmesh's height there), not on the navmesh's own
+                // height: by the east mud the fourth tour ended with you 244 m off, about the way to the recovery point by the gate
+                // (a fall out of the world, AdventurerMotor; or swept off in the river). Checked after a moment, and said if you moved.
+                var standGround = s.Zone.StandAt(XZ(stand), stand.y, 0); if (Mathf.Abs(standGround.y - stand.y) < 3) stand = standGround;
+                motor.Teleport(stand + Vector3.up * .5f);
+                yield return new WaitForSeconds(.8f);
+                float drift = Vector2.Distance(XZ(s.Player.transform.position), XZ(stand));
+                report.AppendLine("you stood at (" + stand.x.ToString("0.0") + ", " + stand.z.ToString("0.0") + ")" + (s.NearWater(stand, 0) ? " IN WATER" : "") + (drift > 2 ? ", and moved " + drift.ToString("0") + " m at once (fell or carried)" : ", and stayed"));
                 var look = mp - stand; look.y = 0; motor.SetView(look.sqrMagnitude > .01f ? Quaternion.LookRotation(look).eulerAngles.y : 0, 16, 7);
                 yield return new WaitForSeconds(2.5f);
                 mp = e.transform.position; float h = bm != null ? bm.Height : 1.7f; var fwd = e.transform.forward;
@@ -148,13 +159,28 @@ namespace Crulanda.Encounter
                 // blow or flinch; its facing is its body's as the clip poses it (ModelBeast.Facing), not the actor's.
                 // Pulled as your opening blow pulls it: a real hit of a twentieth of its health (the first run's hit of 1 came to nothing after the armour and the scales: no threat, so it never came for you).
                 s.Select(e); e.Receive(Mathf.Max(10, e.actor.Health.Pool.Max / 20), s.Player);
-                bool swung = false, cast = false, castAfter = false; float worst = 0, walked = 0; int walkSamples = 0;
+                bool swung = false, cast = false, castAfter = false, checkedCome = false; float worst = 0, walked = 0; int walkSamples = 0;
                 float idleOff = Vector3.Angle(bm != null ? bm.Facing : e.transform.forward, e.transform.forward);
                 var last = e.transform.position; float lastAt = Time.time;
                 for (float t = 0; t < 30 && e.actor.IsAlive; t += Time.deltaTime)
                 {
                     s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max);
                     var p = e.transform.position;
+                    // Four seconds on and it has not come (tour 4: the east mud's and the north bank's snouts stood): say why, from what it holds
+                    // (its foe, its threat, evading, asleep, its path), then stand you at its side so its blow and its move are still seen.
+                    if (!checkedCome && t > 4)
+                    {
+                        checkedCome = true; float gapNow = Vector2.Distance(XZ(p), XZ(s.Player.transform.position));
+                        if (walkSamples == 0 && gapNow > 3)
+                        {
+                            var ag = e.GetComponent<UnityEngine.AI.NavMeshAgent>();
+                            report.AppendLine("it has not come after 4 s (" + gapNow.ToString("0.0") + " m off): foe " + (e.Victim != null ? e.Victim.DisplayName : "none") + ", threat " + e.threat.Any + ", evading " + e.Evading + ", asleep " + e.Dormant
+                                + ", agent " + (ag == null ? "none" : "on the navmesh " + ag.isOnNavMesh + ", path " + (ag.isOnNavMesh ? ag.pathStatus + (ag.pathPending ? " (pending)" : "") + ", stopped " + ag.isStopped + ", speed " + ag.speed.ToString("0.0") : "-"))
+                                + "; you " + (s.Player.IsAlive ? "alive" : "DEAD") + (s.NearWater(s.Player.transform.position, 0) ? ", in water" : "") + ". You are stood at its side.");
+                            var side = p + Quaternion.Euler(0, 35, 0) * e.transform.forward * 2.2f; var g = s.Zone.StandAt(XZ(side), p.y - 1, 0);
+                            if (!s.NearWater(g, 1)) { motor.Teleport(g + Vector3.up * .5f); stand = g; }
+                        }
+                    }
                     if (Time.time - lastAt >= .2f)
                     {
                         var v = (p - last) / (Time.time - lastAt); v.y = 0;
@@ -184,7 +210,7 @@ namespace Crulanda.Encounter
                     yield return null;
                 }
                 report.AppendLine("fight: blow " + (swung ? "seen" : "NOT seen") + ", move " + (e.Cast != null ? e.Cast.name + " (reach " + e.Cast.reach + " m, first after " + e.Cast.first + " s) " : "(none set) ")
-                    + (cast ? (castAfter ? "seen and landed" : "wound up") : "NOT seen in 30 s") + ", it ended " + Vector3.Distance(e.transform.position, s.Player.transform.position).ToString("0.0") + " m from you");
+                    + (cast ? (castAfter ? "seen and landed" : "wound up") : "NOT seen in 30 s") + ", it ended " + Vector3.Distance(e.transform.position, s.Player.transform.position).ToString("0.0") + " m from you; you ended at (" + s.Player.transform.position.x.ToString("0.0") + ", " + s.Player.transform.position.z.ToString("0.0") + "), " + Vector2.Distance(XZ(s.Player.transform.position), XZ(stand)).ToString("0.0") + " m from where you were stood" + (s.NearWater(s.Player.transform.position, 0) ? ", IN WATER" : "") + (s.Player.IsAlive ? "" : ", DEAD"));
                 report.AppendLine("facing: its body " + idleOff.ToString("0") + " degrees off its actor's forward when pulled; walking (over .5 m/s, over fifths of a second, no blow or flinch) "
                     + (walkSamples > 0 ? (walked / walkSamples).ToString("0") + " degrees off its way on average, " + worst.ToString("0") + " at worst (" + walkSamples + " samples)" : "never: it did not walk"));
                 report.AppendLine("in the fight: " + Numbers(e));

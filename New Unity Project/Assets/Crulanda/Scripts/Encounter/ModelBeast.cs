@@ -508,7 +508,14 @@ namespace Crulanda.Encounter
         {
             get
             {
-                var f = OnHumanAvatar && Animator != null && Animator.isHuman ? Animator.bodyRotation * Vector3.forward : Model != null && Model.parent != null ? Model.parent.forward : Vector3.forward;
+                // The humanoid's facing from its hips as posed: square to the line from its left thigh to its right (Animator.bodyRotation may
+                // be read only in OnAnimatorIK: read from the bestiary tour's frame loop it warned every frame, tour 4's log).
+                Vector3 f = Model != null && Model.parent != null ? Model.parent.forward : Vector3.forward;
+                if (OnHumanAvatar && Animator != null && Animator.isHuman)
+                {
+                    var l = Animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg); var r = Animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
+                    if (l != null && r != null) { var across = r.position - l.position; across.y = 0; if (across.sqrMagnitude > 1e-6f) f = Vector3.Cross(across, Vector3.up); }
+                }
                 f.y = 0; return f.sqrMagnitude > 1e-6f ? f.normalized : Vector3.forward;
             }
         }

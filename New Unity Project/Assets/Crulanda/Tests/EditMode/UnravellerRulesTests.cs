@@ -26,7 +26,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(File.Exists(File_), "the data file");
             var t = UnravellerTuning.Parse(File.ReadAllText(File_));
             var d = new UnravellerTuning();
-            Assert.AreEqual(d.health, t.health); Assert.AreEqual(140000, t.health, "tune-2: wipes at 69%, 58% and 46% with the raid geared and buffed");
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(175000, t.health, "tune-3: the fast pulls had her at 18-23% by 4:50, to die only to the pulse");
             Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
             Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
@@ -35,7 +35,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(JsonUtility.ToJson(d), JsonUtility.ToJson(t), "the file's numbers are the defaults' (UnravellerTuning)");
             var tuned = UnravellerTuning.Parse("{\"health\": 90000, \"pinLeast\": 6}");
             Assert.AreEqual(90000, tuned.health); Assert.AreEqual(6, tuned.pinLeast); Assert.AreEqual(12, tuned.pinFirst, "the rest as the defaults");
-            Assert.AreEqual(160000, UnravellerTuning.Parse("not json").health, "a broken file plays the defaults");
+            Assert.AreEqual(new UnravellerTuning().health, UnravellerTuning.Parse("not json").health, "a broken file plays the defaults");
             Assert.AreEqual(15, t.FeedEvery(1)); Assert.AreEqual(20, t.FeedEvery(2)); Assert.AreEqual(20, t.FeedEvery(3));
             Assert.AreEqual(0, t.BroodEvery(1)); Assert.AreEqual(30, t.BroodEvery(2)); Assert.AreEqual(40, t.BroodEvery(3));
             Assert.AreEqual(0, t.SwallowEvery(1)); Assert.AreEqual(35, t.SwallowEvery(2)); Assert.AreEqual(40, t.SwallowEvery(3));
@@ -174,8 +174,8 @@ namespace Crulanda.Tests
         [Test] public void The_Unravelling_grows_each_pulse_and_the_feast_comes_at_nine_minutes()
         {
             var t = T;
-            Assert.AreEqual(.02f, UnravellerRules.PulseShare(0, t), 1e-5f, "2% at first (raid 3; the doc's 1.5%)");
-            Assert.AreEqual(.092f, UnravellerRules.PulseShare(60, t), 1e-5f, "about 9% three minutes in (sixty pulses)");
+            Assert.AreEqual(.012f, UnravellerRules.PulseShare(0, t), 1e-5f, "1.2% at first (tune-3: 2% killed the fast pulls; the doc said 1.5%)");
+            Assert.AreEqual(.036f, UnravellerRules.PulseShare(60, t), 1e-5f, "about 3.6% three minutes in (sixty pulses)");
             Assert.AreEqual(540, UnravellerRules.EnrageLeft(0, t)); Assert.AreEqual(40, UnravellerRules.EnrageLeft(500, t), 1e-4f); Assert.AreEqual(0, UnravellerRules.EnrageLeft(600, t));
             Assert.IsFalse(UnravellerRules.Feast(539.9f, t)); Assert.IsTrue(UnravellerRules.Feast(540, t));
         }
@@ -239,7 +239,7 @@ namespace Crulanda.Tests
         [Test] public void The_ground_spikes_are_warned_and_never_burst_on_a_held_brood()
         {
             var t = T;
-            Assert.That(t.spikeWarn, Is.InRange(1f, 2f), "a crack shown about 1.5 s before (raid 7: \"a sign or warning\")");
+            Assert.That(t.spikeWarn, Is.InRange(1.5f, 2.5f), "a crack shown about 2 s before (raid 7: a sign or warning)");
             Assert.That(t.spikeShare, Is.InRange(.25f, .3f), "a solid hit, 25-30%"); Assert.Less(t.spikeShare, EncounterEnemy.MaxBlowShare);
             Assert.AreEqual(5, t.spikeEveryMin); Assert.AreEqual(7, t.spikeEveryMax);
             var held = new List<Vector2> { new Vector2(10, 0) };

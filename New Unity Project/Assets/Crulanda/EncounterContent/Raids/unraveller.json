@@ -1,6 +1,6 @@
 {
-  "note": "Tune-2 (2026-10-19; wipes at 69%, 58%, 46% at the feast): health 190,000 to 140,000; the sims' blows x1.2 in her fight for the time they lose there (simRaidLift); unmade ground 18 s, four at most; salt snares. Raid 7 (Chris: 'mare down to 3 spiders per add'; 'i want it extremely hard but not impossible': a disciplined raid wins about 1 in 4, in the last minute): brood 3 a wave; her health 190,000; the ground spikes a hazard, warned 1.5 s, 27% and thrown up 0.6 s. Raid 6 (Chris: 'are they buffed up?'): the raid buffs before each pull (class buffs on all ten, food, elixirs, up to 15% more blow and some health); her health 170,000 to 185,000 for it. Raid 5 (Chris: 'once they are cc they need to be killed systematically'): the brood killed one at a time in a kill order (Skull: the free one, then Cross, then Moon), held ones left alone (a blow breaks a hold); brood 12% to 30% of a camp elite (about 1,050 at 22, a few seconds each for Party 2) so the order matters; her health 195,000 to 170,000 for the damage Party 2 now spends on the brood. Raid 4 (Chris: 'ground damage should be increased', 'more brood per wave..need CC baby'): unmade ground 10% to 15% a second and 5% more each second stood in it; brood 3 to 5 a wave, the raid's control classes hold them (18 s, every 15 s each). Raid 3 (2026-10-19, kills at 6:42 and 6:36, the first death at 4:27 with her at 20%: too easy, Chris): health 160,000 to 195,000 (a kill about 8:15 against the 9:00 feast), brood back to 3 a wave, unmade ground 8% to 10% a second, swallowed 12 s to 10 s, the pulse 1.5% to 2% and 0.1% to 0.12% more a pulse. Run 1 (2026-10-19, 0 of 3): lighthouse .18 to .1 (the tanks lost her to the casters), Unravel 20 s to 10 s (the stacks outlasted a swap), steel 5% a stack (melee not gutted), brood 3 to 2 a wave, 20% to 12% health, eaten at 2.5 m for 1% (eaten brood healed her back over the 70% line). The Unraveller's fight (Docs/WORLD_BOSS_1.md 3.2-3.5). Every number GAME-ONLY and PROVISIONAL: build step 6 (the group run tool at 10) tunes them here, and only here. Seconds, metres and shares of health (0.6 = 60%).",
-  "health": 140000,
+  "note": "Tune-3 (0 of 10: the fast pulls died in phase 3 to the pulse, the slow ones drowned in brood scaled for ten): the pulse 2% +0.12% to 1.2% +0.04% a pulse; her health 140,000 to 175,000 (the fast pulls had her at 18-23% by 4:50); the brood no longer scaled to the group; spikes warned 2 s. Tune-2 (2026-10-19; wipes at 69%, 58%, 46% at the feast): health 190,000 to 140,000; the sims' blows x1.2 in her fight for the time they lose there (simRaidLift); unmade ground 18 s, four at most; salt snares. Raid 7 (Chris: 'mare down to 3 spiders per add'; 'i want it extremely hard but not impossible': a disciplined raid wins about 1 in 4, in the last minute): brood 3 a wave; her health 190,000; the ground spikes a hazard, warned 1.5 s, 27% and thrown up 0.6 s. Raid 6 (Chris: 'are they buffed up?'): the raid buffs before each pull (class buffs on all ten, food, elixirs, up to 15% more blow and some health); her health 170,000 to 185,000 for it. Raid 5 (Chris: 'once they are cc they need to be killed systematically'): the brood killed one at a time in a kill order (Skull: the free one, then Cross, then Moon), held ones left alone (a blow breaks a hold); brood 12% to 30% of a camp elite (about 1,050 at 22, a few seconds each for Party 2) so the order matters; her health 195,000 to 170,000 for the damage Party 2 now spends on the brood. Raid 4 (Chris: 'ground damage should be increased', 'more brood per wave..need CC baby'): unmade ground 10% to 15% a second and 5% more each second stood in it; brood 3 to 5 a wave, the raid's control classes hold them (18 s, every 15 s each). Raid 3 (2026-10-19, kills at 6:42 and 6:36, the first death at 4:27 with her at 20%: too easy, Chris): health 160,000 to 195,000 (a kill about 8:15 against the 9:00 feast), brood back to 3 a wave, unmade ground 8% to 10% a second, swallowed 12 s to 10 s, the pulse 1.5% to 2% and 0.1% to 0.12% more a pulse. Run 1 (2026-10-19, 0 of 3): lighthouse .18 to .1 (the tanks lost her to the casters), Unravel 20 s to 10 s (the stacks outlasted a swap), steel 5% a stack (melee not gutted), brood 3 to 2 a wave, 20% to 12% health, eaten at 2.5 m for 1% (eaten brood healed her back over the 70% line). The Unraveller's fight (Docs/WORLD_BOSS_1.md 3.2-3.5). Every number GAME-ONLY and PROVISIONAL: build step 6 (the group run tool at 10) tunes them here, and only here. Seconds, metres and shares of health (0.6 = 60%).",
+  "health": 175000,
   "hitBase": 190,
   "swingEvery": 2.2,
   "enrageSeconds": 540,
@@ -74,8 +74,8 @@
   "calcifyTaken": 1.5,
 
   "pulseEvery": 3,
-  "pulseStart": 0.02,
-  "pulseGrow": 0.0012,
+  "pulseStart": 0.012,
+  "pulseGrow": 0.0004,
   "huntEvery": 20,
   "huntWarn": 3,
   "huntRadius": 5,
@@ -84,7 +84,7 @@
 
   "spikeEveryMin": 5,
   "spikeEveryMax": 7,
-  "spikeWarn": 1.5,
+  "spikeWarn": 2,
   "spikeRadius": 2.2,
   "spikeShare": 0.27,
   "spikeLift": 0.6,

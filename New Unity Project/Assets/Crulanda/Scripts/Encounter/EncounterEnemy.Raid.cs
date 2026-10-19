@@ -22,7 +22,7 @@ namespace Crulanda.Encounter
         public string RankNote { get { return RaidBoss ? RankWords(RaidSize) : null; } }
         public static string RankWords(int raidSize) { return "Raid (" + raidSize + ")"; }
         /// <summary>Whether a party's size raises it (GroupScale): everything but a game animal and a raid boss.</summary>
-        public bool ScalesWithGroup { get { return !Game && !RaidBoss; } }
+        public bool ScalesWithGroup { get { return !Game && !RaidBoss && !Brood; } }   // her brood are set for the raid as they are (tune-3: scaled for ten, a wave outlived its holds)
         /// <summary>Makes this a raid boss for <paramref name="raidSize"/>: its rank, its level shown as it is.</summary>
         public void MakeRaidBoss(int raidSize) { RaidSize = raidSize; actor.SetClassification(ActorClassification.Boss); UnscaleFromGroup(); }
         /// <summary>

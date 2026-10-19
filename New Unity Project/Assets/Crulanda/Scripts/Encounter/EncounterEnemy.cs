@@ -342,6 +342,7 @@ namespace Crulanda.Encounter
                 if (Figure != null) Figure.Strike();
                 int damage = session.Kit.ResolveEnemyHit(this, Victim, CappedBlow(Victim, Mathf.RoundToInt(HitBase * OverHitNow * GroupDamageScale * BlowScale)));
                 session.FloatText(Victim.transform.position, "−" + damage, new Color(1, .45f, .35f));
+                session.NoteHit(Victim, Name + " " + damage);   // the run's death lines (EncounterSession.UnravellerFight)
                 if (damage > 0) Grey(Victim);   // a Hollow Man's blow greys (EncounterEnemy.Grey)
                 RaidSwung(Victim);   // the Unraveller's Unravel (EncounterEnemy.Unraveller)
             }

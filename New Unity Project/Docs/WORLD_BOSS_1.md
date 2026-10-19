@@ -774,6 +774,26 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
    - **Her health 140,000** (190,000): tune-2's best pull reached the feast with her at 46%; with the snares, the uptime and the lift a
      disciplined raid should reach the last minute. Tune-3 reads it.
    - **Fixed:** the buff-up waits until the last pull's fight is over (tune-2's second pull buffed nobody: the brood still fought).
+   **Tune-3 read (0 of 10), the changes for tune-4 (2026-10-19; WRITTEN, NOT RUN).** Two shapes of wipe: fast pulls (4:25-4:56, her at
+   18-23%) died in phase 3 to the Unravelling's pulse; slow pulls (8:25-9:00, her 43-55%) drowned in brood (holds ran out 109-143 times a
+   pull against 25-34 killed). The damage-dealers by the real clock: Mage 90, Ranger 67, Scoundrel 67, Rogue 62, Archivist 43 (aim 62),
+   the Warrior tank 40 (aim 63), the bot Paladin 13 with 15 deaths; healing Cleric 45, Druid 33, Shaman 30.
+   - **The pulse** flatter: 1.2% of health a pulse and 0.04% more each (it was 2% and 0.12%: about 2.5% a second by three minutes, more
+     than three healers mend).
+   - **The brood** were scaled to a group of ten (as any camp mob for a party): far more health than meant, so a wave outlived its holds.
+     Her brood are set for the raid as they are now (about 1,050 at 22: a few seconds each under the raid's damage).
+   - **The pets** stood in the red while their keeper lay dead (the Ranger's wolf 40-130 s a pull): a pet leaves harmful ground whatever its
+     keeper's state.
+   - **The healers** mended in a fixed order and the Cleric's came first to every most-hurt member (the meter counts only what heals): each
+     healer's wait between mends now varies a little, so none is always first.
+   - **The spikes** are warned 2 s (1.5).
+   - **The hunt** looks only within 25 m of her (the PlayMode test's you, standing off on the apron, could be hunted and never ran).
+   - **Her health 175,000** (140,000): the fast pulls had her at 18-23% by 4:50 and died only to the pulse.
+   - **The log** now gives the last blow on each death ("last hit: The Unraveller 410", "Spikes 352", "Weave-Eater brood 96"): the bot
+     Paladin's deaths are to be read there before anything of its is changed. The band lines say the shares in use (hybrid 75%, Archivist
+     70%, tank 72%).
+   - **Tests fixed:** "a broken file plays the defaults" compares with the defaults (not 160,000); the body's height test allows the
+     spider's own 3.4 m (the crown blinks, the spikes erupt: often neither is up).
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

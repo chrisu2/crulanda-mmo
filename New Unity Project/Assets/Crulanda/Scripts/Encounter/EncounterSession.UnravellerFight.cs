@@ -350,6 +350,9 @@ namespace Crulanda.Encounter
                 else if (s.mark != null) s.mark.Show(s.at, t.snareRadius, 1);
             }
         }
+        /// <summary>The last thing that struck each of the raid (the run's death lines: what killed them).</summary>
+        public readonly Dictionary<string, string> LastHitBy = new Dictionary<string, string>();
+        public void NoteHit(Actor victim, string what) { if (victim != null && what != null) LastHitBy[victim.EntityId.Value] = what; }
         /// <summary>Seconds each of the raid (and a pet) stood in harmful ground this pull (the run's log).</summary>
         public readonly Dictionary<string, float> HarmSeconds = new Dictionary<string, float>();
         public void CountHarm(Actor a, float seconds)
@@ -717,6 +720,7 @@ namespace Crulanda.Encounter
             if (a == null || !a.IsAlive || share <= 0) return;
             int raw = Mathf.Max(1, Mathf.RoundToInt(a.Health.Pool.Max * share));
             int dealt = EncounterEnemy.CapBlow(raw, a.Health.Pool.Max, true, passesCap);
+            NoteHit(a, (what ?? (Pulses > 0 && share < .1f ? Unraveller.PulseName : "her")) + " " + dealt);
             a.Health.ApplyDamage(dealt);
             if (what != null || a == Player) FloatText(a.transform.position, (what != null ? what + " " : "") + "−" + dealt, new Color(.62f, .55f, .8f));
         }

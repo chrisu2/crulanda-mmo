@@ -117,8 +117,8 @@ namespace Crulanda.Encounter
                     foreach (var a in s.PartyActors())
                     {
                         if (a == null || a.IsAlive || !dead.Add(a.EntityId.Value)) continue;
-                        string who = a == s.Player ? "you" : a.DisplayName;
-                        string line = Clock(t) + "  DEATH " + who + " (" + dead.Count + " down; her " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%, phase " + e.RaidPhase + "; pin " + e.PinLeft.ToString("0.0") + " s, unravel on it " + e.UnravelOn(a) + ", feeding " + (e.Feeding ? "yes" : "no") + ", brood up " + s.BroodNow.Count(b => b != null && b.actor.IsAlive) + ", unmade " + s.UnmadePatches + (s.SwallowedActor != null ? ", swallowed " + s.SwallowedActor.DisplayName : "") + (s.HuntedActor != null ? ", hunting " + s.HuntedActor.DisplayName : "") + ")";
+                        string who = a == s.Player ? "you" : a.DisplayName; s.LastHitBy.TryGetValue(a.EntityId.Value, out var lastHit);
+                        string line = Clock(t) + "  DEATH " + who + " (" + dead.Count + " down; her " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%, phase " + e.RaidPhase + "; pin " + e.PinLeft.ToString("0.0") + " s, unravel on it " + e.UnravelOn(a) + ", feeding " + (e.Feeding ? "yes" : "no") + ", brood up " + s.BroodNow.Count(b => b != null && b.actor.IsAlive) + ", unmade " + s.UnmadePatches + (s.SwallowedActor != null ? ", swallowed " + s.SwallowedActor.DisplayName : "") + (s.HuntedActor != null ? ", hunting " + s.HuntedActor.DisplayName : "") + (lastHit != null ? "; last hit: " + lastHit : "") + ")";
                         Log(line); if (firstDeath == null) firstDeath = line;
                     }
                     if (Time.time >= nextLog) { nextLog = Time.time + 30; Log(Clock(t) + "  her " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%, enrage in " + Clock(s.RaidBossEnrage) + ", pin " + e.PinLeft.ToString("0") + " s (harpoons " + s.HarpoonsThrown + "), feedings landed " + e.FeedingsLanded + " stopped " + e.FeedingsStopped + ", grown " + Mathf.RoundToInt(e.Growth * 100) + "%; " + s.PartySims.Count(c => c != null && c.actor.IsAlive) + "/" + s.PartySims.Count + " sims up"); }
@@ -145,7 +145,7 @@ namespace Crulanda.Encounter
                 "Pulls:" };
             summary.AddRange(lines.Select(l => "  " + l));
             summary.Add("Buffs at each pull (class buffs laid raid-wide, food, elixir): " + string.Join(" | ", buffLines));
-            summary.Add("Damage against the bands (BALANCE_REPORT.md: a pure damage-dealer the band, a hybrid 90% of it, the Archivist (control and support) 72%, a tank 3/4, a healer low; the band at " + level + " is " + SimCompanion.PureDps(level).ToString("0") + " a second on one target; her fight costs everyone some for moving, salting and harpooning):");
+            summary.Add("Damage against the bands (BALANCE_REPORT.md: a pure damage-dealer the band, a hybrid " + Mathf.RoundToInt(EncounterSession.HybridDpsShare * 100) + "% of it, the Archivist (control and support) " + Mathf.RoundToInt(SimCompanion.ControlDpsShare * 100) + "%, a tank " + Mathf.RoundToInt(SimCompanion.TankDpsShare * 100) + "%, a healer low; the band at " + level + " is " + SimCompanion.PureDps(level).ToString("0") + " a second on one target; her fight costs everyone some for moving, salting and harpooning):");
             summary.AddRange(BandLines(s, level).Select(l => "  " + l));
             summary.Add("Scorecard:"); summary.AddRange(s.Meter.Scorecard().Select(l => "  " + l));
             RaidFinish(s, directory, log, summary);

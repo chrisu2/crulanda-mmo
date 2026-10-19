@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     public sealed class UnravellerTuning
     {
         // ---------- her, and the clock ----------
-        public int health = 140000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
+        public int health = 175000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
         // ---------- the rules that hold all fight (3.3): the Weave-Eaters' own, scaled ----------
         public float lighthouseShare = .1f, lighthouseBeat = 2, lighthouseReach = 30;
         public float blinkEvery = 9, blinkReach = 12, touchShare = .6f, touchSilence = 3, wardReach = 10;
@@ -35,12 +35,12 @@ namespace Crulanda.Encounter
         public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 10; public int saltsToFree = 3;
         public float saltWindow = 12, calcifySeconds = 4, calcifyTaken = 1.5f;
         // ---------- phase 3 ----------
-        public float pulseEvery = 3, pulseStart = .02f, pulseGrow = .0012f;
+        public float pulseEvery = 3, pulseStart = .012f, pulseGrow = .0004f;
         public float huntEvery = 20, huntWarn = 3, huntRadius = 5, huntShare = .8f, missStun = 2;
         // ---------- the ground spikes (raid 7, Chris: "a sign or warning where the spikes will pop before hand if they do damage") ----------
         /// <summary>Every spikeEveryMin-Max s her shards burst out of the ground at two spots (one where one of the raid stands, one at her edge),
         /// a violet crack shown spikeWarn s before; spikeShare of the health of anyone within spikeRadius, thrown up (stunned) spikeLift s.</summary>
-        public float spikeEveryMin = 5, spikeEveryMax = 7, spikeWarn = 1.5f, spikeRadius = 2.2f, spikeShare = .27f, spikeLift = .6f;
+        public float spikeEveryMin = 5, spikeEveryMax = 7, spikeWarn = 2f, spikeRadius = 2.2f, spikeShare = .27f, spikeLift = .6f;
         // ---------- the salt snare (play note 281, Chris: "need some type of mechanism to trap the brood..someone that can do an extra job") ----------
         /// <summary>A ring of salt on bone stakes: snareRadius across, snareSeconds on the ground or until it holds one; a brood crossing it calcified
         /// snareHold s; the Trapper lays snaresPerWave a wave, one each snareEvery s.</summary>

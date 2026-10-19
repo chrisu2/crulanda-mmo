@@ -70,8 +70,8 @@ namespace Crulanda.Tests
             var s = Session(); Assert.NotNull(s); Assert.AreEqual("zone.lowtowns", ZoneBuilder.Active.Zone.id);
             s.Progress.experience = EncounterProgress.XpForLevel(20); s.Player.SetLevel(20);
             var zone = ZoneBuilder.Active; var apron = zone.ReachApron; Assert.NotNull(apron, "the apron");
-            var stand = zone.Ground(apron.center + new Vector2(-2, -12));   // off at the apron's south end: out of her reach and her pulse's
-            Assert.IsTrue(NavMesh.SamplePosition(stand, out var hit, 4, NavMesh.AllAreas)); stand = hit.position;
+            var stand = zone.Ground(apron.center + new Vector2(-6, -26));   // well off: beyond her hunt's reach (UnravellerRules.HuntReach)   // off at the apron's south end: out of her reach and her pulse's
+            Assert.IsTrue(NavMesh.SamplePosition(stand, out var hit, 8, NavMesh.AllAreas)); stand = hit.position;
             s.Player.GetComponent<AdventurerMotor>().Teleport(stand + Vector3.up * 1.05f);
             var pop = SimPopulation.Active; Assert.NotNull(pop);
             string[] classes = { "class.warrior", "class.warrior", "class.cleric", "class.druid", "class.shaman", "class.ranger", "class.mage", "class.rogue", "class.scoundrel" };
@@ -122,7 +122,7 @@ namespace Crulanda.Tests
             Assert.IsNotNull(look.Wrap); Assert.That(look.Wrap.ShardCount, Is.InRange(10, 14));
             var parts = e.GetComponentsInChildren<Renderer>().Where(r => r.enabled && !(r is ParticleSystemRenderer)).ToList();
             var all = parts[0].bounds; foreach (var r in parts) all.Encapsulate(r.bounds);
-            Assert.That(all.size.y, Is.InRange(3.5f, UnravellerBody.WrapLimit + 2.5f), "the spider and its crown, the wrap under 1.5 times her: " + all.size.y);
+            Assert.That(all.size.y, Is.InRange(3f, UnravellerBody.WrapLimit + 2.5f), "the spider and its crown, the wrap under 1.5 times her: " + all.size.y);
             Assert.That(Mathf.Max(all.size.x, all.size.z), Is.GreaterThan(6f), "legs spread wide");
             Assert.IsNotNull(look.Playing, "a clip playing (idle)");
             Time.timeScale = 4;

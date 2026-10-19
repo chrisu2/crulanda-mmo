@@ -170,7 +170,13 @@ namespace Crulanda.Encounter
         void Update()
         {
             if (session == null || session.Paused || actor == null || !actor.IsAlive) return;
-            var player = Heel; if (player == null || (Master != null && !Master.actor.IsAlive)) return;
+            var player = Heel; if (player == null) return;
+            if (Master != null && !Master.actor.IsAlive)
+            {
+                // Its keeper down: it still leaves harmful ground (tune-3: the Ranger's wolf stood 100 s a pull in the red while the Ranger lay dead).
+                if (GroundMarks.InHarm(transform.position) && agent.isOnNavMesh) { session.CountHarm(actor, Time.deltaTime); var o = GroundMarks.StepOut(NavMesh.SamplePosition(transform.position, out var u0, 2, NavMesh.AllAreas) ? u0.position : transform.position - Vector3.up); if (o.HasValue) { agent.isStopped = false; agent.speed = 6; agent.SetDestination(o.Value); } }
+                return;
+            }
             if (Quarry != null && (!Quarry.actor.IsAlive || !Quarry.Engaged && Vector3.Distance(player.position, Quarry.transform.position) > 40)) { Quarry = null; fury = 1; }
             if (Quarry == null) { if (Mode == Order.Assist) Assist(); else Defend(); }
             float toPlayer = Vector3.Distance(transform.position, player.transform.position);

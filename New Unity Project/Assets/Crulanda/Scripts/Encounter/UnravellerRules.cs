@@ -72,9 +72,11 @@ namespace Crulanda.Encounter
         public static string HuntPick(IList<UnravellerCandidate> all)
         {
             UnravellerCandidate best = null;
-            if (all != null) foreach (var c in all) if (c != null && c.alive && c.magic && !c.victim && !c.swallowed && (best == null || c.threat > best.threat)) best = c;
+            if (all != null) foreach (var c in all) if (c != null && c.alive && c.magic && !c.victim && !c.swallowed && c.distance <= HuntReach && (best == null || c.threat > best.threat)) best = c;
             return best?.id;
         }
+        /// <summary>How far from her she looks for whom to hunt (those in her fight, not one standing off on the apron).</summary>
+        public const float HuntReach = 25;
         /// <summary>Who she drifts over and swallows: the nearest living member who is not her target (nor the hunted, nor one swallowed).</summary>
         public static string SwallowPick(IList<UnravellerCandidate> all)
         {

@@ -850,7 +850,7 @@ namespace Crulanda.Encounter
                 var hurt = MostHurt(HealReach);
                 if (hurt != null && hurt.Health.Pool.Ratio < (mender ? .8f : .6f))
                 {
-                    nextHeal = Time.time + (mender ? MendEvery : 6); nextAct = Mathf.Max(nextAct, Time.time + (mender ? 1.2f : 2.2f));
+                    nextHeal = Time.time + (mender ? MendEvery * Random.Range(.85f, 1.15f) : 6); nextAct = Mathf.Max(nextAct, Time.time + (mender ? 1.2f : 2.2f));
                     healing = hurt; healAt = Time.time + 1; if (visual != null) visual.Casting = true;
                     if (agent.isOnNavMesh) agent.isStopped = true;
                     Activity = "Mending " + (hurt == player ? "you" : hurt.DisplayName);

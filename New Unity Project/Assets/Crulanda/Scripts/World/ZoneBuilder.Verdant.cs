@@ -253,11 +253,13 @@ namespace Crulanda.World
             foreach (float deg in new[] { 0f, 45, 90, 135, 180 })
             {
                 float r = deg * Mathf.Deg2Rad; var seat = new Vector3(Mathf.Cos(r), 0, Mathf.Sin(r)) * HearthHouseSeats;
-                Part(PrimitiveType.Cylinder, house, seat + Vector3.up * .22f, new Vector3(.5f, .22f, .5f), dark);
-                inn.seats.Add(new InnSeat { at = house.TransformPoint(seat), face = house.TransformPoint(Vector3.zero) });
+                Part(PrimitiveType.Cylinder, house, seat + Vector3.up * .22f, new Vector3(.5f, .22f, .5f), dark); SeatMark(house, new Vector2(seat.x, seat.z), HearthStumpTop);
+                inn.seats.Add(new InnSeat { at = house.TransformPoint(seat), face = house.TransformPoint(Vector3.zero), top = HearthStumpTop });
             }
             var fade = house.gameObject.AddComponent<RoofFade>(); fade.Half = new Vector2(hr, hr); fade.Walled = true;   // the room stays a room when you are in it
         }
+        /// <summary>The hearth-house's stumps' tops over its floor (m).</summary>
+        public const float HearthStumpTop = .44f;
 
         /// <summary>
         /// A giant tree lying where it fell (the Fallen Ghost-Oak): its trunk along local +x, <paramref name="length"/> long and about

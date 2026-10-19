@@ -52,6 +52,37 @@
 - Standing on the water in that frame was the capture's wading shot (swimming), not a stray floor: the river has no collider.
 - `VillagePlacesWaterTests` (EditMode); compiles, not run. The lead runs it and recaptures the Lowtowns (`lowtowns-98-trades-lineup-*`,
   `-99-errands-lineup-*`, `-98-critters-*`, `-98-figures-walk-*`, `-08-the-sett-bridge`) plus a look under the Sett and Rag Bridges.
+## 2026-10-18: inn sitters on their seats; the taverns' windows and hearths dressed (branch inn-seats; WRITTEN, NOT RUN)
+- Chris, play note 237: "inn still not polished. this guy not even sitting on a chair." Cause: the sitting pose moved every seated
+  body 0.42 m forward (ActorVisual SitShift, note 30, on the belief that the clip puts the hips that far back); the clip as imported
+  does not, so the hips landed 0.4 m in front of the seat: at a table's end, in the air, the stool behind. And a walk to a seat ends up
+  to 0.65 m short of it, where the sitter sat down. Now: the seated body is fitted by measuring the pelvis each frame and putting it
+  over the place (riders keep the old shift); arriving at an inn seat (or drinking, or passing out) puts the sitter on the seat's
+  middle; seats carry their top and a higher seat (bar stools .67-.79 m) lifts the sitter and lets the feet hang; one sitter to a seat
+  (a full room sends nobody to sit beside a stool). Every inn seat (tables, bar, bench, booths, kegs, stumps) has a seat mark the test
+  holds sitters to.
+- After the lane A run (Oakhaven and the Lowtowns failed: sitters 0.3-0.66 m off five table seats): those seats stand off the navmesh's
+  edge (by a wall, the Spoon's partitions), so their place was snapped up to 1.2 m off the stool and the agent can stand no nearer.
+  Seated, the body is now set on the seat's own registered middle (the agent left where it is, not driving the body until the next
+  walk). InnSeatPlayTests makes its own sitters where a zone has too few (it was Inconclusive in the Ash Rim and the Verdant Shore).
+- The second run failed with the same numbers: those seats are on the navmesh after all (the Spoon's four were the dice pit's kegs);
+  another villager's agent at or beside the same seat (the inn's own drinkers sit there by 11:00) pushed the sitter's agent off it by
+  about the agents' radius, and the body went with it. Now every seated sitter is pinned on the seat's middle (the agent no longer moves
+  the body until the next walk or warp), whether the place was moved or not. The test parks everyone else while it sits its sitters and
+  says which way each was seated (Villager.SeatedBy).
+- The Golden Cask and the Cracked Hearth inside: each ground-floor window framed on the inner wall with glazing bars and a sill (pale oak
+  and a deep sill in the Cask; soot-dark timber under a stone lintel in the Hearth); the hearths a dark firebox with a grate and two
+  logs; the Cask's oak mantel with candles and a mug, the Hearth's lintel split and dropped with soot up the stone.
+- Tests: InnSeatPlayTests (all seven inns: every registered seat has a seat under it at its top; a villager put at each seat sits with
+  the measured hips within 0.25 m of a seat, facing its table, bar or fire, at the same height over the seat as the rest). By its logic
+  it fails on the old pose (hips 0.4 m off every seat). Compiles; not run.
+- The lead must: run InnSeatPlayTests (it logs each zone's hips-over-seat median: if the bar stools' sitters sit high or sunk,
+  ActorVisual.SitClipSeat is the one number to set), the inn and throne tests (InnLayoutTests, VillageDrinkTests, CrownThronePlayTests,
+  ModelFigureTests), then capture: the drinkers frame in Oakhaven, Khaven and the Lowtowns (oakhaven-99-inn-drinkers and the like),
+  a bar stool and the hearth bench sitter front, back and side, the Crown's throne (the High Councilor on his seat, front and side),
+  and the Cask's and the Hearth's taproom (windows and hearth). Not in this branch, for the lead: the taprooms' bare plaster (no inner
+  timber framing, wainscot or anything hung), the innkeeper's place in front of the rooms door, the window glass still a flat lit
+  pane (no panes or tint by day), the woodpile model reading as rubble by the hearth, the Cask and the Hearth sharing one interior plan.
 
 ## 2026-10-18 17:49 and 18:00: published: group runs hold the level, the drowned vaults' arches (OPEN until Chris checks it)
 - The drowned vaults are built vaults: unbroken stone rib arches, mould on the stones, no cave stalagmites. Group runs give no

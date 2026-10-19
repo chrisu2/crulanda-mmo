@@ -71,7 +71,13 @@ namespace Crulanda.World
             /// <summary>The tables' middles and turns, and the radius their seats stand at.</summary>
             public readonly List<Vector2> tables = new List<Vector2>(); public readonly List<float> turns = new List<float>();
             public const float SeatRadius = 1, TableRadius = .75f;
-            /// <summary>Where each sitter stands and the point they face.</summary>
+            /// <summary>The tops of the seats the builder puts at each kind of place (m over the floor; play note 237): the tables'
+            /// stools, chairs or benches (<see cref="seatTop"/>), the bar's stools and the hearth's bench. A sitter is lifted to them
+            /// (ActorVisual.SeatRise); InnSeatPlayTests holds the built seats to them.</summary>
+            public float seatTop = TavernSeatTop, stoolTop = TavernStoolTop, benchTop = TavernBenchTop;
+            /// <summary>A tavern's: the kit's stool .45 m tall at the tables and .62 at the bar, its bench .5, each on the .045 m floor.</summary>
+            public const float TavernSeatTop = .495f, TavernStoolTop = .665f, TavernBenchTop = .545f, WaystationSeatTop = .47f;
+            /// <summary>Where each sitter is put (the seat's middle) and the point they face.</summary>
             public readonly List<(Vector2 at, Vector2 face)> seats = new List<(Vector2, Vector2)>(), stools = new List<(Vector2, Vector2)>(), benchSeats = new List<(Vector2, Vector2)>();
             /// <summary>Waystation: the long table (middle, size), the bunks (middles; each <see cref="bunkSize"/>), and where a lodger goes to bed.</summary>
             public Vector2 longTable, longTableSize, bunkSize = new Vector2(2, .8f), sleep; public readonly List<Vector2> bunks = new List<Vector2>();
@@ -105,7 +111,7 @@ namespace Crulanda.World
                 float w = p.w, d = p.d;
                 if (p.waystation)
                 {
-                    p.doorH = 2.3f;
+                    p.doorH = 2.3f; p.seatTop = WaystationSeatTop;   // the benches down the long table
                     // The hearth on the +x end, the long table down the middle away from it, between the doorway and the bunks.
                     p.hearth = new Vector2(w / 2 - .55f, .2f); p.hearthSize = new Vector2(.8f, 1.6f); p.fire = new Vector2(w / 2 - 1.15f, .2f);
                     float length = w - 4.4f; p.longTable = new Vector2(-.6f, .6f); p.longTableSize = new Vector2(length, .8f);
@@ -154,7 +160,7 @@ namespace Crulanda.World
             /// </summary>
             static InnPlan City(Vector2 size)
             {
-                var p = new InnPlan { w = size.x, d = size.y, doorW = CityDoorW, doorH = CityDoorH, wall = .5f, city = true, galleryY = 3.5f, galleryDepth = 2.6f };
+                var p = new InnPlan { w = size.x, d = size.y, doorW = CityDoorW, doorH = CityDoorH, wall = .5f, city = true, galleryY = 3.5f, galleryDepth = 2.6f, seatTop = .5f, stoolTop = .79f, benchTop = .485f };   // the booths' cushions and the chairs; the gilt stools' cushions; the settle by the fire
                 float hx = p.w / 2 - p.wall / 2, hz = p.d / 2 - p.wall / 2, g = p.galleryDepth;
                 // The bar under the back gallery, from 3.75 m in from the -x wall, twelve metres short of the room's width.
                 float len = Mathf.Max(6, p.w - 12), left = -hx + 3.75f;
@@ -205,7 +211,7 @@ namespace Crulanda.World
             /// </summary>
             static InnPlan Spoon(Vector2 size)
             {
-                var p = new InnPlan { w = size.x, d = size.y, doorW = InnDoorW, doorH = InnDoorH, spoon = true };
+                var p = new InnPlan { w = size.x, d = size.y, doorW = InnDoorW, doorH = InnDoorH, spoon = true, seatTop = .47f, stoolTop = .77f, benchTop = .47f };   // the pit's kegs (.44) and the chairs (.485); the tall stools (.745, .795); the bench
                 float hx = p.w / 2 - p.wall / 2, hz = p.d / 2 - p.wall / 2;
                 // The bar along the -x end, 5 m long, a metre off the wall; the keeper past its back end, the rooms door beyond her.
                 p.bar = new Vector2(-hx + 1.4f, -.1f); p.barSize = new Vector2(.8f, 5);
@@ -274,17 +280,33 @@ namespace Crulanda.World
             door.Way = new ZoneDoorway { name = name, middle = mid, inward = FlatOf(t.forward), across = FlatOf(t.right), width = doorW, walkable = NavGap(doorW) };
             return door;
         }
+        /// <summary>What InnSeatPlayTests looks for: an empty object at a seat's middle at its top, one for each seat the builders make
+        /// (a bench or a settle one every 0.3 m along it), so the test holds every sitter to a seat that is really there.</summary>
+        public const string SeatMarkName = "Seat mark";
+        /// <summary>The KayKit chair's seat as a share of its height (its mesh: 1.227 high, the seat's boards at about .45).</summary>
+        public const float KayKitChairSeat = .4f;
+        /// <summary>Marks a seat (see <see cref="SeatMarkName"/>) in the inn's frame: its middle on the floor and its top; a long seat is
+        /// marked along <paramref name="along"/> (its half-length in the frame) every 0.3 m.</summary>
+        public static void SeatMark(Transform t, Vector2 at, float top, Vector2 along = default)
+        {
+            int n = Mathf.Max(0, Mathf.FloorToInt(along.magnitude / .3f));
+            for (int i = -n; i <= n; i++)
+            {
+                var p = at + (n > 0 ? along * (i / (float)n) : Vector2.zero);
+                var m = new GameObject(SeatMarkName).transform; m.SetParent(t, false); m.localPosition = new Vector3(p.x, top, p.y);
+            }
+        }
         static Vector3 FlatOf(Vector3 v) { v.y = 0; return v.sqrMagnitude > 1e-6f ? v.normalized : Vector3.forward; }
         /// <summary>Registers a walk-in inn: its seats, stools and bench (from the plan, in the world), its door and its room.</summary>
         ZoneInn RegisterInn(Transform frame, string style, ZoneDoor door, InnPlan plan, Vector2 half, bool round = false)
         {
             var inn = new ZoneInn { name = door.name, style = style, door = door, frame = frame, half = half, round = round };
-            InnSeat Seat((Vector2 at, Vector2 face) s) { return new InnSeat { at = frame.TransformPoint(new Vector3(s.at.x, 0, s.at.y)), face = frame.TransformPoint(new Vector3(s.face.x, 0, s.face.y)) }; }
+            InnSeat Seat((Vector2 at, Vector2 face) s, float top) { return new InnSeat { at = frame.TransformPoint(new Vector3(s.at.x, 0, s.at.y)), face = frame.TransformPoint(new Vector3(s.face.x, 0, s.face.y)), top = top }; }
             if (plan != null)
             {
-                foreach (var s in plan.seats) inn.seats.Add(Seat(s));
-                foreach (var s in plan.stools) inn.bar.Add(Seat(s));
-                foreach (var s in plan.benchSeats) inn.bench.Add(Seat(s));
+                foreach (var s in plan.seats) inn.seats.Add(Seat(s, plan.seatTop));
+                foreach (var s in plan.stools) inn.bar.Add(Seat(s, plan.stoolTop));
+                foreach (var s in plan.benchSeats) inn.bench.Add(Seat(s, plan.benchTop));
             }
             Inns.Add(inn);
             return inn;
@@ -358,6 +380,7 @@ namespace Crulanda.World
             foreach (int s in new[] { -1, 1 })
             {
                 Part(PrimitiveType.Cube, t, new Vector3(lt.x, .44f, lt.y + s * .65f), new Vector3(ls.x - .2f, .06f, .32f), boards);
+                SeatMark(t, new Vector2(lt.x, lt.y + s * .65f), plan.seatTop, new Vector2((ls.x - .2f) / 2 - .1f, 0));
                 foreach (int e in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(lt.x + e * (ls.x / 2 - .5f), .21f, lt.y + s * .65f), new Vector3(.08f, .42f, .28f), dark);
             }
             for (float x = lt.x - ls.x / 2 + .5f; x < lt.x + ls.x / 2 - .3f; x += 1.3f) ModelProp(t, "Fantasy/Mug", new Vector3(x, .79f, lt.y + ((int)(x * 10) % 2 == 0 ? .2f : -.2f)), x * 40, .12f);

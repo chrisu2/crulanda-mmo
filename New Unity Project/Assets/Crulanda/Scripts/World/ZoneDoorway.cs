@@ -121,8 +121,9 @@ namespace Crulanda.World
         }
     }
 
-    /// <summary>A seat at an inn: where a sitter stands (on the floor) and the point they face (the table, the bar, the fire).</summary>
-    public struct InnSeat { public Vector3 at, face; }
+    /// <summary>A seat at an inn: where a sitter is put (on the floor, the seat's middle: the sitting pose puts the hips over it,
+    /// ActorVisual.SitHipsAhead), the point they face (the table, the bar, the fire), and the seat's top over the floor (m).</summary>
+    public struct InnSeat { public Vector3 at, face; public float top; }
 
     /// <summary>
     /// A walk-in inn as the builder made it (Phase 8.6, 2026-10-15): its door and the doorway lane, the room inside the walls, its

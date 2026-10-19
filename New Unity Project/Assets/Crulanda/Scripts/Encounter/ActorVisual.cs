@@ -1199,7 +1199,7 @@ namespace Crulanda.Encounter
                     lean += 62 + Mathf.Sin(t * .6f) * 1.5f; break;
             }
             // Sitting lowers the whole figure onto the seat; everything else stands.
-            body.localPosition = new Vector3(0, Pose == ActorPose.Sit || Pose == ActorPose.Drink || Pose == ActorPose.Slump ? -.45f * (child ? .66f : 1) : Pose == ActorPose.Sneak ? -.28f : Pose == ActorPose.Swim ? -.15f : 0, 0);
+            body.localPosition = new Vector3(0, Pose == ActorPose.Sit || Pose == ActorPose.Drink || Pose == ActorPose.Slump ? -.45f * (child ? .66f : 1) + SeatRise : Pose == ActorPose.Sneak ? -.28f : Pose == ActorPose.Swim ? -.15f : 0, 0);
             body.localEulerAngles = new Vector3(lean, 0, 0);
         }
         /// <summary>

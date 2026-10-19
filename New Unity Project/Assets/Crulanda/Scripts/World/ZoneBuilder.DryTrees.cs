@@ -20,6 +20,12 @@ namespace Crulanda.World
         public static readonly string[] DryTreeModels = {
             "DryTrees/Model/Dry3333", "DryTrees/Model/Dry4195", "DryTrees/Model/Dry4910", "DryTrees/Model/Dry5818",
             "DryTrees/Model/Dry6524", "DryTrees/Model/Dry7509", "DryTrees/Model/Dry8872" };
+        /// <summary>The three stoutest (Dry8872, Dry6524, Dry5818: the thickest trunks and broadest crowns, measured from the files), for
+        /// the massive dead oaks; and the Gallows Tree's own, the stoutest.</summary>
+        public static readonly int[] StoutDryTrees = { 6, 4, 3 };
+        public const int GallowsDryTree = 6;
+        /// <summary>Each tree's trunk radius low down, as a share of its height (the files' vertices 6-12 per cent up).</summary>
+        public static readonly float[] DryTrunk = { .033f, .031f, .031f, .033f, .028f, .018f, .046f };
         /// <summary>Which of the seven a draw in [0, 1] picks (1 itself the last).</summary>
         public static int DryTreePick(float u) { int n = DryTreeModels.Length; return Mathf.Clamp((int)(u * n), 0, n - 1); }
         /// <summary>
@@ -47,11 +53,12 @@ namespace Crulanda.World
         /// their files' origins, and centring the whole crown (ModelProp) set a trunk up to a metre off its collider. ModelProp drops
         /// the lower-detail copies. Null when the pack is missing.
         /// </summary>
-        public static GameObject DryTreeModel(Transform parent, int pick, Vector3 foot, Quaternion turn, float height, Color shade)
+        public static GameObject DryTreeModel(Transform parent, int pick, Vector3 foot, Quaternion turn, float height, Color shade, float broad = 1)
         {
             string path = DryTreeModels[Mathf.Clamp(pick, 0, DryTreeModels.Length - 1)];
             var go = ModelProp(parent, path, Vector3.zero, 0, height); if (go == null) return null;
             var t = go.transform; var trunkFoot = DryBase(path, t);
+            if (broad != 1) { float s = t.localScale.y; t.localScale = new Vector3(s * broad, s, s * broad); }   // a landmark's girth and spread
             t.localRotation = turn; t.localPosition = foot - turn * Vector3.Scale(t.localScale, trunkFoot);
             var bark = DryBark;
             if (bark != null)
@@ -97,6 +104,30 @@ namespace Crulanda.World
                     low = Mathf.Min(low, Mathf.Min(HeightAt(x, z), MeshY(x, z)));
                 }
             return (c.y - low + .06f) / Mathf.Max(.01f, root.lossyScale.y);
+        }
+
+        /// <summary>
+        /// The Gallows Tree's limb for the crossbeam, in <paramref name="space"/> (the gallows' root; the trunk on its origin): of the
+        /// tree's vertices 38 to 62 per cent of <paramref name="height"/> up and 18 to 40 per cent of it out from the trunk, those in the
+        /// sixteenth of the round that holds the most (the heaviest limb carries the most of the mesh), averaged: the limb's middle there.
+        /// </summary>
+        public static bool GallowsLimb(Transform model, Transform space, float height, out Vector3 limb)
+        {
+            limb = Vector3.zero; var bins = new List<Vector3>[16]; for (int i = 0; i < 16; i++) bins[i] = new List<Vector3>();
+            var toSpace = space.worldToLocalMatrix;
+            foreach (var mf in model.GetComponentsInChildren<MeshFilter>(true))
+            {
+                var mesh = mf.sharedMesh; if (mesh == null || !mesh.isReadable) continue; var m = toSpace * mf.transform.localToWorldMatrix;
+                foreach (var v in mesh.vertices)
+                {
+                    var p = m.MultiplyPoint3x4(v); float r = new Vector2(p.x, p.z).magnitude;
+                    if (p.y < height * .38f || p.y > height * .62f || r < height * .18f || r > height * .4f) continue;
+                    int b = Mathf.FloorToInt(Mathf.Repeat(Mathf.Atan2(p.z, p.x) / (2 * Mathf.PI), 1) * 16) % 16; bins[b].Add(p);
+                }
+            }
+            int best = 0; for (int i = 1; i < 16; i++) if (bins[i].Count > bins[best].Count) best = i;
+            if (bins[best].Count < 6) return false;
+            foreach (var p in bins[best]) limb += p; limb /= bins[best].Count; return true;
         }
 
         static readonly Dictionary<int, (Mesh mesh, Matrix4x4 unit)> dryFar = new Dictionary<int, (Mesh, Matrix4x4)>();

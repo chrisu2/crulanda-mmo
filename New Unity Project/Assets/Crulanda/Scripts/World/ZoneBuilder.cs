@@ -2053,9 +2053,12 @@ namespace Crulanda.World
         /// which of the seven and its turn from the tree's own stream, its trunk's foot sunk under the lowest ground round it so it never
         /// stands on air on a slope, charred darker in the ash and greyed in a gloom. From the zone's stream it takes exactly the draws the
         /// old tree took, so nothing else moves; the collider and nav block are the old ones. <paramref name="girth"/> &gt; .6 (a dead_oak
-        /// prop) is a massive one: taller, a broader collider. <paramref name="mat"/> was the painted tree's bark: the pack's bark is used.
+        /// prop) is a massive one: taller, a broader collider, and one of the three stout dry trees broadened by a third (a landmark, not a
+        /// sapling; the preview-1019 frames). <paramref name="mat"/> was the painted tree's bark: the pack's bark is used.
+        /// <paramref name="pickAs"/>, <paramref name="tall"/>, <paramref name="broad"/>: a landmark's own tree (the Gallows Tree), its
+        /// height and its broadening; the draws are taken all the same.
         /// </summary>
-        Transform DeadTree(Vector2 at, float scale, Material mat, int depth, Transform parent, Transform existing = null, float girth = -1)
+        Transform DeadTree(Vector2 at, float scale, Material mat, int depth, Transform parent, Transform existing = null, float girth = -1, int pickAs = -1, float tall = 0, float broad = 0)
         {
             var root = existing != null ? existing : new GameObject("Dead tree").transform;
             if (existing == null) { root.SetParent(parent, false); root.position = Ground(at); root.rotation = Quaternion.Euler(0, R01 * 360, 0); }
@@ -2066,8 +2069,12 @@ namespace Crulanda.World
             var tr = TreeRandom(root.position); float T() { return (float)tr.NextDouble(); }
             bool massive = girth > .6f;
             float top = DryTreeHeight(scale, massive, T()), r0 = massive ? trunkR * .66f : Mathf.Max(.14f, trunkR * .8f);
-            int pick = DryTreePick(T()); float yaw = T() * 360;
-            DryTreeModel(root, pick, Vector3.down * DrySink(root, r0), Quaternion.Euler(0, yaw, 0), top, DryShade());
+            float u = T(); int pick = massive ? StoutDryTrees[Mathf.Min(2, (int)(u * 3))] : DryTreePick(u); float yaw = T() * 360;
+            float widen = massive ? 1.3f : 1;
+            if (pickAs >= 0) pick = pickAs;
+            if (tall > 0) top = tall;
+            if (broad > 0) { widen = broad; r0 = Mathf.Max(r0, DryTrunk[pick] * top * broad * 1.1f); }
+            DryTreeModel(root, pick, Vector3.down * DrySink(root, r0), Quaternion.Euler(0, yaw, 0), top, DryShade(), widen);
             // The old colliders: a common tree's as the kit tree had it, a massive one's the painted dead oak's.
             var cap = root.gameObject.AddComponent<CapsuleCollider>();
             if (massive) { cap.center = new Vector3(0, top / 2, 0); cap.height = top; } else { cap.center = new Vector3(0, top * .45f, 0); cap.height = top * .9f; }
@@ -3373,10 +3380,37 @@ namespace Crulanda.World
         }
         void Gallows(Transform t)
         {
-            // The Gallows Tree: a leafless tree with a heavy limb, a rope and a wooden platform beneath.
+            // The Gallows Tree (CANON landmark, Chris's Khaven map: a big, gnarled dead tree with a noose from a limb): the stoutest dry
+            // tree (Dry8872), 9 m and broadened by a third. The crossbeam (the carpenter's, GAME-ONLY) is lashed to the trunk and rests on
+            // the tree's heaviest low limb (read from the mesh: GallowsLimb); the rope and noose hang from its end over the platform.
             // The tree on its own child, so only the tree fades for the camera, not the platform and rope.
             var tree = new GameObject("Gallows tree").transform; tree.SetParent(t, false);
-            DeadTree(Vector2.zero, .75f, Tint(art.bark, new Color(.2f, .17f, .15f)), 3, statics, tree);
+            DeadTree(Vector2.zero, .75f, Tint(art.bark, new Color(.2f, .17f, .15f)), 3, statics, tree, -1, GallowsDryTree, 9, 1.35f);
+            string file = DryTreeModels[GallowsDryTree].Substring(DryTreeModels[GallowsDryTree].LastIndexOf('/') + 1);
+            var model = tree.Find("Model " + file);
+            if (model != null && GallowsLimb(model, t, 9, out var limb))
+            {
+                // The tree turned on its trunk so that limb points along the gallows' own +x, where the platform always stood (clear of
+                // the yard's houses as the zone file placed it).
+                tree.localRotation = Quaternion.Euler(0, Mathf.Atan2(limb.z, limb.x) * Mathf.Rad2Deg, 0); limb = new Vector3(new Vector2(limb.x, limb.z).magnitude, limb.y, 0);
+                var rope = Tint(art.cloth, new Color(.45f, .38f, .28f)); var flat = new Vector3(limb.x, 0, limb.z); float reach = flat.magnitude; var dir = flat / Mathf.Max(.01f, reach);
+                var end = dir * (reach + .55f) + Vector3.up * limb.y;
+                Rod(t, dir * .2f + Vector3.up * limb.y, end, .13f, art.bark);                                                   // the crossbeam: trunk to past the limb
+                Rod(t, dir * .25f + Vector3.up * (limb.y - .35f), dir * .25f + Vector3.up * (limb.y + .2f), .16f, rope);          // lashed to the trunk
+                float knot = Mathf.Min(limb.y - .6f, 2.25f); var hang = dir * (reach + .4f);
+                Rod(t, hang + Vector3.up * (limb.y - .1f), hang + Vector3.up * knot, .028f, rope);                              // the rope
+                var side = Vector3.Cross(Vector3.up, dir);
+                for (int k = 0; k < 8; k++)                                                                                     // the noose
+                {
+                    float a0 = k * Mathf.PI / 4, a1 = (k + 1) * Mathf.PI / 4;
+                    Vector3 P(float a) { return hang + Vector3.up * (knot - .17f) + side * Mathf.Sin(a) * .15f + Vector3.up * Mathf.Cos(a) * .17f; }
+                    Rod(t, P(a0), P(a1), .025f, rope);
+                }
+                var face = Quaternion.LookRotation(dir); var mid = dir * (reach + .9f);
+                Part(PrimitiveType.Cube, t, mid + Vector3.up * .5f, new Vector3(2.4f, .15f, 2.4f), art.timber, face);
+                foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, mid + face * new Vector3(sx, .25f, sz), new Vector3(.18f, .5f, .18f), art.timber, face);
+                return;
+            }
             Part(PrimitiveType.Cylinder, t, new Vector3(1.6f, 3.6f, 0), new Vector3(.28f, 1.7f, .28f), art.bark, Quaternion.Euler(0, 0, 80));
             Part(PrimitiveType.Cylinder, t, new Vector3(2.8f, 2.7f, 0), new Vector3(.05f, .75f, .05f), Tint(art.cloth, new Color(.45f, .38f, .28f)));
             Part(PrimitiveType.Cube, t, new Vector3(2.8f, .5f, 0), new Vector3(2.4f, .15f, 2.4f), art.timber);

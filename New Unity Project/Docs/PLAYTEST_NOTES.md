@@ -923,3 +923,5 @@ un-captures.
 - 270 (2026-10-19 ~16:00, watching the tuning batch) "the spikes are launching in the air. not on the ground" (OPEN).
 - 271 (2026-10-19 ~16:05, watching the tuning batch) "paladin always seems to be the first one to die every round. something wrong with
   his kit or armor?" (OPEN): the run bot's Paladin tank enters with 1,111 health against the Warrior tank's 1,303.
+- 272 (2026-10-19 ~16:08) "one class. the shaman needs 1 in raid resurection" (OPEN): the Shaman gets one combat resurrection per boss
+  fight.

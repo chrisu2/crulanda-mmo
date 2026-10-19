@@ -51,3 +51,38 @@ pulse, frightening loneliness, technological ruins).
 
 The Fantasy FREE props under `Resources/Props/Fantasy2` are ithappy's too, from the Unity Asset Store (`Fantasy_Free_fbx.zip`,
 `Unity_6_Fantasy_Free_v2.1.unitypackage`), under the Asset Store EULA like the other kits.
+
+## Fantasy3: alkakrab, Free 25 Fantasy RPG Tracks Vol. 3 (2026-10-19, play note 251)
+
+Play note 251 (Chris, verbatim): "more music tracks for in game. myassets Free 25 Fantasy RPG Tracks Vol. 3". From the Unity Asset
+Store (publisher **alkakrab**; `Asset Store-5.x\alkakrab\AudioMusic\Free 25 Fantasy RPG Tracks Vol 3.unitypackage`), a free
+package under the **Unity Asset Store EULA** (Standard Unity Asset Store End User License): the audio may be used and edited inside
+the game and ship in its builds; it may not be resold or redistributed as audio on its own. The package carries no licence or
+readme file of its own. Same rule as above: the repo stays private, and `Resources/Music` is never published by itself.
+
+25 of its 28 pieces are taken (`tools/import_music_vol3.py`, which extracts them from the package; the WAVs are not in git, the
+`.meta` files are, with the package's own GUIDs). Left in the package: the one-shot copies of Ambient 1-10 and Action 1-5 (the
+loops are the same music) and Fx 1-3 (stings; nothing needs one yet). **Edited:** the ambient, ambience and dark pieces are mixed
+20-40 dB under everything else (RMS .001-.03 against ~.15 for the ithappy packs), so each was raised toward an RMS of .12 with
+its peak held to .9, and written as 16-bit (the action loops and Ambient 3 and 4 were already at level and are unchanged). Import:
+Vorbis, quality .5, streamed (`Editor/ThirdPartyImport.cs`, `OnPreprocessAudio`).
+
+| File (Fantasy3/) | Pack piece | Length | Used for |
+|---|---|---|---|
+| Ambient1Loop, Ambient6Loop | Loops/Ambient 1, 6 | 2:24, 2:12 | the Shattered Peaks by day |
+| Ambient2Loop, Ambient7Loop | Loops/Ambient 2, 7 | 1:54, 2:10 | Oakhaven by day |
+| Ambient3Loop | Loops/Ambient 3 | 1:47 | Khaven |
+| Ambient4Loop | Loops/Ambient 4 | 2:02 | the Ashland Rim by day |
+| Ambient5Loop, Ambient8Loop | Loops/Ambient 5, 8 | 2:08, 2:06 | the Crown of Argentis by day |
+| Ambient9Loop, Ambient10Loop | Loops/Ambient 9, 10 | 2:11, 2:09 | the Verdant Shore by day (the airiest two) |
+| Ambience1 | Tracks/Ambience 1 | 1:06 | the Shore by night |
+| Ambience2 | Tracks/Ambience 2 | 1:00 | Khaven |
+| Ambience3 | Tracks/Ambience 3 | 0:54 | the Rim by night |
+| Ambience4 | Tracks/Ambience 4 | 0:59 | Oakhaven by night |
+| Ambience5 | Tracks/Ambience 5 | 0:54 | the Lowtowns by night |
+| Dark1, Dark3 | Tracks/Dark 1, 3 | 0:52, 0:56 | the Sealed Adit |
+| Dark2, Dark4 | Tracks/Dark 2, 4 | 0:40, 0:46 | Hallow's Creek's cellars (its streets stay silent) |
+| Dark5 | Tracks/Dark 5 | 0:49 | the Lowtowns by day |
+| Action1Loop, Action4Loop | Loops/Action 1, 4 | 1:26, 1:36 | fights in the field (with MeasuredFight) |
+| Action3Loop, Action5Loop | Loops/Action 3, 5 | 1:36, 1:36 | fights under ground (with AggressiveFight) |
+| Action2Loop | Loops/Action 2 | 1:51 | kept for the world boss raid (the Unraveller, `Docs/WORLD_BOSS_1.md`; not built yet) |

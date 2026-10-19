@@ -22,8 +22,19 @@ namespace Crulanda.EditorTools
         void OnPreprocessTexture()
         {
             if (!Ours) return;
-            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") ? 1024 : 512; t.mipmapEnabled = true;
+            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") || assetPath.Contains("/WoodenCanopy/") ? 1024 : 512; t.mipmapEnabled = true;
             if ((assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Village/")) && assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;   // (ends with: Bark_NormalTree.png and Leaves_NormalTree_C.png are colour)
+        }
+        /// <summary>alkakrab's Free 25 Fantasy RPG Tracks Vol. 3 (2026-10-19, play note 251; tools/import_music_vol3.py writes the same
+        /// into the metas): Vorbis at quality .5, streamed from disk, not preloaded, so 25 WAVs (~480 MB) cost the build a few MB each
+        /// and no memory until ZoneMusic plays one.</summary>
+        const string MusicVol3 = "Assets/Crulanda/Resources/Music/Fantasy3/";
+        void OnPreprocessAudio()
+        {
+            if (!assetPath.StartsWith(MusicVol3)) return;
+            var a = (AudioImporter)assetImporter; var s = a.defaultSampleSettings;
+            s.loadType = AudioClipLoadType.Streaming; s.compressionFormat = AudioCompressionFormat.Vorbis; s.quality = .5f; s.preloadAudioData = false;
+            a.defaultSampleSettings = s; a.loadInBackground = true; a.forceToMono = false;
         }
         void OnPreprocessModel()
         {
@@ -110,7 +121,7 @@ namespace Crulanda.EditorTools
             if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
             m.SetFloat("_Glossiness", n == "MetalOrnaments" ? .4f : .12f); m.SetFloat("_Metallic", n == "MetalOrnaments" ? .5f : 0);
         }
-        public override uint GetVersion() { return 6; }   // 2: the prop kits, 3-5: the nature kit, 6: the village kit (2026-10-07)
+        public override uint GetVersion() { return 6; }   // 2: the prop kits, 3-5: the nature kit, 6: the village kit (2026-10-07); not raised for Vol. 3's music and the Wooden Canopy (2026-10-19): they are new, so their first import runs the rules, and a raise would re-import every texture and model
 
         public static void Report()
         {

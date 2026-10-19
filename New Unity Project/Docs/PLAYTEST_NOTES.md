@@ -965,3 +965,4 @@ un-captures.
   ropes while she is pinned (b1 ch.20), a white salt spray, the barrel and rack on the apron).
 - 291 (2026-10-19 ~19:05, tune-8) "healing seems lower..cant tell with dps" (the meter cuts off the damage rate on big totals) and "camera
   gets inside the spider alot hard to see" (OPEN).
+- 292 (2026-10-19 ~19:08, tune-8) "when she is in the water hard to see the telegraphs. try to keep her out of water" (OPEN).

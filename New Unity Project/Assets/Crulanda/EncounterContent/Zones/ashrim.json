@@ -45,7 +45,8 @@
     "fogColor": "#A4A1AE",
     "fogStart": 32,
     "fogEnd": 105,
-    "skyTint": "#9987A1"
+    "skyTint": "#9987A1",
+    "aurora": true
   },
   "spawns": {
     "player": {

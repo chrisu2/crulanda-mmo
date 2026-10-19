@@ -112,6 +112,32 @@
   `/music .35`, and that a new piece starts within 30 s of its cue (they are streamed; the warning "did not load" in the log if not).
 - To capture: the Woodyard from the front (the block, the shed behind it), the back and the side, by day; the woodcutter splitting
   at the block; a walk into the shed's side (stopped at its edge, not through the roof).
+## 2026-10-19: the stylized skies, by the hour and the weather (branch skyboxes; WRITTEN, NOT RUN)
+- Chris, play note 254: "some better sky boxes in my assets Stylized Skyboxes | FREE". Compiles; nothing run in Unity, no captures yet.
+- **The pack** (Staggart Creations, Asset Store EULA) in Resources/Sky/Stylized: the nine painted HDR skies (Noon, Noon (Cloudy),
+  Noon (Overcast), Sunrise, Sunset, Dusk, Night, NightGalaxy, Aurora) with the pack's GUIDs, read as flat lat-long pictures capped at
+  2048 (ThirdPartyImport holds it). The pack's Sky_*.mat (Skybox/Cubemap with an HDRP block) are now on our own Built-in sky shader,
+  Crulanda/StylizedSky, same GUIDs. Left out: the URP demo, the Fog Ring shader graph.
+- **By the hour**: night, then sunrise (5:00-7:00), the day sky, sunset (17:00-18:45), dusk, night from 21:00, each blending into
+  the next (three skies at most at once). By day the weather picks it: clear noon, cloudy (fair, windy) or overcast (overcast, mist,
+  rain, snow, ash, storm); an overcast greys the sunrise and sunset too. A clear night shows the galaxy, a clouded one a plain night.
+  The aurora on about one clear night in six, only on the Peaks and the Ash Rim. The painted sun is turned to where the sun's light
+  comes from; the night sky's painted moon is painted over (the moons stay the Eye and the Tear).
+- **Each zone its own**: its sky tint (a third of the way to it), its haze of its own fog colour from the horizon up (the Lowtowns'
+  yellow smog the thickest, its dark smog by night), its fog below the horizon as before. Hallow's Creek: always the grey overcast
+  sky (b1 ch.21:19, "a grey sky"), no aurora. Khaven follows the weather and the clock like the others: its only canon is Chris's map
+  (maps/khaven_village_map.png: no sky or hour), so its old held dusk was GAME-ONLY and is dropped (2026-10-19, Chris: "CHECK LORE
+  CANON"); its weather never clears, so it reads grey. Caves as before (the sky isn't seen; the
+  cave darkening is unchanged). A zone can keep the old sky (lighting skyStyle "procedural"); none does.
+- **Light**: the skylight leans a third of the way to the sky's own colour, its brightness the zone's own (Chris's settled balance),
+  with no lighting update, so no frame cost. Reflections already come from the sky (the sky probe, every 2 s). The sky shader reads
+  three pictures a pixel.
+- **Tests** (StylizedSkyTests, EditMode, data only): every sky exists with the pack's GUID; Built-in shaders, no demo files, the
+  2048 cap; every hour and weather maps to one to three skies; the zones' own skies hold (Hallow's Creek grey, Khaven no forced sky, the
+  Lowtowns' smog, the aurora only on the Peaks and the Rim).
+- **To run and look at** (local session): StylizedSkyTests, then a build; capture each zone at dawn (6:30), noon, dusk (19:30) and
+  night (1:00), and noon under overcast; check the sun disc sits where the light comes from, no third moon, no seam in the sky, the
+  Lowtowns still yellow, Hallow's Creek grey and still, the frame rate unchanged.
 
 ## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
 - The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'

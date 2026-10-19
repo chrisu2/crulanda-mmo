@@ -21,6 +21,13 @@ namespace Crulanda.EditorTools
         bool Ours { get { return assetPath.StartsWith(Root) || assetPath.StartsWith(Props); } }
         void OnPreprocessTexture()
         {
+            // The Stylized Skyboxes (play note 254; StylizedSky): lat-long HDR pictures read by Crulanda/StylizedSky as flat 2D maps,
+            // 2048 wide, no mip levels (no seam where the picture wraps round), wrapping round but not over the poles.
+            if (assetPath.StartsWith("Assets/Crulanda/Resources/Sky/") && assetPath.EndsWith(".exr"))
+            {
+                var sky = (TextureImporter)assetImporter; sky.textureShape = TextureImporterShape.Texture2D; sky.maxTextureSize = 2048; sky.mipmapEnabled = false;
+                sky.wrapModeU = TextureWrapMode.Repeat; sky.wrapModeV = TextureWrapMode.Clamp; return;
+            }
             if (!Ours) return;
             var t = (TextureImporter)assetImporter;
             if (assetPath.Contains("/MedievalVillage1/")) { t.maxTextureSize = VillageCap(assetPath); t.mipmapEnabled = true; return; }

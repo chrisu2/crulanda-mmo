@@ -874,3 +874,6 @@ un-captures.
   Canopy.fbx (a timber shelter), Stair.fbx, FireWood.fbx (a log stack); big TGA maps: cap at 1024). For the lumberjack's woodyard.
 - 253 (2026-10-19 ~12:40) "assets for alchemy - myassets Free Alchemy and Magic Pack" (OPEN): StormBringer Studios' pack (Asset Store
   cache: Mortar, Cristal_Flask, Flask). For the alchemy trade's benches and the potions' looks.
+- 254 (2026-10-19 ~12:45) "some better sky boxes in my assets Stylized Skyboxes | FREE" (OPEN): Staggart Creations' pack (Asset Store
+  cache, a UPM package: HDRI Noon, Noon (Cloudy), Noon (Overcast), Sunrise, Sunset, Dusk, Night, NightGalaxy, Aurora + Sky_*.mat; a URP
+  demo). Skies through the day and night, each zone's weather its own.

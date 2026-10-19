@@ -62,6 +62,30 @@ What the game has of each (2026-10-19), and what the sims can do:
 Next for the raid and the later bosses: a soak and a spread/stack (both with clear marks: harmful red, helpful gold/green) and an immune
 intermission, written into the next boss's design from this list.
 
+**More from Chris (2026-10-19 ~18:10): two links** — a video, "Top 10 Raid Bosses That Were the First of Their Kind"
+(https://www.youtube.com/watch?v=0-QPuz8iCtA), and a forum list of raid mechanics by expansion
+(https://www.mmo-champion.com/threads/2636828-List-of-each-new-raid-mechanic-tech-per-expansion). Both are about another game; nothing of
+theirs is copied (no names, bosses or looks). What they give is the KINDS of mechanic, written here in our own words as a menu for every
+boss (each one to be given a form from the books; no machines: anything built from gears, engines, vehicles or trains is out):
+- **Movement and space:** a memorised safe path (zones erupt in a set order, a "dance"); a maze or limited sight; the floor collapses,
+  moves or rises (water, the Chemical River, ash) so the arena changes; wind or waves push you; jumping between platforms; falling
+  through the floor into the next stage; damage that falls off with distance from a point; taking cover behind an obstacle from a sweep.
+- **Targeted:** something chases one player (fire or a beam follows them); a mark that bounces and grows with each player it hits; a
+  ticking mark to carry away from the raid (spread) or to share with a partner (stack); hands or roots hold a player until others free
+  them; one player alone sees the right answer and must lead; a player's spirit pulled out to be fetched back.
+- **Shared:** a soak split between everyone standing in it; a health pool shared by several foes; heal a friend or an object to win
+  (the healers' fight); a heal-absorb that must be healed through; line of sight used to dodge.
+- **Interaction:** objects to pick up, carry or click (in turn: a responsibility rotation, as the harpoons already are); orbs to catch
+  or to stand under to slow; move the boss into something; form a chain of players; trample spawning things before they grow.
+- **The boss:** a phase where it is immune and the raid must clear waves or break a shield; a side it shields from (strike from behind);
+  a boss that moves across a large arena; foes that climb the walls; a fight told as acts (a story in stages); casts it "records" and
+  repeats later; an execute that grows as the raid's health falls.
+- **Encounter rules:** a limited number of attempts a week; clear arrows and markers showing what to do (our harmful red / helpful
+  gold-green ground, the HUD line).
+The Unraveller already uses: a responsibility rotation (harpoons), a player held until freed (Swallowed: three salts), the environment
+(the river hides a caster), adds to control and kill in order, phases, interrupts. Candidates for her or the next boss: a soak, a
+spread/stack mark, an immune intermission, a memorised eruption pattern for the spikes.
+
 ## 0.05 No machines (Chris, 2026-10-11, about 01:03, on the Rock-Eater: "more machines!!!!!  i told you NO Machines!")
 Nothing in the dungeon is a machine. Chris's choices (01:04, the question prompt):
 - **The Rock-Eater becomes "a great burrowing beast"**: a huge rock-eating cave beast that Nix rides and drives. The fight stays: the

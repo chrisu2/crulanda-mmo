@@ -913,4 +913,5 @@ un-captures.
   grab ONE and the dps assist him and not break other cc" (the off-tank pulls one held add at a time, the damage assists the off-tank,
   no area damage near the held ones).
 - 266 (2026-10-19 ~15:35, watching raid 6) "ok maybe 5 is too many. drop to 4" (done: four brood a wave) and "are they buffed up? with
-  raid food buffs? elixir? group buffs?" (OPEN: they were not; a raid buff-up before each pull: class buffs on all ten, food, elixirs).
+  raid food buffs? elixir? group buffs?" (OPEN: they were not; a raid buff-up before each pull: class buffs on all ten, food, elixirs). Then: "need to wait or build a
+  rain buff food" (a raid feast to cook and set down before a pull).

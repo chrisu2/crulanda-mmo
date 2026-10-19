@@ -1653,7 +1653,7 @@ namespace Crulanda.World
         {
             var plan = InnPlan.For(size, variant, doorW);
             float w = size.x, d = size.y, H = 6.4f, storey = 3.7f, wall = plan.wall, doorH = plan.doorH;
-            var plaster = Zone.biome == "lowtowns" ? SootBrick(variant + 2) : Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);   // the Rusty Spoon: soot brick (ZoneBuilder.Lowtowns)
+            var plaster = Zone.biome == "lowtowns" ? SootBrick(variant + 2) : Forged ? ForgeStone(variant + 3) : Tint(art.plaster, Plaster[Mathf.Abs(variant) % Plaster.Length]);   // the Rusty Spoon: soot brick (ZoneBuilder.Lowtowns)
             var boards = Tint(art.timber, new Color(.38f, .27f, .18f));
             var dark = Tint(art.timber, new Color(.2f, .13f, .08f));
             GameObject WallPiece(Vector3 pos, Vector3 scale)

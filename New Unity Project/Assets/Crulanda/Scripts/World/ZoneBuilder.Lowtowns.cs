@@ -49,7 +49,7 @@ namespace Crulanda.World
         Material FireWindow { get { return Glowing(new Color(1, .58f, .26f), 1.25f); } }
         Material ShardWindow { get { return Glowing(ShardViolet, 1.1f); } }
         /// <summary>An inn's roof: thatch on the even variants and slate on the odd, as it was; slate always in the Lowtowns (the Rusty Spoon).</summary>
-        Material InnRoof(int variant) { return Zone.biome == "lowtowns" ? LowSlate : variant % 2 == 0 ? art.thatch : art.slate; }
+        Material InnRoof(int variant) { return Zone.biome == "lowtowns" ? LowSlate : Forged ? IronRoof : variant % 2 == 0 ? art.thatch : art.slate; }
         /// <summary>A stream of its own for a prop, keyed on where it stands (the zone's stream is never touched).</summary>
         System.Random LowRng(ZoneProp p) { return new System.Random(Zone.seed ^ (Mathf.RoundToInt(p.at.x * 8) * 73856093) ^ (Mathf.RoundToInt(p.at.y * 8) * 19349663) ^ 0x10717); }
 

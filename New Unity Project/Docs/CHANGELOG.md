@@ -1,5 +1,29 @@
 # Changelog
 
+## 2026-10-19: the Forge District, first playable pass (branch forge-district; WRITTEN, NOT RUN)
+- Chris (ROADMAP, 2026-10-19): "can do forge district but no dungeon for now", "new zone still up to lvl 22", "Keep cap 20".
+  Design: ZONE_FORGE_DISTRICT.md (books and the author's map first; eight open questions at its top). Compiles; nothing run in Unity.
+- **The zone** (`zone.forge`, 360 m, mobs 19-22, biome `forge`; data from `tools/wip/forge/make_forge.py`): the Tithe Gate in from
+  the Lowtowns, the Rust & Ruin (inn), the Forge Warrens, the West and East Fire Pits, two Great Crucibles, the River Aureum and the
+  Molten Vein behind stone kerbs with four bridges, the Foundry's halls, the Spoke in its walled yard (not entered), the Slag Fields.
+- **Its own buildings** (`ZoneBuilder.Forge`): foundry halls, bottle-kiln furnaces, crucibles, fire pits, slag heaps, smelters'
+  lodgings, the district wall and gate, molten channels and bridges, cinder lamps, ingot stacks, the Spoke; soot ground, a wall for
+  an edge, stacks and the Crown past it. No machines: hand bellows, ladles, carried loads. The inn shares the common inn floor plan in
+  its own soot stone and iron roof (question 3).
+- **Camps**: slag-hounds (19-20), Blacklegs (19-21), foundry overseers (20-22), Weave-Eaters at the Spoke (21-22), the Iron Pact at the
+  yard (21-22), two rares (Old Clinker 20, the Spoke-Leech 22). No elites yet (question 8). New moves: Slag-hound, Blackleg, Foundry
+  overseer, Old Clinker, the Spoke-Leech.
+- **Quests**: the breadcrumb from Edda Holt after "Down the Outfall", a main chain of four (to the Spoke's foot; the trail goes up the
+  Spire later), four side quests; six Chronicle pages; three hidden finds (the world's 126); a chapter of the book of lore.
+- **Wiring**: the Lowtowns' Forge District Gate stands open and leads here (and back); `/forge` (sets level 19); a music set no other
+  zone plays (day: Desert Sunset and Crypt, night: Scary Crypt; own tracks can go in Resources/Music/forge); a warm ember grade.
+- **Tests**: ForgeDistrictTests (new); zone counts raised where they were fixed (Achievement, Profession tiers, SocialRules,
+  NodePlacement, TreeLimb, ZoneLore, ZoneGrowth with the district gate's exemption, LowtownsZone's open gate).
+- **The local session must**: run Crulanda > World > Build Oakhaven (registers the zone in the scene; the quest and lore files are
+  added to Encounter.asset by hand and the menu re-sorts them), then the EditMode suite and PlayMode ZoneContentTests, BuildingGroundTests,
+  NodePlacementTests, SecretPlacementTests, ZoneExitTests; captures of every landmark (front, back and side of the Spoke, a crucible,
+  a foundry hall, the inn) by day and night.
+
 ## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
 - The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'
   foods in dungeons, inns and markets; every inn sitter on a real seat; window frames and a hearth at the Golden Cask and the Cracked

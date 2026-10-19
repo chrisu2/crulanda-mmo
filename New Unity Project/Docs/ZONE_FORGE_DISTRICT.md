@@ -19,6 +19,10 @@ CANON-EXPANDED, GAME-ONLY or PROVISIONAL.
 6. **Trades:** reuse the Lowtowns' top nodes (slag-iron, cinder-beam, soot-wort) here (Recommended for the cap of 20), or add a new top
    tier (skill 100) for the Forge? Built: reused.
 7. **Imps** (the Bestiary kit's): as "cinder-imps" in the fire pits? No for now (Recommended: what they are is your pick, BESTIARY_MONSTERS.md).
+8. **Elites:** Captain Hroth Mallin and Overseer Vant need their own moves, and the loot tables stop at 20 (an elite over 20 drops
+   nothing named). Make them level-20 elites now (Recommended), or wait until loot reaches 22? Built: none yet; the camps are there.
+9. **Music:** every track in the packs already plays somewhere; the Forge has its own mix of them. Add new tracks for it (Recommended), or keep the mix?
+10. **World map pin:** the Forge District has no pin yet (the Lowtowns' and the Crown's plates are close). Pin it just east of the Lowtowns (Recommended)?
 
 ## 0. Chris's words (verbatim)
 - 2026-10-19 ~20:05-20:08 (ROADMAP "Next, after the Unraveller's tuning"): "just want everything up to level 20 for now with classes.
@@ -100,12 +104,12 @@ the Spire is 28-30, later (PROVISIONAL). Nobody canon dies; the Spoke is not tou
 | The Spoke's leak | Weave-Eater (weaveeater), pack | 21-22 x3 | north of the Spoke | CANON creature (b1 ch.1:251, "born of the High City's magical pollution"); here GAME-ONLY |
 | Iron Pact at the yard gate | Iron Pact soldier (warden) | 21-22 x4 | the Spoke's yard | CANON faction (world_bible.md); shared freely |
 | Iron Pact crossbowmen | Iron Pact crossbowman (deserter) | 21-22 x3 | the Spoke's yard | CANON faction |
-| **Captain Hroth Mallin** (elite) | warden | 22 | the yard gate | GAME-ONLY |
+| **Captain Hroth Mallin** (elite; not built yet, question 8) | warden | 22 | the yard gate | GAME-ONLY |
 | Blacklegs at the east pits | Blackleg | 20-21 x4 | East Fire Pits | GAME-ONLY |
 | Slag-hounds in the Slag Fields | Slag-hound | 20-21 x5 | south-east | GAME-ONLY |
 | Crucible overseers (north-east) | Foundry overseer | 21-22 x4 | NE Great Crucible | CANON-EXPANDED |
-| **Overseer Vant** (elite) | banditking | 22 | NE Great Crucible | GAME-ONLY |
-| **Old Clinker** (rare, 30%) | wolf | 22 | the Slag Fields | GAME-ONLY |
+| **Overseer Vant** (elite; not built yet, question 8) | banditking | 22 | NE Great Crucible | GAME-ONLY |
+| **Old Clinker** (rare, 30%) | wolf | 20 (beasts' hides stop at 20) | the Slag Fields | GAME-ONLY |
 | **The Spoke-Leech** (rare, 25%) | weaveeater | 22 | the Foundry | CANON-EXPANDED |
 
 Every named elite holds more than its target (the 0.07 rule): Mallin's shield-bash stuns everyone in front of him; Vant's ladle-throw
@@ -144,6 +148,9 @@ smoke from below. Soot falls. Music: its own day and night tracks from the packs
 overcast, mist, ash squalls, rain.
 
 ## 9. Built 2026-10-19 (the first playable pass; not yet run in Unity)
-See CHANGELOG. The zone data is written by `tools/wip/forge/make_forge.py`; its buildings by `ZoneBuilder.Forge.cs` (its own kinds:
+See CHANGELOG. Differences from the plan above: no elites yet (question 8); the main chain's quests are levels 19-21 (the
+quest log offers a quest up to three levels early, and the cap is 20); quests use talking, visiting and fighting only (no quest
+items: each new item needs an icon); no bounties yet (they need a notice board and a rare courier posting); three hidden finds only
+(the world's total is held at 126 by DiscoveryLogTests). The zone data is written by `tools/wip/forge/make_forge.py`; its buildings by `ZoneBuilder.Forge.cs` (its own kinds:
 foundry halls, furnaces, the Great Crucibles, fire pits, slag heaps, smelters' lodgings, the district wall and gate, the molten
 channels and their bridges, cinder lamps, ingot stacks, the Spoke); the Lowtowns' Forge District Gate now leads here; `/forge`.

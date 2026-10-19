@@ -222,6 +222,10 @@ namespace Crulanda.Encounter
             foreach (var b in session.BroodNow) if (b != null && b.actor.IsAlive && b.Incapacitated && b != session.BroodKill && Vector3.Distance(b.transform.position, at) <= reach) return true;
             return false;
         }
+        /// <summary>Its turn at the raid's buff-up before a pull (raid 6, Chris: "are they buffed up? with raid food buffs? elixir? group
+        /// buffs?"): as at a dungeon boss's stop (BuffUpNow): food (a feast for its party if one near carries it, else its dish), the elixir
+        /// for its part, a draught if low, its class's standing buff on all ten. What it used.</summary>
+        public string BuffForRaid() { BuffUpNow(); return BuffNote; }
         /// <summary>Whether this tank taunts her now (the swap at four stacks; RaidJobs.TauntHer).</summary>
         bool TauntsHer(EncounterEnemy e) { return session.TauntsUnraveller(actor, e); }
     }

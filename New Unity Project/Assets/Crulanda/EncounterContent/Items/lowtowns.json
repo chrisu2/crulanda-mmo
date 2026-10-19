@@ -23,6 +23,28 @@
       "stack": 5,
       "description": "A barbed head of old bone on a length of amber rope. Thrown into a spirit, it pins it where it is.",
       "canonStatus": "CANON: bone harpoons on amber rope (book1 ch.20:177-191); this one GAME-ONLY"
+    },
+    {
+      "id": "food.reach_stewpot",
+      "name": "Drain Reach stewpot",
+      "kind": "consumable",
+      "quality": 3,
+      "level": 20,
+      "value": 40,
+      "stack": 5,
+      "heal": 1200,
+      "food": true,
+      "buff": {
+        "kind": "food",
+        "stat": "Spirit",
+        "amount": 10,
+        "stamina": 14,
+        "seconds": 3600,
+        "party": true,
+        "raid": true
+      },
+      "description": "A Rusty Spoon pot of hound-flank stew, black bread and salt, set down on a board by the river for the whole raid. Everyone within reach eats; an hour well fed.",
+      "canonStatus": "GAME-ONLY: a dish for the raid against the Unraveller; the Rusty Spoon is CANON (b1 ch.1:105), its stew is not in the books"
     }
   ],
   "vendors": [

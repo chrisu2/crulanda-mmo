@@ -4235,6 +4235,32 @@
           "count": 1
         }
       ]
+    },
+    {
+      "id": "recipe.reach_stewpot",
+      "name": "Drain Reach stewpot",
+      "profession": "cooking",
+      "station": "fire",
+      "skill": 100,
+      "output": "food.reach_stewpot",
+      "inputs": [
+        {
+          "item": "mat.hound_flank",
+          "count": 3
+        },
+        {
+          "item": "mat.flour",
+          "count": 2
+        },
+        {
+          "item": "mat.salt",
+          "count": 1
+        },
+        {
+          "item": "mat.sootwort",
+          "count": 1
+        }
+      ]
     }
   ]
 }

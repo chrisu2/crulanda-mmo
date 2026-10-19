@@ -38,6 +38,11 @@ namespace Crulanda.Encounter
             Log("Your talents: " + SpendForRole(s) + ".");
             SimCompanion.KitPlayerLike(s, new SimAdventurer { classId = s.ClassDef.id, level = level, gearSeed = 7, gearBonus = 2 });
             Inventory.Add(s.Progress, s.Items, Unraveller.SaltItem, 6); Inventory.Add(s.Progress, s.Items, Unraveller.HarpoonItem, 6);
+            // The bot's raid food, elixirs and draughts (raid 6: none were used), enough for every pull.
+            { int pullsWanted = PullsArg; var all = s.Items.Items.Values;
+              void Give(ItemDef d, int n) { if (d != null) Inventory.Add(s.Progress, s.Items, d.id, n); }
+              Give(BossBuffs.FeastFor(level, s.Items), pullsWanted); Give(BossBuffs.PickDish(all, level), pullsWanted);
+              Give(BossBuffs.PickElixir(s.PlayerRole, BossBuffs.MainStat(s.ClassDef.id), all, level), pullsWanted); Give(BossBuffs.PickDraught(Consumables.PoolOf(s.ClassDef), all, level), pullsWanted); }
             // The nine: two tanks, three healers, five damage with you, from the roster, all at 20 in the Lowtowns.
             var pop = SimPopulation.Active; if (pop == null) { Log("No sims."); RaidFinish(s, directory, log, new List<string> { "No sims." }); yield break; }
             var you = s.PlayerRole;
@@ -61,7 +66,7 @@ namespace Crulanda.Encounter
             if (s.InRaid) s.Raid.Arrange();
             yield return new WaitForSeconds(.5f);
             Log("The raid: you (" + s.ClassDef.displayName + ", " + you + ", " + s.Player.Health.Pool.Max + " health), " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " (" + SimRoster.ClassName(c.sim.classId) + ", " + c.Role + ", party " + (s.InRaid ? s.Raid.PartyOf(c.sim.id) + 1 : 1) + ", " + c.actor.Health.Pool.Max + " health)")) + ".");
-            int pulls = PullsArg, wins = 0; var lines = new List<string>(); float killTime = 0;
+            int pulls = PullsArg, wins = 0; var lines = new List<string>(); float killTime = 0; var buffLines = new List<string>();
             var tune = UnravellerTuning.Current;
             Log("Her numbers (EncounterContent/Raids/unraveller.json): health " + tune.health + ", enrage " + tune.enrageSeconds + " s, blink every " + tune.blinkEvery + " s, pins " + tune.pinFirst + " to " + tune.pinLeast + " s.");
             Time.timeScale = Speed; int shots = 0;
@@ -79,6 +84,16 @@ namespace Crulanda.Encounter
                 s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max); s.Player.Resource.Pool.Fill();
                 if (Inventory.Count(s.Progress, Unraveller.SaltItem) < 3) Inventory.Add(s.Progress, s.Items, Unraveller.SaltItem, 3);
                 yield return new WaitForSeconds(1);
+                // The buff-up (raid 6): the sims restock their packs (their coin), everyone buffs, a ready check, and the pull waits for it.
+                foreach (var c in s.PartySims) if (c != null) { c.sim.coin = Mathf.Max(c.sim.coin, 400); SimEconomy.Stock(c.sim, s.Items); }
+                foreach (var line in s.RaidBuffUp()) Log("Pull " + pull + " buff-up: " + line);
+                yield return new WaitForSeconds(1);
+                if (s.ReadyCheck()) { float rc = Time.time; while (s.Raid.Checking && Time.time - rc < 12) yield return null; }
+                int cb = 0, fedN = 0, elixN = 0, members = 0;
+                foreach (var a in s.PartyActors()) { if (a == null || !a.IsAlive) continue; var b = s.BuffsOn(a); members++; cb += b.classBuffs; if (b.fed) fedN++; if (b.elixir) elixN++; }
+                string buffs = members + " up: class buffs " + (members > 0 ? (cb / (float)members).ToString("0.0") : "0") + " each, fed " + fedN + ", elixir " + elixN;
+                Log("Pull " + pull + " buffs: " + buffs + "; " + string.Join("; ", s.PartyActors().Where(a => a != null && a.IsAlive).Select(a => { var b = s.BuffsOn(a); return (a == s.Player ? "you" : a.DisplayName.Split(' ')[0]) + " " + b.classBuffs + (b.fed ? " fed" : "") + (b.elixir ? " elixir" : ""); })));
+                buffLines.Add("Pull " + pull + ": " + buffs);
                 // The pull: the tanks go first; the bot follows a moment after.
                 var tanks = s.PartySims.Where(c => c != null && c.Role == SimCompanion.PartyRole.Tank).ToList();
                 foreach (var tk in tanks) e.threat.Add(tk.actor.EntityId.Value, 50 - 10 * tanks.IndexOf(tk));
@@ -124,6 +139,7 @@ namespace Crulanda.Encounter
                 "Mean kill time: " + (wins > 0 ? Clock(killTime / wins) : "-") + " against the enrage at " + Clock(tune.enrageSeconds),
                 "Pulls:" };
             summary.AddRange(lines.Select(l => "  " + l));
+            summary.Add("Buffs at each pull (class buffs laid raid-wide, food, elixir): " + string.Join(" | ", buffLines));
             summary.Add("Damage against the bands (BALANCE_REPORT.md: a pure damage-dealer the band, a hybrid 90% of it, the Archivist (control and support) 72%, a tank 3/4, a healer low; the band at " + level + " is " + SimCompanion.PureDps(level).ToString("0") + " a second on one target; her fight costs everyone some for moving, salting and harpooning):");
             summary.AddRange(BandLines(s, level).Select(l => "  " + l));
             summary.Add("Scorecard:"); summary.AddRange(s.Meter.Scorecard().Select(l => "  " + l));

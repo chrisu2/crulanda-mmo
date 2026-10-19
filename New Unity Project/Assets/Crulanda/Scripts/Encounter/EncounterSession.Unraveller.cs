@@ -50,6 +50,7 @@ namespace Crulanda.Encounter
         }
         void TickUnraveller()
         {
+            TickRaidFeast();   // the raid's stewpot (EncounterSession.UnravellerFight)
             var s = WorldBossNow; if (s == null) return;
             if (!nowDone && ZoneId == Unraveller.Zone && NowRequested) { nowDone = true; UnravellerSoon(30); }
             var beat = WorldBossClock.Tick(s, Mathf.Min(Time.deltaTime, .5f), WorldSeed);

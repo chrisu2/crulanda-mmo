@@ -18,7 +18,9 @@ namespace Crulanda.Encounter
     /// names a StatType (Strength, Agility, Intellect, Spirit, Stamina or Armor); amount is that stat; stamina is a dish's Stamina;
     /// seconds how long it lasts (1800, half an hour); name what the buff row calls it (empty: "Well fed", the stat, "Salve").
     /// </summary>
-    [Serializable] public sealed class ItemBuff { public string kind, stat, name; public int amount, stamina; public float seconds; public bool party; }
+    [Serializable] public sealed class ItemBuff { public string kind, stat, name; public int amount, stamina; public float seconds; public bool party;
+        /// <summary>A raid's feast (the Drain Reach stewpot, raid 6): set down for the whole raid of ten, not a party of five.</summary>
+        public bool raid; }
 
     /// <summary>
     /// The rules for a consumable's buff, a draught's pool and a cure, pure over the item and a status runtime so they are tested
@@ -38,6 +40,10 @@ namespace Crulanda.Encounter
         public static readonly string[] Pools = { "mana", "vigor", "focus", "nerve", "breath", "salt" };
         /// <summary>A feast feeds this many: the eater and four more of the party (DUNGEON_DESIGN: five-player).</summary>
         public const int PartySize = 5;
+        /// <summary>A raid's feast feeds this many: the raid of ten (RaidGroup.Size).</summary>
+        public const int RaidSize = 10;
+        /// <summary>A raid's feast stays out this long, for the raid to come and eat (seconds).</summary>
+        public const float RaidFeastSeconds = 60;
         /// <summary>How near the eater the party must be to share a feast (metres).</summary>
         public const float FeastRange = 12;
         public const string NoEatingLine = "You can't eat while fighting.";
@@ -90,10 +96,10 @@ namespace Crulanda.Encounter
         public static int Feed(ItemDef d, IList<StatusEffectRuntime> party, float now)
         {
             int fed = 0; if (party == null || !HasBuff(d)) return 0;
-            var seen = new HashSet<StatusEffectRuntime>();
+            var seen = new HashSet<StatusEffectRuntime>(); int most = d.buff.raid ? RaidSize : PartySize;
             foreach (var who in party)
             {
-                if (fed >= PartySize) break;
+                if (fed >= most) break;
                 if (who == null || !seen.Add(who)) continue;
                 if (Apply(d, who, now)) fed++;
             }

@@ -56,7 +56,7 @@ namespace Crulanda.Tests
                 var d = Items().Get(r.output); Assert.IsTrue(d.food, r.output + " is eaten.");
                 if (r.skill < 20) { Assert.IsFalse(Consumables.HasBuff(d), r.output + " (Cooking " + r.skill + ") only heals."); continue; }
                 Assert.IsTrue(Consumables.HasBuff(d), r.output + " (Cooking " + r.skill + ") leaves you well fed.");
-                Assert.AreEqual("food", d.buff.kind, r.output); Assert.AreEqual(1800, d.buff.seconds, r.output);
+                Assert.AreEqual("food", d.buff.kind, r.output); Assert.AreEqual(d.buff.raid ? 3600 : 1800, d.buff.seconds, r.output + (d.buff.raid ? " (the raid's stewpot: an hour)" : ""));
                 Assert.Greater(d.buff.stamina, 0, r.output + ": Stamina."); Assert.Greater(d.buff.amount, 0, r.output + ": and one stat.");
                 Assert.IsTrue(Consumables.TryStat(d.buff.stat, out var stat) && stat != StatType.Armor && stat != StatType.Stamina, r.output + ": one of the four stats besides Stamina.");
                 dishes.Add(d);

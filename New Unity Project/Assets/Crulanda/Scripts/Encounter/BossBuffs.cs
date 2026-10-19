@@ -123,7 +123,8 @@ namespace Crulanda.Encounter
         }
 
         public static bool IsDish(ItemDef d) { return d != null && d.food && Consumables.HasBuff(d) && !d.buff.party; }
-        public static bool IsFeast(ItemDef d) { return d != null && d.food && Consumables.HasBuff(d) && d.buff.party; }
+        public static bool IsFeast(ItemDef d) { return d != null && d.food && Consumables.HasBuff(d) && d.buff.party && !d.buff.raid; }   // a party's (the raid's stewpot is the raid buff-up's: IsRaidFeast)
+        public static bool IsRaidFeast(ItemDef d) { return d != null && d.food && Consumables.HasBuff(d) && d.buff.raid; }
         public static bool IsSalve(ItemDef d) { return d != null && Consumables.HasBuff(d) && d.buff.kind == "salve"; }
         public static bool IsElixir(ItemDef d, StatType stat) { return d != null && Consumables.HasBuff(d) && d.buff.kind == "elixir" && Consumables.TryStat(d.buff.stat, out var s) && s == stat; }
         public static bool IsDraught(ItemDef d, string pool) { return d != null && d.restore > 0 && !string.IsNullOrEmpty(pool) && d.pool == pool; }

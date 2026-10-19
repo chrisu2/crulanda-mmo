@@ -348,6 +348,7 @@ namespace Crulanda.Encounter
         {
             var d = Items?.Get(Progress.bag[i].item); if (d == null || d.kind != "consumable") return false;
             if (WeaveEaterRules.ThrownKind(d) != null) return ThrowItem(d);   // salt and the bone harpoon are thrown at the target (EncounterSession.Lowtowns)
+            if (BossBuffs.IsRaidFeast(d)) { if (InCombat) { Message(Consumables.NoEatingLine); return false; } Inventory.Remove(Progress, d.id, 1); return SetDownRaidFeast(d, Player); }   // the raid's stewpot (EncounterSession.UnravellerFight)
             string why = Consumables.Refusal(d, InCombat, ClassDef);
             if (why != null) { Message(why); return false; }
             bool potion = Consumables.OnPotionCooldown(d);

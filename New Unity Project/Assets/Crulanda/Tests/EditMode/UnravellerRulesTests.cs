@@ -4,6 +4,7 @@ using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using Crulanda.Encounter;
+using Crulanda.World;
 
 namespace Crulanda.Tests
 {
@@ -25,7 +26,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(File.Exists(File_), "the data file");
             var t = UnravellerTuning.Parse(File.ReadAllText(File_));
             var d = new UnravellerTuning();
-            Assert.AreEqual(d.health, t.health); Assert.AreEqual(170000, t.health, "raid 5: 195,000 less what Party 2 now spends on the brood");
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(185000, t.health, "raid 6: the raid buffed before each pull");
             Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
             Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
@@ -210,6 +211,29 @@ namespace Crulanda.Tests
                 Assert.IsNotNull(w.GetComponentInChildren<ParticleSystem>(), "the ash where she moves");
             }
             finally { Object.DestroyImmediate(host); }
+        }
+
+        [Test] public void The_raids_stewpot_is_cooked_feeds_all_ten_for_an_hour_and_stays_in_the_brief()
+        {
+            // Raid 6, Chris: "need to wait or build a raid buff food".
+            var items = ProfessionDataTests.Items(); var pot = items.Get(EncounterSession.RaidFeastItem);
+            Assert.IsNotNull(pot, "the Drain Reach stewpot (Items/lowtowns.json)"); StringAssert.StartsWith("GAME-ONLY", pot.canonStatus);
+            Assert.IsTrue(BossBuffs.IsRaidFeast(pot)); Assert.IsFalse(BossBuffs.IsFeast(pot), "not a party's feast: a dungeon's buff-up never takes it");
+            var recipe = ProfessionDataTests.Db(items).RecipesFor("cooking").FirstOrDefault(r => r.output == pot.id);
+            Assert.IsNotNull(recipe, "a cook makes it (recipe.reach_stewpot)"); Assert.AreEqual("fire", recipe.station);
+            Assert.AreEqual(3600, pot.buff.seconds, "an hour");
+            // All ten eat (a party's feast feeds five).
+            var bodies = new List<Crulanda.Combat.StatusEffectRuntime>();
+            for (int i = 0; i < 12; i++) { var st = new Crulanda.Gameplay.StatBlock(); foreach (var s in new[] { Crulanda.Core.StatType.Spirit, Crulanda.Core.StatType.Stamina }) st.SetBase(s, 10); bodies.Add(new Crulanda.Combat.StatusEffectRuntime(st)); }
+            Assert.AreEqual(Consumables.RaidSize, Consumables.Feed(pot, bodies, 5), "the raid of ten fed");
+            Assert.IsTrue(bodies[9].Has(Consumables.FedId)); Assert.IsFalse(bodies[10].Has(Consumables.FedId), "ten, no more");
+            // A little more than a party's best feast, inside the buffs' brief (BossBuffs.MaxEdge, 15%).
+            foreach (var d in items.Items.Values.Where(BossBuffs.IsFeast)) { Assert.Greater(pot.buff.stamina, d.buff.stamina, d.id); Assert.GreaterOrEqual(pot.buff.amount, d.buff.amount, d.id); }
+            var body = new Crulanda.Gameplay.StatBlock(); body.SetBase(Crulanda.Core.StatType.Stamina, 10); body.SetBase(Crulanda.Core.StatType.Spirit, 10);
+            var on = new Crulanda.Combat.StatusEffectRuntime(body); Consumables.Apply(pot, on, 0);
+            Assert.That(BossBuffs.Edge(body, on, Crulanda.Core.StatType.Stamina, 20), Is.InRange(.03f, BossBuffs.MaxEdge), "its health share at 20");
+            Assert.That(BossBuffs.Edge(body, on, Crulanda.Core.StatType.Spirit, 20), Is.LessThanOrEqualTo(BossBuffs.MaxEdge), "its mend share at 20");
+            Assert.IsTrue(FoodModels.Dishes.ContainsKey(pot.id), "a pot on a board in the world (FoodModels)");
         }
 
         [Test] public void A_rotation_goes_round_passing_over_those_who_cannot()

@@ -676,6 +676,20 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      the next; no sim's area blow while a held brood is within its reach. The control classes re-hold any that break. A raid that drops its
      holds or kills out of order has free brood on its healers. (When you, the bot, are the off-tank, the damage-dealers do not wait: they
      open the Skull themselves.)
+   **Raid 6 (2026-10-19) and what was changed (WRITTEN, NOT RUN again).** Chris, verbatim: "ok maybe 5 is too many. drop to 4" (the
+   coordinator set four a wave, e11c8340); "are they buffed up? with raid food buffs? elixir? group buffs?"; "need to wait or build a raid
+   buff food".
+   - **The raid's buff-up before every pull** (`EncounterSession.RaidBuffUp`; the run's bot and every sim, as at a dungeon boss's stop):
+     food, the elixir for one's part, a draught if low, and every class's standing buff laid on all ten; then a ready check, and the pull
+     waits for it. The sims restock their packs with their coin first; the bot is given food, elixirs and draughts for every pull. The log
+     has each pull's buff-up (who used what) and what each carries (class buffs, fed, elixir); the summary a line a pull.
+   - **The raid's feast, the Drain Reach stewpot** (GAME-ONLY dish; the Rusty Spoon is CANON, b1 ch.1:105): `food.reach_stewpot`
+     (Items/lowtowns.json), cooked at a fire from Cooking 100 (`recipe.reach_stewpot`: three hound flanks, two flour, salt, sootwort). Set
+     down, a pot on a board stands where the cook stands for 60 s, and everyone of the raid who comes within 12 m eats once (ten at most):
+     well fed for an hour, Spirit 10 and Stamina 14 (the best party feast's are 8 and 11; its health share at 20 about 8%, inside the
+     buffs' 15%). A cook in the raid sets it down at the buff-up; with none carried, the sim with the most coin buys one of Mother Sall at the
+     Rusty Spoon. A party's feast buff-up never takes it. Its icon is a recoloured stew's, to be painted.
+   - **Her health 185,000** (170,000), for the buffs (up to 15% on a blow, some health).
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

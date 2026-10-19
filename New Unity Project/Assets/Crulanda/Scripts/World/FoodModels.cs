@@ -89,6 +89,7 @@ namespace Crulanda.World
             { "food.bear_broth", new[] { F("CookingPot2_Soup"), F("Spoon", .12f, 0, 70) } },
             { "food.passfire_feast", new[] { F("Plate2"), F("Steak", -.03f, 0, 10, OnPlate), F("Bacon_Cooked", .07f, -.05f, 80, OnPlate), F("Turnip", .07f, .06f, 0, OnPlate), F("Bread_Slice", -.08f, .07f, 30, OnPlate) } },
             { "food.sap_venison", new[] { F("Plate2"), F("Steak", 0, 0, -10, OnPlate), F("Mushroom", .08f, .06f, 0, OnPlate), F("Mushroom_Sliced", -.08f, .06f, 30, OnPlate) } },
+            { "food.reach_stewpot", new[] { F("Plate_Square"), F("CookingPot2_Soup", 0, 0, 0, OnPlate), F("Bread", .22f, .12f, 30, OnPlate), F("Sausage_Cooked", -.22f, .14f, 70, OnPlate), F("Spoon", .18f, -.16f, 110, OnPlate) } },   // the raid's stewpot on a board (raid 6)
             { "food.shore_feast", new[] { F("Plate2"), F("Fish", 0, 0, 90, OnPlate), F("Bread_Slice", -.09f, .05f, 20, OnPlate), F("Egg_Fried", .08f, .06f, 0, OnPlate), F("Apple_Green", .09f, -.07f, 0, OnPlate) } },
             // The tinctures, cordials, the brine draught and the salves (the buff items)
             { "potion.tincture_ox", new[] { Kit("Potion_1", .1f) } }, { "potion.tincture_hare", new[] { Kit("Potion_1", .1f) } },

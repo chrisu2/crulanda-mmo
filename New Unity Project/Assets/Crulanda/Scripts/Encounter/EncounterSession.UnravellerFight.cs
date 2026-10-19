@@ -126,6 +126,83 @@ namespace Crulanda.Encounter
         }
 
         // ---------- the brood (phase 2 on) ----------
+        /// <summary>
+        /// The raid's buff-up before a pull (raid 6): every member buffs from its bags as at a dungeon boss's stop (you as /buff does, each sim
+        /// its turn: food, the elixir for its part, a draught if low, its class's standing buff on all ten); then what each carries, by name:
+        /// how many class buffs, fed or not, an elixir (or salve) or not. Out of a fight only.
+        /// </summary>
+        public List<string> RaidBuffUp()
+        {
+            var lines = new List<string>(); if (InCombat) return lines;
+            // The raid's stewpot first (raid 6, Chris: "need to wait or build a raid buff food"): whoever carries one sets it down; with none
+            // carried, the sim with the most coin buys one of Mother Sall at the Rusty Spoon (on the way: it is there for the pull).
+            if (InRaid && raidFeast == null)
+            {
+                var pot = Items?.Get(RaidFeastItem);
+                if (pot != null)
+                {
+                    int bag = Progress.bag.FindIndex(s => !s.Empty && s.item == RaidFeastItem);
+                    if (bag >= 0) { UseItem(bag); lines.Add("you set down a " + pot.name); }
+                    else
+                    {
+                        SimCompanion cook = null;
+                        foreach (var c in PartySims) if (c != null && c.actor.IsAlive && SimEconomy.Count(c.sim, RaidFeastItem) > 0) { cook = c; break; }
+                        if (cook == null) { foreach (var c in PartySims) if (c != null && c.actor.IsAlive && (cook == null || c.sim.coin > cook.sim.coin)) cook = c;
+                            if (cook != null) { cook.sim.coin = Mathf.Max(0, cook.sim.coin - BossBuffs.FairPrice(pot)); SimEconomy.Add(cook.sim, RaidFeastItem, 1); } }
+                        if (cook != null) { SimEconomy.Add(cook.sim, RaidFeastItem, -1); SetDownRaidFeast(pot, cook.actor); lines.Add(cook.sim.name + " set down a " + pot.name + " (from the Rusty Spoon)"); ChatSay(ChatChannel.Party, cook.sim.name, cook.sim.chatty > .65f ? "stew's down, eat up before the pull" : "Mother Sall's stew is on the board. Eat before we pull."); }
+                    }
+                    FeedFromRaidFeast();
+                }
+            }
+            var mine = BuffUp(); lines.Add("you used: " + (mine.Count > 0 ? string.Join(", ", mine) : "nothing"));
+            foreach (var c in PartySims) if (c != null && c.actor != null && c.actor.IsAlive) lines.Add(c.sim.name + " used: " + c.BuffForRaid());
+            return lines;
+        }
+        /// <summary>The raid's feast's item (Items/lowtowns.json; Professions: recipe.reach_stewpot, Cooking 100).</summary>
+        public const string RaidFeastItem = "food.reach_stewpot";
+        ItemDef raidFeast; Vector3 raidFeastAt; float raidFeastUntil; readonly HashSet<Actor> raidFeastFed = new HashSet<Actor>();
+        /// <summary>The raid's feast out now (its item), or null.</summary>
+        public ItemDef RaidFeastOut { get { return raidFeast != null && Time.time < raidFeastUntil ? raidFeast : null; } }
+        /// <summary>
+        /// The raid's stewpot set down by <paramref name="cook"/> (raid 6): the pot on its board where the cook stands, for
+        /// Consumables.RaidFeastSeconds; everyone of the raid (all ten) who comes within Consumables.FeastRange of it while it is out eats once
+        /// and is well fed for an hour (its buff, a little more than a dish's). Out of a fight only.
+        /// </summary>
+        public bool SetDownRaidFeast(ItemDef d, Actor cook)
+        {
+            if (d == null || cook == null) return false;
+            raidFeast = d; raidFeastAt = cook.transform.position - Vector3.up; raidFeastUntil = Time.time + Consumables.RaidFeastSeconds; raidFeastFed.Clear();
+            var go = SetDish(d.id, raidFeastAt + cook.transform.forward * 1.2f, cook.transform.position);
+            if (go != null) Destroy(go, Consumables.RaidFeastSeconds);
+            Message((cook == Player ? "You set" : cook.DisplayName + " sets") + " down a " + d.name + " for the raid: come and eat (" + Mathf.RoundToInt(Consumables.RaidFeastSeconds) + " s).");
+            FeedFromRaidFeast();
+            return true;
+        }
+        /// <summary>Those of the raid within reach of the stewpot who have not eaten from it yet eat now (ten at most).</summary>
+        void FeedFromRaidFeast()
+        {
+            if (RaidFeastOut == null) return;
+            var list = new List<Crulanda.Combat.StatusEffectRuntime>(); var who = new List<Actor>();
+            foreach (var a in PartyActors())
+            {
+                if (a == null || !a.IsAlive || raidFeastFed.Contains(a) || Vector3.Distance(a.transform.position - Vector3.up, raidFeastAt) > Consumables.FeastRange) continue;
+                var c = a.GetComponent<Crulanda.Combat.Combatant>(); if (c == null || c.Statuses == null) continue;
+                list.Add(c.Statuses); who.Add(a);
+            }
+            if (list.Count == 0 || raidFeastFed.Count >= Consumables.RaidSize) return;
+            Consumables.Feed(raidFeast, list.Take(Consumables.RaidSize - raidFeastFed.Count).ToList(), Time.time);
+            foreach (var a in who.Take(Consumables.RaidSize - raidFeastFed.Count).ToList()) raidFeastFed.Add(a);
+        }
+        float raidFeastLook;
+        /// <summary>Each frame (TickUnraveller): the raid comes and eats while the pot is out.</summary>
+        void TickRaidFeast() { if (raidFeast == null || Time.time < raidFeastLook) return; raidFeastLook = Time.time + .5f; if (RaidFeastOut == null) { raidFeast = null; return; } FeedFromRaidFeast(); }
+        /// <summary>What <paramref name="a"/> carries now: its class buffs, fed, an elixir or salve.</summary>
+        public (int classBuffs, bool fed, bool elixir) BuffsOn(Actor a)
+        {
+            var st = a != null ? a.GetComponent<Crulanda.Combat.Combatant>()?.Statuses : null; if (st == null) return (0, false, false);
+            int n = 0; foreach (var id in ClassBuffs.ClassIds) { var b = ClassBuffs.For(id); if (b != null && st.Has(b.id)) n++; }
+            return (n, st.Has(Consumables.FedId), st.Has(Consumables.ElixirId) || st.Has(Consumables.SalveId));
+        }
         /// <summary>The off-tank: the raid's tank sim she is not on (it takes the brood), or null.</summary>
         public SimCompanion OffTank
         {

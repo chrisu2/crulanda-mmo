@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     public sealed class UnravellerTuning
     {
         // ---------- her, and the clock ----------
-        public int health = 170000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
+        public int health = 185000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
         // ---------- the rules that hold all fight (3.3): the Weave-Eaters' own, scaled ----------
         public float lighthouseShare = .1f, lighthouseBeat = 2, lighthouseReach = 30;
         public float blinkEvery = 9, blinkReach = 12, touchShare = .6f, touchSilence = 3, wardReach = 10;

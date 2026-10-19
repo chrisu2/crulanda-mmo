@@ -936,3 +936,5 @@ un-captures.
 - 276 (2026-10-19 ~16:22, the tuning batch with buffs; meter over 687 s: Mage ~186/s, Ranger ~140, Archivist ~128, Rogue ~121,
   Scoundrel ~120, Warrior 64, Paladin 33) "mage doesnt look balanced now" (OPEN: every damage class far over its band with buffs).
   Then: "cleric almost twice the healing as well" (Cleric ~104/s, Shaman 67, Druid 59).
+- 277 (2026-10-19 ~16:25) "can we kill the raid. all respawned while main spider at half health and make necessary changes as noted"
+  (the batch stopped; no reviving mid-fight but the Shaman's one; a wipe ends the pull) (OPEN).

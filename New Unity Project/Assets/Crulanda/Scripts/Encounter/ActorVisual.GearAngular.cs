@@ -83,16 +83,23 @@ namespace Crulanda.Encounter
         Mesh HelmShell(Helm h, string key, float[] ys, float[] extra, int n, float gap, float thick, System.Func<int, int, bool> open, bool apex, float lift,
             out float[][] sup, out Vector3[][] rings, out Vector3 apexAt, float[][] given = null, float minApex = float.MinValue)
         {
-            int R = ys.Length; rings = new Vector3[R][]; var centres = new Vector3[R];
-            var gaps = new float[R]; for (int i = 0; i < R; i++) gaps[i] = gap + (extra != null ? extra[i] : 0);
-            sup = AngularShell.Fit(ys, HelmPoints(h, ys[0], apex ? h.top + 1 : ys[R - 1]), n, gaps, apex, given);
-            for (int i = 0; i < R; i++) { centres[i] = new Vector3(0, ys[i], h.z0); var c = AngularShell.Corners(sup[i]); rings[i] = new Vector3[n]; for (int k = 0; k < n; k++) rings[i][k] = h.At(c[k], ys[i]); }
-            apexAt = Vector3.zero; Vector3? top = null;
+            int R0 = ys.Length; var gaps = new float[R0]; for (int i = 0; i < R0; i++) gaps[i] = gap + (extra != null ? extra[i] : 0);
+            var ysA = ys; var givenA = given;
             if (apex)
             {
-                float ya = AngularShell.ApexHeight(sup[R - 1], ys[R - 1], HelmPoints(h, ys[R - 1], h.top + 1), gap);
-                ya = Mathf.Max(Mathf.Max(ya, h.top + h.Y(gap)) + h.Y(lift), minApex); apexAt = new Vector3(0, ya, h.z0); top = apexAt;
+                // The crown (2026-10-18, first run: a cone's point over the last ring stood half a metre up on a coif): one more ring
+                // the gap over the top of the head (or hair), starting round the top's own points, then a low point just over it.
+                float yTop = Mathf.Max(h.top + h.Y(gap), minApex - h.Y(lift));
+                ysA = new float[R0 + 1]; System.Array.Copy(ys, ysA, R0); ysA[R0] = yTop;
+                var g2 = new float[R0 + 1]; System.Array.Copy(gaps, g2, R0); g2[R0] = gaps[R0 - 1]; gaps = g2;
+                givenA = new float[R0 + 1][]; if (given != null) System.Array.Copy(given, givenA, R0);
+                givenA[R0] = HelmSupport(h, Mathf.Lerp(ys[R0 - 1], h.top, .5f), h.top, n, gaps[R0]);
             }
+            int R = ysA.Length; rings = new Vector3[R][]; var centres = new Vector3[R];
+            sup = AngularShell.Fit(ysA, HelmPoints(h, ysA[0], ysA[R - 1]), n, gaps, false, givenA);
+            for (int i = 0; i < R; i++) { centres[i] = new Vector3(0, ysA[i], h.z0); var c = AngularShell.Corners(sup[i]); rings[i] = new Vector3[n]; for (int k = 0; k < n; k++) rings[i][k] = h.At(c[k], ysA[i]); }
+            apexAt = Vector3.zero; Vector3? top = null;
+            if (apex) { apexAt = new Vector3(0, ysA[R - 1] + h.Y(lift), h.z0); top = apexAt; }
             var rr = rings; var cc = centres; var tp = top; float th = thick / h.s.x;
             return M.Cached("h." + key + "." + h.key + "." + K(ys) + "|" + (minApex > float.MinValue ? K(minApex) : ""), () => AngularShell.Build(rr, cc, th, open, tp));
         }
@@ -122,7 +129,7 @@ namespace Crulanda.Encounter
         {
             f.onHead = true; var h = HelmOn(true); const int n = 8;
             string main = f.v == "leaf" || f.tier == 0 ? "cloth" : "leather", band = f.tier >= 1 ? "trim" : "cloth2";
-            float rim = h.eyes + HatAboveEyes, top = h.top;
+            float rim = h.eyes + .22f * h.H, top = h.top;   // just over the brows (HatAboveEyes left it 6.5 cm under the top: perched)
             var ys = new[] { rim, Mathf.Lerp(rim, top, .4f), Mathf.Lerp(rim, top, .7f), Mathf.Lerp(rim, top, .88f) };
             f.Add(OnBody, main, HelmShell(h, "cap", ys, null, n, .004f, .003f, null, true, .002f, out var sup, out _, out var apex), I);
             var bs = Wider(sup[0], sup[1], .0045f);
@@ -152,9 +159,9 @@ namespace Crulanda.Encounter
         {
             f.onHead = true; var h = HelmOn(true); const int n = 8; bool half = f.v == "half";
             string main = f.tier >= 1 ? "plate" : "leather2", hk = half ? "kettle.half" : "kettle";
-            float rim = h.eyes + HatAboveEyes * (half ? .7f : 1), top = h.top;
+            float rim = h.eyes + (half ? .17f : .22f) * h.H, top = h.top;
             var ys = new[] { rim, Mathf.Lerp(rim, top, .4f), Mathf.Lerp(rim, top, .7f), Mathf.Lerp(rim, top, .88f) };
-            f.Add(OnBody, main, HelmShell(h, hk, ys, null, n, .006f, .004f, null, true, half ? .006f : .014f, out var sup, out _, out var apex), I);
+            f.Add(OnBody, main, HelmShell(h, hk, ys, null, n, .006f, .004f, null, true, half ? .005f : .01f, out var sup, out _, out var apex), I);
             var rs = Wider(sup[0], sup[1], .005f);
             f.Add(OnBody, "trim", HelmShell(h, hk + ".rim", new[] { rim - h.Y(.002f), rim + h.Y(.011f) }, null, n, 0, .003f, null, false, 0, out _, out _, out _, new[] { rs, rs }), I);
             if (!half)

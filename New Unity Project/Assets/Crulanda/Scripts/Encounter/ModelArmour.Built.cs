@@ -105,16 +105,24 @@ namespace Crulanda.Encounter
                 // Every ring round the whole stretch (a trim ring over a cuff stands clear of all of it).
                 var all = flat.ConvertAll(f => f.q); sup = new float[R][]; for (int i = 0; i < R; i++) sup[i] = AngularShell.Support(all, n, gaps[i]);
             }
-            else sup = AngularShell.Fit(hs, flat, n, gaps, apex);
+            else if (!apex) sup = AngularShell.Fit(hs, flat, n, gaps, false);
+            else
+            {
+                // The crown (2026-10-18, first run: a cone's point over the last ring shot a metre out of each shoulder): one more ring
+                // the gap over the highest point, starting round the top's own points, then a low point just over it.
+                float hTop = hs[R - 1]; foreach (var f in flat) hTop = Mathf.Max(hTop, f.h);
+                var hs2 = new float[R + 1]; System.Array.Copy(hs, hs2, R); hs2[R] = hTop + gap;
+                var g2 = new float[R + 1]; System.Array.Copy(gaps, g2, R); g2[R] = gaps[R - 1];
+                var given = new float[R + 1][]; var crownPts = new List<Vector2>(); float from = Mathf.Lerp(hs[R - 1], hTop, .5f);
+                foreach (var f in flat) if (f.h >= from) crownPts.Add(f.q);
+                given[R] = AngularShell.Support(crownPts, n, g2[R]);
+                hs = hs2; gaps = g2; R++; rings = new Vector3[R][]; centres = new Vector3[R];
+                sup = AngularShell.Fit(hs, flat, n, gaps, false, given);
+            }
             if (flat.Count == 0) for (int i = 0; i < R; i++) for (int k = 0; k < n; k++) sup[i][k] = gaps[i] + .01f;
             for (int i = 0; i < R; i++) { centres[i] = origin + axis * hs[i]; rings[i] = AngularShell.Place(AngularShell.Corners(sup[i]), centres[i], across, fwd); }
             apexAt = Vector3.zero; Vector3? top = null;
-            if (apex)
-            {
-                var above = new List<(Vector2, float)>(); foreach (var (q, h) in flat) if (h > hs[R - 1]) above.Add((q, h));
-                float ha = AngularShell.ApexHeight(sup[R - 1], hs[R - 1], above, gap);
-                apexAt = origin + axis * (Mathf.Max(ha, hs[R - 1] + gap) + lift); top = apexAt;
-            }
+            if (apex) { apexAt = origin + axis * (hs[R - 1] + lift); top = apexAt; }
             if (cacheKey != null && built.TryGetValue(cacheKey, out var done) && done != null) return done;
             var m = AngularShell.Build(rings, centres, thick, open, top);
             if (cacheKey != null) { m.name = "Gear " + cacheKey; built[cacheKey] = m; }
@@ -285,9 +293,11 @@ namespace Crulanda.Encounter
             var sb = new System.Text.StringBuilder("rigid.").Append(src.GetHashCode()).Append('.').Append(weighKey).Append('.').Append(c.GetHashCode()).Append('.');
             for (int i = 0; i < 12; i++) sb.Append(place[i % 3, i / 3].ToString("0.#####", System.Globalization.CultureInfo.InvariantCulture)).Append(',');
             string key = sb.ToString(); if (Made(key)) return built[key];
-            var m = new Mesh { name = "Gear " + key }; var v = src.vertices; var t = src.triangles; var o = new Vector3[v.Length];
-            for (int i = 0; i < v.Length; i++) o[i] = place.MultiplyPoint3x4(v[i]);
-            m.vertices = o; m.triangles = t; m.RecalculateNormals(); m.RecalculateBounds();
+            // Every triangle its own corners: a horn or a spike shades in flat facets like the plates (2026-10-18: a smooth horn
+            // made the bone pauldron measure round).
+            var m = new Mesh { name = "Gear " + key }; var v = src.vertices; var t = src.triangles; var o = new Vector3[t.Length]; var tt = new int[t.Length];
+            for (int i = 0; i < t.Length; i++) { o[i] = place.MultiplyPoint3x4(v[t[i]]); tt[i] = i; }
+            m.vertices = o; m.triangles = tt; m.RecalculateNormals(); m.RecalculateBounds();
             built[key] = m; return Skin(c, m, weigh);
         }
 

@@ -26,7 +26,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(File.Exists(File_), "the data file");
             var t = UnravellerTuning.Parse(File.ReadAllText(File_));
             var d = new UnravellerTuning();
-            Assert.AreEqual(d.health, t.health); Assert.AreEqual(160000, t.health, "the Leap's lost time (play note 285); tune-4: one in ten, near misses at 8-24%");
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(235000, t.health, "tune-6: killed in 4:58 and 5:57 at 165,000; to land at about 8:30 with the leaps");
             Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
             Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);

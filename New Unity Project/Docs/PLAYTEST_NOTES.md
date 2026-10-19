@@ -966,3 +966,4 @@ un-captures.
 - 291 (2026-10-19 ~19:05, tune-8) "healing seems lower..cant tell with dps" (the meter cuts off the damage rate on big totals) and "camera
   gets inside the spider alot hard to see" (OPEN).
 - 292 (2026-10-19 ~19:08, tune-8) "when she is in the water hard to see the telegraphs. try to keep her out of water" (OPEN).
+- 293 (2026-10-19 ~19:30, tune-9) "jumped a little too far..maybe down 1/4th of total distance" (done: 35-55 m to 30-41 m).

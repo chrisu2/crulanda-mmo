@@ -13,13 +13,15 @@
   comes from; the night sky's painted moon is painted over (the moons stay the Eye and the Tear).
 - **Each zone its own**: its sky tint (a third of the way to it), its haze of its own fog colour from the horizon up (the Lowtowns'
   yellow smog the thickest, its dark smog by night), its fog below the horizon as before. Hallow's Creek: always the grey overcast
-  sky (b1 ch.21:19, "a grey sky"), no aurora. Khaven: its held evening, the Sunset sky by day. Caves as before (the sky isn't seen; the
+  sky (b1 ch.21:19, "a grey sky"), no aurora. Khaven follows the weather and the clock like the others: its only canon is Chris's map
+  (maps/khaven_village_map.png: no sky or hour), so its old held dusk was GAME-ONLY and is dropped (2026-10-19, Chris: "CHECK LORE
+  CANON"); its weather never clears, so it reads grey. Caves as before (the sky isn't seen; the
   cave darkening is unchanged). A zone can keep the old sky (lighting skyStyle "procedural"); none does.
 - **Light**: the skylight leans a third of the way to the sky's own colour, its brightness the zone's own (Chris's settled balance),
   with no lighting update, so no frame cost. Reflections already come from the sky (the sky probe, every 2 s). The sky shader reads
   three pictures a pixel.
 - **Tests** (StylizedSkyTests, EditMode, data only): every sky exists with the pack's GUID; Built-in shaders, no demo files, the
-  2048 cap; every hour and weather maps to one to three skies; the zones' own skies hold (Hallow's Creek grey, Khaven's evening, the
+  2048 cap; every hour and weather maps to one to three skies; the zones' own skies hold (Hallow's Creek grey, Khaven no forced sky, the
   Lowtowns' smog, the aurora only on the Peaks and the Rim).
 - **To run and look at** (local session): StylizedSkyTests, then a build; capture each zone at dawn (6:30), noon, dusk (19:30) and
   night (1:00), and noon under overcast; check the sun disc sits where the light comes from, no third moon, no seam in the sky, the

@@ -338,7 +338,7 @@ namespace Crulanda.World
         public string nightFog;
         /// <summary>The sky (StylizedSky, play note 254). skyStyle "procedural": the old procedural sky (empty: the stylized skies).
         /// skyDay: the zone's own day sky by its pack name (empty: the weather's clear, cloudy or overcast noon): Hallow's Creek's grey
-        /// "Noon (Overcast)" (b1 ch.21:19, "a grey sky"), Khaven's held evening "Sunset". aurora: a rare clear night shows the aurora.</summary>
+        /// "Noon (Overcast)" (b1 ch.21:19, "a grey sky"). aurora: a rare clear night shows the aurora.</summary>
         public string skyStyle, skyDay; public bool aurora;
     }
     [Serializable] public sealed class ZoneSpawns

@@ -10,7 +10,7 @@ namespace Crulanda.World
     /// zone's weather), sunset, dusk and night again; a clear night shows the galaxy, and on a rare clear night where the zone allows it
     /// (ZoneLighting.aurora: the Peaks, the Ash Rim) the aurora. A zone keeps its own air (WorldClock): its sky tint, its haze (the
     /// Lowtowns' yellow smog), its fog below the horizon, and may hold its own day sky (ZoneLighting.skyDay: Hallow's Creek's grey,
-    /// still sky; Khaven's held evening) or keep the old procedural sky (skyStyle "procedural"). The painted sun is turned to stand where
+    /// still sky) or keep the old procedural sky (skyStyle "procedural"). The painted sun is turned to stand where
     /// the sun light comes from; the night sky's painted moon is painted over (the moons are TwinMoons'). The skylight (ambient) leans a
     /// third of the way to the sky's own colours, its brightness the zone's own, so the light matches the sky without a GI update.
     /// GAME-ONLY dressing.

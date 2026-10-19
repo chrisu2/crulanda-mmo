@@ -108,7 +108,9 @@ namespace Crulanda.Tests
             var hallows = Zone("hallows").lighting; Assert.AreEqual("Noon (Overcast)", hallows.skyDay, "Hallow's Creek: a grey sky (b1 ch.21:19)");
             Assert.AreEqual(1, W(StylizedSky.Weights(12, 0, 0, false, StylizedSky.IndexOf(hallows.skyDay)), StylizedSky.Overcast), 1e-4f, "grey on a clear day too");
             Assert.IsFalse(hallows.aurora, "no aurora over the still town");
-            Assert.AreEqual("Sunset", Zone("khaven").lighting.skyDay, "Khaven's held evening");
+            // Khaven follows the weather and the clock like the others (Chris 2026-10-19, "CHECK LORE CANON": its only canon is its map,
+            // with no sky or hour; the held dusk was GAME-ONLY, dropped). Its weather never clears, so its day sky stays grey.
+            Assert.IsTrue(string.IsNullOrEmpty(Zone("khaven").lighting.skyDay), "Khaven has no forced day sky");
             // The Lowtowns' yellow smog: a thick haze of its own fog colour, a yellow tint.
             var low = Zone("lowtowns").lighting; float haze = StylizedSky.ZoneHaze(low.skyHaze); var tint = StylizedSky.ZoneTint(low.skyTint);
             Assert.Greater(haze, .8f, "the smog");

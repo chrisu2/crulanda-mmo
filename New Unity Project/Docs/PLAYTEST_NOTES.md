@@ -890,3 +890,5 @@ un-captures.
 - 257 (2026-10-19 ~14:50, his crop of the test copy's Lowtowns roofs) "what is the green stuff?" (the neon moss: flat bright-green blobs on
   the tiles). He chose (verbatim) "Make it look like moss (Recommended)": thin uneven patches along the tiles and gutters, dull by day,
   a faint glow at night (OPEN).
+- 258 (2026-10-19 ~15:00, on the test copy's Gallows Tree, khaven-art2) "tree trunk too low" (OPEN): the tree is sunk, its fork at the
+  ground and the trunk buried.

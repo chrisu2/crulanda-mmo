@@ -69,7 +69,7 @@ namespace Crulanda.Encounter
             yield return new WaitForSeconds(.5f);
             Log("Gear: " + string.Join("; ", s.PartySims.Where(c => c != null).Select(c => { var ids = SimGear.For(c.sim, s.Items); var ds = ids.Select(id => s.Items.Get(id)).Where(d => d != null).ToList(); return c.sim.name.Split(' ')[0] + " " + ds.Count + " pieces, level " + (ds.Count > 0 ? ds.Average(d => d.level).ToString("0.0") : "-") + ", " + ds.Count(d => d.quality >= 3) + " rare+"; })) + ".");
             Log("The raid: you (" + s.ClassDef.displayName + ", " + you + ", " + s.Player.Health.Pool.Max + " health), " + string.Join(", ", s.PartySims.Where(c => c != null).Select(c => c.sim.name + " (" + SimRoster.ClassName(c.sim.classId) + ", " + c.Role + ", party " + (s.InRaid ? s.Raid.PartyOf(c.sim.id) + 1 : 1) + ", " + c.actor.Health.Pool.Max + " health)")) + ".");
-            int pulls = PullsArg, wins = 0; var lines = new List<string>(); float killTime = 0; var buffLines = new List<string>();
+            aliveSeconds.Clear(); int pulls = PullsArg, wins = 0; var lines = new List<string>(); float killTime = 0; var buffLines = new List<string>();
             var tune = UnravellerTuning.Current;
             Log("Her numbers (EncounterContent/Raids/unraveller.json): health " + tune.health + ", enrage " + tune.enrageSeconds + " s, blink every " + tune.blinkEvery + " s, pins " + tune.pinFirst + " to " + tune.pinLeast + " s.");
             Time.timeScale = Speed; int shots = 0;
@@ -89,7 +89,11 @@ namespace Crulanda.Encounter
                 yield return new WaitForSeconds(1);
                 // The buff-up (raid 6): the sims restock their packs (their coin), everyone buffs, a ready check, and the pull waits for it.
                 foreach (var c in s.PartySims) if (c != null) { c.sim.coin = Mathf.Max(c.sim.coin, 400); SimEconomy.Stock(c.sim, s.Items); }
-                { float quiet = Time.time; while (s.InCombat && Time.time - quiet < 30) yield return null; }   // out of the fight first (tune-2: pull 2's buff-up came while the brood still fought, and nobody buffed)
+                // Every pull buffs (tune-4's pull 2 buffed nobody: the session was still "in a fight" with a straggler). Anything still on the raid is
+                // let go, you stop your attack, and the buff-up waits for the quiet.
+                s.StopAutoAttack(); s.Select(null);
+                foreach (var o in s.Enemies.ToArray()) if (o != null && o.actor.IsAlive && o.FightingParty) o.ResetFight();
+                { float quiet = Time.time; while (s.InCombat && Time.time - quiet < 30) yield return null; if (s.InCombat) Log("Pull " + pull + ": still in a fight after 30 s; buffing all the same"); }   // out of the fight first (tune-2: pull 2's buff-up came while the brood still fought, and nobody buffed)
                 foreach (var line in s.RaidBuffUp()) Log("Pull " + pull + " buff-up: " + line);
                 yield return new WaitForSeconds(1);
                 if (s.ReadyCheck()) { float rc = Time.time; while (s.Raid.Checking && Time.time - rc < 12) yield return null; }
@@ -123,6 +127,7 @@ namespace Crulanda.Encounter
                     }
                     if (Time.time >= nextLog) { nextLog = Time.time + 30; Log(Clock(t) + "  her " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%, enrage in " + Clock(s.RaidBossEnrage) + ", pin " + e.PinLeft.ToString("0") + " s (harpoons " + s.HarpoonsThrown + "), feedings landed " + e.FeedingsLanded + " stopped " + e.FeedingsStopped + ", grown " + Mathf.RoundToInt(e.Growth * 100) + "%; " + s.PartySims.Count(c => c != null && c.actor.IsAlive) + "/" + s.PartySims.Count + " sims up"); }
                     BotRaidStep(s, e, motor, ref nextCast);
+                    foreach (var a in s.PartyActors()) if (a != null && a.IsAlive) { aliveSeconds.TryGetValue(a.EntityId.Value, out var was); aliveSeconds[a.EntityId.Value] = was + Time.deltaTime; }
                     yield return null;
                 }
                 EncounterInput.Scripted = Vector2.zero;
@@ -151,6 +156,8 @@ namespace Crulanda.Encounter
             RaidFinish(s, directory, log, summary);
         }
         /// <summary>Each member's damage a second over the fighting time against what its class and part should do (the bands), worst first.</summary>
+        /// <summary>Each member's living seconds in the pulls (its damage a living second beside its damage a fighting second: tune-4).</summary>
+        static readonly Dictionary<string, float> aliveSeconds = new Dictionary<string, float>();
         static List<string> BandLines(EncounterSession s, int level)
         {
             var l = new List<(float share, string line)>(); float secs = s.Meter.CombatSeconds, band = SimCompanion.PureDps(level);
@@ -162,8 +169,9 @@ namespace Crulanda.Encounter
                 else continue;   // a pet: in its keeper's
                 float want = role == SimCompanion.PartyRole.Tank ? band * SimCompanion.TankDpsShare : role == SimCompanion.PartyRole.Healer ? band * .25f : band * (classId == "class.archivist" ? SimCompanion.ControlDpsShare : EncounterSession.Hybrid(classId) ? EncounterSession.HybridDpsShare : 1);
                 float dps = r.Dps(secs), share = want > 0 ? dps / want : 0;
+                aliveSeconds.TryGetValue(r.id, out var lived); float livingDps = lived > 1 ? r.damage / lived : 0;
                 string note = role == SimCompanion.PartyRole.Healer ? (dps > want * 1.2f ? "HIGH for a healer" : "ok (a healer's)") : share > 1.1f ? "OVER" : share < .7f ? "UNDER" : "in band";
-                l.Add((share, r.name + ", " + role + ": " + dps.ToString("0.0") + "/s against " + want.ToString("0") + " (" + Mathf.RoundToInt(share * 100) + "%) " + note + (r.healing > 0 ? "; heals " + r.Hps(secs).ToString("0.0") + "/s" : "") + "; deaths " + r.deaths));
+                l.Add((share, r.name + ", " + role + ": " + dps.ToString("0.0") + "/s against " + want.ToString("0") + " (" + Mathf.RoundToInt(share * 100) + "%) " + note + (r.healing > 0 ? "; heals " + r.Hps(secs).ToString("0.0") + "/s" : "") + "; per living second " + livingDps.ToString("0.0") + "/s (" + Mathf.RoundToInt(want > 0 ? 100 * livingDps / want : 0) + "%, alive " + Mathf.RoundToInt(lived) + " s)" + (r.healing > 0 && lived > 1 ? ", heals " + (r.healing / lived).ToString("0.0") + "/s" : "") + "; deaths " + r.deaths));
             }
             return l.OrderBy(x => x.share).Select(x => x.line).ToList();
         }
@@ -173,19 +181,21 @@ namespace Crulanda.Encounter
         static void BotRaidStep(EncounterSession s, EncounterEnemy e, AdventurerMotor motor, ref float nextCast)
         {
             if (!s.Player.IsAlive) { EncounterInput.Scripted = Vector2.zero; return; }
-            var me = s.Player.transform.position; Vector3? goal = null; float reach;
+            var me = s.Player.transform.position; Vector3? goal = null; float reach; bool inRed = false;
             if (s.HuntedActor == s.Player) { goal = s.NearestWater(me, 25); reach = .5f; }
             else
             {
                 var feet = NavMesh.SamplePosition(me, out var under, 2, NavMesh.AllAreas) ? under.position : me - Vector3.up;
                 var outOf = GroundMarks.StepOut(feet);
-                if (outOf.HasValue) { goal = outOf; reach = .4f; s.CountHarm(s.Player, Time.deltaTime); }
+                if (outOf.HasValue) { goal = outOf; reach = .3f; inRed = true; s.CountHarm(s.Player, Time.deltaTime); }
                 else
                 {
                     goal = e.transform.position; reach = (MeleeClass(s) ? 2.4f : 12) + e.BodyRadius;   // to her edge
                     // Never into the red to strike: a clear spot in reach (Chris: "they need to evacuate").
                     var clear = GroundMarks.StrikeSpot(me, e.transform.position, e.BodyRadius, MeleeClass(s) ? 2.4f : 12);
-                    if (clear.HasValue && GroundMarks.InHarm(e.transform.position + (me - e.transform.position).normalized * Mathf.Min(reach, Vector3.Distance(me, e.transform.position)))) { goal = clear; reach = .5f; }
+                    // With marks about her, it stands on the nearest clear spot of her edge (tune-4: the bot tank stopped at her edge in her grey
+                    // ground, stepped out, came back to the same spot, and died to it: "last hit: Unmade ground 457-627").
+                    if (clear.HasValue) { goal = clear; reach = .5f; }
                 }
             }
             // Salt on her when the raid warning asks it of you.
@@ -200,7 +210,7 @@ namespace Crulanda.Encounter
             // A tank bot takes her as a sim tank does (the swap at four stacks; from a caster she blinked onto): a taunt, every 8 s at most.
             if (Time.time >= botTauntAt && s.TauntsUnraveller(s.Player, e) && Vector3.Distance(me, e.transform.position) < 15)
             { botTauntAt = Time.time + 8; e.threat.Taunt(s.Player.EntityId.Value, Time.time, 4); s.FloatText(me + Vector3.up * 2, "Taunt", new Color(1, .7f, .3f)); }
-            if (Time.time >= nextCast) { nextCast = Time.time + .4f; BotCast(s); }
+            if (!inRed && Time.time >= nextCast) { nextCast = Time.time + .4f; BotCast(s); }   // out of the red first, then the abilities
             if (!goal.HasValue) { EncounterInput.Scripted = Vector2.zero; return; }
             var to = goal.Value - me; to.y = 0;
             if (to.magnitude <= reach || s.PlayerStunned || s.PlayerRooted) { EncounterInput.Scripted = Vector2.zero; return; }

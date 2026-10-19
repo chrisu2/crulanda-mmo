@@ -794,6 +794,13 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      70%, tank 72%).
    - **Tests fixed:** "a broken file plays the defaults" compares with the defaults (not 160,000); the body's height test allows the
      spider's own 3.4 m (the crown blinks, the spikes erupt: often neither is up).
+   **Tune-4 read (1 of 10: the kill at 7:12; near misses with her at 8%, 12%, 16%, 20%, 24%), the changes for tune-5 (2026-10-19;
+   WRITTEN, NOT RUN).** The add phase works now (holds ran out 0-9 times a pull, most brood killed). The bot Paladin's deaths: "last hit:
+   Unmade ground 457-627": it stopped at her edge in her grey ground, stepped out and came back to the same spot. Now, with marks about her,
+   the bot stands on the nearest clear spot of her edge, and uses no ability while it is still in the red. Every pull buffs (pull 2 had
+   not: the session was still in a fight with a straggler; the run now lets anything on the raid go and waits for the quiet). Her health
+   165,000 (175,000), toward three kills in ten. The summary gives each member's damage (and healing) a living second beside a fighting
+   second (wipes counted dead time against everyone).
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

@@ -481,67 +481,67 @@
     {
       "id": "legend.second_truth",
       "look": "model.weapon:Sword8_White/pale+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.iron_anchor",
       "look": "model.weapon:Mace2H_Epic/pale+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.two_rules",
       "look": "model.weapon:Sics_Dagger/pale+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.song_of_sifting",
       "look": "model.weapon:Ashen_nth_equi_rondel_dagger/pale+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.salt_wall_bow",
       "look": "model.weapon:Bow_Epic/pale+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.sun_staff",
       "look": "model.tall:Staff_Epic/sandthrone+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.amber_wood_crook",
       "look": "staff:crook/veridian+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.first_verse",
       "look": "model.tall:Cartoon_Staff_05/pale+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.menders_first_tool",
       "look": "hammer.war:maul/pale+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.grohls_harpoon",
       "look": "polearm:harpoon/ashwalker+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {
       "id": "legend.hill_shrine_lantern",
       "look": "model.weapon:Mace1H_Epic/concord+glow",
-      "source": "vendor:Tynara Embercoil",
+      "source": "forge:Tynara Embercoil",
       "unique": true
     },
     {

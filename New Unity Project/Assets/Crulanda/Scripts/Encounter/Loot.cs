@@ -134,7 +134,7 @@ namespace Crulanda.Encounter
         public const int ClassSetOwnWeight = 3;
         /// <summary>The stats an effect of kind "stat" may change.</summary>
         public static readonly StatType[] EffectStats = { StatType.MaxHealth, StatType.MaxPower, StatType.AttackPower, StatType.Armor, StatType.Strength, StatType.Agility, StatType.Stamina, StatType.Intellect, StatType.Spirit };
-        public static readonly string[] SourceKinds = { "boss", "mob", "quest", "vendor", "world", "secret" };
+        public static readonly string[] SourceKinds = { "boss", "mob", "quest", "vendor", "world", "secret", "forge" };   // forge: remade by a smith (the legendary weapons, WORLD_BOSS_1.md 4.6)
         /// <summary>Once every piece of a signature list is owned, the list still pays out at this share of its chance.</summary>
         public const float SignatureOwnedShare = .35f;
         /// <summary>An epic you own drops at this share of its chance.</summary>
@@ -449,6 +449,7 @@ namespace Crulanda.Encounter
                     }
                 case "quest": return "A quest reward";
                 case "vendor": return "Sold by " + rest;
+                case "forge": return "Remade at " + rest + "'s night forge";
                 case "world": return "A rare find anywhere (levels " + rest + ")";
                 default: return "Hidden somewhere";
             }
@@ -509,6 +510,9 @@ namespace Crulanda.Encounter
                         break;
                     case "vendor":
                         if (!loot.Items.StockFor(rest, null, 1).Contains(g.id)) problems.Add(p + rest + " does not sell it.");
+                        if (!Lives(rest)) problems.Add(p + "nobody called " + rest + " lives in any zone.");
+                        break;
+                    case "forge":
                         if (!Lives(rest)) problems.Add(p + "nobody called " + rest + " lives in any zone.");
                         break;
                     case "world":

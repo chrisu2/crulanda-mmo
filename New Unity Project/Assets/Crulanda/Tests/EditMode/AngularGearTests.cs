@@ -64,8 +64,9 @@ namespace Crulanda.Tests
             for (int i = 0; i + 2 < tris.Count; i += 3)
             {
                 Vector3 a = tris[i], e1 = tris[i + 1] - a, e2 = tris[i + 2] - a, p = Vector3.Cross(d, e2); float det = Vector3.Dot(e1, p);
-                if (Mathf.Abs(det) < 1e-12f) continue; float inv = 1 / det; var s = o - a; float u = Vector3.Dot(s, p) * inv; if (u < 0 || u > 1) continue;
-                var q = Vector3.Cross(s, e1); float vv = Vector3.Dot(d, q) * inv; if (vv < 0 || u + vv > 1) continue;
+                // A small tolerance: a ray through an edge or a corner between two faces (the facets' seams) must not slip between them in floats.
+                if (Mathf.Abs(det) < 1e-12f) continue; float inv = 1 / det; var s = o - a; float u = Vector3.Dot(s, p) * inv; if (u < -1e-4f || u > 1.0001f) continue;
+                var q = Vector3.Cross(s, e1); float vv = Vector3.Dot(d, q) * inv; if (vv < -1e-4f || u + vv > 1.0001f) continue;
                 float t = Vector3.Dot(e2, q) * inv; if (t > 1e-6f && t < best) best = t;
             }
             return best;
@@ -141,6 +142,15 @@ namespace Crulanda.Tests
                 if (low > skullTop - .07f) { fails.Add(look + ": perched, its lowest edge only " + (skullTop - low).ToString("0.000") + " m under the skull's top"); continue; }
                 var side = Vector3.Cross(up, Vector3.forward).sqrMagnitude > .1f ? Vector3.Cross(up, Vector3.forward).normalized : Vector3.right; var fwd = Vector3.Cross(side, up);
                 float worstIn = 0, worstGap = 0; int missed = 0;
+                // Poking through: every point of the head and hair round the skull's top 5 cm, on its own ray out from the axis.
+                foreach (var p in body)
+                {
+                    float hp = H(p); if (hp > skullTop - .01f || hp < skullTop - .05f) continue;
+                    var o = centre + up * hp; var q = Vector3.ProjectOnPlane(p - o, up); float r = q.magnitude; if (r < 1e-3f) continue;
+                    float hit = Hit(tris, o, q / r); if (float.IsInfinity(hit)) { missed++; continue; }
+                    worstIn = Mathf.Max(worstIn, r - hit);
+                }
+                // Standing off: on rays every 15 degrees, the inside against the head or hair right there (within 3 mm up or down, 6 degrees round).
                 for (float dh = .01f; dh <= .05f; dh += .01f)
                     for (int ia = 0; ia < 24; ia++)
                     {
@@ -148,12 +158,12 @@ namespace Crulanda.Tests
                         float surf = 0; bool any = false;
                         foreach (var p in body)
                         {
-                            if (Mathf.Abs(H(p) - h) > .006f) continue; var q = Vector3.ProjectOnPlane(p - o, up); float r = q.magnitude; if (r < 1e-4f) continue;
-                            if (Vector3.Dot(q / r, dir) < Mathf.Cos(8 * Mathf.Deg2Rad)) continue; surf = Mathf.Max(surf, r); any = true;
+                            if (Mathf.Abs(H(p) - h) > .003f) continue; var q = Vector3.ProjectOnPlane(p - o, up); float r = q.magnitude; if (r < 1e-4f) continue;
+                            if (Vector3.Dot(q / r, dir) < Mathf.Cos(6 * Mathf.Deg2Rad)) continue; surf = Mathf.Max(surf, r); any = true;
                         }
                         if (!any) continue;
                         float hit = Hit(tris, o, dir); if (float.IsInfinity(hit)) { missed++; continue; }
-                        worstIn = Mathf.Max(worstIn, surf - hit); worstGap = Mathf.Max(worstGap, hit - surf);
+                        worstGap = Mathf.Max(worstGap, hit - surf);
                     }
                 float upHit = Hit(tris, centre + up * (bodyTop - .01f), up);
                 if (missed > 0) fails.Add(look + ": " + missed + " rays round the skull's top meet no helm");

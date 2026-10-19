@@ -33,19 +33,92 @@ namespace Crulanda.Encounter
         /// unit along x, y and z, the eye line, the skull's height over the eyes, the outline's top and axis.</summary>
         sealed class Helm
         {
-            public HeadOutline o; public Vector3 s; public float eyes, H, top, z0; public string key;
+            public Vector3 s; public float eyes, H, top, z0; public string key;
+            /// <summary>The points the walls clear: metres about the axis, with their frame heights.</summary>
+            public List<(Vector2 q, float y)> pts;
             /// <summary>Metres as head-frame height.</summary>
             public float Y(float metres) { return metres / s.y; }
             /// <summary>A point of a ring's plane (metres about the axis) at frame height y, in the head frame.</summary>
             public Vector3 At(Vector2 q, float y) { return new Vector3(q.x / s.x, y, z0 + q.y / s.z); }
         }
-        Helm HelmOn(bool hair)
+        /// <summary>
+        /// A head measured for a helm, from its own vertices in the bind pose (2026-10-18, second run: the outline's rows, 8 mm apart
+        /// and each the hull of three, stood the crown out 3-4 cm). <paramref name="hairBelow"/>: the hair's points under that
+        /// frame height count too (a cap or kettle hat: the hair above it is cut away, <see cref="CutHair"/>, and what hangs under the
+        /// rim stays); NaN for none (a barbute or a coif hides the hair).
+        /// </summary>
+        Helm HelmOn(float hairBelow)
         {
-            var o = hair ? (hairOutline ?? headOutline) : headOutline; var sc = headFrame.lossyScale;
-            var h = new Helm { o = o, s = new Vector3(Mathf.Abs(sc.x), Mathf.Abs(sc.y), Mathf.Abs(sc.z)), eyes = headOutline.eyes, top = o.top, z0 = o.z0 };
-            h.H = Mathf.Max(.05f, headOutline.top - headOutline.eyes);
-            h.key = OutlineKey(o) + "." + OutlineKey(headOutline) + "." + K(h.s.x, h.s.y, h.s.z);
+            var sc = headFrame.lossyScale; bool hair = !float.IsNaN(hairBelow);
+            var h = new Helm { s = new Vector3(Mathf.Abs(sc.x), Mathf.Abs(sc.y), Mathf.Abs(sc.z)), eyes = headOutline.eyes, z0 = headOutline.z0, pts = new List<(Vector2, float)>() };
+            h.H = HeadH; float top = float.MinValue;
+            void Take(Vector3 p) { h.pts.Add((new Vector2(p.x * h.s.x, (p.z - h.z0) * h.s.z), p.y)); top = Mathf.Max(top, p.y); }
+            if (helmHead != null && helmHead.Count > 0) foreach (var p in helmHead) Take(p);
+            else { h.pts.AddRange(OutlinePoints(headOutline, h)); top = headOutline.top; }
+            if (hair && helmHair != null) foreach (var (_, at) in helmHair) foreach (var p in at) if (p.y <= hairBelow) Take(p);
+            h.top = top == float.MinValue ? headOutline.top : top;
+            h.key = OutlineKey(headOutline) + "." + (hair ? K(hairBelow) + "." + helmHairKey : "bare") + "." + K(h.s.x, h.s.y, h.s.z);
             return h;
+        }
+        /// <summary>The skull's height over the eyes (head-frame units).</summary>
+        float HeadH { get { return Mathf.Max(.05f, headOutline.top - headOutline.eyes); } }
+        /// <summary>The head's and the hair's vertices in the head frame, taken with the outlines in the bind pose (ActorVisual.Model,
+        /// Frames); the hair per renderer, every vertex, for cutting it under a cap.</summary>
+        List<Vector3> helmHead; List<(SkinnedMeshRenderer smr, Vector3[] at)> helmHair; string helmHairKey = "";
+        readonly Dictionary<SkinnedMeshRenderer, Mesh> wholeHair = new Dictionary<SkinnedMeshRenderer, Mesh>();
+        static readonly Dictionary<(Mesh, int), Mesh> cutHairs = new Dictionary<(Mesh, int), Mesh>();
+        void MeasureHelm()
+        {
+            if (model == null || headFrame == null) return;
+            var toFrame = headFrame.worldToLocalMatrix; helmHead = null; helmHair = new List<(SkinnedMeshRenderer, Vector3[])>(); var key = new System.Text.StringBuilder();
+            if (model.Head is SkinnedMeshRenderer hs) helmHead = BindPoints(hs, toFrame);
+            foreach (var r in model.Hair)
+            {
+                if (!(r is SkinnedMeshRenderer smr) || !r.name.Contains("Hair_") || r.name.Contains("Beard")) continue;
+                var mesh = smr.sharedMesh; if (mesh == null || !mesh.isReadable) continue;
+                var v = mesh.vertices; var w = mesh.boneWeights; var bp = mesh.bindposes; var bones = smr.bones; if (w.Length != v.Length || bp.Length != bones.Length) continue;
+                var skin = new Matrix4x4[bones.Length]; for (int i = 0; i < bones.Length; i++) skin[i] = toFrame * (bones[i] != null ? bones[i].localToWorldMatrix : Matrix4x4.identity) * bp[i];
+                var at = new Vector3[v.Length];
+                for (int i = 0; i < v.Length; i++) { var b = w[i]; at[i] = skin[b.boneIndex0].MultiplyPoint3x4(v[i]) * b.weight0 + skin[b.boneIndex1].MultiplyPoint3x4(v[i]) * b.weight1 + skin[b.boneIndex2].MultiplyPoint3x4(v[i]) * b.weight2 + skin[b.boneIndex3].MultiplyPoint3x4(v[i]) * b.weight3; }
+                helmHair.Add((smr, at)); key.Append(mesh.name).Append(';');
+            }
+            helmHairKey = key.ToString();
+        }
+        /// <summary>The hair cut at a frame height under a cap or kettle hat: only its triangles wholly under it are drawn (the rest
+        /// would stand through the crown). Given back whole when the head piece comes off (<see cref="WholeHair"/>).</summary>
+        void CutHair(float below)
+        {
+            if (helmHair == null) return;
+            foreach (var (smr, at) in helmHair)
+            {
+                if (smr == null) continue;
+                if (!wholeHair.TryGetValue(smr, out var whole)) wholeHair[smr] = whole = smr.sharedMesh;
+                var ck = (whole, Mathf.RoundToInt(below * 2000));
+                if (!cutHairs.TryGetValue(ck, out var cut) || cut == null)
+                {
+                    cut = Instantiate(whole); cut.name = whole.name + " (under a helm)";
+                    for (int s = 0; s < whole.subMeshCount; s++)
+                    {
+                        var t = whole.GetTriangles(s); var keep = new List<int>();
+                        for (int i = 0; i + 2 < t.Length; i += 3) if (at[t[i]].y <= below && at[t[i + 1]].y <= below && at[t[i + 2]].y <= below) { keep.Add(t[i]); keep.Add(t[i + 1]); keep.Add(t[i + 2]); }
+                        cut.SetTriangles(keep, s);
+                    }
+                    cutHairs[ck] = cut;
+                }
+                smr.sharedMesh = cut;
+            }
+        }
+        void WholeHair() { foreach (var kv in wholeHair) if (kv.Key != null) kv.Key.sharedMesh = kv.Value; wholeHair.Clear(); }
+        /// <summary>The outline's sampled points (a figure whose head mesh could not be read).</summary>
+        static List<(Vector2, float)> OutlinePoints(HeadOutline o, Helm h)
+        {
+            var list = new List<(Vector2, float)>();
+            for (int iy = 0; iy < o.ny; iy++) for (int ia = 0; ia < HeadAngles; ia++)
+            {
+                float r = o.r[iy, ia]; if (r <= 0) continue; float a = 2 * Mathf.PI * ia / HeadAngles;
+                list.Add((new Vector2(Mathf.Sin(a) * r * h.s.x, Mathf.Cos(a) * r * h.s.z), o.y0 + iy * HeadStep));
+            }
+            return list;
         }
         /// <summary>A short hash of an outline (built meshes are shared by heads of one shape).</summary>
         static string OutlineKey(HeadOutline o)
@@ -56,19 +129,10 @@ namespace Crulanda.Encounter
             Mix(o.y0); Mix(o.z0); Mix(o.eyes); Mix(o.top); foreach (var r in o.r) Mix(r);
             return o.key = hash.ToString("x16");
         }
-        /// <summary>The outline's points between two heights (metres about the axis, with their frame heights).</summary>
+        /// <summary>The head's points between two heights (metres about the axis, with their frame heights).</summary>
         static List<(Vector2 q, float y)> HelmPoints(Helm h, float y0, float y1)
         {
-            var list = new List<(Vector2, float)>(); var o = h.o; float pad = HeadStep * .5f;
-            for (int iy = 0; iy < o.ny; iy++)
-            {
-                float y = o.y0 + iy * HeadStep; if (y < y0 - pad || y > y1 + pad) continue;
-                for (int ia = 0; ia < HeadAngles; ia++)
-                {
-                    float r = o.r[iy, ia]; if (r <= 0) continue; float a = 2 * Mathf.PI * ia / HeadAngles;
-                    list.Add((new Vector2(Mathf.Sin(a) * r * h.s.x, Mathf.Cos(a) * r * h.s.z), y));
-                }
-            }
+            var list = new List<(Vector2, float)>(); foreach (var p in h.pts) if (p.y >= y0 && p.y <= y1) list.Add(p);
             return list;
         }
         static float[] HelmSupport(Helm h, float y0, float y1, int n, float gap) { return AngularShell.Support(HelmPoints(h, y0, y1).ConvertAll(p => p.q), n, gap); }
@@ -127,9 +191,10 @@ namespace Crulanda.Encounter
         /// </summary>
         void AngularCap(Fit f)
         {
-            f.onHead = true; var h = HelmOn(true); const int n = 8;
+            f.onHead = true; const int n = 8;
+            float rim = headOutline.eyes + .22f * HeadH;   // just over the brows (HatAboveEyes left it 6.5 cm under the top: perched)
+            float cut = rim + .008f / Mathf.Abs(headFrame.lossyScale.y); CutHair(cut); var h = HelmOn(cut); float top = h.top;
             string main = f.v == "leaf" || f.tier == 0 ? "cloth" : "leather", band = f.tier >= 1 ? "trim" : "cloth2";
-            float rim = h.eyes + .22f * h.H, top = h.top;   // just over the brows (HatAboveEyes left it 6.5 cm under the top: perched)
             var ys = new[] { rim, Mathf.Lerp(rim, top, .4f), Mathf.Lerp(rim, top, .7f), Mathf.Lerp(rim, top, .88f) };
             f.Add(OnBody, main, HelmShell(h, "cap", ys, null, n, .004f, .003f, null, true, .002f, out var sup, out _, out var apex), I);
             var bs = Wider(sup[0], sup[1], .0045f);
@@ -157,9 +222,10 @@ namespace Crulanda.Encounter
         /// </summary>
         void AngularKettle(Fit f)
         {
-            f.onHead = true; var h = HelmOn(true); const int n = 8; bool half = f.v == "half";
+            f.onHead = true; const int n = 8; bool half = f.v == "half";
             string main = f.tier >= 1 ? "plate" : "leather2", hk = half ? "kettle.half" : "kettle";
-            float rim = h.eyes + (half ? .17f : .22f) * h.H, top = h.top;
+            float rim = headOutline.eyes + (half ? .17f : .22f) * HeadH;
+            float cut = rim + .008f / Mathf.Abs(headFrame.lossyScale.y); CutHair(cut); var h = HelmOn(cut); float top = h.top;
             var ys = new[] { rim, Mathf.Lerp(rim, top, .4f), Mathf.Lerp(rim, top, .7f), Mathf.Lerp(rim, top, .88f) };
             f.Add(OnBody, main, HelmShell(h, hk, ys, null, n, .006f, .004f, null, true, half ? .005f : .01f, out var sup, out _, out var apex), I);
             var rs = Wider(sup[0], sup[1], .005f);
@@ -205,7 +271,7 @@ namespace Crulanda.Encounter
         /// </summary>
         void AngularBarbute(Fit f)
         {
-            f.onHead = true; var h = HelmOn(false); const int n = 12; float e = h.eyes, H = h.H;
+            f.onHead = true; var h = HelmOn(float.NaN); const int n = 12; float e = h.eyes, H = h.H;
             var ys = new[] { e - .85f * H, e - .5f * H, e - .15f * H, e + .15f * H, e + .45f * H, e + .75f * H, e + .9f * H };
             bool Open(int s, int k) { return s <= 1 && k == 0 || s == 2 && (k == 11 || k == 0 || k == 1); }
             f.Add(OnBody, "plate", HelmShell(h, "barbute", ys, null, n, .007f, .004f, Open, true, .004f, out var sup, out _, out var apex), I);
@@ -250,7 +316,7 @@ namespace Crulanda.Encounter
         /// </summary>
         void AngularCoif(Fit f)
         {
-            f.onHead = true; var h = HelmOn(false); const int n = 12; float e = h.eyes, H = h.H, chin = e - .9f * H;
+            f.onHead = true; var h = HelmOn(float.NaN); const int n = 12; float e = h.eyes, H = h.H, chin = e - .9f * H;
             var ys = new[] { chin - .62f * H, chin - .32f * H, chin, e - .55f * H, e - .2f * H, e + .2f * H, e + .5f * H, e + .75f * H, e + .9f * H };
             var chinSup = HelmSupport(h, chin, e - .55f * H, n, .005f);
             var given = new float[ys.Length][]; given[0] = Plus(chinSup, .05f); given[1] = Plus(chinSup, .02f);

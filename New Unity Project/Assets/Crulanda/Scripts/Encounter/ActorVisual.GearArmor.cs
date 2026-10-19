@@ -441,7 +441,7 @@ namespace Crulanda.Encounter
         {
             switch (slot)
             {
-                case EquipSlot.Head: ShowHair(true); Tuck(false); DruidHood(true); break;
+                case EquipSlot.Head: ShowHair(true); Tuck(false); DruidHood(true); WholeHair(); break;
                 case EquipSlot.Chest: Bare(baseChest); Bare(baseSleeves); if (baseBelt != null) baseBelt.enabled = true; HangCloak(false); break;
                 case EquipSlot.Hands: Bare(baseHands); break;
                 case EquipSlot.Legs: Bare(baseLegs); break;

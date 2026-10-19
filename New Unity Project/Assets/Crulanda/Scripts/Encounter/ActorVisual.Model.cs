@@ -255,7 +255,7 @@ namespace Crulanda.Encounter
             if (orc && OrcKit) { sh.x *= OrcHeadWide; sh.z *= OrcHeadWide; }   // what an orc wears on its head, as broad as its head
             var headAt = L(m.HeadBone) + new Vector3(0, .12f * s, .01f * s) * hs;   // a little high, so a helmet's rim clears the eyes
             headFrame = Region("Head frame", m.HeadBone, headAt - new Vector3(0, .8f * sh.y, 0), sh);
-            headOutline = Outline(false); hairOutline = Outline(true);
+            headOutline = Outline(false); hairOutline = Outline(true); MeasureHelm();
             // Face: the old face (eyes at .835, mouth at .745) onto the model's (eyes about .1 above the Head bone, mouth .04), for
             // what is worn over it: a mask, a scarf over the nose and mouth, a tear.
             var fs = new Vector3(.58f, .67f, .72f) * hs;

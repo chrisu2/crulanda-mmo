@@ -105,6 +105,15 @@ shoulders are now built from the model's own measurements instead of drawn round
   pulled the pauldron's middle off the shoulder). Fixed: a crown ring the gap over the head's (or shoulder's) highest point, fitted
   round the top's own points, then a low point just over it (a flat-faceted crown, not a cone); caps and kettles come down to just
   over the brows (they stopped 6.5 cm under the top); small rigid parts (horns, spikes) are flat-faceted. WRITTEN, NOT RUN again.
+- **Second run (EditMode 11/13, shoulders pass):** helms stood 3.4-3.9 cm off the head and the egg test failed. Checked in a Python model
+  on the real Quaternius head and hair vertices (read from the FBX files): (1) the head outline's rows are 8 mm apart and each the
+  hull of three, so near the crown the rings were fitted to points 1-2 cm wider than the head (4.4 cm gap); (2) a cap or kettle fitted
+  round the hair hugs the hair's hollows (parting, strands: 3-6 cm to the hair surface); (3) the test's 6 mm/8-degree window and
+  float rays slipping between facet seams made false "pokes" and the egg's infinite miss. Fixed: helms fit the head's own bind-pose
+  vertices; under a cap or kettle the hair is cut to what hangs below the rim (its triangles above it are not drawn; whole again
+  when the cap comes off) and the cap fits the skull plus that hair; the test checks pokes per point and gaps within 3 mm/6 degrees,
+  and its rays allow for seams. The model measured, every hair style (parted, buzzed, long, buns, none): cap worst gap 1.2-1.6 cm,
+  kettle 1.5-1.8, barbute 1.4, nothing poking through; the egg 1.2 cm. WRITTEN, NOT RUN.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

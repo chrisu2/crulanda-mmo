@@ -969,3 +969,4 @@ un-captures.
 - 293 (2026-10-19 ~19:30, tune-9) "jumped a little too far..maybe down 1/4th of total distance" (done: 35-55 m to 30-41 m). Then: "not sure where i respawned but not near the raid" (a recovery point by the apron for her raid).
 - 294 (2026-10-19 ~19:45, tune-10) "when she leaps she would target on raid member and if that member does not move out of the range
   theyll die" (OPEN: the leap marks one member; the rings under them; out before she lands or die).
+- 295 (2026-10-19 ~20:00; tune-10's first pull reached the feast at 15:53 with her at 31%) "cut about 10% health" (done: 340,000 to 306,000).

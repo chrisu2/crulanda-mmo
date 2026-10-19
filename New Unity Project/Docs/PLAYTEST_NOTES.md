@@ -842,3 +842,7 @@ un-captures.
   Then (verbatim): "the old ones were better". Today's figures (Quaternius) stay; Phase 8.5 goes on with note 239 on them.
 - 241 (2026-10-18 ~20:45, on wardrobe 06-helms-f: the CHOSAN model helms Headgear.B.013-016 perched and tilted on the skull) "none
   fit on the head" (OPEN): branch angular-gear retires those helms and builds every helm from the head's own outline.
+- 242 (2026-10-19 ~10:55, watching the picture round's wardrobe line-up of branch angular-gear) "i think we have reverted too much
+  bring back what we had before. helm dont fit. most sit around the head a too large for the head. hood is awful" (OPEN). Asked, he
+  chose (verbatim) "Old helms, new gloves (Recommended)": helms back as in his game, keep the new gloves and shoulder plates, then the
+  hood (the oilskin hood stands out round the head like a bell).

@@ -240,7 +240,9 @@ namespace Crulanda.Encounter
         /// The brood's kill order (raid 5, Chris: "once they are cc they need to be killed systematically or they will break and eventually kill
         /// the raid"): a free one first (it is on the healers; the nearest to breaking first among the free); then the held, Cross before Moon
         /// before unmarked, the one whose hold runs out soonest first. The first is the Skull: the brood-takers kill it, and only it (a blow on
-        /// another held one would break it). (id, held, its mark, seconds left on its hold).
+        /// another held one would break it). With every one held, the off-tank grabs the Skull (its blow breaks that hold, its taunt takes it)
+        /// and the damage-dealers assist it, waiting on her until it is there; no area blow near a held one. (id, held, its mark, seconds left
+        /// on its hold).
         /// </summary>
         public static List<string> KillOrder(IList<(string id, bool held, RaidMark mark, float holdLeft)> brood)
         {

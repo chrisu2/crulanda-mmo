@@ -670,6 +670,12 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      killed in turn take most of a wave's 30 s, and a raid that lets the holds run out or kills out of order has free brood on its healers);
      her health 170,000 (195,000), for the damage the raid now spends on the brood.
    - **The run's log** gives each pull's brood killed, broken free of their holds, and eaten.
+   - **The add phase's final shape** (Chris, verbatim: "if all is cc'd then the tank still needs to grab ONE and the dps assist him and not
+     break other cc"): with every brood held, the off-tank grabs the Skull (its blow breaks that one hold, its taunt takes it) and the
+     damage-dealers assist it, staying on her until the off-tank is on the Skull, never touching a held one; when it dies the off-tank grabs
+     the next; no sim's area blow while a held brood is within its reach. The control classes re-hold any that break. A raid that drops its
+     holds or kills out of order has free brood on its healers. (When you, the bot, are the off-tank, the damage-dealers do not wait: they
+     open the Skull themselves.)
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

@@ -126,6 +126,16 @@ namespace Crulanda.Encounter
         }
 
         // ---------- the brood (phase 2 on) ----------
+        /// <summary>The off-tank: the raid's tank sim she is not on (it takes the brood), or null.</summary>
+        public SimCompanion OffTank
+        {
+            get
+            {
+                var e = UnravellerFighting; if (e == null) return null;
+                foreach (var c in PartySims) if (c != null && c.actor.IsAlive && c.Role == SimCompanion.PartyRole.Tank && e.Victim != c.actor) return c;
+                return null;
+            }
+        }
         /// <summary>The brood the raid kills now (the Skull; raid 5's kill order), or null.</summary>
         public EncounterEnemy BroodKill { get; private set; }
         /// <summary>The boss frame's kill-order line: "Kill: Skull, then Cross, Moon (3 held)"; null with no brood up.</summary>

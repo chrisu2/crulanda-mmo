@@ -197,9 +197,17 @@ namespace Crulanda.Encounter
             if (Role == PartyRole.Tank && (holds || TauntsHer(e))) return e;   // holding her, or the one to take her back (a swap, a blink onto a caster)
             int party = session.InRaid ? session.Raid.PartyOf(sim.id) : 0;
             if (!RaidJobs.TakesBrood(Role, party, holds, Melee)) return null;
-            // The kill order's Skull (raid 5): only it; a blow on another held one would break it.
+            // The kill order's Skull (raid 5): only it; a blow on another held one would break it. Chris: "if all is cc'd then the tank still needs
+            // to grab ONE and the dps assist him and not break other cc": the off-tank grabs it (its blow breaks the hold, its taunt takes it);
+            // the damage-dealers assist the off-tank, and leave a held Skull alone until the off-tank is on it (meanwhile, her).
             var skull = session.BroodKill;
-            if (skull != null && skull.actor.IsAlive && Vector3.Distance(skull.transform.position, transform.position) < 40) return skull;
+            if (skull != null && skull.actor.IsAlive && Vector3.Distance(skull.transform.position, transform.position) < 40)
+            {
+                if (Role == PartyRole.Tank) return skull;
+                var ot = session.OffTank;
+                if (skull.Incapacitated && ot != null && ot != this && ot.actor.IsAlive && Vector3.Distance(ot.transform.position, skull.transform.position) > 6) return e;   // wait for the tank to grab it
+                return skull;
+            }
             EncounterEnemy best = null; float bestD = 40;
             foreach (var b in session.BroodNow)
             {
@@ -207,6 +215,12 @@ namespace Crulanda.Encounter
                 float dist = Vector3.Distance(b.transform.position, transform.position); if (dist < bestD) { best = b; bestD = dist; }
             }
             return best;
+        }
+        /// <summary>No area blow near a held brood while a wave is up (raid 5: it would break the holds).</summary>
+        public bool HeldBroodNear(Vector3 at, float reach)
+        {
+            foreach (var b in session.BroodNow) if (b != null && b.actor.IsAlive && b.Incapacitated && b != session.BroodKill && Vector3.Distance(b.transform.position, at) <= reach) return true;
+            return false;
         }
         /// <summary>Whether this tank taunts her now (the swap at four stacks; RaidJobs.TauntHer).</summary>
         bool TauntsHer(EncounterEnemy e) { return session.TauntsUnraveller(actor, e); }

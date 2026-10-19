@@ -57,7 +57,14 @@ namespace Crulanda.Tests
                 var b = ZoneBuilder.PropBounds(root);
                 Assert.AreEqual(.95f, b.size.y, .02f, "stands .95 m, as the Fantasy kit's barrel did");
                 Assert.AreEqual(0, b.min.y, .02f, "its foot on the spot");
-                Assert.That(Mathf.Max(b.size.x, b.size.z), Is.InRange(.55f, .8f), "upright, about two thirds as wide as tall (not on its side)");
+                // Across, measured unturned (turned 30 degrees, the box round it is 1.37 times the barrel's width: the 0.879 of the first
+                // run was that box, not a tilt). The file's vertices: 0.679 across x and z, 1.002 tall, so .95 tall is .64 across.
+                var flat = new GameObject("flat").transform; flat.SetParent(root, false);
+                ZoneBuilder.ModelProp(flat, ZoneBuilder.WoodBarrelPath, Vector3.zero, 0, .95f);
+                var fb = ZoneBuilder.PropBounds(flat);
+                Assert.AreEqual(.95f, fb.size.y, .02f, "unturned, .95 m tall");
+                Assert.That(fb.size.x, Is.InRange(.6f, .7f), "upright: .64 across x, two thirds of its height (on its side it would be .95)");
+                Assert.That(fb.size.z, Is.InRange(.6f, .7f), "upright: .64 across z");
                 Assert.NotNull(go.GetComponent<BoxCollider>(), "solid when asked");
                 var mesh = ZoneBuilder.WoodBarrelMesh; Assert.NotNull(mesh, "its mesh");
                 Assert.IsTrue(mesh.isReadable, "readable, for the joined meshes (the Lowtowns' clutter, the Spoon)");

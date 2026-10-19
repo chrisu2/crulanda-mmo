@@ -2031,81 +2031,30 @@ namespace Crulanda.World
             Solid(t, new Vector3(0, 1.2f, 0), new Vector3(2.4f, 2.4f, 2.4f));
         }
         /// <summary>
-        /// A dead tree (Khaven's Stillwood, the Rim's husks, the unmade): a tapered, slightly bent bole on a root flare of
-        /// buttress ridges (Bole), ending in a broken leader; three to five limbs leaving it at different heights, each crooked (a
-        /// kink part way) and tapering to a point, with branches off its length, not its tip, and twigs off those. Grey weathered
-        /// wood, no bark grain in the shade. Its look is its own (TreeRandom); from the zone's stream it takes exactly the draws the
-        /// old tree took, so nothing else moves. <paramref name="girth"/> &gt; .6 (a dead_oak prop) keeps a massive trunk.
+        /// A dead tree (Khaven's Stillwood, the Rim's husks, the unmade, the woods' snags, the groves, Hallow's Creek's and the Shore's dead
+        /// oaks, the gallows): one of the seven Dry Trees (play note 248; ZoneBuilder.DryTrees), as tall as the old one stood (DryTreeHeight),
+        /// which of the seven and its turn from the tree's own stream, its trunk's foot sunk under the lowest ground round it so it never
+        /// stands on air on a slope, charred darker in the ash and greyed in a gloom. From the zone's stream it takes exactly the draws the
+        /// old tree took, so nothing else moves; the collider and nav block are the old ones. <paramref name="girth"/> &gt; .6 (a dead_oak
+        /// prop) is a massive one: taller, a broader collider. <paramref name="mat"/> was the painted tree's bark: the pack's bark is used.
         /// </summary>
         Transform DeadTree(Vector2 at, float scale, Material mat, int depth, Transform parent, Transform existing = null, float girth = -1)
         {
             var root = existing != null ? existing : new GameObject("Dead tree").transform;
             if (existing == null) { root.SetParent(parent, false); root.position = Ground(at); root.rotation = Quaternion.Euler(0, R01 * 360, 0); }
             if (girth < 0) girth = existing != null && depth >= 5 ? .9f : .38f;
-            float trunkH = (girth > .6f ? 4.2f : 5.2f) * scale, trunkR = girth * scale;
+            float trunkR = girth * scale;
             for (int i = 0; i < 5; i++) _ = R01;                                           // the old root flare's draws
             SkipBranchDraws(depth, trunkR * (girth > .6f ? .75f : .7f));                     // and the old limbs'
             var tr = TreeRandom(root.position); float T() { return (float)tr.NextDouble(); }
             bool massive = girth > .6f;
-            // The kit's dead tree (art round 4, 2026-10-07), one of five from the tree's own stream, as tall as the painted one would
-            // stand; charred darker in the ash. The massive dead oaks (landmarks) stay painted.
-            if (!massive && HasProp("Nature/DeadTree_1"))
-            {
-                float kitTop = trunkH * 1.35f * (.9f + T() * .2f);
-                var kit = KitTree(root, "Nature/DeadTree_" + (1 + (int)(T() * 5) % 5), kitTop, Mathf.Max(.14f, trunkR * .8f), T() * 360);
-                if (kit != null)
-                {
-                    if (Zone.biome == "ash" || Gloom) foreach (var r in kit.GetComponentsInChildren<Renderer>()) r.sharedMaterial = KitShade(r.sharedMaterial, Zone.biome == "ash" ? new Color(.55f, .52f, .5f) : new Color(.8f, .78f, .76f));
-                    return root;
-                }
-            }
-            // A massive one (a dead_oak prop) is a great old tree: tall, a broad but not squat bole, long heavy limbs.
-            float top = (massive ? trunkH * 2.1f : trunkH * 1.35f) * (.9f + T() * .2f), r0 = massive ? trunkR * .66f : Mathf.Max(.14f, trunkR * .8f);
-            var axis = Bole(root, tr, top, r0, mat, .45f);   // a snapped-off top
-            // Playtest 2026-10-03 ("this tree is still broke"): the limbs were long thin spears, all climbing, so the tree read as an
-            // antler or a broom. A dead oak's limbs are short for its height, heavy where they leave the bole, crooked in three
-            // lengths that each turn a little, and end in snapped stubs; forks off every length, some drooping, each forked again.
-            int n = (massive ? 5 : 4) + (int)(T() * 2); float turn = T() * 360;
-            for (int i = 0; i < n; i++)
-            {
-                // Up the trunk from about a third to four fifths, lowest first: the low limbs heavy and near level, the upper ones shorter and climbing.
-                float u = .32f + .48f * (i + T() * .6f) / n, yaw = turn + i * 360f / n + (T() - .5f) * 70;
-                var outward = Quaternion.Euler(0, yaw, 0) * Vector3.right;
-                float reach = top * (massive ? .32f + T() * .18f : .32f + T() * .2f) * (1.3f - u * .6f);
-                float r = r0 * (massive ? .5f + T() * .14f : .5f + T() * .16f) * (1.2f - u * .45f);
-                var from = axis(top * u); var dir = (outward + Vector3.up * (.05f + u * .4f + T() * .3f)).normalized;
-                float segLen = reach * (.45f + T() * .1f);
-                for (int seg = 0; seg < 3; seg++)
-                {
-                    var to = from + dir * segLen; float bow = .06f + T() * .06f, rEnd = r * (seg == 2 ? .35f : .6f);
-                    Limb(root, from, to, r, rEnd, mat, bow, 8, seg == 0, seg == 2);
-                    // Forks off this length (on its bowed line), turning their own way, some drooping; most fork once more.
-                    int subs = seg == 2 ? 1 : 1 + (int)(T() * 2);
-                    for (int k = 0; k < subs; k++)
-                    {
-                        float s2 = .35f + T() * .5f; var at2 = LimbAt(from, to, bow, s2); float rAt = Mathf.Lerp(r, rEnd, s2) * .6f;
-                        var d2 = (Quaternion.AngleAxis((T() - .5f) * 110, Vector3.up) * dir + Vector3.up * (T() * .9f - .25f)).normalized;
-                        float len = segLen * (.5f + T() * .6f); var tip = at2 + d2 * len; float bb = .08f + T() * .08f;
-                        Limb(root, at2, tip, rAt, rAt * .3f, mat, bb, 6);
-                        if (T() < .7f)
-                        {
-                            var at3 = LimbAt(at2, tip, bb, .5f + T() * .3f); float rs = rAt * .45f;
-                            var d3 = (Quaternion.AngleAxis((T() - .5f) * 120, Vector3.up) * d2 + Vector3.up * (T() * .8f - .2f)).normalized;
-                            Limb(root, at3, at3 + d3 * len * (.4f + T() * .3f), rs, rs * .3f, mat, .1f, 5);
-                        }
-                    }
-                    // The next length: a kink in plan and in pitch, thinner and shorter.
-                    from = to; r = rEnd; segLen *= .75f;
-                    dir = (Quaternion.AngleAxis((T() - .5f) * 60, Vector3.up) * dir + Vector3.up * ((T() - .5f) * .5f + .15f)).normalized;
-                }
-            }
-            // The leader's broken top: a last short twig or two just under the snag.
-            for (int k = 0, m = 1 + (int)(T() * 2); k < m; k++)
-            {
-                var from = axis(top * (.86f + T() * .06f)); var dir = (Quaternion.Euler(0, T() * 360, 0) * Vector3.right + Vector3.up * (.6f + T() * .8f)).normalized;
-                Limb(root, from, from + dir * top * (.08f + T() * .06f), r0 * .26f, r0 * .07f, mat, .08f, 5);
-            }
-            var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, top / 2, 0); cap.height = top; cap.radius = r0;
+            float top = DryTreeHeight(scale, massive, T()), r0 = massive ? trunkR * .66f : Mathf.Max(.14f, trunkR * .8f);
+            int pick = DryTreePick(T()); float yaw = T() * 360;
+            DryTreeModel(root, pick, Vector3.down * DrySink(root, r0), Quaternion.Euler(0, yaw, 0), top, DryShade());
+            // The old colliders: a common tree's as the kit tree had it, a massive one's the painted dead oak's.
+            var cap = root.gameObject.AddComponent<CapsuleCollider>();
+            if (massive) { cap.center = new Vector3(0, top / 2, 0); cap.height = top; } else { cap.center = new Vector3(0, top * .45f, 0); cap.height = top * .9f; }
+            cap.radius = r0;
             root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
             return root;
         }
@@ -6303,6 +6252,16 @@ namespace Crulanda.World
                 if (!parts.TryGetValue((mat, side), out var list)) parts[(mat, side)] = list = new List<CombineInstance>();
                 list.Add(new CombineInstance { mesh = mesh, transform = Matrix4x4.TRS(at, rot, scale) });
             }
+            // A dead tree out here is one of the Dry Trees (play note 248), its lowest-detail copy, th tall, its trunk's foot on the ground;
+            // false when the pack is missing (the spires stand instead).
+            var dryMat = DryBark != null ? (DryShade() == Color.white ? DryBark : KitShade(DryBark, DryShade())) : null;
+            bool PutDry(int side, float pickDraw, Vector3 at, float yaw, float th)
+            {
+                if (dryMat == null || !DryTreeFar(DryTreePick(pickDraw), out var mesh, out var unit)) return false;
+                if (!parts.TryGetValue((dryMat, side), out var list)) parts[(dryMat, side)] = list = new List<CombineInstance>();
+                list.Add(new CombineInstance { mesh = mesh, transform = Matrix4x4.TRS(at, Quaternion.Euler(0, yaw, 0), Vector3.one * th) * unit });
+                return true;
+            }
             // Meadows and woods are wooded right over the ridge, the rows closing up into a canopy (2026-10-10, Chris: "horizon still
             // looks empty. compare the horizon in world of warcraft forever in elwynn forest": the trees stopped 43 m out, up to 19 m
             // apart, and the ridge behind them was bare).
@@ -6340,8 +6299,15 @@ namespace Crulanda.World
                         }
                         else if (pick < dead)
                         {
-                            if (!bare) Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.45f, th, .45f));
-                            for (int j = 0; j < 3; j++) { float tilt = 35 + R() * 20; if (!bare) Put(side, spire, deadMat, at + Vector3.up * th * (.45f + j * .14f), Quaternion.Euler(0, yaw + j * 120, tilt), new Vector3(.18f, th * .4f, .18f)); }
+                            // The first three rows (to 22 m out, where the near wood is) a Dry Tree; further out, in the fog, the old spire
+                            // and three limbs (a dry tree in every row was a million triangles round Khaven). The same three draws either way.
+                            float d0 = R(), d1 = R(), d2 = R();
+                            if (!bare && !(row <= 22 && PutDry(side, d0, at + Vector3.up * .3f, yaw, th)))
+                            {
+                                Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.45f, th, .45f));
+                                float[] d = { d0, d1, d2 };
+                                for (int j = 0; j < 3; j++) Put(side, spire, deadMat, at + Vector3.up * th * (.45f + j * .14f), Quaternion.Euler(0, yaw + j * 120, 35 + d[j] * 20), new Vector3(.18f, th * .4f, .18f));
+                            }
                         }
                         else if (bare) { if (pick >= dead + pines) R(); }   // (a broadleaf's leaf shade draw)
                         else if (pick < dead + pines)
@@ -6430,8 +6396,13 @@ namespace Crulanda.World
                 }
                 else if (pick < dead)
                 {
-                    Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.5f, th, .5f));
-                    for (int j = 0; j < 5; j++) Put(side, spire, deadMat, at + Vector3.up * th * (.36f + j * .1f), Quaternion.Euler(0, yaw + j * 137, 32 + N() * 24), new Vector3(.19f, th * (.42f - j * .04f), .19f));
+                    // A Dry Tree (play note 248); its five draws taken as the old five limbs took them, so the rest stand where they did.
+                    var d = new float[5]; for (int j = 0; j < 5; j++) d[j] = N();
+                    if (!PutDry(side, d[0], at + Vector3.up * .3f, yaw, th))
+                    {
+                        Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.5f, th, .5f));
+                        for (int j = 0; j < 5; j++) Put(side, spire, deadMat, at + Vector3.up * th * (.36f + j * .1f), Quaternion.Euler(0, yaw + j * 137, 32 + d[j] * 24), new Vector3(.19f, th * (.42f - j * .04f), .19f));
+                    }
                 }
                 else if (pick < dead + pines)
                 {

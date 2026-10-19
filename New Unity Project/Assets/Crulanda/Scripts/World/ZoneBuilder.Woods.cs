@@ -186,15 +186,14 @@ namespace Crulanda.World
         void FallenTrunk(Vector2 at, float r1, float r2)
         {
             var t = Root(new ZoneProp { kind = "log", name = "Fallen trunk", at = at, rotation = r1 * 360 }, statics);
-            // The kit's dead tree laid on its side, a little into the ground (Chris, 2026-10-14 18:55: "dont like these trees new
-            // bottoms/roots ... coloring is off": the built trunk's black end and moss blob); the built trunk when the kit is missing.
-            if (HasProp("Nature/DeadTree_1"))
+            // A dead tree laid on its side, a little into the ground (Chris, 2026-10-14 18:55: "dont like these trees new bottoms/roots ...
+            // coloring is off": the built trunk's black end and moss blob): one of the Dry Trees since play note 248 (it was the nature
+            // kit's dead tree), its foot by the root, its crown along -x; the built trunk when the pack is missing.
+            if (DryTreesThere)
             {
-                var kit = ModelProp(t, "Nature/DeadTree_" + (1 + (int)(r2 * 4.99f)), Vector3.zero, 0, 6 + r2 * 3);
+                var kit = DryTreeModel(t, DryTreePick(r2 * 7.31f % 1), new Vector3(0, .35f, 0), Quaternion.Euler(0, 0, 84 + r2 * 5), 6 + r2 * 3, DryShade());
                 if (kit != null)
                 {
-                    kit.transform.localRotation = Quaternion.Euler(0, 0, 84 + r2 * 5); kit.transform.localPosition = new Vector3(0, .35f, 0);
-                    DressNature(kit, Wither(new Color(.42f, .34f, .26f)));
                     var col = t.gameObject.AddComponent<CapsuleCollider>(); col.direction = 0; col.center = new Vector3(-2.8f, .35f, 0); col.height = 6; col.radius = .4f;
                     t.gameObject.AddComponent<NavBlocker>(); return;
                 }

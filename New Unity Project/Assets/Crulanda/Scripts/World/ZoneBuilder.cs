@@ -1214,7 +1214,7 @@ namespace Crulanda.World
                         LowtownProp(t, p); break;   // the Lowtowns' kinds (ZoneBuilder.Lowtowns.cs, Phase 9.1)
                     case "oven": Oven(t); break;
                     case "tannery": Tannery(t); break;
-                    case "woodpile": Woodpile(t); break;
+                    case "woodpile": Woodpile(t); if (p.variant == WoodyardCanopyVariant) WoodyardCanopy(t); break;
                     case "leathershop": LeatherShop(t); break;
                     case "dryhut": DryingHut(t); break;
                     case "kitchen": Kitchen(t); break;
@@ -4190,6 +4190,32 @@ namespace Crulanda.World
             MeshPart2(log, t, new Vector3(-.5f, .68f, -1), bark, split, Quaternion.Euler(0, 0, 90)).transform.localScale = new Vector3(.71f, .8f, .71f);
             Solid(t, new Vector3(-.4f, .6f, .6f), new Vector3(3, 1.3f, 1.2f));
             Workplace(t, "woodpile", new Vector3(1.4f, 0, -1.4f), new Vector3(1.4f, .6f, -.6f));
+        }
+        /// <summary>The woodpile's variant with the Wooden Canopy over its seasoning wood (Oakhaven's Woodyard, the one lumberjack's yard).</summary>
+        public const int WoodyardCanopyVariant = 1;
+        /// <summary>The canopy's middle in the woodpile's frame, its height, and the ground it covers (the pack's 8.8 by 4.8 m, 3.8 m tall
+        /// shelter brought to 3 m): behind the chopping block, on the side away from the log stack.</summary>
+        public static readonly Vector3 WoodyardCanopyAt = new Vector3(-.3f, 0, -3.95f);
+        public const float WoodyardCanopyHeight = 3f;
+        public static readonly Vector2 WoodyardCanopyFoot = new Vector2(6.95f, 3.76f);
+        /// <summary>The split firewood stacks under it, in the woodpile's frame (x, z, yaw): clear of its six posts (at about x -3.45,
+        /// -.3 and 2.85, z -2.45 and -5.45 here).</summary>
+        public static readonly Vector3[] WoodyardFirewood = { new Vector3(-2.35f, -4.7f, 4), new Vector3(-.85f, -4.75f, -3), new Vector3(.65f, -4.65f, 2), new Vector3(-1.6f, -3.3f, 93) };
+        /// <summary>
+        /// (2026-10-19, play note 252: "good for lumberjack in myassets - Wooden Canopy") icescreen's Wooden Canopy (Asset Store EULA;
+        /// Resources/Props/WoodenCanopy, the pack's own Standard materials and prefabs): its timber shelter over split firewood stacks,
+        /// three in a row along its back and one turned across in front, behind the chopping block, so the lumberjack splits at the
+        /// block (the woodpile's workplace) a step in front of the shelter's long side. Six posts under a gable roof whose eaves come
+        /// down to about 1.3 m at this size (read from Canopy.fbx), so one collider fills its footprint: nobody walks through the
+        /// roof. Every piece casts and takes shadow (ModelProp). The pack's ladder (Stair) is not used.
+        /// </summary>
+        void WoodyardCanopy(Transform t)
+        {
+            var roof = ModelProp(t, "WoodenCanopy/Prefab/Canopy", WoodyardCanopyAt, 0, WoodyardCanopyHeight);
+            if (roof == null) { Debug.LogWarning("Woodyard: the Wooden Canopy is not in Resources/Props/WoodenCanopy."); return; }
+            roof.name = "Wooden canopy";
+            foreach (var f in WoodyardFirewood) { var w = ModelProp(t, "WoodenCanopy/Prefab/FireWood", new Vector3(f.x, 0, f.y), f.z, .56f); if (w != null) w.name = "Firewood stack"; }
+            Solid(t, WoodyardCanopyAt + new Vector3(0, .65f, 0), new Vector3(WoodyardCanopyFoot.x, 1.3f, WoodyardCanopyFoot.y));   // its eaves come down to 1.3 m: a woodshed to reach into, not walk under
         }
 
         // ---------- landmarks (the Peaks, the Ashland Rim) ----------

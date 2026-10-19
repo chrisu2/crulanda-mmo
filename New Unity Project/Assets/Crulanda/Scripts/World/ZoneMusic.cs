@@ -17,6 +17,10 @@ namespace Crulanda.World
     /// /music &lt;0-1&gt; and /music off in the chat (EncounterSession.PlayerChat). The session makes one per zone load
     /// (<see cref="Begin"/>); the camera's AudioListener hears it; everything is 2D. A zone's own folder, Resources/Music/&lt;short&gt;
     /// (oakhaven, khaven, peaks, ashrim, verdant, adit), adds any track dropped into it to that zone's day set, no code needed.
+    /// (2026-10-19, play note 251: "more music tracks for in game ... Free 25 Fantasy RPG Tracks Vol. 3") alkakrab's pack, under
+    /// Resources/Music/Fantasy3 (tools/import_music_vol3.py): each zone and dungeon gets its own pieces of it on top of what it had,
+    /// no two sharing one (<see cref="Fantasy3"/>); its action loops join the field's and the dungeons' fight tracks
+    /// (<see cref="FieldFights"/>, <see cref="DungeonFights"/>), one kept back for the world boss (<see cref="WorldBossFight"/>).
     /// </summary>
     public sealed class ZoneMusic : MonoBehaviour
     {
@@ -35,40 +39,63 @@ namespace Crulanda.World
             /// physically heavy ... Just the crunch of their boots on the pristine gravel" (b1 ch.21:19); sound "fell to the ground and died"
             /// (b1 ch.17:9).</summary>
             public bool quiet;
+            /// <summary>A dungeon (the Sealed Adit, Hallow's Creek's cellars): its day set is its dungeon set, played everywhere in
+            /// it (in a quiet zone, under ground only), with the dungeons' fight tracks.</summary>
+            public bool dungeon;
         }
         /// <summary>No track: what a quiet zone plays out of doors.</summary>
         public static readonly string[] Silence = new string[0];
         public const string FieldFight = "Music/Eastern/MeasuredFight", DungeonFight = "Music/Eastern/AggressiveFight";
-        /// <summary>The Sealed Adit's and every cave's: the dark pack's two crypts.</summary>
+        /// <summary>Every cave's (and the base of each dungeon's set): the dark pack's two crypts.</summary>
         public static readonly string[] DungeonTracks = { "Music/Dark/ScaryCrypt", "Music/Dark/Crypt" };
+        /// <summary>alkakrab's Vol. 3 (play note 251), as Resources paths.</summary>
+        public const string Fantasy3 = "Music/Fantasy3/";
+        /// <summary>A fight draws one of these (<see cref="FightsFor"/>): the eastern pack's measured fight in the field and its
+        /// aggressive one under ground, each with two of Vol. 3's action loops.</summary>
+        public static readonly string[] FieldFights = { FieldFight, Fantasy3 + "Action1Loop", Fantasy3 + "Action4Loop" },
+            DungeonFights = { DungeonFight, Fantasy3 + "Action3Loop", Fantasy3 + "Action5Loop" };
+        /// <summary>Kept for the world boss raid (the Unraveller, Docs/WORLD_BOSS_1.md; not built yet): Vol. 3's longest action loop,
+        /// in no zone's set and no fight pool, so the raid's music is heard nowhere else.</summary>
+        public const string WorldBossFight = Fantasy3 + "Action2Loop";
+        /// <summary>The fight tracks a fight in a set with <paramref name="fight"/> as its fight track draws from.</summary>
+        public static string[] FightsFor(string fight) { return fight == FieldFight ? FieldFights : fight == DungeonFight ? DungeonFights : new[] { fight }; }
+        static string[] With(string[] older, params string[] added) { var all = new string[older.Length + added.Length]; older.CopyTo(all, 0); for (int i = 0; i < added.Length; i++) all[older.Length + i] = Fantasy3 + added[i]; return all; }
         /// <summary>
         /// By zone id, chosen by the packs' moods against WORLD_ZONES: the quiet eastern pieces for the Peaks (a pass with pilgrims)
         /// and the Rim's dusk, the last-zone pieces for the Rim's waste and the grey's edge, the dark pack for Khaven's dusk, the
         /// villages' nights and the dungeons. Nothing in the packs is pastoral, so Oakhaven and the Shore take the two softest (Last
         /// Hope, Oasis). Two to four a zone; a track two zones share is stored once, under its pack.
+        /// Vol. 3 (2026-10-19) is added by mood, measured (its pieces are numbered, not named): the brightest, airiest ambient loops for
+        /// the open Shore (9, 10), Oakhaven's fields (7, 2) and the Crown (8, 5); the warmer, fuller ones for the Peaks' pass (6, 1),
+        /// Khaven's dusk (3) and the Rim's waste (4); the low, dark ambience pieces for Khaven, the Rim's night and the Lowtowns' drains;
+        /// Oakhaven's and the Shore's nights the gentlest two (4, 1); the dark pieces for the grim Lowtowns (5, the deepest) and the
+        /// two dungeons (the Adit 1 and 3; Hallow's Creek's cellars 2 and 4, the sparsest, half of it silence). Each Vol. 3 piece is in
+        /// one zone only (ZoneMusicTests).
         /// </summary>
         public static readonly Dictionary<string, Set> Sets = new Dictionary<string, Set> {
-            { "zone.oakhaven", new Set { day = new[] { "Music/Last/LastHope", "Music/Eastern/Oasis" }, night = new[] { "Music/Dark/Cemetery" }, grey = new[] { "Music/Last/EchoesAfterFire" } } },
-            { "zone.khaven", new Set { day = new[] { "Music/Dark/Cemetery", "Music/Last/RustAndSilence" } } },   // dusk all day: the same by night
-            { "zone.peaks", new Set { day = new[] { "Music/Eastern/MysteriousCity", "Music/Eastern/RestlessNight" }, night = new[] { "Music/Eastern/RestlessNight" } } },
-            { "zone.ashrim", new Set { day = new[] { "Music/Last/EchoesAfterFire", "Music/Last/ForgottenSouls", "Music/Eastern/DesertSunset" }, night = new[] { "Music/Last/ForgottenSouls" }, grey = new[] { "Music/Last/EchoesAfterFire" } } },
-            { "zone.verdant", new Set { day = new[] { "Music/Eastern/Oasis", "Music/Last/LastHope" }, night = new[] { "Music/Eastern/RestlessNight" } } },
-            { "zone.adit", new Set { day = DungeonTracks, combat = DungeonFight } },
-            { "zone.lowtowns", new Set { day = new[] { "Music/Last/RustAndSilence", "Music/Eastern/MysteriousCity" }, night = new[] { "Music/Dark/Cemetery", "Music/Eastern/RestlessNight" } } },   // the Lowtowns (Phase 9.1): rust and smog by day, the drains' night
+            { "zone.oakhaven", new Set { day = With(new[] { "Music/Last/LastHope", "Music/Eastern/Oasis" }, "Ambient7Loop", "Ambient2Loop"), night = With(new[] { "Music/Dark/Cemetery" }, "Ambience4"), grey = new[] { "Music/Last/EchoesAfterFire" } } },
+            { "zone.khaven", new Set { day = With(new[] { "Music/Dark/Cemetery", "Music/Last/RustAndSilence" }, "Ambient3Loop", "Ambience2") } },   // dusk all day: the same by night
+            { "zone.peaks", new Set { day = With(new[] { "Music/Eastern/MysteriousCity", "Music/Eastern/RestlessNight" }, "Ambient6Loop", "Ambient1Loop"), night = new[] { "Music/Eastern/RestlessNight" } } },
+            { "zone.ashrim", new Set { day = With(new[] { "Music/Last/EchoesAfterFire", "Music/Last/ForgottenSouls", "Music/Eastern/DesertSunset" }, "Ambient4Loop"), night = With(new[] { "Music/Last/ForgottenSouls" }, "Ambience3"), grey = new[] { "Music/Last/EchoesAfterFire" } } },
+            { "zone.verdant", new Set { day = With(new[] { "Music/Eastern/Oasis", "Music/Last/LastHope" }, "Ambient9Loop", "Ambient10Loop"), night = With(new[] { "Music/Eastern/RestlessNight" }, "Ambience1") } },
+            { "zone.adit", new Set { day = With(DungeonTracks, "Dark1", "Dark3"), combat = DungeonFight, dungeon = true } },
+            { "zone.lowtowns", new Set { day = With(new[] { "Music/Last/RustAndSilence", "Music/Eastern/MysteriousCity" }, "Dark5"), night = With(new[] { "Music/Dark/Cemetery", "Music/Eastern/RestlessNight" }, "Ambience5") } },   // the Lowtowns (Phase 9.1): rust and smog by day, the drains' night
             // Hallow's Creek, the second dungeon: silent out of doors, the dungeon's set in its cellars.
-            { "zone.hallows", new Set { day = DungeonTracks, combat = DungeonFight, quiet = true } },
-            { "zone.crown", new Set { day = new[] { "Music/Eastern/MysteriousCity", "Music/Last/LastHope" }, night = new[] { "Music/Eastern/RestlessNight" } } },   // the Crown of Argentis (a city)
+            { "zone.hallows", new Set { day = With(DungeonTracks, "Dark2", "Dark4"), combat = DungeonFight, quiet = true, dungeon = true } },
+            { "zone.crown", new Set { day = With(new[] { "Music/Eastern/MysteriousCity", "Music/Last/LastHope" }, "Ambient8Loop", "Ambient5Loop"), night = new[] { "Music/Eastern/RestlessNight" } } },   // the Crown of Argentis (a city)
         };
         /// <summary>A zone's set; a zone not in <see cref="Sets"/> gets Oakhaven's.</summary>
         public static Set SetFor(string zoneId) { Set s; return zoneId != null && Sets.TryGetValue(zoneId, out s) ? s : Sets["zone.oakhaven"]; }
         /// <summary>The tracks for where <paramref name="at"/> stands in <paramref name="zone"/> at <paramref name="darkness"/>
-        /// (WorldClock's, 0..1), and the fight track that goes with them: the dungeon set inside a cave or in the Adit, else the zone's
-        /// grey, night or day set.</summary>
+        /// (WorldClock's, 0..1), and the fight track that goes with them: a dungeon's own set in a dungeon, the caves' inside a cave,
+        /// else the zone's grey, night or day set.</summary>
         public static string[] TracksFor(ZoneDefinition zone, Vector3 at, float darkness, out string fight)
         {
             var set = SetFor(zone != null ? zone.id : null);
-            if (set.quiet && !Hollow.InsideAny(at, 1)) { fight = set.combat ?? FieldFight; return Silence; }
-            if (set.day == DungeonTracks || Hollow.InsideAny(at, 1)) { fight = DungeonFight; return DungeonTracks; }
+            bool inside = Hollow.InsideAny(at, 1);
+            if (set.quiet && !inside) { fight = set.combat ?? FieldFight; return Silence; }
+            if (set.dungeon) { fight = DungeonFight; return set.day; }
+            if (inside) { fight = DungeonFight; return DungeonTracks; }
             fight = set.combat ?? FieldFight;
             if (zone != null && zone.wasting != null && set.grey.Length > 0 && at.x > zone.wasting.x - GreyReach) return set.grey;
             if (darkness > .5f && set.night.Length > 0) return set.night;
@@ -147,7 +174,7 @@ namespace Crulanda.World
             {
                 shown = want;
                 if (a.Busy && fade < 0 && Array.IndexOf(want, a.Path) < 0) { b.Cue(Pick(want), now); fade = 0; }
-                else if (!a.Busy && want == DungeonTracks) nextAt = Mathf.Min(nextAt, now + 4);
+                else if (!a.Busy && (want == DungeonTracks || (want.Length > 0 && SetFor(zone != null ? zone.id : null).dungeon))) nextAt = Mathf.Min(nextAt, now + 4);
             }
             if (fade >= 0)
             {
@@ -159,7 +186,7 @@ namespace Crulanda.World
             // The fight track: up in a second and a half, down over eight; gone when down. A fight that starts again inside those
             // eight seconds keeps the track it had.
             bool fightingNow = fighting != null && fighting() && fightSet > 0;
-            if (fightingNow && !fightWanted) { fight.Cue(fightPath, now); fightWanted = true; }
+            if (fightingNow && !fightWanted) { var pool = FightsFor(fightPath); fight.Cue(pool[UnityEngine.Random.Range(0, pool.Length)], now); fightWanted = true; }
             fightLevel = Mathf.MoveTowards(fightLevel, fightingNow ? 1 : 0, dt / (fightingNow ? FightIn : FightOut));
             if (!fightingNow && fightLevel <= 0 && fightWanted) { fight.Stop(); fightWanted = false; }
             float night = Mathf.Lerp(1, NightLevel, dark), duck = Mathf.Lerp(1, Duck, fightLevel);

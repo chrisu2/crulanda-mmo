@@ -299,7 +299,10 @@ namespace Crulanda.Tests
                 Assert.AreEqual(ZoneBuilder.WoodyardCanopyFoot.x, b.size.x, .2f, "its long side along x");
                 Assert.AreEqual(ZoneBuilder.WoodyardCanopyFoot.y, b.size.z, .2f, "its short side along z");
                 Assert.AreEqual(0, b.min.y, .02f, "on the ground");
-                float lo = float.MaxValue, hi = float.MinValue, loTop = float.MaxValue, hiTop = float.MinValue;
+                // Upright (lane B frame oakhaven-15-woodyard, 2026-10-19: it lay on its side, one roof slope on the grass): the posts'
+                // feet, the lowest tenth, stand on the ground in two rows along the whole length (x) and most of the depth (z) apart,
+                // with open ground between the rows; the ridge, the top tenth, runs the whole length and is narrow.
+                var feet = new List<Vector3>(); var ridge = new List<Vector3>();
                 foreach (var mf in holder.GetComponentsInChildren<MeshFilter>(true))
                 {
                     Assert.IsTrue(mf.sharedMesh.isReadable, "the mesh is readable (ThirdPartyImport)");
@@ -307,13 +310,30 @@ namespace Crulanda.Tests
                     foreach (var v in mf.sharedMesh.vertices)
                     {
                         var p = m.MultiplyPoint3x4(v);
-                        if (p.y < b.min.y + b.size.y * .2f) { lo = Mathf.Min(lo, p.z); hi = Mathf.Max(hi, p.z); }
-                        if (p.y > b.max.y - b.size.y * .2f) { loTop = Mathf.Min(loTop, p.z); hiTop = Mathf.Max(hiTop, p.z); }
+                        if (p.y < b.min.y + b.size.y * .1f) feet.Add(p);
+                        if (p.y > b.max.y - b.size.y * .1f) ridge.Add(p);
                     }
                 }
-                Assert.Less(hiTop - loTop, (hi - lo) * .6f, "the ridge is up and the posts are down (bottom " + (hi - lo).ToString("0.00") + " m wide, top " + (hiTop - loTop).ToString("0.00") + ")");
+                Assert.Greater(feet.Count, 8, "posts reach the ground");
+                float Span(List<Vector3> l, Func<Vector3, float> f) { return l.Max(f) - l.Min(f); }
+                string Say(List<Vector3> l) { return "x " + Span(l, p => p.x).ToString("0.00") + ", z " + Span(l, p => p.z).ToString("0.00") + " m"; }
+                Assert.Greater(Span(feet, p => p.x), b.size.x * .8f, "the post feet stand along the whole length (" + Say(feet) + ")");
+                Assert.Greater(Span(feet, p => p.z), b.size.z * .6f, "in two rows across the depth (" + Say(feet) + ")");
+                Assert.IsFalse(feet.Any(p => Mathf.Abs(p.z - b.center.z) < b.size.z * .2f), "nothing touches the ground down the middle: the space under the roof is open");
+                Assert.Greater(Span(ridge, p => p.x), b.size.x * .8f, "the ridge runs the length on top (" + Say(ridge) + ")");
+                Assert.Less(Span(ridge, p => p.z), b.size.z * .3f, "and is narrow: the roof is up, not on its side (" + Say(ridge) + ")");
             }
             finally { UnityEngine.Object.DestroyImmediate(holder); }
+            // The firewood stacks: low and flat on the ground, as the Woodyard sets them (.56 m high).
+            var stack = new GameObject("firewood test");
+            try
+            {
+                Assert.IsNotNull(ZoneBuilder.ModelProp(stack.transform, "WoodenCanopy/Prefab/FireWood", Vector3.zero, 0, .56f));
+                var s = ZoneBuilder.PropBounds(stack.transform);
+                Assert.AreEqual(.56f, s.size.y, .03f, "a stack .56 m high"); Assert.AreEqual(0, s.min.y, .02f, "on the ground");
+                Assert.Greater(Mathf.Min(s.size.x, s.size.z), 1f, "and over a metre each way: lying flat, not on its end (" + s.size.ToString("0.00") + ")");
+            }
+            finally { UnityEngine.Object.DestroyImmediate(stack); }
         }
     }
 }

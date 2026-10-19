@@ -71,6 +71,49 @@ anywhere"); it is not needed now.
 Then found in Downloads (2026-10-18 ~18:20): "Modular Hero.unitypackage" (CHOSAN, Oct 15; the old p85-hero branch took its body)
 and "Modular Character Outfits - Fantasy[Standard].zip" (Quaternius: the same files as Resources/Characters/Outfits, nothing new). Asked
 again with CHOSAN on hand, Chris kept (verbatim) "GanzSe (Recommended)". p85-hero is superseded.
+**Chris turned GanzSe down (2026-10-18 ~20:15, verbatim): "i dont like the new characters"**, after its first line-up beside
+today's figures (ui-captures/wardrobe-ganzse-1). Branch p85-ganzse is kept but not merged. Open with it: "helms and gauntlet still
+tooo round" (play note 239) on today's figures.
+**Angular gear on today's figures (branch angular-gear, 2026-10-18; WRITTEN, NOT RUN: compiled offline only, no Unity run, no
+capture).** For note 239 and the 10-10 "all seem to not fit properly", on the Quaternius figures (ModelFigure), helms, hand pieces and
+shoulders are now built from the model's own measurements instead of drawn round the old figure and scaled or warped on:
+- Helms (cap, kettle, barbute, coif): a stack of flat-faceted rings round the head's outline in the bind pose (head, or head and hair
+  for a cap or kettle), each a few mm outside every point of the head between its neighbours, closed in a low point that just clears
+  the skull (AngularShell, ActorVisual.GearAngular). They come down to the brow (cap, kettle), the jaw (barbute, with a T opening and a
+  plate collar) or the shoulders (coif: open round the face, mail in rows); nasal bars, cheek guards, combs, rims and a sloping brim
+  are flat plates set on the measured faces. No SeatHead/HatFit for these. Hoods, masks, wraps, circlets and crowns are unchanged.
+- The Modular Hero (CHOSAN) helmets are retired: pinned out of another rig they perched, tilted (06-helms-f), and no item wore them
+  (GearLooks.ModelHelms keeps only the sentinel helm, which an Ash Rim drop wears; the wardrobe line-up drops them).
+- Gloves and gauntlets: the hand's own skin stood 1.5-6 mm off it and skinned to the same finger bones (ModelArmour.HandShell: it
+  closes round a grip), a cuff of six or eight plates flaring up the forearm, plates over the fingers' and hand's backs for
+  gauntlets; wraps are bands of plates. The outfit's bracers hide under them. No more balls.
+- Pauldrons and spaulders: a faceted cap over each shoulder from the shoulder's own points, open on the neck side, a rim band, lames
+  down the upper arm; riding the collarbone and the upper arm.
+- Every look's materials, palettes, quality accents and tier extras are kept; only shapes and fit changed. The smooth figure keeps
+  the old drawings.
+- Tests (EditMode AngularGearTests, for the lead to run): a shell holds within 2 cm round an egg of points and is flat-shaded; every
+  helm comes 7 cm under the skull's top and stands 0-2 cm off the head and hair round its top 5 cm, closing within 4.5 cm over it;
+  gloves and gauntlets are within 1.25x the bare hand (through it 1.25x + 8 mm); shoulder plates rest within 3 cm of the body over the
+  shoulder; no main part is round (AngularShell.Roundness: share of smooth-shaded triangles, at most 0.15; today's domes and balls
+  are near 1). Also run ModelFigureTests (it checks gauntlets ride the hand's bones and caps sit on the head).
+- **The lead must capture** (one Unity job, lane A or B): wardrobe 04-sets front, 05-sets back, 06-helms, 07-shoulders-chests,
+  08-hands-legs-feet-neck, each front, back and side, plus 11-in-motion (a walking figure) with gauntlets and a pauldron on; then a
+  close look at a barbute's T and a coif's face opening, and a gauntlet gripping a sword and a staff. Not shown to Chris before that.
+- **First run (wardrobe-angular-1, EditMode 10/13):** gloves good (hand-shaped, cuffs, fingerless shows the fingers: kept). Helms and
+  shoulders wrong for one cause: the closing point was set by a cone rule that, when the widest point sat just above the last ring,
+  pushed the point metres out (a coif half a metre tall, a barbute's top 1.76 m up, a spike a metre out of each shoulder, which also
+  pulled the pauldron's middle off the shoulder). Fixed: a crown ring the gap over the head's (or shoulder's) highest point, fitted
+  round the top's own points, then a low point just over it (a flat-faceted crown, not a cone); caps and kettles come down to just
+  over the brows (they stopped 6.5 cm under the top); small rigid parts (horns, spikes) are flat-faceted. WRITTEN, NOT RUN again.
+- **Second run (EditMode 11/13, shoulders pass):** helms stood 3.4-3.9 cm off the head and the egg test failed. Checked in a Python model
+  on the real Quaternius head and hair vertices (read from the FBX files): (1) the head outline's rows are 8 mm apart and each the
+  hull of three, so near the crown the rings were fitted to points 1-2 cm wider than the head (4.4 cm gap); (2) a cap or kettle fitted
+  round the hair hugs the hair's hollows (parting, strands: 3-6 cm to the hair surface); (3) the test's 6 mm/8-degree window and
+  float rays slipping between facet seams made false "pokes" and the egg's infinite miss. Fixed: helms fit the head's own bind-pose
+  vertices; under a cap or kettle the hair is cut to what hangs below the rim (its triangles above it are not drawn; whole again
+  when the cap comes off) and the cap fits the skull plus that hair; the test checks pokes per point and gaps within 3 mm/6 degrees,
+  and its rays allow for seams. The model measured, every hair style (parted, buzzed, long, buns, none): cap worst gap 1.2-1.6 cm,
+  kettle 1.5-1.8, barbute 1.4, nothing poking through; the egg 1.2 cm. WRITTEN, NOT RUN.
 **Animations (2026-10-10, brought up to date 2026-10-11):** Kevin Iglesias's Archer pack is in, in part (BowShot01 load, hold and release, BowIdle01; the rest when the bow is right, note 112); his Melee pack waits to be imported. The rest of this paragraph is from before they came:
 a Kevin Iglesias archery set (the same maker as the locomotion) would give a real draw, aim and release on the same Humanoid avatar.
 **Done when:** the wardrobe line-up (EncounterCapture --crulanda-wardrobe-capture) shows every slot's every family fitting on every

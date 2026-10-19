@@ -905,3 +905,4 @@ un-captures.
 - 264 (2026-10-19 ~15:20, watching raid 4) "something needs to be done about the swirling bowl spike above the mob..make it smaller and
   blink on and off randomly" and "ground damage should be increased" (OPEN): her purple crown smaller, flickering in and out at
   random; the grey ground hits harder.
+- 265 (2026-10-19 ~15:25, watching raid 4) "more brood per wave..need CC baby" (OPEN): bigger brood waves that crowd control must hold.

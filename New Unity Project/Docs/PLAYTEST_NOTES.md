@@ -941,3 +941,4 @@ un-captures.
 - 278 (2026-10-19 ~16:40, on the corrected raid numbers: Mage ~74/s, Ranger 56, Archivist 51, Rogue/Scoundrel 48 vs a band of 88; heals
   Cleric 41, Shaman 27, Druid 23) "still not on target" (OPEN).
 - 279 (2026-10-19 ~16:42) "hybrids 75% of target" (the hybrids' damage at 75% of the pure damage band; replaces "a bit lower", 90%).
+- 280 (2026-10-19 ~16:45, watching tune-2) "people still standing in red areas. they need to evacuate" (OPEN).

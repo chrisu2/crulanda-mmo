@@ -125,7 +125,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(.15f, UnravellerRules.GroundBite(0, t), 1e-4f, "15% the first second (raid 4: 10% was too little)");
             Assert.AreEqual(.25f, UnravellerRules.GroundBite(2, t), 1e-4f, "5% more each second stood");
             Assert.AreEqual(EncounterEnemy.MaxBlowShare, UnravellerRules.GroundBite(20, t), 1e-4f, "never past the 60% cap");
-            Assert.AreEqual(5, t.broodCount, "five brood a wave (raid 4: \"more brood per wave\")");
+            Assert.AreEqual(4, t.broodCount, "four brood a wave (Chris after raid 6: \"ok maybe 5 is too many. drop to 4\"; raid 4: \"more brood per wave\")");
         }
 
         [Test] public void A_salted_brood_shatters_at_three_times_and_one_that_reaches_her_is_eaten()

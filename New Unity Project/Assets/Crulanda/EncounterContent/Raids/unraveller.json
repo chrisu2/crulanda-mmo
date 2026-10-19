@@ -45,7 +45,7 @@
   "broodEvery1": 0,
   "broodEvery2": 30,
   "broodEvery3": 40,
-  "broodCount": 5,
+  "broodCount": 4,
   "broodHoldSeconds": 18,
   "broodHoldEvery": 15,
   "broodLevel": 22,

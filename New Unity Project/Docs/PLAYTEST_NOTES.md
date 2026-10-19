@@ -961,3 +961,5 @@ un-captures.
 - 289 (2026-10-19 ~18:55, tune-8) "yeh still not enough time to move after telegraphing" and "i think the pet pulled the mob or was still
   alive and restarted the raid" (OPEN: every warning long enough to walk out; a pet goes with its owner and never pulls; a wipe ends cleanly).
   Then: "still not jumping very far. need to jump out of melee and ranger range".
+- 290 (2026-10-19 ~19:00, tune-8) "i dont see the salt or harpoons is that a visible item?" (OPEN: thrown bone harpoons with glowing amber
+  ropes while she is pinned (b1 ch.20), a white salt spray, the barrel and rack on the apron).

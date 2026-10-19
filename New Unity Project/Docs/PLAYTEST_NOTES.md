@@ -918,3 +918,5 @@ un-captures.
 - 267 (2026-10-19 ~15:45, watching raid 7) "i guess there needs to be a sign or warning where the spikes will pop before hand if they
   do damage"; asked, he chose (verbatim) "Yes, with a warning (Recommended)": the spikes hurt, a glowing crack shows ~1.5 s before (OPEN).
 - 268 (2026-10-19 ~15:50, watching raid 7) "mare down to 3 spiders per add" (three brood a wave).
+- 269 (2026-10-19 ~15:52) "i want it extremely hard but not impossible" (the Unraveller's target: a disciplined raid wins about 1 in 4,
+  near the end of the clock; any sloppiness wipes; replaces "1 in 2").

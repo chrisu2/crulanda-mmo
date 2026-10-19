@@ -127,7 +127,7 @@ namespace Crulanda.Tests
             Assert.IsNotNull(look.Playing, "a clip playing (idle)");
             // On the floor (play note 282: "instead of the mobs floating but them on the ground!").
             for (int f = 0; f < 3; f++) yield return null;
-            Assert.AreEqual(UnravellerBody.FloorUnder(e.transform.position), look.LowestY, .1f, "her legs on the floor under her");
+            Assert.AreEqual(UnravellerBody.FloorUnder(e.transform.position) - UnravellerBody.FootSink, look.FeetNow, .1f, "her planted feet (the leg-tip bones) on the floor under her, not in the air (tune-6)");
             Time.timeScale = 4;
             Pull(s, e);
             yield return Until(() => e.PullAt >= 0, 10);
@@ -171,7 +171,7 @@ namespace Crulanda.Tests
             float start = Time.time;
             while (Time.time - start < 70 && (s.BroodRisen == 0 || s.UnmadePatches == 0 || s.SwallowsFreed + s.SwallowsErased == 0)) { TakeTo(e, .6f); yield return null; }
             Assert.GreaterOrEqual(s.BroodRisen, 3, "three brood out of the river");
-            foreach (var b in s.BroodNow.Where(x => x != null && x.actor.IsAlive)) { var bb = b.GetComponent<BroodBody>(); if (bb != null && bb.HasSpider) Assert.AreEqual(UnravellerBody.FloorUnder(b.transform.position), bb.LowestY, .1f, "a brood's legs on the floor"); }
+            foreach (var b in s.BroodNow.Where(x => x != null && x.actor.IsAlive)) { var bb = b.GetComponent<BroodBody>(); if (bb != null && bb.HasSpider) Assert.AreEqual(UnravellerBody.FloorUnder(b.transform.position) - UnravellerBody.FootSink, bb.FeetNow, .1f, "a brood's planted feet on the floor"); }
             Assert.Greater(s.PartySims.Sum(c => c.SaltsThrown), 0, "sims threw salt (the brood, the swallowed)");
             Assert.Greater(s.UnmadePatches, 0, "unmade ground laid where she floats");
             Assert.Greater(s.PartySims.Sum(c => c.StepsOut), 0, "sims stepped out of marked ground");

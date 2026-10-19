@@ -113,6 +113,28 @@ namespace Crulanda.Encounter
             if (UnityEngine.AI.NavMesh.SamplePosition(p, out var hit, 6, UnityEngine.AI.NavMesh.AllAreas)) return hit.position.y;
             var zone = Crulanda.World.ZoneBuilder.Active; return zone != null ? zone.Ground(new Vector2(p.x, p.z)).y : p.y - 1;
         }
+        /// <summary>The leg tips: the skeleton's end bones (no bone under them), found once.</summary>
+        public static List<Transform> FootBones(Transform spider)
+        {
+            var l = new List<Transform>(); if (spider == null) return l;
+            var bones = new HashSet<Transform>();
+            foreach (var sk in spider.GetComponentsInChildren<SkinnedMeshRenderer>(true)) if (sk.bones != null) foreach (var b in sk.bones) if (b != null) bones.Add(b);
+            foreach (var b in bones) { bool leaf = true; foreach (Transform c in b) if (bones.Contains(c)) { leaf = false; break; } if (leaf) l.Add(b); }
+            return l;
+        }
+        /// <summary>Where the planted feet are now: the mean height of the lowest four leg tips (the feet on the ground in any pose).</summary>
+        public static float FeetY(List<Transform> feet)
+        {
+            if (feet == null || feet.Count == 0) return float.NaN;
+            var ys = new List<float>(); foreach (var f in feet) if (f != null) ys.Add(f.position.y);
+            ys.Sort(); int n = Mathf.Min(4, ys.Count); float sum = 0; for (int i = 0; i < n; i++) sum += ys[i];
+            return n > 0 ? sum / n : float.NaN;
+        }
+        /// <summary>How far the feet sit into the floor (they stand on it, not on air): 2.5 cm.</summary>
+        public const float FootSink = .025f;
+        List<Transform> feet;
+        /// <summary>The planted feet's height now (the test: on the floor).</summary>
+        public float FeetNow { get { return FeetY(feet); } }
         /// <summary>Its lowest point now (the test: on the floor).</summary>
         public float LowestY { get { float low = float.MaxValue; foreach (var p in Points(spider)) low = Mathf.Min(low, p.y); return low; } }
         static Material hideMat;
@@ -163,7 +185,15 @@ namespace Crulanda.Encounter
             // On the floor under her (the bar's top, the apron), not at a height from her actor: looked at twice a second (she is hauled).
             if (Time.time >= floorLook || float.IsNaN(floorAt)) { floorLook = Time.time + .5f; floorAt = FloorUnder(transform.position); }
             float depth = s != null && s.UnravellerFoe == enemy ? s.UnravellerDepth : 0;
-            if (spider != null) spider.position = new Vector3(spider.position.x, floorAt + legsBelowPivot + depth, spider.position.z);
+            // By its leg tips, every frame after its clip has posed it (Chris, tune-6: "still floating a bit": the pose lifted the legs off the
+            // floor the bind pose had set them on): the planted feet just into the floor.
+            if (spider != null)
+            {
+                if (feet == null) feet = FootBones(spider);
+                float f = FeetY(feet);
+                if (!float.IsNaN(f)) spider.position += Vector3.up * (floorAt - FootSink + depth - f);
+                else spider.position = new Vector3(spider.position.x, floorAt + legsBelowPivot + depth, spider.position.z);
+            }
             if (crown != null) crown.position = new Vector3(crown.position.x, floorAt + (spider != null ? SpiderHeight * .9f : 2.6f) + depth, crown.position.z);
             TickCrown();
             if (!enemy.actor.IsAlive)

@@ -16,7 +16,8 @@ namespace Crulanda.Encounter
         /// <summary>Its length, nose to rump with its legs (metres).</summary>
         public const float Length = 1.3f;
         public static readonly Color Purple = new Color(.72f, .42f, 1f), Glow = new Color(.18f, .05f, .3f);
-        float legsBelowPivot, floorAt = float.NaN, floorLook;
+        float legsBelowPivot, floorAt = float.NaN, floorLook; System.Collections.Generic.List<Transform> feet;
+        public float FeetNow { get { return UnravellerBody.FeetY(feet); } }
         public float LowestY { get { float low = float.MaxValue; foreach (var p in UnravellerBody.Points(spider)) low = Mathf.Min(low, p.y); return low; } }
         EncounterEnemy enemy; Transform spider; Animation anim; Renderer[] parts; Vector3 lastPos; float lastSwingIn; bool died, white;
         public bool HasSpider { get { return spider != null; } }
@@ -77,7 +78,10 @@ namespace Crulanda.Encounter
         {
             if (enemy == null || spider == null) return;
             if (Time.time >= floorLook || float.IsNaN(floorAt)) { floorLook = Time.time + .5f; floorAt = UnravellerBody.FloorUnder(transform.position); }
-            spider.position = new Vector3(spider.position.x, floorAt + legsBelowPivot, spider.position.z);
+            if (feet == null) feet = UnravellerBody.FootBones(spider);
+            float f = UnravellerBody.FeetY(feet);   // by its leg tips, each frame (tune-6)
+            if (!float.IsNaN(f)) spider.position += Vector3.up * (floorAt - UnravellerBody.FootSink - f);
+            else spider.position = new Vector3(spider.position.x, floorAt + legsBelowPivot, spider.position.z);
             if (!enemy.actor.IsAlive)
             {
                 if (!died) { died = true; bool shattered = enemy.Calcified || white; if (anim != null && anim["death1"] != null) { foreach (AnimationState st in anim) st.speed = 1; anim.Stop(); anim.Play("death1"); Playing = "death1"; } SetWhite(false); if (shattered) SetWhite(true); }

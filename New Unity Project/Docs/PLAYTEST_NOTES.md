@@ -867,3 +867,6 @@ un-captures.
   kaykit-weapons) as more weapon looks.
 - 250 (2026-10-19 ~12:25) "here are some axes in myassets - mid poly axes collection" (OPEN): Sky Den Games' "Mid poly Axes
   Collection" (Asset Store cache: one Axes.fbx holding the set, two materials). Added to the weapons work (branch kaykit-weapons).
+- 251 (2026-10-19 ~12:30) "more music tracks for in game. myassets Free 25 Fantasy RPG Tracks Vol. 3" (OPEN): alkakrab's pack (Asset
+  Store cache): Tracks (Ambient 1-10, Ambience 1-5, Dark 1-5, Action 1-5, Fx 1-3) and Loops (Ambient 1-10, Action 1-5), WAV (~800 MB:
+  compress on import). Spread over the zones, dungeons and fights, each zone its own.

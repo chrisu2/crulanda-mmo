@@ -220,6 +220,7 @@ namespace Crulanda.World
             {
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .36f, at.y), new Vector3(.08f, .36f, .08f), Gilt);
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .74f, at.y), new Vector3(.44f, .05f, .44f), Cushion);
+                SeatMark(t, at, .79f);
             }
             Workplace(t, "bar", new Vector3(plan.stand.x, 0, plan.stand.y), new Vector3(plan.bar.x, 1, plan.bar.y));
             // The rooms door behind the innkeeper (barred to the player: the lodgers go up by the back stair through it).
@@ -243,6 +244,7 @@ namespace Crulanda.World
             AddStation("fire", t.name, Ground(new Vector2(fire.transform.position.x, fire.transform.position.z)), t);   // the hearth is a fire to cook at, named after the inn
             StationRoom(t, new Rect(-w / 2, -d / 2, w, d));
             CityBench(t, new Vector3(plan.bench.x, 0, plan.bench.y), 270, 2.2f);   // its back to the room, facing the fire
+            SeatMark(t, plan.bench, .485f, new Vector2(0, .95f));
             ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(plan.woodpile.x, .045f, plan.woodpile.y), 0, .5f);
             // ---------- the kitchen under the back gallery: the range with its pot, the cook's place, the hatch where goods are handed in ----------
             var range = BoxPart(t, new Vector3(plan.range.x, .55f, plan.range.y), new Vector3(plan.rangeSize.x, 1.1f, plan.rangeSize.y), Masonry, null, 1);
@@ -266,6 +268,7 @@ namespace Crulanda.World
                     foreach (int sz in new[] { -1, 1 })
                     {
                         Part(PrimitiveType.Cube, t, new Vector3(at.x, .45f, at.y + sz * 1.0f), new Vector3(1.7f, .1f, .55f), Cushion);
+                        SeatMark(t, new Vector2(at.x, at.y + sz * 1.0f), .5f, new Vector2(.75f, 0));
                         Part(PrimitiveType.Cube, t, new Vector3(at.x, .2f, at.y + sz * 1.0f), new Vector3(1.7f, .4f, .5f), oak);
                         Part(PrimitiveType.Cube, t, new Vector3(at.x, .95f, at.y + sz * 1.32f), new Vector3(1.75f, 1.9f, .1f), oak);   // the high back
                         Part(PrimitiveType.Cube, t, new Vector3(at.x, 1.92f, at.y + sz * 1.32f), new Vector3(1.8f, .06f, .14f), Gilt);
@@ -285,7 +288,8 @@ namespace Crulanda.World
                 {
                     var seat = plan.seats[12 + (n - 3) * 4 + k].at; var toward = at - seat; float yaw = Mathf.Atan2(toward.x, toward.y) * Mathf.Rad2Deg;
                     if (ModelProp(t, "KayKit/chair", new Vector3(seat.x, .045f, seat.y), yaw, 1.05f) == null)
-                    { Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .25f, seat.y), new Vector3(.42f, .25f, .42f), oak); Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .52f, seat.y), new Vector3(.44f, .03f, .44f), Cushion); }
+                    { Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .25f, seat.y), new Vector3(.42f, .25f, .42f), oak); Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .52f, seat.y), new Vector3(.44f, .03f, .44f), Cushion); SeatMark(t, seat, .55f); }
+                    else SeatMark(t, seat, .045f + 1.05f * KayKitChairSeat);
                 }
                 ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, tableTop, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, tableTop, at.y + .25f), n * 70, .12f);
             }

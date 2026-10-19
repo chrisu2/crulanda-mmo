@@ -304,7 +304,7 @@ namespace Crulanda.World
             for (int i = 0; i < plan.stools.Count; i++)
             {
                 var (at, _) = plan.stools[i]; var m = woods[i % woods.Length]; float tall = .72f + (i % 2) * .05f;
-                Cyl(m, new Vector3(at.x, tall, at.y), new Vector3(.38f, .025f, .38f));
+                Cyl(m, new Vector3(at.x, tall, at.y), new Vector3(.38f, .025f, .38f)); SeatMark(t, at, tall + .025f);
                 for (int k = 0; k < 3; k++)
                 {
                     float a = (k * 120 + i * 25) * Mathf.Deg2Rad;
@@ -331,7 +331,7 @@ namespace Crulanda.World
             AddStation("fire", t.name, Ground(new Vector2(fire.transform.position.x, fire.transform.position.z)), t);
             StationRoom(t, new Rect(-w / 2, -d / 2, w, d));
             // The bench: a plank on three trestles, facing the fire.
-            parts.Box(worn, new Vector3(plan.bench.x, .44f, plan.bench.y), new Vector3(.38f, .06f, 1.7f));
+            parts.Box(worn, new Vector3(plan.bench.x, .44f, plan.bench.y), new Vector3(.38f, .06f, 1.7f)); SeatMark(t, plan.bench, .47f, new Vector2(0, .75f));
             foreach (float dz in new[] { -.7f, 0, .7f }) parts.Box(boards, new Vector3(plan.bench.x, .21f, plan.bench.y + dz), new Vector3(.34f, .42f, .06f));
             // Firewood stacked in the front corner by the hearth.
             for (int row = 0; row < 3; row++)
@@ -363,7 +363,7 @@ namespace Crulanda.World
             {
                 var dir = toward - at; float yaw = Mathf.Atan2(dir.x, dir.y) * Mathf.Rad2Deg; bool shortLeg = k % 3 == 1;
                 var q = Quaternion.Euler(shortLeg ? 3.5f : 0, yaw, shortLeg ? -2.5f : 0); var m = woods[(k * 3 + 1) % woods.Length];
-                var o = new Vector3(at.x, shortLeg ? .03f : 0, at.y); const float seat = .46f;
+                var o = new Vector3(at.x, shortLeg ? .03f : 0, at.y); const float seat = .46f; SeatMark(t, at, seat + .025f);
                 parts.Box(m, o + q * new Vector3(0, seat, 0), new Vector3(.44f, .05f, .42f), q);
                 foreach (int sx in new[] { -1, 1 })
                     foreach (int sz in new[] { -1, 1 })
@@ -394,7 +394,7 @@ namespace Crulanda.World
                     foreach (var (s, f) in plan.seats)
                         if (Vector2.Distance(f, at) < .01f)
                         {
-                            Cyl(boards, new Vector3(s.x, .22f, s.y), new Vector3(.42f, .22f, .42f));
+                            Cyl(boards, new Vector3(s.x, .22f, s.y), new Vector3(.42f, .22f, .42f)); SeatMark(t, s, .44f);
                             Cyl(iron, new Vector3(s.x, .36f, s.y), new Vector3(.44f, .015f, .44f));
                         }
                     Part(PrimitiveType.Cube, t, c + new Vector3(0, 2.3f, 0), new Vector3(.2f, .24f, .2f), Tint(art.glass, new Color(1, .62f, .3f)));

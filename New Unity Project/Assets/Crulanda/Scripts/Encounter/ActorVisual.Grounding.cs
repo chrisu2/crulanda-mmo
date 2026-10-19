@@ -41,7 +41,10 @@ namespace Crulanda.Encounter
             // The ground under each ball (as SoleGapOf), kept for PlantFoot this frame: the model only moves up or down before it.
             float fallback = transform.position.y - 1;
             ballGround[0] = GroundUnder(model.BallL.position, fallback); ballGround[1] = GroundUnder(model.BallR.position, fallback); ankleGround[0] = ankleGround[1] = float.NaN;
-            float gl = model.BallL.position.y - ToeRest - ballGround[0], gr = model.BallR.position.y - ToeRest - ballGround[1], gap = Mathf.Min(gl, gr);
+            float gl = model.BallL.position.y - ToeRest - ballGround[0], gr = model.BallR.position.y - ToeRest - ballGround[1];
+            // On a seat higher than the clip's (a bar stool): the feet hang by that much, not pulled back to the floor.
+            if (SeatRise != 0 && (Pose == ActorPose.Sit || Pose == ActorPose.Drink || Pose == ActorPose.Slump)) { gl -= SeatRise; gr -= SeatRise; }
+            float gap = Mathf.Min(gl, gr);
             // Standing, both feet are down: the body sits to the higher sole so the leg that cannot reach (the idle's straight left
             // leg, 5 cm up in FootTests) lands, and PlantFoot bends the other knee to its ground. Moving: GroundMoving.
             var mv = transform.position - groundLast; mv.y = 0; groundLast = transform.position; float sp = Time.deltaTime > 0 ? mv.magnitude / Time.deltaTime : 0;

@@ -1593,6 +1593,58 @@ namespace Crulanda.World
         /// The door is a double door <paramref name="doorW"/> wide (Phase 8.6, 2026-10-15: two leaves, 2.6 m; it was one of 1.6) and the
         /// room is laid out by its plan (InnPlan): five tables of three, the bar with two stools, the hearth's bench.
         /// </summary>
+        /// <summary>
+        /// A tavern's window seen from the taproom (play note 237, "inn still not polished": the glass showed inside as a flat glowing
+        /// square on bare plaster): a frame round it on the wall's inner face, a cross of glazing bars and a sill. The Golden Cask's in
+        /// pale oak with a deep sill; the Cracked Hearth's in soot-dark timber, its sill narrow and a lintel of stone over it.
+        /// </summary>
+        void InnWindowInside(Transform t, float x, float face, int sz, int variant)
+        {
+            const float ww = .9f, wh = .8f, y = 1.5f, bar = .07f;
+            bool cask = variant != 1;
+            var wood = Tint(art.timber, cask ? new Color(.52f, .38f, .24f) : new Color(.16f, .11f, .08f));
+            float z = face - sz * .02f;   // just proud of the plaster, into the room
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(x + s * (ww / 2 + bar / 2), y, z), new Vector3(bar, wh + 2 * bar, .05f), wood);   // the jambs
+            Part(PrimitiveType.Cube, t, new Vector3(x, y, face - sz * .07f), new Vector3(.035f, wh, .03f), wood);   // the glazing bars, proud of the glass (it stands .05 into the room)
+            Part(PrimitiveType.Cube, t, new Vector3(x, y, face - sz * .07f), new Vector3(ww, .035f, .03f), wood);
+            if (cask)
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(x, y + wh / 2 + bar / 2, z), new Vector3(ww + 2 * bar, bar, .05f), wood);   // the head
+                Part(PrimitiveType.Cube, t, new Vector3(x, y - wh / 2 - .03f, face - sz * .06f), new Vector3(ww + .24f, .05f, .12f), wood);   // a deep sill
+            }
+            else
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(x, y + wh / 2 + .07f, z), new Vector3(ww + .3f, .14f, .06f), Tint(Masonry, new Color(.42f, .4f, .37f)));   // a stone lintel
+                Part(PrimitiveType.Cube, t, new Vector3(x, y - wh / 2 - .03f, face - sz * .035f), new Vector3(ww + .1f, .04f, .07f), wood);   // a narrow sill
+            }
+        }
+        /// <summary>
+        /// The tavern hearth's face (play note 237: the fire was a bright slab on a block of stone): a dark firebox round the embers, two
+        /// logs on the grate and, for the Golden Cask, an oak mantel shelf with candles; for the Cracked Hearth, its lintel split through
+        /// and sagging, soot up the stone over it (GAME-ONLY). <paramref name="front"/> is the hearth's face (x in the room's frame).
+        /// </summary>
+        void TavernHearthFace(Transform t, float front, float zMid, int variant)
+        {
+            var soot = Tint(Masonry, new Color(.12f, .11f, .1f)); var iron = Tint(art.metal, new Color(.16f, .16f, .17f));
+            var log = Tint(art.timber, new Color(.3f, .2f, .12f));
+            foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(front - .04f, .5f, zMid + s * .76f), new Vector3(.1f, 1, .14f), soot);   // the firebox's cheeks
+            Part(PrimitiveType.Cube, t, new Vector3(front - .1f, .08f, zMid), new Vector3(.22f, .05f, 1.4f), iron);   // the grate
+            foreach (float dz in new[] { -.18f, .16f }) Part(PrimitiveType.Cylinder, t, new Vector3(front - .12f, .17f, zMid + dz), new Vector3(.13f, .32f, .13f), log, Quaternion.Euler(90, dz * 60, 0));
+            if (variant != 1)
+            {
+                Part(PrimitiveType.Cube, t, new Vector3(front - .04f, 1.02f, zMid), new Vector3(.12f, .12f, 1.66f), soot);   // the lintel
+                Part(PrimitiveType.Cube, t, new Vector3(front - .14f, 1.36f, zMid), new Vector3(.3f, .08f, 2.5f), Tint(art.timber, new Color(.45f, .3f, .17f)));   // the mantel shelf
+                foreach (float dz in new[] { -.9f, .9f }) ModelProp(t, "Medieval/Prefabs/CandleV1", new Vector3(front - .14f, 1.4f, zMid + dz), 0, .2f);
+                ModelProp(t, "Fantasy/Mug", new Vector3(front - .14f, 1.4f, zMid + .3f), 30, .12f);
+            }
+            else
+            {
+                // The split lintel: two stones, the one end dropped, the crack between them black.
+                Part(PrimitiveType.Cube, t, new Vector3(front - .04f, 1.03f, zMid - .44f), new Vector3(.13f, .13f, .8f), Tint(Masonry, new Color(.4f, .38f, .35f)));
+                Part(PrimitiveType.Cube, t, new Vector3(front - .04f, .99f, zMid + .43f), new Vector3(.13f, .13f, .8f), Tint(Masonry, new Color(.4f, .38f, .35f)), Quaternion.Euler(-4, 0, 0));
+                Part(PrimitiveType.Cube, t, new Vector3(front - .02f, 1.3f, zMid), new Vector3(.03f, .5f, .9f), soot);   // soot up the stone
+            }
+        }
         void Inn(Transform t, Vector2 size, int variant, float doorW = InnDoorW)
         {
             var plan = InnPlan.For(size, variant, doorW);
@@ -1646,6 +1698,7 @@ namespace Crulanda.World
                     if (sz > 0) Part(PrimitiveType.Cube, t, new Vector3(x, storey + 1.3f, sz * d / 2), new Vector3(.8f, .7f, wall + .1f), art.glass);
                     // Frames and sills round that glass on the outer wall face; shutters downstairs where they clear the corner post (inner face at w/2 - .17) and the door opening.
                     if (!covered) Window(t, new Vector3(x, 1.5f, sz * (d / 2 + wall / 2)), .9f, .8f, sz, variant, Mathf.Abs(x) + .84f <= w / 2 - .17f && (sz > 0 || Mathf.Abs(x) - .84f >= doorW / 2 + .05f), false);
+                    if (!covered) InnWindowInside(t, x, sz * (d / 2 - wall / 2), sz, variant);
                     if (sz > 0) Window(t, new Vector3(x, storey + 1.3f, sz * (d / 2 + wall / 2)), .8f, .7f, sz, variant, false, false);
                 }
             float roofH = Mathf.Max(2.4f, d * .5f);
@@ -1677,6 +1730,7 @@ namespace Crulanda.World
             {
                 if (kitTables) ModelProp(t, "Fantasy/Stool", new Vector3(at.x, .045f, at.y), 0, .62f);
                 else { Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .32f, at.y), new Vector3(.36f, .32f, .36f), dark); Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .65f, at.y), new Vector3(.42f, .03f, .42f), boards); }
+                SeatMark(t, at, plan.stoolTop);
             }
             // The innkeeper's place at the open end of the bar, and behind it the door to the rooms upstairs (barred to the player:
             // whoever lodges at the inn goes to bed through it), set between two of the back wall's windows. With a kitchen on the
@@ -1687,7 +1741,7 @@ namespace Crulanda.World
             Doors.Add(new ZoneDoor { name = t.name + ", upstairs", kind = "rooms", openable = false, position = t.TransformPoint(new Vector3(roomsX, 1, d / 2 - .7f)) });
             if (kitchen.HasValue) InnerDoor(t, kitchen.Value - KitchenDoorX, d / 2 - wall / 2, dark);
             // The kit's chandelier over the room and a bench by the hearth (2026-10-07); the tables below are the kit's where it is there.
-            ModelProp(t, "Fantasy/Chandelier", new Vector3(0, 2.55f, -.2f), 0, .8f); ModelProp(t, "Fantasy/Bench", new Vector3(plan.bench.x, .045f, plan.bench.y), 90, .5f);
+            ModelProp(t, "Fantasy/Chandelier", new Vector3(0, 2.55f, -.2f), 0, .8f); if (ModelProp(t, "Fantasy/Bench", new Vector3(plan.bench.x, .045f, plan.bench.y), 90, .5f) != null) SeatMark(t, plan.bench, plan.benchTop, new Vector2(0, 1.1f));   // the kit's bench is 2.6 m long at .5 m
             ModelProp(t, "Medieval/Prefabs/PileOfWoodV1", new Vector3(plan.woodpile.x, .045f, plan.woodpile.y), 0, .5f);   // round the hearth's back (it stood where a table's seat is now)
             for (int n = 0; n < plan.tables.Count; n++)
             {
@@ -1698,18 +1752,19 @@ namespace Crulanda.World
                     // On the table's own top as it came out (2026-10-16, Chris: "table and mug still not meeting. hovering over tables": the
                     // width cap makes the long table lower than .8 m, and the mug and candle stood at a fixed .845).
                     float top = table != null ? TopIn(t, table) : .845f;
-                    for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; ModelProp(t, "Fantasy/Stool", new Vector3(seat.x, .045f, seat.y), -(turn + k * 120) + 90, .45f); }
+                    for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; ModelProp(t, "Fantasy/Stool", new Vector3(seat.x, .045f, seat.y), -(turn + k * 120) + 90, .45f); SeatMark(t, seat, plan.seatTop); }
                     ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, top, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, top, at.y + .25f), turn + 70, .12f);
                     continue;
                 }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .78f, at.y), new Vector3(1.2f, .04f, 1.2f), boards);
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .4f, at.y), new Vector3(.18f, .38f, .18f), dark);
-                for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .25f, seat.y), new Vector3(.4f, .25f, .4f), dark); }
+                for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; Part(PrimitiveType.Cylinder, t, new Vector3(seat.x, .25f, seat.y), new Vector3(.4f, .25f, .4f), dark); SeatMark(t, seat, .5f); }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .88f, at.y), new Vector3(.12f, .08f, .12f), art.glass);   // candle
             }
             var hearth = BoxPart(t, new Vector3(plan.hearth.x, 1, plan.hearth.y), new Vector3(plan.hearthSize.x, 2, plan.hearthSize.y), Masonry, null, 1);
             hearth.AddComponent<BoxCollider>(); hearth.AddComponent<NavBlocker>();
             Part(PrimitiveType.Cube, t, new Vector3(w / 2 - 1.02f, .55f, .8f), new Vector3(.1f, .8f, 1.4f), art.glass);   // embers
+            TavernHearthFace(t, w / 2 - 1.05f, .8f, variant);
             var fire = new GameObject("Hearth fire").AddComponent<Light>(); fire.transform.SetParent(t, false);
             fire.transform.localPosition = new Vector3(plan.fire.x, 1, plan.fire.y); fire.type = LightType.Point; fire.range = 9; fire.intensity = 1.8f; fire.color = new Color(1, .55f, .25f);
             AddStation("fire", t.name, Ground(new Vector2(fire.transform.position.x, fire.transform.position.z)), t);   // the hearth is a fire to cook at, named after the inn

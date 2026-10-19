@@ -235,6 +235,6 @@ namespace Crulanda.Encounter
         }
         bool Arrow { get { return sim.classId == "class.ranger"; } }
         /// <summary>Where its bolts leave from: its right hand, or its chest.</summary>
-        Vector3 Hand { get { var hand = visual != null ? visual.RightHandle : null; return hand != null ? hand.position : transform.position + Vector3.up * 1.3f; } }
+        public Vector3 Hand { get { var hand = visual != null ? visual.RightHandle : null; return hand != null ? hand.position : transform.position + Vector3.up * 1.3f; } }
     }
 }

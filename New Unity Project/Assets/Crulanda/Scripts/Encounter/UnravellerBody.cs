@@ -37,7 +37,7 @@ namespace Crulanda.Encounter
         /// <summary>The model's turn to face her forward (the file's front is not checked in a build yet: PROVISIONAL).</summary>
         public static float FaceYaw = 0;
         public static readonly Color Hide = new Color(.16f, .12f, .22f), HideGlow = new Color(.16f, .05f, .3f);
-        EncounterEnemy enemy; Transform root, spider, crown; Animation anim; VoidWrap wrap; Vector3 lastPos; float lastSwingIn, jolted; bool died;
+        EncounterEnemy enemy; Transform root, spider, crown; Animation anim; VoidWrap wrap; Vector3 lastPos; float lastSwingIn, jolted; bool died, gathered;
         /// <summary>The spider came in (the package is there).</summary>
         public bool HasSpider { get { return spider != null; } }
         public VoidWrap Wrap { get { return wrap; } }
@@ -195,11 +195,21 @@ namespace Crulanda.Encounter
                 else spider.position = new Vector3(spider.position.x, floorAt + legsBelowPivot + depth, spider.position.z);
             }
             if (crown != null) crown.position = new Vector3(crown.position.x, floorAt + (spider != null ? SpiderHeight * .9f : 2.6f) + depth, crown.position.z);
-            // Her leap (play note 285): the whole body along an arc from where she was to where she lands (her actor is there already), the jump clip.
+            // Gathering to leap (tune-8: "not properly telegraphed"): she draws down low, then rears back, before she goes.
+            if (s != null && spider != null && s.LeapGathering(enemy, out var gk))
+            {
+                float crouch = Mathf.SmoothStep(0, 1, Mathf.Clamp01(gk / .6f)), rear = Mathf.SmoothStep(0, 1, Mathf.Clamp01((gk - .6f) / .4f));
+                spider.position += Vector3.up * (-.45f * crouch * (1 - rear) + .3f * rear);
+                spider.localRotation = Quaternion.Euler(-18 * rear, FaceYaw, 0); gathered = true;
+                Play("idle", .1f); TickCrown();
+                return;
+            }
+            if (gathered && spider != null) { spider.localRotation = Quaternion.Euler(0, FaceYaw, 0); gathered = false; }
+            // Her leap (play note 285; tune-8: slower and higher): the whole body along an arc from where she was to where she lands, the jump clip.
             if (s != null && s.LeapArc(enemy, out var lf, out var lt, out var lk))
             {
                 var arcAt = Vector3.Lerp(lf, lt, lk); var off = arcAt - transform.position;
-                root.position = root.position + new Vector3(off.x, 0, off.z) + Vector3.up * (16 * lk * (1 - lk));   // up to 4 m at the top
+                root.position = root.position + new Vector3(off.x, 0, off.z) + Vector3.up * (4 * s.LeapHeight * lk * (1 - lk));   // leapHeight at the top
                 if (Playing != "jump") { if (anim != null && anim["jump"] != null) { anim.Stop(); anim.Play("jump"); } Playing = "jump"; }
                 return;
             }

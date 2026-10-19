@@ -95,6 +95,8 @@ namespace Crulanda.Encounter
             if (Expired(shownFrom, shownAt, Time.time, Lifetime) && gameObject.activeSelf) return;   // its time is up: not shown again until hidden and put out afresh
             shownAt = Time.time;
             var up = Vector3.up; float lift = .09f; var zone = Crulanda.World.ZoneBuilder.Active;
+            // Over water: on top of its surface, flat, plain to see (Chris: "when she is in the water hard to see the telegraphs").
+            if (zone != null && zone.WaterAtPoint(feet + Vector3.up * .5f, out float surface, out _) && feet.y < surface + .02f) feet.y = surface + .02f;
             if (zone != null && Mathf.Abs(zone.HeightAt(feet.x, feet.z) - feet.y) < .35f)
             {
                 float hx = zone.HeightAt(feet.x + reach, feet.z) - zone.HeightAt(feet.x - reach, feet.z), hz = zone.HeightAt(feet.x, feet.z + reach) - zone.HeightAt(feet.x, feet.z - reach);
@@ -121,6 +123,11 @@ namespace Crulanda.Encounter
                 fillMat.color = new Color(bodyColour.r, bodyColour.g, bodyColour.b, bodyColour.a * faint);
             }
             if (!gameObject.activeSelf) gameObject.SetActive(true);
+        }
+        /// <summary>A plain disc on the ground (her leap's shadow): not a mark of its own (the rings round it are), in no registry.</summary>
+        public static GameObject Disc(string name, Color colour, out Material mat)
+        {
+            var go = new GameObject(name); Part(go.transform, "Disc", DiscMesh(), colour, out mat); mat.renderQueue = 3095; go.SetActive(false); return go;
         }
         public void Hide() { Reach = 0; Filled = 0; shownFrom = -1; if (gameObject.activeSelf) gameObject.SetActive(false); }
         void OnDestroy() { Live.Remove(this); if (ringMat != null) Destroy(ringMat); if (fillMat != null) Destroy(fillMat); }

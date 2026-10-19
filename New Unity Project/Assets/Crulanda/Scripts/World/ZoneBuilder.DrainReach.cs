@@ -110,8 +110,10 @@ namespace Crulanda.World
             var q = Quaternion.Euler(0, apron.rotation, 0); var c = new Vector3(apron.center.x, 0, apron.center.y);
             Vector3 On(float lx, float lz) { var p = c + q * new Vector3(lx, 0, lz); p.y = HeightAt(p.x, p.z); return p; }
             float riverSide = apron.size.x / 2 - 1.6f, ends = apron.size.y / 2 - 2.5f;
-            ReachBarrelAt = On(riverSide, ends); ReachRackAt = On(riverSide, -ends);
-            ReachTibbAt = On(riverSide - 1.6f, ends - .4f); ReachKettaAt = On(riverSide - 1.6f, -ends + .4f);
+            // The barrel 25 m up from the rack, by the bar, where it always stood (the apron runs on north past it since tune-8, for her leap).
+            float north = Mathf.Min(ends, -ends + 25);
+            ReachBarrelAt = On(riverSide, north); ReachRackAt = On(riverSide, -ends);
+            ReachTibbAt = On(riverSide - 1.6f, north - .4f); ReachKettaAt = On(riverSide - 1.6f, -ends + .4f);
             var stock = new GameObject("The Drain Reach stock").transform; stock.SetParent(root, false);
             var oak = Tint(art.timber, new Color(.32f, .22f, .14f)); var hoop = SootIron; var salt = Tint(art.stone, new Color(.78f, .78f, .74f));
             var paper = Tint(art.stone, new Color(.62f, .58f, .5f)); var bone = Tint(art.stone, new Color(.86f, .8f, .62f));

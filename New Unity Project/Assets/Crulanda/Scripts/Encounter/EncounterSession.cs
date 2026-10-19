@@ -1982,6 +1982,7 @@ namespace Crulanda.Encounter
             // the Sweep: the horns, the warders in Pell Row, the child you lead over the roofs (EncounterSession.Sweep)
             TickSweep();
             TickRiver();   // the Chemical River: its poison, and the tracking it hides you from (EncounterSession.River)
+            TickSimPets();   // a pet back with its keeper up again (EncounterSession.Party)
             AdvanceToast();
             // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.
             if (lastHour >= 0 && Bounties.DayTurned(lastHour, Crulanda.World.WorldClock.Hour)) Progress.days++;

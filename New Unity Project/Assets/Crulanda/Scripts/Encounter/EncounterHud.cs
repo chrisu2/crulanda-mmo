@@ -1183,22 +1183,22 @@ namespace Crulanda.Encounter
         /// <summary>The party's damage and healing meter (/meter): a row a member, damage and healing done, and each a second over the
         /// party's fighting time since the reset. Under the quest tracker on the right.</summary>
         /// <summary>Where the meter sits on the 1440x900 canvas for a party of <paramref name="rows"/>.</summary>
-        public static Rect MeterRect(int rows) { return new Rect(1100, 456, 340, 60 + 22 * Mathf.Max(1, rows)); }
+        public static Rect MeterRect(int rows) { return new Rect(1030, 456, 410, 60 + 22 * Mathf.Max(1, rows)); }   // wide enough for "155.4k  612/s" (Chris: "healing seems lower..cant tell with dps")
         void DrawMeter()
         {
             var m = session.Meter; var rows = new List<CombatMeter.Row>(m.Rows); float t = m.CombatSeconds;
             var r = MeterRect(rows.Count);
             Fill(r, new Color(0, 0, 0, .55f));
             GUI.contentColor = gold; GUI.Label(new Rect(r.x + 10, r.y + 6, 200, 20), "DAMAGE AND HEALING", small); GUI.contentColor = Color.white;
-            GUI.Label(new Rect(r.x + 10, r.y + 22, 420, 18), (session.Meter.RunName != null ? session.Meter.RunName + "  ·  " : "") + "over " + Mathf.RoundToInt(t) + " s of fighting  ·  /meter reset", tiny);   // the run's name when one is set (the balance harness names each fight)
-            GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 178, r.y + 40, 80, 18), "damage", tiny);
-            GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 256, r.y + 40, 80, 18), "healing", tiny); GUI.contentColor = Color.white;
+            GUI.Label(new Rect(r.x + 10, r.y + 22, 420, 18), (session.Meter.RunName != null ? session.Meter.RunName + "  ·  " : "") + "over " + Mathf.RoundToInt(t) + " s of fighting  ·  a second while up  ·  /meter reset", tiny);   // the run's name when one is set (the balance harness names each fight)
+            GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 170, r.y + 40, 118, 18), "damage", tiny);
+            GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 292, r.y + 40, 114, 18), "healing", tiny); GUI.contentColor = Color.white;
             float y = r.y + 58;
             foreach (var row in rows)
             {
-                GUI.Label(new Rect(r.x + 10, y, 170, 20), row.name, small);
-                GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 178, y, 80, 20), row.damage.ToString("N0") + " " + row.Dps(t).ToString("0") + "/s", small);
-                GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 256, y, 74, 20), row.healing.ToString("N0") + " " + row.Hps(t).ToString("0") + "/s", small);
+                GUI.Label(new Rect(r.x + 10, y, 158, 20), row.name, small);
+                GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 170, y, 118, 20), CombatMeter.Short(row.damage) + "  " + row.DpsUp(t).ToString("0") + "/s", small);
+                GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 292, y, 114, 20), CombatMeter.Short(row.healing) + "  " + row.HpsUp(t).ToString("0") + "/s", small);
                 GUI.contentColor = Color.white; y += 22;
             }
             if (rows.Count == 0) GUI.Label(new Rect(r.x + 10, y, 300, 20), "Nothing yet.", small);
@@ -1221,8 +1221,8 @@ namespace Crulanda.Encounter
             foreach (var row in rows)
             {
                 GUI.Label(new Rect(r.x + 30, y, 260, 22), row.name + (row == mvp ? "  ★" : ""), small);
-                GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 300, y, 160, 22), row.damage.ToString("N0") + "  " + row.Dps(t).ToString("0") + "/s", small);
-                GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 470, y, 160, 22), row.healing.ToString("N0") + "  " + row.Hps(t).ToString("0") + "/s", small);
+                GUI.contentColor = new Color(1, .75f, .5f); GUI.Label(new Rect(r.x + 300, y, 160, 22), CombatMeter.Short(row.damage) + "  " + row.DpsUp(t).ToString("0") + "/s", small);
+                GUI.contentColor = new Color(.5f, 1, .7f); GUI.Label(new Rect(r.x + 470, y, 160, 22), CombatMeter.Short(row.healing) + "  " + row.HpsUp(t).ToString("0") + "/s", small);
                 GUI.contentColor = row.deaths > 0 ? new Color(1, .5f, .45f) : Color.white; GUI.Label(new Rect(r.x + 640, y, 90, 22), row.deaths.ToString(), small);
                 GUI.contentColor = Color.white; y += 26;
             }

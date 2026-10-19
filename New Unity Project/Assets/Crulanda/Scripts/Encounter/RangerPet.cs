@@ -143,7 +143,7 @@ namespace Crulanda.Encounter
         /// <summary>Sent at a target; its first bite lands <paramref name="firstBite"/> times as hard (Sic).</summary>
         public void Hunt(EncounterEnemy target, float firstBite)
         {
-            if (target == null || !target.actor.IsAlive || !actor.IsAlive) return;
+            if (target == null || !target.actor.IsAlive || !actor.IsAlive || session.UnravellerNotPulled(target)) return;
             if (Quarry != target) { Quarry = target; huntSince = Time.time; fury = Mathf.Max(fury, firstBite); } else fury = Mathf.Max(fury, firstBite);
         }
         /// <summary>
@@ -171,12 +171,11 @@ namespace Crulanda.Encounter
         {
             if (session == null || session.Paused || actor == null || !actor.IsAlive) return;
             var player = Heel; if (player == null) return;
-            if (Master != null && !Master.actor.IsAlive)
-            {
-                // Its keeper down: it still leaves harmful ground (tune-3: the Ranger's wolf stood 100 s a pull in the red while the Ranger lay dead).
-                if (GroundMarks.InHarm(transform.position) && agent.isOnNavMesh) { session.CountHarm(actor, Time.deltaTime); var o = GroundMarks.StepOut(NavMesh.SamplePosition(transform.position, out var u0, 2, NavMesh.AllAreas) ? u0.position : transform.position - Vector3.up); if (o.HasValue) { agent.isStopped = false; agent.speed = 6; agent.SetDestination(o.Value); } }
-                return;
-            }
+            // Its keeper down: it goes with them (Chris, tune-8: "i think the pet pulled the mob or was still alive and restarted the raid"); it comes
+            // back when they are up (EncounterSession.TickSimPets). Yours stands out of the fight while you are down.
+            if (Master != null && !Master.actor.IsAlive) { session.PetFallsWithKeeper(this); return; }
+            if (Master == null && !session.Player.IsAlive) { Quarry = null; session.ForgetOnEnemies(actor); if (agent.isOnNavMesh) agent.isStopped = true; return; }
+            if (Quarry != null && session.UnravellerNotPulled(Quarry)) { Quarry = null; fury = 1; }   // pets never pull her
             if (Quarry != null && (!Quarry.actor.IsAlive || !Quarry.Engaged && Vector3.Distance(player.position, Quarry.transform.position) > 40)) { Quarry = null; fury = 1; }
             if (Quarry == null) { if (Mode == Order.Assist) Assist(); else Defend(); }
             float toPlayer = Vector3.Distance(transform.position, player.transform.position);

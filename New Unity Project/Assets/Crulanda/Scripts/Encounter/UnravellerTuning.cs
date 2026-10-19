@@ -31,16 +31,16 @@ namespace Crulanda.Encounter
         /// <summary>A control class's hold on a brood (raid 4): its seconds and its wait before the next.</summary>
         public float broodHoldSeconds = 18, broodHoldEvery = 15;
         public float broodHealthShare = .3f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
-        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .15f, unmadeRamp = .05f, unmadeLife = 18; public int unmadeMost = 4;
+        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .06f, unmadeRamp = .06f, unmadeLife = 18; public int unmadeMost = 4;
         public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 10; public int saltsToFree = 3;
         public float saltWindow = 12, calcifySeconds = 4, calcifyTaken = 1.5f;
         // ---------- phase 3 ----------
         public float pulseEvery = 3, pulseStart = .012f, pulseGrow = .0003f;
-        public float huntEvery = 20, huntWarn = 3, huntRadius = 5, huntShare = .8f, missStun = 2;
+        public float huntEvery = 20, huntWarn = 4, huntRadius = 5, huntShare = .8f, missStun = 2;
         // ---------- the ground spikes (raid 7, Chris: "a sign or warning where the spikes will pop before hand if they do damage") ----------
         /// <summary>Every spikeEveryMin-Max s her shards burst out of the ground at two spots (one where one of the raid stands, one at her edge),
         /// a violet crack shown spikeWarn s before; spikeShare of the health of anyone within spikeRadius, thrown up (stunned) spikeLift s.</summary>
-        public float spikeEveryMin = 5, spikeEveryMax = 7, spikeWarn = 2f, spikeRadius = 2.2f, spikeShare = .27f, spikeLift = .6f;
+        public float spikeEveryMin = 5, spikeEveryMax = 7, spikeWarn = 3f, spikeRadius = 2.2f, spikeShare = .27f, spikeLift = .6f;
         // ---------- the salt snare (play note 281, Chris: "need some type of mechanism to trap the brood..someone that can do an extra job") ----------
         /// <summary>A ring of salt on bone stakes: snareRadius across, snareSeconds on the ground or until it holds one; a brood crossing it calcified
         /// snareHold s; the Trapper lays snaresPerWave a wave, one each snareEvery s.</summary>
@@ -49,7 +49,12 @@ namespace Crulanda.Encounter
         /// <summary>At each share of her health (leapAt1-3) she tears free of the harpoons and leaps leapRange m (least to most) across the bar or
         /// the apron: a deep-red ring where she will land leapWarn s before, a leapSeconds arc, leapShare of the health of anyone in the ring
         /// (leapRadius) and thrown leapKnock m, and a brood wave of broodCount where she lands.</summary>
-        public float leapAt1 = .75f, leapAt2 = .5f, leapAt3 = .25f, leapWarn = 2, leapSeconds = .9f, leapRadius = 5, leapShare = .35f, leapKnock = 4, leapRangeMin = 12, leapRangeMax = 18;
+        public float leapAt1 = .75f, leapAt2 = .5f, leapAt3 = .25f, leapWarn = 3.8f, leapSeconds = 2, leapRadius = 5, leapShare = .35f, leapKnock = 4, leapRangeMin = 35, leapRangeMax = 55;
+        /// <summary>Tune-8 (Chris: "leaps are too quick and not properly telegraphed", "also distance is too short"): the rings come leapWarn s
+        /// before she lands; she gathers (crouches, rears back) leapWarn - leapSeconds s, then leapSeconds in the air, an arc leapHeight m high,
+        /// her shadow growing where she will land; the ground shakes leapShake s. Phase 3 comes in quiet for phase3Lull s ("not sure what took
+        /// everyone out around 40% mark"): the pulse after it, the hunt after twice it, the spikes and the unmade ground not before it.</summary>
+        public float leapHeight = 6, leapShake = .4f, phase3Lull = 6;
         // ---------- the sims (3.5) ----------
         public float simRaidLift = 1.2f; public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;
         /// <summary>The chance a sim misses its part of a mechanic now and then: at 18, at 20, and what a careless one (rash: nerve over .75) adds.</summary>

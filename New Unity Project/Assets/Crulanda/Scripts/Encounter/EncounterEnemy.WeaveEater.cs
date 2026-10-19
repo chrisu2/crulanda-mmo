@@ -92,12 +92,21 @@ namespace Crulanda.Encounter
             var dir = v.transform.position - transform.position; dir.y = 0; if (dir.sqrMagnitude < .01f) return false;
             var to = transform.position + dir.normalized * WeaveEaterRules.BlinkStep(gap, EaterBlinkReach);
             if (!NavMesh.SamplePosition(to, out var hit, 2, NavMesh.AllAreas)) return false;
-            if (!NavMesh.SamplePosition(v.transform.position, out var foe, 2.5f, NavMesh.AllAreas) || Mathf.Abs(hit.position.y - foe.position.y) > 2) return false;
+            var land = hit.position;
+            // Hers lands on the dry, never in the river (Chris: "try to keep her out of water"): short of the water, or not at all.
+            if (RaidBoss && session.WetForHer(land + Vector3.up))
+            {
+                bool dry = false; float step = WeaveEaterRules.BlinkStep(gap, EaterBlinkReach);
+                for (float f = .8f; f > .1f && !dry; f -= .2f)
+                    if (NavMesh.SamplePosition(transform.position + dir.normalized * step * f, out var h2, 2, NavMesh.AllAreas) && !session.WetForHer(h2.position + Vector3.up)) { land = h2.position; dry = true; }
+                if (!dry) return false;
+            }
+            if (!NavMesh.SamplePosition(v.transform.position, out var foe, 2.5f, NavMesh.AllAreas) || Mathf.Abs(land.y - foe.position.y) > 2) return false;
             var from = transform.position;
-            agent.Warp(hit.position); transform.rotation = Quaternion.LookRotation(dir);
+            agent.Warp(land); transform.rotation = Quaternion.LookRotation(dir);
             session.FloatText(from + Vector3.up * .3f, "Displaces", new Color(.55f, .5f, .7f));
             // Her touch only where she lands on them (within touching), not a blink that falls short.
-            return Vector3.Distance(hit.position, v.transform.position) <= 4.5f;
+            return Vector3.Distance(land, v.transform.position) <= 4.5f;
         }
     }
 }

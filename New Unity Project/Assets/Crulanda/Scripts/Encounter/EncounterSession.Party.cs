@@ -82,6 +82,29 @@ namespace Crulanda.Encounter
             var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Master = c; if (look == ActorLook.Skeleton) pet.Kind = "thrall"; wolf.gameObject.SetActive(true); pet.Init(wolf, this, new SimPetMaster());
             SimPets.Add(pet); return pet;
         }
+        /// <summary>A pet whose keeper is down goes with them (Chris, tune-8: "i think the pet pulled the mob or was still alive and restarted the
+        /// raid"): out of every enemy's threat, gone; TickSimPets brings it back when its keeper is up. A wipe is the party down: pets never count.</summary>
+        public void PetFallsWithKeeper(RangerPet p)
+        {
+            if (p == null) return;
+            ForgetOnEnemies(p.actor);
+            SimPets.Remove(p); Destroy(p.gameObject);
+        }
+        /// <summary>Out of every enemy's threat.</summary>
+        public void ForgetOnEnemies(Crulanda.Gameplay.Actor a) { if (a == null) return; foreach (var e in Enemies) if (e != null) e.threat.Remove(a.EntityId.Value); }
+        float nextPetLook;
+        /// <summary>Every 2 s: a party Ranger or Bonecaller who is up and whose pet went with them when they fell has it back.</summary>
+        void TickSimPets()
+        {
+            if (Time.time < nextPetLook) return; nextPetLook = Time.time + 2;
+            foreach (var c in PartySims.ToArray())
+            {
+                if (c == null || c.actor == null || !c.actor.IsAlive || c.sim == null) continue;
+                bool ranger = c.sim.classId == "class.ranger", thrall = c.sim.classId == "class.mage" && SimCompanion.Bonecaller(c.sim);
+                if (!ranger && !thrall || SimPets.Exists(p => p != null && p.Master == c)) continue;
+                SummonSimWolf(c, ranger ? ActorLook.Wolf : ActorLook.Skeleton);
+            }
+        }
         public void DismissSimWolf(SimCompanion c)
         {
             foreach (var p in SimPets.ToArray())

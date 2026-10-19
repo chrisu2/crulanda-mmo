@@ -70,7 +70,7 @@ namespace Crulanda.Tests
             var s = Session(); Assert.NotNull(s); Assert.AreEqual("zone.lowtowns", ZoneBuilder.Active.Zone.id);
             s.Progress.experience = EncounterProgress.XpForLevel(20); s.Player.SetLevel(20);
             var zone = ZoneBuilder.Active; var apron = zone.ReachApron; Assert.NotNull(apron, "the apron");
-            var stand = zone.Ground(apron.center + new Vector2(-6, -26));   // well off: beyond her hunt's reach (UnravellerRules.HuntReach)   // off at the apron's south end: out of her reach and her pulse's
+            var stand = zone.Ground(apron.center + new Vector2(-6, 15 - apron.size.y / 2 - 26));   // well off: beyond her hunt's reach (UnravellerRules.HuntReach)   // off at the apron's south end: out of her reach and her pulse's
             Assert.IsTrue(NavMesh.SamplePosition(stand, out var hit, 8, NavMesh.AllAreas)); stand = hit.position;
             s.Player.GetComponent<AdventurerMotor>().Teleport(stand + Vector3.up * 1.05f);
             var pop = SimPopulation.Active; Assert.NotNull(pop);

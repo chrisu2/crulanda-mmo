@@ -57,7 +57,7 @@ namespace Crulanda.Encounter
             var chosen = new List<SimAdventurer>();
             foreach (var c in want) { var x = pop.World.sims.Find(y => y.classId == c && !chosen.Contains(y)); if (x != null) chosen.Add(x); else Log("no sim of " + c + " in the roster"); }
             var apron = s.Zone.ReachApron; var bar = s.Zone.SiltBar;
-            var stand = s.Zone.Ground(apron != null ? apron.center : bar.center);
+            var stand = s.Zone.Ground(apron != null ? new Vector2(apron.center.x, bar.center.y) : bar.center);   // on the apron across from the bar
             if (NavMesh.SamplePosition(stand, out var standHit, 4, NavMesh.AllAreas)) stand = standHit.position;
             var motor = s.Player.GetComponent<AdventurerMotor>(); motor.Teleport(stand + Vector3.up * 1.05f);
             int k = 0;

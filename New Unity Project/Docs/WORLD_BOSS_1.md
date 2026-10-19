@@ -834,6 +834,37 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      its kill around minute 11-14 and a slow one dies to the pulse or the feast by 16. Target unchanged: sims alone kill her 25-35% of
      pulls. The run tool's pull limit is now 17 minutes, and `group_run.ps1 -Raid` waits 600 s + 420 s a pull (game at 3x) unless
      `-TimeoutSec` is given. Numbers in the data file (`health`, `enrageSeconds`, `pulseGrow`); tests pin them.
+   - **Tune-8 and play note 290** (2026-10-19, WRITTEN, NOT RUN). All GAME-ONLY fight rules; the bone harpoons ("petrified leviathan bone")
+     and their "trailing glowing ropes of amber light" are CANON (book1 ch.20).
+     - **The Leap readable** (Chris: "leaps are too quick and not properly telegraphed"): the rings come down 3.8 s before she lands, the
+       outer one filling, her body's own solid. She gathers 1.8 s first (stands, draws down low, rears back; "The Unraveller gathers to leap!"
+       in raid warning, a screech line in chat), then 2 s in the air on an arc 6 m high, her shadow growing and darkening where she will
+       land; dust thrown up and the view shaken a moment when she lands. Nothing is struck until she lands. The sims step out from the
+       rings' first moment.
+     - **The Leap far** (Chris: "also distance is too short", "still not jumping very far. need to jump out of melee and ranger range"):
+       35-55 m, and at least 35 m both from where she took off and from the raid's middle (the longest reach of any attack in the game is
+       30 m; 5 more). A bug had sent every leap to the bar's middle (the ground check never passed); fixed. The apron now runs on north along
+       the bank to 56 m (z 177-233) so such a landing always exists on the bar or the apron, never the water; Tibb's barrel stays where it was.
+     - **Time to move** (Chris: "yeh still not enough time to move after telegraphing"): every mark's warning is at least twice the time
+       to run from its middle out of it (run speed 5.2 m/s); spike cracks 3 s, unmade ground 3 s, her hunt 4 s, the leap 3.8 s. A test holds it.
+     - **The 40% mark** (Chris: "not sure what took everyone out around 40% mark"): unmade ground under the ranged and healers bit 15% at
+       once and more each second; now 6%, then 6% more a second. Phase 3 comes in with "Phase 3: The Unravelling" in raid warning and 6 s
+       of quiet: the pulse after it (low, as before), the hunt after 12 s, spikes and unmade ground not before 6-8 s.
+     - **Pets** (Chris: "i think the pet pulled the mob or was still alive and restarted the raid"): a pet goes with its keeper when they
+       fall (out of every foe's threat) and comes back when they are up; yours stands out of the fight while you are down. A wipe is the
+       raid down; pets never count. Before the pull (and after a wipe's reset) no sim or pet strikes her until you or a tank pulls her.
+     - **Seen harpoons and salt** (play note 290: "i dont see the salt or harpoons is that a visible item?"): a pale bone harpoon flies
+       from the thrower's hand in an arc and sticks in her side, an amber rope from it back to the thrower while its pin lasts (one a pin;
+       taut and brighter while she is hauled; fading as the pin ends). Salt: a white handful from the hand and a puff where it lands. Tibb's
+       barrel and Ketta's rack stand out on the apron for every fight; a sim out of what it throws walks to them for three more. All
+       cleared at the fight's end. (Not yet: an item shown in the hand before the throw.)
+     - **The meter** (Chris: "healing seems lower..cant tell with dps"): totals shortened (155.4k), the columns wider, and the rate is a
+       second while that member was up (dead time no longer drags the wiped down).
+     - **The camera** (Chris: "camera gets inside the spider alot hard to see"): her body and her brood's stop the camera short; at her
+       legs it looks down over her (pitch at least 28 degrees). The run's bot uses the same camera.
+     - **Out of the water** (Chris: "when she is in the water hard to see the telegraphs. try to keep her out of water"): the harpoons
+       now haul her toward the apron, away from the river (they hauled her toward its middle); her blink lands short of the water or not
+       at all; pushed into the river any way, she is moved back onto the dry. Marks over water lie on its surface.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

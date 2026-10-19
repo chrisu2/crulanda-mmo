@@ -354,9 +354,9 @@ namespace Crulanda.Encounter
         /// stands (Chris, 2026-10-11: "party doesnt ignore the CC mobs"). A stunned one is fair game: the stun does not break.</summary>
         public static bool Held(EncounterEnemy e) { return e != null && (e.Incapacitated || e.Feared); }
         /// <summary>The enemy it should be fighting: your target when it is in a fight, otherwise whatever is on one of the party.</summary>
-        public EncounterEnemy Quarry
+        public EncounterEnemy Quarry { get { var q = QuarryNow(); return session.UnravellerNotPulled(q) ? null : q; } }   // not her before the pull (tune-8)
+        EncounterEnemy QuarryNow()
         {
-            get
             {
                 // In the Unraveller's fight, its part first: the tank holding her keeps her, the brood's takers take the brood (SimCompanion.Raid).
                 var raid = RaidQuarry(); if (raid != null) return raid;

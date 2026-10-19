@@ -123,8 +123,8 @@ namespace Crulanda.Tests
         [Test] public void Unmade_ground_bites_harder_the_longer_one_stands_in_it()
         {
             var t = T;
-            Assert.AreEqual(.15f, UnravellerRules.GroundBite(0, t), 1e-4f, "15% the first second (raid 4: 10% was too little)");
-            Assert.AreEqual(.25f, UnravellerRules.GroundBite(2, t), 1e-4f, "5% more each second stood");
+            Assert.AreEqual(.06f, UnravellerRules.GroundBite(0, t), 1e-4f, "6% the first second (tune-8: under a healer, 15% at once killed)");
+            Assert.AreEqual(.18f, UnravellerRules.GroundBite(2, t), 1e-4f, "6% more each second stood");
             Assert.AreEqual(EncounterEnemy.MaxBlowShare, UnravellerRules.GroundBite(20, t), 1e-4f, "never past the 60% cap");
             Assert.AreEqual(3, t.broodCount, "three brood a wave (Chris, raid 7: \"mare down to 3 spiders per add\"; before: \"ok maybe 5 is too many. drop to 4\")");
         }
@@ -240,7 +240,7 @@ namespace Crulanda.Tests
         [Test] public void The_ground_spikes_are_warned_and_never_burst_on_a_held_brood()
         {
             var t = T;
-            Assert.That(t.spikeWarn, Is.InRange(1.5f, 2.5f), "a crack shown about 2 s before (raid 7: a sign or warning)");
+            Assert.That(t.spikeWarn, Is.AtLeast(3f), "a crack shown 3 s before (raid 7: a sign or warning; tune-8: \"still not enough time to move\")");
             Assert.That(t.spikeShare, Is.InRange(.25f, .3f), "a solid hit, 25-30%"); Assert.Less(t.spikeShare, EncounterEnemy.MaxBlowShare);
             Assert.AreEqual(5, t.spikeEveryMin); Assert.AreEqual(7, t.spikeEveryMax);
             var held = new List<Vector2> { new Vector2(10, 0) };
@@ -284,8 +284,40 @@ namespace Crulanda.Tests
             // Play note 285, Chris: "maybe a jump mechanic to get away and release her brood".
             var t = T;
             CollectionAssert.AreEqual(new[] { .75f, .5f, .25f }, new[] { t.leapAt1, t.leapAt2, t.leapAt3 });
-            Assert.That(t.leapWarn, Is.InRange(1.5f, 2.5f), "a red ring where she will land, about 2 s before");
+            Assert.That(t.leapWarn, Is.InRange(3.5f, 4f), "the red rings where she will land, 3.5-4 s before (tune-8: \"not properly telegraphed\")");
+            Assert.GreaterOrEqual(t.leapWarn - t.leapSeconds, 1.5f, "she gathers (crouches, rears back) 1.5 s or more before she leaves the ground");
+            Assert.That(t.leapSeconds, Is.InRange(1.6f, 2f), "a slow arc to watch her come"); Assert.That(t.leapHeight, Is.InRange(5f, 7f), "about 6 m high");
+            // Out of melee and of every bow and spell (Chris: "still not jumping very far. need to jump out of melee and ranger range"): the longest
+            // reach of any ability in the game's content, and the Ranger's bow, and 5 m more.
+            var asset = System.IO.File.ReadAllText(System.IO.Path.Combine(UnityEngine.Application.dataPath, "Crulanda/EncounterContent/Encounter.asset"));
+            float longest = RangerKit.BowRange;
+            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(asset, @"\brange: ([0-9.]+)"))
+                longest = UnityEngine.Mathf.Max(longest, float.Parse(m.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture));
+            Assert.GreaterOrEqual(t.leapRangeMin, longest + 5, "she lands beyond the longest reach (" + longest + " m) and 5 m more");
+            Assert.Greater(t.leapRangeMax, t.leapRangeMin + 10, "room on the bar and the apron to find such a spot");
             Assert.Less(t.leapShare, EncounterEnemy.MaxBlowShare); Assert.Greater(t.leapRangeMin, t.leapRadius * 2, "far enough to make the raid move");
+        }
+
+        [Test] public void Every_mark_gives_time_to_walk_out_of_it()
+        {
+            // Chris (tune-8): "yeh still not enough time to move after telegraphing". From a mark's middle at a run, out in under half its warning;
+            // nothing bites until the warning is done.
+            var t = T; float run = AdventurerMotor.RunSpeed;
+            var marks = new[] { ("unmade ground", t.unmadeWarn, t.unmadeRadius), ("spike cracks", t.spikeWarn, t.spikeRadius), ("her hunt", t.huntWarn, t.huntRadius), ("her leap", t.leapWarn, t.leapRadius) };
+            foreach (var (name, warn, radius) in marks) Assert.GreaterOrEqual(warn, radius / run * 2, name + ": " + warn + " s for " + radius + " m");
+            Assert.GreaterOrEqual(t.unmadeWarn, 3f); Assert.GreaterOrEqual(t.spikeWarn, 3f); Assert.GreaterOrEqual(t.leapWarn, 3.5f);
+            Assert.Less(UnravellerRules.GroundBite(0, t), .1f, "unmade ground's first bite is modest (tune-8: 230-440 at once killed the ranged)");
+            Assert.GreaterOrEqual(t.phase3Lull, 4f, "phase 3 comes in with a quiet (tune-8: \"not sure what took everyone out around 40% mark\")");
+        }
+
+        [Test] public void The_camera_stops_short_of_her_body()
+        {
+            // Chris: "camera gets inside the spider alot hard to see".
+            Assert.AreEqual(7, AdventurerMotor.IntoBall(Vector3.zero, Vector3.forward, new Vector3(0, 0, 10), 3), 1e-4f, "it meets her 7 m back");
+            Assert.AreEqual(-1, AdventurerMotor.IntoBall(Vector3.zero, Vector3.forward, new Vector3(5, 0, 10), 3), "passing by her");
+            Assert.AreEqual(-1, AdventurerMotor.IntoBall(Vector3.zero, Vector3.back, new Vector3(0, 0, 10), 3), "behind it");
+            Assert.AreEqual(-1, AdventurerMotor.IntoBall(new Vector3(0, 0, 9), Vector3.forward, new Vector3(0, 0, 10), 3), "inside her: the pitch looks over instead");
+            Assert.Greater(AdventurerMotor.NearHerPitch, 15f);
         }
 
         [Test] public void A_rotation_goes_round_passing_over_those_who_cannot()

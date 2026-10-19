@@ -73,12 +73,15 @@ namespace Crulanda.Encounter
             int phase = UnravellerRules.PhaseNow(e.RaidPhase, e.actor.Health.Pool.Ratio, t);   // once reached, held (run 1: healed back over 70%, it went back to 1)
             if (phase != e.RaidPhase) EnterPhase(e, phase);
             if (e.Cast != null) e.Cast.every = t.FeedEvery(phase);
-            // The hauling: two harpoons in her, a metre a second toward the river's middle.
+            // The hauling: two harpoons in her, a metre a second toward the apron, away from the water (Chris: "when she is in the water hard to
+            // see the telegraphs. try to keep her out of water"; it was toward the river's middle).
             if (e.Hauled)
             {
-                if (now >= nextHaulLook) { nextHaulLook = now + 1; haulDir = RiverWay(e.transform.position); }
+                if (now >= nextHaulLook) { nextHaulLook = now + 1; haulDir = DryWay(e.transform.position); }
                 e.Haul(haulDir, t.haulPace * Time.deltaTime);
             }
+            // Never in the river: walked, knocked or chased into it, she is pushed back onto the dry at a run.
+            if (WetForHer(e.transform.position)) e.Haul(DryWay(e.transform.position), 4 * Time.deltaTime);
             TickBrood(e, phase, now);
             TickUnmade(e, phase, now);
             TickSwallow(e, phase, now);
@@ -167,6 +170,7 @@ namespace Crulanda.Encounter
             Leaps = 0; HarmSeconds.Clear(); SnaresLaid = SnaresCaught = BroodHoldsRanOut = 0;
             SpikeBursts = SpikeHits = BroodKilled = BroodBrokeFree = BroodRisen = BroodEaten = SwallowsFreed = SwallowsErased = HuntsMissed = HuntsLanded = Pulses = Feasts = HarpoonsThrown = SaltsThrown = 0;
             SetRotations();
+            if (Zone != null) Zone.SetReachStock(true);   // Tibb's barrel and Ketta's rack out on the apron for the fight (play note 290)
             if (Unraveller.FightTrackReady) Crulanda.World.ZoneMusic.FightOverride = Unraveller.FightTrack;
             if (HarpoonRotation != null && HarpoonRotation.Order.Count > 0) Message("Harpoons, in turn: " + string.Join(", ", HarpoonRotation.Order.Select(NameOfRaidId)) + ". Interrupts on the Feeding: " + (InterruptRotation != null && InterruptRotation.Order.Count > 0 ? string.Join(", ", InterruptRotation.Order.Select(NameOfRaidId)) : "nobody") + ".");
         }
@@ -181,12 +185,13 @@ namespace Crulanda.Encounter
             snares.Clear();
             foreach (var s in spikeSpots) if (s.mark != null) Destroy(s.mark.gameObject);
             spikeSpots.Clear(); spikeAt = -1; nextSpike = 0;
-            leapsDone = 0; leapWarnUntil = -1; leapArcStart = -1; if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide();
+            leapsDone = 0; leapStart = leapLiftAt = leapLandAt = -1; leapAloft = false; if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide(); if (leapShadow != null) leapShadow.SetActive(false);
             var wrap = WrapOf(e); if (wrap != null) wrap.AutoErupt = true;
             if (SwallowedActor != null) Spit(e, SwallowedActor);
             Swallow.End(); SwallowedActor = null; SaltCall.Clear();
             HuntedActor = null; huntAt = -1; if (huntMark != null) huntMark.Hide();
             RaidBossPinned = 0; RaidBossEnrage = 0; pinFreeSince = -1;
+            RaidThrows.ClearAll();   // every harpoon, rope and handful gone
             if (Crulanda.World.ZoneMusic.FightOverride == Unraveller.FightTrack) Crulanda.World.ZoneMusic.FightOverride = null;
         }
         void EnterPhase(EncounterEnemy e, int phase)
@@ -194,7 +199,15 @@ namespace Crulanda.Encounter
             float now = Time.time; int was = e.RaidPhase; e.RaidPhase = phase;
             if (was == 0) return;   // the pull itself: phase 1, nothing to say
             if (phase == 2) { ChatSay(ChatChannel.Say, Unraveller.Name, Unraveller.BroodLine); nextBrood = now + 3; nextUnmade = now + 5; nextSwallow = now + 10; }
-            if (phase == 3) { ChatSay(ChatChannel.Say, Unraveller.Name, Unraveller.MoreLine); nextPulse = now + UT.pulseEvery; nextHunt = now + 6; if (was < 2) { nextBrood = now + 3; nextUnmade = now + 5; nextSwallow = now + 10; } }
+            if (phase == 3)
+            {
+                // Tune-8 (Chris: "not sure what took everyone out around 40% mark": the pulse, the spikes, the hunt and the unmade ground all at once):
+                // a clear warning and a quiet: the pulse after phase3Lull s (and low), the hunt after twice it, spikes and unmade ground not before it.
+                ChatSay(ChatChannel.Say, Unraveller.Name, Unraveller.MoreLine); RaidWarning(Unraveller.Phase3Warning);
+                float lull = UT.phase3Lull; nextPulse = now + lull; nextHunt = now + lull * 2;
+                nextSpike = Mathf.Max(nextSpike, now + lull); nextUnmade = Mathf.Max(nextUnmade, now + lull + 2);
+                if (was < 2) { nextBrood = now + 3; nextSwallow = now + 10; }
+            }
             Message(Unraveller.PhaseSystem(phase));
         }
 
@@ -361,30 +374,47 @@ namespace Crulanda.Encounter
             if (a == null || seconds <= 0) return; string n = a == Player ? "you" : a.DisplayName.Split(' ')[0] + (a.DisplayName.Contains("'s ") ? " " + a.DisplayName.Split(' ').Last() : "");
             HarmSeconds.TryGetValue(n, out var was); HarmSeconds[n] = was + seconds;
         }
-        // ---------- the Leap (play note 285) ----------
-        int leapsDone; float leapWarnUntil = -1; Vector3 leapTo; BlowMark leapMark, leapCore;
-        /// <summary>Her leap in the air now: from, to, and how far through (0-1); false when she is not leaping (UnravellerBody draws the arc).</summary>
+        // ---------- the Leap (play note 285; tune-8, Chris: "leaps are too quick and not properly telegraphed", "also distance is too short") ----------
+        // The rings at the first moment; she stands and gathers (crouches, rears back) leapWarn - leapSeconds s; then leapSeconds in the air, a high
+        // arc (leapHeight m) with her shadow growing where she will land; the blow only as she lands, leapWarn s after the rings came.
+        int leapsDone; float leapStart = -1, leapLiftAt = -1, leapLandAt = -1; bool leapAloft; Vector3 leapTo, leapFrom; BlowMark leapMark, leapCore;
+        GameObject leapShadow; Material leapShadowMat;
+        public int Leaps;
+        /// <summary>Her leap in the air now: from, to, and how far through (0-1); false when she is not in the air (UnravellerBody draws the arc).</summary>
         public bool LeapArc(EncounterEnemy e, out Vector3 from, out Vector3 to, out float t)
         {
-            from = leapFrom; to = leapTo; t = leapArcStart < 0 ? 1 : (Time.time - leapArcStart) / Mathf.Max(.01f, UT.leapSeconds);
-            return e == UnravellerFoe && leapArcStart >= 0 && t < 1;
+            from = leapFrom; to = leapTo; t = leapAloft ? Mathf.Clamp01((Time.time - leapLiftAt) / Mathf.Max(.01f, leapLandAt - leapLiftAt)) : 1;
+            return e == UnravellerFoe && leapAloft && t < 1;
         }
-        Vector3 leapFrom; float leapArcStart = -1;
-        public int Leaps;
+        /// <summary>Her gathering to leap (the rings down, she not yet off the ground): how far through it (0-1).</summary>
+        public bool LeapGathering(EncounterEnemy e, out float k)
+        {
+            k = leapStart < 0 ? 0 : Mathf.Clamp01((Time.time - leapStart) / Mathf.Max(.01f, leapLiftAt - leapStart));
+            return e == UnravellerFoe && leapStart >= 0 && !leapAloft;
+        }
+        /// <summary>How high her leap's arc goes (m).</summary>
+        public float LeapHeight { get { return UT.leapHeight; } }
         float[] LeapMarks { get { var t = UT; return new[] { t.leapAt1, t.leapAt2, t.leapAt3 }; } }
         void TickLeap(EncounterEnemy e, float now)
         {
             var t = UT;
-            if (leapArcStart >= 0 && now - leapArcStart >= t.leapSeconds) leapArcStart = -1;
-            if (leapWarnUntil >= 0)
+            if (leapStart >= 0)
             {
-                if (leapMark != null) leapMark.Show(leapTo, t.leapRadius, Mathf.Clamp01(1 - (leapWarnUntil - now) / Mathf.Max(.01f, t.leapWarn)));
-                if (leapCore != null) leapCore.Show(leapTo, e.BodyRadius, 1);   // where her body lands: solid, death
-                if (now < leapWarnUntil) return;
-                // She leaps: torn free of the harpoons, an arc through the air, the ring struck and thrown, her brood up round her.
-                leapWarnUntil = -1; if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide();
-                e.Pins.Clear(); e.TearFree();
-                leapFrom = e.transform.position; leapArcStart = now; Leaps++;
+                // The rings from the first moment to her landing: the outer filling as the time runs out, her body's own solid (death).
+                if (leapMark != null) leapMark.Show(leapTo, t.leapRadius, Mathf.Clamp01((now - leapStart) / Mathf.Max(.01f, leapLandAt - leapStart)));
+                if (leapCore != null) leapCore.Show(leapTo, e.BodyRadius, 1);
+                if (!leapAloft && now >= leapLiftAt)
+                {
+                    // Off the ground: torn free of the harpoons, in the air (her actor stays where she was until she lands; nothing is struck yet).
+                    leapAloft = true; leapFrom = e.transform.position;
+                    e.Pins.Clear(); e.TearFree(); e.RawStun(leapLandAt - now + .2f);
+                    Message(Unraveller.LeapLine);
+                }
+                if (leapAloft) ShowLeapShadow(leapTo, Mathf.Clamp01((now - leapLiftAt) / Mathf.Max(.01f, leapLandAt - leapLiftAt)), e.BodyRadius);
+                if (now < leapLandAt) return;
+                // She lands: the ring struck and thrown, her brood up round her, the ground shaken.
+                leapStart = leapLiftAt = leapLandAt = -1; leapAloft = false; Leaps++;
+                if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide(); if (leapShadow != null) leapShadow.SetActive(false);
                 e.DisplaceTo(leapTo);
                 foreach (var a in PartyActors().ToArray())
                 {
@@ -394,7 +424,7 @@ namespace Crulanda.Encounter
                     if (d <= e.BodyRadius) { NoteHit(a, "Crushed under her landing"); a.Health.ApplyDamage(EncounterEnemy.CapBlow(a.Health.Pool.Current, a.Health.Pool.Max, true, true)); FloatText(a.transform.position + Vector3.up, "Crushed", new Color(.69f, .08f, .12f)); continue; }
                     Hurt(a, t.leapShare, Unraveller.LeapName, false); e.Knock(a, t.leapKnock);
                 }
-                Message(Unraveller.LeapLine);
+                LeapDust.Burst(leapTo, t.leapRadius, Player != null && Flat(Player.transform.position - leapTo) < 30 ? t.leapShake : 0);
                 SpawnBrood(e, t.broodCount, leapTo);
                 return;
             }
@@ -402,26 +432,79 @@ namespace Crulanda.Encounter
             if (SwallowedActor != null || e.Feeding || e.Stunned) return;   // not while she swallows or feeds (or stands calcified): when she is free
             leapsDone++;
             leapTo = LeapSpot(e);
+            leapStart = now; leapLandAt = now + t.leapWarn; leapLiftAt = leapLandAt - Mathf.Min(t.leapSeconds, t.leapWarn);
+            e.RawStun(leapLiftAt - now);   // she stands and gathers: no swing, no step
             if (leapMark == null) leapMark = BlowMark.Create(GroundKind.Harmful, t.leapWarn + 1, Unraveller.LeapName);
-            leapMark.Show(leapTo, t.leapRadius, 0); leapWarnUntil = now + t.leapWarn;
+            leapMark.Show(leapTo, t.leapRadius, 0);
             if (leapCore == null) leapCore = BlowMark.Create(GroundKind.Harmful, t.leapWarn + 1, "Under her landing");
             leapCore.Show(leapTo, e.BodyRadius, 1);
-            RaidWarning(Unraveller.LeapWarning);
+            RaidWarning(Unraveller.LeapWarning); Message(Unraveller.LeapScreech);
         }
-        /// <summary>Where she leaps to: another part of the bar or the apron, 12-18 m off, on the walkable ground.</summary>
+        /// <summary>Her shadow where she will land, growing and darkening as she comes down (not a mark of its own: the rings round it are).</summary>
+        void ShowLeapShadow(Vector3 at, float k, float body)
+        {
+            if (leapShadow == null) leapShadow = BlowMark.Disc("Her shadow", new Color(0, 0, 0, 0), out leapShadowMat);
+            if (!leapShadow.activeSelf) leapShadow.SetActive(true);
+            leapShadow.transform.position = at + Vector3.up * .14f;
+            float r = Mathf.Lerp(.8f, body * 1.15f, k); leapShadow.transform.localScale = new Vector3(r, 1, r);
+            leapShadowMat.color = new Color(.02f, 0, .03f, Mathf.Lerp(.2f, .7f, k));
+        }
+        /// <summary>Where she leaps to (Chris: "still not jumping very far. need to jump out of melee and ranger range"): another part of the bar
+        /// or the apron, on the walkable ground (never the water), at least leapRangeMin m (the longest reach of any attack, 30 m, and 5 more) both
+        /// from where she took off and from the middle of the raid, at most leapRangeMax: everyone runs to her.</summary>
         Vector3 LeapSpot(EncounterEnemy e)
         {
-            var t = UT; var bar = Zone != null ? Zone.SiltBar : null; var apron = Zone != null ? Zone.ReachApron : null;
-            for (int k = 0; k < 16; k++)
+            var t = UT; var from = e.transform.position; var raid = RaidMiddle(from);
+            for (int k = 0; k < 64; k++)
             {
-                var p = e.transform.position + Quaternion.Euler(0, Random.Range(0f, 360f), 0) * Vector3.forward * Random.Range(t.leapRangeMin, t.leapRangeMax);
-                if (!NavMesh.SamplePosition(p, out var hit, 3, NavMesh.AllAreas)) continue;
-                if (Zone != null && Zone.ChemicalAt(hit.position + Vector3.up)) continue;   // onto the bar or the apron, not the water
-                var q = new Vector2(hit.position.x, hit.position.z);
-                bool onIt = bar == null || ZoneWaterInside(bar, q) || apron != null && ZoneWaterInside(apron, q);
-                if (onIt) return hit.position;
+                var p = from + Quaternion.Euler(0, Random.Range(0f, 360f), 0) * Vector3.forward * Random.Range(t.leapRangeMin, t.leapRangeMax);
+                if (!LeapGround(p, out var at)) continue;
+                float d = Flat(at - from), dr = Flat(at - raid);
+                if (d >= t.leapRangeMin && d <= t.leapRangeMax && dr >= t.leapRangeMin) return at;
             }
-            return bar != null ? Zone.Ground(bar.center) : e.transform.position;
+            // Nothing found by chance: the point of the bar and the apron farthest from both, within the most.
+            var far = FarthestLeapSpot(from, raid); if (far.HasValue) return far.Value;
+            var bar = Zone != null ? Zone.SiltBar : null;
+            return bar != null ? Zone.Ground(bar.center) : from;
+        }
+        /// <summary>The middle of the raid's living (you and the sims; her own spot when none).</summary>
+        Vector3 RaidMiddle(Vector3 or)
+        {
+            var sum = Vector3.zero; int n = 0;
+            foreach (var a in PartyActors()) if (a != null && a.IsAlive && a != SwallowedActor) { sum += a.transform.position; n++; }
+            return n > 0 ? sum / n : or;
+        }
+        /// <summary>A point on her ground (the bar, its neck, the apron), on the navmesh and out of the water.</summary>
+        bool LeapGround(Vector3 p, out Vector3 at)
+        {
+            at = p;
+            if (!NavMesh.SamplePosition(p, out var hit, 3, NavMesh.AllAreas)) return false;
+            if (Zone != null && Zone.ChemicalAt(hit.position + Vector3.up)) return false;
+            at = hit.position;
+            if (Zone == null || Zone.Zone == null || Zone.Zone.shoals == null) return true;
+            var q = new Vector2(at.x, at.z);
+            foreach (var sh in Zone.Zone.shoals) if (sh != null && Crulanda.World.ZoneWater.ShoalOut(sh, q.x, q.y) <= 0) return true;   // (<= 0: inside is 0; tune-8 found "< 0" turned every leap down)
+            return false;
+        }
+        Vector3? FarthestLeapSpot(Vector3 from, Vector3 raid)
+        {
+            var t = UT; Vector3? best = null; float bestD = 0; if (Zone == null || Zone.Zone == null || Zone.Zone.shoals == null) return null;
+            foreach (var sh in Zone.Zone.shoals)
+            {
+                if (sh == null) continue;
+                float r = sh.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), sn = Mathf.Sin(r);
+                for (float fx = -.5f; fx <= .51f; fx += .25f)
+                    for (float fz = -.5f; fz <= .51f; fz += .0625f)
+                    {
+                        float lx = fx * Mathf.Max(0, sh.size.x - 3), lz = fz * Mathf.Max(0, sh.size.y - 3);
+                        var w = new Vector2(sh.center.x + lx * c + lz * sn, sh.center.y - lx * sn + lz * c);
+                        if (!LeapGround(Zone.Ground(w), out var at)) continue;
+                        float d = Flat(at - from); if (d > t.leapRangeMax) continue;
+                        float worst = Mathf.Min(d, Flat(at - raid)); if (worst <= bestD) continue;
+                        bestD = worst; best = at;
+                    }
+            }
+            return best;
         }
         static bool ZoneWaterInside(Crulanda.World.ZoneShoal s, Vector2 p) { return Crulanda.World.ZoneWater.ShoalOut(s, p.x, p.y) < 0; }
         /// <summary>Raisings this session (the Shaman's Barrow-wake; the run's log).</summary>
@@ -804,6 +887,23 @@ namespace Crulanda.Encounter
             else v.GetComponent<SimCompanion>()?.Silence(seconds);
             FloatText(v.transform.position + Vector3.up * .8f, "Silenced", new Color(.75f, .85f, 1));
         }
+        /// <summary>Her, up but not pulled (no fight begun, or reset after a wipe): no sim or pet strikes her until you or a tank pulls her (Chris,
+        /// tune-8: "i think the pet pulled the mob or was still alive and restarted the raid"). Pets never pull.</summary>
+        public bool UnravellerNotPulled(EncounterEnemy e)
+        {
+            if (e == null || e != UnravellerFoe || e.PullAt >= 0) return false;
+            if (Target == e && AutoAttack) return false;   // you pull her
+            var v = e.Victim; return v == null || !(v == Player || IsRaidTank(v));
+        }
+        /// <summary>Her body and her brood's as the camera sees them (Chris: "camera gets inside the spider alot hard to see"): a ball each, round
+        /// the body and its shards, that the camera keeps out of (AdventurerMotor).</summary>
+        public void CameraBlockers(List<(Vector3 c, float r)> into)
+        {
+            into.Clear();
+            var e = UnravellerFoe;
+            if (e != null && e.actor != null && e.actor.IsAlive && !UnravellerSinking && !LeapArc(e, out _, out _, out _)) into.Add((e.transform.position + Vector3.up * .8f, e.BodyRadius * 1.1f));
+            foreach (var b in BroodNow) if (b != null && b.actor != null && b.actor.IsAlive) into.Add((b.transform.position + Vector3.up * .3f, b.BodyRadius * 1.1f));
+        }
         /// <summary>The raid as her rules see it (blink, hunt, swallow choices).</summary>
         List<UnravellerCandidate> Candidates(EncounterEnemy e)
         {
@@ -850,6 +950,19 @@ namespace Crulanda.Encounter
         bool IsRaidHealer(Actor a) { if (a == Player) return PlayerRole == SimCompanion.PartyRole.Healer; if (Companion != null && a == Companion.actor) return true; var c = a != null ? a.GetComponent<SimCompanion>() : null; return c != null && c.Role == SimCompanion.PartyRole.Healer; }
         string NameOfRaidId(string id) { if (id == RaidGroup.You) return "you"; var c = PartySim(id); return c != null ? c.sim.name : id; }
         /// <summary>The way toward the river's middle from <paramref name="from"/>: to the nearest chemical water within 25 m (zero: none).</summary>
+        /// <summary>Whether one standing at <paramref name="at"/> (an actor's place, a metre over its feet) is in the river.</summary>
+        public bool WetForHer(Vector3 at) { return Zone != null && Zone.HasChemical && Zone.ChemicalAt(at); }
+        /// <summary>The way to the dry from <paramref name="from"/>: toward the apron's middle line (the bank), else straight away from the water.</summary>
+        Vector3 DryWay(Vector3 from)
+        {
+            var apron = Zone != null ? Zone.ReachApron : null;
+            if (apron != null)
+            {
+                float z = Mathf.Clamp(from.z, apron.center.y - apron.size.y / 2 + 2, apron.center.y + apron.size.y / 2 - 2);
+                var d = new Vector3(apron.center.x, from.y, z) - from; d.y = 0; if (d.sqrMagnitude > .25f) return d.normalized;
+            }
+            var w = RiverWay(from); return -w;
+        }
         Vector3 RiverWay(Vector3 from)
         {
             var near = NearestWater(from, 25); if (!near.HasValue) return Vector3.zero;
@@ -891,17 +1004,20 @@ namespace Crulanda.Encounter
         /// WeaveEaterRules): the sting, then on a Weave-Eater the hold. On her: a harpoon pins her (the shortening pin, a Feeding broken); salt
         /// counts toward freeing the swallowed and is lost otherwise. On her brood: salt calcifies it to shatter. What the hold was, for the line.
         /// </summary>
+        /// <summary>The hand a throw leaves: a sim's right hand, else at your shoulder.</summary>
+        Vector3 ThrowHand(Actor by) { var c = by != null ? by.GetComponent<SimCompanion>() : null; return c != null ? c.Hand : by.transform.position + Vector3.up * .4f + by.transform.right * .3f; }
         public bool ThrowAt(EncounterEnemy t, string kind, Actor by, int level)
         {
             if (t == null || !t.actor.IsAlive || by == null) return false;
             if (by == Player) Bolt(t, kind == WeaveEaterRules.Harpoon ? BoneYellow : SaltWhite, kind == WeaveEaterRules.Harpoon ? .14f : .22f, kind == WeaveEaterRules.Harpoon);
+            if (kind != WeaveEaterRules.Harpoon && InDrainReachZone) RaidThrows.SaltAt(ThrowHand(by), t.transform);   // the white handful seen (play note 290)
             bool eater = WeaveEaterRules.IsWeaveEater(t);
             var (sting, hold, seconds) = WeaveEaterRules.Throw(kind, level, eater);
             t.Receive(sting, by);   // the sting first: a blow breaks a hold, so the hold goes on after it
             if (!t.actor.IsAlive) return false;
             if (t.RaidBoss)
             {
-                if (kind == WeaveEaterRules.Harpoon) { t.Harpooned(by); return true; }
+                if (kind == WeaveEaterRules.Harpoon) { float pin = t.Harpooned(by); RaidThrows.Harpoon(ThrowHand(by), by, t, pin); return true; }   // the harpoon and its amber rope seen (play note 290)
                 return t.SaltedHer(by) || Swallow.Active;
             }
             if (hold == "stun")

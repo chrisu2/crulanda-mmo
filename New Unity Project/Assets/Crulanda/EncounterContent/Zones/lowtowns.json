@@ -7587,9 +7587,9 @@
     {
       "name": "The Drain Reach apron",
       "kind": "apron",
-      "canonStatus": "GAME-ONLY: wet setts on the west bank of the Drain Reach",
-      "center": { "x": -27, "y": 192 },
-      "size": { "x": 9, "y": 30 },
+      "canonStatus": "GAME-ONLY: wet setts on the west bank of the Drain Reach, run on north along the bank so her leap can carry 25-40 m (tune-8)",
+      "center": { "x": -27, "y": 205 },
+      "size": { "x": 9, "y": 56 },
       "rotation": 0,
       "rise": 0.42,
       "blend": 0.75

@@ -135,6 +135,17 @@ namespace Crulanda.Encounter
         /// <summary>How far below level the orbit goes (Chris, 2026-10-04: "camera should also have a up and down"): under the horizon the
         /// camera runs along the ground and tilts up at the sky, as in the classic MMOs. It was 12 degrees above level at the lowest.</summary>
         const float MinPitch = -40;
+        /// <summary>The least pitch at her legs (looking down over her body).</summary>
+        public const float NearHerPitch = 28;
+        readonly System.Collections.Generic.List<(Vector3 c, float r)> blockers = new System.Collections.Generic.List<(Vector3 c, float r)>();
+        /// <summary>How far along a ray from <paramref name="from"/> it first enters a ball; -1 when it never does or starts inside it.</summary>
+        public static float IntoBall(Vector3 from, Vector3 dir, Vector3 c, float r)
+        {
+            var oc = from - c; float b = Vector3.Dot(oc, dir), cc = oc.sqrMagnitude - r * r;
+            if (cc <= 0 || b > 0) return -1;
+            float disc = b * b - cc; if (disc < 0) return -1;
+            return -b - Mathf.Sqrt(disc);
+        }
         void LateUpdate()
         {
             if (view == null) return;
@@ -142,13 +153,19 @@ namespace Crulanda.Encounter
             var zoneHere = Crulanda.World.ZoneBuilder.Active; bool inCave = false;
             foreach (var h in Crulanda.World.Hollow.All) if (h.Depth(transform.position) > .1f) { inCave = true; break; }
             var groundCollider = zoneHere != null && zoneHere.GroundMesh != null && !inCave ? zoneHere.GroundMesh.GetComponent<Collider>() : null;
-            var rotation = Quaternion.Euler(pitch, yaw, 0);
+            // Her body and her brood keep the camera out (Chris: "camera gets inside the spider alot hard to see"): at her legs it looks down over
+            // her (a higher least pitch); farther off it is pulled in front of her rather than through her.
+            float pitchNow = pitch;
+            if (session != null) session.CameraBlockers(blockers);
+            foreach (var b in blockers) { var f = pivot - b.c; f.y = 0; if (f.magnitude < b.r + 1.5f) { pitchNow = Mathf.Max(pitchNow, NearHerPitch); break; } }
+            var rotation = Quaternion.Euler(pitchNow, yaw, 0);
             // Camera collision: pull in toward the player when scenery is in the way. Not characters, and not trees: the
             // camera looks through a tree instead (it fades, below), so turning among trees doesn't yank the view in.
             float allowed = distance;
             foreach (var hit in Physics.SphereCastAll(pivot, .3f, -(rotation * Vector3.forward), distance, ~0, QueryTriggerInteraction.Ignore))
                 if (hit.collider != groundCollider && hit.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() == null && hit.collider.GetComponentInParent<Crulanda.World.TreeFade>() == null && hit.distance > .05f)
                     allowed = Mathf.Min(allowed, hit.distance);
+            foreach (var b in blockers) { float d = IntoBall(pivot, -(rotation * Vector3.forward), b.c, b.r); if (d >= 0 && d < allowed) allowed = Mathf.Max(.6f, d - .3f); }
             // At least 1.2 m out of doors; indoors as close as the wall behind you allows (the tester's note 117, 2026-10-10: "The camera
             // goes inside walls when you walk into a building": the 1.2 m put it into the wall a step behind you).
             bool indoors = Crulanda.World.RoofFade.Inside(transform.position);

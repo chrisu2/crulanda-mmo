@@ -102,6 +102,28 @@ namespace Crulanda.Encounter
                     return true;
                 }
             }
+            // Out of harpoons or salt it has been throwing, and nothing urgent: to Ketta's rack or Tibb's barrel on the apron for three more
+            // (play note 290: "i dont see the salt or harpoons"; they are things you fetch). Carries still takes from the stock at once for the Feeding.
+            if (!e.Feeding && hunted != actor && session.ApronStock && session.Zone != null)
+            {
+                string need = HarpoonsThrown > 0 && SimEconomy.Count(sim, Unraveller.HarpoonItem) == 0 ? Unraveller.HarpoonItem : SaltsThrown > 0 && SimEconomy.Count(sim, Unraveller.SaltItem) == 0 ? Unraveller.SaltItem : null;
+                if (need != null)
+                {
+                    var at = need == Unraveller.HarpoonItem ? session.Zone.ReachRackAt : session.Zone.ReachBarrelAt;
+                    if (at != Vector3.zero)
+                    {
+                        var flat = at - transform.position; flat.y = 0;
+                        if (flat.magnitude <= 2.6f) { Carries(need); }
+                        else if (NavMesh.SamplePosition(at, out var stock, 3, NavMesh.AllAreas))
+                        {
+                            agent.isStopped = false; agent.speed = 5.2f; agent.SetDestination(stock.position);
+                            if (visual != null) visual.Casting = false; healing = null;
+                            Activity = need == Unraveller.HarpoonItem ? "To Ketta's rack for harpoons" : "To Tibb's barrel for salt";
+                            return true;
+                        }
+                    }
+                }
+            }
             // The Feeding: the interrupter on turn kicks; when it cannot (immune, its kick spent), the harpooner on turn throws into it.
             if (e.Feeding && e.CastProgress > .2f && !Silenced)
             {

@@ -13,7 +13,10 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed class CombatMeter
     {
-        public sealed class Row { public string id, name; public int damage, healing, deaths; public float Dps(float seconds) { return seconds > 1 ? damage / seconds : 0; } public float Hps(float seconds) { return seconds > 1 ? healing / seconds : 0; } }
+        public sealed class Row { public string id, name; public int damage, healing, deaths; public float alive;
+            /// <summary>A second over its own time up in the fights (Chris: "healing seems lower..cant tell with dps": dead time dragged the wiped down).</summary>
+            public float DpsUp(float seconds) { return alive > 1 ? damage / alive : Dps(seconds); } public float HpsUp(float seconds) { return alive > 1 ? healing / alive : Hps(seconds); }
+            public float Dps(float seconds) { return seconds > 1 ? damage / seconds : 0; } public float Hps(float seconds) { return seconds > 1 ? healing / seconds : 0; } }
         readonly EncounterSession s; readonly Dictionary<string, Row> rows = new Dictionary<string, Row>();
         /// <summary>Seconds the party has spent in a fight since the reset.</summary>
         public float CombatSeconds { get; private set; }
@@ -65,7 +68,14 @@ namespace Crulanda.Encounter
         }
         public Row TopHealer() { Row best = null; foreach (var r in rows.Values) if (r.healing > 0 && (best == null || r.healing > best.healing)) best = r; return best; }
         public void Heal(Actor by, int amount) { var r = RowFor(by); if (r != null && amount > 0) r.healing += amount; }
-        public void Tick(bool inCombat, float dt) { if (inCombat) CombatSeconds += dt; }
+        public void Tick(bool inCombat, float dt)
+        {
+            if (!inCombat) return;
+            CombatSeconds += dt;
+            foreach (var a in s.PartyActors()) if (a != null && a.IsAlive) { var r = RowFor(a); if (r != null) r.alive += dt; }   // each member's own time up
+        }
+        /// <summary>A total short enough for its column: 9,876, 155.4k, 1.24M.</summary>
+        public static string Short(int n) { return n < 10000 ? n.ToString("N0") : n < 1000000 ? (n / 1000f).ToString("0.0") + "k" : (n / 1000000f).ToString("0.00") + "M"; }
         public void Reset() { rows.Clear(); CombatSeconds = 0; Drops.Clear(); Coin = 0; RunName = null; RunStartedAt = -1; }
         public IEnumerable<Row> Rows { get { return rows.Values.OrderByDescending(r => r.damage + r.healing); } }
         public bool Empty { get { return rows.Count == 0; } }

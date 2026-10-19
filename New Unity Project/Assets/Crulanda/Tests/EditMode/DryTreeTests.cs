@@ -124,16 +124,16 @@ namespace Crulanda.Tests
             Assert.That(ZoneBuilder.GallowsRope, Is.InRange(.03f, .045f), "a rope thick enough to see");
             foreach (var limb in new[] { new Vector3(2.6f, 4.1f, 0), new Vector3(1.6f, 3.4f, 0), new Vector3(3.6f, 5.5f, 0), new Vector3(1.2f, 2.8f, 0) })
             {
-                var g = ZoneBuilder.GallowsPlan(limb); string at = "limb " + limb;
+                var g = ZoneBuilder.GallowsPlan(limb); string where = "limb " + limb;
                 float half = ZoneBuilder.GallowsBoards / 2;
-                Assert.Less(Mathf.Abs(g.noose.x - g.platform.x), half * .5f, at + ": the noose over the middle of the boards (x)");
-                Assert.Less(Mathf.Abs(g.noose.z - g.platform.z), half * .5f, at + ": the noose over the middle of the boards (z)");
-                Assert.That(g.noose.y - ZoneBuilder.GallowsDeck, Is.InRange(1.5f, 2f), at + ": the noose's foot at head height over the deck");
-                Assert.That(g.ropeTop.x, Is.InRange(g.beamFrom.x, g.beamTo.x), at + ": the rope hangs from the beam");
-                Assert.Less(g.ropeTop.y, g.beamTo.y, at + ": under it"); Assert.Greater(g.ropeTop.y - g.knot.y, .3f, at + ": a length of rope shows");
-                Assert.Less(g.beamTo.x - g.ropeTop.x, .25f, at + ": near the beam's free end");
-                Assert.Greater(g.platform.x - half, .8f, at + ": the boards clear of the trunk");
-                Assert.AreEqual(g.beamFrom.y, g.beamTo.y, 1e-4f, at + ": the beam level, at the limb");
+                Assert.Less(Mathf.Abs(g.noose.x - g.platform.x), half * .5f, where + ": the noose over the middle of the boards (x)");
+                Assert.Less(Mathf.Abs(g.noose.z - g.platform.z), half * .5f, where + ": the noose over the middle of the boards (z)");
+                Assert.That(g.noose.y - ZoneBuilder.GallowsDeck, Is.InRange(1.5f, 2f), where + ": the noose's foot at head height over the deck");
+                Assert.That(g.ropeTop.x, Is.InRange(g.beamFrom.x, g.beamTo.x), where + ": the rope hangs from the beam");
+                Assert.Less(g.ropeTop.y, g.beamTo.y, where + ": under it"); Assert.Greater(g.ropeTop.y - g.knot.y, .3f, where + ": a length of rope shows");
+                Assert.Less(g.beamTo.x - g.ropeTop.x, .25f, where + ": near the beam's free end");
+                Assert.Greater(g.platform.x - half, .8f, where + ": the boards clear of the trunk");
+                Assert.AreEqual(g.beamFrom.y, g.beamTo.y, 1e-4f, where + ": the beam level, at the limb");
             }
         }
 

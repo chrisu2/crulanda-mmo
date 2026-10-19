@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     public sealed class UnravellerTuning
     {
         // ---------- her, and the clock ----------
-        public int health = 160000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
+        public int health = 195000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
         // ---------- the rules that hold all fight (3.3): the Weave-Eaters' own, scaled ----------
         public float lighthouseShare = .1f, lighthouseBeat = 2, lighthouseReach = 30;
         public float blinkEvery = 9, blinkReach = 12, touchShare = .6f, touchSilence = 3, wardReach = 10;
@@ -27,13 +27,13 @@ namespace Crulanda.Encounter
         // ---------- phase 2 ----------
         /// <summary>The brood's wait in each phase; in phase 1 none (0) as the doc has it: the fight's first two minutes are the pins, the
         /// Feeding and the swap. A step-6 knob if phase 1 wants adds (play note 260, "she needs adds").</summary>
-        public float broodEvery1 = 0, broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 2, broodLevel = 22;
+        public float broodEvery1 = 0, broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 3, broodLevel = 22;
         public float broodHealthShare = .12f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
-        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .08f;
-        public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 12; public int saltsToFree = 3;
+        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .1f;
+        public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 10; public int saltsToFree = 3;
         public float saltWindow = 12, calcifySeconds = 4, calcifyTaken = 1.5f;
         // ---------- phase 3 ----------
-        public float pulseEvery = 3, pulseStart = .015f, pulseGrow = .001f;
+        public float pulseEvery = 3, pulseStart = .02f, pulseGrow = .0012f;
         public float huntEvery = 20, huntWarn = 3, huntRadius = 5, huntShare = .8f, missStun = 2;
         // ---------- the sims (3.5) ----------
         public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;

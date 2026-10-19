@@ -25,11 +25,11 @@ namespace Crulanda.Tests
             Assert.IsTrue(File.Exists(File_), "the data file");
             var t = UnravellerTuning.Parse(File.ReadAllText(File_));
             var d = new UnravellerTuning();
-            Assert.AreEqual(d.health, t.health); Assert.AreEqual(160000, t.health, "160,000 after the clamp (3.2)");
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(195000, t.health, "raid 3: 160,000 (3.2) was killed in 6:40");
             Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
             Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
-            Assert.AreEqual(4, t.swapAt); Assert.AreEqual(7, t.erasedAt); Assert.AreEqual(3, t.saltsToFree); Assert.AreEqual(12, t.saltWindow);
+            Assert.AreEqual(4, t.swapAt); Assert.AreEqual(7, t.erasedAt); Assert.AreEqual(3, t.saltsToFree); Assert.AreEqual(12, t.saltWindow); Assert.AreEqual(10, t.swallowSeconds, "raid 3");
             // The file and the defaults agree everywhere (a build without the file plays the same fight).
             Assert.AreEqual(JsonUtility.ToJson(d), JsonUtility.ToJson(t), "the file's numbers are the defaults' (UnravellerTuning)");
             var tuned = UnravellerTuning.Parse("{\"health\": 90000, \"pinLeast\": 6}");
@@ -139,7 +139,7 @@ namespace Crulanda.Tests
             var late = new SwallowSalts(); late.Begin("v", 0);
             late.Salt("a", 0, t); late.Salt("b", 5, t);
             Assert.IsFalse(late.Salt("c", 12.5f, t), "the first salt out of the 12 s window: two, not three");
-            Assert.IsFalse(late.Erased(11.9f, t)); Assert.IsTrue(late.Erased(12, t), "12 s inside her and they are erased");
+            Assert.IsFalse(late.Erased(t.swallowSeconds - .1f, t)); Assert.IsTrue(late.Erased(t.swallowSeconds, t), "10 s inside her (raid 3; the doc's 12) and they are erased");
         }
 
         [Test] public void The_hunt_falls_on_the_brightest_and_the_river_makes_her_miss()
@@ -164,8 +164,8 @@ namespace Crulanda.Tests
         [Test] public void The_Unravelling_grows_each_pulse_and_the_feast_comes_at_nine_minutes()
         {
             var t = T;
-            Assert.AreEqual(.015f, UnravellerRules.PulseShare(0, t), 1e-5f, "1.5% at first");
-            Assert.AreEqual(.075f, UnravellerRules.PulseShare(60, t), 1e-5f, "about 7.5% three minutes in (sixty pulses)");
+            Assert.AreEqual(.02f, UnravellerRules.PulseShare(0, t), 1e-5f, "2% at first (raid 3; the doc's 1.5%)");
+            Assert.AreEqual(.092f, UnravellerRules.PulseShare(60, t), 1e-5f, "about 9% three minutes in (sixty pulses)");
             Assert.AreEqual(540, UnravellerRules.EnrageLeft(0, t)); Assert.AreEqual(40, UnravellerRules.EnrageLeft(500, t), 1e-4f); Assert.AreEqual(0, UnravellerRules.EnrageLeft(600, t));
             Assert.IsFalse(UnravellerRules.Feast(539.9f, t)); Assert.IsTrue(UnravellerRules.Feast(540, t));
         }
@@ -178,6 +178,11 @@ namespace Crulanda.Tests
                 var w = VoidWrap.Wrap(host.transform, UnravellerBody.WrapHeight, 3.5f, -1, 5);
                 Assert.AreEqual(1, w.transform.lossyScale.y, 1e-3f, "built in the world's metres, her scale undone");
                 Assert.That(w.ShardCount, Is.InRange(10, 14), "a few jagged shards, not a forest (raid 2)");
+                Assert.IsFalse(w.transform.Find("Shards").gameObject.activeSelf, "not out of the ground all the time (raid 3: every 5-7 s)");
+                Assert.That(VoidWrap.Rise + VoidWrap.Stand + VoidWrap.Sink, Is.InRange(1f, 1.5f), "an eruption of a second or so");
+                Assert.AreEqual(5, VoidWrap.EruptMin); Assert.AreEqual(7, VoidWrap.EruptMax);
+                w.Erupt(true);
+                Assert.IsTrue(w.transform.Find("Shards").gameObject.activeSelf, "erupting"); Assert.AreEqual(1, w.Eruptions);
                 var rs = w.GetComponentsInChildren<Renderer>(true).Where(r => r is MeshRenderer).ToList();
                 Assert.AreEqual(2 * w.ShardCount, rs.Count, "each shard a void core and an aether rim: cheap to draw");
                 var b = rs[0].bounds; foreach (var r in rs) b.Encapsulate(r.bounds);

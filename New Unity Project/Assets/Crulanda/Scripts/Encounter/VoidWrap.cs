@@ -14,6 +14,10 @@ namespace Crulanda.Encounter
     ///   slow noise) and now and then gone for a moment, so the edge never settles. The body reads first (Chris, raid 2: "woah too much cant
     ///   even make out the spider": the first wrap was a seven-metre tower of opaque shards in front of the camera);
     /// - the aether: the same shards a touch larger behind them in a shimmering violet, so every edge has a corrupted-light rim;
+    /// - not there all the time (Chris, raid 3: "dont make the purple spikes permanently coming out of ground. randomly every 5-7secs"): the
+    ///   shards burst up out of the ground round it at a random moment every <see cref="EruptMin"/>-<see cref="EruptMax"/> s, stand a moment
+    ///   and sink away (about 1.25 s in all), each time in new places; between, only the body, its glow and the ash. Purely a look: nothing
+    ///   is struck by an eruption (her ground marks are her hazards). A blink brings one at once where she lands;
     /// - the ash: grey dust lifting and fading where it stands and more where it moves (a particle system on the ground, by distance);
     /// - the jerk: moved more than 2.5 m in a frame (a blink, a hunt's fall) it leaves a fading afterimage of its shards where it was and
     ///   lands squashed for a tenth of a second;
@@ -29,7 +33,13 @@ namespace Crulanda.Encounter
         public Crulanda.Gameplay.Actor Owner;
         Transform shardRoot; readonly List<(Transform t, Quaternion rest, Vector3 scale, float seed, Renderer rim, Renderer core)> shards = new List<(Transform, Quaternion, Vector3, float, Renderer, Renderer)>();
         Material voidMat, rimMat; MaterialPropertyBlock block; ParticleSystem ash;
-        Vector3 lastPos; float squashUntil; bool crystal; readonly List<(Transform t, float until)> ghosts = new List<(Transform, float)>();
+        Vector3 lastPos; float squashUntil, eruptFrom = -10, nextErupt; bool crystal;
+        /// <summary>The wait between eruptions (seconds), and an eruption's rise, stand and sink.</summary>
+        public const float EruptMin = 5, EruptMax = 7, Rise = .25f, Stand = .6f, Sink = .4f;
+        /// <summary>The shards are out of the ground now.</summary>
+        public bool Erupting { get { return Time.time - eruptFrom < Rise + Stand + Sink; } }
+        public int Eruptions { get; private set; }
+        System.Random placeRng; readonly List<(Transform t, float until)> ghosts = new List<(Transform, float)>();
         /// <summary>How many shards it is made of (the tests).</summary>
         public int ShardCount { get { return shards.Count; } }
         /// <summary>Afterimages left by jerks so far (the tests and the capture).</summary>
@@ -90,7 +100,8 @@ namespace Crulanda.Encounter
             var g = new Gradient(); g.SetKeys(new[] { new GradientColorKey(Ash, 0), new GradientColorKey(new Color(.2f, .18f, .24f), 1) }, new[] { new GradientAlphaKey(.8f, 0), new GradientAlphaKey(0, 1) }); col.color = g;
             var pr = ashGo.GetComponent<ParticleSystemRenderer>(); pr.sharedMaterial = new Material(shader) { name = "Ash", color = Color.white }; pr.shadowCastingMode = ShadowCastingMode.Off; pr.receiveShadows = false;
             ash.Play();
-            lastPos = transform.position;
+            lastPos = transform.position; placeRng = new System.Random(seed + 1);
+            nextErupt = Time.time + Random.Range(1f, EruptMax); shardRoot.gameObject.SetActive(false);
         }
         static Renderer Part(Transform parent, string name, Material m, float grow)
         {
@@ -119,13 +130,19 @@ namespace Crulanda.Encounter
                 foreach (var r in gh.t.GetComponentsInChildren<Renderer>()) { block.SetColor("_Color", (r.sharedMaterial == rimMat ? Aether : Void) * new Color(1, 1, 1, left)); r.SetPropertyBlock(block); }
             }
             if (crystal) return;
+            // The eruption: up out of the ground, a moment, and down again; then nothing till the next.
+            if (t >= nextErupt && !Erupting) Erupt(false);
+            float f = t - eruptFrom, rise = f < 0 ? 0 : f < Rise ? f / Rise : f < Rise + Stand ? 1 : f < Rise + Stand + Sink ? 1 - (f - Rise - Stand) / Sink : 0;
+            rise = Mathf.SmoothStep(0, 1, rise);
+            if (shardRoot.gameObject.activeSelf != rise > 0) shardRoot.gameObject.SetActive(rise > 0);
+            if (rise <= 0) return;
             // The shifting edge: each shard turns and stretches on its own slow noise; the rim shimmers.
             float squash = t < squashUntil ? 1 : 0;
             foreach (var s in shards)
             {
                 float n1 = Mathf.PerlinNoise(s.seed, t * .9f) - .5f, n2 = Mathf.PerlinNoise(s.seed + 7, t * 1.3f) - .5f, n3 = Mathf.PerlinNoise(s.seed + 13, t * 2.1f) - .5f;
                 s.t.localRotation = s.rest * Quaternion.Euler(n1 * 14, n2 * 20, n3 * 14);
-                s.t.localScale = new Vector3(s.scale.x * (1 + n2 * .35f + squash * .4f), s.scale.y * (1 + n1 * .18f - squash * .35f), s.scale.z * (1 + n3 * .35f + squash * .4f));
+                s.t.localScale = new Vector3(s.scale.x * (1 + n2 * .35f + squash * .4f), Mathf.Max(.001f, s.scale.y * rise * (1 + n1 * .18f - squash * .35f)), s.scale.z * (1 + n3 * .35f + squash * .4f));
                 float shimmer = .25f + .4f * Mathf.PerlinNoise(s.seed + 3, t * 3.5f);
                 block.SetColor("_Color", new Color(Aether.r, Aether.g, Aether.b, shimmer)); s.rim.SetPropertyBlock(block);
                 // The flicker: now and then a shard is gone for a moment, its void thinner and thicker as it shifts.
@@ -134,9 +151,29 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>Where it was, its shards for a third of a second, fading: the jerk through space.</summary>
+        /// <summary>The shards burst out of the ground now, in new places round it (<paramref name="full"/>: at once at their full height,
+        /// as the tests and an afterimage want).</summary>
+        public void Erupt(bool full)
+        {
+            Eruptions++; eruptFrom = Time.time - (full ? Rise : 0); nextErupt = Time.time + Rise + Stand + Sink + Random.Range(EruptMin, EruptMax);
+            foreach (var s in shards)
+            {
+                float yaw = (float)placeRng.NextDouble() * 360, r = Radius * (.6f + .4f * (float)placeRng.NextDouble());
+                s.t.localPosition = Quaternion.Euler(0, yaw, 0) * Vector3.forward * r;
+            }
+            for (int i = 0; i < shards.Count; i++)
+            {
+                var s = shards[i]; float yaw = Quaternion.LookRotation(new Vector3(s.t.localPosition.x, 0, s.t.localPosition.z)).eulerAngles.y;
+                var rest = Quaternion.Euler(0, yaw, 0) * Quaternion.Euler(25 + 25 * (float)placeRng.NextDouble(), (float)placeRng.NextDouble() * 90, 0);
+                shards[i] = (s.t, rest, s.scale, s.seed, s.rim, s.core);
+                if (full) { s.t.localRotation = rest; s.t.localScale = s.scale; }
+            }
+            shardRoot.gameObject.SetActive(true);
+        }
         void Afterimage(Vector3 from)
         {
             Jerks++; squashUntil = Time.time + .1f;
+            Erupt(true);   // the jerk: the shards burst out where it lands, and their afterimage hangs where it was
             var ghost = Instantiate(shardRoot.gameObject, shardRoot.position - transform.position + from, shardRoot.rotation).transform;
             ghost.name = "Void afterimage"; ghost.localScale = Vector3.one;
             ghosts.Add((ghost, Time.time + .35f));
@@ -146,6 +183,7 @@ namespace Crulanda.Encounter
             crystal = on;
             var c = on ? Crystal : Void;
             foreach (var s in shards) { block.SetColor("_Color", c); s.core.SetPropertyBlock(block); s.core.enabled = true; s.rim.enabled = !on; s.t.localRotation = s.rest; s.t.localScale = s.scale; }
+            shardRoot.gameObject.SetActive(on);   // dead, the shards stand white round her (salt's work); alive, they erupt and sink
             if (ash != null) { if (on) ash.Stop(true, ParticleSystemStopBehavior.StopEmitting); else ash.Play(); }
         }
         void OnDestroy()

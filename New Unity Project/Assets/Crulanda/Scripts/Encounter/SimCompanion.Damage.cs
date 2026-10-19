@@ -33,8 +33,8 @@ namespace Crulanda.Encounter
         }
         /// <summary>A control and support class's share of the pure band (BALANCE_REPORT.md: "control and support at most 75%" of the damage
         /// median): the Archivist, whose part is its holds and its vows (Chris, raid 2: "archivist now doing 80dps", the top of the meter at a
-        /// hybrid's 90%). 78%: well under the damage-dealers (and the hybrids' 90%), just over a tank's three quarters (every damage-dealer out-hits the tank).</summary>
-        public const float ControlDpsShare = .78f;
+        /// hybrid's 90%). 72%: well under the damage-dealers and hybrids, about a tank's. (Raid 3: 85 a second at .78, over its aim of 69 by its buffs' edge, up to 15% on Intellect from the raid's class buffs, and the area blows it found on her brood counting her as one of a pack: SimCompanion.Fight.)</summary>
+        public const float ControlDpsShare = .72f;
         /// <summary>What a pure damage sim of <paramref name="level"/> sustains on a dummy, the middle of its band.</summary>
         public static float PureDps(int level) { return PureBandMid * BandScale(level); }
         /// <summary>What this sim in the damage part sustains on a dummy, with its pet: the band's middle, a hybrid's share, its practice.</summary>

@@ -172,6 +172,7 @@ namespace Crulanda.Encounter
             foreach (var e in session.Enemies)
             {
                 if (e == null || !e.actor.IsAlive || !e.FightingParty || e.Game || e.Hidden || e.Inside != null) continue;
+                if (e.RaidBoss) continue;   // nor is she counted toward a pack of her brood (raid 3: two brood by her made a "pack of three" for the Archivist's area blow)
                 if (Vector3.Distance(e.transform.position, quarry.transform.position) > AreaReach) continue;
                 near++;
                 if (e != quarry && !Held(e) && !e.LeaveAlone && !e.RaidBoss) hit.Add(e);   // nor onto her from her brood

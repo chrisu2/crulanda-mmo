@@ -623,6 +623,21 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      floated once each half second, smaller, to her side.
    - **To capture next** (front, back, side): her with the thin wrap (the spider reads first), the crown, the brood spiders scuttling out of the
      river, a salted one white and its shattering, the melee at her legs' edge outside the grey ground.
+   **Raid 3 (2026-10-19, run-captures\unraveller-raid-3: pulls 1 and 2 kills in 6:42 and 6:36, the first death at 4:27 with her at 20%)
+   and what was changed (WRITTEN, NOT RUN again).** Chris, verbatim: "seems too easy now. dont make the purple spikes permanently coming out
+   of ground. randomly every 5-7secs". The melee and the healers now work (his meter: Ranger 86, Archivist 85, Scoundrel 61, Rogue 59; the
+   healers even, 46-49).
+   - **Harder, toward one kill in two with the bot playing well** (data file only): health 160,000 to 195,000 (about 8:15 a kill against the
+     9:00 feast at raid 3's pace, less the Archivist's cut below); the brood back to 3 a wave; unmade ground 10% a second (8%); Swallowed 10 s
+     (12); the Unravelling's pulse 2% and 0.12% more a pulse (1.5%, 0.1%). Step 6 reads the next run's kill rate before moving any more.
+   - **The spikes erupt, not stand:** the void wrap's shards are under the ground until, at a random moment every 5-7 s, they burst up round
+     her in new places, stand a moment and sink (about 1.25 s); a blink brings one where she lands, with the afterimage where she was; dead,
+     they stand white. Purely a look (no hazard in it: her ground marks are her hazards). Between, the spider, its violet glow, the crown and
+     the ash.
+   - **The Archivist still at 85** (its aim 69 at 78%): its blows carry its buffs' edge (up to 15%: the raid's class buffs on Intellect),
+     and its area blow found "packs" of her brood counting her as one of them (two brood beside her made three). She no longer counts toward
+     a pack, and the control share is 72% (about 63 at 20, some 72 with its buffs): under every damage-dealer. SimDummyTests no longer asks
+     the Archivist to out-hit the tank.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

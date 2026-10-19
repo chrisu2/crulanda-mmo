@@ -124,7 +124,7 @@ namespace Crulanda.Encounter
                 "Mean kill time: " + (wins > 0 ? Clock(killTime / wins) : "-") + " against the enrage at " + Clock(tune.enrageSeconds),
                 "Pulls:" };
             summary.AddRange(lines.Select(l => "  " + l));
-            summary.Add("Damage against the bands (BALANCE_REPORT.md: a pure damage-dealer the band, a hybrid 90% of it, the Archivist (control and support) 78%, a tank 3/4, a healer low; the band at " + level + " is " + SimCompanion.PureDps(level).ToString("0") + " a second on one target; her fight costs everyone some for moving, salting and harpooning):");
+            summary.Add("Damage against the bands (BALANCE_REPORT.md: a pure damage-dealer the band, a hybrid 90% of it, the Archivist (control and support) 72%, a tank 3/4, a healer low; the band at " + level + " is " + SimCompanion.PureDps(level).ToString("0") + " a second on one target; her fight costs everyone some for moving, salting and harpooning):");
             summary.AddRange(BandLines(s, level).Select(l => "  " + l));
             summary.Add("Scorecard:"); summary.AddRange(s.Meter.Scorecard().Select(l => "  " + l));
             RaidFinish(s, directory, log, summary);

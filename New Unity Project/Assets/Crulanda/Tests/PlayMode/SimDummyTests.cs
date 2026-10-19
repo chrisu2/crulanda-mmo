@@ -168,12 +168,12 @@ namespace Crulanda.Tests
                     else if (c.Role == SimCompanion.PartyRole.Tank) Assert.That(withPet / pure, Is.InRange(.7f, .8f), who + ": a tank deals about three quarters of a damage-dealer's");
                     else Assert.That(withPet / pure, Is.InRange(.1f, .35f), who + ": a healer's damage is less again");
                 }
-                // The order Chris asked for: every damage-dealer over the tank, the tank over the healer.
+                // The order Chris asked for: every damage-dealer over the tank (the Archivist, control and support, about a tank's: raid 3), the tank over the healer.
                 float RateOf(SimCompanion c) { var pet = session.SimPets.Find(p => p != null && p.Master == c); return rates[c.actor.EntityId.Value] + (pet != null ? rates[pet.actor.EntityId.Value] : 0); }
                 var tankSim = party.Find(c => c.Role == SimCompanion.PartyRole.Tank); var healSim = party.Find(c => c.Role == SimCompanion.PartyRole.Healer);
                 if (tankSim != null)
                 {
-                    foreach (var c in party) if (c.Role == SimCompanion.PartyRole.Damage) Assert.Greater(RateOf(c), RateOf(tankSim), c.sim.name + " out-damages the tank at " + level);
+                    foreach (var c in party) if (c.Role == SimCompanion.PartyRole.Damage && c.sim.classId != "class.archivist") Assert.Greater(RateOf(c), RateOf(tankSim), c.sim.name + " out-damages the tank at " + level);
                     if (healSim != null) Assert.Greater(RateOf(tankSim), RateOf(healSim), "the tank out-damages the healer at " + level);
                 }
             }

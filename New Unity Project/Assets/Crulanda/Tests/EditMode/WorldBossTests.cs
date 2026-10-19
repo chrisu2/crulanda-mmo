@@ -138,8 +138,8 @@ namespace Crulanda.Tests
             Assert.AreEqual(30, Unraveller.Level); Assert.AreEqual(10, Unraveller.RaidSize);
             Assert.AreEqual(1.6f, EncounterEnemy.OvermatchHit(Unraveller.Level, EncounterProgress.LevelCap), 1e-4f, "+10 counts +5: she hits x1.6");
             Assert.AreEqual(.7f, EncounterEnemy.OvermatchTaken(Unraveller.Level, EncounterProgress.LevelCap), 1e-4f, "and takes x0.7");
-            Assert.AreEqual(160000, Unraveller.EffectiveHealth);
-            Assert.AreEqual(112000, Unraveller.HealthPool, "her pool: 160,000 after the clamp's x0.7");
+            Assert.AreEqual(160000, Unraveller.EffectiveHealth, "the doc's first target (the data file's health is what plays: raid 3)");
+            Assert.AreEqual(Mathf.RoundToInt(UnravellerTuning.Current.health * .7f), Unraveller.HealthPool, "her pool: the data file's health after the clamp's x0.7");
             // No blow over 60% of a member's health, unless it carries the cap-passing flag; a blow on someone outside the party lands whole.
             Assert.AreEqual(600, EncounterEnemy.CapBlow(2500, 1000, true, false), "capped at three fifths");
             Assert.AreEqual(2500, EncounterEnemy.CapBlow(2500, 1000, true, true), "a blow meant to kill passes the cap");

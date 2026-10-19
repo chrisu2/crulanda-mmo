@@ -34,6 +34,16 @@ namespace Crulanda.Encounter
         /// <summary>Blackened steel's stacks after one more blow from steel: one more, never over the most (three on her, one on a Weave-Eater).</summary>
         public static int SteelNext(int stacks, int most) { return Mathf.Clamp(stacks + 1, 1, Mathf.Max(1, most)); }
         /// <summary>The Feeding unstopped: what she heals (a share of her pool) and how much heavier her blows grow, for <paramref name="eaten"/> good effects eaten.</summary>
+        /// <summary>Whom her leap marks (play note 294): the farthest of <paramref name="raid"/> (id, metres from her), never <paramref name="last"/>
+        /// when anyone else stands; null for nobody.</summary>
+        public static string LeapPick(IList<(string id, float distance)> raid, string last)
+        {
+            string best = null; float far = -1; bool others = false;
+            if (raid == null) return null;
+            foreach (var r in raid) if (r.id != last) others = true;
+            foreach (var r in raid) { if (others && r.id == last) continue; if (r.distance > far) { far = r.distance; best = r.id; } }
+            return best;
+        }
         public static float FeedHeal(int eaten, UnravellerTuning t) { return t.feedHeal * Mathf.Clamp(eaten, 0, t.feedEatenMost); }
         public static float FeedGrow(int eaten, UnravellerTuning t) { return t.feedGrow * Mathf.Clamp(eaten, 0, t.feedEatenMost); }   // at most feedEatenMost a Feeding (tune-9)
         /// <summary>An interrupt takes unless the last one did within <see cref="UnravellerTuning.interruptImmune"/> seconds.</summary>

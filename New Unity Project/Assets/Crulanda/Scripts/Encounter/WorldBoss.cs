@@ -131,9 +131,11 @@ namespace Crulanda.Encounter
         // ---------- her fight (WORLD_BOSS_1.md 3.3-3.4; build steps 4 and 5; GAME-ONLY lines) ----------
         public const string FeedingName = "The Feeding", BroodName = "Weave-Eater brood", UnmadeName = "Unmade ground", HuntName = "Erased", PulseName = "Unravelling";
         public const string SpikesName = "Spikes", SpikesThrown = "The spikes throw you up", SpikesWarning = "Violet cracks under you: the spikes are coming, step off!";
-        public const string LeapName = "Her leap", LeapWarning = "The Unraveller gathers to leap! Out of the red rings!", LeapScreech = "The Unraveller screeches and draws herself down to leap.", Phase3Warning = "Phase 3: The Unravelling", LeapLine = "The Unraveller tears free of the ropes and leaps across the bar; her brood boil up where she lands.";
+        public const string LeapName = "Her leap", LeapWarning = "The Unraveller gathers to leap! Out of the red rings!", LeapMarkLine = "The Unraveller marks {0}: move!", LeapScreech = "The Unraveller screeches and draws herself down to leap.", Phase3Warning = "Phase 3: The Unravelling", LeapLine = "The Unraveller tears free of the ropes and leaps across the bar; her brood boil up where she lands.";
         public const string SaltItem = "throw.salt_twist", HarpoonItem = "throw.bone_harpoon";
         public const string BroodLine = "...the little ones are hungry too...", MoreLine = "...more...", FeastLine = "...all of it...";
+        /// <summary>The raid warning naming the one her leap marks (play note 294).</summary>
+        public static string LeapMarks(string who) { return string.Format(LeapMarkLine, who); }
         public static string PhaseSystem(int phase) { return phase == 2 ? "The Brood: the river boils at the bar's edges, and her children come up out of it." : phase == 3 ? "The Unravelling: the air itself comes apart round her." : "The Hunger."; }
         public const string BroodRiseLine = "Weave-Eaters rise out of the black water on both sides of the bar. They go for whoever works the Weave.";
         public const string BroodWarning = "The brood are coming for the healers: salt them, then break them!";

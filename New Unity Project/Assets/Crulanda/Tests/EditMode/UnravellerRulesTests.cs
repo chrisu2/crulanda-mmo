@@ -288,15 +288,20 @@ namespace Crulanda.Tests
             Assert.That(t.leapWarn, Is.InRange(3.5f, 4f), "the red rings where she will land, 3.5-4 s before (tune-8: \"not properly telegraphed\")");
             Assert.GreaterOrEqual(t.leapWarn - t.leapSeconds, 1.5f, "she gathers (crouches, rears back) 1.5 s or more before she leaves the ground");
             Assert.That(t.leapSeconds, Is.InRange(1.6f, 2f), "a slow arc to watch her come"); Assert.That(t.leapHeight, Is.InRange(5f, 7f), "about 6 m high");
-            // Out of melee and of every bow and spell (Chris: "still not jumping very far. need to jump out of melee and ranger range"): the longest
-            // reach of any ability in the game's content, and the Ranger's bow, and 5 m more.
-            var asset = System.IO.File.ReadAllText(System.IO.Path.Combine(UnityEngine.Application.dataPath, "Crulanda/EncounterContent/Encounter.asset"));
-            float longest = RangerKit.BowRange;
-            foreach (System.Text.RegularExpressions.Match m in System.Text.RegularExpressions.Regex.Matches(asset, @"\brange: ([0-9.]+)"))
-                longest = UnityEngine.Mathf.Max(longest, float.Parse(m.Groups[1].Value, System.Globalization.CultureInfo.InvariantCulture));
-            Assert.GreaterOrEqual(t.leapRangeMin, longest, "she lands at least the longest reach (" + longest + " m) away: everyone must move (Chris, 2026-10-19: \"jumped a little too far..maybe down 1/4th of total distance\": 35-55 m to 30-41)");
-            Assert.Greater(t.leapRangeMax, t.leapRangeMin + 10, "room on the bar and the apron to find such a spot");
-            Assert.Less(t.leapShare, EncounterEnemy.MaxBlowShare); Assert.Greater(t.leapRangeMin, t.leapRadius * 2, "far enough to make the raid move");
+            // Play note 294 (Chris: "they need enought time to get out of range tho"): the one she marks runs from the rings' middle past the outer
+            // ring in under half the warning, counted from when the rings show.
+            Assert.GreaterOrEqual(t.leapWarn, 4f); Assert.GreaterOrEqual(t.leapWarn, 2 * t.leapRadius / AdventurerMotor.RunSpeed);
+            Assert.Less(t.leapShare, EncounterEnemy.MaxBlowShare);
+        }
+
+        [Test] public void Her_leap_marks_the_farthest_never_the_same_twice_running()
+        {
+            // Play note 294: "when she leaps she would target on raid member and if that member does not move out of the range theyll die".
+            var raid = new List<(string, float)> { ("tank", 3), ("healer", 24), ("archer", 18) };
+            Assert.AreEqual("healer", UnravellerRules.LeapPick(raid, null), "the farthest");
+            Assert.AreEqual("archer", UnravellerRules.LeapPick(raid, "healer"), "not the same twice running");
+            Assert.AreEqual("tank", UnravellerRules.LeapPick(new List<(string, float)> { ("tank", 3) }, "tank"), "alone: the same");
+            Assert.IsNull(UnravellerRules.LeapPick(new List<(string, float)>(), null));
         }
 
         [Test] public void Every_mark_gives_time_to_walk_out_of_it()

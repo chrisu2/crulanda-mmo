@@ -46,10 +46,10 @@ namespace Crulanda.Encounter
         /// snareHold s; the Trapper lays snaresPerWave a wave, one each snareEvery s.</summary>
         public float snareSeconds = 30, snareHold = 12, snareRadius = 1.5f, snareEvery = 8; public int snaresPerWave = 3;
         // ---------- the Leap (play note 285, Chris: "maybe a jump mechanic to get away and release her brood") ----------
-        /// <summary>At each share of her health (leapAt1-3) she tears free of the harpoons and leaps leapRange m (least to most) across the bar or
+        /// <summary>At each share of her health (leapAt1-3) she tears free of the harpoons and leaps onto the one she marks (play note 294; before, leapRange m) across the bar or
         /// the apron: a deep-red ring where she will land leapWarn s before, a leapSeconds arc, leapShare of the health of anyone in the ring
         /// (leapRadius) and thrown leapKnock m, and a brood wave of broodCount where she lands.</summary>
-        public float leapAt1 = .75f, leapAt2 = .5f, leapAt3 = .25f, leapWarn = 3.8f, leapSeconds = 2, leapRadius = 5, leapShare = .35f, leapKnock = 4, leapRangeMin = 30, leapRangeMax = 41;
+        public float leapAt1 = .75f, leapAt2 = .5f, leapAt3 = .25f, leapWarn = 4, leapSeconds = 2, leapRadius = 5, leapShare = .35f, leapKnock = 4;
         /// <summary>Tune-8 (Chris: "leaps are too quick and not properly telegraphed", "also distance is too short"): the rings come leapWarn s
         /// before she lands; she gathers (crouches, rears back) leapWarn - leapSeconds s, then leapSeconds in the air, an arc leapHeight m high,
         /// her shadow growing where she will land; the ground shakes leapShake s. Phase 3 comes in quiet for phase3Lull s ("not sure what took

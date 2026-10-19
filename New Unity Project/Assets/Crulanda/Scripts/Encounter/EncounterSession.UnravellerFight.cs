@@ -185,7 +185,7 @@ namespace Crulanda.Encounter
             snares.Clear();
             foreach (var s in spikeSpots) if (s.mark != null) Destroy(s.mark.gameObject);
             spikeSpots.Clear(); spikeAt = -1; nextSpike = 0;
-            leapsDone = 0; leapStart = leapLiftAt = leapLandAt = -1; leapAloft = false; if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide(); if (leapShadow != null) leapShadow.SetActive(false);
+            leapsDone = 0; leapStart = leapLiftAt = leapLandAt = -1; leapAloft = false; LeapMarked = null; leapLastId = null; if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide(); if (leapShadow != null) leapShadow.SetActive(false);
             var wrap = WrapOf(e); if (wrap != null) wrap.AutoErupt = true;
             if (SwallowedActor != null) Spit(e, SwallowedActor);
             Swallow.End(); SwallowedActor = null; SaltCall.Clear();
@@ -381,6 +381,9 @@ namespace Crulanda.Encounter
         int leapsDone; float leapStart = -1, leapLiftAt = -1, leapLandAt = -1; bool leapAloft; Vector3 leapTo, leapFrom; BlowMark leapMark, leapCore;
         GameObject leapShadow; Material leapShadowMat;
         public int Leaps;
+        /// <summary>The one her leap is marked on now (play note 294), or null.</summary>
+        public Actor LeapMarked { get; private set; }
+        string leapLastId; float leapMarkFloat;
         /// <summary>Her leap in the air now: from, to, and how far through (0-1); false when she is not in the air (UnravellerBody draws the arc).</summary>
         public bool LeapArc(EncounterEnemy e, out Vector3 from, out Vector3 to, out float t)
         {
@@ -404,6 +407,8 @@ namespace Crulanda.Encounter
                 // The rings from the first moment to her landing: the outer filling as the time runs out, her body's own solid (death).
                 if (leapMark != null) leapMark.Show(leapTo, t.leapRadius, Mathf.Clamp01((now - leapStart) / Mathf.Max(.01f, leapLandAt - leapStart)));
                 if (leapCore != null) leapCore.Show(leapTo, e.BodyRadius, 1);
+                // Her mark over the one she chose, while she gathers and flies.
+                if (LeapMarked != null && LeapMarked.IsAlive && now >= leapMarkFloat) { leapMarkFloat = now + .9f; FloatText(LeapMarked.transform.position + Vector3.up * 1.4f, "Marked", new Color(.85f, .1f, .14f)); }
                 if (!leapAloft && now >= leapLiftAt)
                 {
                     // Off the ground: torn free of the harpoons, in the air (her actor stays where she was until she lands; nothing is struck yet).
@@ -414,7 +419,7 @@ namespace Crulanda.Encounter
                 if (leapAloft) ShowLeapShadow(leapTo, Mathf.Clamp01((now - leapLiftAt) / Mathf.Max(.01f, leapLandAt - leapLiftAt)), e.BodyRadius);
                 if (now < leapLandAt) return;
                 // She lands: the ring struck and thrown, her brood up round her, the ground shaken.
-                leapStart = leapLiftAt = leapLandAt = -1; leapAloft = false; Leaps++;
+                leapStart = leapLiftAt = leapLandAt = -1; leapAloft = false; Leaps++; LeapMarked = null;
                 if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide(); if (leapShadow != null) leapShadow.SetActive(false);
                 e.DisplaceTo(leapTo);
                 foreach (var a in PartyActors().ToArray())
@@ -431,15 +436,19 @@ namespace Crulanda.Encounter
             }
             if (leapsDone >= LeapMarks.Length || e.actor.Health.Pool.Ratio > LeapMarks[leapsDone]) return;
             if (SwallowedActor != null || e.Feeding || e.Stunned) return;   // not while she swallows or feeds (or stands calcified): when she is free
-            leapsDone++;
-            leapTo = LeapSpot(e);
+            // The one she marks: the farthest of the raid from her (often a healer or an archer), never the same twice running.
+            var all = PartyActors().Where(a => a != null && a.IsAlive && a != SwallowedActor).ToList(); if (all.Count == 0) return;
+            var pickId = UnravellerRules.LeapPick(all.Select(a => (a.EntityId.Value, Flat(a.transform.position - e.transform.position))).ToList(), leapLastId);
+            var marked = all.Find(a => a.EntityId.Value == pickId) ?? all[0];
+            leapsDone++; leapLastId = marked.EntityId.Value; LeapMarked = marked;
+            leapTo = LeapSpotUnder(marked, e);   // fixed where they stood: the rings do not follow
             leapStart = now; leapLandAt = now + t.leapWarn; leapLiftAt = leapLandAt - Mathf.Min(t.leapSeconds, t.leapWarn);
             e.RawStun(leapLiftAt - now);   // she stands and gathers: no swing, no step
             if (leapMark == null) leapMark = BlowMark.Create(GroundKind.Harmful, t.leapWarn + 1, Unraveller.LeapName);
             leapMark.Show(leapTo, t.leapRadius, 0);
             if (leapCore == null) leapCore = BlowMark.Create(GroundKind.Harmful, t.leapWarn + 1, "Under her landing");
             leapCore.Show(leapTo, e.BodyRadius, 1);
-            RaidWarning(Unraveller.LeapWarning); Message(Unraveller.LeapScreech);
+            RaidWarning(Unraveller.LeapMarks(marked == Player ? "YOU" : marked.DisplayName)); Message(Unraveller.LeapScreech); leapMarkFloat = 0;
         }
         /// <summary>Her shadow where she will land, growing and darkening as she comes down (not a mark of its own: the rings round it are).</summary>
         void ShowLeapShadow(Vector3 at, float k, float body)
@@ -450,30 +459,19 @@ namespace Crulanda.Encounter
             float r = Mathf.Lerp(.8f, body * 1.15f, k); leapShadow.transform.localScale = new Vector3(r, 1, r);
             leapShadowMat.color = new Color(.02f, 0, .03f, Mathf.Lerp(.2f, .7f, k));
         }
-        /// <summary>Where she leaps to (Chris: "still not jumping very far. need to jump out of melee and ranger range"): another part of the bar
-        /// or the apron, on the walkable ground (never the water), at least leapRangeMin m (the longest reach of any attack, 30 m, and 5 more) both
-        /// from where she took off and from the middle of the raid, at most leapRangeMax: everyone runs to her.</summary>
-        Vector3 LeapSpot(EncounterEnemy e)
+        /// <summary>Where she leaps (play note 294, Chris: "when she leaps she would target on raid member and if that member does not move out of
+        /// the range theyll die"): under the one she marks, fixed where they stood; on the dry (in the water: the nearest dry spot to them).</summary>
+        Vector3 LeapSpotUnder(Actor who, EncounterEnemy e)
         {
-            var t = UT; var from = e.transform.position; var raid = RaidMiddle(from);
-            for (int k = 0; k < 64; k++)
-            {
-                var p = from + Quaternion.Euler(0, Random.Range(0f, 360f), 0) * Vector3.forward * Random.Range(t.leapRangeMin, t.leapRangeMax);
-                if (!LeapGround(p, out var at)) continue;
-                float d = Flat(at - from), dr = Flat(at - raid);
-                if (d >= t.leapRangeMin && d <= t.leapRangeMax && dr >= t.leapRangeMin) return at;
-            }
-            // Nothing found by chance: the point of the bar and the apron farthest from both, within the most.
-            var far = FarthestLeapSpot(from, raid); if (far.HasValue) return far.Value;
-            var bar = Zone != null ? Zone.SiltBar : null;
-            return bar != null ? Zone.Ground(bar.center) : from;
-        }
-        /// <summary>The middle of the raid's living (you and the sims; her own spot when none).</summary>
-        Vector3 RaidMiddle(Vector3 or)
-        {
-            var sum = Vector3.zero; int n = 0;
-            foreach (var a in PartyActors()) if (a != null && a.IsAlive && a != SwallowedActor) { sum += a.transform.position; n++; }
-            return n > 0 ? sum / n : or;
+            var feet = who.transform.position - Vector3.up;
+            if (LeapGround(feet + Vector3.up * .5f, out var at) && !WetForHer(at + Vector3.up)) return at;
+            for (float r = 1.5f; r <= 12; r += 1.5f)
+                for (int k = 0; k < 12; k++)
+                {
+                    var p = feet + Quaternion.Euler(0, k * 30f, 0) * Vector3.forward * r;
+                    if (LeapGround(p + Vector3.up * .5f, out var dry) && !WetForHer(dry + Vector3.up)) return dry;
+                }
+            return e.transform.position - Vector3.up;
         }
         /// <summary>A point on her ground (the bar, its neck, the apron), on the navmesh and out of the water.</summary>
         bool LeapGround(Vector3 p, out Vector3 at)
@@ -486,26 +484,6 @@ namespace Crulanda.Encounter
             var q = new Vector2(at.x, at.z);
             foreach (var sh in Zone.Zone.shoals) if (sh != null && Crulanda.World.ZoneWater.ShoalOut(sh, q.x, q.y) <= 0) return true;   // (<= 0: inside is 0; tune-8 found "< 0" turned every leap down)
             return false;
-        }
-        Vector3? FarthestLeapSpot(Vector3 from, Vector3 raid)
-        {
-            var t = UT; Vector3? best = null; float bestD = 0; if (Zone == null || Zone.Zone == null || Zone.Zone.shoals == null) return null;
-            foreach (var sh in Zone.Zone.shoals)
-            {
-                if (sh == null) continue;
-                float r = sh.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), sn = Mathf.Sin(r);
-                for (float fx = -.5f; fx <= .51f; fx += .25f)
-                    for (float fz = -.5f; fz <= .51f; fz += .0625f)
-                    {
-                        float lx = fx * Mathf.Max(0, sh.size.x - 3), lz = fz * Mathf.Max(0, sh.size.y - 3);
-                        var w = new Vector2(sh.center.x + lx * c + lz * sn, sh.center.y - lx * sn + lz * c);
-                        if (!LeapGround(Zone.Ground(w), out var at)) continue;
-                        float d = Flat(at - from); if (d > t.leapRangeMax) continue;
-                        float worst = Mathf.Min(d, Flat(at - raid)); if (worst <= bestD) continue;
-                        bestD = worst; best = at;
-                    }
-            }
-            return best;
         }
         static bool ZoneWaterInside(Crulanda.World.ZoneShoal s, Vector2 p) { return Crulanda.World.ZoneWater.ShoalOut(s, p.x, p.y) < 0; }
         /// <summary>Raisings this session (the Shaman's Barrow-wake; the run's log).</summary>

@@ -875,6 +875,14 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
        seconds ("Unmade ground (5 s in it) 392"), and a sim still in it a second after a bite goes straight out, whatever it was doing.
      - **The Feeding's growth**: one landed Feeding on a fully buffed raid ate 38 good effects (77% heavier blows and 11% of her health
        back at once). Now at most 8 count a Feeding (16% heavier, 2.4% back); `feedEatenMost` in the data file.
+   - **The marked leap** (play note 294, 2026-10-19, WRITTEN, NOT RUN; GAME-ONLY). Chris: "when she leaps she would target on raid member
+     and if that member does not move out of the range theyll die"; "they need enought time to get out of range tho". She marks one of the
+     raid: the farthest from her (often a healer or an archer), never the same one twice running. Raid warning "The Unraveller marks <name>:
+     move!" ("YOU" when it is you), and "Marked" over their head while she gathers and flies. The rings come down under them at that moment
+     and stay where they stood (they do not follow); in the water, at the nearest dry spot. 4 s from the rings to her landing (2 s
+     gathering, 2 s in the air), at least twice the run from the rings' middle past the outer ring (5 m at 5.2 m/s); a test holds it.
+     Whoever is still under her body as she lands dies; anyone else in the outer ring takes the 35% and is thrown. The marked sim, the
+     sims near it and the bot step out of the rings from the first moment. The fixed 30-41 m pick is gone (`leapRangeMin/Max` dropped).
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

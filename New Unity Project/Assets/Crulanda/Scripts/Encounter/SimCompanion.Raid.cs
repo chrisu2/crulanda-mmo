@@ -104,6 +104,8 @@ namespace Crulanda.Encounter
                 if (now >= harpoonLateUntil && RaidJobs.HarpoonNow(true, e.PinLeft, has, d <= WeaveEaterRules.ThrowRange, t.harpoonLead)) { Throw(e, WeaveEaterRules.Harpoon); return true; }
             }
             // The salts on the swallowed: those called, each once.
+            // The brood held: the raid's control classes, each one at a time (raid 4).
+            if (!Silenced && HoldBrood(now)) return true;
             if (session.SaltCall.Contains(sim.id) && now >= saltSkipUntil && !Silenced)
             {
                 if (session.Swallow.Since != saltRolledFor) { saltRolledFor = session.Swallow.Since; saltMissed = Misses(); }   // once a swallowing
@@ -124,6 +126,33 @@ namespace Crulanda.Encounter
             return false;
         }
         /// <summary>The interrupter <paramref name="id"/> can kick her now: alive, free, its kick ready, within its reach of her.</summary>
+        float nextBroodHold;
+        /// <summary>Brood it has held (the log and the tests).</summary>
+        public int BroodHeld { get; private set; }
+        /// <summary>A control class's hold on one of her brood (raid 4, "need CC baby"): the nearest brood that is free (not held, not
+        /// salted), within its reach, put out of the fight for broodHoldSeconds, marked Moon (or Cross) so the raid sees it; its wait
+        /// broodHoldEvery. True when it held one (its frame).</summary>
+        bool HoldBrood(float now)
+        {
+            if (now < nextBroodHold || RaidJobs.BroodHolder(sim.classId, Role) < 0 || session.BroodNow.Count == 0) return false;
+            var t = UnravellerTuning.Current;
+            EncounterEnemy pick = null; float best = 25;
+            foreach (var b in session.BroodNow)
+            {
+                if (b == null || !b.actor.IsAlive || b.Controlled || b.Calcified || !b.Takes("incap")) continue;
+                float d = Vector3.Distance(b.transform.position, transform.position); if (d < best) { best = d; pick = b; }
+            }
+            if (pick == null) return false;
+            if (Misses()) { nextBroodHold = now + 3; return false; }
+            if (pick.Apply("incap", actor, t.broodHoldSeconds) != null) { nextBroodHold = now + 3; return false; }
+            nextBroodHold = now + t.broodHoldEvery; BroodHeld++;
+            bool moonTaken = session.BroodNow.Exists(b => b != null && b != pick && b.actor.IsAlive && b.RaidMarked == RaidMark.Moon);
+            if (pick.RaidMarked == RaidMark.None) pick.RaidMarked = moonTaken ? RaidMark.Cross : RaidMark.Moon;
+            var move = ClassMove; string name = move != null ? move.name : sim.classId == "class.rogue" ? "Gouge" : sim.classId == "class.scoundrel" ? "Lullaby" : "Lull";
+            if (move != null) ShowHold(move, pick); else session.FloatText(pick.transform.position + Vector3.up * 1.8f, name, ControlRings.Held);
+            if (BroodHeld == 1) session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "holding a spider" : "I'll hold one of the brood.");
+            return true;
+        }
         bool InterruptReady(string id, EncounterEnemy e)
         {
             var c = session.PartySim(id);

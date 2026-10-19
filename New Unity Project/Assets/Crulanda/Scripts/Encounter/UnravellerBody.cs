@@ -11,7 +11,8 @@ namespace Crulanda.Encounter
     ///   attack1/2, hit1/2, death1), huge (about <see cref="SpiderHeight"/> m to its back, legs spread to about ten), its hide turned to void:
     ///   near black with a faint violet light in it;
     /// - the purple spikes Chris liked: the Weave-Eaters' own tangle of fraying threads with burning tips (ActorVisual's Weave-Eater core)
-    ///   bursting from her back as a crown, three times its size;
+    ///   on her back as a small crown (its own size: raid 4, Chris: "make it smaller and blink on and off randomly"), showing for a short
+    ///   random spell and gone for a longer one, fading in and out (<see cref="CrownOn"/>, <see cref="CrownOff"/>), apart from the wrap's eruptions;
     /// - the books' wrap (VoidWrap; b1 ch.20:119): a thin translucent flickering edge of jagged void round her legs and back, a shimmering
     ///   aether rim, ash where she moves, the jerk of her blink (ch.20:131); never over 1.5 times her height, so the spider reads first.
     /// Her rising and sinking (EncounterSession.Unraveller) lift and lower the whole; the spider walks when she moves, strikes when she swings,
@@ -22,7 +23,12 @@ namespace Crulanda.Encounter
     {
         public const string ModelPath = "Props/fantasySpider/spider_myOldOne", MaterialPath = "Props/fantasySpider/Materials/spider_black_Std", TexturePath = "Props/fantasySpider/spider_01_black";
         /// <summary>Ground to the spider's back, and the most its legs may spread across, in metres; the wrap's height.</summary>
-        public const float SpiderHeight = 3.4f, SpiderSpan = 10, CrownScale = 3;
+        public const float SpiderHeight = 3.4f, SpiderSpan = 10, CrownScale = 1;
+        /// <summary>The crown's blink: seconds shown (least, most), seconds gone (least, most), and its fade.</summary>
+        public static readonly Vector2 CrownOn = new Vector2(.6f, 1.5f), CrownOff = new Vector2(2, 5); public const float CrownFade = .15f;
+        float crownShowFrom, crownHideFrom; Renderer[] crownParts;
+        /// <summary>How much of the crown shows now (0 gone, 1 whole).</summary>
+        public float CrownShown { get; private set; }
         /// <summary>Her body's reach out from her centre: melee strikes her from there (EncounterEnemy.BodyRadius; raid 2).</summary>
         public const float BodyRadius = 2.5f;
         /// <summary>The wrap's tallest shard: never over one and a half times her body (raid 2: the seven-metre wrap hid the spider and the view).</summary>
@@ -76,6 +82,8 @@ namespace Crulanda.Encounter
             crown = new GameObject("Crown").transform; crown.SetParent(root, false);
             crown.localPosition = new Vector3(0, ground + (spider != null ? SpiderHeight * .9f : 2.6f), spider != null ? -.4f : 0); crown.localScale = Vector3.one * CrownScale;
             if (core != null) { core.SetParent(crown, false); core.localPosition = Vector3.zero; }
+            crownParts = crown.GetComponentsInChildren<Renderer>(true);
+            crownShowFrom = Time.time + Random.Range(CrownOff.x, CrownOff.y); crownHideFrom = crownShowFrom + Random.Range(CrownOn.x, CrownOn.y); SetCrown(0);
             wrap = VoidWrap.Wrap(root, WrapHeight, spider != null ? SpiderSpan * .35f : 1.8f, ground, enemy != null ? enemy.persistentId.GetHashCode() : 7);   // round her legs' and back's edge
             lastPos = transform.position;
         }
@@ -95,6 +103,24 @@ namespace Crulanda.Encounter
             m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", HideGlow);
             return hideMat = m;
         }
+        /// <summary>The crown blinks on and off at random, fading quickly; dead, it stands (crystal).</summary>
+        void TickCrown()
+        {
+            if (crown == null) return;
+            float t = Time.time, show;
+            if (!enemy.actor.IsAlive) show = 1;
+            else
+            {
+                if (t >= crownHideFrom + CrownFade) { crownShowFrom = t + Random.Range(CrownOff.x, CrownOff.y); crownHideFrom = crownShowFrom + Random.Range(CrownOn.x, CrownOn.y); }
+                show = t < crownShowFrom ? 0 : t < crownShowFrom + CrownFade ? (t - crownShowFrom) / CrownFade : t < crownHideFrom ? 1 : 1 - (t - crownHideFrom) / CrownFade;
+            }
+            SetCrown(Mathf.Clamp01(show));
+        }
+        void SetCrown(float show)
+        {
+            CrownShown = show; crown.localScale = Vector3.one * CrownScale * Mathf.Max(.001f, show);
+            bool on = show > 0; if (crownParts != null) foreach (var r in crownParts) if (r != null && r.enabled != on) r.enabled = on;
+        }
         void Play(string clip, float fade = .25f)
         {
             if (anim == null || anim[clip] == null || Playing == clip && anim.IsPlaying(clip)) return;
@@ -106,6 +132,7 @@ namespace Crulanda.Encounter
             var s = enemy.session;
             // Rising out of the river and sinking back into it: the whole body, from under the water.
             root.localPosition = new Vector3(0, s != null && s.UnravellerFoe == enemy ? s.UnravellerDepth / Mathf.Max(.01f, transform.lossyScale.y) : 0, 0);
+            TickCrown();
             if (!enemy.actor.IsAlive)
             {
                 if (!died) { died = true; if (anim != null && anim["death1"] != null) { anim.Stop(); anim.Play("death1"); Playing = "death1"; } }

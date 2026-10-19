@@ -69,6 +69,17 @@ namespace Crulanda.Tests
             CollectionAssert.AreEqual(new[] { "b" }, sims, "two salted already: one more");
         }
 
+        [Test] public void The_raids_control_holds_the_brood_the_Archivist_first()
+        {
+            var d = SimCompanion.PartyRole.Damage;
+            Assert.AreEqual(0, RaidJobs.BroodHolder("class.archivist", d), "the Archivist's raid part: holding the brood");
+            Assert.Less(RaidJobs.BroodHolder("class.rogue", d), RaidJobs.BroodHolder("class.mage", d));
+            Assert.GreaterOrEqual(RaidJobs.BroodHolder("class.scoundrel", d), 0);
+            Assert.AreEqual(-1, RaidJobs.BroodHolder("class.ranger", d), "the Ranger shoots");
+            Assert.AreEqual(-1, RaidJobs.BroodHolder("class.druid", SimCompanion.PartyRole.Healer), "a healing Druid heals");
+            Assert.AreEqual(-1, RaidJobs.BroodHolder("class.archivist", SimCompanion.PartyRole.Tank));
+        }
+
         [Test] public void The_off_tank_and_Party_2s_damage_take_the_brood()
         {
             Assert.IsTrue(RaidJobs.TakesBrood(SimCompanion.PartyRole.Tank, 0, false, true), "the tank not holding her");

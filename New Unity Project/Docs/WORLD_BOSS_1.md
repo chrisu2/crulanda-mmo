@@ -638,6 +638,21 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      and its area blow found "packs" of her brood counting her as one of them (two brood beside her made three). She no longer counts toward
      a pack, and the control share is 72% (about 63 at 20, some 72 with its buffs): under every damage-dealer. SimDummyTests no longer asks
      the Archivist to out-hit the tank.
+   **Raid 4 (2026-10-19, watched by Chris) and what was changed (WRITTEN, NOT RUN again).** Chris, verbatim: "something needs to be done
+   about the swirling bowl spike above the mob..make it smaller and blink on and off randomly"; "ground damage should be increased"; "more
+   brood per wave..need CC baby".
+   - **The crown** (the Weave-Eater threads on her back) is its own size now (a third of the 3x), and blinks: shown 0.6-1.5 s, gone 2-5 s, a
+     0.15 s fade each way, at random, apart from the ground spikes' eruptions; dead, it stands (crystal).
+   - **Unmade ground:** 15% of health a second (10%), and 5% more for each second stood in it (`unmadeRamp`; capped at 60%): a mistake
+     punished, not the raid. The sims look for marked ground four times a second and step out when it is shown, 3 s before it bites, so a sim
+     is only in it when it walks through or misses on purpose.
+   - **The brood and crowd control:** 5 a wave (3). The raid's control classes hold them (`RaidJobs.BroodHolder`): the Archivist first (its
+     raid part, fitting its lower damage share), then the Rogue, the Scoundrel, the Mage, a Druid not healing; each holds the nearest free
+     brood out of the fight for 18 s, then waits 15 s (`broodHoldSeconds`, `broodHoldEvery`), and marks it Moon (or Cross). A held brood is
+     left alone; a marked one free again is fought and held again (the Moon/Cross "leave alone" no longer skips her brood once free). The rest
+     are salted and shattered as before. With the raid's four control classes, four of five are held each wave; without them five go for the
+     healers.
+   - Toward 1 in 2: her health stays 195,000; the new ground and the bigger waves are the change this round. Step 6 reads raid 5's kill rate.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

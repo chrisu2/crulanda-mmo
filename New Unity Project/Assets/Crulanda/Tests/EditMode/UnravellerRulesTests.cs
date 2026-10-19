@@ -119,6 +119,15 @@ namespace Crulanda.Tests
             CollectionAssert.Contains(MobCasts.Kinds, EncounterEnemy.FeedKind);
         }
 
+        [Test] public void Unmade_ground_bites_harder_the_longer_one_stands_in_it()
+        {
+            var t = T;
+            Assert.AreEqual(.15f, UnravellerRules.GroundBite(0, t), 1e-4f, "15% the first second (raid 4: 10% was too little)");
+            Assert.AreEqual(.25f, UnravellerRules.GroundBite(2, t), 1e-4f, "5% more each second stood");
+            Assert.AreEqual(EncounterEnemy.MaxBlowShare, UnravellerRules.GroundBite(20, t), 1e-4f, "never past the 60% cap");
+            Assert.AreEqual(5, t.broodCount, "five brood a wave (raid 4: \"more brood per wave\")");
+        }
+
         [Test] public void A_salted_brood_shatters_at_three_times_and_one_that_reaches_her_is_eaten()
         {
             var t = T;
@@ -181,6 +190,11 @@ namespace Crulanda.Tests
                 Assert.IsFalse(w.transform.Find("Shards").gameObject.activeSelf, "not out of the ground all the time (raid 3: every 5-7 s)");
                 Assert.That(VoidWrap.Rise + VoidWrap.Stand + VoidWrap.Sink, Is.InRange(1f, 1.5f), "an eruption of a second or so");
                 Assert.AreEqual(5, VoidWrap.EruptMin); Assert.AreEqual(7, VoidWrap.EruptMax);
+                // Her crown (raid 4: "make it smaller and blink on and off randomly"): its own size, shown briefly, gone longer.
+                Assert.LessOrEqual(UnravellerBody.CrownScale, 1.01f, "a third of the first crown's 3x");
+                Assert.That(UnravellerBody.CrownOn.x, Is.InRange(.5f, 1f)); Assert.That(UnravellerBody.CrownOn.y, Is.InRange(1f, 1.6f), "on 0.6-1.5 s");
+                Assert.That(UnravellerBody.CrownOff.x, Is.InRange(1.9f, 2.1f)); Assert.That(UnravellerBody.CrownOff.y, Is.InRange(4.9f, 5.1f), "off 2-5 s");
+                Assert.That(UnravellerBody.CrownFade, Is.InRange(.05f, .3f), "a quick fade, not a pop");
                 w.Erupt(true);
                 Assert.IsTrue(w.transform.Find("Shards").gameObject.activeSelf, "erupting"); Assert.AreEqual(1, w.Eruptions);
                 var rs = w.GetComponentsInChildren<Renderer>(true).Where(r => r is MeshRenderer).ToList();

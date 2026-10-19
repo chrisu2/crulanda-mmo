@@ -27,9 +27,11 @@ namespace Crulanda.Encounter
         // ---------- phase 2 ----------
         /// <summary>The brood's wait in each phase; in phase 1 none (0) as the doc has it: the fight's first two minutes are the pins, the
         /// Feeding and the swap. A step-6 knob if phase 1 wants adds (play note 260, "she needs adds").</summary>
-        public float broodEvery1 = 0, broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 3, broodLevel = 22;
+        public float broodEvery1 = 0, broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 5, broodLevel = 22;
+        /// <summary>A control class's hold on a brood (raid 4): its seconds and its wait before the next.</summary>
+        public float broodHoldSeconds = 18, broodHoldEvery = 15;
         public float broodHealthShare = .12f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
-        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .1f;
+        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .15f, unmadeRamp = .05f;
         public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 10; public int saltsToFree = 3;
         public float saltWindow = 12, calcifySeconds = 4, calcifyTaken = 1.5f;
         // ---------- phase 3 ----------

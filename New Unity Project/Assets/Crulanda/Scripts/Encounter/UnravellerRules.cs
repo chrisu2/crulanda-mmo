@@ -43,6 +43,9 @@ namespace Crulanda.Encounter
         /// <summary>Seconds left against the enrage (the feast at 9:00 from the pull).</summary>
         public static float EnrageLeft(float sincePull, UnravellerTuning t) { return Mathf.Max(0, t.enrageSeconds - sincePull); }
         public static bool Feast(float sincePull, UnravellerTuning t) { return sincePull >= t.enrageSeconds; }
+        /// <summary>Unmade ground's bite in a second, for one who has stood in it <paramref name="stoodSeconds"/> whole seconds before this
+        /// one: 15% of health, 5% more each second stood (raid 4). Under the 60% cap.</summary>
+        public static float GroundBite(int stoodSeconds, UnravellerTuning t) { return Mathf.Min(EncounterEnemy.MaxBlowShare, t.unmadeShare + t.unmadeRamp * Mathf.Max(0, stoodSeconds)); }
         /// <summary>A blow on one of her brood: three times as much while it stands calcified by salt ("shattered ... into a million harmless shards").</summary>
         public static int ShatterDamage(int damage, bool calcified, UnravellerTuning t) { return calcified ? Mathf.RoundToInt(damage * t.shatter) : damage; }
         /// <summary>A brood that reaches her is eaten.</summary>
@@ -217,6 +220,16 @@ namespace Crulanda.Encounter
             var sims = new List<string>(); bool you = false;
             for (int i = 0; i < l.Count && sims.Count + (you ? 1 : 0) < need; i++) { if (l[i].you) you = true; else sims.Add(l[i].id); }
             return (sims, you);
+        }
+        /// <summary>
+        /// Who holds the brood (raid 4, Chris: "more brood per wave..need CC baby"): the raid's control, in order: the Archivist first (that is
+        /// its raid part), then the Rogue, the Scoundrel, the Mage, a Druid not healing; each holds one brood out of the fight in turn (a
+        /// sap, a lull, a hex, a sleep). Its place in that order, or -1 for one who holds none (tanks, healers, the rest).
+        /// </summary>
+        public static int BroodHolder(string classId, SimCompanion.PartyRole role)
+        {
+            if (role != SimCompanion.PartyRole.Damage) return -1;
+            switch (classId) { case "class.archivist": return 0; case "class.rogue": return 1; case "class.scoundrel": return 2; case "class.mage": return 3; case "class.druid": return 4; default: return -1; }
         }
         /// <summary>Who takes the brood (3.4): the tank not holding her, and Party 2's damage-dealers who fight from range (run 1: the melee
         /// chased blinking brood across the bar, the Scoundrel at 24 a second; the melee stay on her).</summary>

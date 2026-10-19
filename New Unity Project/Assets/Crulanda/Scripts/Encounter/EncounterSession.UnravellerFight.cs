@@ -26,6 +26,7 @@ namespace Crulanda.Encounter
         /// <summary>Her brood up now (alive or fallen this fight).</summary>
         public readonly List<EncounterEnemy> BroodNow = new List<EncounterEnemy>();
         readonly List<(Vector3 at, float live, BlowMark mark)> unmade = new List<(Vector3, float, BlowMark)>();
+        readonly Dictionary<string, int> groundSeconds = new Dictionary<string, int>();
         /// <summary>The swallowing now (who, since when, who has salted her).</summary>
         public readonly SwallowSalts Swallow = new SwallowSalts();
         /// <summary>The one inside her now, or null.</summary>
@@ -108,7 +109,7 @@ namespace Crulanda.Encounter
             foreach (var b in BroodNow) if (b != null) { Enemies.Remove(b); if (Target == b) Target = null; Destroy(b.gameObject); }
             BroodNow.Clear();
             foreach (var u in unmade) if (u.mark != null) Destroy(u.mark.gameObject);
-            unmade.Clear();
+            unmade.Clear(); groundSeconds.Clear();
             if (SwallowedActor != null) Spit(e, SwallowedActor);
             Swallow.End(); SwallowedActor = null; SaltCall.Clear();
             HuntedActor = null; huntAt = -1; if (huntMark != null) huntMark.Hide();
@@ -197,7 +198,12 @@ namespace Crulanda.Encounter
             foreach (var a in PartyActors().ToArray())
             {
                 if (a == null || !a.IsAlive) continue;
-                foreach (var u in unmade) if (now >= u.live && Flat(a.transform.position - Vector3.up - u.at) <= t.unmadeRadius && Mathf.Abs(a.transform.position.y - 1 - u.at.y) < GroundMarks.Height) { Hurt(a, t.unmadeShare, Unraveller.UnmadeName, false); break; }
+                bool inIt = false;
+                foreach (var u in unmade) if (now >= u.live && Flat(a.transform.position - Vector3.up - u.at) <= t.unmadeRadius && Mathf.Abs(a.transform.position.y - 1 - u.at.y) < GroundMarks.Height) { inIt = true; break; }
+                string id = a.EntityId.Value; groundSeconds.TryGetValue(id, out int stood);
+                if (!inIt) { groundSeconds.Remove(id); continue; }
+                // The longer one stands in it the worse (raid 4, Chris: "ground damage should be increased"): 15%, then 20%, 25% ... a second.
+                Hurt(a, UnravellerRules.GroundBite(stood, t), Unraveller.UnmadeName, false); groundSeconds[id] = stood + 1;
             }
             // And the swallowed, inside her, 4% a second (TickSwallow keeps them there).
             if (SwallowedActor != null && SwallowedActor.IsAlive) Hurt(SwallowedActor, t.swallowShare, null, false);

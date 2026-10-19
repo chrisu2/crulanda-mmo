@@ -887,3 +887,6 @@ un-captures.
   Then (verbatim): "maybe use this with the purple spike or some conglomeration. myassets free fantasy spider": Kalamona's "Free Fantasy
   Spider" (Asset Store cache: spider_myOldOne.FBX with one animation take, textures, Standard materials) as her body, with the purple
   spikes and the void-and-aether.
+- 257 (2026-10-19 ~14:50, his crop of the test copy's Lowtowns roofs) "what is the green stuff?" (the neon moss: flat bright-green blobs on
+  the tiles). He chose (verbatim) "Make it look like moss (Recommended)": thin uneven patches along the tiles and gutters, dull by day,
+  a faint glow at night (OPEN).

@@ -42,14 +42,14 @@ namespace Crulanda.Tests
                     Assert.IsTrue(File.Exists(Path.Combine(Kit, "Prefabs", h.model.name + "_Standard.prefab")), h.model.name + "'s Built-in prefab is in the project.");
                     Assert.That(h.scale, Is.InRange(ZoneBuilder.VillageScaleMin, ZoneBuilder.VillageScaleMax), "A door the street's height (" + h.model.name + " at " + row.prop.at + ").");
                     Assert.That(Mathf.Abs(h.scaleX) / h.scale, Is.InRange(1f, 1.151f), "Widened at most 15 %.");
-                    if (h.model.name == ZoneBuilder.VillageLow) Assert.AreEqual(2, row.under, "The low house only on two storeys of brick.");
+                    if (row.under > 0) CollectionAssert.DoesNotContain(new[] { "House_7", "House_8", "House_9" }, h.model.name, "No porch-fronted house raised on the brick (it read as a black slab).");
                     if (row.under == 0) CollectionAssert.Contains(ZoneBuilder.VillageTall.Concat(new[] { "Blacksmith" }).ToList(), h.model.name, "On the setts, only a tall house.");
                 }
                 if (ZoneBuilder.TenementStoreys(row.prop.variant) == 4 && !row.smithy) Assert.AreEqual(2, row.under, "A four-storey terrace stays tall: two storeys of brick under its houses (" + row.prop.at + ").");
                 if (!row.smithy) Assert.GreaterOrEqual(row.houses.Max(h => h.Top), 7.5f, "Vertical as the books have it: the row at " + row.prop.at + " stands over 7.5 m.");
             }
             Assert.AreEqual(1, rows.Count(r => r.smithy && r.houses.Single().model.name == "Blacksmith"), "The Rust Market smith's shop is the Blacksmith.");
-            Assert.GreaterOrEqual(rows.SelectMany(r => r.houses).Select(h => h.model.name).Distinct().Count(), 9, "Varied: most of the pack's houses are used.");
+            Assert.GreaterOrEqual(rows.SelectMany(r => r.houses).Select(h => h.model.name).Distinct().Count(), 8, "Varied: most of the pack's houses are used.");
             Assert.That(rows.SelectMany(r => r.houses).Count(h => h.scaleX < 0), Is.InRange(rows.Sum(r => r.houses.Count) / 4, rows.Sum(r => r.houses.Count) * 3 / 4), "Some mirrored, some not.");
             // The dressing's prefabs are there too.
             foreach (var n in new[] { "Pot_1", "Pot_2", "Wooden_Tub", "Wooden_Bucket", "Wooden_Barrel", "Wooden_Spinning_Wheel", "Stump_A", "Anvil", "Blacksmith_Table", "Hammer", "Sword", "Spear", "Shield", "Wood_Tyre", "Blacksmith_Logo" })

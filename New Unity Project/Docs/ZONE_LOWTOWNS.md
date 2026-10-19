@@ -665,3 +665,25 @@ the roofs (not floating), the smith's gear stands beside the door (not in it), a
   a row's ends and behind shallow houses have a coping and a plank gate with iron straps. The pack's Built-in set has no weapon stand (its
   FBX is removed), so the smith's sword and spear lean on the Fantasy kit's stand, as the forges have. The EditMode test now looks for the
   pack's own names only (VillageKit.cs is the Quaternius village kit, another pack). Not re-run.
+- **The black slab (2026-10-19, the lowtowns-art2 frames):** the house on the brick that read as a big flat black slab was House_9, one of
+  the pack's three porch-fronted designs (House_7, 8, 9): a deep recessed ground floor of near-black timber under a jettied upper floor.
+  On the setts that is a porch; raised on two storeys of brick it is a black box overhanging the brick. Fixed: House_9 now stands on the
+  setts only (with the tall houses); House_7 and House_8 (the same design, and low) are taken out of the project (folder 92 MB). Not a
+  missing material: the pack's maps load (their means are low because each atlas is mostly black margin) and nothing is metallic. The soot
+  is lighter (0.84 and 0.74 of the paint, from 0.7 and 0.58): the pack's timber is dark already. Each brick block is one tier; the "two
+  tiers" in the frame are two neighbouring rows of different height (one storey and two) seen from behind; nothing stacks a block on a
+  block.
+- **Play note 257 (Chris, 2026-10-19), the moss.** Asked "what is the green stuff?" of his crop of the roofs (flat bright-green blobs on
+  the tiles), he chose, verbatim: **"Make it look like moss (Recommended)"**. CANON: "vibrant, unnatural neon moss" (b1 ch.7:17); how it
+  lies is GAME-ONLY. Done:
+  - **On the pack's roofs** (`PackRoofMoss`): the roof's own triangles are read from the model, and every pad is laid on the tile under it,
+    along its slope, 1-2 cm thick and lifted 4 mm: nothing floats, nothing is a flat rectangle off the roof. It gathers where moss grows:
+    strips along the ridge and the eaves (the roof's top and bottom tenth), clumps round the chimney's foot, a rare cushion on the open
+    slope; each patch a scatter of small pads of their own size, turn and green, so its edge is broken. On about six roofs in ten.
+  - **The colour:** a dull, dark green by day (the paint 0.2, 0.33, 0.1 and a paler 0.3, 0.37, 0.12, matte); its glow is a trace by day (4%)
+    and rises through dusk to the full glow at night on the clock (`NightGlow`, driven by `WorldClock.Darkness`).
+  - **The older moss** reads the same way: the brick terraces' roof moss (`RoofMoss`: the roof route's terraces, the edge's backs) is
+    1-2 cm pads lying on the slates, turned at most 12 degrees off the courses; the moss on the retaining walls' copings
+    (`ZoneBuilder.LowtownLevels`) and its drips are thin too; the roof walks' and the water tower's patches are 1.4 cm. All share the two
+    moss materials, so all follow the clock. The drain mould (the under-ways' green glow, b1 ch.6:129) is unchanged.
+  Not run in Unity. **To capture:** a roof close up by day and at night (the High Rows from above, Pell Row's walks), and a coping's moss.

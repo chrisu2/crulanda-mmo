@@ -26,9 +26,9 @@ namespace Crulanda.World
         // ---------- the books' colours (Lowtowns pick 2) ----------
         /// <summary>"vibrant, unnatural neon moss" on the slate (CANON, book1 ch.7:17): a sick bright green that glows a little by day and
         /// shows up at night.</summary>
-        static readonly Color NeonMossColour = new Color(.3f, .74f, .13f), NeonMossGlow = new Color(.1f, .36f, .05f);
+        static readonly Color NeonMossColour = new Color(.2f, .33f, .1f), NeonMossGlow = new Color(.12f, .44f, .06f);   // dull by day (play note 257); the glow is the night's (NightGlow)
         /// <summary>The moss's yellow-green, mixed in so a patch is never one flat colour.</summary>
-        static readonly Color NeonMossPaleColour = new Color(.52f, .76f, .14f), NeonMossPaleGlow = new Color(.2f, .3f, .04f);
+        static readonly Color NeonMossPaleColour = new Color(.3f, .37f, .12f), NeonMossPaleGlow = new Color(.22f, .36f, .05f);
         /// <summary>The green bioluminescent mould of the under-ways (CANON, book1 ch.6:129: "the faint, greenish glow of bioluminescent mold
         /// clinging to the archways"; ch.9:55).</summary>
         static readonly Color MouldColour = new Color(.2f, .6f, .35f), MouldGlow = new Color(.2f, 1f, .5f);
@@ -42,8 +42,18 @@ namespace Crulanda.World
             if (m.HasProperty("_EmissionColor")) { m.EnableKeyword("_EMISSION"); m.SetColor("_EmissionColor", glow); m.globalIlluminationFlags = MaterialGlobalIlluminationFlags.None; }
             lowGlows[key] = m; return m;
         }
-        Material NeonMoss { get { return LowGlow(art.stone, NeonMossColour, NeonMossGlow, "neon moss"); } }
-        Material NeonMossPale { get { return LowGlow(art.stone, NeonMossPaleColour, NeonMossPaleGlow, "neon moss pale"); } }
+        Material NeonMoss { get { return NightMoss(LowGlow(art.stone, NeonMossColour, NeonMossGlow, "neon moss"), NeonMossGlow); } }
+        Material NeonMossPale { get { return NightMoss(LowGlow(art.stone, NeonMossPaleColour, NeonMossPaleGlow, "neon moss pale"), NeonMossPaleGlow); } }
+        /// <summary>The neon moss as moss (play note 257, Chris 2026-10-19: "Make it look like moss"): matte, a dull green by day, its glow
+        /// a trace in daylight and up after dark on the clock (NightGlow).</summary>
+        Material NightMoss(Material m, Color glow)
+        {
+            if (nightMoss.Contains(m)) return m;
+            nightMoss.Add(m); if (m.HasProperty("_Glossiness")) m.SetFloat("_Glossiness", .06f);
+            var clock = GetComponent<NightGlow>() ?? gameObject.AddComponent<NightGlow>(); clock.Add(m, glow);
+            return m;
+        }
+        readonly HashSet<Material> nightMoss = new HashSet<Material>();
         Material DrainMould { get { return LowGlow(art.stone, MouldColour, MouldGlow * 1.3f, "drain mould"); } }
         Material WallCoping { get { return Dressed(new Color(.29f, .28f, .27f)); } }
 
@@ -133,8 +143,8 @@ namespace Crulanda.World
                     {
                         float s = .18f + R() * .32f, across = (R() - .3f) * (thick / 2 + .08f);
                         var at = centre + yaw * new Vector3(px, top + .14f + .02f - centre.y, fs * across);
-                        Add(R() < .7f ? moss : mossPale, at, new Vector3(s * (.7f + R() * .8f), .03f + R() * .05f, s * (.6f + R() * .6f)));
-                        if (R() < .18f && tall > 1) { float dh = .12f + R() * .35f; Add(moss, F(px, top - dh / 2, .015f), new Vector3(.06f + R() * .12f, dh, .03f)); }
+                        Add(R() < .7f ? moss : mossPale, at + Vector3.down * (.016f - .004f), new Vector3(s * (.7f + R() * .8f), .012f + R() * .012f, s * (.6f + R() * .6f)));   // thin, lying on the coping (play note 257)
+                        if (R() < .18f && tall > 1) { float dh = .12f + R() * .35f; Add(moss, F(px, top - dh / 2, .008f), new Vector3(.06f + R() * .12f, dh, .014f)); }
                     }
                 }
                 if (tall < 1.6f) return;

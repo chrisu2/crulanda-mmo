@@ -197,9 +197,9 @@ namespace Crulanda.World
             {
                 if (Mathf.Abs(x) > xMax) return;
                 u = Mathf.Clamp(u, .02f, .97f);
-                var dims = new Vector3(size * (.6f + R() * .9f), .03f + R() * .05f, size * (.5f + R() * .7f));
-                var tilt = Quaternion.Euler(side * slope, 0, 0) * Quaternion.Euler(0, (R() - .5f) * 70, 0);
-                parts.Box(greens[R() < .7f ? 0 : 1], new Vector3(x, eaves + roofH * (1 - u) + .02f + dims.y / 2, side * hd * u), dims, tilt);
+                var dims = new Vector3(size * (.6f + R() * .9f), .01f + R() * .01f, size * (.5f + R() * .7f));   // thin, along the slates (play note 257)
+                var tilt = Quaternion.Euler(side * slope, 0, 0) * Quaternion.Euler(0, (R() - .5f) * 24, 0);
+                parts.Box(greens[R() < .7f ? 0 : 1], new Vector3(x, eaves + roofH * (1 - u) + .006f + dims.y / 2 / Mathf.Cos(slope * Mathf.Deg2Rad), side * hd * u), dims, tilt);
             }
             // A clump: a big pad and smaller ones scattered round it.
             void Clump(int side, float x, float u, float spread, int n)

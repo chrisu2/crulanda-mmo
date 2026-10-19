@@ -849,3 +849,5 @@ un-captures.
 - 243 (2026-10-19 ~11:00) the first world boss (brief, verbatim in ROADMAP "The first world boss"): one mini world boss in the highest
   zone, level 30, a 10-player raid, the hardest to kill, drops components for each class's legendary weapon; one piece needs the other
   world bosses at end game (OPEN).
+- 244 (2026-10-19 ~11:35, on wardrobe-angular-3 06-helms-b: the new cloth hood and coif, the old scarf and kettle) "these look
+  pitiful. not sure why we keep going back and forth and get poor results. do i need to download more helms?? or can you design" (OPEN).

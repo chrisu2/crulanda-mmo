@@ -126,7 +126,7 @@ namespace Crulanda.World
             // The walked decks (NavWalkable) stay out of the batch: batching swaps their MeshFilter's mesh for the root's combined one, which is
             // not readable, and the navmesh is built from them afterwards (EncounterNavigation: "Source mesh Combined Mesh ... does not
             // allow read access", the Lowtowns' bridges, 2026-10-16). Each game object is batched on its own MeshFilter.
-            if (!NoStaticBatching) try { StaticBatchingUtility.Combine(statics.GetComponentsInChildren<MeshFilter>(true).Where(f => f.GetComponent<NavWalkable>() == null).Select(f => f.gameObject).ToArray(), statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
+            if (!NoStaticBatching) try { BatchStatic(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             Debug.Log("Static scenery merged: " + before + " renderers into " + statics.GetComponentsInChildren<MeshRenderer>().Length + ".");
             Lap("batching");
             // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).
@@ -1058,6 +1058,23 @@ namespace Crulanda.World
         /// </summary>
         /// <summary>Tests that read the scenery's meshes (BuildingGroundTests' flush faces) set this: static batching leaves them unreadable.</summary>
         public static bool NoStaticBatching;
+        /// <summary>
+        /// What static batching may take: not a walked deck (NavWalkable: its mesh must stay readable for the navmesh), and not a flame
+        /// (CandleFlame). Play note 255 (2026-10-19, Chris: "fire goes around the bazier", the brazier's flame standing beside its bowl and
+        /// lower): the flame shader (Crulanda/CandleFlame) breathes the flame's height and leans its tip from the mesh's own vertex
+        /// positions (y scaled, x and z pushed by the height). Batched, a mesh's vertices are baked into the batch root's space (the
+        /// zone's, metres above its origin), so the "height" was the flame's height in the world: the cone was squashed and stretched
+        /// about the zone's floor and pushed sideways by up to a few tenths of a metre a metre of it, off its bowl. A flame is kept out of
+        /// the batch, so it is drawn on its own mesh, about its own base.
+        /// </summary>
+        public static bool Batchable(GameObject g) { return g.GetComponent<NavWalkable>() == null && g.GetComponent<CandleFlame>() == null; }
+        /// <summary>Static batching under <paramref name="root"/>, of what <see cref="Batchable"/> allows. Returns how many were batched.</summary>
+        public static int BatchStatic(GameObject root)
+        {
+            var take = root.GetComponentsInChildren<MeshFilter>(true).Where(f => Batchable(f.gameObject)).Select(f => f.gameObject).ToArray();
+            if (take.Length > 0) StaticBatchingUtility.Combine(take, root);
+            return take.Length;
+        }
         int MergeStatics()
         {
             int total = 0;

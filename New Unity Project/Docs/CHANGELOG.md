@@ -1,5 +1,22 @@
 # Changelog
 
+## 2026-10-19: the braziers' flames back in their bowls (branch brazier-flame; WRITTEN, NOT RUN)
+- Chris (play note 255): "fire goes around the bazier"; "it was dancing around the brazier" (his frame: the flame beside the bowl,
+  lower). Compiles; nothing run in Unity, no captures yet.
+- **Cause**: the flame shader (Crulanda/CandleFlame) breathes a flame from its mesh's own vertex positions: it scaled the height and
+  pushed the tip sideways by the vertex's height. The zone's static batching took the flames in with the scenery, which moves a mesh's
+  vertices into the zone's own space, so the "height" was the flame's height in the world (metres): the cone was stretched and squashed
+  about the zone's floor and swung sideways by tenths of a metre, round and round the bowl. Every flame on that shader that was batched
+  was off the same way: the braziers, the inns' and lamps' candle flames, the Adit's torches.
+- **Fix**: flames are kept out of static batching (`ZoneBuilder.Batchable`/`BatchStatic`: no CandleFlame, no walked deck; used for the
+  zone's scenery and the Adit's kit and cave works). The shader holds its breathing to the mesh's unit height (the base never moves,
+  the tip leans a little) and carries the DisableBatching tag. `CandleFlame.Sway` is the shader's breathing on the CPU, for the tests.
+- Tests (`BrazierFlamePlayTests`, PlayMode): a flame is never batched and its base never moves; in the Ash Rim, the Adit and the Crown
+  no flame is in a static batch or wears a combined mesh, and every brazier's flame stands over its bowl, its drawn base within 3 cm of
+  the bowl's middle across half a minute.
+- To check in game (night, captures front and side, a few seconds apart): an Ash Rim brazier; an Adit camp's brazier; the Crown dais
+  braziers; an inn's candles and a street lamp's flame; an Adit wall torch. The flame sits in the bowl and only its tip sways.
+
 ## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
 - The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'
   foods in dungeons, inns and markets; every inn sitter on a real seat; window frames and a hearth at the Golden Cask and the Cracked

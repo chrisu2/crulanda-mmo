@@ -641,7 +641,7 @@ namespace Crulanda.World
             KitDressing();
             FloorClutter();
             CampDressing();
-            if (kit != null && Application.isPlaying) StaticBatchingUtility.Combine(kit.gameObject);
+            if (kit != null && Application.isPlaying) BatchStatic(kit.gameObject);   // not the torches' flames (play note 255)
 
             // The floors filled (Chris, 2026-10-11: "room full of nothing", "more nothingness"): drawn out two and a half times as wide,
             // the chambers kept their rubble at the walls' feet only and the floor between lay bare. Rock outcrops, rubble, dripstone and

@@ -29,6 +29,17 @@ namespace Crulanda.World
             if (glow != null) { f.flicker = glow.GetComponent<Flicker>(); if (f.flicker == null) f.flicker = glow.gameObject.AddComponent<Flicker>(); }
             return flame;
         }
+        /// <summary>The shader's breathing (Crulanda/CandleFlame's vertex stage) on the CPU: where a vertex of the flame's mesh (its own
+        /// space, the base at the origin, the tip a unit up) is drawn at time <paramref name="t"/> (the flame's seeded time). The base never
+        /// moves; the tip leans at most .12 and .08 of the mesh's height and breathes by <paramref name="wobble"/>.</summary>
+        public static Vector3 Sway(Vector3 v, float t, float wobble = .14f)
+        {
+            float h = Mathf.Clamp01(v.y);
+            v.y += h * wobble * (.6f * Mathf.Sin(t * 4.5f) + .4f * Mathf.Sin(t * 7.3f + 1.7f));
+            v.x += .12f * h * Mathf.Sin(t * 2.7f);
+            v.z += .08f * h * Mathf.Sin(t * 3.4f + .9f);
+            return v;
+        }
         void Start() { rend = GetComponent<Renderer>(); block = new MaterialPropertyBlock(); seed = Random.value * 100; }
         void LateUpdate()
         {

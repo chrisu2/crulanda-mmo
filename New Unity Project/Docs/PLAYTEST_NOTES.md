@@ -932,3 +932,4 @@ un-captures.
   should not stay on the ground permanently" (OPEN).
 - 275 (2026-10-19 ~16:18) "how can you tell which is good and which are bad. no way to know to get out or stand in it" (OPEN): one look
   for every ground effect: harmful red/violet and jagged with a warning, helpful soft gold/green; a HUD line naming what you stand in.
+  Then: "nothing should be permanent onscreen" (every effect has a lifetime; all clear at the fight's end).

@@ -1648,6 +1648,18 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 5
     statusId: 
+  - id: shaman.barrow_wake
+    name: Barrow-wake
+    description: "Once a fight: the old dead send one of yours back up out of the dark, at four tenths of their health."
+    effect: 4
+    power: 40
+    cost: 30
+    cooldown: 0
+    range: 30
+    castTime: 3
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
   - id: scoundrel.quick_cut
     name: Quick Cut
     description: "A quick cut with the dirk. Builds 8 Nerve, and starts automatic weapon attacks."
@@ -2389,6 +2401,9 @@ MonoBehaviour:
         talentId: 
       - abilityId: shaman.barrow_call
         level: 8
+        talentId: 
+      - abilityId: shaman.barrow_wake
+        level: 10
         talentId: 
     talentTree: {fileID: 4900000, guid: 1a8b9b2f52d342858f00c3b297a913ef, type: 3}
   - definition:

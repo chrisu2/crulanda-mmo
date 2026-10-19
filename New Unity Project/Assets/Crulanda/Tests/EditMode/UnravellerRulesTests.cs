@@ -248,6 +248,36 @@ namespace Crulanda.Tests
             Assert.IsTrue(UnravellerRules.SpikeSpotClear(new Vector2(0, 0), null, t));
         }
 
+        [Test] public void Each_erupting_shard_stands_on_the_floor_at_its_spot()
+        {
+            // The tuning batch, Chris: "the spikes are launching in the air. not on the ground". Her origin 2.6 m up (her scale), the floor 0.3.
+            var host = new GameObject("Wrapped body"); host.transform.position = new Vector3(0, 2.9f, 0); host.transform.localScale = Vector3.one * 2.6f;
+            var floor = GameObject.CreatePrimitive(PrimitiveType.Plane); floor.transform.position = new Vector3(0, .3f, 0); floor.transform.localScale = Vector3.one * 4;
+            try
+            {
+                Physics.SyncTransforms();
+                var w = VoidWrap.Wrap(host.transform, UnravellerBody.WrapHeight, 3.5f, -1, 5);
+                foreach (var full in new[] { true })
+                {
+                    w.Erupt(full); Physics.SyncTransforms();
+                    CheckOnFloor(w, .3f, "round her");
+                    w.EruptAt(new List<Vector3> { new Vector3(6, 2, 1), new Vector3(-5, 1, -4) }, 2.2f);
+                    foreach (Transform s in w.transform.Find("Shards")) s.localScale = s.localScale;   // (at rest: no frame has run)
+                    CheckOnFloor(w, .3f, "at the cracks");
+                }
+            }
+            finally { Object.DestroyImmediate(host); Object.DestroyImmediate(floor); }
+        }
+        static void CheckOnFloor(VoidWrap w, float floorY, string where)
+        {
+            foreach (Transform shard in w.transform.Find("Shards"))
+            {
+                float low = float.MaxValue;
+                foreach (var mf in shard.GetComponentsInChildren<MeshFilter>(true)) foreach (var v in mf.sharedMesh.vertices) low = Mathf.Min(low, mf.transform.TransformPoint(v).y);
+                Assert.AreEqual(floorY, low, .05f, "a shard's lowest point on the floor (" + where + "), not in the air: " + low);
+            }
+        }
+
         [Test] public void A_rotation_goes_round_passing_over_those_who_cannot()
         {
             var r = new RaidRotation(new[] { "a", "b", "c" });

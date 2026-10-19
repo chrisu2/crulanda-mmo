@@ -261,11 +261,28 @@ namespace Crulanda.Encounter
         /// The run bot's kit (RunCapture, the Nix fight test): the temp save has only the starter gear, so the player is given the armour and
         /// the Stamina of a sim's pieces of its class and level (<paramref name="like"/>), the pieces only (not the tank's edges).
         /// </summary>
-        public static void KitPlayerLike(EncounterSession s, SimAdventurer like)
+        public static void KitPlayerLike(EncounterSession s, SimAdventurer like) { KitPlayerLike(s, like, false); }
+        /// <summary>
+        /// The run bot's kit; <paramref name="tank"/>: as the raid's tank (Chris, the raids: "paladin always seems to be the first one to die every
+        /// round. something wrong with his kit or armor?"): the bot tank had a Paladin damage-dealer's pieces (some slots bare: only the Warrior
+        /// sim was counted a tank's kit), none of the tank's edges, 1,111 health to the Warrior sim's 1,303. As a tank it wears all seven plate
+        /// pieces of its level and has the sim tank's armour and health edges (its training: SimCompanion.TankArmourEdge, TankHealthEdge).
+        /// </summary>
+        public static void KitPlayerLike(EncounterSession s, SimAdventurer like, bool tank)
         {
-            s.Player.Stats.SetBase(Crulanda.Core.StatType.Armor, PiecesArmour(like, s.Items));
+            var pieces = tank ? new SimAdventurer { classId = "class.warrior", level = like.level, gearSeed = like.gearSeed, gearBonus = like.gearBonus } : like;   // a tank's all seven pieces
+            s.Player.Stats.SetBase(Crulanda.Core.StatType.Armor, Mathf.RoundToInt(PiecesArmour(pieces, s.Items) * (tank ? TankArmourEdge : 1)));
             s.Player.Stats.RemoveModifiersFromSource(playerKitSource);
-            s.Player.Stats.AddModifiers(new List<StatModifier> { new StatModifier(Crulanda.Core.StatType.MaxHealth, ModifierOp.Flat, HealthPerStamina * GearStamina(like, s.Items), playerKitSource) });
+            var mods = new List<StatModifier> { new StatModifier(Crulanda.Core.StatType.MaxHealth, ModifierOp.Flat, HealthPerStamina * GearStamina(pieces, s.Items), playerKitSource) };
+            if (tank) mods.Add(new StatModifier(Crulanda.Core.StatType.MaxHealth, ModifierOp.PercentAdd, TankHealthEdge - 1, playerKitSource));
+            s.Player.Stats.AddModifiers(mods);
+            // A tank on par with the Warrior sim tank (Chris, the raids: "give the pally some hear. he's down again", then "gear"): never less
+            // health than a sim tank of its level in the same pieces (its own class's base health was the gap left).
+            if (tank)
+            {
+                int want = MaxHealthFor(pieces, s.Items), have = s.Player.Health.Pool.Max;
+                if (want > have) s.Player.Stats.AddModifiers(new List<StatModifier> { new StatModifier(Crulanda.Core.StatType.MaxHealth, ModifierOp.Flat, want - have, playerKitSource) });
+            }
             s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max);
         }
         static readonly object playerKitSource = new object();
@@ -798,6 +815,7 @@ namespace Crulanda.Encounter
             if (!Melee && healing == null && StepClearOfHold()) return;
             // Out of any marked ground (GroundMarks; WORLD_BOSS_1.md 3.5, shared with the dungeons), a mend in hand landing first.
             if (healing == null && StepOutOfGround()) return;
+            if (healing == null && BarrowWake()) return;   // a Shaman's one raising a fight (SimCompanion.Raid)
             // Its part in the Unraveller's fight: the river when hunted, the harpoons, the kicks on the Feeding, the salts (SimCompanion.Raid).
             if (healing == null && RaidTurn()) return;
             // Its turn at a buff-up (BossBuffs): a beat after the leader stops, each in its slot's turn, out of a fight.
@@ -1161,6 +1179,8 @@ namespace Crulanda.Encounter
                 if (p != null && p.Role == PartyRole.Tank && p.actor.IsAlive && p.actor.Health.Pool.Ratio < .6f && Vector3.Distance(p.transform.position, transform.position) <= reach) return p.actor;
             if (session.InRaid) foreach (var p in session.PartySims)
                 if (p != null && p.Role == PartyRole.Tank && p.actor.IsAlive && p.actor.Health.Pool.Ratio < .6f && Vector3.Distance(p.transform.position, transform.position) <= reach) return p.actor;
+            // You tanking count as a tank (the raids: the bot Paladin, the main tank, was healed as anyone, after the sim tank: the first to die).
+            { var you = session.Player; if (you != null && you.IsAlive && session.PlayerRole == PartyRole.Tank && you.Health.Pool.Ratio < .6f && Vector3.Distance(you.transform.position, transform.position) <= reach) return you; }
             Actor best = null; float low = 1;
             // Not one another healer's mend is already on its way to, unless it is low (raid 2: three healers at the same most-hurt member,
             // the Shaman's mend landing last on a full bar every time: 24 a second healed to the Druid's 44 and the Cleric's 43).

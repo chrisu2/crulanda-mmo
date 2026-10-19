@@ -26,6 +26,31 @@ namespace Crulanda.Encounter
         /// <summary>Silenced (her touch): it neither mends nor casts nor kicks.</summary>
         public bool Silenced { get { return Time.time < silencedUntil; } }
         public void Silence(float seconds) { silencedUntil = Mathf.Max(silencedUntil, Time.time + seconds); }
+        /// <summary>Raised in a fight (a Shaman's Barrow-wake): it falls afresh next time.</summary>
+        public void Raised() { downSince = -1; }
+        /// <summary>A Shaman sim's one raising a fight (play note 272): its charge, the one it is raising and when it lands.</summary>
+        public readonly RezCharge Wake = new RezCharge();
+        Actor waking; float wakeAt;
+        public int Wakes { get; private set; }
+        /// <summary>A Shaman sim raises the most needed of the fallen (RaidJobs.RezPick), a 3 s cast, once a fight. True while it casts.</summary>
+        bool BarrowWake()
+        {
+            if (sim.classId != "class.shaman") return false;
+            if (!session.InCombat) { Wake.Reset(); waking = null; return false; }
+            if (waking != null)
+            {
+                if (waking.IsAlive) { waking = null; if (visual != null) visual.Casting = false; return false; }
+                if (Time.time < wakeAt) { Activity = "Calling " + waking.DisplayName + " back"; return true; }
+                var who = waking; waking = null; if (visual != null) visual.Casting = false;
+                if (Wake.Spend()) { session.RaiseFallen(who, actor, "Barrow-wake"); Wakes++; }
+                return false;
+            }
+            if (!Wake.Ready || Silenced) return false;
+            var pick = session.RezTarget(transform.position, 30); if (pick == null) return false;
+            waking = pick; wakeAt = Time.time + 3; if (agent.isOnNavMesh) agent.isStopped = true; if (visual != null) visual.Casting = true;
+            session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "rezzing " + pick.DisplayName.Split(' ')[0].ToLower() : "Old ones, send " + pick.DisplayName.Split(' ')[0] + " back to us.");
+            return true;
+        }
         /// <summary>Let go early (spat out of her whole).</summary>
         public void ReleaseHold() { heldUntil = Mathf.Min(heldUntil, Time.time); }
         /// <summary>How many times it stepped out of marked ground, threw a harpoon, salt, kicked the Feeding (the log and the tests).</summary>

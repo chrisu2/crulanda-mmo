@@ -270,6 +270,32 @@ namespace Crulanda.Encounter
             int n = 0; foreach (var id in ClassBuffs.ClassIds) { var b = ClassBuffs.For(id); if (b != null && st.Has(b.id)) n++; }
             return (n, st.Has(Consumables.FedId), st.Has(Consumables.ElixirId) || st.Has(Consumables.SalveId));
         }
+        /// <summary>Raisings this session (the Shaman's Barrow-wake; the run's log).</summary>
+        public int Rezzes;
+        /// <summary>The fallen one a Shaman at <paramref name="from"/> raises (RaidJobs.RezPick: a tank, a healer, a damage-dealer; not in marked ground).</summary>
+        public Actor RezTarget(Vector3 from, float reach)
+        {
+            var list = new List<(string, SimCompanion.PartyRole, bool, bool, float)>(); var by = new Dictionary<string, Actor>();
+            foreach (var a in PartyActors())
+            {
+                if (a == null) continue;
+                var c = a.GetComponent<SimCompanion>(); var role = a == Player ? PlayerRole : c != null ? c.Role : SimCompanion.PartyRole.Damage;
+                var feet = a.transform.position - Vector3.up; bool danger = GroundMarks.Inside(new Vector2(feet.x, feet.z), GroundMarks.Near(feet.y)) >= 0;
+                list.Add((a.EntityId.Value, role, !a.IsAlive, danger, Vector3.Distance(from, a.transform.position))); by[a.EntityId.Value] = a;
+            }
+            var id = RaidJobs.RezPick(list, reach); return id != null && by.TryGetValue(id, out var who) ? who : null;
+        }
+        /// <summary>Raises <paramref name="who"/> at 40% of its health and a third of its pool (the Barrow-wake), said and counted.</summary>
+        public void RaiseFallen(Actor who, Actor by, string what)
+        {
+            if (who == null || who.IsAlive) return;
+            who.Health.Revive(Mathf.RoundToInt(who.Health.Pool.Max * .4f));
+            if (who.Resource != null) { var p = who.Resource.Pool; p.SetCurrent(Mathf.Max(p.Current, p.Max / 3)); }
+            who.GetComponent<SimCompanion>()?.Raised();
+            Rezzes++; HealFx.Show(who.transform);
+            FloatText(who.transform.position + Vector3.up, what, new Color(.78f, .84f, 1));
+            Message((by == Player ? "Your " : by.DisplayName + "'s ") + what + ": the old dead send " + (who == Player ? "you" : who.DisplayName) + " back up out of the dark.");
+        }
         /// <summary>The off-tank: the raid's tank sim she is not on (it takes the brood), or null.</summary>
         public SimCompanion OffTank
         {

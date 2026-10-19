@@ -710,6 +710,22 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      keep). Out of her fight the shards erupt as before, for the look.
    - **Toward one in four:** her health 190,000 (185,000) with three a wave, the buffs, the feast and the spikes in. The run's log now counts
      spike bursts and hits.
+   **The tuning batch (2026-10-19; WRITTEN, NOT RUN again).** Chris, verbatim: "the spikes are launching in the air. not on the ground";
+   "paladin always seems to be the first one to die every round. something wrong with his kit or armor?", "give the pally some hear. he's
+   down again", "gear"; "one class. the shaman needs 1 in raid resurection" (play note 272).
+   - **The Paladin tank** (the run's bot, the main tank, first to die in about half the pulls). Three causes, all fixed: (1) its gear: the run
+     kitted it as a Paladin damage-dealer (some slots bare, as only the Warrior sim was counted a tank, and none of the tank's training):
+     1,111 health to the Warrior sim's 1,303. Now a tank bot wears all seven plate pieces of its level with the sim tank's armour and health
+     edges, and never less health than a Warrior sim tank of its level in those pieces; the run's log sets the two side by side. (2) The
+     healers put the sim tanks first and you after anyone: a tank you are now healed as a tank. (3) The bot never pressed its defences: under
+     60% it uses its Guard and its ward (Aegis) first. The Paladin's kit is not changed.
+   - **The spikes on the ground:** each shard is seated on the floor at its spot (the first ground under it, else the zone's), its lowest
+     point on the floor, and rises out of it and sinks back into it whole; they had sat at a height taken from her body. A test holds every
+     shard's lowest point within 5 cm of the floor. The crown on her back is apart from them (unchanged).
+   - **The Shaman's Barrow-wake** (GAME-ONLY, in the Shaman's own voice: the old dead send one back): once a fight (ready again 6 s after
+     it), a 3 s call at 30 m that raises a fallen one of the raid at 40% health and a third of its pool. On the bar's 13th slot, from level 10
+     (the highest a class's unlock may be), no talent; its icon the Barrow-call's for now. A Shaman sim uses it on the most needed of the
+     fallen within reach: a tank, then a healer, then a damage-dealer, never one lying in marked ground. The run's log counts the raisings.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

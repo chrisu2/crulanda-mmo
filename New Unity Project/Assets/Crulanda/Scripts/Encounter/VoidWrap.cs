@@ -32,6 +32,32 @@ namespace Crulanda.Encounter
         /// <summary>A body's own actor: dead, the wrap goes to crystal.</summary>
         public Crulanda.Gameplay.Actor Owner;
         Transform shardRoot; readonly List<(Transform t, Quaternion rest, Vector3 scale, float seed, Renderer rim, Renderer core)> shards = new List<(Transform, Quaternion, Vector3, float, Renderer, Renderer)>();
+        /// <summary>Each shard's seat (in the shards' root): its lowest point on the floor at its spot (Chris, the tuning batch: "the spikes are
+        /// launching in the air. not on the ground": they had sat at a height from her body, not the floor under them).</summary>
+        readonly List<Vector3> seats = new List<Vector3>();
+        /// <summary>The floor at <paramref name="p"/>'s spot: the first ground below (not an actor's body), else the zone's ground there, else
+        /// the shards' root's height.</summary>
+        float FloorAt(Vector3 p)
+        {
+            var hits = Physics.RaycastAll(new Vector3(p.x, p.y + 8, p.z), Vector3.down, 30, Physics.DefaultRaycastLayers, QueryTriggerInteraction.Ignore);
+            float best = float.NegativeInfinity; float top = p.y + 8;
+            foreach (var h in hits) { if (h.collider.GetComponentInParent<Crulanda.Gameplay.Actor>() != null) continue; if (h.point.y > best && h.point.y <= top) best = h.point.y; }
+            if (!float.IsNegativeInfinity(best)) return best;
+            var zone = Crulanda.World.ZoneBuilder.Active; if (zone != null) return zone.Ground(new Vector2(p.x, p.z)).y;
+            return shardRoot.position.y;
+        }
+        /// <summary>Sets shard <paramref name="i"/> at the spot under <paramref name="world"/>, leaning as <paramref name="rest"/>, its lowest point
+        /// (its aether rim's) on the floor.</summary>
+        void Seat(int i, Vector3 world, Quaternion rest)
+        {
+            var s = shards[i]; float floor = FloorAt(world), low = 0;
+            foreach (var v in new[] { Vector3.right, Vector3.forward, Vector3.left, Vector3.back })
+                low = Mathf.Min(low, (rest * Vector3.Scale(s.scale, Vector3.Scale(new Vector3(1.12f, 1.06f, 1.12f), v))).y);
+            var local = shardRoot.InverseTransformPoint(new Vector3(world.x, floor - low, world.z));
+            while (seats.Count <= i) seats.Add(Vector3.zero);
+            seats[i] = local; shards[i] = (s.t, rest, s.scale, s.seed, s.rim, s.core);
+            s.t.localPosition = local; s.t.localRotation = rest;
+        }
         Material voidMat, rimMat; MaterialPropertyBlock block; ParticleSystem ash;
         Vector3 lastPos; float squashUntil, eruptFrom = -10, nextErupt; bool crystal;
         /// <summary>The wait between eruptions (seconds), and an eruption's rise, stand and sink.</summary>
@@ -50,10 +76,8 @@ namespace Crulanda.Encounter
             {
                 var s = shards[i]; var c = spots[i % spots.Count];
                 var off = Quaternion.Euler(0, (float)placeRng.NextDouble() * 360, 0) * Vector3.forward * (radius * .8f * (float)placeRng.NextDouble());
-                var local = shardRoot.InverseTransformPoint(c + off); local.y = Mathf.Max(local.y, -.2f);
-                s.t.localPosition = local;
                 var rest = Quaternion.Euler(0, (float)placeRng.NextDouble() * 360, 0) * Quaternion.Euler(10 + 25 * (float)placeRng.NextDouble(), 0, 0);
-                shards[i] = (s.t, rest, s.scale, s.seed, s.rim, s.core);
+                Seat(i, c + off, rest);
             }
         }
         System.Random placeRng; readonly List<(Transform t, float until)> ghosts = new List<(Transform, float)>();
@@ -105,6 +129,7 @@ namespace Crulanda.Encounter
                 t.localRotation = rest; t.localScale = scale;
                 var rim = Part(t, "Aether", rimMat, 1.12f); var core = Part(t, "Void", voidMat, 1);
                 shards.Add((t, rest, scale, R(0, 100), rim, core));
+                Seat(shards.Count - 1, shardRoot.TransformPoint(t.localPosition), rest);
             }
             // The ash where it stands and moves: grey motes lifting and fading.
             var ashGo = new GameObject("Ash"); ashGo.transform.SetParent(transform, false); ashGo.transform.localPosition = new Vector3(0, Base + .05f, 0);
@@ -155,11 +180,14 @@ namespace Crulanda.Encounter
             if (rise <= 0) return;
             // The shifting edge: each shard turns and stretches on its own slow noise; the rim shimmers.
             float squash = t < squashUntil ? 1 : 0;
-            foreach (var s in shards)
+            for (int i = 0; i < shards.Count; i++)
             {
+                var s = shards[i];
                 float n1 = Mathf.PerlinNoise(s.seed, t * .9f) - .5f, n2 = Mathf.PerlinNoise(s.seed + 7, t * 1.3f) - .5f, n3 = Mathf.PerlinNoise(s.seed + 13, t * 2.1f) - .5f;
-                s.t.localRotation = s.rest * Quaternion.Euler(n1 * 14, n2 * 20, n3 * 14);
-                s.t.localScale = new Vector3(s.scale.x * (1 + n2 * .35f + squash * .4f), Mathf.Max(.001f, s.scale.y * rise * (1 + n1 * .18f - squash * .35f)), s.scale.z * (1 + n3 * .35f + squash * .4f));
+                // Up out of the floor at its seat and back down into it: the whole shard, from below the ground, never in the air.
+                if (i < seats.Count) s.t.localPosition = seats[i] + Vector3.down * ((1 - rise) * s.scale.y * 1.1f);
+                s.t.localRotation = s.rest * Quaternion.Euler(n1 * 6, n2 * 20, n3 * 6);
+                s.t.localScale = new Vector3(s.scale.x * (1 + n2 * .35f + squash * .4f), Mathf.Max(.001f, s.scale.y * (1 + n1 * .18f - squash * .35f)), s.scale.z * (1 + n3 * .35f + squash * .4f));
                 float shimmer = .25f + .4f * Mathf.PerlinNoise(s.seed + 3, t * 3.5f);
                 block.SetColor("_Color", new Color(Aether.r, Aether.g, Aether.b, shimmer)); s.rim.SetPropertyBlock(block);
                 // The flicker: now and then a shard is gone for a moment, its void thinner and thicker as it shifts.
@@ -173,17 +201,13 @@ namespace Crulanda.Encounter
         public void Erupt(bool full)
         {
             Eruptions++; eruptFrom = Time.time - (full ? Rise : 0); nextErupt = Time.time + Rise + Stand + Sink + Random.Range(EruptMin, EruptMax);
-            foreach (var s in shards)
-            {
-                float yaw = (float)placeRng.NextDouble() * 360, r = Radius * (.6f + .4f * (float)placeRng.NextDouble());
-                s.t.localPosition = Quaternion.Euler(0, yaw, 0) * Vector3.forward * r;
-            }
             for (int i = 0; i < shards.Count; i++)
             {
-                var s = shards[i]; float yaw = Quaternion.LookRotation(new Vector3(s.t.localPosition.x, 0, s.t.localPosition.z)).eulerAngles.y;
+                var s = shards[i];
+                float yaw = (float)placeRng.NextDouble() * 360, r = Radius * (.6f + .4f * (float)placeRng.NextDouble());
                 var rest = Quaternion.Euler(0, yaw, 0) * Quaternion.Euler(25 + 25 * (float)placeRng.NextDouble(), (float)placeRng.NextDouble() * 90, 0);
-                shards[i] = (s.t, rest, s.scale, s.seed, s.rim, s.core);
-                if (full) { s.t.localRotation = rest; s.t.localScale = s.scale; }
+                Seat(i, shardRoot.TransformPoint(Quaternion.Euler(0, yaw, 0) * Vector3.forward * r), rest);
+                if (full) s.t.localScale = s.scale;
             }
             shardRoot.gameObject.SetActive(true);
         }
@@ -199,7 +223,7 @@ namespace Crulanda.Encounter
         {
             crystal = on;
             var c = on ? Crystal : Void;
-            foreach (var s in shards) { block.SetColor("_Color", c); s.core.SetPropertyBlock(block); s.core.enabled = true; s.rim.enabled = !on; s.t.localRotation = s.rest; s.t.localScale = s.scale; }
+            for (int i = 0; i < shards.Count; i++) { var s = shards[i]; block.SetColor("_Color", c); s.core.SetPropertyBlock(block); s.core.enabled = true; s.rim.enabled = !on; s.t.localRotation = s.rest; s.t.localScale = s.scale; if (i < seats.Count) s.t.localPosition = seats[i]; }
             shardRoot.gameObject.SetActive(on);   // dead, the shards stand white round her (salt's work); alive, they erupt and sink
             if (ash != null) { if (on) ash.Stop(true, ParticleSystemStopBehavior.StopEmitting); else ash.Play(); }
         }

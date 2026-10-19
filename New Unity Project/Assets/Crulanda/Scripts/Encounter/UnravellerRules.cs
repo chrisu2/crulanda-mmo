@@ -167,6 +167,16 @@ namespace Crulanda.Encounter
         public bool SaltedBy(string thrower) { return thrower != null && salted.ContainsKey(thrower); }
     }
 
+    /// <summary>A once-a-fight charge (the Shaman's Barrow-wake, play note 272): ready, spent, and ready again when the fight is over. Pure.</summary>
+    public sealed class RezCharge
+    {
+        public bool Ready { get; private set; } = true;
+        /// <summary>Spends it: true when it was ready.</summary>
+        public bool Spend() { if (!Ready) return false; Ready = false; return true; }
+        /// <summary>The fight over (or wiped): ready again.</summary>
+        public void Reset() { Ready = true; }
+    }
+
     /// <summary>A rotation the raid's leader sets (3.5: the harpoons, the interrupts): members in turn; one who cannot (down, swallowed, out of
     /// harpoons) is passed over. Pure.</summary>
     public sealed class RaidRotation
@@ -193,6 +203,19 @@ namespace Crulanda.Encounter
     /// </summary>
     public static class RaidJobs
     {
+        /// <summary>Whom a Shaman raises (play note 272): the most needed of the fallen within reach, a tank, then a healer, then a
+        /// damage-dealer, the nearest of a kind first; never one lying in marked ground (the danger that killed them). Null for nobody.</summary>
+        public static string RezPick(IList<(string id, SimCompanion.PartyRole role, bool dead, bool inDanger, float distance)> all, float reach)
+        {
+            string best = null; int bestRank = 9; float bestD = float.MaxValue;
+            if (all != null) foreach (var c in all)
+            {
+                if (!c.dead || c.inDanger || c.distance > reach) continue;
+                int rank = c.role == SimCompanion.PartyRole.Tank ? 0 : c.role == SimCompanion.PartyRole.Healer ? 1 : 2;
+                if (rank < bestRank || rank == bestRank && c.distance < bestD) { best = c.id; bestRank = rank; bestD = c.distance; }
+            }
+            return best;
+        }
         /// <summary>A harpooner throws now: its turn, a harpoon in its bags, her within throwing reach, and her pin running out (2 s left or free).</summary>
         public static bool HarpoonNow(bool myTurn, float pinLeft, bool hasHarpoon, bool inReach, float lead) { return myTurn && hasHarpoon && inReach && pinLeft <= lead; }
         public enum Answer { None, Interrupt, Harpoon }

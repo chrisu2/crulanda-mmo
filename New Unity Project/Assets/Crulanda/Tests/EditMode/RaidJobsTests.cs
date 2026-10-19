@@ -77,6 +77,21 @@ namespace Crulanda.Tests
             CollectionAssert.IsEmpty(RaidJobs.KillOrder(null));
         }
 
+        [Test] public void The_Shaman_raises_once_a_fight_the_tank_first_never_in_the_danger()
+        {
+            // Play note 272, Chris: "the shaman needs 1 in raid resurection".
+            var w = new RezCharge(); Assert.IsTrue(w.Ready); Assert.IsTrue(w.Spend(), "once"); Assert.IsFalse(w.Spend(), "not twice in a fight");
+            w.Reset(); Assert.IsTrue(w.Spend(), "ready again after the fight (or the wipe)");
+            var t = SimCompanion.PartyRole.Tank; var h = SimCompanion.PartyRole.Healer; var d = SimCompanion.PartyRole.Damage;
+            var fallen = new List<(string, SimCompanion.PartyRole, bool, bool, float)> { ("rogue", d, true, false, 5), ("cleric", h, true, false, 20), ("warrior", t, true, false, 28), ("you", t, false, false, 2) };
+            Assert.AreEqual("warrior", RaidJobs.RezPick(fallen, 30), "a tank first");
+            fallen[2] = ("warrior", t, true, true, 28);
+            Assert.AreEqual("cleric", RaidJobs.RezPick(fallen, 30), "not one lying in the danger: then a healer");
+            Assert.AreEqual("rogue", RaidJobs.RezPick(fallen, 10), "out of reach left: then damage");
+            Assert.IsNull(RaidJobs.RezPick(new List<(string, SimCompanion.PartyRole, bool, bool, float)> { ("you", t, false, false, 1) }, 30), "nobody fallen");
+            CollectionAssert.Contains(ShamanKit.BarIds, "shaman.barrow_wake", "on the Shaman's bar (slot 13, from level 10, no talent)");
+        }
+
         [Test] public void The_raids_control_holds_the_brood_the_Archivist_first()
         {
             var d = SimCompanion.PartyRole.Damage;

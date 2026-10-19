@@ -13,7 +13,8 @@ namespace Crulanda.Encounter
     /// off by Chris; PROVISIONAL names): an orc weather-speaker who calls on rain, stone and the old dead. Standing stones raised from the
     /// ground, not built (no machines). Breath, a well of 100, pays for every call.
     /// Bar: 1 Squall, 2 Tide Mend, 3 Rain Call, 4 Chain Mend, 5 Thunderhead, 6 Hailfall, 7 Earthskin, 8 Rooting Stamp, 9 Cairn,
-    /// 10 Moor Wind, 11 Mist, 12 Barrow-call.
+    /// 10 Moor Wind, 11 Mist, 12 Barrow-call, 13 Barrow-wake (Chris, play note 272: "the shaman needs 1 in raid resurection"; GAME-ONLY: once
+    /// a fight the old dead send a fallen one of yours back, at level 10, no talent).
     /// Four paths: Rainspeaker (healer), Stormcaller (ranged dps), Stonebound (tank), Gravewind (control).
     /// </summary>
     public sealed class ShamanKit : ClassKit
@@ -25,7 +26,7 @@ namespace Crulanda.Encounter
             "gw-moor-wind", "gw-mist", "gw-barrow", "gw-cold", "gw-long-dark", "gw-wailing",
             "rs-soft-rain", "rs-spring-tide", "sc-low-clouds", "sc-heavy-sky", "sb-bedrock", "sb-stone-call", "gw-far-wind", "gw-clinging-mist" };   // tier 3 (the cap of 20, 2026-10-16)
         public static readonly string[] BarIds = { "shaman.squall", "shaman.tide_mend", "shaman.rain_call", "shaman.chain_mend", "shaman.thunderhead", "shaman.hailfall",
-            "shaman.earthskin", "shaman.rooting_stamp", "shaman.cairn", "shaman.moor_wind", "shaman.mist", "shaman.barrow_call" };
+            "shaman.earthskin", "shaman.rooting_stamp", "shaman.cairn", "shaman.moor_wind", "shaman.mist", "shaman.barrow_call", "shaman.barrow_wake" };
         public const float MendReach = 30, RainRadius = 8, ChainReach = 12, HailRadius = 6, StampRadius = 8, WindRadius = 8, EarthskinCut = .1f, LowMend = .35f, SpringTide = .05f, StoneCallSeconds = 3, MistSlow = .3f, MistSlowSeconds = 6;
 
         readonly Dictionary<string, AbilityDefinition> abilities = new Dictionary<string, AbilityDefinition>(StringComparer.Ordinal);
@@ -113,6 +114,7 @@ namespace Crulanda.Encounter
                 case "shaman.moor_wind": return MoorWind(a);
                 case "shaman.mist": return Mist(a);
                 case "shaman.barrow_call": return BarrowCall(a);
+                case "shaman.barrow_wake": return BarrowWake(a);
             }
             return false;
         }
@@ -213,6 +215,17 @@ namespace Crulanda.Encounter
             });
         }
 
+        // ---------- Barrow-wake (the fight's one raising) ----------
+        /// <summary>Once a fight (until 6 s out of one): spent.</summary>
+        public readonly RezCharge Wake = new RezCharge();
+        bool BarrowWake(AbilityDefinition a)
+        {
+            if (!Need(Wake.Ready, "The old dead have already sent one back this fight.")) return false;
+            var who = s.RezTarget(s.Player.transform.position, a.range);
+            if (!Need(who != null, "Nobody of yours lies fallen within reach (or they lie in the danger).")) return false;
+            return Start(a, () => { if (!who.IsAlive && Wake.Spend()) s.RaiseFallen(who, s.Player, a.name); });
+        }
+
         // ---------- incoming blows ----------
         public override int ResolveEnemyHit(EncounterEnemy enemy, Actor victim, int raw)
         {
@@ -255,7 +268,7 @@ namespace Crulanda.Encounter
         {
             periodic.Tick(Now);
             if (inCombat) lastFight = Now;
-            if (Now - lastFight > 6) { ancestorSpent = mountainSpent = false; charge = 0; }
+            if (Now - lastFight > 6) { ancestorSpent = mountainSpent = false; charge = 0; Wake.Reset(); }
         }
         public override void ResetState() { periodic.Clear(); charge = 0; earthskinUntil = 0; ancestorSpent = mountainSpent = false; }
         public override void ClearTransient() { ResetState(); if (s.Player != null) PlayerCombat.ClearBarrier(); }

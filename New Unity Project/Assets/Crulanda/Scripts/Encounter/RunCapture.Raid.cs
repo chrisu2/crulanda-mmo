@@ -36,7 +36,9 @@ namespace Crulanda.Encounter
             int level = EncounterProgress.LevelCap;
             s.Progress.experience = EncounterProgress.XpForLevel(level); s.Player.SetLevel(level); s.LevelHeld = true;
             Log("Your talents: " + SpendForRole(s) + ".");
-            SimCompanion.KitPlayerLike(s, new SimAdventurer { classId = s.ClassDef.id, level = level, gearSeed = 7, gearBonus = 2 });
+            SimCompanion.KitPlayerLike(s, new SimAdventurer { classId = s.ClassDef.id, level = level, gearSeed = 7, gearBonus = 2 }, s.PlayerRole == SimCompanion.PartyRole.Tank);   // a tank's kit for the tank bot
+            { var w = new SimAdventurer { classId = "class.warrior", level = level, gearSeed = 7, gearBonus = 2 };
+              Log("Your kit (" + s.PlayerRole + "): " + s.Player.Health.Pool.Max + " health, armour " + s.Player.Stats.GetRounded(Crulanda.Core.StatType.Armor) + "; a Warrior sim tank of " + level + " in the same pieces: " + SimCompanion.MaxHealthFor(w, s.Items) + " health, armour " + SimCompanion.ArmourFor(w, s.Items) + "."); }
             Inventory.Add(s.Progress, s.Items, Unraveller.SaltItem, 6); Inventory.Add(s.Progress, s.Items, Unraveller.HarpoonItem, 6);
             // The bot's raid food, elixirs and draughts (raid 6: none were used), enough for every pull.
             { int pullsWanted = PullsArg; var all = s.Items.Items.Values;
@@ -100,6 +102,7 @@ namespace Crulanda.Encounter
                 s.Select(e); s.BeginAutoAttack();
                 Log("Pull " + pull + " (seed " + (1000 + pull) + "): she is pulled.");
                 Shot(s, directory, "pull" + pull + "-0-pulled", ref shots, null);
+                int rezzesBefore = s.Rezzes;
                 float start = Time.time, nextCast = 0, nextLog = Time.time + 30; int phaseSeen = 1; var dead = new HashSet<string>(); string firstDeath = null;
                 bool won = false, ended = false; float lastRatio = 1;
                 while (Time.time - start < PullLimit)
@@ -124,7 +127,7 @@ namespace Crulanda.Encounter
                 float took = Time.time - start;
                 if (won) { wins++; killTime += took; }
                 string end = won ? "KILL in " + Clock(took) : ended ? "WIPE at " + Clock(took) + " (her at " + Mathf.RoundToInt(lastRatio * 100) + "%" + (s.Feasts > 0 ? ", the feast" : "") + ")" : "CALLED at " + Clock(took) + " (stuck)";
-                string counts = "brood " + s.BroodRisen + " (killed " + s.BroodKilled + ", broke free of their holds " + s.BroodBrokeFree + ", eaten " + s.BroodEaten + "), swallowed freed " + s.SwallowsFreed + " erased " + s.SwallowsErased + ", hunts missed " + s.HuntsMissed + " landed " + s.HuntsLanded + ", harpoons " + s.HarpoonsThrown + ", salts " + s.SaltsThrown + ", pulses " + s.Pulses + ", spike bursts " + s.SpikeBursts + " (hit " + s.SpikeHits + ")";
+                string counts = "brood " + s.BroodRisen + " (killed " + s.BroodKilled + ", broke free of their holds " + s.BroodBrokeFree + ", eaten " + s.BroodEaten + "), swallowed freed " + s.SwallowsFreed + " erased " + s.SwallowsErased + ", hunts missed " + s.HuntsMissed + " landed " + s.HuntsLanded + ", harpoons " + s.HarpoonsThrown + ", salts " + s.SaltsThrown + ", pulses " + s.Pulses + ", spike bursts " + s.SpikeBursts + " (hit " + s.SpikeHits + "), raised " + (s.Rezzes - rezzesBefore);
                 Log("Pull " + pull + ": " + end + "; " + counts + (firstDeath != null ? "; first death: " + firstDeath.Trim() : ""));
                 lines.Add("Pull " + pull + ": " + end + "; deaths " + dead.Count + "; " + counts);
                 Shot(s, directory, "pull" + pull + "-end-" + (won ? "kill" : "wipe"), ref shots, null);

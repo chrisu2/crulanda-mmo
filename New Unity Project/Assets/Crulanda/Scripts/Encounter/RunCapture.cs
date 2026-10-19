@@ -546,6 +546,9 @@ namespace Crulanda.Encounter
         {
             if (s.PlayerCasting || s.Kit == null) return;
             bool hurt = s.Player.Health.Pool.Ratio < .45f || s.PartySims.Exists(c => c != null && c.actor != null && c.actor.IsAlive && c.actor.Health.Pool.Ratio < .45f);
+            // A tank's defences (the raids: the bot tank used none, Guard and Aegis on the bar unpressed): under 60% its guard or ward first.
+            if (s.PlayerRole == SimCompanion.PartyRole.Tank && s.Player.Health.Pool.Ratio < .6f)
+                for (int i = 0; i < s.Kit.ActionCount; i++) { var a = s.Kit.ActionAt(i); if (a == null || s.Kit.ActionLockLabel(i) != null) continue; if ((a.effect == Crulanda.Abilities.AbilityEffect.Guard || a.effect == Crulanda.Abilities.AbilityEffect.Rally) && s.UseAbility(i)) return; }
             for (int pass = 0; pass < 2; pass++)
                 for (int i = 0; i < s.Kit.ActionCount; i++)
                 {

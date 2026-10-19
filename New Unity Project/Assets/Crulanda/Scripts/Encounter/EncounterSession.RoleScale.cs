@@ -16,9 +16,9 @@ namespace Crulanda.Encounter
         public static readonly Dictionary<string, float> BuildDamageScale = new Dictionary<string, float>
         {
             // DPS toward the median; a hybrid class's damage path at HybridDpsShare of it (2026-10-16: judicator .71, thornclaw .74,
-            // thornsong 2.42 and the-unwriting 1.6 before, each x0.9)
-            { "class.ranger/marksman", 0.64f }, { "class.druid/thornclaw", 0.67f }, { "class.ranger/skirmisher", 0.69f }, { "class.paladin/judicator", 0.64f },
-            { "class.mage/combustion", 1.88f }, { "class.druid/thornsong", 2.18f }, { "class.archivist/the-unwriting", 1.44f },
+            // thornsong 2.42 and the-unwriting 1.6 before, each x0.9; 2026-10-19, Chris "hybrids 75% of target": each x0.75 of those)
+            { "class.ranger/marksman", 0.64f }, { "class.druid/thornclaw", 0.555f }, { "class.ranger/skirmisher", 0.69f }, { "class.paladin/judicator", 0.533f },
+            { "class.mage/combustion", 1.88f }, { "class.druid/thornsong", 1.815f }, { "class.archivist/the-unwriting", 1.2f },
             // under the role caps
             { "class.ranger/pathfinder", .60f }, { "class.rogue/thiefs-grace", .82f }, { "class.rogue/swashbuckler", .72f }, { "class.paladin/vanguard", .92f },
             { "class.warrior/support", .93f }, { "class.warrior/jailer", .93f },
@@ -70,7 +70,7 @@ namespace Crulanda.Encounter
         /// healer's path besides its damage (Docs/BALANCE_REPORT.md). Their scales above are the 62-72 retune's x0.9; the sims' blows too
         /// (SimCompanion.Hit).
         /// </summary>
-        public const float HybridDpsShare = .90f;
+        public const float HybridDpsShare = .75f;   // Chris, 2026-10-19: "hybrids 75% of target" (was .90, "A bit lower", 2026-10-16)
         /// <summary>The hybrid classes: every class with a tank's or a healer's path (talent data; TalentDataTests checks the list).</summary>
         public static readonly HashSet<string> HybridClasses = new HashSet<string> { "class.warrior", "class.druid", "class.paladin", "class.archivist", "class.saltmender", "class.cleric", "class.shaman" };
         public static bool Hybrid(string classId) { return classId != null && HybridClasses.Contains(classId); }

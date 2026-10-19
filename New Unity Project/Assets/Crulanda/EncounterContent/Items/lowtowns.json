@@ -13,6 +13,18 @@
       "canonStatus": "CANON: salt against the Weave-Eaters (book1 ch.20:199-203); the twist GAME-ONLY"
     },
     {
+      "id": "throw.salt_snare",
+      "name": "Salt snare",
+      "kind": "consumable",
+      "thrown": "snare",
+      "quality": 1,
+      "level": 18,
+      "value": 4,
+      "stack": 10,
+      "description": "A pouch of grey salt and three bone stakes. Laid in a ring where the Weave-Eaters will come, it holds the first to cross it, white and still.",
+      "canonStatus": "CANON: salt and bone against the Weave-Eaters (book1 ch.20:181-205); the snare GAME-ONLY"
+    },
+    {
       "id": "throw.bone_harpoon",
       "name": "Bone harpoon",
       "kind": "consumable",
@@ -52,6 +64,7 @@
       "npc": "Tibb Marrow",
       "items": [
         "throw.salt_twist",
+        "throw.salt_snare",
         "potion.salt"
       ]
     },

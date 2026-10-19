@@ -17,6 +17,8 @@ namespace Crulanda.Encounter
         bool ThrowItem(ItemDef d)
         {
             string kind = WeaveEaterRules.ThrownKind(d); var t = Target;
+            // A salt snare (play note 281): laid where your target is (a brood's path), else at your feet; it needs no target.
+            if (kind == WeaveEaterRules.Snare) { if (InCombat && t == null && Player == null) return false; Inventory.Remove(Progress, d.id, 1); LaySnare(t != null && t.actor.IsAlive && Distance(t) <= WeaveEaterRules.ThrowRange ? t.transform.position : Player.transform.position, Player); Message("You lay a ring of salt on bone stakes: whatever of the Weave-Eaters crosses it will stand white."); return true; }
             if (t == null || t.actor == null || !t.actor.IsAlive || t.Game) { Message(WeaveEaterRules.NoTargetLine); return false; }
             if (Distance(t) > WeaveEaterRules.ThrowRange) { Message("Too far to throw. Come within " + WeaveEaterRules.ThrowRange + " metres."); return false; }
             Inventory.Remove(Progress, d.id, 1);

@@ -94,7 +94,7 @@ namespace Crulanda.Encounter
             RaidBossPinned = e.PinLeft; RaidBossEnrage = UnravellerRules.EnrageLeft(e.SincePull, t);
             if (e.PinLeft <= 0) { if (pinFreeSince < 0) pinFreeSince = now; else if (now - pinFreeSince > 1.5f && HarpoonRotation != null && HarpoonRotation.Current(HarpoonAble) == RaidGroup.You) { HarpoonRotation.Skip(); pinFreeSince = now; } }
             else pinFreeSince = -1;
-            TickSpikes(e, now);
+            TickSpikes(e, now); TickSnares();
             if (!feasted && UnravellerRules.Feast(e.SincePull, t)) Feast(e);
         }
         // ---------- the ground spikes (raid 7): warned, then they burst ----------
@@ -164,6 +164,7 @@ namespace Crulanda.Encounter
         void BeginUnravellerFight(EncounterEnemy e)
         {
             float now = Time.time; e.PullAt = now; e.RaidPhase = 0; feasted = false; nextSpike = now + Random.Range(UT.spikeEveryMin, UT.spikeEveryMax); nextBrood = now + Mathf.Max(10, UT.broodEvery1);   // phase-1 adds (off by default)
+            HarmSeconds.Clear(); SnaresLaid = SnaresCaught = BroodHoldsRanOut = 0;
             SpikeBursts = SpikeHits = BroodKilled = BroodBrokeFree = BroodRisen = BroodEaten = SwallowsFreed = SwallowsErased = HuntsMissed = HuntsLanded = Pulses = Feasts = HarpoonsThrown = SaltsThrown = 0;
             SetRotations();
             if (Unraveller.FightTrackReady) Crulanda.World.ZoneMusic.FightOverride = Unraveller.FightTrack;
@@ -176,6 +177,8 @@ namespace Crulanda.Encounter
             BroodNow.Clear(); BroodKill = null; broodWas.Clear(); broodDeadAt.Clear();
             foreach (var u in unmade) if (u.mark != null) Destroy(u.mark.gameObject);
             unmade.Clear(); groundSeconds.Clear();
+            foreach (var sn in snares) if (sn.mark != null) Destroy(sn.mark.gameObject);
+            snares.Clear();
             foreach (var s in spikeSpots) if (s.mark != null) Destroy(s.mark.gameObject);
             spikeSpots.Clear(); spikeAt = -1; nextSpike = 0;
             var wrap = WrapOf(e); if (wrap != null) wrap.AutoErupt = true;
@@ -314,6 +317,46 @@ namespace Crulanda.Encounter
                 return help != null ? ("In " + (help.Label ?? "blessed ground"), false) : ((string, bool)?)null;
             }
         }
+        // ---------- the salt snare (play note 281; CANON: salt and bone hold the Weave-Eaters, b1 ch.20:181-205; the snare GAME-ONLY) ----------
+        readonly List<(Vector3 at, float until, BlowMark mark)> snares = new List<(Vector3, float, BlowMark)>();
+        public int SnaresLaid, SnaresCaught;
+        /// <summary>The raid's Trapper (a sim's id, "you", or null: the first Ranger of the raid; /raid trapper).</summary>
+        public string TrapperId { get; set; }
+        public string Trapper { get { if (TrapperId != null) return TrapperId; var r = PartySims.Find(c => c != null && c.actor.IsAlive && c.sim.classId == "class.ranger"); return r != null ? r.sim.id : null; } }
+        public int SnaresOut { get { return snares.Count; } }
+        /// <summary>A salt snare laid at <paramref name="at"/> by <paramref name="by"/>: a white ring of salt on bone stakes (a helpful mark).</summary>
+        public void LaySnare(Vector3 at, Actor by)
+        {
+            var t = UT; if (NavMesh.SamplePosition(at, out var hit, 2.5f, NavMesh.AllAreas)) at = hit.position;
+            var m = BlowMark.Create(GroundKind.Helpful, t.snareSeconds + 1, "A salt snare", true); m.Ally = by != Player; m.Show(at, t.snareRadius, 1);
+            snares.Add((at, Time.time + t.snareSeconds, m)); SnaresLaid++;
+            FloatText(at + Vector3.up, "Salt snare", new Color(.95f, .95f, .9f));
+        }
+        void TickSnares()
+        {
+            var t = UT;
+            for (int i = snares.Count - 1; i >= 0; i--)
+            {
+                var s = snares[i]; bool done = Time.time >= s.until;
+                if (!done)
+                    foreach (var b in BroodNow)
+                    {
+                        if (b == null || !b.actor.IsAlive || b.Controlled || b.Calcified || Flat(b.transform.position - Vector3.up - s.at) > t.snareRadius) continue;
+                        b.RawStun(t.snareHold); b.CalcifyBrood(t.snareHold); SnaresCaught++; done = true;   // white crystal in the salt: held, then shattered in the kill order
+                        FloatText(b.transform.position + Vector3.up * 1.5f, "Snared", new Color(.97f, .97f, .92f));
+                        break;
+                    }
+                if (done) { if (s.mark != null) Destroy(s.mark.gameObject); snares.RemoveAt(i); }
+                else if (s.mark != null) s.mark.Show(s.at, t.snareRadius, 1);
+            }
+        }
+        /// <summary>Seconds each of the raid (and a pet) stood in harmful ground this pull (the run's log).</summary>
+        public readonly Dictionary<string, float> HarmSeconds = new Dictionary<string, float>();
+        public void CountHarm(Actor a, float seconds)
+        {
+            if (a == null || seconds <= 0) return; string n = a == Player ? "you" : a.DisplayName.Split(' ')[0] + (a.DisplayName.Contains("'s ") ? " " + a.DisplayName.Split(' ').Last() : "");
+            HarmSeconds.TryGetValue(n, out var was); HarmSeconds[n] = was + seconds;
+        }
         /// <summary>Raisings this session (the Shaman's Barrow-wake; the run's log).</summary>
         public int Rezzes;
         /// <summary>The fallen one a Shaman at <paramref name="from"/> raises (RaidJobs.RezPick: a tank, a healer, a damage-dealer; not in marked ground).</summary>
@@ -365,20 +408,22 @@ namespace Crulanda.Encounter
             }
         }
         readonly Dictionary<EncounterEnemy, float> broodDeadAt = new Dictionary<EncounterEnemy, float>();
-        readonly Dictionary<EncounterEnemy, (bool alive, bool held)> broodWas = new Dictionary<EncounterEnemy, (bool, bool)>();
+        readonly Dictionary<EncounterEnemy, (bool alive, bool held, float left)> broodWas = new Dictionary<EncounterEnemy, (bool, bool, float)>();
+        /// <summary>Holds on the brood that ran their time out (not broken: BroodBrokeFree counts those broken by a blow).</summary>
+        public int BroodHoldsRanOut;
         /// <summary>Each brood's last frame: killed (alive to dead) and broke free (its hold ran out, not the Skull's broken by the raid).</summary>
         void CountBrood()
         {
             foreach (var b in BroodNow)
             {
                 if (b == null) continue;
-                bool alive = b.actor.IsAlive, held = b.Incapacitated;
+                bool alive = b.actor.IsAlive, held = b.Incapacitated; float left = held ? b.ControlSecondsLeft : 0;
                 if (broodWas.TryGetValue(b, out var was))
                 {
                     if (was.alive && !alive) BroodKilled++;
-                    else if (alive && was.held && !held && b != BroodKill) BroodBrokeFree++;
+                    else if (alive && was.held && !held && b != BroodKill) { if (was.left > .3f) BroodBrokeFree++; else BroodHoldsRanOut++; }   // broken by a blow, or its time out
                 }
-                broodWas[b] = (alive, held);
+                broodWas[b] = (alive, held, left);
             }
         }
         /// <summary>The kill order kept: the Skull on the first of it (raid 5).</summary>
@@ -457,6 +502,8 @@ namespace Crulanda.Encounter
             {
                 nextUnmade = now + t.unmadeEvery;
                 var at = e.transform.position; if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
+                // No more than unmadeMost at once (Chris: "some reds under her are staying a long time"): the oldest goes.
+                while (unmade.Count >= t.unmadeMost) { if (unmade[0].mark != null) Destroy(unmade[0].mark.gameObject); unmade.RemoveAt(0); }
                 var m = BlowMark.Create(GroundKind.Harmful, t.unmadeWarn + t.unmadeLife + 1, Unraveller.UnmadeName); m.BodyColour = UnmadeGrey; m.Show(at, t.unmadeRadius, 0);
                 unmade.Add((at, now + t.unmadeWarn, m));
                 if (Player != null && Flat(Player.transform.position - at) <= t.unmadeRadius + 1) RaidWarning(Unraveller.UnmadeWarning);

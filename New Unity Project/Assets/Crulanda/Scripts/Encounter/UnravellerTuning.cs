@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     public sealed class UnravellerTuning
     {
         // ---------- her, and the clock ----------
-        public int health = 190000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
+        public int health = 140000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
         // ---------- the rules that hold all fight (3.3): the Weave-Eaters' own, scaled ----------
         public float lighthouseShare = .1f, lighthouseBeat = 2, lighthouseReach = 30;
         public float blinkEvery = 9, blinkReach = 12, touchShare = .6f, touchSilence = 3, wardReach = 10;
@@ -31,7 +31,7 @@ namespace Crulanda.Encounter
         /// <summary>A control class's hold on a brood (raid 4): its seconds and its wait before the next.</summary>
         public float broodHoldSeconds = 18, broodHoldEvery = 15;
         public float broodHealthShare = .3f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
-        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .15f, unmadeRamp = .05f, unmadeLife = 40;
+        public float unmadeEvery = 20, unmadeRadius = 2.5f, unmadeWarn = 3, unmadeShare = .15f, unmadeRamp = .05f, unmadeLife = 18; public int unmadeMost = 4;
         public float swallowEvery2 = 35, swallowEvery3 = 40, swallowShare = .04f, swallowSeconds = 10; public int saltsToFree = 3;
         public float saltWindow = 12, calcifySeconds = 4, calcifyTaken = 1.5f;
         // ---------- phase 3 ----------
@@ -41,8 +41,12 @@ namespace Crulanda.Encounter
         /// <summary>Every spikeEveryMin-Max s her shards burst out of the ground at two spots (one where one of the raid stands, one at her edge),
         /// a violet crack shown spikeWarn s before; spikeShare of the health of anyone within spikeRadius, thrown up (stunned) spikeLift s.</summary>
         public float spikeEveryMin = 5, spikeEveryMax = 7, spikeWarn = 1.5f, spikeRadius = 2.2f, spikeShare = .27f, spikeLift = .6f;
+        // ---------- the salt snare (play note 281, Chris: "need some type of mechanism to trap the brood..someone that can do an extra job") ----------
+        /// <summary>A ring of salt on bone stakes: snareRadius across, snareSeconds on the ground or until it holds one; a brood crossing it calcified
+        /// snareHold s; the Trapper lays snaresPerWave a wave, one each snareEvery s.</summary>
+        public float snareSeconds = 30, snareHold = 12, snareRadius = 1.5f, snareEvery = 8; public int snaresPerWave = 3;
         // ---------- the sims (3.5) ----------
-        public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;
+        public float simRaidLift = 1.2f; public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;
         /// <summary>The chance a sim misses its part of a mechanic now and then: at 18, at 20, and what a careless one (rash: nerve over .75) adds.</summary>
         public float simMissAt18 = .12f, simMissAt20 = .04f, simMissCareless = .06f;
 

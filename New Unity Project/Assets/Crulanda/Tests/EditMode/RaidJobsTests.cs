@@ -112,6 +112,17 @@ namespace Crulanda.Tests
             finally { Object.DestroyImmediate(bad.gameObject); Object.DestroyImmediate(good.gameObject); Object.DestroyImmediate(green.gameObject); }
         }
 
+        [Test] public void The_salt_snare_is_sold_thrown_and_tuned()
+        {
+            // Play note 281, Chris: "need some type of mechanism to trap the brood..someone that can do an extra job".
+            var t = T;
+            Assert.AreEqual(30, t.snareSeconds); Assert.AreEqual(12, t.snareHold); Assert.AreEqual(3, t.snaresPerWave); Assert.AreEqual(8, t.snareEvery);
+            var d = new ItemDef { id = "throw.salt_snare", kind = "consumable", thrown = "snare" };
+            Assert.AreEqual(WeaveEaterRules.Snare, WeaveEaterRules.ThrownKind(d), "laid from the bags as salt and harpoons are thrown");
+            Assert.AreEqual(.75f, EncounterSession.HybridDpsShare, 1e-4f, "Chris, 2026-10-19: \"hybrids 75% of target\"");
+            Assert.Less(SimCompanion.TankDpsShare, EncounterSession.HybridDpsShare); Assert.Less(SimCompanion.ControlDpsShare, EncounterSession.HybridDpsShare);
+        }
+
         [Test] public void The_raids_control_holds_the_brood_the_Archivist_first()
         {
             var d = SimCompanion.PartyRole.Damage;

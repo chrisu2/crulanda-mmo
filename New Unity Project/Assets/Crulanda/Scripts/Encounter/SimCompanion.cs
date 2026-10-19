@@ -187,7 +187,13 @@ namespace Crulanda.Encounter
         /// damage part its blow holds it to the pure damage band, a hybrid to EncounterSession.HybridDpsShare of it (Chris, 2026-10-16:
         /// "A bit lower"), its pet's bites counted in (SimCompanion.Damage, 2026-10-17); a tank and a healer hit half their formula's blow.
         /// </summary>
-        public int Hit { get { float blow = Role == PartyRole.Damage ? DamageBlow : Role == PartyRole.Tank ? TankBlow : BaseHit * RoleDamage(Role); return Mathf.Max(1, Mathf.RoundToInt(blow * (1 + DamageEdge))); } }
+        public int Hit { get { float blow = Role == PartyRole.Damage ? DamageBlow : Role == PartyRole.Tank ? TankBlow : BaseHit * RoleDamage(Role); return Mathf.Max(1, Mathf.RoundToInt(blow * (1 + DamageEdge) * RaidLift)); } }
+        /// <summary>
+        /// In the world boss's fight a sim's blows are this much heavier (UnravellerTuning.simRaidLift): the time it loses there (the adds, the
+        /// harpoons, the salt, out of the red, waiting on a tank) took the damage-dealers to 48-74 a second against the band's 88 (tune-1, read
+        /// by the real clock); Chris's raid target is the band less that time, about 80-95 for a pure damage-dealer. Elsewhere 1.
+        /// </summary>
+        float RaidLift { get { return session != null && session.UnravellerFighting != null && Role != PartyRole.Healer ? UnravellerTuning.Current.simRaidLift : 1; } }
         public int HealAmount { get { return Mathf.RoundToInt(12 + 5 * sim.level); } }
         /// <summary>Experience from the party's kills (EncounterSession.EnemyDied): a level when it has enough, said in Party.</summary>
         public void GainXp(int xp)
@@ -921,6 +927,14 @@ namespace Crulanda.Encounter
                 // Once at its quarry a melee sim holds its ground through a nudge (StandSlack): a shove from a pet or a sim walking past no
                 // longer sends it off "closing on" a quarry it is all but touching (SimDummyTests, 2026-10-18: the Scoundrel 3 s of 40 not striking).
                 if (d > Reach + (Melee && atQuarry == quarry ? StandSlack : 0)) { atQuarry = null; agent.isStopped = false; agent.speed = 5.2f; CloseOn(quarry); Activity = "Closing on " + quarry.actor.DisplayName; return; }
+                // In red where it would strike from (her edge lies in her unmade ground): a clear spot within reach first (Chris: "people still
+                // standing in red areas. they need to evacuate").
+                if (GroundMarks.InHarm(transform.position))
+                {
+                    var clearSpot = GroundMarks.StrikeSpot(transform.position, quarry.transform.position, quarry.BodyRadius, Reach);
+                    var go = clearSpot ?? GroundMarks.StepOut(NavMesh.SamplePosition(transform.position, out var u, 2, NavMesh.AllAreas) ? u.position : transform.position - Vector3.up);
+                    if (go.HasValue) { agent.isStopped = false; agent.speed = 5.2f; agent.SetDestination(go.Value); Activity = "Out of the red"; return; }
+                }
                 atQuarry = quarry; closeStuckSince = -1;
                 agent.isStopped = true;
                 StrikeAt(quarry, true);

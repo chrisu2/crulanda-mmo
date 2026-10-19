@@ -89,6 +89,7 @@ namespace Crulanda.Encounter
                 yield return new WaitForSeconds(1);
                 // The buff-up (raid 6): the sims restock their packs (their coin), everyone buffs, a ready check, and the pull waits for it.
                 foreach (var c in s.PartySims) if (c != null) { c.sim.coin = Mathf.Max(c.sim.coin, 400); SimEconomy.Stock(c.sim, s.Items); }
+                { float quiet = Time.time; while (s.InCombat && Time.time - quiet < 30) yield return null; }   // out of the fight first (tune-2: pull 2's buff-up came while the brood still fought, and nobody buffed)
                 foreach (var line in s.RaidBuffUp()) Log("Pull " + pull + " buff-up: " + line);
                 yield return new WaitForSeconds(1);
                 if (s.ReadyCheck()) { float rc = Time.time; while (s.Raid.Checking && Time.time - rc < 12) yield return null; }
@@ -128,7 +129,7 @@ namespace Crulanda.Encounter
                 float took = Time.time - start;
                 if (won) { wins++; killTime += took; }
                 string end = won ? "KILL in " + Clock(took) : ended ? "WIPE at " + Clock(took) + " (her at " + Mathf.RoundToInt(lastRatio * 100) + "%" + (s.Feasts > 0 ? ", the feast" : "") + ")" : "CALLED at " + Clock(took) + " (stuck)";
-                string counts = "brood " + s.BroodRisen + " (killed " + s.BroodKilled + ", broke free of their holds " + s.BroodBrokeFree + ", eaten " + s.BroodEaten + "), swallowed freed " + s.SwallowsFreed + " erased " + s.SwallowsErased + ", hunts missed " + s.HuntsMissed + " landed " + s.HuntsLanded + ", harpoons " + s.HarpoonsThrown + ", salts " + s.SaltsThrown + ", pulses " + s.Pulses + ", spike bursts " + s.SpikeBursts + " (hit " + s.SpikeHits + "), raised " + (s.Rezzes - rezzesBefore);
+                string counts = "brood " + s.BroodRisen + " (killed " + s.BroodKilled + ", holds broken by a blow " + s.BroodBrokeFree + ", holds run out " + s.BroodHoldsRanOut + ", eaten " + s.BroodEaten + "), swallowed freed " + s.SwallowsFreed + " erased " + s.SwallowsErased + ", hunts missed " + s.HuntsMissed + " landed " + s.HuntsLanded + ", harpoons " + s.HarpoonsThrown + ", salts " + s.SaltsThrown + ", pulses " + s.Pulses + ", spike bursts " + s.SpikeBursts + " (hit " + s.SpikeHits + "), raised " + (s.Rezzes - rezzesBefore) + ", snares " + s.SnaresLaid + " (caught " + s.SnaresCaught + "); in the red: " + (s.HarmSeconds.Count == 0 ? "nobody" : string.Join(", ", s.HarmSeconds.OrderByDescending(kv => kv.Value).Select(kv => kv.Key + " " + kv.Value.ToString("0") + " s")));
                 Log("Pull " + pull + ": " + end + "; " + counts + (firstDeath != null ? "; first death: " + firstDeath.Trim() : ""));
                 lines.Add("Pull " + pull + ": " + end + "; deaths " + dead.Count + "; " + counts);
                 Shot(s, directory, "pull" + pull + "-end-" + (won ? "kill" : "wipe"), ref shots, null);
@@ -178,8 +179,14 @@ namespace Crulanda.Encounter
             {
                 var feet = NavMesh.SamplePosition(me, out var under, 2, NavMesh.AllAreas) ? under.position : me - Vector3.up;
                 var outOf = GroundMarks.StepOut(feet);
-                if (outOf.HasValue) { goal = outOf; reach = .4f; }
-                else { goal = e.transform.position; reach = (MeleeClass(s) ? 2.4f : 12) + e.BodyRadius; }   // to her edge
+                if (outOf.HasValue) { goal = outOf; reach = .4f; s.CountHarm(s.Player, Time.deltaTime); }
+                else
+                {
+                    goal = e.transform.position; reach = (MeleeClass(s) ? 2.4f : 12) + e.BodyRadius;   // to her edge
+                    // Never into the red to strike: a clear spot in reach (Chris: "they need to evacuate").
+                    var clear = GroundMarks.StrikeSpot(me, e.transform.position, e.BodyRadius, MeleeClass(s) ? 2.4f : 12);
+                    if (clear.HasValue && GroundMarks.InHarm(e.transform.position + (me - e.transform.position).normalized * Mathf.Min(reach, Vector3.Distance(me, e.transform.position)))) { goal = clear; reach = .5f; }
+                }
             }
             // Salt on her when the raid warning asks it of you.
             var w = s.RaidWarningText;

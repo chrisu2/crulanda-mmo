@@ -33,7 +33,7 @@ namespace Crulanda.Encounter
     public static class WeaveEaterRules
     {
         public const float SaltSeconds = 4, HarpoonSeconds = 5, BlackenSeconds = 20, BlackenShare = .1f, ThrowRange = 15, MeleeReach = 4.5f;
-        public const string Salt = "salt", Harpoon = "harpoon";
+        public const string Salt = "salt", Harpoon = "harpoon", Snare = "snare";
         /// <summary>The blink (ch.20:131): its reach, how often, and the gap under which it walks instead.</summary>
         public const float BlinkReach = 7, BlinkEvery = 4.5f, BlinkMin = 5;
         /// <summary>The lighthouse (ch.20:121): how often, how far, and what share of the top threat a magic-worker gains each beat.</summary>
@@ -65,7 +65,7 @@ namespace Crulanda.Encounter
         public const string BlackenedLine = "Your steel comes out of the Weave-Eater black and brittle. Your blows land softer for a while.";
         public const string NoTargetLine = "Throw it at what? Pick out a foe first.";
         /// <summary>A thrown item's kind the game knows (salt or a harpoon), or null.</summary>
-        public static string ThrownKind(ItemDef d) { return d == null || d.kind != "consumable" ? null : d.thrown == Salt || d.thrown == Harpoon ? d.thrown : null; }
+        public static string ThrownKind(ItemDef d) { return d == null || d.kind != "consumable" ? null : d.thrown == Salt || d.thrown == Harpoon || d.thrown == Snare ? d.thrown : null; }
         /// <summary>Whether a mob of this name and look is a Weave-Eater (the Lantern-Eater and the Mother of Drains among them).</summary>
         public static bool IsWeaveEater(string mobName, bool weaveEaterLook)
         {

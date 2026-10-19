@@ -40,7 +40,7 @@ namespace Crulanda.Encounter
         {
             int k = Inside(p, marks); if (k < 0) return null;
             var c = marks[k].c; var away = p - c; away = away.sqrMagnitude > .0001f ? away.normalized : Vector2.right;
-            foreach (float extra in new[] { 0f, 2f, 4f })
+            foreach (float extra in new[] { 0f, 2f, 4f, 8f, 12f })   // far enough even past a run of patches (raid: no safe spot near)
                 foreach (float turn in new[] { 0f, 30f, -30f, 60f, -60f, 90f, -90f, 120f, -120f, 150f, -150f, 180f })
                 {
                     float rad = turn * Mathf.Deg2Rad;
@@ -51,6 +51,28 @@ namespace Crulanda.Encounter
                     return to;
                 }
             return null;
+        }
+        /// <summary>Whether <paramref name="at"/> (a body's position, a metre over its feet) stands in harmful ground now.</summary>
+        public static bool InHarm(Vector3 at)
+        {
+            var feet = at - Vector3.up; var marks = Near(feet.y);
+            return marks.Count > 0 && Inside(new Vector2(feet.x, feet.z), marks) >= 0;
+        }
+        /// <summary>A spot from which to strike <paramref name="target"/> (within <paramref name="reach"/> of its edge, <paramref name="body"/>)
+        /// out of harmful ground, the nearest to <paramref name="from"/> on the walkable ground; null for none (stand off, then).</summary>
+        public static Vector3? StrikeSpot(Vector3 from, Vector3 target, float body, float reach)
+        {
+            var marks = Near(target.y - 1); if (marks.Count == 0) return null;
+            Vector3? best = null; float bestD = float.MaxValue;
+            for (int k = 0; k < 16; k++)
+                foreach (float r in new[] { body + reach * .6f, body + reach * .95f })
+                {
+                    var p = target + Quaternion.Euler(0, k * 22.5f, 0) * Vector3.forward * r;
+                    if (!NavMesh.SamplePosition(p, out var hit, 1.5f, NavMesh.AllAreas)) continue;
+                    if (Inside(new Vector2(hit.position.x, hit.position.z), marks) >= 0) continue;
+                    float d = Vector3.Distance(hit.position, from); if (d < bestD) { bestD = d; best = hit.position; }
+                }
+            return best;
         }
         /// <summary>The marks showing now that lie at about <paramref name="y"/>'s height, as flat circles.</summary>
         public static List<(Vector2 c, float r)> Near(float y)

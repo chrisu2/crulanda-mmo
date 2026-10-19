@@ -195,6 +195,7 @@ namespace Crulanda.Encounter
                 case "arrange": if (InRaid) { Raid.Arrange(); Message("The parties are set out: a tank and a healer in each."); } else Message("You are not in a raid."); return;
                 case "leave": if (InRaid) LeaveRaid(); else Message("You are not in a raid."); return;
                 // You in the Unraveller's harpoon rotation, or out of it (WORLD_BOSS_1.md 3.5): your turn shows on the boss frame; set at the pull.
+                case "trapper": TrapperId = TrapperId == RaidGroup.You ? null : RaidGroup.You; Message(TrapperId == RaidGroup.You ? "You are the raid's Trapper: lay salt snares on the brood's path (Tibb Marrow sells them)." : "The raid's Ranger is the Trapper again."); return;
                 case "harpoon": HarpoonYou = !HarpoonYou; Message(HarpoonYou ? "You are in the harpoon rotation from her next pull: your turn shows on the boss frame." : "You are out of the harpoon rotation."); return;
                 default: Message("/raid alone opens the raid window; /raid form, call, ready, arrange, harpoon, leave."); return;
             }

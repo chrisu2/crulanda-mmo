@@ -751,6 +751,29 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
    - **Raid gear:** the tuning runs dress every member (the bot and the nine) in a rare piece of level 20 in every slot (`SimGear.RaidGear`),
      logged per member; the bot tank has the sim tank's edges and health on top. In play, only level-20 sims with two or more bought
      upgrades (rare in most slots) answer the call to arms (`RaidCall.CallLevel`, `CallGear`).
+   **Tune-2 read, and the changes for tune-3 (2026-10-19; WRITTEN, NOT RUN).** Tune-2's first four pulls (rare level-20 gear, buffed, the
+   meter fixed): wipes at 7:56 (her at 69%), 6:21 (58%), 9:00 (46%, the feast); brood killed 18, 11, 29 of 39, 30, 45; the bot tank on par
+   (1,306 health, armour 460, against the Warrior sim's 1,303 and 473). Chris, verbatim: "hybrids 75% of target"; "people still standing
+   in red areas. they need to evacuate"; "some reds under her are staying a long time and pets just standing in it"; "need some type of
+   mechanism to trap the brood..someone that can do an extra job" (play note 281).
+   - **Hybrids 75%** (recorded in BALANCE_REPORT.md): `HybridDpsShare` .75; the players' hybrid damage paths down by the same step; a tank
+     sim 72%, the Archivist (control) 70%. Hybrids today: Warrior, Paladin, Druid, Archivist, Salt-Mender, Cleric, Shaman.
+   - **Out of the red:** a sim looks five times a second; when where it would strike from is in harmful ground (her edge lies in her unmade
+     ground) it goes to a clear spot within reach first; a step-out looks up to 12 m further when patches have run together; pets step out
+     as their keepers do; the bot strikes from a clear spot. The log counts each member's (and pet's) seconds in the red a pull.
+   - **Her unmade ground:** 18 s a patch (40), no more than four at once (the oldest goes).
+   - **The salt snare** (GAME-ONLY; CANON salt and bone, b1 ch.20:181-205; no machine: a ring of salt on bone stakes): the raid's Trapper
+     (the Ranger by default; `/raid trapper` makes it you) lays one on the path of a free brood toward its quarry, one each 8 s, three out at
+     most, a salt twist each; it lies 30 s or until a brood crosses it, which stands calcified 12 s (the next blow shatters it). You can lay
+     them too: the Salt snare, sold by Tibb Marrow. The log counts snares laid and caught; it now tells holds broken by a blow from holds that
+     ran their time out.
+   - **The sims' uptime in her fight:** by the real clock the damage-dealers were at 48-74 a second against 88; their blows are x1.2 in her
+     fight (`simRaidLift`) for the time the fight takes from them. Expected in tune-3 with the uptime fixes: Ranger, Mage, Rogue, Scoundrel
+     about 80-95; the Archivist about 60-65; a Warrior or Paladin tank about 60; healers about 25-40 healing a second each, to be read (the
+     Cleric's lead looked real in tune-1: the spread rule stands, the run's band lines now give each healer's healing).
+   - **Her health 140,000** (190,000): tune-2's best pull reached the feast with her at 46%; with the snares, the uptime and the lift a
+     disciplined raid should reach the last minute. Tune-3 reads it.
+   - **Fixed:** the buff-up waits until the last pull's fight is over (tune-2's second pull buffed nobody: the brood still fought).
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

@@ -643,3 +643,12 @@ earlier runs had the bot at 61-64 (hallows-6, -7, -10r).
   no experience from kills or discovered places for you, none for the sims (their kill counts still go up). You and the sims fight the whole
   run at 17, so the scorecard compares like with like. The bot still wears what it loots, as the sims wear their upgrades.
 - Expected: the bot about the harness's Judicator band at its level (59-65 at 15), near 90% of the Rogue. Compiles; not run in Unity yet.
+
+## Hybrids at 75% (Chris, 2026-10-19)
+Chris, verbatim, watching the world boss's raid: **"hybrids 75% of target"**. A hybrid class's damage is 75% of the pure damage target
+(it was 90%: "A bit lower", 2026-10-16). `EncounterSession.HybridDpsShare` = .75; the player builds' damage scales of the hybrids' damage
+paths are taken down by the same step (x0.833: judicator .533, thornclaw .555, thornsong 1.815, the-unwriting 1.2); a tank sim deals 72%
+(`SimCompanion.TankDpsShare`, under a hybrid's), the Archivist sim in the damage part 70% (`ControlDpsShare`, control and support).
+The hybrids today (`EncounterSession.HybridClasses`, every class with a tank's or a healer's path): Warrior, Paladin, Druid, Archivist,
+Salt-Mender, Cleric, Shaman. The pure damage classes: Ranger, Mage, Rogue, Scoundrel.
+

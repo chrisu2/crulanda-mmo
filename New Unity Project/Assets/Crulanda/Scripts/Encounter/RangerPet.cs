@@ -181,7 +181,16 @@ namespace Crulanda.Encounter
                 if (stuck && NavMesh.SamplePosition(player.transform.position - player.transform.forward * 2, out var near, 12, NavMesh.AllAreas)) agent.Warp(near.position);
             }
             if (!agent.isOnNavMesh) return;
-            if (Quarry != null && Quarry.Brood && Quarry.LeaveAlone) { Quarry = null; fury = 1; }   // a held brood is not bitten: the bite breaks the raid's hold (raid 6)
+            if (Quarry != null && Quarry.Brood && Quarry.LeaveAlone) { Quarry = null; fury = 1; }
+            // Out of harmful ground first, as its keeper (Chris: "pets just standing in it").
+            if (GroundMarks.InHarm(transform.position))
+            {
+                session.CountHarm(actor, Time.deltaTime);
+                var feet = NavMesh.SamplePosition(transform.position, out var under, 2, NavMesh.AllAreas) ? under.position : transform.position - Vector3.up;
+                var spot = Quarry != null ? GroundMarks.StrikeSpot(transform.position, Quarry.transform.position, Quarry.BodyRadius, BiteReach) : null;
+                var go = spot ?? GroundMarks.StepOut(feet);
+                if (go.HasValue && agent.isOnNavMesh) { agent.isStopped = false; agent.speed = 6; agent.SetDestination(go.Value); return; }
+            }   // a held brood is not bitten: the bite breaks the raid's hold (raid 6)
             if (Quarry != null)
             {
                 float reach = Vector3.Distance(transform.position, Quarry.transform.position);

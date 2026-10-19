@@ -165,7 +165,7 @@ namespace Crulanda.Tests
                         Assert.That(withPet, Is.InRange(aim * (1 - within), aim * (1 + within)), who + " sustains its band on the dummy" + (pet != null ? ", its pet counted in" : "") + " [" + line + "]");
                     }
                     // The tank: three quarters of a damage-dealer's (Chris, 2026-10-18: "maybe 3/4 of dps"; SimCompanion.TankDpsShare).
-                    else if (c.Role == SimCompanion.PartyRole.Tank) Assert.That(withPet / pure, Is.InRange(.7f, .8f), who + ": a tank deals about three quarters of a damage-dealer's");
+                    else if (c.Role == SimCompanion.PartyRole.Tank) Assert.That(withPet / pure, Is.InRange(.68f, .76f), who + ": a tank deals about three quarters of a damage-dealer's (72%, under a hybrid's 75%)");
                     else Assert.That(withPet / pure, Is.InRange(.1f, .35f), who + ": a healer's damage is less again");
                 }
                 // The order Chris asked for: every damage-dealer over the tank (the Archivist, control and support, about a tank's: raid 3), the tank over the healer.

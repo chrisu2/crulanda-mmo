@@ -68,7 +68,8 @@ namespace Crulanda.Encounter
         {
             if (session.HuntedActor == actor) return false;   // the hunted runs for the river instead (RaidTurn)
             if (Time.time < groundLookAt) return steppingOut;
-            groundLookAt = Time.time + .25f;
+            groundLookAt = Time.time + .2f;
+            if (session.UnravellerFighting != null) { if (GroundMarks.InHarm(transform.position)) session.CountHarm(actor, .2f); }
             var feet = NavMesh.SamplePosition(transform.position, out var under, 2, NavMesh.AllAreas) ? under.position : transform.position - Vector3.up;
             var to = GroundMarks.StepOut(feet);
             if (!to.HasValue) { steppingOut = false; return false; }
@@ -129,6 +130,8 @@ namespace Crulanda.Encounter
                 if (now >= harpoonLateUntil && RaidJobs.HarpoonNow(true, e.PinLeft, has, d <= WeaveEaterRules.ThrowRange, t.harpoonLead)) { Throw(e, WeaveEaterRules.Harpoon); return true; }
             }
             // The salts on the swallowed: those called, each once.
+            // The Trapper's salt snares on the brood's path (play note 281).
+            if (!Silenced && LaySnare(now)) return true;
             // The brood held: the raid's control classes, each one at a time (raid 4).
             if (!Silenced && HoldBrood(now)) return true;
             if (session.SaltCall.Contains(sim.id) && now >= saltSkipUntil && !Silenced)
@@ -151,6 +154,24 @@ namespace Crulanda.Encounter
             return false;
         }
         /// <summary>The interrupter <paramref name="id"/> can kick her now: alive, free, its kick ready, within its reach of her.</summary>
+        float nextSnare;
+        /// <summary>The raid's Trapper (the Ranger by default): a salt snare on the path of a free brood toward whom it goes, one each snareEvery
+        /// s, no more than snaresPerWave out, from its salt (a twist a snare). True when it laid one.</summary>
+        bool LaySnare(float now)
+        {
+            if (session.Trapper != sim.id || now < nextSnare) return false;
+            var t = UnravellerTuning.Current; if (session.SnaresOut >= t.snaresPerWave) return false;
+            EncounterEnemy pick = null; float best = 25;
+            foreach (var b in session.BroodNow) { if (b == null || !b.actor.IsAlive || b.Controlled || b.Calcified) continue; float d = Vector3.Distance(b.transform.position, transform.position); if (d < best) { best = d; pick = b; } }
+            if (pick == null || !Carries(Unraveller.SaltItem)) return false;
+            if (Misses()) { nextSnare = now + 3; return false; }
+            var to = pick.Victim != null ? pick.Victim.transform.position : transform.position; var way = to - pick.transform.position; way.y = 0;
+            var at = pick.transform.position + (way.sqrMagnitude > .01f ? way.normalized * Mathf.Min(4, way.magnitude * .5f) : Vector3.zero);
+            SimEconomy.Add(sim, Unraveller.SaltItem, -1); visual?.Strike("throw");
+            session.LaySnare(at, actor); nextSnare = now + t.snareEvery;
+            if (session.SnaresLaid == 1) session.ChatSay(ChatChannel.Party, sim.name, sim.chatty > .65f ? "snares down by the water" : "Salt snares on their path. Let them come.");
+            return true;
+        }
         float nextBroodHold;
         /// <summary>Brood it has held (the log and the tests).</summary>
         public int BroodHeld { get; private set; }

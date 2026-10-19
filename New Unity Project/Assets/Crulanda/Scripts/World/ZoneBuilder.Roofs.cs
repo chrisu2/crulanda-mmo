@@ -256,7 +256,7 @@ namespace Crulanda.World
                     wall.AddComponent<BoxCollider>().size = new Vector3(.1f, 1.6f, len);
                     // Slates slipped onto the lead here and there, and a patch of the neon moss (book1 ch.7:17).
                     for (int k = 0; k < 4; k++) b.Box(LowSlate, mid + dir * ((R() - .5f) * (len - 1)) + outv * ((R() - .5f) * 1.2f) + Vector3.up * .02f, new Vector3(.3f, .025f, .45f), Quaternion.Euler(0, R() * 180, 0));
-                    if (R() < .7f) b.Box(NeonMoss, mid + dir * ((R() - .5f) * (len - 2)) - outv * .7f + Vector3.up * .02f, new Vector3(.5f + R() * .6f, .04f, .3f + R() * .3f), Quaternion.Euler(0, R() * 180, 0));
+                    if (R() < .7f) b.Box(NeonMoss, mid + dir * ((R() - .5f) * (len - 2)) - outv * .7f + Vector3.up * .011f, new Vector3(.5f + R() * .6f, .014f, .3f + R() * .3f), Quaternion.Euler(0, R() * 180, 0));
                 }
                 else if (leg.kind == "bridge")
                 {
@@ -409,15 +409,21 @@ namespace Crulanda.World
                 b.Box(timber, (p + q) / 2, new Vector3(.1f, .1f, (q - p).magnitude), Quaternion.LookRotation(q - p));
             }
             b.Box(timber, tower.TransformPoint(new Vector3(0, floorY, 0)), new Vector3(2.8f, .16f, 3.1f), tower.rotation);
-            // The barrel: staves, three iron hoops, a shallow cone of a lid.
-            var tank = Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 1.4f, 0), new Vector3(2.4f, 1.3f, 2.4f), staves); tank.name = "The tank";
-            foreach (float y in new[] { .35f, 1.4f, 2.45f }) Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + y, 0), new Vector3(2.46f, .05f, 2.46f), iron);
+            // The barrel: the wood barrel (play note 247, 2026-10-19) fitted to the old tank, 2.6 m tall and 2.4 across (a squat butt);
+            // else staves and three iron hoops. A shallow cone of a lid.
+            var tank = ModelProp(tower, WoodBarrelPath, new Vector3(0, floorY + .1f, 0), 0, 2.6f, false, null, new Vector3(2.4f, 2.6f, 2.4f));
+            if (tank == null)
+            {
+                tank = Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 1.4f, 0), new Vector3(2.4f, 1.3f, 2.4f), staves);
+                foreach (float y in new[] { .35f, 1.4f, 2.45f }) Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + y, 0), new Vector3(2.46f, .05f, 2.46f), iron);
+            }
+            tank.name = "The tank";
             Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 2.78f, 0), new Vector3(2.6f, .06f, 2.6f), timber);
             Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 2.95f, 0), new Vector3(1.6f, .12f, 1.6f), timber);
             Part(PrimitiveType.Cylinder, tower, new Vector3(0, floorY + 3.1f, 0), new Vector3(.7f, .1f, .7f), timber);
             // A stain where it weeps down a leg onto the slates, and moss at its foot.
             Part(PrimitiveType.Cube, tower, new Vector3(.9f, floorY + .6f, -.85f), new Vector3(.3f, 1.2f, .05f), wet, Quaternion.Euler(0, 45, 0));
-            b.Box(NeonMoss, tower.TransformPoint(new Vector3(-lx, -rise * (lz / half) + .05f, -lz)), new Vector3(.6f, .05f, .4f), tower.rotation);
+            b.Box(NeonMoss, tower.TransformPoint(new Vector3(-lx, -rise * (lz / half) + .012f, -lz)), new Vector3(.6f, .014f, .4f), tower.rotation);
             // Guy ropes to the nearest chimney stack and to an iron pin at the gutter: what keeps it standing, just.
             var guyFrom = tower.TransformPoint(new Vector3(0, floorY + 2.2f, 0));
             void Guy(Vector3 to) { var d = to - guyFrom; b.Box(rope, (guyFrom + to) / 2, new Vector3(.035f, .035f, d.magnitude), Quaternion.LookRotation(d)); }

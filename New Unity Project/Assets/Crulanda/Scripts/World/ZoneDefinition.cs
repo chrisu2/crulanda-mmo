@@ -326,7 +326,7 @@ namespace Crulanda.World
         public string fogColor = "#9A9888"; public float fogStart = 45, fogEnd = 120;
         /// <summary>
         /// Optional (0 or empty = the shared default), read by WorldClock. sunHigh: the sun's noon elevation in degrees (the
-        /// default arc climbs to about 45; Khaven's stays low, so its day holds the dusk). skyTint (hex), skyExposure (default
+        /// default arc climbs to about 45; Hallow's Creek's stays low under its grey sky). skyTint (hex), skyExposure (default
         /// 1.05) and skyHaze (atmosphere thickness): the procedural sky's daytime look. Night falls the same everywhere.
         /// </summary>
         public float sunHigh, skyExposure, skyHaze; public string skyTint;
@@ -336,6 +336,10 @@ namespace Crulanda.World
         /// <summary>A zone's own colour of the night's fog (hex; empty: the shared moonlit blue). The Lowtowns: the smog by night, grey and
         /// lit from under by the orange fires (CANON, book1 ch.1:191: "a smear of orange fires and grey smog").</summary>
         public string nightFog;
+        /// <summary>The sky (StylizedSky, play note 254). skyStyle "procedural": the old procedural sky (empty: the stylized skies).
+        /// skyDay: the zone's own day sky by its pack name (empty: the weather's clear, cloudy or overcast noon): Hallow's Creek's grey
+        /// "Noon (Overcast)" (b1 ch.21:19, "a grey sky"). aurora: a rare clear night shows the aurora.</summary>
+        public string skyStyle, skyDay; public bool aurora;
     }
     [Serializable] public sealed class ZoneSpawns
     {

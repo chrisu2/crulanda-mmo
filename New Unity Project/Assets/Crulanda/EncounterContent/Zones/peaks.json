@@ -50,6 +50,7 @@
     "fogStart": 80,
     "fogEnd": 300,
     "skyTint": "#6B87B8",
+    "aurora": true,
     "skyExposure": 1.15,
     "skyHaze": 0.9
   },

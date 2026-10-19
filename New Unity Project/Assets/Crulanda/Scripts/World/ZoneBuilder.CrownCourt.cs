@@ -329,7 +329,8 @@ namespace Crulanda.World
                 case "simpler":
                     for (int k = 0; k < 6; k++) { var v = top + new Vector3(-.6f + k * .09f, 0, -.12f); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .06f, 0), new Vector3(.05f, .06f, .05f), CourtGlass); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .135f, 0), new Vector3(.025f, .015f, .025f), Tint(art.timber, new Color(.6f, .46f, .3f))); }
                     Jar(t, top + new Vector3(.05f, 0, .1f), new Color(.62f, .4f, .28f)); Jar(t, top + new Vector3(.3f, 0, .08f), new Color(.36f, .44f, .4f), 1.2f);
-                    if (ModelProp(t, "Medieval/Prefabs/BottleV1", top + new Vector3(.6f, 0, 0), 0, .28f) == null) Part(PrimitiveType.Cylinder, t, top + new Vector3(.6f, .12f, 0), new Vector3(.08f, .12f, .08f), CourtGlass);
+                    if (ModelProp(t, AlchemyCrystal, top + new Vector3(.6f, 0, 0), 20, CrystalHeight) == null) Part(PrimitiveType.Cylinder, t, top + new Vector3(.6f, .12f, 0), new Vector3(.08f, .12f, .08f), CourtGlass);
+                    ModelProp(t, AlchemyFlask, top + new Vector3(.45f, 0, .12f), 0, FlaskHeight);   // the counter: a crystal flask on its stand and a round flask for sale (play note 253)
                     break;
                 case "cook":
                     for (int k = 0; k < 3; k++) if (ModelProp(t, k == 1 ? "Megapack/Models/Market/Bread_2" : "Megapack/Models/Market/Bread_1", top + new Vector3(-.55f + k * .22f, 0, (k % 2) * .1f), k * 40, .11f) == null) Part(PrimitiveType.Capsule, t, top + new Vector3(-.55f + k * .22f, .05f, 0), new Vector3(.12f, .12f, .1f), Tint(art.hay, new Color(.7f, .48f, .26f)), Quaternion.Euler(0, 0, 90));
@@ -475,7 +476,7 @@ namespace Crulanda.World
                     });
                     Rod(t, new Vector3(-w / 2 + .4f, 2.35f, -1.7f), new Vector3(-.2f, 2.35f, -1.7f), .04f, oak);
                     for (int k = 0; k < 6; k++) HerbBundle(t, new Vector3(-w / 2 + .6f + k * .4f, 2.33f, -1.7f), k + r.Next(3), .9f);
-                    if (ModelProp(t, "Medieval/Prefabs/BeerBarrelV1", new Vector3(-w / 2 + .65f, .04f, -1.35f), 90, .8f) == null) Barrel(t, new Vector3(-w / 2 + .65f, .04f, -1.35f), .8f);
+                    if (ModelProp(t, WoodBarrelPath, new Vector3(-w / 2 + .65f, .04f, -1.35f), 90, .8f) == null) Barrel(t, new Vector3(-w / 2 + .65f, .04f, -1.35f), .8f);   // the wood barrel (play note 247), .8 m as the beer barrel stood
                     Blocker(t, new Vector3(-w / 2 + .65f, .4f, -1.35f), new Vector3(.75f, .8f, .75f));
                     break;
                 }
@@ -646,12 +647,19 @@ namespace Crulanda.World
             var basin = new Vector3(.32f, top, .05f);
             MeshPart(PropMesh("Still basin", () => Turned(new[] { new Vector2(0, 0), new Vector2(.15f, 0), new Vector2(.18f, .12f), new Vector2(.16f, .12f), new Vector2(.14f, .02f), new Vector2(0, .02f) }, 12)), t, basin, Tint(art.stone, new Color(.62f, .6f, .56f)));
             Part(PrimitiveType.Cylinder, t, basin + new Vector3(0, .1f, 0), new Vector3(.3f, .005f, .3f), art.water != null ? art.water : art.glass);
-            Part(PrimitiveType.Sphere, t, basin + new Vector3(0, .14f, 0), new Vector3(.17f, .17f, .17f), CourtGlass);
-            Part(PrimitiveType.Cylinder, t, basin + new Vector3(0, .27f, 0), new Vector3(.04f, .06f, .04f), CourtGlass);
+            // The flask cooling in the basin: the alchemy pack's round flask (play note 253), else a painted one.
+            if (ModelProp(t, AlchemyFlask, basin + new Vector3(0, .03f, 0), 0, FlaskHeight) == null)
+            {
+                Part(PrimitiveType.Sphere, t, basin + new Vector3(0, .14f, 0), new Vector3(.17f, .17f, .17f), CourtGlass);
+                Part(PrimitiveType.Cylinder, t, basin + new Vector3(0, .27f, 0), new Vector3(.04f, .06f, .04f), CourtGlass);
+            }
             for (int k = 0; k < 5; k++) { var v = new Vector3(.5f + k * .065f, top, -.2f); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .06f, 0), new Vector3(.045f, .06f, .045f), CourtGlass); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .13f, 0), new Vector3(.022f, .012f, .022f), Tint(art.timber, new Color(.6f, .46f, .3f))); }
             Jar(t, new Vector3(-.75f, top, .18f), new Color(.62f, .4f, .28f)); Jar(t, new Vector3(.68f, top, .18f), new Color(.36f, .44f, .4f), 1.15f);
-            MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(-.05f, top, -.18f), Tint(art.stone, new Color(.62f, .6f, .56f)));
-            Rod(t, new Vector3(-.05f, top + .07f, -.18f), new Vector3(.03f, top + .22f, -.1f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            if (ModelProp(t, AlchemyMortar, new Vector3(-.05f, top, -.18f), 120, MortarHeight) == null)   // the alchemy pack's (play note 253), else painted
+            {
+                MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(-.05f, top, -.18f), Tint(art.stone, new Color(.62f, .6f, .56f)));
+                Rod(t, new Vector3(-.05f, top + .07f, -.18f), new Vector3(.03f, top + .22f, -.1f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            }
             Glow(t, b + new Vector3(0, .3f, -.2f), 2.5f, .4f, new Color(1, .55f, .25f), .9f);
         }
         /// <summary>The cook's hearth: a raised bed of stone with a kerb, a fire of logs on its coals, an iron bar across on two standards with

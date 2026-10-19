@@ -24,9 +24,15 @@ namespace Crulanda.World
         /// <summary>Models that come in lying down (a Z-up export: their height runs along z, or along x), set upright first (PropCapture
         /// showed which, 2026-10-07): the turn is put on the model's own parts before it is measured.</summary>
         static readonly Dictionary<string, Vector3> PropTurns = new Dictionary<string, Vector3> {
-            { "Fantasy/Barrel", new Vector3(-90, 0, 0) }, { "Fantasy/Stool", new Vector3(-90, 0, 0) }, { "Fantasy/Chandelier", new Vector3(-90, 0, 0) },
+            { "Fantasy/Stool", new Vector3(-90, 0, 0) }, { "Fantasy/Chandelier", new Vector3(-90, 0, 0) },
             { "Fantasy/Dummy", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_1", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_2", new Vector3(-90, 0, 0) }, { "Fantasy/WeaponStand", new Vector3(-90, 0, 0) },   // the weapon stand made Z up too: it lay tipped against the yard's fence (Chris, 15:20) and in Vell's smithy   // Banner_2 made Z up like Banner_1 (2.08 m along z): lying flat it came in some 15 times too big (the 14:12 yard frame) { "Fantasy/CandleStick", new Vector3(0, 0, -90) },
             { "Medieval/Prefabs/CandleV1", new Vector3(-90, 0, 0) },
+            // The Simple Wood Barrel's one node carries a half turn about z (read from the file, 2026-10-19), which stood it on its head
+            // below its pivot; its vertices are y up with the foot at 0, so the node's turn is dropped.
+            { WoodBarrelPath, Vector3.zero },
+            // icescreen's Wooden Canopy (play note 252) needs no entry: its 3ds Max files keep the mesh Z up under a GeometricRotation of
+            // -90 about x, and Unity bakes that in (lane A, 2026-10-19: with a -90 turn here the canopy measured 4.77 m on end, i.e. it
+            // had stood upright without one). WorkshopDataTests measures it standing.
             // Fantasy2/ (ithappy's Fantasy FREE, the market pieces, 2026-10-15) needs no entry: Blender's export with the turn baked in
             // (UpAxis Y, every node's rotation zero, metres), read from the files; MarketPropTests measures them standing.
             // The Small Props Pack's "Unity FBX" models stand on their heads: their vertices are the glTF copies' turned half round X (read
@@ -72,6 +78,30 @@ namespace Crulanda.World
         /// pieces take a Standard material a family each (M_Wall, M_Pillar, M_Arch, M_Step, M_Tile, M_Torch, M_Handrail: the colour and
         /// normal maps), by the family in the mesh's material name (Step_A carries M_Step_A and M_Wall_A), else by the file's name.
         /// </summary>
+        /// <summary>
+        /// The Simple Wood Barrel (Kraken XR, Asset Store EULA; Resources/Props/WoodBarrel, play note 247, 2026-10-19, Chris: "replace all
+        /// wooden barrels with this in myassets . simple wood barrel"): every wooden barrel, keg and cask in the game is this one model now
+        /// (the inns', the markets', the yards', the camps', the caves', the Spoon's kegs and casks, the Lowtowns' clutter, the water tower's
+        /// tank), at the height the old one stood. One mesh, 1.0 m tall and 0.68 across in the file, its foot at 0. Its own material is
+        /// replaced by WoodBarrel.mat (Built-in Standard: the pack's albedo, normal and metallic-smoothness maps, capped at 1024 by
+        /// ThirdPartyImport). GAME-ONLY: where the barrels stand is the game's.
+        /// </summary>
+        public const string WoodBarrelPath = "WoodBarrel/BARREL_1";
+        static Material woodBarrelMat;
+        public static Material WoodBarrelMaterial { get { if (woodBarrelMat == null) woodBarrelMat = Resources.Load<Material>("Props/WoodBarrel/WoodBarrel"); return woodBarrelMat; } }
+        /// <summary>The barrel's mesh (readable: ThirdPartyImport), for the joined meshes (the Lowtowns' clutter); null when it is not there.</summary>
+        public static Mesh WoodBarrelMesh
+        {
+            get { var src = PropSource(WoodBarrelPath); var mf = src != null ? src.GetComponentInChildren<MeshFilter>(true) : null; return mf != null ? mf.sharedMesh : null; }
+        }
+        /// <summary>The matrix that stands the barrel's <paramref name="mesh"/> on <paramref name="foot"/> (its foot's middle), turned
+        /// <paramref name="rot"/>, <paramref name="height"/> tall, and <paramref name="across"/> wide when given (else as the model is).</summary>
+        public static Matrix4x4 WoodBarrelFit(Mesh mesh, Vector3 foot, Quaternion rot, float height, float across = 0)
+        {
+            var b = mesh.bounds; float s = height / Mathf.Max(.001f, b.size.y);
+            float w = across > 0 ? across / Mathf.Max(.001f, Mathf.Max(b.size.x, b.size.z)) : s;
+            return Matrix4x4.TRS(foot, rot, Vector3.one) * Matrix4x4.Scale(new Vector3(w, s, w)) * Matrix4x4.Translate(new Vector3(-b.center.x, -b.min.y, -b.center.z));
+        }
         static readonly Dictionary<string, Material> dungeonModularMats = new Dictionary<string, Material>();
         static Material DungeonModularMat(string family)
         {
@@ -112,6 +142,9 @@ namespace Crulanda.World
             var inst = Instantiate(src, t, false); inst.transform.localPosition = Vector3.zero; inst.transform.localRotation = src.transform.localRotation;
             foreach (var c in go.GetComponentsInChildren<Component>(true))
                 if (!(c is Transform) && !(c is MeshFilter) && !(c is MeshRenderer) && !(c is SkinnedMeshRenderer)) { if (Application.isPlaying) Destroy(c); else DestroyImmediate(c); }
+            // The Dry Trees (play note 248) carry three lower-detail copies of each tree in the file: only the full one is kept (the static
+            // merge would draw all four at once; ZoneBuilder.DryTrees).
+            if (path.StartsWith("DryTrees/")) foreach (var r in go.GetComponentsInChildren<Renderer>(true)) if (r != null && r.gameObject.name.Contains("LOD")) DestroyImmediate(r.gameObject);
             if (PropTurns.TryGetValue(path, out var turn)) inst.transform.localRotation = Quaternion.Euler(turn);
             else if (path.StartsWith("Dungeon/")) inst.transform.localRotation = Quaternion.Euler(-90, 0, 0);   // the Adit's pieces (Blender, Z up), all of them
             var b = PropBounds(t); if (b.size.y < .001f) return go;
@@ -126,6 +159,9 @@ namespace Crulanda.World
                 foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = SmallPropsAtlas; r.sharedMaterials = mats; }
             if (path.StartsWith("KayKit/") && KayKitAtlas != null)   // the KayKit Dungeon Pack (CC0): one atlas for the whole pack
                 foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = KayKitAtlas; r.sharedMaterials = mats; }
+            if (path.StartsWith("WoodBarrel/") && WoodBarrelMaterial != null)
+                foreach (var r in go.GetComponentsInChildren<Renderer>(true)) { var mats = r.sharedMaterials; for (int i = 0; i < mats.Length; i++) mats[i] = WoodBarrelMaterial; r.sharedMaterials = mats; }
+            if (path.StartsWith("Alchemy/")) DressAlchemy(go);
             if (path.StartsWith("DungeonModular/")) DressDungeonModular(go, path.Substring(path.LastIndexOf('/') + 1));
             if (path.StartsWith("Nature/")) DressNature(go);
             if (solid) { var col = go.AddComponent<BoxCollider>(); col.center = b.center; col.size = b.size; go.AddComponent<NavBlocker>(); }
@@ -222,20 +258,20 @@ namespace Crulanda.World
         }
         /// <summary>The kit props the builders use, with the heights they stand at (PropCapture renders this row to look at).</summary>
         public static readonly (string path, float height)[] KitProps = {
-            ("Fantasy/Barrel", .95f), ("Fantasy/Crate_Wooden", .82f), ("Fantasy/Table_Large", .8f), ("Fantasy/Stool", .45f), ("Fantasy/CandleStick", .22f), ("Fantasy/Mug", .12f),
+            (WoodBarrelPath, .95f), ("Fantasy/Crate_Wooden", .82f), ("Fantasy/Table_Large", .8f), ("Fantasy/Stool", .45f), ("Fantasy/CandleStick", .22f), ("Fantasy/Mug", .12f),
             ("Fantasy/Chandelier", .8f), ("Fantasy/Bench", .5f), ("Fantasy/Workbench", .9f), ("Fantasy/WeaponStand", 1.6f), ("Fantasy/Whetstone", .6f), ("Fantasy/Bucket_Metal", .38f),
             ("Fantasy/FarmCrate_Apple", .34f), ("Fantasy/FarmCrate_Carrot", .34f), ("Fantasy/Dummy", 1.9f), ("Fantasy/Banner_1", 2.6f), ("Fantasy/Cauldron", .9f),
             ("Medieval/Prefabs/PileOfWoodV1", .5f), ("Medieval/Prefabs/CandleV1", .2f), ("Medieval/Prefabs/BottleV1", .28f), ("Medieval/Prefabs/MugV2", .13f), ("Medieval/Prefabs/PotV1", .3f),
-            ("Medieval/Prefabs/BeerBarrelV1", .9f), ("Medieval/Prefabs/LanternV1", .4f),
+            ("Medieval/Prefabs/LanternV1", .4f),
             ("Nature/CommonTree_1", 7), ("Nature/CommonTree_3", 7), ("Nature/CommonTree_5", 7), ("Nature/Pine_1", 10), ("Nature/Pine_4", 10), ("Nature/Bush_Common", 1.3f), ("Nature/Bush_Common_Flowers", 1.3f),
-            ("Nature/DeadTree_1", 6), ("Nature/Rock_Medium_1", 1.5f), ("Nature/Grass_Common_Tall", .5f), ("Nature/Flower_3_Group", .35f), ("Nature/TwistedTree_1", 8),
+            ("DryTrees/Model/Dry3333", 7), ("DryTrees/Model/Dry7509", 7), ("Nature/Rock_Medium_1", 1.5f), ("Nature/Grass_Common_Tall", .5f), ("Nature/Flower_3_Group", .35f), ("Nature/TwistedTree_1", 8),
             ("Nature/Rock_Medium_2", 1.5f), ("Nature/Rock_Medium_3", 1.5f),
             ("Megapack/Models/Plants/Rock_1", 1.5f), ("Megapack/Models/Plants/Rock_2", 1.5f), ("Megapack/Models/Plants/Rock_3", 1.5f), ("Megapack/Models/Plants/Rock_4", 1.5f),
             ("Megapack/Models/Rock_Formation_1", 3), ("Megapack/Models/Plants/Rodck_Formation_2", 3), ("Megapack/Models/Plants/Rock_Formation_3", 3), ("Megapack/Models/Plants/Stone_1", .6f),
             ("Megapack/Models/Hay_1", 1.2f), ("Megapack/Models/Hay_2", 1.2f), ("Megapack/Models/Cart_1", 1.4f), ("Megapack/Models/Cart_2", 1.4f), ("Megapack/Models/Wheelbarrow", .8f),
             ("Megapack/Models/Trough_Hay", .7f), ("Megapack/Models/Market/Market_Table_1", 1), ("Megapack/Models/Stall_1", 2.6f), ("Megapack/Models/Market/Crate_1_Apples", .5f),
             ("Megapack/Models/Arrow Target", 1.5f), ("Megapack/Models/Plants/TreeTrunk_1", .8f), ("Megapack/Models/Tree_Broken_1", 2), ("Megapack/Models/WodenLog_Cuted", .6f),
-            ("Megapack/Models/Fireplace", .6f), ("Megapack/Models/Barrel_1", .95f),
+            ("Megapack/Models/Fireplace", .6f),
             ("Megapack/Models/Buildings/Buiilding_6_1", 7.6f), ("Megapack/Models/Buildings/Stable_1", 4.1f), ("Megapack/Models/Buildings/Tower_1", 9.5f), ("Megapack/Models/Buildings/Windmill", 13),
             ("Village/Wall_Plaster_Straight", 3), ("Village/Wall_Plaster_Door_Round", 3), ("Village/Wall_Plaster_Window_Wide_Round", 3), ("Village/Wall_UnevenBrick_Straight", 3),
             ("Village/Roof_RoundTiles_6x8", 3), ("Village/Floor_WoodDark", .3f), ("Village/Door_1_Round", 2.4f), ("Village/Prop_Chimney", 2.5f), ("Village/Corner_Exterior_Wood", 3), ("Village/Stairs_Exterior_Straight", 1.5f),
@@ -246,7 +282,7 @@ namespace Crulanda.World
             ("KayKit/floor_tile_large", .15f), ("KayKit/floor_tile_small", .15f), ("KayKit/floor_tile_small_broken_A", .15f), ("KayKit/floor_tile_large_rocks", .64f), ("KayKit/ceiling_tile", .35f),
             ("KayKit/torch_mounted", 1.06f), ("KayKit/torch_lit", 1.13f), ("KayKit/banner_red", 3.2f), ("KayKit/banner_triple_red", 3.2f), ("KayKit/banner_shield_red", 3.2f),
             ("KayKit/table_long", 1), ("KayKit/table_medium", 1), ("KayKit/chair", 1.23f), ("KayKit/stool", .5f), ("KayKit/shelves", 1.95f), ("KayKit/chest", 1.3f), ("KayKit/candle_lit", 1.05f),
-            ("KayKit/candle_triple", .87f), ("KayKit/barrel_large", 2), ("KayKit/box_large", 1.5f), ("KayKit/crates_stacked", 2.14f), ("KayKit/keg", 2.05f), ("KayKit/rubble_half", 3.5f),
+            ("KayKit/candle_triple", .87f), ("KayKit/box_large", 1.5f), ("KayKit/crates_stacked", 2.14f), ("KayKit/rubble_half", 3.5f),
             ("KayKit/sword_shield", 1.67f), ("KayKit/barrier", 1.1f), ("KayKit/bed_frame", 1.06f), ("KayKit/trunk_large_A", 1),
             // The Dungeon Modular Pack at its own sizes (metres from its centimetre files).
             ("DungeonModular/Wall_A", 4), ("DungeonModular/Wall_B", 4), ("DungeonModular/Wall_C", 2), ("DungeonModular/Pillar_A", 4), ("DungeonModular/Pillar_B", 2), ("DungeonModular/Arch_A", 3.46f),
@@ -255,12 +291,14 @@ namespace Crulanda.World
             ("Fantasy2/stall_001", 2.57f), ("Fantasy2/stall_table_001", 1.08f), ("Fantasy2/table_001", .78f), ("Fantasy2/jug_001", .34f), ("Fantasy2/jug_002", .51f), ("Fantasy2/jug_003", .57f),
             ("Fantasy2/jug_004", .33f), ("Fantasy2/jug_005", .45f), ("Fantasy2/plate_001", .07f), ("Fantasy2/plate_002", .07f), ("Fantasy2/plate_003", .07f), ("Fantasy2/bag_001", .57f),
             ("Fantasy2/bag_002", .57f), ("Fantasy2/bag_003", .57f), ("Fantasy2/bag_004", .57f), ("Fantasy2/box_001", .54f), ("Fantasy2/box_001_001", .34f), ("Fantasy2/box_002", .17f),
-            ("Fantasy2/box_003", .32f), ("Fantasy2/bucket_001", .48f), ("Fantasy2/barrel_001", .73f), ("Fantasy2/holder_001", 2.01f), ("Fantasy2/pointer_001", 2.17f), ("Fantasy2/log_001", 1.81f),
+            ("Fantasy2/box_003", .32f), ("Fantasy2/bucket_001", .48f), ("Fantasy2/holder_001", 2.01f), ("Fantasy2/pointer_001", 2.17f), ("Fantasy2/log_001", 1.81f),
             ("Fantasy2/log_002", .74f), ("Fantasy2/log_003", .32f), ("Fantasy2/log_004", .54f), ("Fantasy2/cart_001", 1.16f),
             // The Fantasy kit's pieces the dungeons and rooms took up (playtest note 234, PropDressing) and the food models (note 235, FoodModels).
+            // The Free Alchemy and Magic Pack (play note 253, ZoneBuilder.Alchemy).
+            (AlchemyMortar, MortarHeight), (AlchemyFlask, FlaskHeight), (AlchemyCrystal, CrystalHeight),
             ("Fantasy/SmallBottle", .12f), ("Fantasy/Book_7", .07f), ("Fantasy/Cabinet", 1f), ("Fantasy/Shelf_Simple", .3f),
             ("Fantasy/Bag", 0.55f), ("Fantasy/Rope_1", 0.08f), ("Fantasy/Rope_2", 0.06f), ("Fantasy/Rope_3", 0.1f), ("Fantasy/Bucket_Wooden_1", 0.3f), ("Fantasy/Shield_Wooden", 0.6f),
-            ("Fantasy/Barrel_Apples", 0.9f), ("Fantasy/Barrel_Holder", 1.2f), ("Fantasy/Pickaxe_Bronze", 1f), ("Fantasy/Cage_Small", 0.85f), ("Fantasy/Chain_Coil", 0.08f), ("Fantasy/Vase_2", 0.5f),
+            ("Fantasy/Pickaxe_Bronze", 1f), ("Fantasy/Cage_Small", 0.85f), ("Fantasy/Chain_Coil", 0.08f), ("Fantasy/Vase_2", 0.5f),
             ("Fantasy/Vase_4", 0.45f), ("Fantasy/Vase_Rubble_Medium", 0.16f), ("Fantasy/Candle_1", 0.13f), ("Fantasy/Candle_2", 0.25f), ("Fantasy/CandleStick_Stand", 1.3f), ("Fantasy/CandleStick_Triple", 0.4f),
             ("Fantasy/Potion_1", 0.1f), ("Fantasy/Potion_2", 0.26f), ("Fantasy/Potion_4", 0.2f), ("Fantasy/Bottle_1", 0.24f), ("Fantasy/Pot_1", 0.2f), ("Fantasy/Pot_1_Lid", .07f),
             ("Fantasy/Book_Stack_1", 0.2f), ("Fantasy/Book_Stack_2", 0.2f), ("Fantasy/BookGroup_Small_1", 0.3f), ("Fantasy/BookGroup_Small_2", 0.28f), ("Fantasy/Bookcase_2", 2.4f), ("Fantasy/BookStand", 1.4f),

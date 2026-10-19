@@ -78,7 +78,7 @@ namespace Crulanda.World
             var r = LowRng(p);
             switch (p.kind)
             {
-                case "tenement": Tenement(t, LowtownSize(p), p.variant, p.style, r, !string.IsNullOrEmpty(p.name) && p.name != p.kind); break;
+                case "tenement": if (!VillageTerrace(t, p, r)) Tenement(t, LowtownSize(p), p.variant, p.style, r, !string.IsNullOrEmpty(p.name) && p.name != p.kind); break;   // the pack's houses where they fit (ZoneBuilder.LowtownVillage)
                 case "warehouse": Warehouse(t, LowtownSize(p), p.variant); break;
                 case "lane_wall": LaneWall(t, p.size.x > 0 ? p.size.x : 10, p.size.y > 0 ? p.size.y : 2.6f, p.variant, r); break;
                 case "brick_bridge": BrickBridge(t, p.size.x > 0 ? p.size.x : 22, p.size.y > 0 ? p.size.y : 6); break;
@@ -197,9 +197,9 @@ namespace Crulanda.World
             {
                 if (Mathf.Abs(x) > xMax) return;
                 u = Mathf.Clamp(u, .02f, .97f);
-                var dims = new Vector3(size * (.6f + R() * .9f), .03f + R() * .05f, size * (.5f + R() * .7f));
-                var tilt = Quaternion.Euler(side * slope, 0, 0) * Quaternion.Euler(0, (R() - .5f) * 70, 0);
-                parts.Box(greens[R() < .7f ? 0 : 1], new Vector3(x, eaves + roofH * (1 - u) + .02f + dims.y / 2, side * hd * u), dims, tilt);
+                var dims = new Vector3(size * (.6f + R() * .9f), .01f + R() * .01f, size * (.5f + R() * .7f));   // thin, along the slates (play note 257)
+                var tilt = Quaternion.Euler(side * slope, 0, 0) * Quaternion.Euler(0, (R() - .5f) * 24, 0);
+                parts.Box(greens[R() < .7f ? 0 : 1], new Vector3(x, eaves + roofH * (1 - u) + .006f + dims.y / 2 / Mathf.Cos(slope * Mathf.Deg2Rad), side * hd * u), dims, tilt);
             }
             // A clump: a big pad and smaller ones scattered round it.
             void Clump(int side, float x, float u, float spread, int n)
@@ -862,6 +862,7 @@ namespace Crulanda.World
             var parts = new Batch(); float edge = Half - 12;
             var clear = new List<(Vector2 at, float r)>();
             foreach (var d in Doors) clear.Add((new Vector2(d.position.x, d.position.z), 2.4f));
+            foreach (var v in villageDoorClear) clear.Add((v, 1.1f));   // the fronts of the pack's houses: their doors (ZoneBuilder.LowtownVillage)
             foreach (var n in Zone.nodes) if (n != null) clear.Add((n.at, 3));
             foreach (var s in Zone.secrets) if (s != null) clear.Add((s.at, s.radius + 2.5f));
             if (Zone.stations != null) foreach (var s in Zone.stations) if (s != null) clear.Add((s.at, 3));
@@ -917,12 +918,16 @@ namespace Crulanda.World
                     foreach (int sy in new[] { -1, 1 }) Box(batten, c + turn * new Vector3(0, sy * s * .42f, 0), new Vector3(s + .03f, s * .1f, s + .03f), turn);
                 }
             }
+            // The barrels are the wood barrel (play note 247, 2026-10-19), .91 m as the painted ones stood, joined into the clutter's mesh.
+            var cask = WoodBarrelMesh; var caskWood = WoodBarrelMaterial;
             void Barrels(Vector3 at, Quaternion q)
             {
                 int n = 1 + (int)(R() * 3);
                 for (int i = 0; i < n; i++)
                 {
                     var c = at + q * new Vector3((i - (n - 1) / 2f) * .72f, 0, (i % 2) * .3f - .15f);
+                    float turn = (c.x * 37 + c.z * 53 + i * 70) % 360;   // not from R: the clutter after it stays where it was
+                    if (cask != null && caskWood != null) { parts.AddMesh(cask, caskWood, WoodBarrelFit(cask, c, Quaternion.Euler(0, turn, 0), .91f)); continue; }
                     Shape(cyl, stave, c + Vector3.up * .45f, new Vector3(.62f, .45f, .62f), Quaternion.identity);
                     foreach (float y in new[] { .16f, .74f }) Shape(cyl, SootIron, c + Vector3.up * y, new Vector3(.655f, .025f, .655f), Quaternion.identity);
                     Shape(cyl, batten, c + Vector3.up * .905f, new Vector3(.56f, .01f, .56f), Quaternion.identity);
@@ -1072,7 +1077,10 @@ namespace Crulanda.World
                     if (near) continue;
                     var t = new GameObject("Washing line").transform; t.SetParent(root, false);
                     t.position = new Vector3(mid.x, HeightAt(mid.x, mid.y), mid.y); t.rotation = Quaternion.LookRotation(Vector3.Cross(Vector3.up, outV));
-                    WashingLine(t, span, 5.4f + R() * 2.2f, r); strung.Add(mid); lines++;
+                    // Under the eaves at both ends (the pack's houses are lower than the old terraces; ZoneBuilder.LowtownVillage).
+                    float high = Mathf.Min(5.4f + R() * 2.2f, Mathf.Min(VillageLineCap(from), VillageLineCap(from + o2 * span)));
+                    if (high < 3.4f) { DestroyImmediate(t.gameObject); continue; }
+                    WashingLine(t, span, high, r); strung.Add(mid); lines++;
                 }
             }
             // Lamp posts where a lane runs dark: on its verge, none within 22 m of another.

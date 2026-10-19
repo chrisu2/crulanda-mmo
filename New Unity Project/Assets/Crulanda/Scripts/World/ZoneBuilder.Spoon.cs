@@ -26,6 +26,9 @@ namespace Crulanda.World
     {
         /// <summary>The Spoon's front window, its boards and broken glass after a brawl, and the lane outside it where the thrown one lands
         /// (EncounterSession.Spoon finds them by these names under the inn's frame).</summary>
+        /// <summary>The dice pit's kegs' tops, where a drinker sits (the seat marks; InnPlan.seatTop .47 counts on it): the wood barrel
+        /// stands this tall there (play note 247), as the painted keg did.</summary>
+        public const float PitKegTop = .44f;
         public const string SpoonWindowName = "Spoon front window", SpoonBoardsName = "Spoon window boards", SpoonLaneName = "Spoon window lane", SpoonCardsName = "Spoon card table";
         /// <summary>Old iron gone to rust: the Spoon's sign.</summary>
         Material SpoonRust { get { return Tint(art.metal, new Color(.5f, .23f, .1f)); } }
@@ -43,6 +46,14 @@ namespace Crulanda.World
             var cylinder = PrimitiveMesh(PrimitiveType.Cylinder); var sphere = PrimitiveMesh(PrimitiveType.Sphere);
             var parts = new Batch();
             void Cyl(Material m, Vector3 at, Vector3 scale, Quaternion? rot = null) { parts.AddMesh(cylinder, m, Matrix4x4.TRS(at, rot ?? Quaternion.identity, scale)); }
+            // The Spoon's casks and kegs are the wood barrel (play note 247, 2026-10-19), joined into the room's parts: its foot on foot,
+            // turned rot, height tall (along its staves) and across wide when given; false when the model is not there (the painted ones).
+            var keg = WoodBarrelMesh; var kegWood = WoodBarrelMaterial;
+            bool Keg(Vector3 foot, float height, float across = 0, Quaternion? rot = null)
+            {
+                if (keg == null || kegWood == null) return false;
+                parts.AddMesh(keg, kegWood, WoodBarrelFit(keg, foot, rot ?? Quaternion.identity, height, across)); return true;
+            }
             GameObject WallPiece(Vector3 pos, Vector3 scale) { var o = BoxPart(t, pos, scale, brick); o.AddComponent<BoxCollider>(); o.AddComponent<NavBlocker>(); return o; }
 
             // ---------- the shell: the floor, the brick walls (each its own collider and navmesh blocker), the low ceiling ----------
@@ -272,8 +283,12 @@ namespace Crulanda.World
             // On the bar: two tap-casks, mugs, a dice cup.
             foreach (float z in new[] { plan.bar.y + 1.6f, plan.bar.y - 1.9f })
             {
-                Cyl(boards, new Vector3(plan.bar.x - .1f, barTop + .22f, z), new Vector3(.4f, .25f, .4f), Quaternion.Euler(90, 0, 0));
-                foreach (float dz in new[] { -.16f, .16f }) Cyl(iron, new Vector3(plan.bar.x - .1f, barTop + .22f, z + dz), new Vector3(.42f, .015f, .42f), Quaternion.Euler(90, 0, 0));
+                // a cask on its side, .5 long and .4 across, its middle .22 over the bar (its foot's middle at one end)
+                if (!Keg(new Vector3(plan.bar.x - .1f, barTop + .22f, z - .25f), .5f, .4f, Quaternion.Euler(90, 0, 0)))
+                {
+                    Cyl(boards, new Vector3(plan.bar.x - .1f, barTop + .22f, z), new Vector3(.4f, .25f, .4f), Quaternion.Euler(90, 0, 0));
+                    foreach (float dz in new[] { -.16f, .16f }) Cyl(iron, new Vector3(plan.bar.x - .1f, barTop + .22f, z + dz), new Vector3(.42f, .015f, .42f), Quaternion.Euler(90, 0, 0));
+                }
                 parts.Box(iron, new Vector3(plan.bar.x - .1f, barTop + .12f, z - .27f), new Vector3(.04f, .04f, .1f));
                 parts.Box(boards, new Vector3(plan.bar.x - .1f, barTop + .04f, z), new Vector3(.36f, .08f, .3f));
             }
@@ -283,8 +298,8 @@ namespace Crulanda.World
             // Behind it: the ale casks along the wall, the water butt among them (the ale's watered: Mother Sall says so), a shelf of jugs
             // over them, the cellar's trapdoor in the floor.
             float behind = -hx + .5f;
-            foreach (float z in new[] { -2.3f, -1.5f, -.7f }) Barrel(t, new Vector3(behind, .045f, z), .8f, z * 40, true);
-            Barrel(t, new Vector3(behind, .045f, .1f), .95f, 10, true);
+            foreach (float z in new[] { -2.3f, -1.5f, -.7f }) if (!Keg(new Vector3(behind, .045f, z), .8f, 0, Quaternion.Euler(0, z * 40, 0))) Barrel(t, new Vector3(behind, .045f, z), .8f, z * 40, true);
+            if (!Keg(new Vector3(behind, .045f, .1f), .95f, 0, Quaternion.Euler(0, 10, 0))) Barrel(t, new Vector3(behind, .045f, .1f), .95f, 10, true);   // the water butt (its head .97 up: the water just under the rim)
             Cyl(art.water, new Vector3(behind, .045f + .93f, .1f), new Vector3(.5f, .005f, .5f));
             parts.Box(boards, new Vector3(-hx + .14f, 1.9f, -1.0f), new Vector3(.26f, .05f, 2.6f));
             for (int k = 0; k < 7; k++) Cyl(k % 2 == 0 ? Tint(art.stone, new Color(.55f, .45f, .32f)) : Tint(art.stone, new Color(.4f, .36f, .3f)), new Vector3(-hx + .14f, 2.03f, -2.1f + k * .36f), new Vector3(.14f, .1f, .14f));
@@ -395,8 +410,13 @@ namespace Crulanda.World
                     foreach (var (s, f) in plan.seats)
                         if (Vector2.Distance(f, at) < .01f)
                         {
-                            Cyl(boards, new Vector3(s.x, .22f, s.y), new Vector3(.42f, .22f, .42f)); SeatMark(t, s, .44f);
-                            Cyl(iron, new Vector3(s.x, .36f, s.y), new Vector3(.44f, .015f, .44f));
+                            // a keg .44 tall and .42 across (squat: a seat), the seat on its head
+                            if (!Keg(new Vector3(s.x, 0, s.y), PitKegTop, .42f, Quaternion.Euler(0, s.x * 97, 0)))
+                            {
+                                Cyl(boards, new Vector3(s.x, .22f, s.y), new Vector3(.42f, .22f, .42f));
+                                Cyl(iron, new Vector3(s.x, .36f, s.y), new Vector3(.44f, .015f, .44f));
+                            }
+                            SeatMark(t, s, PitKegTop);
                         }
                     Part(PrimitiveType.Cube, t, c + new Vector3(0, 2.3f, 0), new Vector3(.2f, .24f, .2f), Tint(art.glass, new Color(1, .62f, .3f)));
                     parts.Box(iron, c + new Vector3(0, 2.44f, 0), new Vector3(.26f, .04f, .26f)); parts.Box(iron, c + new Vector3(0, 2.6f, 0), new Vector3(.02f, .28f, .02f));
@@ -439,8 +459,11 @@ namespace Crulanda.World
                             break;
                         default:
                             // A cask stood on end with a round board on it.
-                            Cyl(boards, c + new Vector3(0, .37f, 0), new Vector3(.66f, .37f, .66f));
-                            foreach (float y in new[] { .15f, .6f }) Cyl(iron, c + new Vector3(0, y, 0), new Vector3(.68f, .02f, .68f));
+                            if (!Keg(c, .74f, 0, Quaternion.Euler(0, n * 50, 0)))
+                            {
+                                Cyl(boards, c + new Vector3(0, .37f, 0), new Vector3(.66f, .37f, .66f));
+                                foreach (float y in new[] { .15f, .6f }) Cyl(iron, c + new Vector3(0, y, 0), new Vector3(.68f, .02f, .68f));
+                            }
                             Cyl(woods[n % woods.Length], c + new Vector3(0, tableTop, 0), new Vector3(1.05f, .03f, 1.05f));
                             break;
                     }

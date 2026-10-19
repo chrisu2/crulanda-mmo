@@ -306,7 +306,7 @@ namespace Crulanda.World
             BuildCaveWater(root, look);
             foreach (var dl in dropLooks) BuildDrop(dl.def, dl.from, dl.to, root, look);
             BuildAditPolish(root, look);   // (S7) the lichen, the swing-loads, the Breach's hidden seeps (ZoneBuilder.AditPolish.cs)
-            if (Application.isPlaying && look.childCount > 0) StaticBatchingUtility.Combine(look.gameObject);
+            if (Application.isPlaying && look.childCount > 0) BatchStatic(look.gameObject);   // not a flame (play note 255)
         }
         /// <summary>A short apron of planks from each raised lip or mouth of a cave to the nearest deck end within 5 m and 2 m of its
         /// height (the Cutting Drift's lip onto the Foundry's catwalk, its mouth onto the bridge tower; AditNavDiagnostics 2026-10-14:

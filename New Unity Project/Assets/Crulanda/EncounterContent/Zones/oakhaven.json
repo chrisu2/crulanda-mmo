@@ -2728,7 +2728,8 @@
         "x": -40,
         "y": 55
       },
-      "rotation": 90
+      "rotation": 90,
+      "variant": 1
     },
     {
       "kind": "lamp",

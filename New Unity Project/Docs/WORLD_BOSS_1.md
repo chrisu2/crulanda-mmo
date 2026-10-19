@@ -282,6 +282,12 @@ leaves no room for a missed one. Nothing random-unfair: the hunted and the swall
 4. **Chris's run:** a preview build with its own save folder (`--crulanda-save-dir`, a .bat), a level-20 character in good gear, the call to arms
    and a kill. Nothing is done until he has played it.
 
+### 3.7 Her music (GAME-ONLY; the track chosen 2026-10-19)
+Play note 251 brought in alkakrab's Fantasy RPG Tracks Vol. 3, and one of its action loops is kept for her alone:
+`ZoneMusic.WorldBossFight` (`Resources/Music/Fantasy3/Action2Loop`, the pack's longest, 1:51 looped). No zone's set and no fight pool
+plays it (`ZoneMusicTests`). When she is built, her fight cues it in place of the zone's fight track from the first blow, fading over
+eight seconds after she dies or the raid wipes.
+
 ---
 
 ## 4. The legendary weapons

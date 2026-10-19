@@ -21,9 +21,53 @@ namespace Crulanda.EditorTools
         bool Ours { get { return assetPath.StartsWith(Root) || assetPath.StartsWith(Props); } }
         void OnPreprocessTexture()
         {
+            // The Stylized Skyboxes (play note 254; StylizedSky): lat-long HDR pictures read by Crulanda/StylizedSky as flat 2D maps,
+            // 2048 wide, no mip levels (no seam where the picture wraps round), wrapping round but not over the poles.
+            if (assetPath.StartsWith("Assets/Crulanda/Resources/Sky/") && assetPath.EndsWith(".exr"))
+            {
+                var sky = (TextureImporter)assetImporter; sky.textureShape = TextureImporterShape.Texture2D; sky.maxTextureSize = 2048; sky.mipmapEnabled = false;
+                sky.wrapModeU = TextureWrapMode.Repeat; sky.wrapModeV = TextureWrapMode.Clamp; return;
+            }
             if (!Ours) return;
-            var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") ? 1024 : 512; t.mipmapEnabled = true;
+            var t = (TextureImporter)assetImporter;
+            if (assetPath.Contains("/MedievalVillage1/")) { t.maxTextureSize = VillageCap(assetPath); t.mipmapEnabled = true; return; }
+            t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") || assetPath.Contains("/DryTrees/") || assetPath.Contains("/Alchemy/") || assetPath.Contains("/WoodenCanopy/") ? 1024 : 512; t.mipmapEnabled = true;   // DryTrees: the Dry Trees pack (play note 248); Alchemy (note 253)
             if ((assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Village/")) && assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;   // (ends with: Bark_NormalTree.png and Leaves_NormalTree_C.png are colour)
+            // The Free Alchemy and Magic Pack (StormBringer Studios, Asset Store EULA; Resources/Props/Alchemy, play note 253): 1024 px
+            // maps, kept at 1024 (the 512 the other packs fall to would blur the mortar's stone and the flask's brass).
+            // The Simple Wood Barrel (Kraken XR, Asset Store EULA; Resources/Props/WoodBarrel, play note 247, 2026-10-19): three 4096 px maps
+            // (17-19 MB each) for a prop a metre tall, capped at 1024; its normal map a normal map, its metallic-smoothness map linear.
+            if (assetPath.StartsWith(Props + "WoodBarrel/"))
+            {
+                t.maxTextureSize = 1024;
+                if (assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;
+                if (assetPath.EndsWith("_MetallicSmoothness.png")) t.sRGBTexture = false;
+            }
+        }
+        /// <summary>
+        /// The Medieval Village Pack Vol.1 (MyDreamGameStudio, Asset Store EULA; Resources/Props/MedievalVillage1, 2026-10-19, play note 246:
+        /// the Lowtowns' houses, ZoneBuilder.LowtownVillage). It ships 2048 px maps, three a material (colour, normal, metallic-smoothness):
+        /// the colour of a house's big parts (walls, roofs, planks, stone) at 1024, everything else (normal and metallic maps, doors, glass,
+        /// chimneys, the small props) at 512, so its hundred-odd materials stay a sane size in the build. The files were brought in at those
+        /// sizes already; the pack's own .meta files (normal maps marked) are kept.
+        /// </summary>
+        public static int VillageCap(string path)
+        {
+            string f = Path.GetFileNameWithoutExtension(path);
+            bool house = f.StartsWith("House_") || f.StartsWith("Blacksmith_Wall") || f.StartsWith("Blacksmith_Roof") || f.StartsWith("Blacksmith_Plank") || f.StartsWith("Blacksmith_Wood");
+            bool small = f.Contains("_Door") || f.Contains("_Glass") || f.Contains("_Smoker") || f.Contains("_Window") || f.Contains("_Rope");
+            return house && !small && f.EndsWith("_BaseColor") ? 1024 : 512;
+        }
+        /// <summary>alkakrab's Free 25 Fantasy RPG Tracks Vol. 3 (2026-10-19, play note 251; tools/import_music_vol3.py writes the same
+        /// into the metas): Vorbis at quality .5, streamed from disk, not preloaded, so 25 WAVs (~480 MB) cost the build a few MB each
+        /// and no memory until ZoneMusic plays one.</summary>
+        const string MusicVol3 = "Assets/Crulanda/Resources/Music/Fantasy3/";
+        void OnPreprocessAudio()
+        {
+            if (!assetPath.StartsWith(MusicVol3)) return;
+            var a = (AudioImporter)assetImporter; var s = a.defaultSampleSettings;
+            s.loadType = AudioClipLoadType.Streaming; s.compressionFormat = AudioCompressionFormat.Vorbis; s.quality = .5f; s.preloadAudioData = false;
+            a.defaultSampleSettings = s; a.loadInBackground = true; a.forceToMono = false;
         }
         void OnPreprocessModel()
         {
@@ -110,7 +154,7 @@ namespace Crulanda.EditorTools
             if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
             m.SetFloat("_Glossiness", n == "MetalOrnaments" ? .4f : .12f); m.SetFloat("_Metallic", n == "MetalOrnaments" ? .5f : 0);
         }
-        public override uint GetVersion() { return 6; }   // 2: the prop kits, 3-5: the nature kit, 6: the village kit (2026-10-07)
+        public override uint GetVersion() { return 6; }   // 2: the prop kits, 3-5: the nature kit, 6: the village kit (2026-10-07); not raised for Vol. 3's music and the Wooden Canopy (2026-10-19): they are new, so their first import runs the rules, and a raise would re-import every texture and model
 
         public static void Report()
         {

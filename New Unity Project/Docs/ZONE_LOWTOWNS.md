@@ -607,3 +607,83 @@ bridge without coming down into the lane, comes down the fire escape and is take
 the lane fails it and it resets). **To run in the local session:** both, and LowtownsZoneTests, LowtownsRoofsTests, ZoneContentTests
 (Lowtowns). **To look at:** the horns' line and toast, the warders walking Pell Row, the child following on the rope bridges, the
 fire escape down, the Seeker on the far roof from the lane and from the walks.
+
+## The houses: the Medieval Village Pack (lowtowns-village, 2026-10-19; play note 246; WRITTEN, compiles, NOT RUN in Unity)
+Chris, 2026-10-19 ~12:00, verbatim: "i like this better for lowtowns look and feel. Free Medieval Village Pack Vol.1 it is in myassets".
+The place is CANON: "the sprawling, shadowed districts at the base of the mountain" (WB:97), "a sprawling, chaotic sea of slate
+rooftops, vibrant, unnatural neon moss" (b1 ch.7:17), tenements three and four storeys high with laundry strung between the blocks
+(ch.1:225), orange fires in the windows (ch.1:191). How each house stands is GAME-ONLY. Code: `ZoneBuilder.LowtownVillage` (new),
+`ZoneBuilder.Lowtowns` (the tenement kind calls it; the washing lines and the clutter mind the new houses).
+- **The pack:** MyDreamGameStudio's Medieval Village Pack Vol.1 (Asset Store EULA), in `Resources/Props/MedievalVillage1`: the ten
+  houses, the Blacksmith and 14 props (pots, tub, bucket, barrel, spinning wheel; the smith's stump, anvil, table, hammer,
+  sword, spear, shield, cart wheel and sign). Its own Built-in ("Standard") materials and prefabs from the nested package in the pack, so
+  nothing is pink; every file keeps the pack's own .meta (its guid). The textures were cut from 2048 to 1024 (house colour maps) and 512
+  (normal and metallic maps, doors, glass, chimneys, small props) on disk, and the importer holds them there (`ThirdPartyImport`); the
+  folder is 119 MB. **Left out:** the water wheel and the windmill (no machines), the Tavern (the Rusty Spoon is the zone's inn), the
+  animal shed, the chimney stack, bowl, cart and table, and the demo scene. None of it is used outside the Lowtowns.
+- **Which plots:** every `tenement` plot in the data (147 of them) but the four of the roof route over Pell Row and the blind backs at
+  the zone's edge. The roof route's lead walks stand on those four terraces' gutters (`ZoneBuilder.Roofs`, 10 m up), so they keep their
+  soot-brick terraces exactly; the edge's backs stay brick too (the zone's wall). The Rusty Spoon, the warehouse, the soup-hall, the
+  Holding House, the dead-house, the market halls and the toll-house are unchanged.
+- **How a plot is filled** (`PlanVillageRow`, a stream of the plot's own): houses side by side along the plot's frontage, each turned so
+  its door is on the street, scaled to the plot's depth (0.85 to 1.15: a door 1.8 to 2.6 m tall), mirrored or not, drawn by width, never
+  the same house twice side by side, widened up to 15% to close the row; any end left over is a brick yard wall, and a yard wall runs
+  behind. **Vertical, as the books have it:** a four-storey terrace becomes houses on **two storeys of soot brick** (the old terrace's
+  brick, its doors on stoops on the street, its windows, a few lit); a three-storey one becomes houses on **one storey of brick** (half of
+  them) or one of the pack's **tall houses** (House_5, House_6, House_10) standing on the setts. On the brick, a **timber gallery** runs
+  along the front at the top on iron brackets (above head height; nothing stands in the street), with a rail, for the houses' doors; pots,
+  tubs and a spinning wheel stand on it.
+- **The Rust Market smith's shop** is the pack's Blacksmith on the terrace plot nearest the market hearth (50.9, 33.5), its anvil on a
+  stump, table and hammer, weapon stand with sword, spear and shield, and a cart wheel under its front awning, its sign by the door. The
+  hearth itself (the smith's station) is unchanged.
+- **The Lowtowns' colour on them:** every material soot-darkened (two shades, a little warm under the yellow smog); the pack's glass a
+  fire's orange (most) or a shard's violet (one in five) in three houses in ten, dark in the rest; neon moss on the plain gable roofs
+  (houses 1-6 and 10); soot smoke from one chimney in three; a lantern (glowing glass, no light of its own) on one front in three. The
+  yellow haze, the lane lamps and the night's lights are the zone's own, unchanged. Washing lines now hang under the eaves of the house
+  they meet (none lower than 3.4 m).
+- **Walking:** each plot keeps the old terrace's one collider box (its height the old eaves), so the navmesh where people walk is
+  unchanged; the houses only render. Every house stands inside its plot; the street clutter keeps off their fronts.
+- **Found in the data, not changed:** three plots already reach into a lane that ends at them (Gutter Alley at -100.6, -166.5; Weir Back
+  at 170.9, 154.8; the Weir Stair at -70.5, 157.8), and the smugglers' pier camp's centre (86.1, 172.2) stands inside the terrace at 88.7,
+  169.6 (its mobs spawn round a solid block). Worth a look when the Drain Reach lands.
+
+**Tests:** `LowtownsVillageTests` (EditMode, new: every terrace plot gets pack houses, prefabs there, scale and storeys right, the smith's
+shop; the roof route's four terraces keep their brick and the walks still join; every house inside its plot, side by side, door wall on
+the street; none over a road (but a lane that ends at it), a stair or ramp, or a camp's centre; only the Lowtowns' builder names the
+pack and no scene or asset elsewhere uses its files; no windmill or water wheel (by name and by the pack's guids), no tavern or demo;
+every material on the Built-in Standard shader, none URP, every reference found). `LowtownsVillagePlayTests` (PlayMode, new, for the
+lead: every planned house placed in the built zone, none pink, all soot-tinted, each inside its plot on its brick at its planned height;
+the roof walks still one path on the navmesh; Oakhaven has none). **To run in the local session:** both, LowtownsRoofsTests,
+LowtownsSweepTests, LowtownsLevelsTests, LowtownsZoneTests, SweepPlayTests, and BuildingGroundTests and NodePlacementTests for the
+Lowtowns. **To capture (by day and at night):** the Rust Market and its smith's shop, the High Rows, the docks, the Night Market, the
+Tenement Rows and Pell Row (the roof route's brick terraces among the new houses), one gallery close up, a roof's moss, a washing line.
+**To check in the captures:** that each house's door faces the street (the pack's doors are read as on the model's +z), the moss lies on
+the roofs (not floating), the smith's gear stands beside the door (not in it), and the soot tint reads as the Lowtowns, not a village.
+- **Fixed after the first run (2026-10-19, the lowtowns-art1 frames; PlayMode 31/31 passed):** the brick under a row is now a block
+  under each house (its own footprint and 15 cm more), not one box over the whole plot that read as a blank crate with a house
+  overhanging it; every face that shows has windows with sills, lintels and jambs (doors on the street front), and the yard walls left at
+  a row's ends and behind shallow houses have a coping and a plank gate with iron straps. The pack's Built-in set has no weapon stand (its
+  FBX is removed), so the smith's sword and spear lean on the Fantasy kit's stand, as the forges have. The EditMode test now looks for the
+  pack's own names only (VillageKit.cs is the Quaternius village kit, another pack). Not re-run.
+- **The black slab (2026-10-19, the lowtowns-art2 frames):** the house on the brick that read as a big flat black slab was House_9, one of
+  the pack's three porch-fronted designs (House_7, 8, 9): a deep recessed ground floor of near-black timber under a jettied upper floor.
+  On the setts that is a porch; raised on two storeys of brick it is a black box overhanging the brick. Fixed: House_9 now stands on the
+  setts only (with the tall houses); House_7 and House_8 (the same design, and low) are taken out of the project (folder 92 MB). Not a
+  missing material: the pack's maps load (their means are low because each atlas is mostly black margin) and nothing is metallic. The soot
+  is lighter (0.84 and 0.74 of the paint, from 0.7 and 0.58): the pack's timber is dark already. Each brick block is one tier; the "two
+  tiers" in the frame are two neighbouring rows of different height (one storey and two) seen from behind; nothing stacks a block on a
+  block.
+- **Play note 257 (Chris, 2026-10-19), the moss.** Asked "what is the green stuff?" of his crop of the roofs (flat bright-green blobs on
+  the tiles), he chose, verbatim: **"Make it look like moss (Recommended)"**. CANON: "vibrant, unnatural neon moss" (b1 ch.7:17); how it
+  lies is GAME-ONLY. Done:
+  - **On the pack's roofs** (`PackRoofMoss`): the roof's own triangles are read from the model, and every pad is laid on the tile under it,
+    along its slope, 1-2 cm thick and lifted 4 mm: nothing floats, nothing is a flat rectangle off the roof. It gathers where moss grows:
+    strips along the ridge and the eaves (the roof's top and bottom tenth), clumps round the chimney's foot, a rare cushion on the open
+    slope; each patch a scatter of small pads of their own size, turn and green, so its edge is broken. On about six roofs in ten.
+  - **The colour:** a dull, dark green by day (the paint 0.2, 0.33, 0.1 and a paler 0.3, 0.37, 0.12, matte); its glow is a trace by day (4%)
+    and rises through dusk to the full glow at night on the clock (`NightGlow`, driven by `WorldClock.Darkness`).
+  - **The older moss** reads the same way: the brick terraces' roof moss (`RoofMoss`: the roof route's terraces, the edge's backs) is
+    1-2 cm pads lying on the slates, turned at most 12 degrees off the courses; the moss on the retaining walls' copings
+    (`ZoneBuilder.LowtownLevels`) and its drips are thin too; the roof walks' and the water tower's patches are 1.4 cm. All share the two
+    moss materials, so all follow the clock. The drain mould (the under-ways' green glow, b1 ch.6:129) is unchanged.
+  Not run in Unity. **To capture:** a roof close up by day and at night (the High Rows from above, Pell Row's walks), and a coping's moss.

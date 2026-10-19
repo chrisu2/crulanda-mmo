@@ -171,6 +171,12 @@ namespace Crulanda.World
                 if (piece != null && name == "ModularFloor") Shade(piece, FloorShade);
                 return piece;
             }
+            // A wooden barrel in the kit's place (play note 247, 2026-10-19: the wood barrel, not the Dungeon kit's): its foot on foot.
+            GameObject Cask(Vector3 foot, float yaw, float height)
+            {
+                if (kit == null) { kit = new GameObject("Adit kit").transform; kit.SetParent(t, false); }
+                return ModelProp(kit, WoodBarrelPath, foot, yaw, height);
+            }
             float YawAt(float s) { return Along(s).eulerAngles.y; }
             var torchFire = new Color(1, .62f, .3f);
             // A torch in its iron bracket on a wall face (foot: the wall's face at the floor; out: the way into the room), 1.5 m up, its
@@ -641,7 +647,7 @@ namespace Crulanda.World
             KitDressing();
             FloorClutter();
             CampDressing();
-            if (kit != null && Application.isPlaying) StaticBatchingUtility.Combine(kit.gameObject);
+            if (kit != null && Application.isPlaying) BatchStatic(kit.gameObject);   // not the torches' flames (play note 255)
 
             // The floors filled (Chris, 2026-10-11: "room full of nothing", "more nothingness"): drawn out two and a half times as wide,
             // the chambers kept their rubble at the walls' feet only and the floor between lay bare. Rock outcrops, rubble, dripstone and
@@ -678,7 +684,7 @@ namespace Crulanda.World
                         if (k == 0) { Brazier(t, at, null); Block(at, new Vector3(.9f, 1.1f, .9f), Along(s)); continue; }
                         if (k <= 2)
                         {
-                            if (C() < .5f) { var b = Piece("Barrel", at, C() * 360, .95f); if (b != null) Block(at, new Vector3(.9f, .95f, .9f), Along(s)); }
+                            if (C() < .5f) { var b = Cask(at, C() * 360, .95f); if (b != null) Block(at, new Vector3(.9f, .95f, .9f), Along(s)); }
                             else { Crate(at, Along(s) * Quaternion.Euler(0, C() * 40 - 20, 0), 1 + (int)(C() * 2), false); Block(at, new Vector3(1.1f, 1.2f, 1.1f), Along(s)); }
                             continue;
                         }
@@ -789,7 +795,7 @@ namespace Crulanda.World
                         float s0 = h.Along[foreman] + 3 * X; var q = Along(s0); var box = On(s0, h.Half[foreman] * .62f); box.y = FloorY(box.x, box.z);
                         if (Free(box)) { Piece("Chest_gold", box, YawAt(s0) - 90, .85f); Block(box, new Vector3(1, .9f, 1), q); }
                         var barrel = On(s0 + 1.6f, h.Half[foreman] * .66f); barrel.y = FloorY(barrel.x, barrel.z);
-                        if (Free(barrel)) { Piece("Barrel", barrel, K() * 360, 1f); Block(barrel, new Vector3(.9f, 1, .9f), q); }
+                        if (Free(barrel)) { Cask(barrel, K() * 360, 1f); Block(barrel, new Vector3(.9f, 1, .9f), q); }
                         break;
                     }
                     case "workings": case "main":
@@ -1072,11 +1078,13 @@ namespace Crulanda.World
                     var kegs = new GameObject(AditPowder).transform; kegs.SetParent(t, false); kegs.localPosition = keg; kegs.localRotation = q;
                     for (int k = 0; k < 2; k++)
                     {
+                        // two kegs of the wood barrel (play note 247), .66 tall as the painted ones stood; else painted
+                        if (ModelProp(kegs, WoodBarrelPath, new Vector3(0, 0, k * .6f - .3f), k * 70, .66f) != null) continue;
                         var at = new Vector3(0, .33f, k * .6f - .3f);
                         Part(PrimitiveType.Cylinder, kegs, at, new Vector3(.5f, .33f, .5f), dark);
                         foreach (float y in new[] { -.2f, .2f }) Part(PrimitiveType.Cylinder, kegs, at + Vector3.up * y, new Vector3(.53f, .03f, .53f), iron);
                     }
-                    Part(PrimitiveType.Cube, kegs, new Vector3(0, .7f, 0), new Vector3(.35f, .04f, .25f), Tint(art.cloth, new Color(.6f, .15f, .1f)));   // a red-marked lid: powder
+                    Part(PrimitiveType.Cube, kegs, new Vector3(0, .68f, 0), new Vector3(.35f, .04f, .25f), Tint(art.cloth, new Color(.6f, .15f, .1f)));   // a red-marked lid across both: powder
                     Interactables.Add(new ZoneInteractable { name = AditPowder, prompt = "Take blasting powder", kind = "powder", position = t.TransformPoint(keg), root = kegs });
                     RailHall(hallFrom);
                 }
@@ -1437,7 +1445,7 @@ namespace Crulanda.World
                             Block(foot, new Vector3(.35f, 3.2f, .35f), Quaternion.identity);
                         }
                 // Barrels stood on the platform against the right-hand wall.
-                if (walled) for (int k = 0; k < 3; k++) { float s = from + 6 * X + k * 1.2f; var b = On(s, h.Half[RingAt(s)] * wallAt - 1.2f); if (Free(b)) { Piece("Barrel", b, K() * 360, .95f); Block(b, new Vector3(.9f, .95f, .9f), Along(s)); } }
+                if (walled) for (int k = 0; k < 3; k++) { float s = from + 6 * X + k * 1.2f; var b = On(s, h.Half[RingAt(s)] * wallAt - 1.2f); if (Free(b)) { Cask(b, K() * 360, .95f); Block(b, new Vector3(.9f, .95f, .9f), Along(s)); } }
                 for (float s = from + 8 * X; s < to; s += 30) { int i = RingAt(s); Glow(t, c[i] + Vector3.up * h.Height[i] * .7f, 30 * CW, .7f, RailBlue, .7f); }
                 // The carriage (Chris, 2026-10-11: "NO Machines"; it had been an armoured rail-car with a cab, rivets and levers): two timber
                 // ore wagons coupled on the old rails, plank-sided and iron-banded on wooden wheels, the geodes in their crates in the rear one,

@@ -126,7 +126,7 @@ namespace Crulanda.World
             // The walked decks (NavWalkable) stay out of the batch: batching swaps their MeshFilter's mesh for the root's combined one, which is
             // not readable, and the navmesh is built from them afterwards (EncounterNavigation: "Source mesh Combined Mesh ... does not
             // allow read access", the Lowtowns' bridges, 2026-10-16). Each game object is batched on its own MeshFilter.
-            if (!NoStaticBatching) try { StaticBatchingUtility.Combine(statics.GetComponentsInChildren<MeshFilter>(true).Where(f => f.GetComponent<NavWalkable>() == null).Select(f => f.gameObject).ToArray(), statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
+            if (!NoStaticBatching) try { BatchStatic(statics.gameObject); } catch (Exception e) { Debug.LogWarning("Static batching skipped: " + e.Message); }
             Debug.Log("Static scenery merged: " + before + " renderers into " + statics.GetComponentsInChildren<MeshRenderer>().Length + ".");
             Lap("batching");
             // In daylight, before the clock sets the hour; about 4 px a metre (1024 for the old 260 m zones).
@@ -1058,6 +1058,23 @@ namespace Crulanda.World
         /// </summary>
         /// <summary>Tests that read the scenery's meshes (BuildingGroundTests' flush faces) set this: static batching leaves them unreadable.</summary>
         public static bool NoStaticBatching;
+        /// <summary>
+        /// What static batching may take: not a walked deck (NavWalkable: its mesh must stay readable for the navmesh), and not a flame
+        /// (CandleFlame). Play note 255 (2026-10-19, Chris: "fire goes around the bazier", the brazier's flame standing beside its bowl and
+        /// lower): the flame shader (Crulanda/CandleFlame) breathes the flame's height and leans its tip from the mesh's own vertex
+        /// positions (y scaled, x and z pushed by the height). Batched, a mesh's vertices are baked into the batch root's space (the
+        /// zone's, metres above its origin), so the "height" was the flame's height in the world: the cone was squashed and stretched
+        /// about the zone's floor and pushed sideways by up to a few tenths of a metre a metre of it, off its bowl. A flame is kept out of
+        /// the batch, so it is drawn on its own mesh, about its own base.
+        /// </summary>
+        public static bool Batchable(GameObject g) { return g.GetComponent<NavWalkable>() == null && g.GetComponent<CandleFlame>() == null; }
+        /// <summary>Static batching under <paramref name="root"/>, of what <see cref="Batchable"/> allows. Returns how many were batched.</summary>
+        public static int BatchStatic(GameObject root)
+        {
+            var take = root.GetComponentsInChildren<MeshFilter>(true).Where(f => Batchable(f.gameObject)).Select(f => f.gameObject).ToArray();
+            if (take.Length > 0) StaticBatchingUtility.Combine(take, root);
+            return take.Length;
+        }
         int MergeStatics()
         {
             int total = 0;
@@ -1214,7 +1231,7 @@ namespace Crulanda.World
                         LowtownProp(t, p); break;   // the Lowtowns' kinds (ZoneBuilder.Lowtowns.cs, Phase 9.1)
                     case "oven": Oven(t); break;
                     case "tannery": Tannery(t); break;
-                    case "woodpile": Woodpile(t); break;
+                    case "woodpile": Woodpile(t); if (p.variant == WoodyardCanopyVariant) WoodyardCanopy(t); break;
                     case "leathershop": LeatherShop(t); break;
                     case "dryhut": DryingHut(t); break;
                     case "kitchen": Kitchen(t); break;
@@ -2031,81 +2048,37 @@ namespace Crulanda.World
             Solid(t, new Vector3(0, 1.2f, 0), new Vector3(2.4f, 2.4f, 2.4f));
         }
         /// <summary>
-        /// A dead tree (Khaven's Stillwood, the Rim's husks, the unmade): a tapered, slightly bent bole on a root flare of
-        /// buttress ridges (Bole), ending in a broken leader; three to five limbs leaving it at different heights, each crooked (a
-        /// kink part way) and tapering to a point, with branches off its length, not its tip, and twigs off those. Grey weathered
-        /// wood, no bark grain in the shade. Its look is its own (TreeRandom); from the zone's stream it takes exactly the draws the
-        /// old tree took, so nothing else moves. <paramref name="girth"/> &gt; .6 (a dead_oak prop) keeps a massive trunk.
+        /// A dead tree (Khaven's Stillwood, the Rim's husks, the unmade, the woods' snags, the groves, Hallow's Creek's and the Shore's dead
+        /// oaks, the gallows): one of the seven Dry Trees (play note 248; ZoneBuilder.DryTrees), as tall as the old one stood (DryTreeHeight),
+        /// which of the seven and its turn from the tree's own stream, its trunk's foot sunk under the lowest ground round it so it never
+        /// stands on air on a slope, charred darker in the ash and greyed in a gloom. From the zone's stream it takes exactly the draws the
+        /// old tree took, so nothing else moves; the collider and nav block are the old ones. <paramref name="girth"/> &gt; .6 (a dead_oak
+        /// prop) is a massive one: taller, a broader collider, and one of the three stout dry trees broadened by a third (a landmark, not a
+        /// sapling; the preview-1019 frames). <paramref name="mat"/> was the painted tree's bark: the pack's bark is used.
+        /// <paramref name="pickAs"/>, <paramref name="tall"/>, <paramref name="broad"/>: a landmark's own tree (the Gallows Tree), its
+        /// height and its broadening; the draws are taken all the same.
         /// </summary>
-        Transform DeadTree(Vector2 at, float scale, Material mat, int depth, Transform parent, Transform existing = null, float girth = -1)
+        Transform DeadTree(Vector2 at, float scale, Material mat, int depth, Transform parent, Transform existing = null, float girth = -1, int pickAs = -1, float tall = 0, float broad = 0)
         {
             var root = existing != null ? existing : new GameObject("Dead tree").transform;
             if (existing == null) { root.SetParent(parent, false); root.position = Ground(at); root.rotation = Quaternion.Euler(0, R01 * 360, 0); }
             if (girth < 0) girth = existing != null && depth >= 5 ? .9f : .38f;
-            float trunkH = (girth > .6f ? 4.2f : 5.2f) * scale, trunkR = girth * scale;
+            float trunkR = girth * scale;
             for (int i = 0; i < 5; i++) _ = R01;                                           // the old root flare's draws
             SkipBranchDraws(depth, trunkR * (girth > .6f ? .75f : .7f));                     // and the old limbs'
             var tr = TreeRandom(root.position); float T() { return (float)tr.NextDouble(); }
             bool massive = girth > .6f;
-            // The kit's dead tree (art round 4, 2026-10-07), one of five from the tree's own stream, as tall as the painted one would
-            // stand; charred darker in the ash. The massive dead oaks (landmarks) stay painted.
-            if (!massive && HasProp("Nature/DeadTree_1"))
-            {
-                float kitTop = trunkH * 1.35f * (.9f + T() * .2f);
-                var kit = KitTree(root, "Nature/DeadTree_" + (1 + (int)(T() * 5) % 5), kitTop, Mathf.Max(.14f, trunkR * .8f), T() * 360);
-                if (kit != null)
-                {
-                    if (Zone.biome == "ash" || Gloom) foreach (var r in kit.GetComponentsInChildren<Renderer>()) r.sharedMaterial = KitShade(r.sharedMaterial, Zone.biome == "ash" ? new Color(.55f, .52f, .5f) : new Color(.8f, .78f, .76f));
-                    return root;
-                }
-            }
-            // A massive one (a dead_oak prop) is a great old tree: tall, a broad but not squat bole, long heavy limbs.
-            float top = (massive ? trunkH * 2.1f : trunkH * 1.35f) * (.9f + T() * .2f), r0 = massive ? trunkR * .66f : Mathf.Max(.14f, trunkR * .8f);
-            var axis = Bole(root, tr, top, r0, mat, .45f);   // a snapped-off top
-            // Playtest 2026-10-03 ("this tree is still broke"): the limbs were long thin spears, all climbing, so the tree read as an
-            // antler or a broom. A dead oak's limbs are short for its height, heavy where they leave the bole, crooked in three
-            // lengths that each turn a little, and end in snapped stubs; forks off every length, some drooping, each forked again.
-            int n = (massive ? 5 : 4) + (int)(T() * 2); float turn = T() * 360;
-            for (int i = 0; i < n; i++)
-            {
-                // Up the trunk from about a third to four fifths, lowest first: the low limbs heavy and near level, the upper ones shorter and climbing.
-                float u = .32f + .48f * (i + T() * .6f) / n, yaw = turn + i * 360f / n + (T() - .5f) * 70;
-                var outward = Quaternion.Euler(0, yaw, 0) * Vector3.right;
-                float reach = top * (massive ? .32f + T() * .18f : .32f + T() * .2f) * (1.3f - u * .6f);
-                float r = r0 * (massive ? .5f + T() * .14f : .5f + T() * .16f) * (1.2f - u * .45f);
-                var from = axis(top * u); var dir = (outward + Vector3.up * (.05f + u * .4f + T() * .3f)).normalized;
-                float segLen = reach * (.45f + T() * .1f);
-                for (int seg = 0; seg < 3; seg++)
-                {
-                    var to = from + dir * segLen; float bow = .06f + T() * .06f, rEnd = r * (seg == 2 ? .35f : .6f);
-                    Limb(root, from, to, r, rEnd, mat, bow, 8, seg == 0, seg == 2);
-                    // Forks off this length (on its bowed line), turning their own way, some drooping; most fork once more.
-                    int subs = seg == 2 ? 1 : 1 + (int)(T() * 2);
-                    for (int k = 0; k < subs; k++)
-                    {
-                        float s2 = .35f + T() * .5f; var at2 = LimbAt(from, to, bow, s2); float rAt = Mathf.Lerp(r, rEnd, s2) * .6f;
-                        var d2 = (Quaternion.AngleAxis((T() - .5f) * 110, Vector3.up) * dir + Vector3.up * (T() * .9f - .25f)).normalized;
-                        float len = segLen * (.5f + T() * .6f); var tip = at2 + d2 * len; float bb = .08f + T() * .08f;
-                        Limb(root, at2, tip, rAt, rAt * .3f, mat, bb, 6);
-                        if (T() < .7f)
-                        {
-                            var at3 = LimbAt(at2, tip, bb, .5f + T() * .3f); float rs = rAt * .45f;
-                            var d3 = (Quaternion.AngleAxis((T() - .5f) * 120, Vector3.up) * d2 + Vector3.up * (T() * .8f - .2f)).normalized;
-                            Limb(root, at3, at3 + d3 * len * (.4f + T() * .3f), rs, rs * .3f, mat, .1f, 5);
-                        }
-                    }
-                    // The next length: a kink in plan and in pitch, thinner and shorter.
-                    from = to; r = rEnd; segLen *= .75f;
-                    dir = (Quaternion.AngleAxis((T() - .5f) * 60, Vector3.up) * dir + Vector3.up * ((T() - .5f) * .5f + .15f)).normalized;
-                }
-            }
-            // The leader's broken top: a last short twig or two just under the snag.
-            for (int k = 0, m = 1 + (int)(T() * 2); k < m; k++)
-            {
-                var from = axis(top * (.86f + T() * .06f)); var dir = (Quaternion.Euler(0, T() * 360, 0) * Vector3.right + Vector3.up * (.6f + T() * .8f)).normalized;
-                Limb(root, from, from + dir * top * (.08f + T() * .06f), r0 * .26f, r0 * .07f, mat, .08f, 5);
-            }
-            var cap = root.gameObject.AddComponent<CapsuleCollider>(); cap.center = new Vector3(0, top / 2, 0); cap.height = top; cap.radius = r0;
+            float top = DryTreeHeight(scale, massive, T()), r0 = massive ? trunkR * .66f : Mathf.Max(.14f, trunkR * .8f);
+            float u = T(); int pick = massive ? StoutDryTrees[Mathf.Min(2, (int)(u * 3))] : DryTreePick(u); float yaw = T() * 360;
+            float widen = massive ? 1.3f : 1;
+            if (pickAs >= 0) pick = pickAs;
+            if (tall > 0) top = tall;
+            if (broad > 0) { widen = broad; r0 = Mathf.Max(r0, DryTrunk[pick] * top * broad * 1.1f); }
+            DryTreeModel(root, pick, Vector3.down * DrySink(root, r0), Quaternion.Euler(0, yaw, 0), top, DryShade(), widen);
+            // The old colliders: a common tree's as the kit tree had it, a massive one's the painted dead oak's.
+            var cap = root.gameObject.AddComponent<CapsuleCollider>();
+            if (massive) { cap.center = new Vector3(0, top / 2, 0); cap.height = top; } else { cap.center = new Vector3(0, top * .45f, 0); cap.height = top * .9f; }
+            cap.radius = r0;
             root.gameObject.AddComponent<NavBlocker>(); root.gameObject.AddComponent<TreeFade>();
             return root;
         }
@@ -2784,11 +2757,14 @@ namespace Crulanda.World
             var mesh = PropMesh("Post " + w + "x" + h, () => Turned(new[] { new Vector2(r * 1.16f, 0), new Vector2(r, .22f), new Vector2(r * .94f, top - r * 1.5f), new Vector2(r * 1.3f, top - r * 1.3f), new Vector2(r * 1.3f, top - r * .45f), new Vector2(r * .85f, top - r * .1f), new Vector2(0, top) }, 6));
             return MeshPart(mesh, t, foot, m, rot);
         }
-        /// <summary>A coopered barrel standing on <paramref name="foot"/>, a metre tall and .72 across the bilge at size 1: bulged staves, a recessed head and three iron hoops.</summary>
+        /// <summary>A wooden barrel standing on <paramref name="foot"/>, .95 m tall at size 1: the Simple Wood Barrel (play note 247,
+        /// 2026-10-19; <see cref="WoodBarrelPath"/>), at the height the Fantasy kit's barrel stood. <paramref name="painted"/> (the inn sign's
+        /// gilded cask, recoloured and turned) and a scene without the model take the painted one: a metre tall and .72 across the bilge at
+        /// size 1, bulged staves, a recessed head and three iron hoops.</summary>
         GameObject Barrel(Transform t, Vector3 foot, float size = 1, float yaw = 0, bool painted = false)
         {
-            if (!painted) { var model = ModelProp(t, "Fantasy/Barrel", foot, yaw, .95f * size); if (model != null) return model; }   // the kit's barrel (2026-10-07), the painted one when the kit is not there
-            var mesh = PropMesh("Barrel", () => TwoTone(
+            if (!painted) { var model = ModelProp(t, WoodBarrelPath, foot, yaw, .95f * size); if (model != null) return model; }
+            var mesh = PropMesh("Coopered barrel", () => TwoTone(
                 Turned(new[] { new Vector2(0, 0), new Vector2(.3f, 0), new Vector2(.345f, .28f), new Vector2(.36f, .5f), new Vector2(.345f, .72f), new Vector2(.3f, 1), new Vector2(.27f, 1), new Vector2(.27f, .95f), new Vector2(0, .95f) }, 12),
                 Joined(Piece(Turned(new[] { new Vector2(.315f, .12f), new Vector2(.335f, .12f), new Vector2(.348f, .2f), new Vector2(.328f, .2f) }, 12)),
                     Piece(Turned(new[] { new Vector2(.355f, .46f), new Vector2(.376f, .46f), new Vector2(.376f, .54f), new Vector2(.355f, .54f) }, 12)),
@@ -3404,10 +3380,36 @@ namespace Crulanda.World
         }
         void Gallows(Transform t)
         {
-            // The Gallows Tree: a leafless tree with a heavy limb, a rope and a wooden platform beneath.
+            // The Gallows Tree (CANON landmark, Chris's Khaven map: a big, gnarled dead tree with a noose from a limb): a dry tree
+            // with a clear trunk (GallowsDryTree, GallowsTall: some 2 m of trunk before the first fork), broadened. The crossbeam (the carpenter's, GAME-ONLY) is lashed to the trunk and rests on
+            // the tree's heaviest low limb (read from the mesh: GallowsLimb); the rope and noose hang from its end over the platform.
             // The tree on its own child, so only the tree fades for the camera, not the platform and rope.
             var tree = new GameObject("Gallows tree").transform; tree.SetParent(t, false);
-            DeadTree(Vector2.zero, .75f, Tint(art.bark, new Color(.2f, .17f, .15f)), 3, statics, tree);
+            DeadTree(Vector2.zero, .75f, Tint(art.bark, new Color(.2f, .17f, .15f)), 3, statics, tree, -1, GallowsDryTree, GallowsTall, GallowsBroad);
+            string file = DryTreeModels[GallowsDryTree].Substring(DryTreeModels[GallowsDryTree].LastIndexOf('/') + 1);
+            var model = tree.Find("Model " + file);
+            if (model != null && GallowsLimb(model, t, GallowsTall, out var limb))
+            {
+                // The tree turned on its trunk so that limb points along the gallows' own +x, where the platform always stood (clear of
+                // the yard's houses as the zone file placed it).
+                tree.localRotation = Quaternion.Euler(0, Mathf.Atan2(limb.z, limb.x) * Mathf.Rad2Deg, 0); limb = new Vector3(new Vector2(limb.x, limb.z).magnitude, limb.y, 0);
+                // (preview-1019 art2: the rope too thin to see, the platform off the beam's end.) GallowsPlan lays it out: the beam's free
+                // end over the platform's middle, a 4 cm rope from it, the noose's foot at head height over the boards.
+                var plan = GallowsPlan(limb); var rope = Tint(art.cloth, new Color(.45f, .38f, .28f));
+                Rod(t, plan.beamFrom, plan.beamTo, .13f, art.bark);                                                              // the crossbeam: trunk, limb, out
+                Rod(t, plan.beamFrom + Vector3.down * .35f, plan.beamFrom + Vector3.up * .2f, .17f, rope);                       // lashed to the trunk
+                Rod(t, plan.ropeTop, plan.knot, GallowsRope, rope);                                                               // the rope
+                for (int k = 0; k < 10; k++)                                                                                     // the noose, a loop across the beam
+                {
+                    float a0 = k * Mathf.PI / 5, a1 = (k + 1) * Mathf.PI / 5;
+                    Vector3 P(float a) { return plan.knot + Vector3.down * GallowsLoop + Vector3.forward * Mathf.Sin(a) * GallowsLoop * .85f + Vector3.up * Mathf.Cos(a) * GallowsLoop; }
+                    Rod(t, P(a0), P(a1), GallowsRope, rope);
+                }
+                Part(PrimitiveType.Cube, t, plan.platform + Vector3.up * (GallowsDeck - .075f), new Vector3(GallowsBoards, .15f, GallowsBoards), art.timber);
+                foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
+                    Part(PrimitiveType.Cube, t, plan.platform + new Vector3(sx * (GallowsBoards / 2 - .2f), (GallowsDeck - .15f) / 2, sz * (GallowsBoards / 2 - .2f)), new Vector3(.18f, GallowsDeck - .15f, .18f), art.timber);
+                return;
+            }
             Part(PrimitiveType.Cylinder, t, new Vector3(1.6f, 3.6f, 0), new Vector3(.28f, 1.7f, .28f), art.bark, Quaternion.Euler(0, 0, 80));
             Part(PrimitiveType.Cylinder, t, new Vector3(2.8f, 2.7f, 0), new Vector3(.05f, .75f, .05f), Tint(art.cloth, new Color(.45f, .38f, .28f)));
             Part(PrimitiveType.Cube, t, new Vector3(2.8f, .5f, 0), new Vector3(2.4f, .15f, 2.4f), art.timber);
@@ -3904,9 +3906,9 @@ namespace Crulanda.World
         void Stall(Transform t, int variant)
         {
             bool hide = variant == 3;
-            // The kit's crates of apples and carrots in front of a produce stall, a barrel by the others (2026-10-07).
+            // The kit's crates of apples and carrots in front of a produce stall, a barrel by the others (2026-10-07; the wood barrel, note 247).
             if (!hide && Mathf.Abs(variant) % 3 == 0) { GroundProp(t, "Fantasy/FarmCrate_Apple", new Vector3(-1.05f, 0, -1.35f), 14, .34f); GroundProp(t, "Fantasy/FarmCrate_Carrot", new Vector3(-.4f, 0, -1.4f), -9, .34f); }
-            else if (!hide) GroundProp(t, "Fantasy/Barrel", new Vector3(1.75f, 0, -.3f), 30, .95f);
+            else if (!hide) GroundProp(t, WoodBarrelPath, new Vector3(1.75f, 0, -.3f), 30, .95f);
             var colors = hide ? new[] { new Color(.56f, .43f, .29f), new Color(.64f, .52f, .36f) } : Awnings[Mathf.Abs(variant) % Awnings.Length];
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 })
                 if (hide) Part(PrimitiveType.Cylinder, t, new Vector3(sx * 1.4f, sz > 0 ? 1.25f : 1.1f, sz * .9f), new Vector3(.13f, sz > 0 ? 1.25f : 1.1f, .13f), Bone);
@@ -4238,6 +4240,36 @@ namespace Crulanda.World
             MeshPart2(log, t, new Vector3(-.5f, .68f, -1), bark, split, Quaternion.Euler(0, 0, 90)).transform.localScale = new Vector3(.71f, .8f, .71f);
             Solid(t, new Vector3(-.4f, .6f, .6f), new Vector3(3, 1.3f, 1.2f));
             Workplace(t, "woodpile", new Vector3(1.4f, 0, -1.4f), new Vector3(1.4f, .6f, -.6f));
+        }
+        /// <summary>The woodpile's variant with the Wooden Canopy over its seasoning wood (Oakhaven's Woodyard, the one lumberjack's yard).</summary>
+        public const int WoodyardCanopyVariant = 1;
+        /// <summary>The canopy's middle in the woodpile's frame, its height, and the ground it covers: the pack's own size (8.8 by 4.8 m,
+        /// 3.8 m to the ridge; the posts 2.4 m, the eaves' edge 1.6 m), so a man stands under it (2026-10-19: at 3 m it read as a roof
+        /// on the grass in the lane frames). Behind the chopping block, on the side away from the log stack.</summary>
+        public static readonly Vector3 WoodyardCanopyAt = new Vector3(-.3f, 0, -4.4f);
+        public const float WoodyardCanopyHeight = 3.81f;
+        public static readonly Vector2 WoodyardCanopyFoot = new Vector2(8.82f, 4.77f);
+        /// <summary>The six posts' feet in the canopy's own frame (read from Canopy.fbx: x about -4, 0 and 4, z about -1.9 and 1.9).</summary>
+        public static readonly Vector2[] WoodyardCanopyPosts = { new Vector2(-4, -1.9f), new Vector2(0, -1.9f), new Vector2(4, -1.9f), new Vector2(-4, 1.9f), new Vector2(0, 1.9f), new Vector2(4, 1.9f) };
+        /// <summary>The split firewood stacks under it, in the woodpile's frame (x, z, yaw): three along the back, clear of the back
+        /// posts (z -6.3 here), and one turned across in front, clear of the front posts (z -2.5) and the middle ones (x about -.3).</summary>
+        public static readonly Vector3[] WoodyardFirewood = { new Vector3(-2.75f, -5.4f, 4), new Vector3(-1.25f, -5.45f, -3), new Vector3(.75f, -5.35f, 2), new Vector3(-2.2f, -3.65f, 93) };
+        /// <summary>
+        /// (2026-10-19, play note 252: "good for lumberjack in myassets - Wooden Canopy") icescreen's Wooden Canopy (Asset Store EULA;
+        /// Resources/Props/WoodenCanopy, the pack's own Standard materials and prefabs): its timber shelter over split firewood stacks,
+        /// three in a row along its back and one turned across in front, behind the chopping block, so the lumberjack splits at the
+        /// block (the woodpile's workplace) a step in front of the shelter's long side. Six posts under a gable roof, each post solid,
+        /// and the stacks; the ground under the roof is open to walk on. Every piece casts and takes shadow (ModelProp). The pack's
+        /// ladder (Stair) is not used.
+        /// </summary>
+        void WoodyardCanopy(Transform t)
+        {
+            var roof = ModelProp(t, "WoodenCanopy/Prefab/Canopy", WoodyardCanopyAt, 0, WoodyardCanopyHeight);
+            if (roof == null) { Debug.LogWarning("Woodyard: the Wooden Canopy is not in Resources/Props/WoodenCanopy."); return; }
+            roof.name = "Wooden canopy";
+            foreach (var f in WoodyardFirewood) { var w = ModelProp(t, "WoodenCanopy/Prefab/FireWood", new Vector3(f.x, 0, f.y), f.z, .56f); if (w != null) w.name = "Firewood stack"; }
+            foreach (var post in WoodyardCanopyPosts) Solid(t, WoodyardCanopyAt + new Vector3(post.x, 1.2f, post.y), new Vector3(post.x == 0 ? .8f : .45f, 2.4f, .45f));   // the middle ones a little wider: the file's middle posts stand a quarter metre off centre
+            foreach (var f in WoodyardFirewood) Solid(t, new Vector3(f.x, .28f, f.y), Mathf.Abs(Mathf.DeltaAngle(f.z, 90)) < 45 ? new Vector3(1.1f, .56f, 1.32f) : new Vector3(1.32f, .56f, 1.1f));
         }
 
         // ---------- landmarks (the Peaks, the Ashland Rim) ----------
@@ -4900,7 +4932,8 @@ namespace Crulanda.World
             for (int k = 0; k < 4; k++) Part(PrimitiveType.Sphere, t, new Vector3(4.4f + (k % 2) * .7f, FloorY(4.6f, 9.8f) + .35f, 9.5f + k * .45f), new Vector3(.8f, .7f, .7f), sack, Quaternion.Euler(0, k * 40, k * 8));
             Part(PrimitiveType.Sphere, t, new Vector3(3.6f, FloorY(3.6f, 9.4f) + .12f, 9.4f), new Vector3(1.1f, .22f, .8f), Tint(art.hay, new Color(.8f, .72f, .5f)));   // spilt grain
             for (int k = 0; k < 3; k++) Part(PrimitiveType.Cube, t, new Vector3(-3.9f + (k == 2 ? .45f : k * .9f), FloorY(-3.5f, 15.6f) + (k == 2 ? 1.35f : .45f), 15.6f), Vector3.one * .9f, crate, Quaternion.Euler(0, 12, 0));
-            for (int k = 0; k < 2; k++) Part(PrimitiveType.Cylinder, t, new Vector3(5.1f, FloorY(5.1f, 13.6f) + .5f, 13.2f + k * .8f), new Vector3(.7f, .5f, .7f), wood);
+            for (int k = 0; k < 2; k++)   // two barrels, a metre tall (the wood barrel, play note 247), else painted
+                if (ModelProp(t, WoodBarrelPath, new Vector3(5.1f, FloorY(5.1f, 13.6f), 13.2f + k * .8f), k * 75, 1) == null) Part(PrimitiveType.Cylinder, t, new Vector3(5.1f, FloorY(5.1f, 13.6f) + .5f, 13.2f + k * .8f), new Vector3(.7f, .5f, .7f), wood);
             Banner(t, new Vector3(-4.6f, FloorY(-4.6f, 9.8f), 9.8f), 20, sand, wood, 2.9f);
             // The low passage: a dropped sack, a spent torch.
             Part(PrimitiveType.Sphere, t, new Vector3(-7.4f, FloorY(-7.4f, 20.6f) + .3f, 20.6f), new Vector3(.7f, .55f, .6f), sack, Quaternion.Euler(0, 30, 20));
@@ -4956,7 +4989,8 @@ namespace Crulanda.World
                     KeepClear(t, at + q0 * new Vector3(0, 0, .5f), 1.2f);   // the stack and its sack
                 }
                 var desk = On(s0 + 1.5f, -h.Half[store] * .45f); KeepClear(t, desk, 1.3f);
-                foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(b * .7f, .45f, 0), new Vector3(.55f, .45f, .55f), wood);
+                foreach (int b in new[] { -1, 1 })   // the two barrels (the wood barrel, note 247; .9 m, the plank's height), else painted ones
+                    if (ModelProp(t, WoodBarrelPath, desk + q0 * new Vector3(b * .7f, 0, 0), q0.eulerAngles.y + b * 35, .9f) == null) Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(b * .7f, .45f, 0), new Vector3(.55f, .45f, .55f), wood);
                 Part(PrimitiveType.Cube, t, desk + Vector3.up * .95f, new Vector3(2, .08f, .8f), wood, q0);
                 Part(PrimitiveType.Cube, t, desk + q0 * new Vector3(-.3f, 1.03f, 0), new Vector3(.4f, .06f, .3f), Tint(art.cloth, new Color(.4f, .22f, .14f)), q0 * Quaternion.Euler(0, 8, 0));   // the ledger
                 Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(.5f, 1.1f, .1f), new Vector3(.06f, .08f, .06f), Tint(art.plaster, new Color(.9f, .86f, .75f)));   // a candle
@@ -6303,6 +6337,16 @@ namespace Crulanda.World
                 if (!parts.TryGetValue((mat, side), out var list)) parts[(mat, side)] = list = new List<CombineInstance>();
                 list.Add(new CombineInstance { mesh = mesh, transform = Matrix4x4.TRS(at, rot, scale) });
             }
+            // A dead tree out here is one of the Dry Trees (play note 248), its lowest-detail copy, th tall, its trunk's foot on the ground;
+            // false when the pack is missing (the spires stand instead).
+            var dryMat = DryBark != null ? (DryShade() == Color.white ? DryBark : KitShade(DryBark, DryShade())) : null;
+            bool PutDry(int side, float pickDraw, Vector3 at, float yaw, float th)
+            {
+                if (dryMat == null || !DryTreeFar(DryTreePick(pickDraw), out var mesh, out var unit)) return false;
+                if (!parts.TryGetValue((dryMat, side), out var list)) parts[(dryMat, side)] = list = new List<CombineInstance>();
+                list.Add(new CombineInstance { mesh = mesh, transform = Matrix4x4.TRS(at, Quaternion.Euler(0, yaw, 0), Vector3.one * th) * unit });
+                return true;
+            }
             // Meadows and woods are wooded right over the ridge, the rows closing up into a canopy (2026-10-10, Chris: "horizon still
             // looks empty. compare the horizon in world of warcraft forever in elwynn forest": the trees stopped 43 m out, up to 19 m
             // apart, and the ridge behind them was bare).
@@ -6340,8 +6384,15 @@ namespace Crulanda.World
                         }
                         else if (pick < dead)
                         {
-                            if (!bare) Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.45f, th, .45f));
-                            for (int j = 0; j < 3; j++) { float tilt = 35 + R() * 20; if (!bare) Put(side, spire, deadMat, at + Vector3.up * th * (.45f + j * .14f), Quaternion.Euler(0, yaw + j * 120, tilt), new Vector3(.18f, th * .4f, .18f)); }
+                            // The first three rows (to 22 m out, where the near wood is) a Dry Tree; further out, in the fog, the old spire
+                            // and three limbs (a dry tree in every row was a million triangles round Khaven). The same three draws either way.
+                            float d0 = R(), d1 = R(), d2 = R();
+                            if (!bare && !(row <= 22 && PutDry(side, d0, at + Vector3.up * .3f, yaw, th)))
+                            {
+                                Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.45f, th, .45f));
+                                float[] d = { d0, d1, d2 };
+                                for (int j = 0; j < 3; j++) Put(side, spire, deadMat, at + Vector3.up * th * (.45f + j * .14f), Quaternion.Euler(0, yaw + j * 120, 35 + d[j] * 20), new Vector3(.18f, th * .4f, .18f));
+                            }
                         }
                         else if (bare) { if (pick >= dead + pines) R(); }   // (a broadleaf's leaf shade draw)
                         else if (pick < dead + pines)
@@ -6430,8 +6481,13 @@ namespace Crulanda.World
                 }
                 else if (pick < dead)
                 {
-                    Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.5f, th, .5f));
-                    for (int j = 0; j < 5; j++) Put(side, spire, deadMat, at + Vector3.up * th * (.36f + j * .1f), Quaternion.Euler(0, yaw + j * 137, 32 + N() * 24), new Vector3(.19f, th * (.42f - j * .04f), .19f));
+                    // A Dry Tree (play note 248); its five draws taken as the old five limbs took them, so the rest stand where they did.
+                    var d = new float[5]; for (int j = 0; j < 5; j++) d[j] = N();
+                    if (!PutDry(side, d[0], at + Vector3.up * .3f, yaw, th))
+                    {
+                        Put(side, spire, deadMat, at, Quaternion.identity, new Vector3(.5f, th, .5f));
+                        for (int j = 0; j < 5; j++) Put(side, spire, deadMat, at + Vector3.up * th * (.36f + j * .1f), Quaternion.Euler(0, yaw + j * 137, 32 + d[j] * 24), new Vector3(.19f, th * (.42f - j * .04f), .19f));
+                    }
                 }
                 else if (pick < dead + pines)
                 {

@@ -1,5 +1,179 @@
 # Changelog
 
+## 2026-10-19: every dead tree is one of the Dry Trees (branch dry-trees; WRITTEN, NOT RUN)
+- Chris, play note 248: "replace all dead trees with this pack in myassets - dry trees". Compiles; nothing run in Unity, no captures yet.
+- **The pack** (DigitalAntichrist's Dry Trees, Asset Store EULA) in Resources/Props/DryTrees: the seven trees (Dry3333 to Dry8872, named
+  for their triangles: 3,300 to 8,900, about the nature kit's dead tree's 6,000), the bark and its normal map, with the pack's own GUIDs.
+  Its material was HDRP (pink here): Bark.mat is now Built-in Standard (bark and normal, matte), same GUID. Left out: the HDRP demo scene
+  and its profiles, the prefabs, the mask map (its AO channel is near black under Standard). Textures capped at 1024 (ThirdPartyImport).
+  *.tif added to Git LFS.
+- **Where** (one builder, `DeadTree`, so all of them): the woods' snags, the dead groves (Khaven's Stillwood, the Ash Rim, Hallow's
+  Creek, the Shore's and Oakhaven's few), the dead oaks (Khaven, Oakhaven, the Shore; they were painted), the grey
+  husks by the Wasting, the Gallows Tree (Khaven, the Peaks), and the woods' fallen trunks (a dry tree laid down). Past the zone's edge the
+  near wood and the first three silhouette rows (to 22 m out) have dry trees (their lowest-detail copy); the rows beyond, in the fog, keep
+  the old spire shapes (a dry tree in every row was about a million triangles round Khaven). Ask Chris if he wants those too.
+- **Kept**: every position, count and collider (the old ones), the heights (the old range, 0.9 to 1.1 of the old size), the zone's draws
+  (nothing else in any zone moves). Which of the seven and its turn come from the tree's own spot, so a zone grows the same trees every
+  time. Each trunk is set on its own foot (the models are not centred on the trunk) and sunk under the lowest ground round it, so none
+  stands on air on a slope. Charred darker in the ash, greyed in Khaven's gloom, as before. The woods still stop drawing far trees.
+  Only the full-detail copy of each tree is used in the world (the static merge would draw all four copies at once).
+- **After the preview-1019 frames** (khaven-03: the Gallows Tree a spindly dry tree, its beam in the air beside it): the Gallows
+  Tree (CANON landmark on Chris's Khaven map: a big gnarled dead tree, a noose from a limb) is the stoutest dry tree (Dry8872), 9 m
+  tall and broadened by a third, turned so its heaviest low limb (read from the mesh: about 4 m up, 2.6 m out) points where the
+  platform stands; the crossbeam is lashed to the trunk and rests on that limb, the rope and a noose hang from its end over the
+  platform; its collider fits the thicker trunk. The big dead oaks (Khaven, Oakhaven, the Shore) now pick from the three stout
+  trees (Dry8872, Dry6524, Dry5818), broadened by a third; the grey husks and snags stay as they were (scenery, not landmarks).
+  After art2 (the beam read as floating behind the tree, no rope seen): the beam's free end now hangs over the platform's middle,
+  a 4 cm rope from it and a noose whose foot is 1.75 m over the boards (GallowsPlan; the test holds the noose over the boards).
+  After Chris on art2 ("tree trunk too low"): Dry8872 forks under half a metre up, so its trunk read as buried. The Gallows Tree
+  is now Dry4910 at 9 m, broadened (a clear trunk of some 2.25 m before its first fork, read from the mesh; its one heavy limb
+  about 4.2 m up carries the beam). Every dry tree now stands on its trunk's own foot (the lowest trunk vertex, not a root tip
+  that dips under it), sunk only to the ground at the trunk's edge plus 5 cm (it sampled twice as far, half a metre on a slope).
+  The test measures the gallows' clear trunk (over 1.5 m) and every tree's foot (within 10 cm of the ground).
+  To capture: khaven-03 again, and the Shore's and Oakhaven's dead oaks.
+- **Tests** (DryTreeTests, EditMode, files only): no nature-kit dead tree or painted dead tree is built; every pick is one of the seven;
+  the pack's GUIDs and full metas, Built-in materials, no demo files, the texture cap; heights within the old range.
+- **To run and look at** (local session): DryTreeTests, then a build; capture Oakhaven's woods (a snag and a fallen trunk), the Ash Rim
+  (the dead groves and the edge past the Wasting), Hallow's Creek (the dead groves and the willow's square), the Shore (the dead oaks),
+  Khaven's Stillwood and the Gallows Tree: trunks on the ground on slopes, no pink, no doubled trees, the edge's dead trees standing.
+  Check the frame rate in Khaven and the Ash Rim (most dead trees).
+## 2026-10-19: the Free Alchemy and Magic Pack for the alchemy trade (branch wood-barrel; WRITTEN, NOT RUN)
+- Chris (play note 253): "assets for alchemy - myassets Free Alchemy and Magic Pack". Compiles; nothing run in Unity, no captures yet.
+- **The pack**: StormBringer Studios' Free Alchemy and Magic Pack (Asset Store EULA) in `Resources/Props/Alchemy`: its mortar and
+  pestle, round glass flask and crystal flask on a brass stand (meshes, prefabs, materials, 1024 px maps; the package's own GUIDs; not
+  its sample scene). Its materials are already Built-in (Standard; the glass Standard (Specular setup)), so they are kept; its clear
+  glass is too clear to read as a potion, so placed flasks wear `PotionGlass.mat` (the same shader and normal map, pale green at half
+  alpha). `ThirdPartyImport` keeps its maps at 1024 (unlisted packs fall to 512).
+- **Benches, each zone its own** (`ZoneBuilder.Alchemy.BenchSets`): Mother Vane's salt-bench (the Ash Rim) a mortar and two flasks of
+  brine; Wenna Coyle's (Khaven) the mortar at the back, three flasks along the front; the Moss-Lantern's (the Verdant) the crystal
+  flask on its stand and a mortar; the dyer's vats bench (the Lowtowns) a mortar for the madder and a flask of mordant. Lisbet's drying
+  hut (Oakhaven): the mortar at the back of the bench, a crystal flask between the jars and the still, the still's flask a round flask.
+  The Crown's Court Still-room: the still-table's mortar and the flask cooling in its basin, the shop counter's crystal flask (was the
+  Medieval bottle) and a round flask. The painted mortar, vials and flasks stay as the fallback when the pack is missing.
+- **Potions' look** (`FoodModels.Dishes`): the cordials are the crystal flask; the healing draughts (minor, healing, Tarnwater,
+  dewfern, clean-blood: new looks) and the restoring draughts (clear-head, second-wind, steady-hand, bold-heart, deep-breath) the round
+  flask. Kept from the Fantasy kit: the tinctures' small stoppered vials (the pack has nothing that small), the brine draught's and
+  the salt tonic's plain bottle, the salves' pots, the Court still's row of small vials and the Root-Mother's sap vials. Only a dish cooked
+  at a fire is shown in the world; a brewed potion is not set down (no change there).
+- Tests (`AlchemyPackTests`, EditMode): the three models load and stand at life size on their foot; every material is a Built-in shader,
+  the maps capped at 1024, placed glass is the potion glass; every potion item's look names models in the project (cordials and
+  draughts the pack's flasks); each zone's bench has its own set, on the bench.
+- To check in game (captures front, back, side): Lisbet's drying hut bench (Oakhaven); Wenna Coyle's bench (Khaven); Mother Vane's
+  salt-bench (the Ash Rim); the Moss-Lantern's bench (the Verdant); the dyer's bench (the Lowtowns); the Court Still-room's still-table
+  and counter (the Crown). That the flasks read as glass with something in it, the mortar's stone and pestle, nothing floating or sunk.
+
+## 2026-10-19: every wooden barrel is the Simple Wood Barrel (branch wood-barrel; WRITTEN, NOT RUN)
+- Chris (play note 247): "replace all wooden barrels with this in myassets . simple wood barrel". Compiles; nothing run in Unity, no
+  captures yet.
+- **The model**: Kraken XR's Simple Wood Barrel (Asset Store EULA) in `Resources/Props/WoodBarrel` (the FBX and its three maps, the
+  package's own GUIDs; not its prefab or sample scene). Its own material is swapped for `WoodBarrel.mat` (Built-in Standard: albedo,
+  normal, metallic-smoothness); the 4096 px maps are capped at 1024 by `ThirdPartyImport`. The file's node is turned half round, so the
+  game drops that turn and stands it on its foot. 1.0 m tall, 0.68 across in the file.
+- **Where it stands now** (each at the height the old one stood): every `ZoneBuilder.Barrel` (inn fronts, bars and the city inn, yards,
+  the smithy, the cook's and the simpler's shops, the Crown court's goods, Hallow's Creek yards, the training yard, workshops, the forge
+  node's water cask, the "barrels" props of six zones), the market stalls' barrel and the market pack's barrel piece, the simpler's
+  spirit cask (was the Medieval beer barrel), the Adit's camp, Foreman's and platform barrels (were the Dungeon kit's), the Adit's two
+  powder kegs, the Store Caves' desk (a plank on two barrels) and the camp chamber's barrels, the Lowtowns' street clutter, the Rusty
+  Spoon's tap-casks on the bar (on their sides), its ale casks and water butt, its dice-pit kegs (.44 m: the seats stay at their height)
+  and its cask table, Tolley's water tower's tank (fitted to the old 2.4 x 2.6 m), Crowsfoot Hollow's barrel of apples (now the barrel
+  with apples heaped on its head) and Hallow's Creek's cellar barrel rack (a timber cradle with the barrel lying on it).
+- **Kept as they were**: the Golden Cask's sign (a gilded cask, a painted emblem, not a barrel); the dyers' vats; the salt-cask shield.
+  The painted barrel stays only as the fallback when the model is missing. The old barrel models stay in their packs, unused.
+- Tests (`WoodBarrelTests`, EditMode): no old barrel model is named in the code; the barrel loads, stands .95 m on its foot, upright;
+  its material is Built-in Standard with the three maps, each capped at 1024; the pit kegs' tops are at the seat height (.44).
+- To check in game (captures front, back, side): the Golden Cask's front barrels and bar (Oakhaven); Oakhaven's market stalls; the Lowtowns'
+  barrels; the Adit camp's barrels and the powder kegs; the Rusty Spoon's bar casks, dice pit (sit on a keg) and cask table; the
+  Lowtowns' street clutter and the water tower; Crowsfoot's apple barrel and Hallow's Creek's cellar rack.
+## 2026-10-19: the Lowtowns' houses from the Medieval Village Pack (branch lowtowns-village; WRITTEN, NOT RUN)
+- Chris (PLAYTEST_NOTES 246): "i like this better for lowtowns look and feel. Free Medieval Village Pack Vol.1 it is in myassets".
+  Compiles; nothing run in Unity, no captures yet. Details: ZONE_LOWTOWNS.md "The houses".
+- **The pack** in `Resources/Props/MedievalVillage1`: ten houses, the Blacksmith and 15 props, on the pack's own Built-in materials
+  (not pink), each file with the pack's own .meta; textures cut to 1024/512 (119 MB). The windmill and water wheel left out (no
+  machines), and the tavern, animal shed and demo. Used by the Lowtowns only.
+- **The Lowtowns rebuilt with it:** 147 of the zone's terraces are now rows of the pack's houses, doors on the street, scaled to the
+  street, mixed and mirrored; the four-storey ones stand on two storeys of soot brick, others on one storey or as the pack's tall houses,
+  a timber gallery along the brick for the upper doors. The smith's shop by the Rust Market hearth is the pack's Blacksmith with its
+  anvil, table and weapon stand. Soot on every house, a few windows lit orange or violet, neon moss on the roofs, chimney smoke,
+  lanterns. Kept as they were: the Rusty Spoon, the roof route's four terraces over Pell Row (the lead walks stand on them), the edge's
+  blind backs, the other buildings, the ground, roads, stairs, river, docks and camps. Same colliders, so the navmesh is unchanged.
+- **Tests (new):** LowtownsVillageTests (EditMode), LowtownsVillagePlayTests (PlayMode). **To capture:** the Rust Market, the High
+  Rows, the docks and the Night Market, by day and at night.
+## 2026-10-19: more music in every zone, and a woodshed at Oakhaven's woodyard (branch music-vol3; WRITTEN, NOT RUN)
+- Chris (PLAYTEST_NOTES 251-252): "more music tracks for in game. myassets Free 25 Fantasy RPG Tracks Vol. 3"; "good for lumberjack in
+  myassets - Wooden Canopy". Compiles; nothing run in Unity, no captures yet.
+- **Music** (`ZoneMusic`, `Resources/Music/Fantasy3`, terms in `Resources/Music/LICENSES.md`): 25 of alkakrab's 28 pieces (the ten
+  ambient loops, five ambience, five dark, five action loops; not the Fx stings or the one-shot copies). Every zone and both dungeons
+  get pieces of their own on top of what they had, none shared: Oakhaven 2 by day and 1 at night, the Shore its 2 airiest by day and
+  1 at night, the Crown 2, the Peaks 2, Khaven 2, the Ash Rim 1 by day and 1 at night, the Lowtowns a dark piece by day and a low one at
+  night, the Sealed Adit 2 dark pieces, Hallow's Creek's cellars 2 (its streets stay silent, day and night). Fights now draw one of
+  three tracks (the old one and two action loops; field and dungeon each their own); one action loop is kept for the Unraveller's raid
+  (`ZoneMusic.WorldBossFight`, `WORLD_BOSS_1.md` 3.7). The pack's quiet pieces were mixed 20-40 dB under the rest, so they are
+  raised to the same level as the older tracks. The WAVs are NOT in git (like the older packs): after merging run
+  `python tools/import_music_vol3.py` in `D:\code\mmo` (and each lane), or copy `Resources/Music/Fantasy3/*.wav` from the
+  `D:\code\mmo-music-vol3` worktree. Vorbis .5, streamed (about 2-4 MB a piece in the build).
+- **Woodshed** (`ZoneBuilder.WoodyardCanopy`, `Resources/Props/WoodenCanopy`, icescreen, Asset Store EULA): Oakhaven's Woodyard (the
+  only lumberjack in the game; `oakhaven.json` gives it variant 1) gets the Wooden Canopy behind the chopping block, on the side away
+  from the North furrows, with four split-firewood stacks under it; the woodcutter keeps splitting at the block a step in front of it.
+  At the pack's own size: 8.8 by 4.8 m, 3.8 m to the ridge, posts 2.4 m, the eaves' edge 1.6 m, so you stand under it (the first
+  lane B frame at 3 m read as a roof lying on the grass). The six posts and the stacks are solid; the ground under the roof is open.
+  The pack's own Standard materials, maps capped at 1024; the ladder unused. Over 6 m from the field, 27 m from the nearest road,
+  3.9 m from the Tithe barn. (A -90 turn tried after that frame was wrong: Unity bakes the 3ds Max rotation, and lane A's test measured
+  the turned shed 4.77 m on end; the turn is gone.) The test measures the post feet on the ground in two rows with open ground
+  between, the ridge narrow on top, and the stacks lying flat.
+- Tests (to run): `ZoneMusicTests` (every track is there; each zone's Vol. 3 pieces its own; all 25 used; the boss track nowhere
+  else; Hallow's Creek silent day and night; the Adit's own set), `WorkshopDataTests` (the canopy on Oakhaven's Woodyard only, off
+  fields, roads, water and other props, the stacks under its roof, the block outside it; the models load upright on Standard
+  materials at 1024), and `HallowsNavTests` (Main Street still silent).
+- To listen to: Oakhaven by day and at night (two new soft loops, one night piece), the Verdant Shore by day, the Lowtowns by day
+  (the new dark piece should sit under the smog, not over it), the Sealed Adit, Hallow's Creek's cellars (and silence on Main Street),
+  and three fights in a row in the field and in a cave (different tracks). Check the new pieces are not louder than the old ones at
+  `/music .35`, and that a new piece starts within 30 s of its cue (they are streamed; the warning "did not load" in the log if not).
+- To capture: the Woodyard from the front (the block, the shed behind it), the back and the side, by day; the woodcutter splitting
+  at the block; a walk into the shed's side (stopped at its edge, not through the roof).
+## 2026-10-19: the stylized skies, by the hour and the weather (branch skyboxes; WRITTEN, NOT RUN)
+- Chris, play note 254: "some better sky boxes in my assets Stylized Skyboxes | FREE". Compiles; nothing run in Unity, no captures yet.
+- **The pack** (Staggart Creations, Asset Store EULA) in Resources/Sky/Stylized: the nine painted HDR skies (Noon, Noon (Cloudy),
+  Noon (Overcast), Sunrise, Sunset, Dusk, Night, NightGalaxy, Aurora) with the pack's GUIDs, read as flat lat-long pictures capped at
+  2048 (ThirdPartyImport holds it). The pack's Sky_*.mat (Skybox/Cubemap with an HDRP block) are now on our own Built-in sky shader,
+  Crulanda/StylizedSky, same GUIDs. Left out: the URP demo, the Fog Ring shader graph.
+- **By the hour**: night, then sunrise (5:00-7:00), the day sky, sunset (17:00-18:45), dusk, night from 21:00, each blending into
+  the next (three skies at most at once). By day the weather picks it: clear noon, cloudy (fair, windy) or overcast (overcast, mist,
+  rain, snow, ash, storm); an overcast greys the sunrise and sunset too. A clear night shows the galaxy, a clouded one a plain night.
+  The aurora on about one clear night in six, only on the Peaks and the Ash Rim. The painted sun is turned to where the sun's light
+  comes from; the night sky's painted moon is painted over (the moons stay the Eye and the Tear).
+- **Each zone its own**: its sky tint (a third of the way to it), its haze of its own fog colour from the horizon up (the Lowtowns'
+  yellow smog the thickest, its dark smog by night), its fog below the horizon as before. Hallow's Creek: always the grey overcast
+  sky (b1 ch.21:19, "a grey sky"), no aurora. Khaven follows the weather and the clock like the others: its only canon is Chris's map
+  (maps/khaven_village_map.png: no sky or hour), so its old held dusk was GAME-ONLY and is dropped, sky and low sun both (its
+  light now climbs with the clock; its grey-violet tint and haze kept, mild under the new sky) (2026-10-19, Chris: "CHECK LORE
+  CANON"); its weather never clears, so it reads grey. Caves as before (the sky isn't seen; the
+  cave darkening is unchanged). A zone can keep the old sky (lighting skyStyle "procedural"); none does.
+- **Light**: the skylight leans a third of the way to the sky's own colour, its brightness the zone's own (Chris's settled balance),
+  with no lighting update, so no frame cost. Reflections already come from the sky (the sky probe, every 2 s). The sky shader reads
+  three pictures a pixel.
+- **Tests** (StylizedSkyTests, EditMode, data only): every sky exists with the pack's GUID; Built-in shaders, no demo files, the
+  2048 cap; every hour and weather maps to one to three skies; the zones' own skies hold (Hallow's Creek grey, Khaven no forced sky, the
+  Lowtowns' smog, the aurora only on the Peaks and the Rim).
+- **To run and look at** (local session): StylizedSkyTests, then a build; capture each zone at dawn (6:30), noon, dusk (19:30) and
+  night (1:00), and noon under overcast; check the sun disc sits where the light comes from, no third moon, no seam in the sky, the
+  Lowtowns still yellow, Hallow's Creek grey and still, the frame rate unchanged.
+## 2026-10-19: the braziers' flames back in their bowls (branch brazier-flame; WRITTEN, NOT RUN)
+- Chris (play note 255): "fire goes around the bazier"; "it was dancing around the brazier" (his frame: the flame beside the bowl,
+  lower). Compiles; nothing run in Unity, no captures yet.
+- **Cause**: the flame shader (Crulanda/CandleFlame) breathes a flame from its mesh's own vertex positions: it scaled the height and
+  pushed the tip sideways by the vertex's height. The zone's static batching took the flames in with the scenery, which moves a mesh's
+  vertices into the zone's own space, so the "height" was the flame's height in the world (metres): the cone was stretched and squashed
+  about the zone's floor and swung sideways by tenths of a metre, round and round the bowl. Every flame on that shader that was batched
+  was off the same way: the braziers, the inns' and lamps' candle flames, the Adit's torches.
+- **Fix**: flames are kept out of static batching (`ZoneBuilder.Batchable`/`BatchStatic`: no CandleFlame, no walked deck; used for the
+  zone's scenery and the Adit's kit and cave works). The shader holds its breathing to the mesh's unit height (the base never moves,
+  the tip leans a little) and carries the DisableBatching tag. `CandleFlame.Sway` is the shader's breathing on the CPU, for the tests.
+- Tests (`BrazierFlamePlayTests`, PlayMode): a flame is never batched and its base never moves; in the Ash Rim, the Adit and the Crown
+  no flame is in a static batch or wears a combined mesh, and every brazier's flame stands over its bowl, its drawn base within 3 cm of
+  the bowl's middle across half a minute.
+- To check in game (night, captures front and side, a few seconds apart): an Ash Rim brazier; an Adit camp's brazier; the Crown dais
+  braziers; an inn's candles and a street lamp's flame; an Adit wall torch. The flame sits in the bowl and only its tip sways.
+
 ## 2026-10-19 11:52: published: new monsters, props and food, inn seats, river fixes (OPEN until Chris checks it)
 - The Ember-bound (the Adit's Ember Vent) and the Bank-snouts (the Lowtowns' river banks); 64 of the Fantasy kit's props and the books'
   foods in dungeons, inns and markets; every inn sitter on a real seat; window frames and a hearth at the Golden Cask and the Cracked

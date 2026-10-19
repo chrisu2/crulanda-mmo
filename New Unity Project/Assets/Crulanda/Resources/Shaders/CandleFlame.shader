@@ -25,7 +25,9 @@ Shader "Crulanda/CandleFlame"
     }
     SubShader
     {
-        Tags { "Queue" = "Geometry" "RenderType" = "Opaque" }
+        // DisableBatching: the breathing reads the mesh's own vertex positions (its base at the origin), which batching moves into the
+        // world's (play note 255: the brazier's flame drawn beside its bowl). ZoneBuilder.Batchable keeps flames out of static batching.
+        Tags { "Queue" = "Geometry" "RenderType" = "Opaque" "DisableBatching" = "True" }
         LOD 100
         Pass
         {
@@ -45,9 +47,12 @@ Shader "Crulanda/CandleFlame"
                 float3 at = float3(unity_ObjectToWorld._m03, unity_ObjectToWorld._m13, unity_ObjectToWorld._m23);
                 o.seed = frac(dot(at, float3(12.9898, 78.233, 37.719))) * 6.2832;
                 float t = _Time.y + o.seed;
-                // Breathing: the height sways, and the tip leans, more the higher up; nothing below the base moves.
-                float h = max(v.vertex.y, 0);
-                v.vertex.y *= 1 + _Wobble * (0.6 * sin(t * 4.5) + 0.4 * sin(t * 7.3 + 1.7));
+                // Breathing: the height sways, and the tip leans, more the higher up; nothing below the base moves. The flame meshes
+                // stand on their origin, a unit high (the cone; a candle's sphere round it), so h runs 0 at the base to 1 at the tip, and
+                // is held there: a mesh drawn in another space (batched, its vertices in the world's metres) can no longer swing its base
+                // round the bowl (play note 255, "it was dancing around the brazier"). CandleFlame.Sway is this on the CPU, for the tests.
+                float h = saturate(v.vertex.y);
+                v.vertex.y += h * _Wobble * (0.6 * sin(t * 4.5) + 0.4 * sin(t * 7.3 + 1.7));
                 v.vertex.x += 0.12 * h * sin(t * 2.7);
                 v.vertex.z += 0.08 * h * sin(t * 3.4 + 0.9);
                 o.pos = UnityObjectToClipPos(v.vertex);

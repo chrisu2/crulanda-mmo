@@ -185,6 +185,7 @@
     "fogEnd": 190,
     "sunHigh": 12,
     "skyTint": "#7A788C",
+    "skyDay": "Noon (Overcast)",
     "skyExposure": 0.8,
     "skyHaze": 1.2
   },

@@ -58,13 +58,17 @@ namespace Crulanda.World
         const float OnPlate = .018f;   // a plate's top over the table (its rim stands higher; the food sits in its well)
         static Bit Cheese(string n, float h, float x = 0, float z = 0, float y = 0) { return new Bit("Megapack/Models/Market/" + n, h, x, z, 0, y); }
         static Bit Kit(string n, float h, float x = 0, float z = 0) { return new Bit("Fantasy/" + n, h, x, z); }
+        /// <summary>The alchemy pack's flasks (play note 253, ZoneBuilder.Alchemy): the round glass flask, the crystal flask on its stand.</summary>
+        static Bit Flask() { return new Bit(ZoneBuilder.AlchemyFlask, .14f); }
+        static Bit Crystal() { return new Bit(ZoneBuilder.AlchemyCrystal, .2f); }
 
         /// <summary>
         /// Every food and buff item's look, by item id (items.json and trades.json): the plate or pot it comes in first, then what is on it.
         /// The dishes are named for what is in them, so the nearest model in a medieval kitchen stands in: the Harrow pasty is the pack's
         /// crescent pastry (crimped shut), griddle bread and the hearth- and sap-cakes its flat cakes, jerky its cured strips, a haunch its
-        /// drumstick, a chop or a flank its steak. The tinctures are small stoppered vials, the cordials taller ones, the draughts bottles,
-        /// the salves lidded pots.
+        /// drumstick, a chop or a flank its steak. The tinctures are the Fantasy kit's small stoppered vials (the alchemy pack has none that
+        /// small); the cordials the alchemy pack's crystal flask on its stand; the healing and the restoring draughts its round flask (play
+        /// note 253); the brine draught and the salt tonic the kit's plain bottle; the salves lidded pots.
         /// </summary>
         public static readonly Dictionary<string, Bit[]> Dishes = new Dictionary<string, Bit[]> {
             // Oakhaven's and the Harrow's plain food
@@ -94,13 +98,16 @@ namespace Crulanda.World
             { "potion.tincture_ox", new[] { Kit("Potion_1", .1f) } }, { "potion.tincture_hare", new[] { Kit("Potion_1", .1f) } },
             { "potion.tincture_owl", new[] { Kit("Potion_1", .1f) } }, { "potion.tincture_hearth", new[] { Kit("Potion_1", .1f) } },
             { "potion.tincture_bear", new[] { Kit("Potion_1", .1f) } },
-            { "potion.cordial_ox", new[] { Kit("Potion_2", .18f) } }, { "potion.cordial_hare", new[] { Kit("Potion_2", .18f) } },
-            { "potion.cordial_owl", new[] { Kit("Potion_2", .18f) } }, { "potion.cordial_hearth", new[] { Kit("Potion_2", .18f) } },
-            { "potion.cordial_bear", new[] { Kit("Potion_2", .18f) } },
-            { "potion.draught_salt", new[] { Kit("Bottle_1", .24f) } },
-            { "potion.draught_mana", new[] { Kit("SmallBottle", .12f) } }, { "potion.draught_vigor", new[] { Kit("SmallBottle", .12f) } },
-            { "potion.draught_focus", new[] { Kit("SmallBottle", .12f) } }, { "potion.draught_nerve", new[] { Kit("SmallBottle", .12f) } },
-            { "potion.draught_breath", new[] { Kit("SmallBottle", .12f) } },
+            { "potion.cordial_ox", new[] { Crystal() } }, { "potion.cordial_hare", new[] { Crystal() } },
+            { "potion.cordial_owl", new[] { Crystal() } }, { "potion.cordial_hearth", new[] { Crystal() } },
+            { "potion.cordial_bear", new[] { Crystal() } },
+            { "potion.draught_salt", new[] { Kit("Bottle_1", .24f) } }, { "potion.salt", new[] { Kit("Bottle_1", .24f) } },
+            { "potion.draught_mana", new[] { Flask() } }, { "potion.draught_vigor", new[] { Flask() } },
+            { "potion.draught_focus", new[] { Flask() } }, { "potion.draught_nerve", new[] { Flask() } },
+            { "potion.draught_breath", new[] { Flask() } },
+            // The healing draughts (the drink brewed at the bench, the Tarn's, the Verdant's dewfern, the clean-blood cure)
+            { "potion.minor", new[] { Flask() } }, { "potion.healing", new[] { Flask() } }, { "potion.tarn", new[] { Flask() } },
+            { "potion.dewfern", new[] { Flask() } }, { "potion.clean_blood", new[] { Flask() } },
             { "salve.tallow", new[] { Kit("Pot_1_Lid", .07f) } },
             { "salve.scree", new[] { Kit("Vase_4", .1f) } },
         };

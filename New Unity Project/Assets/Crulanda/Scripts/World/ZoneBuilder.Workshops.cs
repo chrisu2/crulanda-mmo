@@ -385,6 +385,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Sphere, t, new Vector3(.2f, .95f, 1.1f), Vector3.one * .2f, Tint(art.foliage, new Color(.42f, .6f, .28f)));
             Part(PrimitiveType.Cube, t, new Vector3(-.2f, .87f, .82f), new Vector3(.26f, .01f, .035f), art.metal, Quaternion.Euler(0, 20, 0));
             Jar(t, new Vector3(.42f, .855f, 1.25f), new Color(.5f, .46f, .36f), 1.4f);
+            CounterFare(t, new Vector3(-.02f, .855f, 1.32f), new Vector3(.45f, .855f, .85f), 2, 3);   // the zone's fare on the board (playtest note 235)
             Part(PrimitiveType.Cube, t, new Vector3(-.2f, 1.6f, d / 2 - .16f), new Vector3(1.5f, .04f, .26f), dark);
             foreach (float x in new[] { -.8f, .4f }) Part(PrimitiveType.Cube, t, new Vector3(x, 1.5f, d / 2 - .13f), new Vector3(.05f, .05f, .22f), dark, Quaternion.Euler(35, 0, 0));
             for (int i = 0; i < 4; i++) Jar(t, new Vector3(-.75f + i * .37f, 1.62f, d / 2 - .16f), i % 2 == 0 ? new Color(.62f, .4f, .28f) : new Color(.5f, .46f, .36f), .9f + (i % 3) * .15f);

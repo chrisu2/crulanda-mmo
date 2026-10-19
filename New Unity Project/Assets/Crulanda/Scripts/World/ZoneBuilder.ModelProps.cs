@@ -257,6 +257,22 @@ namespace Crulanda.World
             ("Fantasy2/bag_002", .57f), ("Fantasy2/bag_003", .57f), ("Fantasy2/bag_004", .57f), ("Fantasy2/box_001", .54f), ("Fantasy2/box_001_001", .34f), ("Fantasy2/box_002", .17f),
             ("Fantasy2/box_003", .32f), ("Fantasy2/bucket_001", .48f), ("Fantasy2/barrel_001", .73f), ("Fantasy2/holder_001", 2.01f), ("Fantasy2/pointer_001", 2.17f), ("Fantasy2/log_001", 1.81f),
             ("Fantasy2/log_002", .74f), ("Fantasy2/log_003", .32f), ("Fantasy2/log_004", .54f), ("Fantasy2/cart_001", 1.16f),
+            // The Fantasy kit's pieces the dungeons and rooms took up (playtest note 234, PropDressing) and the food models (note 235, FoodModels).
+            ("Fantasy/SmallBottle", .12f), ("Fantasy/Book_7", .07f), ("Fantasy/Cabinet", 1f), ("Fantasy/Shelf_Simple", .3f),
+            ("Fantasy/Bag", 0.55f), ("Fantasy/Rope_1", 0.08f), ("Fantasy/Rope_2", 0.06f), ("Fantasy/Rope_3", 0.1f), ("Fantasy/Bucket_Wooden_1", 0.3f), ("Fantasy/Shield_Wooden", 0.6f),
+            ("Fantasy/Barrel_Apples", 0.9f), ("Fantasy/Barrel_Holder", 1.2f), ("Fantasy/Pickaxe_Bronze", 1f), ("Fantasy/Cage_Small", 0.85f), ("Fantasy/Chain_Coil", 0.08f), ("Fantasy/Vase_2", 0.5f),
+            ("Fantasy/Vase_4", 0.45f), ("Fantasy/Vase_Rubble_Medium", 0.16f), ("Fantasy/Candle_1", 0.13f), ("Fantasy/Candle_2", 0.25f), ("Fantasy/CandleStick_Stand", 1.3f), ("Fantasy/CandleStick_Triple", 0.4f),
+            ("Fantasy/Potion_1", 0.1f), ("Fantasy/Potion_2", 0.26f), ("Fantasy/Potion_4", 0.2f), ("Fantasy/Bottle_1", 0.24f), ("Fantasy/Pot_1", 0.2f), ("Fantasy/Pot_1_Lid", .07f),
+            ("Fantasy/Book_Stack_1", 0.2f), ("Fantasy/Book_Stack_2", 0.2f), ("Fantasy/BookGroup_Small_1", 0.3f), ("Fantasy/BookGroup_Small_2", 0.28f), ("Fantasy/Bookcase_2", 2.4f), ("Fantasy/BookStand", 1.4f),
+            ("Fantasy/Scroll_1", 0.05f), ("Fantasy/Scroll_2", 0.06f), ("Fantasy/Lantern_Wall", 0.55f), ("Fantasy/Peg_Rack", 0.35f), ("Fantasy/Crate_Metal", 0.8f), ("Fantasy/Shelf_Small_Bottles", 0.65f),
+            ("Fantasy/Chalice", 0.2f), ("Fantasy/Coin_Pile", 0.07f), ("Fantasy/Coin_Pile_2", 0.06f), ("Fantasy/Key_Gold", 0.012f), ("Fantasy/Key_Metal", 0.012f), ("Fantasy/Pouch_Large", 0.14f),
+            ("Food/Apple", .08f), ("Food/Apple_Green", .08f), ("Food/Orange", .075f), ("Food/Bread", .15f), ("Food/Bread_Slice", .1f), ("Food/Carrot", .2f),
+            ("Food/Turnip", .17f), ("Food/Lettuce_Whole", .17f), ("Food/Mushroom", .06f), ("Food/Mushroom_Sliced", .025f), ("Food/Fish", .035f), ("Food/FishBone", .05f),
+            ("Food/ChickenLeg", .066f), ("Food/Steak", .036f), ("Food/Sausage_Raw", .022f), ("Food/Sausage_Cooked", .022f), ("Food/Bacon_Uncooked", .006f), ("Food/Bacon_Cooked", .006f),
+            ("Food/Egg_Whole", .055f), ("Food/Egg_Whole_White", .055f), ("Food/Egg_Fried", .012f), ("Food/Pancake", .027f), ("Food/Croissant", .06f), ("Food/CookingPot", .14f),
+            ("Food/CookingPot_Soup", .14f), ("Food/CookingPot2", .08f), ("Food/CookingPot2_Soup", .08f), ("Food/FryingPan", .03f), ("Food/Plate", .035f), ("Food/Plate2", .033f),
+            ("Food/Plate_Square", .021f), ("Food/Bottle1", .3f), ("Food/Bottle2", .3f), ("Food/Jar_Large", .18f), ("Food/Knife", .003f), ("Food/Fork", .005f),
+            ("Food/Spoon", .008f),
         };
     }
 }

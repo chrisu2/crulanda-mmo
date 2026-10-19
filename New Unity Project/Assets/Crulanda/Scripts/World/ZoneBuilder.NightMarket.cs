@@ -85,6 +85,9 @@ namespace Crulanda.World
                     if (i % 3 == 0) nb.Box(flame, root.InverseTransformPoint(at + Vector3.up * (h / 2 + .03f)), new Vector3(.025f, .05f, .025f), q);
                 }
                 Glow(night, root.InverseTransformPoint(top + Vector3.up * .4f), 6, 0, new Color(1, .72f, .38f), 1f).name = "Candle-light";
+                // The kit's candlesticks among his own (playtest note 234): a triple-branched one at the end of the counter, two church candles.
+                SmallPiece(ModelProp(root, "Fantasy/CandleStick_Triple", root.InverseTransformPoint(top + q * new Vector3(.75f, 0, .2f)), q.eulerAngles.y, .4f));
+                foreach (var (x, tall) in new[] { (-.7f, .25f), (-.55f, .16f) }) SmallPiece(ModelProp(root, "Fantasy/Candle_2", root.InverseTransformPoint(top + q * new Vector3(x, 0, .22f)), q.eulerAngles.y, tall));
                 var flutter = new GameObject("Light-butterflies").transform; flutter.SetParent(night, false); flutter.position = top + Vector3.up * .5f;
                 flutter.gameObject.AddComponent<LightButterflies>().Init(Glowing(ButterflyBlue, 2.6f), Tint(art.stone, new Color(.5f, .48f, .4f)), Zone.seed);
                 Glow(night, flutter.localPosition + Vector3.up * .5f, 5, 0, ButterflyBlue, .7f).name = "Butterfly-light";

@@ -815,6 +815,7 @@ namespace Crulanda.World
             Solidify(BoxPart(t, lectern + Vector3.up * .55f, new Vector3(.7f, 1.1f, .6f), DarkOak));
             Part(PrimitiveType.Cube, t, lectern + new Vector3(0, 1.15f, 0), new Vector3(.6f, .06f, .45f), Tint(art.plaster, new Color(.94f, .9f, .78f)), Quaternion.Euler(-15, 0, 0));
             foreach (float z in new[] { -3f, 4f }) ModelProp(t, "Fantasy/Chandelier", new Vector3(0, H - 2, z), 0, 1.2f);
+            DressRoom(t, "archive");   // the kit's book stand, candelabrum, books and scrolls (playtest note 234; PropDressing.Rooms)
             Lettering(t, t.name, new Vector3(0, 5.3f, -d / 2 - .4f), 6);
             // The scribes' places (p9-cityinn): at the reading desks either side of each chair, and before the wall shelves.
             foreach (int s in new[] { -1, 1 })

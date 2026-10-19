@@ -1672,6 +1672,7 @@ namespace Crulanda.World
             // The bar's top dressed from the Medieval props (2026-10-07): two mugs, a bottle and a candle along it.
             ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(-w / 2 + 1.3f, 1.16f, d / 2 - 1.5f), 20, .13f); ModelProp(t, "Medieval/Prefabs/MugV2", new Vector3(-w / 2 + 2.1f, 1.16f, d / 2 - 1.55f), -60, .13f);
             ModelProp(t, "Medieval/Prefabs/BottleV1", new Vector3(-w / 2 + 3.4f, 1.16f, d / 2 - 1.45f), 0, .28f); ModelProp(t, "Medieval/Prefabs/CandleV1", new Vector3(-w / 2 + 4.2f, 1.16f, d / 2 - 1.6f), 0, .2f);
+            CounterFare(t, new Vector3(-w / 2 + 2.75f, 1.16f, d / 2 - 1.5f), new Vector3(-w / 2 + 2.75f, 1.16f, d / 2 - 1.5f), 1, 2);   // a thing of the zone's fare on the bar (playtest note 235)
             bool kitTables = HasProp("Fantasy/Table_Large");
             foreach (var (at, face) in plan.stools)
             {
@@ -1700,6 +1701,7 @@ namespace Crulanda.World
                     float top = table != null ? TopIn(t, table) : .845f;
                     for (int k = 0; k < 3; k++) { var seat = plan.seats[n * 3 + k].at; ModelProp(t, "Fantasy/Stool", new Vector3(seat.x, .045f, seat.y), -(turn + k * 120) + 90, .45f); }
                     ModelProp(t, "Fantasy/CandleStick", new Vector3(at.x + .15f, top, at.y - .1f), 0, .22f); ModelProp(t, "Fantasy/Mug", new Vector3(at.x - .3f, top, at.y + .25f), turn + 70, .12f);
+                    TableFare(t, new Vector3(at.x, top, at.y), -turn, n);   // the zone's fare on it (playtest note 235)
                     continue;
                 }
                 Part(PrimitiveType.Cylinder, t, new Vector3(at.x, .78f, at.y), new Vector3(1.2f, .04f, 1.2f), boards);
@@ -3883,6 +3885,7 @@ namespace Crulanda.World
                     case 0:   // baskets of apples, turnips and cabbages, heaped over the rim
                         MeshPart(PropMesh("Basket", () => Turned(new[] { new Vector2(0, 0), new Vector2(.13f, 0), new Vector2(.19f, .14f), new Vector2(.165f, .14f), new Vector2(.12f, .03f), new Vector2(0, .03f) }, 10, .25f)), t, at + new Vector3(0, -.03f, 0), art.hay);
                         var produce = new[] { new Color(.86f, .1f, .08f), new Color(.92f, .8f, .56f), new Color(.3f, .68f, .18f), new Color(.96f, .52f, .08f) }[i % 4];
+                        if (!StallFood(t, at, i, false))   // the zone's own produce in the basket (playtest note 235), else the painted
                         for (int k = 0; k < 3; k++) Part(PrimitiveType.Sphere, t, at + new Vector3((k - 1) * .09f, .12f + (k % 2) * .03f, (k % 2) * .08f - .04f), Vector3.one * .15f, Tint(art.foliage, produce));
                         break;
                     case 1:   // bolts of cloth laid across the counter, and clay pots
@@ -3894,9 +3897,12 @@ namespace Crulanda.World
                         else if (i % 3 == 1) Part(PrimitiveType.Cube, t, at + new Vector3(0, .03f, 0), new Vector3(.07f, .05f, .34f), Bone, Quaternion.Euler(0, R() * 50 - 25, 0));
                         else Part(PrimitiveType.Capsule, t, at + new Vector3(0, .05f, 0), new Vector3(.08f, .14f, .08f), Tint(art.cloth, new Color(.36f, .16f, .12f)), Quaternion.Euler(90, R() * 60, 0));
                         break;
-                    default:  // loaves and rolls
-                        Part(PrimitiveType.Capsule, t, at + new Vector3(0, .07f, 0), new Vector3(.2f, .17f, .2f), Tint(art.hay, new Color(.72f, .48f, .22f)), Quaternion.Euler(90, R() * 60, 0));
+                    default:  // loaves and rolls (the zone's own where it has them, playtest note 235); the draw is taken either way
+                    {
+                        float spin = R() * 60;
+                        if (!StallFood(t, at + new Vector3(0, -.03f, 0), i, true)) Part(PrimitiveType.Capsule, t, at + new Vector3(0, .07f, 0), new Vector3(.2f, .17f, .2f), Tint(art.hay, new Color(.72f, .48f, .22f)), Quaternion.Euler(90, spin, 0));
                         break;
+                    }
                 }
             }
             Crate(t, new Vector3(1.9f, .3f, .2f), .6f, 12);
@@ -4900,6 +4906,10 @@ namespace Crulanda.World
                 Part(PrimitiveType.Cube, t, desk + q0 * new Vector3(-.3f, 1.03f, 0), new Vector3(.4f, .06f, .3f), Tint(art.cloth, new Color(.4f, .22f, .14f)), q0 * Quaternion.Euler(0, 8, 0));   // the ledger
                 Part(PrimitiveType.Cylinder, t, desk + q0 * new Vector3(.5f, 1.1f, .1f), new Vector3(.06f, .08f, .06f), Tint(art.plaster, new Color(.9f, .86f, .75f)));   // a candle
                 Glow(t, desk + q0 * new Vector3(.5f, 1.4f, .1f), 5, .9f, new Color(1, .7f, .4f), .9f).gameObject.AddComponent<Flicker>();
+                // His papers, purse and key on the desk (the kit's, playtest note 234).
+                SmallPiece(ModelProp(t, "Fantasy/Scroll_1", desk + q0 * new Vector3(.12f, .99f, -.2f), q0.eulerAngles.y + 15, .05f));
+                SmallPiece(ModelProp(t, "Fantasy/Key_Metal", desk + q0 * new Vector3(-.75f, .99f, .18f), q0.eulerAngles.y + 70, .012f));
+                SmallPiece(ModelProp(t, "Fantasy/Pouch_Large", desk + q0 * new Vector3(.85f, .99f, -.15f), q0.eulerAngles.y - 20, .14f));
                 Block(desk, new Vector3(2.1f, 1, .9f), q0);
                 var warm = On(s0 - 1.5f, h.Half[store] * .3f); Brazier(t, warm, null); Block(warm, new Vector3(.8f, 1.2f, .8f), Quaternion.identity); KeepClear(t, warm, .6f);   // off the way through
                 // The choked side way: a dark mouth in the left wall and a heap of fallen rock across it.
@@ -4944,6 +4954,10 @@ namespace Crulanda.World
                 Part(PrimitiveType.Cube, loot, new Vector3(1.4f, .68f, .56f), new Vector3(.92f, .08f, .62f), Tint(art.timber, new Color(.3f, .2f, .12f)), Quaternion.Euler(-38, 0, 0));   // its lid, thrown back
                 var gold = Glowing(new Color(1, .78f, .3f), .5f);
                 for (int k = 0; k < 7; k++) Part(PrimitiveType.Sphere, loot, new Vector3(1.2f + (k % 3) * .17f, .62f + (k / 3) * .04f, .75f + (k % 2) * .14f), new Vector3(.14f, .05f, .14f), gold);
+                // The kit's coin, cup, purse and key spilt in front of the chest (playtest note 234): underfoot, no colliders.
+                foreach (var (kit, at, h2, yaw) in new[] { ("Coin_Pile", new Vector3(.75f, 0, 1.05f), .07f, 0f), ("Coin_Pile_2", new Vector3(.3f, 0, 1.3f), .06f, 40f),
+                    ("Chalice", new Vector3(1.05f, 0, 1.3f), .22f, 0f), ("Pouch_Large", new Vector3(-.15f, 0, 1.5f), .15f, 70f), ("Key_Gold", new Vector3(1.7f, .62f, .95f), .012f, 30f) })
+                    SmallPiece(ModelProp(loot, "Fantasy/" + kit, at, yaw, h2));
                 Interactables.Add(new ZoneInteractable { name = loot.name, prompt = "Search the deserters' plunder", kind = "crates", position = loot.position, root = loot });
                 for (int k = 0; k < 4; k++)
                 {
@@ -4951,6 +4965,10 @@ namespace Crulanda.World
                     for (int b = 0; b < 2; b++) Part(PrimitiveType.Cylinder, t, at + new Vector3(b * .2f, .05f, 0), new Vector3(.07f, .3f, .07f), Bone, Quaternion.Euler(0, b * 70 + k * 40, 90));
                 }
             }
+            // The kit's pieces (playtest note 234, ZoneBuilder.Dressing): the camp's pots and gear at the walls, the guard's weapon stand
+            // at the camp's mouth, stolen apples in the Store Caves, a captive's cage and chain in the Echoing Hall.
+            DressCave(t, h, "crowsfoot", c, ring, n, P, RingAt, On, Along,
+                a => a == "camp" ? 12.6f : a == "store" && store >= 0 ? h.Along[store] : a == "hall" && hall >= 0 ? h.Along[hall] : float.NaN, null, Block);
         }
         /// <summary>
         /// The Root-Mother's Deep (CANON-EXPANDED: the Veridian Temple and the Root-Mother are Book 3's; the deep is GAME-ONLY): a
@@ -5066,6 +5084,10 @@ namespace Crulanda.World
             // Puddles of seep-water, dark, here and there (stone, not metal: nothing to reflect down here).
             var puddle = Tint(art.stone, new Color(.12f, .11f, .1f));
             for (float s0 = 4; s0 < h.Length - 3; s0 += 4.5f) if (D() < .4f) Part(PrimitiveType.Cylinder, t, On(s0, (D() - .5f) * h.Half[RingAt(s0)]) + Vector3.up * .012f, new Vector3(.9f + D() * .8f, .01f, .6f + D() * .6f), puddle, Along(s0) * Quaternion.Euler(0, D() * 90, 0));
+            // The Keepers' offerings from the kit (playtest note 234): earthenware and candles at the walls, sap in stoppered vials by the
+            // Heart, a book of theirs; grey caps in the Gallery.
+            DressCave(t, h, "rootdeep", c, ring, n, P, RingAt, On, Along,
+                a => a == "gallery" && gallery >= 0 ? h.Along[gallery] : a == "well" && well >= 0 ? h.Along[well] : a == "heart" && heart >= 0 ? h.Along[heart] : float.NaN, null, Block);
         }
         /// <summary>
         /// A cave's painted lining: what shows from inside, laid over the faceted shell (which stays the collider). The shell's own

@@ -894,3 +894,5 @@ un-captures.
   ground and the trunk buried.
 - 259 (2026-10-19 ~15:00, watching raid 2: his screenshot, the Unraveller hidden behind a wall of tall black shards, the damage numbers
   stacked over her) "woah too much cant even make out the spider" (OPEN): the void wrap thinned to a translucent edge, the spider first.
+- 260 (2026-10-19 ~15:05, watching raid 2) "she needs adds. smaller spiders with the original texture but purple" (OPEN): her brood as
+  small spiders, the spider's own texture tinted purple.

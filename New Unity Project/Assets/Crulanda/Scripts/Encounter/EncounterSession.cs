@@ -1741,6 +1741,7 @@ namespace Crulanda.Encounter
                         point = hit.position + Vector3.up; footed = true;
                         if (patrol) break;
                         foreach (var w in stood) { var d = w - point; d.y = 0; if (d.magnitude < gap * .9f) { footed = false; break; } }
+                        if (footed && camp.dry && NearWater(point)) footed = false;   // a dry camp's (the Bank-snouts): never in or by the water (EncounterSession.Dry)
                     }
                     // Eight draws all footed on another's place (or off the navmesh): spots turned round the camp's centre by the golden
                     // angle, a little further out each, with no more draws from the dice, so no later camp's mobs move (the bowl's rim's
@@ -1761,7 +1762,7 @@ namespace Crulanda.Encounter
                     AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.Bear ? 4f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
                     a.GetComponent<NavMeshAgent>().areaMask &= ~(1 << EncounterNavigation.DropArea);   // (the Adit rework) a camp's mobs never take a one-way drop: they would be gone from their camp for good
                     var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
-                    enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius;
+                    enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius; enemy.KeepDry = camp.dry;
                     enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
                     enemy.FleeAt = elite ? 0 : camp.flee;   // bolts at low health (D5; EncounterEnemy.Flee)
                     enemy.Gap = gap;
@@ -1805,6 +1806,7 @@ namespace Crulanda.Encounter
                 if (!NavMesh.SamplePosition(want, out var hit, 3, NavMesh.AllAreas) || Mathf.Abs(hit.position.y + 1 - want.y) > 1.5f) continue;
                 point = hit.position + Vector3.up;
                 if (OffDeck(camp, spot, point)) continue;
+                if (camp.dry && NearWater(point)) continue;   // a dry camp keeps off the water (EncounterSession.Dry)
                 bool clear = true;
                 foreach (var w in stood) { var d = w - point; d.y = 0; if (d.magnitude < gap * .9f) { clear = false; break; } }
                 if (clear) return true;
@@ -1933,7 +1935,7 @@ namespace Crulanda.Encounter
             {
                 float a = turn + k * Mathf.PI * 2 / 5 + ((float)r.NextDouble() - .5f) * .5f, reach = ring * (.8f + (float)r.NextDouble() * .4f);
                 var p = Zone.StandAt(camp.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * reach, float.NegativeInfinity, 1);
-                if (NavMesh.SamplePosition(p, out var hit, 3, NavMesh.AllAreas)) points.Add(hit.position);
+                if (NavMesh.SamplePosition(p, out var hit, 3, NavMesh.AllAreas) && !(camp.dry && NearWater(hit.position))) points.Add(hit.position);   // a dry camp's roamer never wades (EncounterSession.Dry)
             }
             if (points.Count < 3) return null;
             points.Add(points[0]);   // round the loop and back the same way (EncounterEnemy walks a road back and forth)

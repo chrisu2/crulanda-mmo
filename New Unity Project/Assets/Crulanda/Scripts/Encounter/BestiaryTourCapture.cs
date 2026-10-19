@@ -146,7 +146,8 @@ namespace Crulanda.Encounter
                 // The fight: pulled, you healed whole every frame (you take its blows), until its blow and its move are seen or 30 s pass.
                 // Its walking is judged over fifths of a second, never across a frame's capture, only while it goes over .5 m/s and plays no
                 // blow or flinch; its facing is its body's as the clip poses it (ModelBeast.Facing), not the actor's.
-                s.Select(e); e.Receive(1, s.Player);
+                // Pulled as your opening blow pulls it: a real hit of a twentieth of its health (the first run's hit of 1 came to nothing after the armour and the scales: no threat, so it never came for you).
+                s.Select(e); e.Receive(Mathf.Max(10, e.actor.Health.Pool.Max / 20), s.Player);
                 bool swung = false, cast = false, castAfter = false; float worst = 0, walked = 0; int walkSamples = 0;
                 float idleOff = Vector3.Angle(bm != null ? bm.Facing : e.transform.forward, e.transform.forward);
                 var last = e.transform.position; float lastAt = Time.time;

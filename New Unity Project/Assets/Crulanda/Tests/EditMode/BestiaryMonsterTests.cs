@@ -133,7 +133,13 @@ namespace Crulanda.Tests
                 Assert.That(c.count, Is.InRange(3, 4), c.name + ": a small pack"); Assert.AreEqual("pack", c.social, c.name);
                 Assert.GreaterOrEqual(c.levelMin, 15, c.name); Assert.LessOrEqual(c.levelMax, 20, c.name);
                 float off = PathDist(c.center, river.points) - river.width / 2;
-                Assert.That(off, Is.InRange(c.radius - .5f, 13f), c.name + ": on the bank band, its camp clear of the water (" + off.ToString("0.0") + " m from the waterline)");
+                Assert.LessOrEqual(off, 14f, c.name + ": on the bank band (" + off.ToString("0.0") + " m from the waterline)");
+                // Every member dry (the second tour, 2026-10-18: a blue snout stood in the river): its spawn square's corners (radius times
+                // root two), its stroll circle (the radius, 2.5 m at the least) and the code's own guard (the camp's dry flag).
+                Assert.IsTrue(c.dry, c.name + " keeps to dry ground (spawn, stroll, roam and respawn: EncounterSession.Dry)");
+                float reach = Mathf.Max(c.radius * 1.415f, Mathf.Max(2.5f, c.radius));
+                foreach (var w in z.water.Where(w => w != null && w.points != null && w.points.Length > 1))
+                    Assert.GreaterOrEqual(PathDist(c.center, w.points) - w.width / 2 - reach, EncounterSession.DryMargin, c.name + ": every spot it may be stood on or stroll to is " + EncounterSession.DryMargin + " m or more from " + w.name);
                 foreach (var road in z.roads) Assert.Greater(PathDist(c.center, road.points) - road.width / 2, c.radius + 2, c.name + ": off " + road.name);
                 foreach (var p in z.props.Where(p => p.kind == "dock" || p.kind == "brick_bridge"))
                     Assert.Greater(Vector2.Distance(c.center, p.at), 18, c.name + ": clear of " + p.name);

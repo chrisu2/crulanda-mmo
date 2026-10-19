@@ -24,6 +24,9 @@ namespace Crulanda.Encounter
                 if (agent != null && agent.isOnNavMesh)
                 {
                     var away = transform.position - boltFrom; away.y = 0; if (away.sqrMagnitude < .01f) away = -transform.forward;
+                    // A dry camp's (the Bank-snouts) bolts along the bank, never into the river: the first of the ways round from straight
+                    // away that keeps off the water (EncounterSession.Dry).
+                    if (KeepDry) for (int k = 0; k < 7 && session.NearWater(transform.position + away.normalized * 6); k++) away = Quaternion.Euler(0, (k % 2 == 0 ? 1 : -1) * 45 * (k / 2 + 1), 0) * away;
                     agent.isStopped = false; agent.speed = baseSpeed * 1.15f; agent.SetDestination(transform.position + away.normalized * 6);
                 }
                 return true;

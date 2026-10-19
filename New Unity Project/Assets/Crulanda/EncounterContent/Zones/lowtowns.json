@@ -6058,13 +6058,14 @@
         "x": 16,
         "y": -70
       },
-      "radius": 4,
+      "radius": 3,
       "count": 3,
       "levelMin": 15,
       "levelMax": 16,
       "respawn": 80,
       "social": "pack",
-      "flee": 0.2
+      "flee": 0.2,
+      "dry": true
     },
     {
       "name": "Bank-snouts on the east mud",
@@ -6073,16 +6074,17 @@
       "look": "puglin",
       "canonStatus": "GAME-ONLY creature (the Bank-snout, picked by Chris 2026-10-18, Docs/BESTIARY_MONSTERS.md); CANON: the Chemical River's 'and worse' (book1 ch.15:391)",
       "center": {
-        "x": 19,
+        "x": 24,
         "y": -135
       },
-      "radius": 5,
+      "radius": 3.5,
       "count": 4,
       "levelMin": 16,
       "levelMax": 17,
       "respawn": 80,
       "social": "pack",
-      "flee": 0.2
+      "flee": 0.2,
+      "dry": true
     },
     {
       "name": "Bank-snouts between the bridges",
@@ -6091,16 +6093,17 @@
       "look": "puglin",
       "canonStatus": "GAME-ONLY creature (the Bank-snout, picked by Chris 2026-10-18, Docs/BESTIARY_MONSTERS.md); CANON: the Chemical River's 'and worse' (book1 ch.15:391)",
       "center": {
-        "x": 20,
-        "y": 66
+        "x": 26,
+        "y": 62
       },
-      "radius": 4,
+      "radius": 3,
       "count": 3,
       "levelMin": 17,
       "levelMax": 18,
       "respawn": 80,
       "social": "pack",
-      "flee": 0.2
+      "flee": 0.2,
+      "dry": true
     },
     {
       "name": "Bank-snouts on the north bank",
@@ -6109,16 +6112,17 @@
       "look": "puglin",
       "canonStatus": "GAME-ONLY creature (the Bank-snout, picked by Chris 2026-10-18, Docs/BESTIARY_MONSTERS.md); CANON: the Chemical River's 'and worse' (book1 ch.15:391)",
       "center": {
-        "x": -21,
-        "y": 184
+        "x": -25,
+        "y": 188
       },
-      "radius": 4,
+      "radius": 3,
       "count": 3,
       "levelMin": 18,
       "levelMax": 19,
       "respawn": 80,
       "social": "pack",
-      "flee": 0.2
+      "flee": 0.2,
+      "dry": true
     },
     {
       "name": "The Lantern-Eater",

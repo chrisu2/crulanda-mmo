@@ -940,3 +940,4 @@ un-captures.
   (the batch stopped; no reviving mid-fight but the Shaman's one; a wipe ends the pull) (OPEN).
 - 278 (2026-10-19 ~16:40, on the corrected raid numbers: Mage ~74/s, Ranger 56, Archivist 51, Rogue/Scoundrel 48 vs a band of 88; heals
   Cleric 41, Shaman 27, Druid 23) "still not on target" (OPEN).
+- 279 (2026-10-19 ~16:42) "hybrids 75% of target" (the hybrids' damage at 75% of the pure damage band; replaces "a bit lower", 90%).

@@ -938,3 +938,5 @@ un-captures.
   Then: "cleric almost twice the healing as well" (Cleric ~104/s, Shaman 67, Druid 59).
 - 277 (2026-10-19 ~16:25) "can we kill the raid. all respawned while main spider at half health and make necessary changes as noted"
   (the batch stopped; no reviving mid-fight but the Shaman's one; a wipe ends the pull) (OPEN).
+- 278 (2026-10-19 ~16:40, on the corrected raid numbers: Mage ~74/s, Ranger 56, Archivist 51, Rogue/Scoundrel 48 vs a band of 88; heals
+  Cleric 41, Shaman 27, Druid 23) "still not on target" (OPEN).

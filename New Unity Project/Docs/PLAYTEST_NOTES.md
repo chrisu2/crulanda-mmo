@@ -935,3 +935,4 @@ un-captures.
   Then: "nothing should be permanent onscreen" (every effect has a lifetime; all clear at the fight's end).
 - 276 (2026-10-19 ~16:22, the tuning batch with buffs; meter over 687 s: Mage ~186/s, Ranger ~140, Archivist ~128, Rogue ~121,
   Scoundrel ~120, Warrior 64, Paladin 33) "mage doesnt look balanced now" (OPEN: every damage class far over its band with buffs).
+  Then: "cleric almost twice the healing as well" (Cleric ~104/s, Shaman 67, Druid 59).

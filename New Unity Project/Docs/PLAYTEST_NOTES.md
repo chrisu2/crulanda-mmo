@@ -945,3 +945,5 @@ un-captures.
   staying a long time and pets just standing in it" (OPEN).
 - 281 (2026-10-19 ~16:50) "need some type of mechanism to trap the brook..someone that can do an extra job" (OPEN): a salt-ring snare
   (salt and bone hold Weave-Eaters, b1 ch.20; no machines) laid by an assigned Trapper (the Ranger by default) on the brood's path.
+- 282 (2026-10-19 ~17:50, watching tune-5; the boss's crown and plate hanging in the air) "i think instead of the mobs floating but them
+  on the ground!" and "but make the main spider about 15% bigger" (OPEN). Tune-4 had gone 1 of 10 (a kill at 7:12, wipes at 8-24%).

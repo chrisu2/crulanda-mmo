@@ -854,3 +854,7 @@ un-captures.
 - 245 (2026-10-19 ~11:40) "weapons . KayKit : Fantasy Weapons Bits" (OPEN): Downloads\KayKit_FantasyWeaponsBits_1.0_FREE.zip (Kay
   Lousberg, CC0): 31 models (swords A-E, axes A-C, hammers A-C, daggers A-B, bows A-B with strings, staffs A-B, wand, spear, halberd,
   fist weapons, arrows, shields A-C). Bring them in as the weapons people carry (Phase 8.5).
+- 246 (2026-10-19 ~12:00) "i like this better for lowtowns look and feel. Free Medieval Village Pack Vol.1 it is in myassets" (OPEN):
+  MyDreamGameStudio's pack (Asset Store cache, 839 MB): 10 houses, a tavern, a blacksmith, an animal shed, 21 props, "aged" 2048 textures,
+  URP materials (the project is Built-in: rebuild them). The water wheel and windmill stay out (no machines). These go to the Lowtowns
+  only (every zone unique).

@@ -12,6 +12,7 @@ param([string]$Exe = 'D:\crulanda-work\encounter-validation-b\Builds\Crulanda\Cr
 # (2 tanks, 3 healers, 5 damage with you), salt and harpoons in every bag, a raid on the Drain Reach's apron, her brought up at once
 # (--crulanda-unraveller-now), -Pulls pulls (10), a seed each. raid-log.txt reads each wipe round its first death; run-summary.txt the kill rate.
 # Out to D:\crulanda-work\run-captures\unraveller-raid unless -Out says otherwise.
+if ($Raid -and -not $PSBoundParameters.ContainsKey('TimeoutSec')) { $TimeoutSec = 600 + $Pulls * 420 }   # a pull up to 17 game minutes at 3x, and the waits between (play note 286: a 10-15 minute kill)
 if ($Raid) { $Zone = 'zone.lowtowns'; if (-not $PSBoundParameters.ContainsKey('Out')) { $Out = 'D:\crulanda-work\run-captures\unraveller-raid' } }
 New-Item -ItemType Directory -Force $Out | Out-Null
 & (Join-Path $PSScriptRoot 'screen_prefs.ps1') -Save

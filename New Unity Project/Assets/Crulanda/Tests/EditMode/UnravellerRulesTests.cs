@@ -26,8 +26,8 @@ namespace Crulanda.Tests
             Assert.IsTrue(File.Exists(File_), "the data file");
             var t = UnravellerTuning.Parse(File.ReadAllText(File_));
             var d = new UnravellerTuning();
-            Assert.AreEqual(d.health, t.health); Assert.AreEqual(235000, t.health, "tune-6: killed in 4:58 and 5:57 at 165,000; to land at about 8:30 with the leaps");
-            Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(340000, t.health, "play note 286: a 10-15 minute kill; tune-6 dealt her about 500 a second");
+            Assert.AreEqual(960, t.enrageSeconds, "the feast at 16:00 (play note 286: \"needs to be a 10-15min kill at least\")");
             Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
             Assert.AreEqual(4, t.swapAt); Assert.AreEqual(7, t.erasedAt); Assert.AreEqual(3, t.saltsToFree); Assert.AreEqual(12, t.saltWindow); Assert.AreEqual(10, t.swallowSeconds, "raid 3");
@@ -175,9 +175,10 @@ namespace Crulanda.Tests
         {
             var t = T;
             Assert.AreEqual(.012f, UnravellerRules.PulseShare(0, t), 1e-5f, "1.2% at first (tune-3: 2% killed the fast pulls; the doc said 1.5%)");
-            Assert.AreEqual(.036f, UnravellerRules.PulseShare(60, t), 1e-5f, "about 3.6% three minutes in (sixty pulses)");
-            Assert.AreEqual(540, UnravellerRules.EnrageLeft(0, t)); Assert.AreEqual(40, UnravellerRules.EnrageLeft(500, t), 1e-4f); Assert.AreEqual(0, UnravellerRules.EnrageLeft(600, t));
-            Assert.IsFalse(UnravellerRules.Feast(539.9f, t)); Assert.IsTrue(UnravellerRules.Feast(540, t));
+            Assert.AreEqual(.03f, UnravellerRules.PulseShare(60, t), 1e-5f, "3% three minutes in (sixty pulses): a good raid lives to its kill");
+            Assert.AreEqual(.066f, UnravellerRules.PulseShare(180, t), 1e-5f, "6.6% nine minutes in: a slow raid dies by 16:00");
+            Assert.AreEqual(960, UnravellerRules.EnrageLeft(0, t)); Assert.AreEqual(60, UnravellerRules.EnrageLeft(900, t), 1e-4f); Assert.AreEqual(0, UnravellerRules.EnrageLeft(1000, t));
+            Assert.IsFalse(UnravellerRules.Feast(959.9f, t)); Assert.IsTrue(UnravellerRules.Feast(960, t));
         }
 
         [Test] public void The_void_wrap_is_a_thin_edge_under_the_bodys_height_and_a_half_on_any_body()

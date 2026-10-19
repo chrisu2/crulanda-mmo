@@ -826,6 +826,14 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      out of the rings as out of any red (the inner first: the deepest). Numbers in the data file (`leapAt1-3`, `leapWarn`, `leapSeconds`,
      `leapRadius`, `leapShare`, `leapKnock`, `leapRangeMin/Max`); the log counts leaps.
    - **Her health 160,000** (165,000) for the time the leaps cost.
+   - **A 10-15 minute kill** (play note 286, 2026-10-19, WRITTEN, NOT RUN). Chris: "needs to be a 10-15min kill at least". GAME-ONLY
+     numbers (her lore is unchanged). The feast (enrage) now comes at
+     **16:00** (was 9:00). **Her health 340,000** (was 235,000): tune-6 dealt her about 500 a second; a longer fight with more brood waves
+     and leaps puts about 430 a second on her, so some 13 minutes. The leaps stay at 75%, 50% and 25%; the brood waves keep coming
+     as before. **The pulse grows 0.03% a pulse** (was 0.04%): 3% of health three minutes in, 6.6% at nine, so a good raid lives to
+     its kill around minute 11-14 and a slow one dies to the pulse or the feast by 16. Target unchanged: sims alone kill her 25-35% of
+     pulls. The run tool's pull limit is now 17 minutes, and `group_run.ps1 -Raid` waits 600 s + 420 s a pull (game at 3x) unless
+     `-TimeoutSec` is given. Numbers in the data file (`health`, `enrageSeconds`, `pulseGrow`); tests pin them.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

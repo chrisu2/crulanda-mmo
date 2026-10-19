@@ -24,7 +24,7 @@ namespace Crulanda.Encounter
         public static bool RaidRequested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), RaidFlag) >= 0; } }
         static int PullsArg { get { var a = Environment.GetCommandLineArgs(); int i = Array.IndexOf(a, PullsFlag); return i >= 0 && i + 1 < a.Length && int.TryParse(a[i + 1], out var n) ? Mathf.Clamp(n, 1, 50) : 10; } }
         /// <summary>The game minutes one pull may take before it is called (the enrage is 9: a pull past 10 is stuck).</summary>
-        public const float PullLimit = 10 * 60;
+        public const float PullLimit = 17 * 60;   // the feast at 16:00 (play note 286)
 
         public IEnumerator RaidRun(EncounterSession s, string directory)
         {

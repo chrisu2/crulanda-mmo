@@ -920,3 +920,4 @@ un-captures.
 - 268 (2026-10-19 ~15:50, watching raid 7) "mare down to 3 spiders per add" (three brood a wave).
 - 269 (2026-10-19 ~15:52) "i want it extremely hard but not impossible" (the Unraveller's target: a disciplined raid wins about 1 in 4,
   near the end of the clock; any sloppiness wipes; replaces "1 in 2").
+- 270 (2026-10-19 ~16:00, watching the tuning batch) "the spikes are launching in the air. not on the ground" (OPEN).

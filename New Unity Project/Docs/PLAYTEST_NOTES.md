@@ -956,3 +956,5 @@ un-captures.
   her health raised for a 12-14 minute kill).
 - 287 (2026-10-19 ~18:45, watching tune-8) "leaps are too quick and not properly telegraphed" (OPEN: a wind-up, rings shown ~4 s ahead, a
   slower higher arc, a growing shadow, a raid warning). Then: "also distance is too short" (25-40 m).
+- 288 (2026-10-19 ~18:50, tune-8) "not sure what took everyone out around 40% mark" (the phase-3 change at 40%: grey ground under the
+  ranged hitting 230-440 at once, spikes, the pulse) (OPEN).

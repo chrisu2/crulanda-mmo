@@ -930,3 +930,5 @@ un-captures.
   with all ten in level-20 best-in-slot gear for their part). Then: "or at least good gear" and "that is the point of a raid".
 - 274 (2026-10-19 ~16:15, his screenshot: the dead Paladin on a huge glowing orange disc over the bar; the meter's Ranger at 166/s) "also
   should not stay on the ground permanently" (OPEN).
+- 275 (2026-10-19 ~16:18) "how can you tell which is good and which are bad. no way to know to get out or stand in it" (OPEN): one look
+  for every ground effect: harmful red/violet and jagged with a warning, helpful soft gold/green; a HUD line naming what you stand in.

@@ -860,3 +860,5 @@ un-captures.
   only (every zone unique).
 - 247 (2026-10-19 ~12:10) "replace all wooden barrels with this in myassets .  simple wood barrel" (OPEN): Kraken XR's "Simple Wood
   Barrel" (Asset Store cache: one FBX BARREL_1, albedo/normal/metallic textures). Every wooden barrel in every zone becomes it.
+- 248 (2026-10-19 ~12:15) "replace all dead trees with this pack in myassets - dry trees" (OPEN): DigitalAntichrist's "Dry Trees"
+  (Asset Store cache: 7 FBX Dry3333/4195/4910/5818/6524/7509/8872, one bark material, HDRP demo). Every dead tree/snag becomes one of them.

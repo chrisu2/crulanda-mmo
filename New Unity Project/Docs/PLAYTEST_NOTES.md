@@ -840,3 +840,5 @@ un-captures.
 - 240 (2026-10-18 ~20:15, on the GanzSe line-up beside today's figures) "i dont like the new characters": GanzSe's bodies are out;
   the p85-ganzse work stops (ROADMAP Phase 8.5).
   Then (verbatim): "the old ones were better". Today's figures (Quaternius) stay; Phase 8.5 goes on with note 239 on them.
+- 241 (2026-10-18 ~20:45, on wardrobe 06-helms-f: the CHOSAN model helms Headgear.B.013-016 perched and tilted on the skull) "none
+  fit on the head" (OPEN): branch angular-gear retires those helms and builds every helm from the head's own outline.

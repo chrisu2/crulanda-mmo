@@ -29,12 +29,13 @@ namespace Crulanda.Encounter
         {
             get
             {
+                var raid = session.RaidRoleOf(this); if (raid.HasValue) return raid.Value;   // in a raid, the part it was given (RaidGroup: 2 tanks, 3 healers, 5 damage)
                 if (sim.classId == "class.warrior") return PartyRole.Tank;
                 if (sim.classId == "class.druid") return PartyRole.Healer;
                 // A Salt-Mender heals when no Druid is along (the Mender path, 2026-10-12), else throws salt with the others.
                 if (sim.classId == "class.cleric" || sim.classId == "class.shaman") return PartyRole.Healer;   // note 178: the new healers (classes 9-10)
-                if (sim.classId == "class.saltmender") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid") ? PartyRole.Damage : PartyRole.Healer;
-                if (sim.classId == "class.paladin") return session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.druid" || c.sim.classId == "class.saltmender") || session.PartySims.Exists(c => c != null && c != this && c.sim.classId == "class.warrior") == false ? PartyRole.Tank : PartyRole.Healer;
+                if (sim.classId == "class.saltmender") return session.PartyMatesOf(this).Exists(c => c != null && c != this && c.sim.classId == "class.druid") ? PartyRole.Damage : PartyRole.Healer;
+                if (sim.classId == "class.paladin") return session.PartyMatesOf(this).Exists(c => c != null && c != this && c.sim.classId == "class.druid" || c.sim.classId == "class.saltmender") || session.PartyMatesOf(this).Exists(c => c != null && c != this && c.sim.classId == "class.warrior") == false ? PartyRole.Tank : PartyRole.Healer;
                 return PartyRole.Damage;
             }
         }
@@ -128,6 +129,7 @@ namespace Crulanda.Encounter
             void Consider(Actor a) { if (a != null && a.IsAlive && Vector3.Distance(a.transform.position, transform.position) <= reach && !near.Contains(a)) near.Add(a); }
             Consider(session.Player); if (session.Progress.recruited && session.Companion != null) Consider(session.Companion.actor);
             foreach (var p in session.PartySims) if (p != null) Consider(p.actor);
+            if (session.InRaid) near.RemoveAll(a => !session.SameParty(actor, a));   // a Salt Cairn is party-wide (RaidReach.GroupHeal): its own party in a raid
             return near;
         }
         public float Reach { get { return Melee ? 2.4f : 20; } }
@@ -1099,7 +1101,7 @@ namespace Crulanda.Encounter
             if (st != null && BossBuffs.Wants(st, Consumables.FedId, now))
             {
                 SimCompanion holder = null; ItemDef feast = null;
-                foreach (var p in session.PartySims)
+                foreach (var p in session.PartyMatesOf(this))   // a feast is its own party's (RaidReach.Feast)
                 {
                     if (p == null || p.actor == null || !p.actor.IsAlive || Vector3.Distance(p.transform.position, transform.position) > BossBuffs.BuffReach) continue;
                     var f = BossBuffs.PickFeast(p.Carried()); if (f != null) { holder = p; feast = f; break; }
@@ -1148,7 +1150,10 @@ namespace Crulanda.Encounter
         {
             // The tank first when it is under 60% (2026-10-15: at the Rock-Eater the healer mended a damage-dealer eight times while the tank
             // died unhealed; every group wipe there began with the tank).
-            foreach (var p in session.PartySims)
+            // In a raid its own party's tank before the other's (each party has its tank and healer: RaidGroup.Arrange); out of one the same list.
+            foreach (var p in session.PartyMatesOf(this))
+                if (p != null && p.Role == PartyRole.Tank && p.actor.IsAlive && p.actor.Health.Pool.Ratio < .6f && Vector3.Distance(p.transform.position, transform.position) <= reach) return p.actor;
+            if (session.InRaid) foreach (var p in session.PartySims)
                 if (p != null && p.Role == PartyRole.Tank && p.actor.IsAlive && p.actor.Health.Pool.Ratio < .6f && Vector3.Distance(p.transform.position, transform.position) <= reach) return p.actor;
             Actor best = null; float low = 1;
             void Consider(Actor a) { if (a != null && a.IsAlive && a.Health.Pool.Ratio < low && Vector3.Distance(a.transform.position, transform.position) <= reach) { best = a; low = a.Health.Pool.Ratio; } }

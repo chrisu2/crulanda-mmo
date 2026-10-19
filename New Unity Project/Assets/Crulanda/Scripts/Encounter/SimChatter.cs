@@ -218,7 +218,7 @@ namespace Crulanda.Encounter
         void FriendsAsk()
         {
             if (Time.time < nextAsk) return; nextAsk = Time.time + Mathf.Lerp(150, 300, R);
-            if (S.PartySims.Count >= EncounterSession.MaxPartySims || S.InCombat) return;
+            if (S.PartySims.Count >= EncounterSession.MaxPartySims || S.InRaid || S.InCombat) return;
             var friends = Here().FindAll(s => !S.InParty(s.id) && SimMemory.Of(s) == SimMemory.Standing.Friend && s.bold > .3f && Mathf.Abs(s.level - S.Progress.Level) <= EncounterSession.InviteLevelGap);
             if (friends.Count == 0 || R > .6f) return;
             var s = friends[rng.Next(friends.Count)]; var camp = CampFor(s); bool lingo = s.chatty > .65f;

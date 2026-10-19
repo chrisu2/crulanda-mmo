@@ -313,7 +313,7 @@ namespace Crulanda.Encounter
         {
             int k = R("vw-atonement"); if (k <= 0 || dealt <= 0) return;
             int mend = Mathf.Max(1, Mathf.RoundToInt(dealt * .15f * k));
-            if (R("vw-vow-kept") > 0) { foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= VowReach) HealActor(who, mend); }
+            if (R("vw-vow-kept") > 0) { foreach (var who in Party()) if (who != null && who.IsAlive && s.PartyWide(who) && Vector3.Distance(who.transform.position, s.Player.transform.position) <= VowReach) HealActor(who, mend); }
             else HealActor(MostHurt(30), mend);
         }
         // ---------- the Cantor ----------
@@ -353,7 +353,7 @@ namespace Crulanda.Encounter
         {
             return Start(a, () => {
                 int heal = Mathf.RoundToInt((a.power + Level) * (1 + .04f * R("ca-clear-voice")));
-                foreach (var who in Party()) if (who != null && who.IsAlive && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) HealActor(who, heal);
+                foreach (var who in Party()) if (who != null && who.IsAlive && s.PartyWide(who) && Vector3.Distance(who.transform.position, s.Player.transform.position) <= a.range) HealActor(who, heal);
             });
         }
         bool MendingPhrase(AbilityDefinition a)

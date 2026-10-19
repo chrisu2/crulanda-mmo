@@ -72,7 +72,15 @@ namespace Crulanda.Encounter
         }
 
         /// <summary>The party near a point, alive: you, Mira (recruited), the sims; <paramref name="first"/> first when it is one of them.</summary>
-        public List<Actor> PartyAround(Vector3 at, float reach, Actor first = null)
+        public List<Actor> PartyAround(Vector3 at, float reach, Actor first = null) { return PartyAround(at, reach, first, null); }
+        /// <summary>The same, kept to <paramref name="partyOf"/>'s own party in a raid (a party-wide help, RaidReach); everyone when null.</summary>
+        public List<Actor> PartyAround(Vector3 at, float reach, Actor first, Actor partyOf)
+        {
+            var all = PartyAroundAll(at, reach, first);
+            if (InRaid && partyOf != null) all.RemoveAll(a => !SameParty(partyOf, a));
+            return all;
+        }
+        List<Actor> PartyAroundAll(Vector3 at, float reach, Actor first)
         {
             var list = new List<Actor>();
             void Add(Actor a) { if (a != null && a.IsAlive && !list.Contains(a) && Vector3.Distance(a.transform.position, at) <= reach) list.Add(a); }
@@ -86,7 +94,8 @@ namespace Crulanda.Encounter
         public List<StatusEffectRuntime> FeastCircle(Actor eater)
         {
             var list = new List<StatusEffectRuntime>(); if (eater == null) return list;
-            foreach (var a in PartyAround(eater.transform.position, Consumables.FeastRange, eater)) { var c = a.GetComponent<Combatant>(); if (c != null && c.Statuses != null) list.Add(c.Statuses); }
+            foreach (var a in PartyAround(eater.transform.position, Consumables.FeastRange, eater, eater)) {   // the eater's party in a raid (RaidReach.Feast)
+                var c = a.GetComponent<Combatant>(); if (c != null && c.Statuses != null) list.Add(c.Statuses); }
             return list;
         }
         /// <summary>Lays a class's standing buff on the party within BossBuffs.BuffReach of <paramref name="by"/> (each one of it at a time: a
@@ -117,6 +126,7 @@ namespace Crulanda.Encounter
             get
             {
                 string id = ClassDef != null ? ClassDef.id : null; var role = BossBuffs.NominalRole(id);
+                if (InRaid) { var m = Raid.Find(RaidGroup.You); if (m != null) return m.role; }   // in a raid, the part you were given
                 if (role == SimCompanion.PartyRole.Tank && PartySims.Exists(c => c != null && c.Role == SimCompanion.PartyRole.Tank)) role = SimCompanion.PartyRole.Damage;
                 return role;
             }
@@ -150,7 +160,7 @@ namespace Crulanda.Encounter
                 int i = food != null ? BagIndexOf(d => d == food) : -1;
                 if (i >= 0 && UseItem(i))
                 {
-                    int fed = 0; if (feast != null) foreach (var a in PartyAround(Player.transform.position, Consumables.FeastRange)) { var c = a.GetComponent<Combatant>(); if (c != null && c.Statuses != null && c.Statuses.Has(Consumables.FedId)) fed++; }
+                    int fed = 0; if (feast != null) foreach (var a in PartyAround(Player.transform.position, Consumables.FeastRange, null, Player)) { var c = a.GetComponent<Combatant>(); if (c != null && c.Statuses != null && c.Statuses.Has(Consumables.FedId)) fed++; }
                     used.Add(food.name + (feast != null ? " (" + Mathf.Min(fed, Consumables.PartySize) + " fed)" : ""));
                 }
             }

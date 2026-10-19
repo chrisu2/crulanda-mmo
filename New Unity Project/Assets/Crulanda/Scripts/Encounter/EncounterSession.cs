@@ -383,7 +383,7 @@ namespace Crulanda.Encounter
             }
             Add(Player);
             if (Companion != null && Progress.recruited) Add(Companion.actor);
-            foreach (var s in PartySims) if (s != null) Add(s.actor);
+            foreach (var s in PartySims) if (s != null && PartyWide(s.actor)) Add(s.actor);   // your own party in a raid (RaidReach.Feast)
             return list;
         }
         float foodCarry;
@@ -2025,6 +2025,7 @@ namespace Crulanda.Encounter
             }
             if (!BuildOpen && EncounterInput.Press(KeyCode.E)) Interact();
             if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
+            TickRaid();   // the ready check runs out (EncounterSession.Raid)
             TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
             TickLockouts(); TickQueue(); TickHallows();   // lockouts run out; the dungeon queue gathers its party, leads it and breaks it up (EncounterSession.Lockout, .Queue)
             // (Hallow's Creek) the Ash Road's time-squalls and stone leaves, the bridge's tipping slab (EncounterSession.AshRoad)

@@ -149,13 +149,13 @@ namespace Crulanda.Encounter
         }
 
         // ---------- Choir ----------
-        int MendAround(float reach, int amount) { int sum = 0; foreach (var who in Party().ToList()) if (who != null && Vector3.Distance(who.transform.position, s.Player.transform.position) <= reach) sum += Mend(who, amount); return sum; }
+        int MendAround(float reach, int amount) { int sum = 0; foreach (var who in Party().ToList()) if (who != null && s.PartyWide(who) && Vector3.Distance(who.transform.position, s.Player.transform.position) <= reach) sum += Mend(who, amount); return sum; }
         bool Litany(AbilityDefinition a)
         {
             return Start(With(a, Mathf.Max(0, a.cost - 2 * R("ch-even-breath")), a.castTime), () => {   // Even Breath: cheaper
                 int amount = Dmg((a.power + 2 * Level) * (1 + .04f * R("ch-full-voice")));
                 MendAround(LitanyReach + R("ch-wide-ring"), amount);
-                if (R("ch-chorus") > 0) foreach (var who in Party().ToList()) periodic.Add("chorus", who, Now, 2, 3, Dmg(amount * .1f), (e, i) => Mend((Actor)e.target, e.value) >= 0);
+                if (R("ch-chorus") > 0) foreach (var who in Party().Where(x => s.PartyWide(x)).ToList()) periodic.Add("chorus", who, Now, 2, 3, Dmg(amount * .1f), (e, i) => Mend((Actor)e.target, e.value) >= 0);
             });
         }
         bool Hymn(AbilityDefinition a)
@@ -165,7 +165,7 @@ namespace Crulanda.Encounter
                 periodic.Add("hymn", s.Player, Now, 1, ticks, Dmg((a.power + Level) * (1 + .04f * R("ch-full-voice"))), (e, i) => {
                     float reach = LitanyReach + R("ch-wide-ring");
                     var low = R("ch-answering-hills") > 0 ? MostHurt(reach) : null;   // Answering Hills: the most hurt in reach mended 5% more
-                    foreach (var who in Party().ToList()) if (who != null && Vector3.Distance(who.transform.position, s.Player.transform.position) <= reach) Mend(who, who == low ? Dmg(e.value * (1 + AnsweringHills)) : e.value);
+                    foreach (var who in Party().ToList()) if (who != null && s.PartyWide(who) && Vector3.Distance(who.transform.position, s.Player.transform.position) <= reach) Mend(who, who == low ? Dmg(e.value * (1 + AnsweringHills)) : e.value);
                     if (R("ch-answer") > 0) Grace(2 * R("ch-answer")); return true; });
             });
         }

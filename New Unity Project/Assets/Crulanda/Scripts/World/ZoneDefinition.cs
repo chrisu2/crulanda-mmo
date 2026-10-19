@@ -326,7 +326,7 @@ namespace Crulanda.World
         public string fogColor = "#9A9888"; public float fogStart = 45, fogEnd = 120;
         /// <summary>
         /// Optional (0 or empty = the shared default), read by WorldClock. sunHigh: the sun's noon elevation in degrees (the
-        /// default arc climbs to about 45; Khaven's stays low, so its day holds the dusk). skyTint (hex), skyExposure (default
+        /// default arc climbs to about 45; Hallow's Creek's stays low under its grey sky). skyTint (hex), skyExposure (default
         /// 1.05) and skyHaze (atmosphere thickness): the procedural sky's daytime look. Night falls the same everywhere.
         /// </summary>
         public float sunHigh, skyExposure, skyHaze; public string skyTint;

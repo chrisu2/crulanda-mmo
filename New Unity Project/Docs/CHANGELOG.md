@@ -126,7 +126,8 @@
 - **Each zone its own**: its sky tint (a third of the way to it), its haze of its own fog colour from the horizon up (the Lowtowns'
   yellow smog the thickest, its dark smog by night), its fog below the horizon as before. Hallow's Creek: always the grey overcast
   sky (b1 ch.21:19, "a grey sky"), no aurora. Khaven follows the weather and the clock like the others: its only canon is Chris's map
-  (maps/khaven_village_map.png: no sky or hour), so its old held dusk was GAME-ONLY and is dropped (2026-10-19, Chris: "CHECK LORE
+  (maps/khaven_village_map.png: no sky or hour), so its old held dusk was GAME-ONLY and is dropped, sky and low sun both (its
+  light now climbs with the clock; its grey-violet tint and haze kept, mild under the new sky) (2026-10-19, Chris: "CHECK LORE
   CANON"); its weather never clears, so it reads grey. Caves as before (the sky isn't seen; the
   cave darkening is unchanged). A zone can keep the old sky (lighting skyStyle "procedural"); none does.
 - **Light**: the skylight leans a third of the way to the sky's own colour, its brightness the zone's own (Chris's settled balance),

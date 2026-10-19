@@ -51,7 +51,6 @@
     "fogColor": "#7A5F66",
     "fogStart": 24,
     "fogEnd": 112,
-    "sunHigh": 17,
     "skyTint": "#A67884",
     "skyExposure": 0.8,
     "skyHaze": 1.4

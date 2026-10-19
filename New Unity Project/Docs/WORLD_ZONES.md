@@ -184,8 +184,8 @@ with gate towers, a dead grey wood, dark creek water and an old crypt under the 
 Biome `gloom`: hard grey-brown earth, thin dry grass and no flowers, grey dead woods, withered pines and brush, and a drained
 rose-violet grade. Its sky follows the weather and the clock like every zone's (the stylized skies, play note 254): the map, the
 only canon, gives no sky or hour, so the old held dusk (GAME-ONLY) was dropped 2026-10-19 on Chris's "CHECK LORE CANON". Its
-weather never clears (mist, overcast, rain), so its days read grey; `skyTint`/`skyExposure`/`skyHaze` still tint and dim its sky,
-and `lighting.sunHigh` still keeps its sun low. No Wasting here: only zones whose JSON has a `wasting` block get one.
+weather never clears (mist, overcast, rain), so its days read grey; `skyTint`/`skyExposure`/`skyHaze` still tint and dim its sky
+(a mild grey-violet). Its sun climbs with the clock like every zone's (the low `sunHigh` went with the held dusk). No Wasting here: only zones whose JSON has a `wasting` block get one.
 GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it (Sandthrone is a canon mercenary faction), the Pale watcher
 (canon "Pale Things" as cosmic auditors), the crypt and all exact placement. GAME-ONLY: the beacon mound east of the walls (a
 `Beacon mound` shape, 3.6 m, its old beacon a lookout secret). GAME-ONLY looks: the Cracked Hearth's split chimney with the fire showing through (a reading of the canon name; the map draws it as the inn), the drowned graveyard's flood pool and heaved graves, and the creek barrow's turf mound.

@@ -963,3 +963,5 @@ un-captures.
   Then: "still not jumping very far. need to jump out of melee and ranger range".
 - 290 (2026-10-19 ~19:00, tune-8) "i dont see the salt or harpoons is that a visible item?" (OPEN: thrown bone harpoons with glowing amber
   ropes while she is pinned (b1 ch.20), a white salt spray, the barrel and rack on the apron).
+- 291 (2026-10-19 ~19:05, tune-8) "healing seems lower..cant tell with dps" (the meter cuts off the damage rate on big totals) and "camera
+  gets inside the spider alot hard to see" (OPEN).

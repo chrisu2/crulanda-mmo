@@ -36,6 +36,10 @@ sims' guilds kill her when you are away (default: yes, one try in three; it chan
 
 ---
 
+**The boss-mechanics toolkit (Chris, 2026-10-19):** the list he gave ("take not of this for raid mechanices and design documentation") is in
+DUNGEON_DESIGN.md section 0.08 with what the game has of each. The Unraveller has tank swaps, add management, phases and interrupts/CC;
+she has no soak and no spread/stack yet (candidates when she is next reworked).
+
 ## 1. The boss: the Unraveller
 
 ### 1.1 What the books say about Weave-Eaters (read for this doc)

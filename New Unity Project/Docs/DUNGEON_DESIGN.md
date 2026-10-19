@@ -28,6 +28,40 @@
     - Each stands 10 m or more from every camp, 5 m from a patrol's round, 6 m from a secret, off the pools, the creek, the chasm and a road's middle (CheckpointDataTests); on the floor where it is drawn and walkable from the yard (CheckpointTests).
 - **Not every dungeon a cave (Chris, 2026-10-16 ~20:10, verbatim):** "just fyi all dungeons don't have to be cave systems. just a note". So the later dungeons can be built places above ground or in the open (a town, a keep, a tower, a walled district, a ruin), not tunnels by default; Hallow's Creek (DUNGEON2_DESIGN.md) is a paused town in the open with cellars under it.
 
+## 0.08 The boss-mechanics toolkit (Chris, 2026-10-19 ~18:05: "take not of this for raid mechanices and design documentation")
+Chris pasted this list (his source: a set of YouTube guides; recorded as he gave it, the links kept). Every dungeon boss and every raid
+boss is designed from it: each boss uses several of these, and a raid boss most of them. GAME-ONLY design vocabulary; each boss's own
+form of a mechanic comes from the books (DUNGEON_DESIGN.md section 0, reference-the-books).
+
+> Common Boss Mechanics
+>
+> * Tank Swaps & Debuffs: Bosses apply stacking armor-reduction, healing-debuff, or heavy physical/shadow damage effects to the active tank,
+>   forcing tanks to taunt-swap at a specific stack threshold (e.g., 8-10 stacks).
+> * Soaks: Designated players or the entire group must stand inside a falling meteor, beam, or swirl to absorb and split massive incoming
+>   damage.
+> * Add Management: Secondary enemies (adds) spawn during the fight and must be intercepted, interrupted, grouped up for area-of-effect (AoE)
+>   cleave, or burned down before reaching a critical location or empowering the boss.
+> * Intermissions & Phase Transitions: At specific health percentages (such as 50% or 100% energy), the boss becomes immune or shifts
+>   behavior, triggering a high-intensity transition phase with new movement puzzles, shield burn phases, or wave cleanups.
+> * Targeted Spreads & Stacks: Mechanics mark individual players with ticking debuffs or bombs requiring them to run away from the group
+>   (spread) or cluster tightly with designated partners (stack).
+> * Interrupts & Crowd Control: Critical boss or add casts must be locked out by using kick or stun abilities immediately to prevent
+>   raid-wide wipes or heavy absorb shields. [1](https://www.youtube.com/watch?v=qEDjHal4GL4&t=184), [2](https://www.youtube.com/watch?v=SWTFfcwtnqo),
+>   [3](https://www.youtube.com/watch?v=QpaEHnnA41g), [4](https://www.youtube.com/watch?v=3_CozvNqnDk&t=63), [5](https://www.youtube.com/watch?v=syGfgAGr_dU&t=10),
+>   [6](https://www.youtube.com/watch?v=PZjtxj13csU), [7](https://www.youtube.com/watch?v=5vNz8iQkmtQ&t=5), [8](https://www.youtube.com/watch?v=0-QPuz8iCtA)
+
+What the game has of each (2026-10-19), and what the sims can do:
+| Mechanic | In the game | The sims |
+|---|---|---|
+| Tank swaps | The Unraveller's Unravel (swap at four stacks, 10 s each); dungeon bosses have none yet | taunt-swap at the threshold (raid only) |
+| Soaks | none yet | none: a soak needs "stand in this" marks (the helpful-ground look) and a soak count |
+| Add management | the Unraveller's brood (held, killed in mark order, snared, salted); dungeon camps' adds | holds, kill order, off-tank pick-up, salt |
+| Intermissions and phase transitions | the Unraveller's three phases (no immune intermission) ; dungeon bosses' health phases | follow the phase rules |
+| Spreads and stacks | none yet (the Hunted is one target) | none: needs a spread/stack mark and a run-out/stand-together rule |
+| Interrupts and crowd control | the Feeding (interrupt or harpoon), bosses' casts (CC_DESIGN.md), the brood holds | interrupt and harpoon rotations, holds |
+Next for the raid and the later bosses: a soak and a spread/stack (both with clear marks: harmful red, helpful gold/green) and an immune
+intermission, written into the next boss's design from this list.
+
 ## 0.05 No machines (Chris, 2026-10-11, about 01:03, on the Rock-Eater: "more machines!!!!!  i told you NO Machines!")
 Nothing in the dungeon is a machine. Chris's choices (01:04, the question prompt):
 - **The Rock-Eater becomes "a great burrowing beast"**: a huge rock-eating cave beast that Nix rides and drives. The fight stays: the

@@ -176,10 +176,11 @@ namespace Crulanda.Encounter
 
         /// <summary>
         /// How round a mesh is (the measure behind note 239): the share of its triangles shaded smooth, whose corners' normals
-        /// turn more than <paramref name="degrees"/> from the face's own. A sphere, a lathed dome or a smoothed shell is near 1; a
+        /// turn more than <paramref name="degrees"/> from the face's own (2: a Unity sphere's corners turn only 6-9 degrees from its
+        /// faces, so 10 called it flat; a flat plate's do not turn at all). A sphere, a lathed dome or a smoothed shell is near 1; a
         /// faceted shell of flat plates is 0.
         /// </summary>
-        public static float Roundness(Mesh m, float degrees = 10)
+        public static float Roundness(Mesh m, float degrees = 2)
         {
             if (m == null) return 0;
             var v = m.vertices; var n = m.normals; var t = m.triangles; if (t.Length == 0 || n.Length != v.Length) return 0;

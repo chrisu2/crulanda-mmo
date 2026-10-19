@@ -181,6 +181,18 @@ namespace Crulanda.Encounter
             var d = b - a; var rot = Quaternion.LookRotation(d, up);
             return Matrix4x4.TRS((a + b) / 2 + up.normalized * h.Y(tall) * .5f, rot, new Vector3(wide / h.s.x, h.Y(tall), d.magnitude));
         }
+        /// <summary>
+        /// A comb or a seam up facet k's middle, from ring <paramref name="from"/> over every ring above to the point: bar by bar on
+        /// the plates (2026-10-18, third run: one straight bar from the lower ring to the point cut inside the crown, so a kettle's
+        /// comb stood 3 cm into the head).
+        /// </summary>
+        static void Ridge(Fit f, string role, Helm h, float[][] sup, Vector3[][] rings, Vector3 apex, int k, int from, float wide, float tall)
+        {
+            int n = sup[0].Length; var pts = new List<Vector3>();
+            for (int i = from; i < sup.Length; i++) pts.Add(OnFacet(h, sup[i], k, rings[i][0].y, .001f));
+            pts.Add(apex);
+            for (int i = 0; i + 1 < pts.Count; i++) f.Add(OnBody, role, Cube, HelmBar(h, pts[i], pts[i + 1], FacetUp(k, n), wide, tall));
+        }
         static Vector3 FacetUp(int k, int n, float lean = .6f) { var d = AngularShell.Normal(k, n); return new Vector3(d.x, lean, d.y); }
         /// <summary>A small diamond (a gem, a stud) on a helm.</summary>
         static Matrix4x4 Gem(Helm h, Vector3 at, float yaw, float metres) { return HelmBox(h, at, yaw, new Vector3(metres, metres, metres * .45f), 45); }
@@ -196,7 +208,7 @@ namespace Crulanda.Encounter
             float cut = rim + .008f / Mathf.Abs(headFrame.lossyScale.y); CutHair(cut); var h = HelmOn(cut); float top = h.top;
             string main = f.v == "leaf" || f.tier == 0 ? "cloth" : "leather", band = f.tier >= 1 ? "trim" : "cloth2";
             var ys = new[] { rim, Mathf.Lerp(rim, top, .4f), Mathf.Lerp(rim, top, .7f), Mathf.Lerp(rim, top, .88f) };
-            f.Add(OnBody, main, HelmShell(h, "cap", ys, null, n, .004f, .003f, null, true, .002f, out var sup, out _, out var apex), I);
+            f.Add(OnBody, main, HelmShell(h, "cap", ys, null, n, .004f, .003f, null, true, .002f, out var sup, out var rings, out var apex), I);
             var bs = Wider(sup[0], sup[1], .0045f);
             f.Add(OnBody, band, HelmShell(h, "cap.band", new[] { rim - h.Y(.002f), rim + h.Y(.012f) }, null, n, 0, .003f, null, false, 0, out _, out _, out _, new[] { bs, bs }), I);
             if (f.v == "flaps") f.Add(OnBody, main, HelmShell(h, "cap.flaps", new[] { h.eyes - .45f * h.H, rim + h.Y(.01f) }, null, n, .006f, .004f, (s, k) => k != 2 && k != 6, false, 0, out _, out _, out _), I);
@@ -208,7 +220,7 @@ namespace Crulanda.Encounter
                 f.Add(OnBody, "green", M.Many("a.cap.sprig", Leaf, M.At(V0, V(0, 0, 0), One), M.At(V0, V(0, 0, 35), V(.8f, .8f, .8f)), M.At(V0, V(0, 0, -35), V(.8f, .8f, .8f))), Fit.At(apex, V(-15, 0, 0), One));
             }
             if (f.tier >= 1 || f.l.extra) f.Add(OnBody, band, Cube, HelmBox(h, apex, 45, new Vector3(.012f, .007f, .012f)));   // the button on top
-            f.Fancy(OnBody, Cube, HelmBar(h, OnFacet(h, sup[0], 0, rim + h.Y(.012f), .001f), apex, FacetUp(0, n), .005f, .003f));   // a raised seam up the front gore
+            if (f.l.extra) Ridge(f, "trim", h, sup, rings, apex, 0, 0, .005f, .003f);   // a raised seam up the front gore
             f.Glow(1, OnBody, Cube, Gem(h, OnFacet(h, bs, 0, rim + h.Y(.005f), .002f), 0, .012f));
             f.Glow(2, OnBody, Cube, Gem(h, apex + V(0, h.Y(.004f), 0), 0, .012f));
             f.Rust(OnBody, OnFacet(h, sup[1], 1, ys[1], .001f), new Vector3(.014f / h.s.x, .01f / h.s.y, .003f / h.s.z), V(0, FacetYaw(1, n), 0));
@@ -227,7 +239,7 @@ namespace Crulanda.Encounter
             float rim = headOutline.eyes + (half ? .17f : .22f) * HeadH;
             float cut = rim + .008f / Mathf.Abs(headFrame.lossyScale.y); CutHair(cut); var h = HelmOn(cut); float top = h.top;
             var ys = new[] { rim, Mathf.Lerp(rim, top, .4f), Mathf.Lerp(rim, top, .7f), Mathf.Lerp(rim, top, .88f) };
-            f.Add(OnBody, main, HelmShell(h, hk, ys, null, n, .006f, .004f, null, true, half ? .005f : .01f, out var sup, out _, out var apex), I);
+            f.Add(OnBody, main, HelmShell(h, hk, ys, null, n, .006f, .004f, null, true, half ? .005f : .01f, out var sup, out var rings, out var apex), I);
             var rs = Wider(sup[0], sup[1], .005f);
             f.Add(OnBody, "trim", HelmShell(h, hk + ".rim", new[] { rim - h.Y(.002f), rim + h.Y(.011f) }, null, n, 0, .003f, null, false, 0, out _, out _, out _, new[] { rs, rs }), I);
             if (!half)
@@ -255,8 +267,7 @@ namespace Crulanda.Encounter
             if (f.tier >= 3)
             {
                 float tall = f.tier >= 4 ? .024f : .014f;
-                f.Add(OnBody, "trim", Cube, HelmBar(h, OnFacet(h, sup[1], 0, ys[1], .001f), apex, FacetUp(0, n), .005f, tall));
-                f.Add(OnBody, "trim", Cube, HelmBar(h, OnFacet(h, sup[1], n / 2, ys[1], .001f), apex, FacetUp(n / 2, n), .005f, tall));
+                Ridge(f, "trim", h, sup, rings, apex, 0, 1, .005f, tall); Ridge(f, "trim", h, sup, rings, apex, n / 2, 1, .005f, tall);
             }
             f.Glow(1, OnBody, Cube, Gem(h, OnFacet(h, rs, 0, rim + h.Y(.0045f), .002f), 0, .012f));
             f.Glow(2, OnBody, Cube, Gem(h, apex + V(0, h.Y(.005f), 0), 0, .013f));
@@ -274,7 +285,7 @@ namespace Crulanda.Encounter
             f.onHead = true; var h = HelmOn(float.NaN); const int n = 12; float e = h.eyes, H = h.H;
             var ys = new[] { e - .85f * H, e - .5f * H, e - .15f * H, e + .15f * H, e + .45f * H, e + .75f * H, e + .9f * H };
             bool Open(int s, int k) { return s <= 1 && k == 0 || s == 2 && (k == 11 || k == 0 || k == 1); }
-            f.Add(OnBody, "plate", HelmShell(h, "barbute", ys, null, n, .007f, .004f, Open, true, .004f, out var sup, out _, out var apex), I);
+            f.Add(OnBody, "plate", HelmShell(h, "barbute", ys, null, n, .007f, .004f, Open, true, .004f, out var sup, out var rings, out var apex), I);
             var g0 = sup[0];
             f.Add(OnBody, f.tier >= 4 ? "plate" : "mail", HelmShell(h, "barbute.gorget", new[] { e - 1.35f * H, e - 1.1f * H, ys[0] + h.Y(.004f) }, null, n, 0, .004f, null, false, 0, out _, out _, out _,
                 new[] { Plus(g0, .03f), Plus(g0, .012f), Plus(g0, .003f) }), I);
@@ -292,8 +303,7 @@ namespace Crulanda.Encounter
             }
             if (f.tier >= 4)
             {
-                f.Add(OnBody, "trim", Cube, HelmBar(h, OnFacet(h, sup[4], 0, ys[4], .001f), apex, FacetUp(0, n), .005f, .02f));
-                f.Add(OnBody, "trim", Cube, HelmBar(h, OnFacet(h, sup[2], n / 2, ys[2], .001f), apex, FacetUp(n / 2, n), .005f, .02f));
+                Ridge(f, "trim", h, sup, rings, apex, 0, 4, .005f, .02f); Ridge(f, "trim", h, sup, rings, apex, n / 2, 2, .005f, .02f);
                 var rivets = new List<Matrix4x4>(); foreach (int k in new[] { 2, 3, 9, 10 }) rivets.Add(HelmBox(h, OnFacet(h, sup[1], k, ys[1], .0015f), FacetYaw(k, n), new Vector3(.006f, .006f, .003f)));
                 f.Add(OnBody, "dark", M.Many("a.barbute.rivets." + h.key, Cube, rivets.ToArray()), I);
             }

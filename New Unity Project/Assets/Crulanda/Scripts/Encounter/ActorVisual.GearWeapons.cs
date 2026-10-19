@@ -25,6 +25,7 @@ namespace Crulanda.Encounter
         void BuildGear(GearLook l, Transform root)
         {
             var k = Kit(l);
+            if (KayKitGear(k, root)) { Finish(k, root); return; }   // a KayKit model where the family has one (ActorVisual.KayKitWeapons.cs); the old drawing otherwise
             switch (l.family)
             {
                 case "sword.short": SwordShort(k, root); break;

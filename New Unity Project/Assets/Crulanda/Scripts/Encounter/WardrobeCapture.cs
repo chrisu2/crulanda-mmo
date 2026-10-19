@@ -22,13 +22,34 @@ namespace Crulanda.Encounter
     /// 13-named-oakhaven-*, 14-named-khaven-*, 15-named-peaks-*, 16-named-ashrim-*, 17-named-verdant-*, 18-named-world-*: every
     /// named item of the loot database (step A3) on its own mannequin at its own level and quality, labelled with its name, quality
     /// and source; each boss's list together, then each set (its other pieces and one figure wearing the whole set), then the
-    /// zone's drop lists, quest rewards and merchants' pieces; the world's drops and the named items already in the game last.
+    /// zone's drop lists, quest rewards and merchants' pieces; the world's drops and the named items already in the game last;
+    /// 19-kaykit-main-*, 19-kaykit-off-*: every weapon and shield that wears a KayKit model (play note 245), and the Ranger's own
+    /// bow, in hand and put away, each from the front and from its own side (held-front, held-side, stowed-front, stowed-side);
+    /// 19-kaykit-palettes: the KayKit arming sword in every palette (its steel and wood tinted). With
+    /// <c>--crulanda-wardrobe-kaykit</c> as well, only the 19 shots are taken.
     /// The session is on the capture's throwaway save (EncounterCapture), so nothing here touches a real character.
     /// </summary>
     public sealed class WardrobeCapture : MonoBehaviour
     {
         public const string Flag = "--crulanda-wardrobe-capture";
         public static bool Requested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), Flag) >= 0; } }
+        /// <summary>Only the KayKit weapons' shots (19-kaykit-*).</summary>
+        public const string KayKitFlag = "--crulanda-wardrobe-kaykit";
+        static bool KayKitOnly { get { return Array.IndexOf(Environment.GetCommandLineArgs(), KayKitFlag) >= 0; } }
+        /// <summary>Every main-hand and off-hand look of the line-up that wears a KayKit model (KayKitWeapons), main hand first.</summary>
+        public static string[] KayKitLooks
+        {
+            get
+            {
+                var list = new List<string>();
+                foreach (var l in MainHandLooks) if (WearsKayKit(l)) list.Add(l);
+                foreach (var l in OffHandLooks) if (WearsKayKit(l)) list.Add(l);
+                return list.ToArray();
+            }
+        }
+        static bool WearsKayKit(string look) { return GearLooks.TryParseLook(look, out var f, out var v, out _, out _) && KayKitWeapons.ModelFor(f, v) != null; }
+        /// <summary>The four views of each KayKit piece: in hand (HoldOverride 1) and put away (2), from the front and from its side.</summary>
+        public static readonly (string name, int hold, bool side)[] KayKitViews = { ("held-front", 1, false), ("held-side", 1, true), ("stowed-front", 2, false), ("stowed-side", 2, true) };
 
         /// <summary>Every main-hand family and variant with the palette its named piece wears (glowing where the named piece does).</summary>
         public static readonly string[] MainHandLooks = {
@@ -101,7 +122,7 @@ namespace Crulanda.Encounter
         {
             public int perRow = PerRow; public float spacing = Spacing, focus = .95f, pitch = 12, margin = 1.2f, label = -1.05f, yaw = 180;
         }
-        sealed class Entry { public string[] ids; public string title, sub; public ActorLook look = ActorLook.Warrior; public ActorPose pose; public bool walk; public int form = -1, hair = -1; public float yaw = float.NaN; }
+        sealed class Entry { public string[] ids; public string title, sub; public ActorLook look = ActorLook.Warrior; public ActorPose pose; public bool walk; public int form = -1, hair = -1, hold; public float yaw = float.NaN; }
         EncounterSession session; ItemDatabase db; GearLooks looks;
         readonly List<GameObject> figures = new List<GameObject>();
         readonly List<(Transform at, string title, string sub)> labels = new List<(Transform, string, string)>();
@@ -120,6 +141,12 @@ namespace Crulanda.Encounter
             var zone = Crulanda.World.ZoneBuilder.Active;
             spot = FindSpot(zone, out ground);
             Debug.Log("Wardrobe capture at " + spot + " (ground " + ground.ToString("0.0") + ").");
+            if (KayKitOnly)
+            {
+                yield return KayKitShots(directory);
+                Clear(); EncounterHud.Hidden = false;
+                Debug.Log("WARDROBE_CAPTURE_DONE"); Application.Quit(0); yield break;
+            }
 
             var weapons = new Framing { yaw = 115 }; var shields = new Framing { yaw = -115 };
             var main = Entries(MainHandLooks, "mainhand"); var off = Entries(OffHandLooks, "offhand");
@@ -173,8 +200,32 @@ namespace Crulanda.Encounter
             var hooded = KitEntry(Martial, 13, 3); hooded.look = ActorLook.Druid; hooded.ids[0] = null; hooded.title = "No helm: her hood"; forms.Add(hooded);
             yield return Shot(Path.Combine(directory, "12-druid-forms.png"), forms, 12, new Framing { perRow = 5, spacing = 1.6f, pitch = 8, margin = .9f, yaw = 160 });
             yield return NamedShots(directory);
+            yield return KayKitShots(directory);
             Clear(); EncounterHud.Hidden = false;
             Debug.Log("WARDROBE_CAPTURE_DONE"); Application.Quit(0);
+        }
+
+        /// <summary>
+        /// Shots 19 (play note 245): every KayKit weapon (and the Ranger's own bow) and every KayKit shield, rare at level 8 so the
+        /// accent shows, in each of the four views: held or put away (HoldOverride, whatever the game would do out of a fight), from
+        /// the front (facing the camera) and from the side its hand is on (a weapon's right, a shield's or bow's left). Then the
+        /// arming sword in every palette, held, to judge the tint.
+        /// </summary>
+        IEnumerator KayKitShots(string directory)
+        {
+            var main = new List<string>(); var off = new List<string>();
+            foreach (var l in KayKitLooks) { GearLooks.TryParseLook(l, out var f, out _, out _, out _); (GearLooks.Family(f).slot == "offhand" ? off : main).Add(l); }
+            foreach (var (part, list, ranger) in new[] { ("main", main, true), ("off", off, false) })
+                foreach (var (view, hold, side) in KayKitViews)
+                {
+                    var row = Entries(list.ToArray(), null, 8);
+                    foreach (var e in row) { db.Items[e.ids[0]].quality = 3; e.hold = hold; e.yaw = !side ? 180 : part == "main" ? 90 : -90; }
+                    if (ranger) row.Add(new Entry { ids = new string[0], look = ActorLook.Ranger, title = "Ranger's own bow", sub = KayKitWeapons.ClassBow, hold = hold, yaw = side ? -90 : 180 });
+                    yield return Shots(directory, "19-kaykit-" + part + "-" + view, row, new Framing(), 12);
+                }
+            var palettes = new List<string>(); foreach (var p in looks.PaletteIds) palettes.Add("sword.arming:straight/" + p);
+            var tinted = Entries(palettes.ToArray(), "mainhand", 8); foreach (var e in tinted) { e.hold = 1; e.yaw = 115; }
+            yield return Shots(directory, "19-kaykit-palettes", tinted, new Framing(), 12);
         }
 
         /// <summary>A list in rows of the framing's width, one shot each: name-a, name-b...</summary>
@@ -435,7 +486,7 @@ namespace Crulanda.Encounter
                 var body = GameObject.CreatePrimitive(PrimitiveType.Capsule); body.name = "Body"; body.transform.SetParent(go.transform, false); Destroy(body.GetComponent<Collider>());
                 var look = ActorVisual.Attach(go, e.look, e.hair >= 0 ? e.hair : i);
                 look.ApplyGearIds(Array.FindAll(e.ids, id => id != null), db, looks);
-                look.Pose = e.pose;
+                look.Pose = e.pose; look.HoldOverride = e.hold;
                 if (e.form >= 0) { body.transform.localScale = DruidKit.FormScale((DruidForm)e.form); look.SetClothColor(DruidKit.FormColor((DruidForm)e.form)); }
                 if (e.walk) walkers.Add((go.transform, at, Vector3.right));
                 figures.Add(go); labels.Add((go.transform, e.title, e.sub));

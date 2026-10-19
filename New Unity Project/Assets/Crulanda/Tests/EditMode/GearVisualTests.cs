@@ -367,7 +367,8 @@ namespace Crulanda.Tests
                         v.ApplyGearIds(new[] { id }, db, looks); built++;
                         var root = v.GearRoot(slot); string what = look + " at quality " + q + ", level " + level;
                         Assert.NotNull(root, what + " shows.");
-                        Assert.That(v.GearParts(slot), Is.InRange(hand ? 2 : 1, 12), what + ": a few parts, at most 12.");
+                        bool kayKit = KayKitWeapons.ModelFor(family.name, variant) != null;   // one model (and its accents), not drawn parts (play note 245)
+                        Assert.That(v.GearParts(slot), Is.InRange(hand && !kayKit ? 2 : 1, 12), what + ": a few parts, at most 12.");
                         if (hand) Assert.AreEqual(v.GearParts(slot), Renderers(v.GearRoot(slot, true)), what + ": the slung copy matches.");
                         var parts = SlotParts(v, slot);
                         int lit = 0; foreach (var r in parts) if (r.sharedMaterial != null && r.sharedMaterial.IsKeywordEnabled("_EMISSION")) lit++;

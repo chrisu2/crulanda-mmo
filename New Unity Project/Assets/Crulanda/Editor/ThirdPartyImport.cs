@@ -24,6 +24,9 @@ namespace Crulanda.EditorTools
             if (!Ours) return;
             var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") ? 1024 : 512; t.mipmapEnabled = true;
             if ((assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Village/")) && assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;   // (ends with: Bark_NormalTree.png and Leaves_NormalTree_C.png are colour)
+            // The KayKit Fantasy Weapons Bits atlas (2026-10-19): swatches of colour, read at run time to tint a weapon's metal and wood to
+            // its palette (ActorVisual.KayKitWeapons.cs), so readable and uncompressed (block compression bleeds one swatch into the next).
+            if (assetPath.Contains("/KayKitWeapons/")) { t.isReadable = true; t.textureCompression = TextureImporterCompression.Uncompressed; }
         }
         void OnPreprocessModel()
         {
@@ -99,7 +102,7 @@ namespace Crulanda.EditorTools
             if (normal != null) { m.SetTexture("_BumpMap", normal); m.EnableKeyword("_NORMALMAP"); }
             m.SetFloat("_Glossiness", n == "MetalOrnaments" ? .4f : .12f); m.SetFloat("_Metallic", n == "MetalOrnaments" ? .5f : 0);
         }
-        public override uint GetVersion() { return 6; }   // 2: the prop kits, 3-5: the nature kit, 6: the village kit (2026-10-07)
+        public override uint GetVersion() { return 7; }   // 2: the prop kits, 3-5: the nature kit, 6: the village kit (2026-10-07), 7: the KayKit weapons atlas (2026-10-19)
 
         public static void Report()
         {

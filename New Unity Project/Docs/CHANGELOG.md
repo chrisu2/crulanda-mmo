@@ -1,5 +1,31 @@
 # Changelog
 
+## 2026-10-19: weapons and shields as KayKit models (branch kaykit-weapons; WRITTEN, NOT RUN)
+- Chris (play note 245): "weapons . KayKit : Fantasy Weapons Bits". The pack (Kay Lousberg, CC0; 31 models, one swatch atlas, the
+  licence) is in Resources/Props/KayKitWeapons, imported as the KayKit dungeon pack is (its Unity FBX, full importer metas). 41 of the
+  70 drawn weapon and shield variants now wear a model: swords (sword_B plain, sword_C slim single-edged for curved and falchions,
+  sword_D cup-hilted for disc and the officer's sabre, sword_E the greatsword, sword_A the wooden greatsword), knives (dagger_A/B),
+  axes (axe_A hand, axe_B crescent, axe_C bearded and cleaver), clubs (hammer_C), the flanged mace (hammer_B), war hammers
+  (hammer_A), spear and harpoon (spear_A), billhook (halberd), staves (staff_A plain, staff_B the crystal one), shields (shield_A
+  buckler, shield_B heater and kite, shield_C round). The Ranger's own bow is the strung KayKit bow. Kept as drawings on purpose (the
+  look is the point, no model is that thing): the glass and sickle knives, the broken sabre, the root and living blades, the root
+  maces, the stone fist, the tusk club and the tankard, the fork and spade, the crook and skull staves, the tusk and chitin bucklers,
+  the cask and pot-lid shields, the glass heater, the leaf shields, the lanterns. The Asset Store model weapons are unchanged.
+- Fit by measuring: each model's grip (the pack's pivot, at the middle of the grip wrap, checked in its glTF) on the hand frame's
+  origin, its length up the forearm's pointing line, its head or edge forward, scaled to the old drawing's length; shields face out
+  from the forearm, top up the arm, handle at the arm; the bow's string toward the body. The put-away copy uses the same fit in the
+  back or hip frame. Colours: the atlas's steel and wood swatches lean to the item's palette metal and wood (bronze palettes give
+  bronze blades); wraps, gems and painted faces keep the pack's colours (`KayKitWeapons.Tint` turns it off if it looks wrong). Rare
+  and epic pieces keep their glowing stones (guard and pommel; a shield's boss), epic ones pulse.
+- `KayKitWeapons`, `ActorVisual.KayKitWeapons.cs`, `KayKitWeaponTests` (every variant mapped or an explicit fallback, every model
+  loads, length within 15%, the fist round the grip within 3 cm, the tint by palette only on steel and wood, the line-up complete);
+  GearVisualTests lets a model piece be one part. Compiles; not run in Unity.
+- To capture (lane B, windowed): `--crulanda-wardrobe-capture <dir> --crulanda-wardrobe-kaykit` takes only the new shots:
+  19-kaykit-main-* and 19-kaykit-off-* (held-front, held-side, stowed-front, stowed-side; the Ranger's bow in the main rows),
+  19-kaykit-palettes (one sword in all ten palettes). Look for: the hand closed round the grip, blades along the forearm and
+  forward, shields flat on the forearm facing out, the bow's string toward the body, the slung copies on the back or at the hip
+  not through the body, the size against the old drawings (shots 01 and 02), and whether the tint looks right.
+
 ## 2026-10-18 17:49 and 18:00: published: group runs hold the level, the drowned vaults' arches (OPEN until Chris checks it)
 - The drowned vaults are built vaults: unbroken stone rib arches, mould on the stones, no cave stalagmites. Group runs give no
   experience. Details: CLAUDE_HANDOFF.md, Start here.

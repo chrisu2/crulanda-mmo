@@ -618,6 +618,8 @@ namespace Crulanda.Encounter
         /// <summary>Whether this figure is in a fight (EncounterSession sets it: an enemy while engaged, anyone else while the player
         /// fights). A tall weapon stays in hand then, running or not.</summary>
         public static System.Func<GameObject, bool> Fighting;
+        /// <summary>The wardrobe line-up's say over what is held: 0 the game's own (out in a fight, put away otherwise), 1 in hand, 2 put away.</summary>
+        public int HoldOverride;
         bool runSlung; Transform[] tallOf; bool tall;
         /// <summary>Whether what is held reaches past 1.3 m (a staff, a polearm) and has a slung copy to go on the back.</summary>
         bool HeldTall()
@@ -647,6 +649,7 @@ namespace Crulanda.Encounter
             // weapon is on the back or at the hip; it comes out when a fight starts, or to cast.
             bool fighting = Fighting != null && Fighting(gameObject);
             bool stow = Pose == ActorPose.Swim || (!fighting && !Casting && !BowBusy && Fighting != null) || runSlung && HeldTall() && !fighting;
+            if (HoldOverride != 0) stow = HoldOverride == 2;
             if (held != null && stow != gearStowed)
             {
                 gearStowed = stow;

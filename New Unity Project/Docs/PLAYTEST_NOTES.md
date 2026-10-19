@@ -928,3 +928,5 @@ un-captures.
   Then (verbatim): "give the pally some hear. he's down again" and "gear" (the Paladin tank to wear full level-20 tank gear).
 - 273 (2026-10-19 ~16:12) "all members should have lvl 20 gear. no need to test the fight if all members are BIS" (the raid's tuning runs
   with all ten in level-20 best-in-slot gear for their part). Then: "or at least good gear" and "that is the point of a raid".
+- 274 (2026-10-19 ~16:15, his screenshot: the dead Paladin on a huge glowing orange disc over the bar; the meter's Ranger at 166/s) "also
+  should not stay on the ground permanently" (OPEN).

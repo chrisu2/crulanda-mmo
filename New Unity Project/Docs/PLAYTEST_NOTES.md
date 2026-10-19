@@ -862,3 +862,6 @@ un-captures.
   Barrel" (Asset Store cache: one FBX BARREL_1, albedo/normal/metallic textures). Every wooden barrel in every zone becomes it.
 - 248 (2026-10-19 ~12:15) "replace all dead trees with this pack in myassets - dry trees" (OPEN): DigitalAntichrist's "Dry Trees"
   (Asset Store cache: 7 FBX Dry3333/4195/4910/5818/6524/7509/8872, one bark material, HDRP demo). Every dead tree/snag becomes one of them.
+- 249 (2026-10-19 ~12:20) "here are some more weapon types in my assets - pbr medievel weapons" (OPEN): Cody Dream Studios' "PBR
+  medieval Weapons" (Asset Store cache: Sword, Axe, Mace, Spear, shield; PBR materials). Added to the KayKit weapons work (branch
+  kaykit-weapons) as more weapon looks.

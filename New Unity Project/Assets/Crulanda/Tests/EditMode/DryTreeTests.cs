@@ -109,13 +109,12 @@ namespace Crulanda.Tests
         {
             Assert.AreEqual(7, ZoneBuilder.DryTrunk.Length);
             int stoutest = System.Array.IndexOf(ZoneBuilder.DryTrunk, ZoneBuilder.DryTrunk.Max());
-            Assert.AreEqual(stoutest, ZoneBuilder.GallowsDryTree, "the gallows is the stoutest tree");
             Assert.AreEqual(3, ZoneBuilder.StoutDryTrees.Distinct().Count()); CollectionAssert.Contains(ZoneBuilder.StoutDryTrees, stoutest);
             foreach (int k in ZoneBuilder.StoutDryTrees) Assert.That(k, Is.InRange(0, 6));
             string src = File.ReadAllText(Path.Combine(Root, "Scripts", "World", "ZoneBuilder.cs"));
             int at = src.IndexOf("void Gallows(Transform t)", System.StringComparison.Ordinal); Assert.Greater(at, 0);
             string body = src.Substring(at, src.IndexOf("\n        }", at, System.StringComparison.Ordinal) - at);
-            StringAssert.Contains("GallowsDryTree, 9, 1.35f", body, "the stoutest tree, 9 m, broadened");
+            StringAssert.Contains("GallowsDryTree, GallowsTall, GallowsBroad", body, "the gallows' own tree, tall and broadened");
             StringAssert.Contains("GallowsLimb(", body, "the crossbeam rests on a limb measured from the mesh");
             StringAssert.Contains("StoutDryTrees[", src, "the massive dead oaks pick from the stout trees");
             // (preview-1019 art2: the rope unseen, the platform off the beam's end.) The noose hangs from the beam's free end, its foot at
@@ -135,6 +134,36 @@ namespace Crulanda.Tests
                 Assert.Greater(g.platform.x - half, .8f, where + ": the boards clear of the trunk");
                 Assert.AreEqual(g.beamFrom.y, g.beamTo.y, 1e-4f, where + ": the beam level, at the limb");
             }
+        }
+
+        /// <summary>Chris, 2026-10-19 on the art2 frame: "tree trunk too low". Every dry tree stands on its trunk's own foot (not a root tip
+        /// under it, nor the bounds of the whole), within 10 cm of the ground; the Gallows Tree shows a clear trunk of over 1.5 m before its
+        /// first fork, and its limb for the beam is above that fork. Loads the pack's models (EditMode).</summary>
+        [Test] public void Every_dry_tree_stands_on_its_trunk_and_the_gallows_shows_its_trunk()
+        {
+            var root = new GameObject("dry trees").transform;
+            try
+            {
+                Assert.LessOrEqual(ZoneBuilder.FootSink(0, 0), .1f, "on the flat a foot sinks a few centimetres");
+                for (int k = 0; k < ZoneBuilder.DryTreeModels.Length; k++)
+                {
+                    var holder = new GameObject("tree " + k).transform; holder.SetParent(root, false);
+                    var go = ZoneBuilder.DryTreeModel(holder, k, Vector3.zero, Quaternion.identity, 8, Color.white); Assert.NotNull(go, ZoneBuilder.DryTreeModels[k]);
+                    var pts = new List<Vector3>(); var to = holder.worldToLocalMatrix; int copies = 0;
+                    foreach (var mf in go.GetComponentsInChildren<MeshFilter>(true)) { copies++; var m = to * mf.transform.localToWorldMatrix; foreach (var v in mf.sharedMesh.vertices) pts.Add(m.MultiplyPoint3x4(v)); }
+                    Assert.AreEqual(1, copies, ZoneBuilder.DryTreeModels[k] + ": only the full-detail tree, no lower copies");
+                    var foot = ZoneBuilder.TrunkFoot(pts);
+                    Assert.That(foot.y, Is.InRange(-.1f, .1f), ZoneBuilder.DryTreeModels[k] + ": the trunk's foot on the ground");
+                    Assert.Less(new Vector2(foot.x, foot.z).magnitude, .1f, ZoneBuilder.DryTreeModels[k] + ": the trunk on the spot (its collider's)");
+                }
+                var g = new GameObject("gallows").transform; g.SetParent(root, false);
+                var tree = ZoneBuilder.DryTreeModel(g, ZoneBuilder.GallowsDryTree, Vector3.zero, Quaternion.identity, ZoneBuilder.GallowsTall, Color.white, ZoneBuilder.GallowsBroad);
+                float fork = ZoneBuilder.DryForkHeight(tree.transform, g, 0);
+                Assert.Greater(fork, 1.5f, "the Gallows Tree's clear trunk below its first fork");
+                Assert.IsTrue(ZoneBuilder.GallowsLimb(tree.transform, g, ZoneBuilder.GallowsTall, out var limb), "a limb for the beam");
+                Assert.Greater(limb.y, fork, "the beam's limb above the fork");
+            }
+            finally { Object.DestroyImmediate(root.gameObject); }
         }
 
         [Test] public void Heights_are_within_the_old_range()

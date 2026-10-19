@@ -25,6 +25,11 @@
   trees (Dry8872, Dry6524, Dry5818), broadened by a third; the grey husks and snags stay as they were (scenery, not landmarks).
   After art2 (the beam read as floating behind the tree, no rope seen): the beam's free end now hangs over the platform's middle,
   a 4 cm rope from it and a noose whose foot is 1.75 m over the boards (GallowsPlan; the test holds the noose over the boards).
+  After Chris on art2 ("tree trunk too low"): Dry8872 forks under half a metre up, so its trunk read as buried. The Gallows Tree
+  is now Dry4910 at 9 m, broadened (a clear trunk of some 2.25 m before its first fork, read from the mesh; its one heavy limb
+  about 4.2 m up carries the beam). Every dry tree now stands on its trunk's own foot (the lowest trunk vertex, not a root tip
+  that dips under it), sunk only to the ground at the trunk's edge plus 5 cm (it sampled twice as far, half a metre on a slope).
+  The test measures the gallows' clear trunk (over 1.5 m) and every tree's foot (within 10 cm of the ground).
   To capture: khaven-03 again, and the Shore's and Oakhaven's dead oaks.
 - **Tests** (DryTreeTests, EditMode, files only): no nature-kit dead tree or painted dead tree is built; every pick is one of the seven;
   the pack's GUIDs and full metas, Built-in materials, no demo files, the texture cap; heights within the old range.

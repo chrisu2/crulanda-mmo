@@ -897,3 +897,5 @@ un-captures.
 - 260 (2026-10-19 ~15:05, watching raid 2) "she needs adds. smaller spiders with the original texture but purple" (OPEN): her brood as
   small spiders, the spider's own texture tinted purple.
 - 261 (2026-10-19 ~15:10, watching raid 2, pull 2; pull 1 had reached her 19%) "wipe but when down too fast when over 75% health" (OPEN).
+- 262 (2026-10-19 ~15:15, watching raid 2) "archivist now doing 80dps" and "shaman healing much lower than others" (Druid 44/s, Cleric 43,
+  Shaman 24) (OPEN).

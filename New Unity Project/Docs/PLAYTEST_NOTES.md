@@ -948,3 +948,4 @@ un-captures.
 - 282 (2026-10-19 ~17:50, watching tune-5; the boss's crown and plate hanging in the air) "i think instead of the mobs floating but them
   on the ground!" and "but make the main spider about 15% bigger" (OPEN). Tune-4 had gone 1 of 10 (a kill at 7:12, wipes at 8-24%).
 - 283 (2026-10-19 ~17:55, watching tune-5) "still not moving out of red...it really looks pink so make it a deeper red" (OPEN).
+- 284 (2026-10-19 ~18:15, tune-6: the spider beside the raid, her claws above their shadows) "still floating a bit" (OPEN).

@@ -858,3 +858,5 @@ un-captures.
   MyDreamGameStudio's pack (Asset Store cache, 839 MB): 10 houses, a tavern, a blacksmith, an animal shed, 21 props, "aged" 2048 textures,
   URP materials (the project is Built-in: rebuild them). The water wheel and windmill stay out (no machines). These go to the Lowtowns
   only (every zone unique).
+- 247 (2026-10-19 ~12:10) "replace all wooden barrels with this in myassets .  simple wood barrel" (OPEN): Kraken XR's "Simple Wood
+  Barrel" (Asset Store cache: one FBX BARREL_1, albedo/normal/metallic textures). Every wooden barrel in every zone becomes it.

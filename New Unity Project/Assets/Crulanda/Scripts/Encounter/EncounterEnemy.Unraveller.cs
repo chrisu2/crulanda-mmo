@@ -124,6 +124,7 @@ namespace Crulanda.Encounter
             v.Health.ApplyDamage(dealt);
             session.FloatText(v.transform.position + Vector3.up * .4f, "Erasing touch −" + dealt, new Color(.62f, .55f, .8f));
             session.SilenceMember(v, T.touchSilence, Unraveller.Name + "'s touch");
+            session.SpikesAt(transform.position);   // where she lands, the spikes, warned (raid 7)
         }
         /// <summary>After her blow on <paramref name="v"/> (her swing): a stack of Unravel; seven and the tank is erased.</summary>
         void RaidSwung(Actor v)

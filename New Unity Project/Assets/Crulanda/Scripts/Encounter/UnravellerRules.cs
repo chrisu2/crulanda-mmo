@@ -43,6 +43,13 @@ namespace Crulanda.Encounter
         /// <summary>Seconds left against the enrage (the feast at 9:00 from the pull).</summary>
         public static float EnrageLeft(float sincePull, UnravellerTuning t) { return Mathf.Max(0, t.enrageSeconds - sincePull); }
         public static bool Feast(float sincePull, UnravellerTuning t) { return sincePull >= t.enrageSeconds; }
+        /// <summary>Whether the ground spikes may burst at <paramref name="spot"/>: never within reach of a held brood (the spikes hurt only the
+        /// raid, and a hold is the raid's to keep; raid 7).</summary>
+        public static bool SpikeSpotClear(Vector2 spot, IList<Vector2> heldBrood, UnravellerTuning t)
+        {
+            if (heldBrood != null) foreach (var h in heldBrood) if (Vector2.Distance(spot, h) < t.spikeRadius + 1.5f) return false;
+            return true;
+        }
         /// <summary>Unmade ground's bite in a second, for one who has stood in it <paramref name="stoodSeconds"/> whole seconds before this
         /// one: 15% of health, 5% more each second stood (raid 4). Under the 60% cap.</summary>
         public static float GroundBite(int stoodSeconds, UnravellerTuning t) { return Mathf.Min(EncounterEnemy.MaxBlowShare, t.unmadeShare + t.unmadeRamp * Mathf.Max(0, stoodSeconds)); }

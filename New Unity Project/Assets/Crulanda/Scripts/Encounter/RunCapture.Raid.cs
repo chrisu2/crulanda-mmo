@@ -124,7 +124,7 @@ namespace Crulanda.Encounter
                 float took = Time.time - start;
                 if (won) { wins++; killTime += took; }
                 string end = won ? "KILL in " + Clock(took) : ended ? "WIPE at " + Clock(took) + " (her at " + Mathf.RoundToInt(lastRatio * 100) + "%" + (s.Feasts > 0 ? ", the feast" : "") + ")" : "CALLED at " + Clock(took) + " (stuck)";
-                string counts = "brood " + s.BroodRisen + " (killed " + s.BroodKilled + ", broke free of their holds " + s.BroodBrokeFree + ", eaten " + s.BroodEaten + "), swallowed freed " + s.SwallowsFreed + " erased " + s.SwallowsErased + ", hunts missed " + s.HuntsMissed + " landed " + s.HuntsLanded + ", harpoons " + s.HarpoonsThrown + ", salts " + s.SaltsThrown + ", pulses " + s.Pulses;
+                string counts = "brood " + s.BroodRisen + " (killed " + s.BroodKilled + ", broke free of their holds " + s.BroodBrokeFree + ", eaten " + s.BroodEaten + "), swallowed freed " + s.SwallowsFreed + " erased " + s.SwallowsErased + ", hunts missed " + s.HuntsMissed + " landed " + s.HuntsLanded + ", harpoons " + s.HarpoonsThrown + ", salts " + s.SaltsThrown + ", pulses " + s.Pulses + ", spike bursts " + s.SpikeBursts + " (hit " + s.SpikeHits + ")";
                 Log("Pull " + pull + ": " + end + "; " + counts + (firstDeath != null ? "; first death: " + firstDeath.Trim() : ""));
                 lines.Add("Pull " + pull + ": " + end + "; deaths " + dead.Count + "; " + counts);
                 Shot(s, directory, "pull" + pull + "-end-" + (won ? "kill" : "wipe"), ref shots, null);

@@ -26,7 +26,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(File.Exists(File_), "the data file");
             var t = UnravellerTuning.Parse(File.ReadAllText(File_));
             var d = new UnravellerTuning();
-            Assert.AreEqual(d.health, t.health); Assert.AreEqual(185000, t.health, "raid 6: the raid buffed before each pull");
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(190000, t.health, "raid 7: extremely hard but not impossible");
             Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
             Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
@@ -126,7 +126,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(.15f, UnravellerRules.GroundBite(0, t), 1e-4f, "15% the first second (raid 4: 10% was too little)");
             Assert.AreEqual(.25f, UnravellerRules.GroundBite(2, t), 1e-4f, "5% more each second stood");
             Assert.AreEqual(EncounterEnemy.MaxBlowShare, UnravellerRules.GroundBite(20, t), 1e-4f, "never past the 60% cap");
-            Assert.AreEqual(4, t.broodCount, "four brood a wave (Chris after raid 6: \"ok maybe 5 is too many. drop to 4\"; raid 4: \"more brood per wave\")");
+            Assert.AreEqual(3, t.broodCount, "three brood a wave (Chris, raid 7: \"mare down to 3 spiders per add\"; before: \"ok maybe 5 is too many. drop to 4\")");
         }
 
         [Test] public void A_salted_brood_shatters_at_three_times_and_one_that_reaches_her_is_eaten()
@@ -234,6 +234,18 @@ namespace Crulanda.Tests
             Assert.That(BossBuffs.Edge(body, on, Crulanda.Core.StatType.Stamina, 20), Is.InRange(.03f, BossBuffs.MaxEdge), "its health share at 20");
             Assert.That(BossBuffs.Edge(body, on, Crulanda.Core.StatType.Spirit, 20), Is.LessThanOrEqualTo(BossBuffs.MaxEdge), "its mend share at 20");
             Assert.IsTrue(FoodModels.Dishes.ContainsKey(pot.id), "a pot on a board in the world (FoodModels)");
+        }
+
+        [Test] public void The_ground_spikes_are_warned_and_never_burst_on_a_held_brood()
+        {
+            var t = T;
+            Assert.That(t.spikeWarn, Is.InRange(1f, 2f), "a crack shown about 1.5 s before (raid 7: \"a sign or warning\")");
+            Assert.That(t.spikeShare, Is.InRange(.25f, .3f), "a solid hit, 25-30%"); Assert.Less(t.spikeShare, EncounterEnemy.MaxBlowShare);
+            Assert.AreEqual(5, t.spikeEveryMin); Assert.AreEqual(7, t.spikeEveryMax);
+            var held = new List<Vector2> { new Vector2(10, 0) };
+            Assert.IsFalse(UnravellerRules.SpikeSpotClear(new Vector2(11, 1), held, t), "not on a held brood (its hold kept)");
+            Assert.IsTrue(UnravellerRules.SpikeSpotClear(new Vector2(0, 0), held, t));
+            Assert.IsTrue(UnravellerRules.SpikeSpotClear(new Vector2(0, 0), null, t));
         }
 
         [Test] public void A_rotation_goes_round_passing_over_those_who_cannot()

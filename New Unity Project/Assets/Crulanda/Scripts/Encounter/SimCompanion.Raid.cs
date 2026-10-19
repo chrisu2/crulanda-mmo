@@ -194,7 +194,7 @@ namespace Crulanda.Encounter
         {
             var e = session.UnravellerFighting; if (e == null) return null;
             bool holds = e.Victim == actor;
-            if (Role == PartyRole.Tank && (holds || TauntsHer(e))) return e;   // holding her, or the one to take her back (a swap, a blink onto a caster)
+            if (Role == PartyRole.Tank && (holds || TauntsHer(e) && !(session.BroodKill != null && session.BroodKill.actor.IsAlive && e.Victim != null && session.IsRaidTank(e.Victim)))) return e;   // holding her, or the one to take her back (a swap, a blink onto a caster); while a wave is up and a tank has her, the off-tank stays on the brood (raid 6)
             int party = session.InRaid ? session.Raid.PartyOf(sim.id) : 0;
             if (!RaidJobs.TakesBrood(Role, party, holds, Melee)) return null;
             // The kill order's Skull (raid 5): only it; a blow on another held one would break it. Chris: "if all is cc'd then the tank still needs
@@ -205,7 +205,9 @@ namespace Crulanda.Encounter
             {
                 if (Role == PartyRole.Tank) return skull;
                 var ot = session.OffTank;
-                if (skull.Incapacitated && ot != null && ot != this && ot.actor.IsAlive && Vector3.Distance(ot.transform.position, skull.transform.position) > 6) return e;   // wait for the tank to grab it
+                // Wait for the tank only while it is on its way to the Skull (raid 6: the off-tank went back to her, and the damage-dealers waited
+                // on her for good: six brood killed of thirty).
+                if (skull.Incapacitated && ot != null && ot != this && ot.actor.IsAlive && ot.Quarry == skull && Vector3.Distance(ot.transform.position, skull.transform.position) > 6) return e;
                 return skull;
             }
             EncounterEnemy best = null; float bestD = 40;

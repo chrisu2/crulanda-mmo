@@ -81,14 +81,14 @@ namespace Crulanda.Encounter
             if (Unwriter(sim))
             {
                 var q = Quarry;
-                if (q != null && q.actor.IsAlive && Time.time >= nextUnwrite && Vector3.Distance(q.transform.position, transform.position) <= 30)
+                if (q != null && q.actor.IsAlive && !q.LeaveAlone && Time.time >= nextUnwrite && Vector3.Distance(q.transform.position, transform.position) <= 30)
                 {
                     nextUnwrite = Time.time + 12; unwriting = q; unwriteLeft = 6; unwriteNext = Time.time + 2; Unwrites++;
                     session.FloatText(q.transform.position + Vector3.up * 1.8f, "Unwritten", new Color(.62f, .58f, .7f));
                 }
                 if (unwriting != null && Time.time >= unwriteNext)
                 {
-                    if (!unwriting.actor.IsAlive || unwriteLeft <= 0) unwriting = null;
+                    if (!unwriting.actor.IsAlive || unwriteLeft <= 0 || unwriting.LeaveAlone) unwriting = null;   // a held one is not unwritten on: each tick a blow that breaks the hold (raid 6)
                     else { unwriteNext = Time.time + 2; unwriteLeft--; unwriting.Receive(Mathf.Max(2, Hit / 3), actor); }
                 }
             }

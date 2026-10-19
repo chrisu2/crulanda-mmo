@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     public sealed class UnravellerTuning
     {
         // ---------- her, and the clock ----------
-        public int health = 185000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
+        public int health = 190000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
         // ---------- the rules that hold all fight (3.3): the Weave-Eaters' own, scaled ----------
         public float lighthouseShare = .1f, lighthouseBeat = 2, lighthouseReach = 30;
         public float blinkEvery = 9, blinkReach = 12, touchShare = .6f, touchSilence = 3, wardReach = 10;
@@ -27,7 +27,7 @@ namespace Crulanda.Encounter
         // ---------- phase 2 ----------
         /// <summary>The brood's wait in each phase; in phase 1 none (0) as the doc has it: the fight's first two minutes are the pins, the
         /// Feeding and the swap. A step-6 knob if phase 1 wants adds (play note 260, "she needs adds").</summary>
-        public float broodEvery1 = 0, broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 5, broodLevel = 22;
+        public float broodEvery1 = 0, broodEvery2 = 30, broodEvery3 = 40; public int broodCount = 3, broodLevel = 22;
         /// <summary>A control class's hold on a brood (raid 4): its seconds and its wait before the next.</summary>
         public float broodHoldSeconds = 18, broodHoldEvery = 15;
         public float broodHealthShare = .3f, broodSalt = 4, shatter = 3, broodEatenReach = 2.5f, broodEatenHeal = .01f, broodEatenGrow = .05f;
@@ -37,6 +37,10 @@ namespace Crulanda.Encounter
         // ---------- phase 3 ----------
         public float pulseEvery = 3, pulseStart = .02f, pulseGrow = .0012f;
         public float huntEvery = 20, huntWarn = 3, huntRadius = 5, huntShare = .8f, missStun = 2;
+        // ---------- the ground spikes (raid 7, Chris: "a sign or warning where the spikes will pop before hand if they do damage") ----------
+        /// <summary>Every spikeEveryMin-Max s her shards burst out of the ground at two spots (one where one of the raid stands, one at her edge),
+        /// a violet crack shown spikeWarn s before; spikeShare of the health of anyone within spikeRadius, thrown up (stunned) spikeLift s.</summary>
+        public float spikeEveryMin = 5, spikeEveryMax = 7, spikeWarn = 1.5f, spikeRadius = 2.2f, spikeShare = .27f, spikeLift = .6f;
         // ---------- the sims (3.5) ----------
         public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;
         /// <summary>The chance a sim misses its part of a mechanic now and then: at 18, at 20, and what a careless one (rash: nerve over .75) adds.</summary>

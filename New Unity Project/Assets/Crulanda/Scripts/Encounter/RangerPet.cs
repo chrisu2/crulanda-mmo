@@ -181,6 +181,7 @@ namespace Crulanda.Encounter
                 if (stuck && NavMesh.SamplePosition(player.transform.position - player.transform.forward * 2, out var near, 12, NavMesh.AllAreas)) agent.Warp(near.position);
             }
             if (!agent.isOnNavMesh) return;
+            if (Quarry != null && Quarry.Brood && Quarry.LeaveAlone) { Quarry = null; fury = 1; }   // a held brood is not bitten: the bite breaks the raid's hold (raid 6)
             if (Quarry != null)
             {
                 float reach = Vector3.Distance(transform.position, Quarry.transform.position);

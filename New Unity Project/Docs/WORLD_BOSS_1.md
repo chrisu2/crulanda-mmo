@@ -690,6 +690,26 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      buffs' 15%). A cook in the raid sets it down at the buff-up; with none carried, the sim with the most coin buys one of Mother Sall at the
      Rusty Spoon. A party's feast buff-up never takes it. Its icon is a recoloured stew's, to be painted.
    - **Her health 185,000** (170,000), for the buffs (up to 15% on a blow, some health).
+   **Raid 6 read, raid 7's changes (2026-10-19; WRITTEN, NOT RUN again).** Chris, verbatim: "mare down to 3 spiders per add"; "i guess
+   there needs to be a sign or warning where the spikes will pop before hand if they do damage" (then "Yes, with a warning (Recommended)");
+   and the new target, **"i want it extremely hard but not impossible"** (2026-10-19): a disciplined raid (holds kept, adds killed in order,
+   spikes and grey ground dodged, swaps and harpoons on time) wins about **1 in 4 (25-35%)**, killing her in the last minute before the 9:00
+   feast; any sloppiness wipes; never 0% across ten seeds. This replaces the 1-in-2 of Chris's answer 2.
+   - **Raid 6** (four pulls, all wipes at 4:10-4:30 with her at 66-70%; brood 30 a pull: killed 6-9, broke free of their holds 38-64,
+     eaten 4-9). Why: the holds were broken by the raid's own blows: the Archivist's unwrite kept ticking on a brood after it was held, the
+     Ranger's wolf kept biting a held brood, and a re-hold within 18 s lasted half as long and a third not at all (the diminishing returns);
+     and the damage-dealers waited on her for the off-tank to grab a held Skull while the off-tank had gone back to her (she blinked onto a
+     caster and it was the tank to take her back), so few were killed and the waves piled up (brood up 10-17).
+   - **Fixed:** no unwrite on a held one; no pet bite on a held brood; her brood take a hold again and again at full length (no
+     diminishing returns on their holds); the off-tank stays on the brood while a wave is up and a tank has her; the damage-dealers wait for
+     the off-tank only while it is on its way to the Skull, else they open it themselves. Three a wave (Chris). At about 3,150 health a wave
+     and five damage-dealers on one at a time, a disciplined raid clears a wave in about 15-20 s.
+   - **The ground spikes are a hazard now:** every 5-7 s a violet crack (a ground mark, the sims step out of it as of any) shows at two
+     spots, where one of the raid stands and at her edge, 1.5 s before the shards burst there: 27% of health and thrown up (stunned) 0.6 s.
+     Her blink's landing gets the same warning. They never burst on a held brood and hurt only the raid (the brood's holds are the raid's to
+     keep). Out of her fight the shards erupt as before, for the look.
+   - **Toward one in four:** her health 190,000 (185,000) with three a wave, the buffs, the feast and the spikes in. The run's log now counts
+     spike bursts and hits.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

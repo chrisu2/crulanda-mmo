@@ -92,13 +92,77 @@ namespace Crulanda.Encounter
             RaidBossPinned = e.PinLeft; RaidBossEnrage = UnravellerRules.EnrageLeft(e.SincePull, t);
             if (e.PinLeft <= 0) { if (pinFreeSince < 0) pinFreeSince = now; else if (now - pinFreeSince > 1.5f && HarpoonRotation != null && HarpoonRotation.Current(HarpoonAble) == RaidGroup.You) { HarpoonRotation.Skip(); pinFreeSince = now; } }
             else pinFreeSince = -1;
+            TickSpikes(e, now);
             if (!feasted && UnravellerRules.Feast(e.SincePull, t)) Feast(e);
+        }
+        // ---------- the ground spikes (raid 7): warned, then they burst ----------
+        readonly List<(Vector3 at, BlowMark mark)> spikeSpots = new List<(Vector3, BlowMark)>();
+        float spikeAt = -1, nextSpike;
+        public int SpikeBursts, SpikeHits;
+        VoidWrap WrapOf(EncounterEnemy e) { var b = e != null ? e.GetComponent<UnravellerBody>() : null; return b != null ? b.Wrap : null; }
+        void TickSpikes(EncounterEnemy e, float now)
+        {
+            var t = UT; var wrap = WrapOf(e); if (wrap != null) wrap.AutoErupt = false;
+            if (spikeAt < 0 && now >= nextSpike) BeginSpikes(e, SpikeSpots(e));
+            if (spikeAt < 0) return;
+            foreach (var s in spikeSpots) if (s.mark != null) s.mark.Show(s.at, t.spikeRadius, Mathf.Clamp01(1 - (spikeAt - now) / Mathf.Max(.01f, t.spikeWarn)));
+            if (now < spikeAt) return;
+            // They burst: the shards out of the ground there, and whoever of the raid stands in a crack is struck and thrown up.
+            var spots = spikeSpots.Select(s => s.at).ToList(); SpikeBursts++;
+            if (wrap != null) wrap.EruptAt(spots, t.spikeRadius);
+            foreach (var a in PartyActors().ToArray())
+            {
+                if (a == null || !a.IsAlive || a == SwallowedActor) continue;
+                bool hit = false; foreach (var p in spots) if (Flat(a.transform.position - Vector3.up - p) <= t.spikeRadius && Mathf.Abs(a.transform.position.y - 1 - p.y) < GroundMarks.Height) hit = true;
+                if (!hit) continue;
+                SpikeHits++; Hurt(a, t.spikeShare, Unraveller.SpikesName, false);
+                if (a == Player) StunPlayer(t.spikeLift, Unraveller.SpikesThrown); else a.GetComponent<SimCompanion>()?.HoldUntil("stun", t.spikeLift, a.transform.position);
+            }
+            foreach (var s in spikeSpots) if (s.mark != null) Destroy(s.mark.gameObject);
+            spikeSpots.Clear(); spikeAt = -1;
+            nextSpike = now + Random.Range(t.spikeEveryMin, t.spikeEveryMax);
+        }
+        /// <summary>The spikes' two spots: where one of the raid stands (not the swallowed), and a point at her edge; never by a held brood.</summary>
+        List<Vector3> SpikeSpots(EncounterEnemy e)
+        {
+            var t = UT; var spots = new List<Vector3>();
+            var held = BroodNow.Where(b => b != null && b.actor.IsAlive && b.Incapacitated).Select(b => new Vector2(b.transform.position.x, b.transform.position.z)).ToList();
+            var near = PartyActors().Where(a => a != null && a.IsAlive && a != SwallowedActor && Vector3.Distance(a.transform.position, e.transform.position) < 30).ToList();
+            for (int k = 0; k < 6 && near.Count > 0; k++)
+            {
+                var p = near[Random.Range(0, near.Count)].transform.position - Vector3.up;
+                if (UnravellerRules.SpikeSpotClear(new Vector2(p.x, p.z), held, t)) { spots.Add(p); break; }
+            }
+            for (int k = 0; k < 6; k++)
+            {
+                var p = e.transform.position + Quaternion.Euler(0, Random.Range(0f, 360f), 0) * Vector3.forward * (e.BodyRadius + 1.5f);
+                if (NavMesh.SamplePosition(p, out var hit, 2, NavMesh.AllAreas)) p = hit.position;
+                if (UnravellerRules.SpikeSpotClear(new Vector2(p.x, p.z), held, t)) { spots.Add(p); break; }
+            }
+            return spots;
+        }
+        void BeginSpikes(EncounterEnemy e, List<Vector3> spots)
+        {
+            if (spots.Count == 0) { nextSpike = Time.time + 1; return; }
+            foreach (var p in spots) { var m = BlowMark.Create(); m.Show(p, UT.spikeRadius, 0); spikeSpots.Add((p, m)); }
+            spikeAt = Time.time + UT.spikeWarn;
+            if (Player != null && spots.Exists(p => Flat(Player.transform.position - Vector3.up - p) <= UT.spikeRadius + .5f)) RaidWarning(Unraveller.SpikesWarning);
+        }
+        /// <summary>Where her blink lands: the spikes there too, warned as ever (raid 7).</summary>
+        public void SpikesAt(Vector3 at)
+        {
+            if (UnravellerFighting == null) return;
+            if (NavMesh.SamplePosition(at, out var hit, 3, NavMesh.AllAreas)) at = hit.position;
+            var held = BroodNow.Where(b => b != null && b.actor.IsAlive && b.Incapacitated).Select(b => new Vector2(b.transform.position.x, b.transform.position.z)).ToList();
+            if (!UnravellerRules.SpikeSpotClear(new Vector2(at.x, at.z), held, UT)) return;
+            if (spikeAt < 0) BeginSpikes(UnravellerFighting, new List<Vector3> { at });
+            else { var m = BlowMark.Create(); m.Show(at, UT.spikeRadius, 0); spikeSpots.Add((at, m)); }
         }
         /// <summary>The pull: the clock begins, the rotations are set, her track comes up.</summary>
         void BeginUnravellerFight(EncounterEnemy e)
         {
-            float now = Time.time; e.PullAt = now; e.RaidPhase = 0; feasted = false; nextBrood = now + Mathf.Max(10, UT.broodEvery1);   // phase-1 adds (off by default)
-            BroodKilled = BroodBrokeFree = BroodRisen = BroodEaten = SwallowsFreed = SwallowsErased = HuntsMissed = HuntsLanded = Pulses = Feasts = HarpoonsThrown = SaltsThrown = 0;
+            float now = Time.time; e.PullAt = now; e.RaidPhase = 0; feasted = false; nextSpike = now + Random.Range(UT.spikeEveryMin, UT.spikeEveryMax); nextBrood = now + Mathf.Max(10, UT.broodEvery1);   // phase-1 adds (off by default)
+            SpikeBursts = SpikeHits = BroodKilled = BroodBrokeFree = BroodRisen = BroodEaten = SwallowsFreed = SwallowsErased = HuntsMissed = HuntsLanded = Pulses = Feasts = HarpoonsThrown = SaltsThrown = 0;
             SetRotations();
             if (Unraveller.FightTrackReady) Crulanda.World.ZoneMusic.FightOverride = Unraveller.FightTrack;
             if (HarpoonRotation != null && HarpoonRotation.Order.Count > 0) Message("Harpoons, in turn: " + string.Join(", ", HarpoonRotation.Order.Select(NameOfRaidId)) + ". Interrupts on the Feeding: " + (InterruptRotation != null && InterruptRotation.Order.Count > 0 ? string.Join(", ", InterruptRotation.Order.Select(NameOfRaidId)) : "nobody") + ".");
@@ -110,6 +174,9 @@ namespace Crulanda.Encounter
             BroodNow.Clear(); BroodKill = null; broodWas.Clear();
             foreach (var u in unmade) if (u.mark != null) Destroy(u.mark.gameObject);
             unmade.Clear(); groundSeconds.Clear();
+            foreach (var s in spikeSpots) if (s.mark != null) Destroy(s.mark.gameObject);
+            spikeSpots.Clear(); spikeAt = -1; nextSpike = 0;
+            var wrap = WrapOf(e); if (wrap != null) wrap.AutoErupt = true;
             if (SwallowedActor != null) Spit(e, SwallowedActor);
             Swallow.End(); SwallowedActor = null; SaltCall.Clear();
             HuntedActor = null; huntAt = -1; if (huntMark != null) huntMark.Hide();

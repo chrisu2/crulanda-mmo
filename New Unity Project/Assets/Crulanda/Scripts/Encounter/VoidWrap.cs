@@ -39,6 +39,23 @@ namespace Crulanda.Encounter
         /// <summary>The shards are out of the ground now.</summary>
         public bool Erupting { get { return Time.time - eruptFrom < Rise + Stand + Sink; } }
         public int Eruptions { get; private set; }
+        /// <summary>Erupting on its own timer (out of a fight); off while the session runs the spikes as a hazard (EncounterSession.UnravellerFight).</summary>
+        public bool AutoErupt = true;
+        /// <summary>The shards burst out of the ground at <paramref name="spots"/> (world points), spread within <paramref name="radius"/> of each.</summary>
+        public void EruptAt(IList<Vector3> spots, float radius)
+        {
+            if (spots == null || spots.Count == 0) { Erupt(false); return; }
+            Erupt(false);
+            for (int i = 0; i < shards.Count; i++)
+            {
+                var s = shards[i]; var c = spots[i % spots.Count];
+                var off = Quaternion.Euler(0, (float)placeRng.NextDouble() * 360, 0) * Vector3.forward * (radius * .8f * (float)placeRng.NextDouble());
+                var local = shardRoot.InverseTransformPoint(c + off); local.y = Mathf.Max(local.y, -.2f);
+                s.t.localPosition = local;
+                var rest = Quaternion.Euler(0, (float)placeRng.NextDouble() * 360, 0) * Quaternion.Euler(10 + 25 * (float)placeRng.NextDouble(), 0, 0);
+                shards[i] = (s.t, rest, s.scale, s.seed, s.rim, s.core);
+            }
+        }
         System.Random placeRng; readonly List<(Transform t, float until)> ghosts = new List<(Transform, float)>();
         /// <summary>How many shards it is made of (the tests).</summary>
         public int ShardCount { get { return shards.Count; } }
@@ -131,7 +148,7 @@ namespace Crulanda.Encounter
             }
             if (crystal) return;
             // The eruption: up out of the ground, a moment, and down again; then nothing till the next.
-            if (t >= nextErupt && !Erupting) Erupt(false);
+            if (AutoErupt && t >= nextErupt && !Erupting) Erupt(false);
             float f = t - eruptFrom, rise = f < 0 ? 0 : f < Rise ? f / Rise : f < Rise + Stand ? 1 : f < Rise + Stand + Sink ? 1 - (f - Rise - Stand) / Sink : 0;
             rise = Mathf.SmoothStep(0, 1, rise);
             if (shardRoot.gameObject.activeSelf != rise > 0) shardRoot.gameObject.SetActive(rise > 0);
@@ -173,7 +190,7 @@ namespace Crulanda.Encounter
         void Afterimage(Vector3 from)
         {
             Jerks++; squashUntil = Time.time + .1f;
-            Erupt(true);   // the jerk: the shards burst out where it lands, and their afterimage hangs where it was
+            if (AutoErupt) Erupt(true);   // the jerk: the shards burst out where it lands (in her fight the session warns it first)
             var ghost = Instantiate(shardRoot.gameObject, shardRoot.position - transform.position + from, shardRoot.rotation).transform;
             ghost.name = "Void afterimage"; ghost.localScale = Vector3.one;
             ghosts.Add((ghost, Time.time + .35f));

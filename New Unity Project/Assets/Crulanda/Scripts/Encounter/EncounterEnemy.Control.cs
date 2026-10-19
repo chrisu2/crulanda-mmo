@@ -75,7 +75,7 @@ namespace Crulanda.Encounter
             if (RaidBoss && kind == "silence" && InterruptImmune) { session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }
             bool wasFeeding = Feeding;
             if (Elite && kind != "silence") { if (!OnceAFight(kind, ref seconds)) return "Immune (once a fight)"; }   // Chris's rule (CC_DESIGN.md); an interrupt is not a hold
-            else if (!(RaidBoss && kind == "silence"))   // her interrupts are her own 10 s immunity's (InterruptImmune), not the diminishing returns
+            else if (!(RaidBoss && kind == "silence") && !(Brood && kind == "incap"))   // her brood: held again and again (raid 6: the diminishing returns made a re-hold 9 s, then none)   // her interrupts are her own 10 s immunity's (InterruptImmune), not the diminishing returns
             {
                 var d = diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow ? (Time.time, was.n + 1) : (Time.time, 0);
                 if (d.Item2 >= 2) { diminish[kind] = (was.at, was.n); session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }

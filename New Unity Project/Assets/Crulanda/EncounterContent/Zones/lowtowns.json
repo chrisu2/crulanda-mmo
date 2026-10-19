@@ -89,6 +89,19 @@
         "y": -269
       },
       "radius": 5
+    },
+    {
+      "to": "zone.forge",
+      "name": "East through the Forge District Gate",
+      "at": {
+        "x": 198,
+        "y": 0
+      },
+      "arrive": {
+        "x": -162,
+        "y": 0
+      },
+      "radius": 5
     }
   ],
   "roads": [
@@ -1007,13 +1020,13 @@
     },
     {
       "name": "The Forge District Gate",
-      "text": "Shut, barred from the far side. Smoke rolls over the wall from the chimney stacks beyond.",
+      "text": "Open by day now, its leaves back against the wall. Smoke rolls over it from the chimney stacks beyond, and the Copper-Tithe count who goes through.",
       "at": {
         "x": 203,
         "y": 0
       },
       "radius": 10,
-      "canonStatus": "CANON: the Forge District's walls (book1 ch.3:5); the gate shut until that zone opens (GAME-ONLY)",
+      "canonStatus": "CANON: the Forge District's walls (book1 ch.3:5); the gate open onto the Forge District zone (2026-10-19) GAME-ONLY",
       "view": {
         "x": 180,
         "y": 0
@@ -1084,7 +1097,7 @@
         "x": 480,
         "y": 14
       },
-      "variant": 2
+      "variant": 1
     },
     {
       "kind": "chimney_stack",
@@ -2457,7 +2470,7 @@
     },
     {
       "kind": "signpost",
-      "name": "The Forge District (shut)",
+      "name": "The Forge District (19-22)",
       "at": {
         "x": 192,
         "y": 8

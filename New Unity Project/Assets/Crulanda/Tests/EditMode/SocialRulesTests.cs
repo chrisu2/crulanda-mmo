@@ -61,12 +61,15 @@ namespace Crulanda.Tests
             { "roadcaptain", SocialKind.Call }, { "spansergeant", SocialKind.Call }, { "assessor", SocialKind.Call }, { "pickermaster", SocialKind.Call }, { "loftwatch", SocialKind.Call },
             { "firstcut", SocialKind.Call }, { "registrar", SocialKind.Call }, { "pactcaptain", SocialKind.Call }, { "examiner", SocialKind.Call },
             { "oldram", SocialKind.Solitary }, { "greycarter", SocialKind.Solitary }, { "fallenmason", SocialKind.Solitary }, { "lamplighter", SocialKind.Solitary },
-            { "longshadow", SocialKind.Solitary }, { "reader", SocialKind.Solitary }
+            { "longshadow", SocialKind.Solitary }, { "reader", SocialKind.Solitary },
+            // The Forge District (Docs/ZONE_FORGE_DISTRICT.md, 2026-10-19): the slag-hounds pack, the Blacklegs call (people); the rare Old
+            // Clinker and the Spoke-Leech keep to themselves (their data says solitary). The overseers, the Iron Pact and the Weave-Eaters are above.
+            { "slaghound", SocialKind.Pack }, { "blackleg", SocialKind.Call }, { "clinker", SocialKind.Solitary }, { "spokeleech", SocialKind.Solitary }
         };
 
         [Test] public void Every_camp_in_the_five_zones_has_a_sensible_kind()
         {
-            Assert.AreEqual(8, zones.Count(z => !z.city), "Five zones, the Sealed Adit, the Lowtowns (Phase 9.1) and Hallow's Creek (and the Crown, a city with no camps).");
+            Assert.AreEqual(9, zones.Count(z => !z.city), "Five zones, the Sealed Adit, the Lowtowns (Phase 9.1), Hallow's Creek, the Forge District (and the Crown, a city with no camps).");
             int camps = 0;
             foreach (var (zone, camp, _) in Camps())
             {

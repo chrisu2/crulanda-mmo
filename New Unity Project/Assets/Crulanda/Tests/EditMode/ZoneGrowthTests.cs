@@ -26,7 +26,7 @@ namespace Crulanda.Tests
     /// </summary>
     public class ZoneGrowthTests
     {
-        static readonly string[] Files = { "oakhaven", "khaven", "peaks", "ashrim", "verdant", "adit", "lowtowns", "hallows" };
+        static readonly string[] Files = { "oakhaven", "khaven", "peaks", "ashrim", "verdant", "adit", "lowtowns", "hallows", "forge" };   // the Forge District (2026-10-19)
         static string Read(string folder, string file) { return File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/" + folder + "/" + file + ".json")); }
         static ZoneDefinition Zone(string file) { return JsonUtility.FromJson<ZoneDefinition>(Read("Zones", file)); }
         static float Cheb(Vector2 p) { return Mathf.Max(Mathf.Abs(p.x), Mathf.Abs(p.y)); }
@@ -130,7 +130,8 @@ namespace Crulanda.Tests
                     // Oakhaven's road up to the Crown leads out of these files (a city of 320 m: CrownZoneTests has its exit and arrival).
                     var to = zones.SingleOrDefault(t => t.id == e.to); if (to == null && e.to == "zone.crown") continue;
                     Assert.IsNotNull(to, name + " leads to " + e.to + ", a zone of this test's files.");
-                    if (!to.dungeon && (Cheb(e.at) < half - 12 || Cheb(e.at) > half - 5)) problems.Add(name + " at " + e.at + " is not at the edge");   // a dungeon's door stands where it is dug
+                    bool districtGate = z.id == "zone.lowtowns" && e.to == "zone.forge";   // the Forge District Gate stands in the district's wall, 37 m in from the Lowtowns' edge (ZONE_LOWTOWNS.md)
+                    if (!to.dungeon && !districtGate && (Cheb(e.at) < half - 12 || Cheb(e.at) > half - 5)) problems.Add(name + " at " + e.at + " is not at the edge");   // a dungeon's door stands where it is dug
                     if (!z.roads.Any(r => ToPath(e.at, r.points) < r.width / 2)) problems.Add(name + " at " + e.at + " is off its road");
                     if (!to.roads.Any(r => ToPath(e.arrive, r.points) < r.width / 2)) problems.Add(name + ": the arrival at " + e.arrive + " is off the road");
                     if (!to.exits.Any(back => back.to == z.id && Vector2.Distance(back.at, e.arrive) < 15 && Vector2.Distance(back.at, e.arrive) > back.radius + 1))

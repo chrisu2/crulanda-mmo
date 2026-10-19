@@ -64,7 +64,8 @@ namespace Crulanda.Tests
             Assert.AreEqual("inn", z.props.Single(p => p.name == "The Rusty Spoon").kind, "The Spoon is walked into.");
             Assert.AreEqual(1, z.props.Single(p => p.name == "The Outfall").variant, "The Outfall is grated (the Sludge-Tunnels are not built).");
             Assert.IsTrue(z.props.Any(p => p.kind == "signpost" && p.name.Contains("dangerous, 18-20")), "A sign at the Outfall says dangerous, 18-20.");
-            Assert.AreEqual(2, z.props.Single(p => p.name == "The Forge District's wall").variant, "The Forge District's gate is shut.");
+            Assert.AreEqual(1, z.props.Single(p => p.name == "The Forge District's wall").variant, "The Forge District's gate stands open onto the Forge District (2026-10-19).");
+            Assert.IsTrue(z.exits.Any(e => e.to == "zone.forge"), "Through the Forge District Gate to the Forge District.");
             Assert.AreEqual(1, z.props.Single(p => p.name == "Argentis's outer wall").variant, "The outer gate stands open.");
             Assert.GreaterOrEqual(z.props.Count(p => p.kind == "drain_mouth"), 6, "The Drain Courts' mouths.");
             Assert.GreaterOrEqual(z.props.Count(p => p.kind == "dock"), 3); Assert.GreaterOrEqual(z.props.Count(p => p.kind == "brick_bridge"), 2, "Two brick bridges over the river.");

@@ -34,10 +34,11 @@ LANDMARKS = [
       "GAME-ONLY reading (the shards as burned memory, DUNGEON_DESIGN.md); spent shards as light are CANON (book1 ch.3:133-137)", (120, -100), 14, 16),
     L("The Outfall", (196, -205), 10, "Where the Forge District's drain comes out under the wall: a great arch of brick, an iron grating, and a smell like a hot coin. A sign says what everybody knows.",
       "GAME-ONLY (the Sludge-Tunnels' door, DUNGEON_DESIGN.md, not yet open)", (176, -205), 10, 14),
-    L("The Forge District Gate", (203, 0), 10, "Shut, barred from the far side. Smoke rolls over the wall from the chimney stacks beyond.",
-      "CANON: the Forge District's walls (book1 ch.3:5); the gate shut until that zone opens (GAME-ONLY)", (180, 0), 16, 18),
+    L("The Forge District Gate", (203, 0), 10, "Open by day now, its leaves back against the wall. Smoke rolls over it from the chimney stacks beyond, and the Copper-Tithe count who goes through.",
+      "CANON: the Forge District's walls (book1 ch.3:5); the gate open onto the Forge District zone (2026-10-19) GAME-ONLY", (180, 0), 16, 18),
 ]
-EXITS = [{"to": "zone.oakhaven", "name": "West road to Oakhaven", "at": V(-233, 2), "arrive": V(42, -269), "radius": 5}]
+EXITS = [{"to": "zone.oakhaven", "name": "West road to Oakhaven", "at": V(-233, 2), "arrive": V(42, -269), "radius": 5},
+         {"to": "zone.forge", "name": "East through the Forge District Gate", "at": V(198, 0), "arrive": V(-162, 0), "radius": 5}]   # the Forge District (2026-10-19)
 SPAWN = (-226, 2)
 for name, (x, z) in [("arrival", SPAWN), ("recovery", (-180, -4)), ("companion", (-182, -6))]:
     spot_ok(name, x, z, roads=False)

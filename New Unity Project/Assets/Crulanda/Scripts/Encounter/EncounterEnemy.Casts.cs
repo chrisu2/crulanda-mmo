@@ -94,6 +94,13 @@ namespace Crulanda.Encounter
             new MobCast { mob = "Void-Toucher", name = "Void Pulse", kind = "blast", cast = 1.8f, every = 15, first = 5, power = 2.2f, reach = 4 },
             new MobCast { mob = "Withered Keeper", name = "Grey Roots", kind = "net", cc = "root", seconds = 2.5f, area = 3, cast = 1.6f, every = 16, first = 5, power = 0, reach = 10 },
             new MobCast { mob = "Creeping briar", name = "Thorn Burst", kind = "blast", cast = .8f, every = 14, first = 4, power = 1.8f, reach = 3.5f },
+            // The Forge District (Docs/ZONE_FORGE_DISTRICT.md, 2026-10-19; GAME-ONLY): the slag-hounds' heel-bite, the Blacklegs' thrown slag, the
+            // Council's foundry overseers' cudgel; the rare Old Clinker's worry and the Spoke-Leech's thread-snare. No machines: thrown, swung, bitten.
+            new MobCast { mob = "Slag-hound", name = "Heel-Bite", kind = "net", cc = "root", seconds = 1.5f, area = 0, cast = .8f, every = 15, first = 5, power = 0, reach = 3.5f },
+            new MobCast { mob = "Blackleg", name = "Hot Slag", kind = "bolt", cast = 1.4f, every = 14, first = 4, power = 2.2f, reach = 12 },
+            new MobCast { mob = "Foundry overseer", name = "Tally-Stick Cudgel", kind = "net", cc = "stun", seconds = 1.5f, area = 0, cast = 1.3f, every = 16, first = 5, power = 0, reach = 4 },
+            new MobCast { mob = "Old Clinker", name = "Worry", kind = "net", cc = "stun", seconds = 2, area = 0, cast = 1f, every = 14, first = 5, power = 0, reach = 4 },
+            new MobCast { mob = "The Spoke-Leech", name = "Rune-Snare", kind = "net", cc = "root", seconds = 2, area = 3, cast = 1.2f, every = 15, first = 5, power = 0, reach = 8 },
             // Beasts: a wind-up of under a second, not a spell.
             new MobCast { mob = "Grey wolf", name = "Heel-Snap", kind = "net", cc = "root", seconds = 1.5f, area = 0, cast = .7f, every = 15, first = 6, power = 0, reach = 3.5f },
             new MobCast { mob = "Mountain wolf", name = "Heel-Snap", kind = "net", cc = "root", seconds = 2, area = 0, cast = .7f, every = 15, first = 5, power = 0, reach = 3.5f },

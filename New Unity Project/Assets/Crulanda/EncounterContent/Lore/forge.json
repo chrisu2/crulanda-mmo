@@ -1,0 +1,143 @@
+{
+  "zone": "zone.forge",
+  "canonStatus": "GAME-ONLY: the Forge District's chapter of the book of lore, its lines the game's; the Forge District, its Warrens, the Foundry, the Spoke, the Copper-Tithe, the Rust & Ruin and the Weave-Eaters are CANON (world_bible.md; book1 ch.1, 3, 7, 16, 24), the River Aureum, the Molten Vein and the Great Crucible the author's map, as each line says.",
+  "entries": [
+    {
+      "id": "lore.forge.places.the-tithe-gate",
+      "chapter": "places",
+      "subject": "The Tithe Gate",
+      "more": "The Tithe's gate-book has a column for what each soul owes. Most of it is the Concord's. A little of it is favours.",
+      "page": "doc.forge.tithe_book",
+      "canonStatus": "CANON-EXPANDED: the Copper-Tithe (book1 ch.24:140); GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.places.the-forge-warrens",
+      "chapter": "places",
+      "subject": "The Forge Warrens",
+      "more": "Elfa Raike keeps a slate of the Warrens' coughs. The 'worse since the monolith' column runs off the slate.",
+      "page": "doc.forge.warrens_cough",
+      "canonStatus": "CANON: the Forge District Warrens (book1 ch.3:159); GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.places.the-spoke",
+      "chapter": "places",
+      "subject": "The Spoke",
+      "line": "A rune-carved monolith of black stone in the middle of the Foundry, raised by the Council. It hums, and the air near it tastes of copper.",
+      "more": "On the ring wall round it, low down where a child would sit, a W in chalk.",
+      "secret": "secret.forge.chalk-w",
+      "canonStatus": "CANON: the Spoke, a rune-carved stone monolith (world_bible.md Magic; book1 ch.7:237)"
+    },
+    {
+      "id": "lore.forge.places.the-foundry",
+      "chapter": "places",
+      "subject": "The Foundry",
+      "more": "The Council's list of the district's bright children, graded like ore, each struck through and marked: Moved up.",
+      "page": "doc.forge.resonance_list",
+      "canonStatus": "CANON: the Foundry District (book1 ch.7:237); GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.places.the-great-crucible",
+      "chapter": "places",
+      "subject": "The Great Crucible",
+      "more": "A foundry pass: stamped copper on a cord. It gets you into the yard. It does not get you out.",
+      "page": "doc.forge.foundry_pass",
+      "canonStatus": "CANON: the Great Crucible (the author's map); GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.places.the-slag-fields",
+      "chapter": "places",
+      "subject": "The Slag Fields",
+      "line": "Black heaps cracked with ember, tipped out of the furnaces for a hundred years.",
+      "more": "From the top of the tallest heap the whole district lies below in the smog, and the Crown far off over it all.",
+      "secret": "secret.forge.slag-top",
+      "canonStatus": "CANON-EXPANDED: slag-piles (book1 ch.16:349); GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.places.the-river-aureum",
+      "chapter": "places",
+      "subject": "The River Aureum",
+      "line": "Molten metal running in a stone channel down from the furnaces. The heat comes off it like a wall.",
+      "canonStatus": "CANON: the River Aureum (the author's map); GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.places.the-molten-vein",
+      "chapter": "places",
+      "subject": "The Molten Vein",
+      "line": "The second molten channel, crossed only by its stone bridges.",
+      "canonStatus": "CANON: the Molten Vein (the author's map); GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.places.the-rust-and-ruin",
+      "chapter": "places",
+      "subject": "The Rust & Ruin",
+      "line": "A tavern behind an iron-banded oak door. Stale beer, smoke, and nobody asking your name.",
+      "canonStatus": "CANON: the Rust & Ruin (book1 ch.24:81)"
+    },
+    {
+      "id": "lore.forge.people.hesta-wode",
+      "chapter": "people",
+      "subject": "Hesta Wode",
+      "line": "The Copper-Tithe's tally-woman at the gate. She writes down everyone, and what they owe, and keeps a list of her own now.",
+      "more": "The Tithe's runners hid their takings in the district wall once. Hesta never went to look.",
+      "secret": "secret.forge.tithe-stash",
+      "canonStatus": "CANON-EXPANDED: the Copper-Tithe (book1 ch.24:140); Hesta GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.people.old-aelric",
+      "chapter": "people",
+      "subject": "Old Aelric",
+      "more": "Aelric's notched stick: forty years of pours, and at the end, notches that are not pours.",
+      "page": "doc.forge.aelric_burns",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.people.hamo-glaze",
+      "chapter": "people",
+      "subject": "Hamo Glaze",
+      "line": "A slag-glass blower who makes beads out of the furnaces' leavings. Once he made one the colour of the sea.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.creatures.slag-hound",
+      "chapter": "creatures",
+      "subject": "Slag-hound",
+      "line": "Feral dogs of the slag heaps, grey with ash and burned bald in patches. They hunt the tips in packs.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.creatures.blackleg",
+      "chapter": "creatures",
+      "subject": "Blackleg",
+      "line": "Thugs the foremen hire to keep the smelters working. They warm their hands at the fire pits and take what they like.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.creatures.foundry-overseer",
+      "chapter": "creatures",
+      "subject": "Foundry overseer",
+      "line": "The Council's men in the Foundry, with tally-sticks and cudgels. They count pours and children the same way.",
+      "canonStatus": "CANON-EXPANDED: the Council's foremen; GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.creatures.iron-pact-soldier",
+      "chapter": "creatures",
+      "subject": "Iron Pact soldier",
+      "line": "Soldiers of the Iron Pact, set to keep the Spoke's yard. They do not ask what the yard is for.",
+      "canonStatus": "CANON: the Iron Pact (world_bible.md); here GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.creatures.old-clinker",
+      "chapter": "creatures",
+      "subject": "Old Clinker",
+      "line": "An old slag-hound, half bald and all teeth, who has outlived three packs. The smelters' children dare each other to see him.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.forge.creatures.the-spoke-leech",
+      "chapter": "creatures",
+      "subject": "The Spoke-Leech",
+      "line": "A Weave-Eater grown fat on what leaks off the monolith. It drinks the glow from the runes and the breath from the Warrens.",
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters (book1 ch.1:251); GAME-ONLY"
+    }
+  ]
+}

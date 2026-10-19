@@ -76,7 +76,7 @@ namespace Crulanda.Tests
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             var zones = first.Zone.AllZones().Where(z => !z.dungeon && !z.city).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own; a city (the Crown) no nodes
-            Assert.AreEqual(6, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim, the Verdant Shore and the Lowtowns are registered.");
+            Assert.AreEqual(7, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim, the Verdant Shore, the Lowtowns and the Forge District are registered.");
             var problems = new List<string>();
             // A city's stations only (the Crown's Crafters' Court and its inn's hearth): every one walked to within reach from the start.
             foreach (var id in first.Zone.AllZones().Where(z => z.city).Select(z => z.id).ToList())

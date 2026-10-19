@@ -134,7 +134,7 @@ def keep(x, z, r): CLEAR.append((x, z, r))
 # ======================================================================================================================================
 # The walls: Argentis's outer wall on the west (its gate open: the Gate Ward), the Forge District's on the east (its gate shut).
 prop("town_wall", "Argentis's outer wall", -200, 0, 90, (480, 10), 1)
-prop("town_wall", "The Forge District's wall", 206, 0, 90, (480, 14), 2)
+prop("town_wall", "The Forge District's wall", 206, 0, 90, (480, 14), 1)   # open onto the Forge District (2026-10-19, tools/wip/forge/make_forge.py)
 FOOT.append(("west wall", obb(-200, 0, 3.6, 480, 0))); FOOT.append(("forge wall", obb(206, 0, 3.6, 480, 0)))
 for i, (x, z, h) in enumerate([(222, 150, 34), (228, 70, 40), (218, -20, 30), (230, -90, 38), (221, -160, 32), (226, 212, 28), (232, 20, 26)]):
     prop("chimney_stack", "Foundry stack", x, z, 0, (0, h), i % 3)
@@ -258,7 +258,7 @@ keep(172, -182, 10)
 prop("crates", None, 178, -174, 20, variant=2); prop("barrels", None, 168, -190, 0, variant=2); prop("brazier", None, 174, -184, 0)
 
 # ---- The Forge District's gate (east wall; shut until the Forge District opens, 19-22) ----
-prop("signpost", "The Forge District (shut)", 192, 8, 270)
+prop("signpost", "The Forge District (19-22)", 192, 8, 270)
 prop("lane_lamp", None, 196, -6, 0, variant=1)
 
 # ---- Washing lines and lamps on the main ways, puddles here and there ----

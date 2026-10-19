@@ -63,6 +63,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(13, counts["zone.ashrim"]); Assert.AreEqual(14, counts["zone.verdant"]); Assert.AreEqual(13, counts["zone.adit"]);
             Assert.AreEqual(15, counts["zone.lowtowns"], "The Lowtowns' fifteen: ten pages of the book of lore, a lookout, militia marks, a lamp-shrine, the grey-bell (Phase 9.1) and the carvings under the moss in the drowned vaults (2026-10-18).");
             Assert.AreEqual(8, counts["zone.hallows"], "Hallow's Creek's eight (2026-10-16).");
+            Assert.AreEqual(3, counts["zone.forge"], "The Forge District's three (2026-10-19): a lookout, a stash and the chalk; the world's total stands at its 126 cap (DiscoveryLogTests).");
         }
 
         [Test] public void Every_named_person_in_every_zone_has_two_or_three_stories_and_nobody_else_has_any()

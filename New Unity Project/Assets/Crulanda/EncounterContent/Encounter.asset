@@ -2459,6 +2459,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: 18fb20f367634b13b043a5ef942ce07d, type: 3}
   - {fileID: 4900000, guid: 16fbf31f9a40415fae6bd7551292d66e, type: 3}
   - {fileID: 4900000, guid: 08fced43b9cb4494aa4f1cc616361b9b, type: 3}
+  - {fileID: 4900000, guid: 4d8ddf5ac3d1484cbd9f3f2ffa7f87a6, type: 3}
   itemFiles:
   - {fileID: 4900000, guid: 2d6f824e5db841dc904bc2ea8ade0ca2, type: 3}
   - {fileID: 4900000, guid: 7cab9a409af043aea37f75e1a8cad32b, type: 3}
@@ -2485,6 +2486,7 @@ MonoBehaviour:
   - {fileID: 4900000, guid: b8126f3a4d2e4577b07f8dfa311fe007, type: 3}
   - {fileID: 4900000, guid: 862e84e9204241cc9ad606979102c0fb, type: 3}
   - {fileID: 4900000, guid: ba7539547ffd4ad6a8d667d979eaecce, type: 3}
+  - {fileID: 4900000, guid: dc5214de22a3493483e3297127abf50f, type: 3}
   playerStats:
     baseHealth: 180
     healthPerLevel: 25

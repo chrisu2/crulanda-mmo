@@ -181,7 +181,7 @@ namespace Crulanda.Tests
         }
 
         /// <summary>Each zone's tier: the skill every one of its nodes asks (DESIGN 2.4).</summary>
-        static readonly Dictionary<string, int> Tiers = new Dictionary<string, int> { { "oakhaven", 1 }, { "khaven", 20 }, { "peaks", 40 }, { "ashrim", 60 }, { "verdant", 80 }, { "lowtowns", 90 } };
+        static readonly Dictionary<string, int> Tiers = new Dictionary<string, int> { { "oakhaven", 1 }, { "khaven", 20 }, { "peaks", 40 }, { "ashrim", 60 }, { "verdant", 80 }, { "lowtowns", 90 }, { "forge", 90 } };   // the Forge District (2026-10-19): the Lowtowns' top tier, the cap still 20 (Docs/ZONE_FORGE_DISTRICT.md question 6)
 
         /// <summary>Every zone (DESIGN 2.4, BUILD_PLAN step 8): ten ore, eight windfalls and ten herbs, counting the herb props worked
         /// as nodes, every one a kind the trades know at the zone's tier, no two sharing a respawn (name and metre). Rich seams are

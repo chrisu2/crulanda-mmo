@@ -1,0 +1,513 @@
+{
+  "factions": [],
+  "items": [],
+  "documents": [
+    {
+      "id": "doc.forge.tithe_book",
+      "title": "The Tithe's Gate-Book",
+      "text": "From the Copper-Tithe's book at the Tithe Gate, in Hesta Wode's hand:\n\nCarters, eleven. Smelters back from the Lowtowns, forty-two. Overseers, three, owe nothing (they never do). One stranger from the Lowtowns, sent by the toll-reeve Holt, asking after a child. Let in. Owes: a favour.",
+      "canonStatus": "CANON-EXPANDED: the Copper-Tithe (book1 ch.24:140); the book GAME-ONLY"
+    },
+    {
+      "id": "doc.forge.resonance_list",
+      "title": "The Resonance List",
+      "text": "Project Spoke. Primary Resonance Target List - The Forge District.\n\nA column of names, each with an address, an age and a grade. Most are struck through, and beside the struck names, in a neater hand: Moved up.\n\nNear the bottom, added later: Wren. Oakhaven. Age 9. Grade: High. Moved up.",
+      "canonStatus": "CANON: the Resonance Target List of the Forge District (book1 ch.3:149-159); Wren's line GAME-ONLY"
+    },
+    {
+      "id": "doc.forge.foundry_pass",
+      "title": "A Foundry Pass",
+      "text": "A square of stamped copper on a cord: the Council's seal on one side, a number on the other. Whoever holds it walks through the Foundry and into the yard, and nobody asks.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "doc.forge.aelric_burns",
+      "title": "Aelric's Tally of Pours",
+      "text": "Notches on a stick, kept forty years: one for every pour Old Aelric worked at the Crucible. Near the end the notches change. They're not pours any more, he says. They're children he saw go through the Foundry.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "doc.forge.warrens_cough",
+      "title": "Elfa's Slate",
+      "text": "A slate by Elfa Raike's door: who coughs, how long, whether soot-wort helped. The column for 'better' is short. The column for 'worse since the monolith' is long.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "doc.forge.chalk_w",
+      "title": "The Chalked W",
+      "text": "Low on the Spoke's yard wall, in chalk: a W, and under it, smaller, UP. The same hand as the W scratched into the Holding House's doorstep in the Lowtowns.",
+      "canonStatus": "GAME-ONLY (Wren: peaks.json, lowtowns.json)"
+    }
+  ],
+  "quests": [
+    {
+      "id": "main.forge.0",
+      "title": "The Forge Gate",
+      "kind": "main",
+      "giver": "Edda Holt",
+      "turnIn": "Hesta Wode",
+      "zone": "zone.lowtowns",
+      "level": 19,
+      "requires": [
+        "main.lowtowns.5"
+      ],
+      "canonStatus": "GAME-ONLY (Wren and the soldier's boy); the Forge District and the Copper-Tithe CANON (book1 ch.3:7, ch.24:140)",
+      "summary": "Edda Holt says the Forge District's gate is open to carters now. The Copper-Tithe keep a book there of who goes in. Ask their tally-woman.",
+      "offer": "Edda Holt has the toll-book shut on her knee. \"Up, the ledger said. Up's past the Crown, and there's no road up from here.\" She nods east, at the smoke over the wall. \"But the Forge District's gate is open to carters this week. The Copper-Tithe keep a book on the far side, the same as mine. Better than mine. A woman called Wode. Tell her I sent you. She'll let you in for that. Then she'll want something.\"",
+      "progress": "\"The Forge District Gate, at the top of the market. Mind your purse past it.\"",
+      "complete": "The tally-woman writes your name before you've finished saying it. \"Holt's,\" she says. \"Holt sends me nobody. So you're somebody.\" She turns the book round so you can see the line. \"Owes: a favour. We'll come to that.\"",
+      "steps": [
+        {
+          "text": "Go through the Forge District Gate and find the Copper-Tithe's tally-woman.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Hesta Wode",
+              "text": "Speak with Hesta Wode at the Tithe Gate",
+              "document": "doc.forge.tithe_book"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 900,
+        "gold": 60
+      }
+    },
+    {
+      "id": "main.forge.1",
+      "title": "Under the Tithe",
+      "kind": "main",
+      "giver": "Hesta Wode",
+      "turnIn": "Hesta Wode",
+      "zone": "zone.forge",
+      "level": 19,
+      "requires": [
+        "main.forge.0"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Copper-Tithe (book1 ch.24:140); slag-piles (book1 ch.16:349); the hounds GAME-ONLY",
+      "summary": "Hesta Wode's favour: clear the slag-hounds off the tips behind the Warrens, where the smelters' children pick for coal.",
+      "offer": "\"The favour.\" Hesta taps the book. \"The hounds have the tips behind the Warrens. Children go up there for coal, and the hounds don't care whose children. The Tithe could clear them, but the Tithe would want paying, and the smelters haven't got it. You have.\"",
+      "progress": "\"South of the gate, past the lodgings. You'll hear them.\"",
+      "complete": "Hesta writes a line and crosses out the favour. \"Paid.\" She doesn't look up. \"Now ask me what you came to ask.\"",
+      "steps": [
+        {
+          "text": "Clear the slag-hounds off the Warrens' tips.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.slaghound.forge.*",
+              "count": 6,
+              "text": "Slag-hounds"
+            }
+          ]
+        },
+        {
+          "text": "Go back to Hesta Wode.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Hesta Wode",
+              "text": "Return to Hesta Wode"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 3200,
+        "gold": 150
+      }
+    },
+    {
+      "id": "main.forge.2",
+      "title": "The Resonance List",
+      "kind": "main",
+      "giver": "Hesta Wode",
+      "turnIn": "Old Aelric",
+      "zone": "zone.forge",
+      "level": 20,
+      "requires": [
+        "main.forge.1"
+      ],
+      "canonStatus": "CANON: the Resonance Target List of the Forge District (book1 ch.3:149-159); the Blacklegs and the list's keeping GAME-ONLY",
+      "summary": "The Council keeps a list of the district's bright children. Its Blacklegs keep a copy at the West Fire Pits. Take it, and show it to Old Aelric, who has worked the Crucible forty years.",
+      "offer": "\"A child from Oakhaven.\" Hesta closes the book. \"There's a list. Not mine. The Council's. Every child in the district who lights a lamp by looking at it, their address and their age and a grade, like ore. The Blacklegs at the west pits keep a copy for the overseers.\" She lowers her voice. \"Take it off them. Then don't bring it to me. Take it to Old Aelric in the Warrens. He'll know what the words mean. I'd rather not.\"",
+      "progress": "\"The west pits. South of the Warrens. The Blacklegs are the ones with clean boots.\"",
+      "complete": "Old Aelric holds the list at arm's length and reads it with his lips. He stops near the bottom and taps a line with a burned finger. \"Wren. Oakhaven. Moved up.\" He folds it very small. \"I know what that means. Sit down.\"",
+      "steps": [
+        {
+          "text": "Put down the Blacklegs at the West Fire Pits.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.blackleg.forge.*",
+              "count": 5,
+              "text": "Blacklegs"
+            },
+            {
+              "type": "visit",
+              "zone": "zone.forge",
+              "text": "The West Fire Pits",
+              "at": {
+                "x": -150,
+                "y": -112
+              },
+              "radius": 12,
+              "say": "In a tin box by the pit, wrapped in oilcloth against the heat: a list of names, most struck through."
+            }
+          ]
+        },
+        {
+          "text": "Take the list to Old Aelric in the Warrens.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Old Aelric",
+              "text": "Show Old Aelric the list",
+              "document": "doc.forge.resonance_list"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 3800,
+        "gold": 180
+      }
+    },
+    {
+      "id": "main.forge.3",
+      "title": "What Moved Up Means",
+      "kind": "main",
+      "giver": "Old Aelric",
+      "turnIn": "Old Aelric",
+      "zone": "zone.forge",
+      "level": 20,
+      "requires": [
+        "main.forge.2"
+      ],
+      "canonStatus": "CANON: the Spoke raised in the Foundry (book1 ch.7:237); the pass and the overseers GAME-ONLY",
+      "summary": "The moved go through the Foundry to the Spoke's yard, and nobody gets in without a foundry pass. Clear the Foundry's overseers, then take a pass off the overseers at the Great Crucible.",
+      "offer": "\"Moved up.\" Aelric turns his cup. \"They go through the Foundry, the moved ones. Into the yard round the monolith. I've seen them go, the last few years, in a line, quiet. Then nothing.\" He shows you his arms. \"Nobody goes in that yard without a pass. The overseers carry them. The ones at the Great Crucible carry the good ones. Over the bridge, north-east. Mind the Foundry on the way. They don't like visitors.\"",
+      "progress": "\"The Foundry first. Then the Crucible. The pass is copper, on a cord.\"",
+      "complete": "Aelric turns the pass over in his fingers and gives it back quickly, as if it were hot. \"That'll get you in. It won't get you out. Nothing gets anybody out.\"",
+      "steps": [
+        {
+          "text": "Clear the overseers in the Foundry and at the Great Crucible.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.overseer.forge.*",
+              "count": 7,
+              "text": "Foundry overseers"
+            },
+            {
+              "type": "visit",
+              "zone": "zone.forge",
+              "text": "The Great Crucible",
+              "at": {
+                "x": 110,
+                "y": 108
+              },
+              "radius": 12,
+              "say": "Under the overseers' bench by the pour, on a hook: a square of stamped copper on a cord. A foundry pass."
+            }
+          ]
+        },
+        {
+          "text": "Go back to Old Aelric.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Old Aelric",
+              "text": "Return to Old Aelric",
+              "document": "doc.forge.foundry_pass"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 4200,
+        "gold": 200
+      }
+    },
+    {
+      "id": "main.forge.4",
+      "title": "The Foot of the Spoke",
+      "kind": "main",
+      "giver": "Old Aelric",
+      "turnIn": "Hesta Wode",
+      "zone": "zone.forge",
+      "level": 21,
+      "requires": [
+        "main.forge.3"
+      ],
+      "canonStatus": "CANON: the Spoke (world_bible.md Magic; book1 ch.7:237) and the Iron Pact (world_bible.md); the yard, the chalk and the trail up the Spire's pillars GAME-ONLY; the Spire (28-30) PROVISIONAL",
+      "summary": "Take the pass to the Spoke's yard. The Iron Pact keep it. See where the moved ones go, then tell Hesta Wode.",
+      "offer": "\"Go and look, then.\" Aelric doesn't get up. \"The Iron Pact keep the yard now. Soldiers, not overseers. They won't care about your pass once you've hit one of them, so don't stop.\" He looks at the floor. \"If there's anything of the girl's there. A ribbon. Anything. I'd want to know. I don't know why. I never knew her.\"",
+      "progress": "\"West of the Foundry, the ring wall. The monolith in the middle. You can't miss it. Nobody can.\"",
+      "complete": "Hesta listens with her pen still. When you say UP she writes it down. \"Up the pillars,\" she says. \"To the Spire. There's no road up there for the likes of us.\" She turns a page and starts a new list, in her own hand. \"The Tithe keeps a list too, now. Names that went up. We'll want them back one day.\"",
+      "steps": [
+        {
+          "text": "Fight through the Iron Pact at the Spoke's yard.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.pactsoldier.forge.*",
+              "count": 5,
+              "text": "Iron Pact soldiers"
+            },
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.pactbow.forge.*",
+              "count": 3,
+              "text": "Iron Pact crossbowmen"
+            }
+          ]
+        },
+        {
+          "text": "Stand at the foot of the Spoke.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.forge",
+              "text": "The foot of the Spoke",
+              "at": {
+                "x": -28,
+                "y": 6
+              },
+              "radius": 7,
+              "say": "Close to, the monolith hums in your teeth. The runes are warm. Round its foot the stone is worn smooth in a ring, where people have stood in a line, waiting. A path is beaten from here to the north, toward the Spire's pillars."
+            }
+          ]
+        },
+        {
+          "text": "Tell Hesta Wode what you found.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Hesta Wode",
+              "text": "Return to Hesta Wode"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 5000,
+        "gold": 260
+      }
+    },
+    {
+      "id": "side.ade.bellows",
+      "title": "Ade's Bellows",
+      "kind": "side",
+      "giver": "Ade Heath",
+      "turnIn": "Ade Heath",
+      "zone": "zone.forge",
+      "level": 19,
+      "requires": [
+        "main.forge.1"
+      ],
+      "canonStatus": "GAME-ONLY (hand-bellows, worked by hand)",
+      "summary": "The Blacklegs took Ade Heath's hand-bellows. Teach them not to.",
+      "offer": "\"They took my bellows.\" Ade's fists are black to the wrist. \"The Blacklegs. At the west pits. I can't work the hearth without them and if I can't work the hearth I don't eat.\" He scowls. \"They're only leather and wood. They took them because they could.\"",
+      "progress": "\"The west pits. The ones with clean boots.\"",
+      "complete": "Ade takes the bellows back and squeezes them once, hard, so they wheeze. \"Good,\" he says, and then, gruffly, \"thank you,\" and goes back to the hearth at a run.",
+      "steps": [
+        {
+          "text": "Take Ade's bellows back from the Blacklegs.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.blackleg.forge.*",
+              "count": 4,
+              "text": "Blacklegs",
+              "say": "Under a Blackleg's coat: a pair of small hand-bellows, leather and wood, a name burned into the handle. ADE."
+            }
+          ]
+        },
+        {
+          "text": "Give Ade Heath his bellows.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Ade Heath",
+              "text": "Return to Ade Heath"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 2200,
+        "gold": 90
+      }
+    },
+    {
+      "id": "side.elfa.cough",
+      "title": "Worse at Night",
+      "kind": "side",
+      "giver": "Elfa Raike",
+      "turnIn": "Elfa Raike",
+      "zone": "zone.forge",
+      "level": 20,
+      "requires": [
+        "main.forge.1"
+      ],
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters, born of the High City's magical pollution (book1 ch.1:251); the coughing GAME-ONLY",
+      "summary": "Elfa Raike thinks something near the Spoke makes the Warrens' coughing worse at night. Go and see, and put down what you find.",
+      "offer": "\"It's worse at night.\" Elfa's slate is full. \"Since they started on the monolith. Something comes off it after dark, and the wind brings it down to the Warrens. Go and look. North of the ring wall, by the Foundry. If it's something you can kill, kill it.\"",
+      "progress": "\"North of the ring wall. After dark it's worse, but you'll see them by day too.\"",
+      "complete": "Elfa writes a line on her slate and looks at it a long while. \"Things that eat magic,\" she says. \"Living off the monolith. And we're living under them.\" She rubs out a name in the 'worse' column. \"Thank you. Come back if you cough.\"",
+      "steps": [
+        {
+          "text": "Find what comes off the Spoke at night.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.forge",
+              "text": "North of the ring wall",
+              "at": {
+                "x": 2,
+                "y": 48
+              },
+              "radius": 12,
+              "say": "The air by the Foundry's south door crawls. Shapes like smoke move in it, close to the ground, drinking the glow off the runes."
+            }
+          ]
+        },
+        {
+          "text": "Put down the Weave-Eaters by the Spoke.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.weaveeater.forge.*",
+              "count": 5,
+              "text": "Weave-Eaters"
+            }
+          ]
+        },
+        {
+          "text": "Go back to Elfa Raike.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Elfa Raike",
+              "text": "Return to Elfa Raike",
+              "document": "doc.forge.warrens_cough"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 2600,
+        "gold": 110
+      }
+    },
+    {
+      "id": "side.hamo.glass",
+      "title": "Blue Glass",
+      "kind": "side",
+      "giver": "Hamo Glaze",
+      "turnIn": "Hamo Glaze",
+      "zone": "zone.forge",
+      "level": 20,
+      "requires": [
+        "main.forge.1"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "Hamo Glaze wants to go into the Slag Fields for glass, and the hounds there won't let him.",
+      "offer": "\"There's blue glass in the far heaps. I saw it from the top. But the hounds have the fields this season, and I'm not a fighter.\" Hamo holds up a bead, black and shining. \"Clear me a way and I'll make you something. Not a weapon. Something to look at.\"",
+      "progress": "\"The Slag Fields, south-east. Over the Slag Bridge.\"",
+      "complete": "Hamo comes back from the fields with his pockets clinking and his face lit up. \"Blue,\" he says. \"Blue as anything.\"",
+      "steps": [
+        {
+          "text": "Clear the hounds out of the Slag Fields.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.slaghound.forge.*",
+              "count": 6,
+              "text": "Slag-hounds in the Slag Fields"
+            }
+          ]
+        },
+        {
+          "text": "Go back to Hamo Glaze.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Hamo Glaze",
+              "text": "Return to Hamo Glaze"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 2600,
+        "gold": 110
+      }
+    },
+    {
+      "id": "side.aelric.tally",
+      "title": "Forty Years of Pours",
+      "kind": "side",
+      "giver": "Old Aelric",
+      "turnIn": "Old Aelric",
+      "zone": "zone.forge",
+      "level": 20,
+      "requires": [
+        "main.forge.2"
+      ],
+      "canonStatus": "GAME-ONLY",
+      "summary": "Old Aelric wants the Blacklegs at the east pits taught a lesson for the smelters they beat there.",
+      "offer": "\"The east pits.\" Aelric rubs his arm. \"The Blacklegs there broke a smelter's hands last week. Hands. For being slow at the pour.\" He takes a notched stick off the shelf. \"I've cut a notch for every pour I worked. Forty years. Cut me a few for him.\"",
+      "progress": "\"Over the north bridge, then south. The east pits.\"",
+      "complete": "Aelric cuts four new notches at the end of his stick, deep and clean. \"For his hands,\" he says.",
+      "steps": [
+        {
+          "text": "Put down the Blacklegs at the East Fire Pits.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.forge",
+              "target": "mob.blackleg.forge.*",
+              "count": 6,
+              "text": "Blacklegs at the east pits"
+            }
+          ]
+        },
+        {
+          "text": "Go back to Old Aelric.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.forge",
+              "target": "Old Aelric",
+              "text": "Return to Old Aelric",
+              "document": "doc.forge.aelric_burns"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 2600,
+        "gold": 110
+      }
+    }
+  ]
+}

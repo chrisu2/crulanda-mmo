@@ -1,0 +1,1935 @@
+{
+  "id": "zone.forge",
+  "displayName": "The Forge District",
+  "subtitle": "The Forge District, behind the Lowtowns' east wall: furnaces, crucibles and rivers of molten metal round the Council's Spoke",
+  "canonStatus": "CANON-EXPANDED",
+  "canonNote": "Canon (book1 ch.1:147, ch.2:19 and 197, ch.3:7 and 149-159, ch.7:237-299, ch.9:5, ch.16:131 and 349, ch.17:296-316, ch.24:7 and 81-140, ch.25:175; world_bible.md Magic; the author's map, maps/forge_district_map.png): the Forge District beyond the Rust Market's wall, its soot, sulfur and smelting copper, its manufactories like canyon walls with guard towers, its Warrens and gutters, the Foundry where the Spoke, a rune-carved stone monolith, is raised; the Council's Resonance Target List of the Forge District; the Copper-Tithe; the Rust & Ruin; slag-piles; the River Aureum, the Molten Vein, the Great Crucibles and the Fire Pits of the author's map. Left out by Chris's rule (CRULANDA_CANON.md): the iron walkers of Valen's account and the turning wheels and chains the map draws; and the Seekers (the Transit Hub's). GAME-ONLY: every person, building, camp and quest here. The game is set shortly before Book 1. Docs/ZONE_FORGE_DISTRICT.md.",
+  "size": 360,
+  "levelMin": 19,
+  "levelMax": 22,
+  "biome": "forge",
+  "weather": [
+    {
+      "kind": "overcast",
+      "weight": 3
+    },
+    {
+      "kind": "mist",
+      "weight": 2
+    },
+    {
+      "kind": "ashsquall",
+      "weight": 1.5
+    },
+    {
+      "kind": "rain",
+      "weight": 1.5
+    },
+    {
+      "kind": "fair",
+      "weight": 0.8
+    }
+  ],
+  "worldMapPosition": {
+    "x": -1,
+    "y": -1
+  },
+  "worldMapNote": "Behind the Lowtowns' east wall, at the foot of Argentis; the game map does not draw it, and the pin waits for a place clear of the Crown's and the Lowtowns' plates (PROVISIONAL).",
+  "flatRadius": 400,
+  "hillHeight": 0,
+  "seed": 2219,
+  "squallTint": "#3A302A",
+  "squallText": "A hot wind comes off the furnaces carrying soot and grit, and the light goes brown.",
+  "lighting": {
+    "sunPitch": 28,
+    "sunYaw": -30,
+    "sunIntensity": 0.85,
+    "sunColor": "#E8B47E",
+    "ambientSky": "#7A6656",
+    "ambientEquator": "#5E4A3C",
+    "ambientGround": "#2A1E18",
+    "fogColor": "#6E5A48",
+    "fogStart": 16,
+    "fogEnd": 135,
+    "skyTint": "#8A6E58",
+    "skyExposure": 0.85,
+    "skyHaze": 2.4,
+    "nightClear": 0.4,
+    "nightFog": "#3A2A22"
+  },
+  "spawns": {
+    "player": {
+      "x": -158,
+      "y": 1
+    },
+    "playerFacing": 90,
+    "companion": {
+      "x": -152,
+      "y": -8
+    },
+    "recovery": {
+      "x": -150,
+      "y": -6
+    },
+    "leash": 28,
+    "enemies": []
+  },
+  "objectives": [
+    "Find the Copper-Tithe's tally-woman at the Tithe Gate",
+    "Follow the Council's list to the Spoke"
+  ],
+  "exits": [
+    {
+      "to": "zone.lowtowns",
+      "name": "West through the Tithe Gate to the Lowtowns",
+      "at": {
+        "x": -172,
+        "y": 0
+      },
+      "arrive": {
+        "x": 192,
+        "y": 0
+      },
+      "radius": 5
+    }
+  ],
+  "roads": [
+    {
+      "name": "Gate Street",
+      "width": 7,
+      "points": [
+        {
+          "x": -180,
+          "y": 0
+        },
+        {
+          "x": -150,
+          "y": 2
+        },
+        {
+          "x": -120,
+          "y": 2
+        },
+        {
+          "x": -100,
+          "y": 2
+        },
+        {
+          "x": -80,
+          "y": 2
+        },
+        {
+          "x": -60,
+          "y": 3
+        },
+        {
+          "x": -45,
+          "y": 1
+        }
+      ]
+    },
+    {
+      "name": "Warrens Lane",
+      "width": 5,
+      "points": [
+        {
+          "x": -120,
+          "y": 2
+        },
+        {
+          "x": -128,
+          "y": -40
+        },
+        {
+          "x": -132,
+          "y": -90
+        },
+        {
+          "x": -120,
+          "y": -140
+        },
+        {
+          "x": -110,
+          "y": -172
+        }
+      ]
+    },
+    {
+      "name": "Aureum Crossing",
+      "width": 5,
+      "points": [
+        {
+          "x": -132,
+          "y": -90
+        },
+        {
+          "x": -95,
+          "y": -95
+        },
+        {
+          "x": -58,
+          "y": -95
+        },
+        {
+          "x": -36,
+          "y": -70
+        },
+        {
+          "x": -28,
+          "y": -42
+        }
+      ]
+    },
+    {
+      "name": "Slag Road",
+      "width": 5,
+      "points": [
+        {
+          "x": -28,
+          "y": -42
+        },
+        {
+          "x": 10,
+          "y": -48
+        },
+        {
+          "x": 40,
+          "y": -52
+        },
+        {
+          "x": 59,
+          "y": -55
+        },
+        {
+          "x": 85,
+          "y": -58
+        },
+        {
+          "x": 105,
+          "y": -90
+        },
+        {
+          "x": 112,
+          "y": -128
+        }
+      ]
+    },
+    {
+      "name": "Foundry Lane",
+      "width": 5,
+      "points": [
+        {
+          "x": -52,
+          "y": 3
+        },
+        {
+          "x": -48,
+          "y": 50
+        },
+        {
+          "x": -42,
+          "y": 100
+        },
+        {
+          "x": -38,
+          "y": 150
+        }
+      ]
+    },
+    {
+      "name": "Crucible Way",
+      "width": 6,
+      "points": [
+        {
+          "x": -42,
+          "y": 100
+        },
+        {
+          "x": 0,
+          "y": 106
+        },
+        {
+          "x": 24,
+          "y": 110
+        },
+        {
+          "x": 60,
+          "y": 112
+        },
+        {
+          "x": 95,
+          "y": 108
+        }
+      ]
+    },
+    {
+      "name": "East Road",
+      "width": 5,
+      "points": [
+        {
+          "x": 95,
+          "y": 108
+        },
+        {
+          "x": 118,
+          "y": 62
+        },
+        {
+          "x": 128,
+          "y": 22
+        },
+        {
+          "x": 110,
+          "y": -20
+        },
+        {
+          "x": 85,
+          "y": -58
+        }
+      ]
+    }
+  ],
+  "landmarks": [
+    {
+      "name": "The Tithe Gate",
+      "text": "The gate from the Lowtowns, open by day. The Copper-Tithe keep a booth on the inside and write down everyone who comes through, and what they carry, and what they owe.",
+      "at": {
+        "x": -166,
+        "y": 0
+      },
+      "radius": 12,
+      "canonStatus": "CANON-EXPANDED: the Copper-Tithe (book1 ch.1:145, ch.24:140); their gate GAME-ONLY",
+      "view": {
+        "x": -150,
+        "y": -14
+      },
+      "viewPitch": 14,
+      "viewZoom": 16
+    },
+    {
+      "name": "The Rust & Ruin",
+      "text": "A tavern behind an iron-banded oak door, down a lane where the light never quite reaches. Stale beer, smoke, and nobody asking your name.",
+      "at": {
+        "x": -132,
+        "y": 24
+      },
+      "radius": 9,
+      "canonStatus": "CANON: the Rust & Ruin, its iron-banded oak door (book1 ch.24:81-114); here in the Forge District GAME-ONLY",
+      "view": {
+        "x": -132,
+        "y": 4
+      },
+      "viewPitch": 12,
+      "viewZoom": 15
+    },
+    {
+      "name": "The Forge Warrens",
+      "text": "The smelters' lodgings: low stone rows under iron roofs, a family a room, the gutters black with soot. Valen grew up in gutters like these.",
+      "at": {
+        "x": -130,
+        "y": -60
+      },
+      "radius": 30,
+      "canonStatus": "CANON: the Forge District Warrens (book1 ch.3:159) and Valen's gutters (book1 ch.25:175); the rows GAME-ONLY",
+      "view": {
+        "x": -112,
+        "y": -40
+      },
+      "viewPitch": 15,
+      "viewZoom": 18
+    },
+    {
+      "name": "The West Fire Pits",
+      "text": "Pits of coals that never go out, ringed with blackened stone. The Blacklegs warm their hands here and watch the lodgings.",
+      "at": {
+        "x": -155,
+        "y": -125
+      },
+      "radius": 14,
+      "canonStatus": "CANON: the Fire Pits (the author's map); their use GAME-ONLY",
+      "view": {
+        "x": -136,
+        "y": -104
+      },
+      "viewPitch": 14,
+      "viewZoom": 15
+    },
+    {
+      "name": "The River Aureum",
+      "text": "A channel of molten gold-bright metal running down from the furnaces, behind a kerb of stone. The heat comes off it like a wall.",
+      "at": {
+        "x": -80,
+        "y": 40
+      },
+      "radius": 16,
+      "canonStatus": "CANON: the River Aureum (the author's map); GAME-ONLY course",
+      "view": {
+        "x": -100,
+        "y": 30
+      },
+      "viewPitch": 13,
+      "viewZoom": 15
+    },
+    {
+      "name": "The Foundry",
+      "text": "Long soot-stone halls with their arches glowing, the heavy Foundry where the Council raises the Spoke. Overseers with tally-sticks on every door.",
+      "at": {
+        "x": -40,
+        "y": 100
+      },
+      "radius": 30,
+      "canonStatus": "CANON: the Foundry District, where the Spoke is being built (book1 ch.7:237); its halls GAME-ONLY",
+      "view": {
+        "x": -60,
+        "y": 100
+      },
+      "viewPitch": 15,
+      "viewZoom": 18
+    },
+    {
+      "name": "The Spoke",
+      "text": "A rune-carved monolith of black stone, taller than anything in the district, its runes glowing like coals. It hums. The air near it tastes of copper.",
+      "at": {
+        "x": -12,
+        "y": 0
+      },
+      "radius": 14,
+      "canonStatus": "CANON: the Spoke, a rune-carved stone monolith (world_bible.md Magic; book1 ch.7:237); its look GAME-ONLY from the author's map",
+      "view": {
+        "x": -56,
+        "y": 6
+      },
+      "viewPitch": 22,
+      "viewZoom": 30
+    },
+    {
+      "name": "The Molten Vein",
+      "text": "The second channel of molten metal, out of the north and away south past the Spoke. The stone bridges over it are the only ways across.",
+      "at": {
+        "x": 40,
+        "y": 30
+      },
+      "radius": 16,
+      "canonStatus": "CANON: the Molten Vein (the author's map); GAME-ONLY course",
+      "view": {
+        "x": 24,
+        "y": 20
+      },
+      "viewPitch": 13,
+      "viewZoom": 15
+    },
+    {
+      "name": "The Great Crucible",
+      "text": "A stone bowl the size of a house, molten at the brim. Gangs pour it by ladle and by hand, a little at a time, all day and all night.",
+      "at": {
+        "x": 115,
+        "y": 125
+      },
+      "radius": 12,
+      "canonStatus": "CANON: the Great Crucible (the author's map); poured by hand GAME-ONLY",
+      "view": {
+        "x": 90,
+        "y": 112
+      },
+      "viewPitch": 15,
+      "viewZoom": 18
+    },
+    {
+      "name": "The East Fire Pits",
+      "text": "More pits of coals, and more Blacklegs round them. The smelters walk wide of this side.",
+      "at": {
+        "x": 138,
+        "y": 24
+      },
+      "radius": 12,
+      "canonStatus": "CANON: the Fire Pits (the author's map); GAME-ONLY",
+      "view": {
+        "x": 118,
+        "y": 10
+      },
+      "viewPitch": 14,
+      "viewZoom": 15
+    },
+    {
+      "name": "The Slag Fields",
+      "text": "Heaps of black slag cracked with ember, tipped out of the furnaces for a hundred years. The hounds live in them.",
+      "at": {
+        "x": 120,
+        "y": -125
+      },
+      "radius": 30,
+      "canonStatus": "CANON-EXPANDED: slag-piles (book1 ch.16:349); the fields GAME-ONLY",
+      "view": {
+        "x": 98,
+        "y": -96
+      },
+      "viewPitch": 15,
+      "viewZoom": 18
+    }
+  ],
+  "props": [
+    {
+      "kind": "molten_channel",
+      "name": "The River Aureum",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "rotation": 0,
+      "size": {
+        "x": 8,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": -100,
+          "y": 180
+        },
+        {
+          "x": -90,
+          "y": 90
+        },
+        {
+          "x": -80,
+          "y": 0
+        },
+        {
+          "x": -60,
+          "y": -90
+        },
+        {
+          "x": -30,
+          "y": -180
+        }
+      ],
+      "canonStatus": "CANON: the River Aureum (the author's map, maps/forge_district_map.png); molten metal behind kerbs GAME-ONLY"
+    },
+    {
+      "kind": "molten_channel",
+      "name": "The Molten Vein",
+      "at": {
+        "x": 0,
+        "y": 0
+      },
+      "rotation": 0,
+      "size": {
+        "x": 8,
+        "y": 0
+      },
+      "points": [
+        {
+          "x": 20,
+          "y": 180
+        },
+        {
+          "x": 25,
+          "y": 90
+        },
+        {
+          "x": 40,
+          "y": 30
+        },
+        {
+          "x": 60,
+          "y": -60
+        },
+        {
+          "x": 90,
+          "y": -180
+        }
+      ],
+      "canonStatus": "CANON: the Molten Vein (the author's map); its course here GAME-ONLY"
+    },
+    {
+      "kind": "forge_bridge",
+      "name": "The Aureum Bridge",
+      "at": {
+        "x": -80,
+        "y": 2
+      },
+      "rotation": 90,
+      "size": {
+        "x": 16,
+        "y": 7
+      }
+    },
+    {
+      "kind": "forge_bridge",
+      "name": "The Low Aureum Bridge",
+      "at": {
+        "x": -58.3,
+        "y": -95
+      },
+      "rotation": 90,
+      "size": {
+        "x": 16,
+        "y": 7
+      }
+    },
+    {
+      "kind": "forge_bridge",
+      "name": "The North Vein Bridge",
+      "at": {
+        "x": 23.9,
+        "y": 110
+      },
+      "rotation": 90,
+      "size": {
+        "x": 16,
+        "y": 7
+      }
+    },
+    {
+      "kind": "forge_bridge",
+      "name": "The Slag Bridge",
+      "at": {
+        "x": 58.9,
+        "y": -55
+      },
+      "rotation": 90,
+      "size": {
+        "x": 16,
+        "y": 7
+      }
+    },
+    {
+      "kind": "forge_gate",
+      "name": "The Tithe Gate",
+      "at": {
+        "x": -166,
+        "y": 0
+      },
+      "rotation": 90,
+      "size": {
+        "x": 8,
+        "y": 0
+      }
+    },
+    {
+      "kind": "inn",
+      "name": "The Rust & Ruin",
+      "at": {
+        "x": -132,
+        "y": 24
+      },
+      "rotation": 0,
+      "size": {
+        "x": 14,
+        "y": 10
+      }
+    },
+    {
+      "kind": "the_spoke",
+      "name": "The Spoke",
+      "at": {
+        "x": -12,
+        "y": 0
+      },
+      "rotation": 0,
+      "size": {
+        "x": 14,
+        "y": 48
+      },
+      "canonStatus": "CANON: the Spoke, a rune-carved stone monolith (world_bible.md Magic), raised in the Forge District's Foundry (book1 ch.7:237); its look GAME-ONLY from the author's map"
+    },
+    {
+      "kind": "spoke_yard",
+      "name": "The Spoke's yard",
+      "at": {
+        "x": -12,
+        "y": 0
+      },
+      "rotation": 90,
+      "size": {
+        "x": 26,
+        "y": 0
+      }
+    },
+    {
+      "kind": "lodging_row",
+      "name": "Smelters' lodgings",
+      "at": {
+        "x": -150,
+        "y": -28
+      },
+      "rotation": 270,
+      "size": {
+        "x": 18,
+        "y": 7
+      }
+    },
+    {
+      "kind": "lodging_row",
+      "name": "Smelters' lodgings",
+      "at": {
+        "x": -152,
+        "y": -56
+      },
+      "rotation": 270,
+      "size": {
+        "x": 18,
+        "y": 7
+      },
+      "variant": 1
+    },
+    {
+      "kind": "lodging_row",
+      "name": "Smelters' lodgings",
+      "at": {
+        "x": -154,
+        "y": -84
+      },
+      "rotation": 270,
+      "size": {
+        "x": 18,
+        "y": 7
+      },
+      "variant": 2
+    },
+    {
+      "kind": "lodging_row",
+      "name": "Smelters' lodgings",
+      "at": {
+        "x": -106,
+        "y": -34
+      },
+      "rotation": 90,
+      "size": {
+        "x": 18,
+        "y": 7
+      },
+      "variant": 3
+    },
+    {
+      "kind": "lodging_row",
+      "name": "Smelters' lodgings",
+      "at": {
+        "x": -108,
+        "y": -62
+      },
+      "rotation": 90,
+      "size": {
+        "x": 18,
+        "y": 7
+      },
+      "variant": 4
+    },
+    {
+      "kind": "lodging_row",
+      "name": "Smelters' lodgings",
+      "at": {
+        "x": -160,
+        "y": 30
+      },
+      "rotation": 0,
+      "size": {
+        "x": 18,
+        "y": 7
+      },
+      "variant": 5
+    },
+    {
+      "kind": "lodging_row",
+      "name": "Smelters' lodgings",
+      "at": {
+        "x": -104,
+        "y": 28
+      },
+      "rotation": 0,
+      "size": {
+        "x": 18,
+        "y": 7
+      },
+      "variant": 6
+    },
+    {
+      "kind": "fire_pit",
+      "name": "The west fire pit",
+      "at": {
+        "x": -160,
+        "y": -118
+      },
+      "rotation": 0,
+      "size": {
+        "x": 9,
+        "y": 9
+      }
+    },
+    {
+      "kind": "fire_pit",
+      "name": "The small west fire pit",
+      "at": {
+        "x": -146,
+        "y": -134
+      },
+      "rotation": 0,
+      "size": {
+        "x": 7,
+        "y": 7
+      }
+    },
+    {
+      "kind": "crucible",
+      "name": "The south-west Great Crucible",
+      "at": {
+        "x": -92,
+        "y": -150
+      },
+      "rotation": 0,
+      "size": {
+        "x": 14,
+        "y": 14
+      }
+    },
+    {
+      "kind": "furnace",
+      "name": "Warrens furnace",
+      "at": {
+        "x": -164,
+        "y": -150
+      },
+      "rotation": 0,
+      "size": {
+        "x": 7,
+        "y": 7
+      },
+      "variant": 1
+    },
+    {
+      "kind": "foundry_hall",
+      "name": "Foundry hall",
+      "at": {
+        "x": -68,
+        "y": 80
+      },
+      "rotation": 270,
+      "size": {
+        "x": 24,
+        "y": 12
+      }
+    },
+    {
+      "kind": "foundry_hall",
+      "name": "Foundry hall",
+      "at": {
+        "x": -18,
+        "y": 75
+      },
+      "rotation": 90,
+      "size": {
+        "x": 24,
+        "y": 12
+      }
+    },
+    {
+      "kind": "foundry_hall",
+      "name": "Foundry hall",
+      "at": {
+        "x": -18,
+        "y": 140
+      },
+      "rotation": 90,
+      "size": {
+        "x": 24,
+        "y": 12
+      }
+    },
+    {
+      "kind": "foundry_hall",
+      "name": "Foundry hall",
+      "at": {
+        "x": -70,
+        "y": 135
+      },
+      "rotation": 270,
+      "size": {
+        "x": 24,
+        "y": 12
+      }
+    },
+    {
+      "kind": "furnace",
+      "name": "Foundry furnace",
+      "at": {
+        "x": -64,
+        "y": 40
+      },
+      "rotation": 0,
+      "size": {
+        "x": 7,
+        "y": 7
+      }
+    },
+    {
+      "kind": "furnace",
+      "name": "Foundry furnace",
+      "at": {
+        "x": -64,
+        "y": 108
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      },
+      "variant": 2
+    },
+    {
+      "kind": "crucible",
+      "name": "The Great Crucible",
+      "at": {
+        "x": 115,
+        "y": 125
+      },
+      "rotation": 0,
+      "size": {
+        "x": 16,
+        "y": 16
+      }
+    },
+    {
+      "kind": "fire_pit",
+      "name": "The east fire pit",
+      "at": {
+        "x": 140,
+        "y": 38
+      },
+      "rotation": 0,
+      "size": {
+        "x": 9,
+        "y": 9
+      }
+    },
+    {
+      "kind": "fire_pit",
+      "name": "The small east fire pit",
+      "at": {
+        "x": 140,
+        "y": 8
+      },
+      "rotation": 0,
+      "size": {
+        "x": 7,
+        "y": 7
+      }
+    },
+    {
+      "kind": "furnace",
+      "name": "East furnace",
+      "at": {
+        "x": 150,
+        "y": 75
+      },
+      "rotation": 0,
+      "size": {
+        "x": 7,
+        "y": 7
+      }
+    },
+    {
+      "kind": "furnace",
+      "name": "East furnace",
+      "at": {
+        "x": 70,
+        "y": 145
+      },
+      "rotation": 0,
+      "size": {
+        "x": 7,
+        "y": 7
+      },
+      "variant": 1
+    },
+    {
+      "kind": "slag_heap",
+      "name": "Slag heap",
+      "at": {
+        "x": 92,
+        "y": -122
+      },
+      "rotation": 0,
+      "size": {
+        "x": 10,
+        "y": 10
+      }
+    },
+    {
+      "kind": "slag_heap",
+      "name": "Slag heap",
+      "at": {
+        "x": 132,
+        "y": -142
+      },
+      "rotation": 0,
+      "size": {
+        "x": 9,
+        "y": 9
+      }
+    },
+    {
+      "kind": "slag_heap",
+      "name": "Slag heap",
+      "at": {
+        "x": 145,
+        "y": -100
+      },
+      "rotation": 0,
+      "size": {
+        "x": 9,
+        "y": 9
+      }
+    },
+    {
+      "kind": "slag_heap",
+      "name": "Slag heap",
+      "at": {
+        "x": 100,
+        "y": -158
+      },
+      "rotation": 0,
+      "size": {
+        "x": 8,
+        "y": 8
+      }
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": -150,
+        "y": 8
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": -112,
+        "y": 8
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": -88,
+        "y": 8
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": -56,
+        "y": 9
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": -38,
+        "y": 98
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": 12,
+        "y": 114
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": 34,
+        "y": 104
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": 70,
+        "y": 106
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": 122,
+        "y": 50
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": 116,
+        "y": 0
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": 70,
+        "y": -62
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": 16,
+        "y": -43
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "cinder_lamp",
+      "name": "Cinder lamp",
+      "at": {
+        "x": -44,
+        "y": -64
+      },
+      "rotation": 0
+    },
+    {
+      "kind": "ingot_stack",
+      "name": "Ingots",
+      "at": {
+        "x": -56,
+        "y": 70
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "ingot_stack",
+      "name": "Ingots",
+      "at": {
+        "x": -6,
+        "y": 90
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "ingot_stack",
+      "name": "Ingots",
+      "at": {
+        "x": -6,
+        "y": 126
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "ingot_stack",
+      "name": "Ingots",
+      "at": {
+        "x": 100,
+        "y": 140
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "ingot_stack",
+      "name": "Ingots",
+      "at": {
+        "x": -80,
+        "y": -158
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "ingot_stack",
+      "name": "Ingots",
+      "at": {
+        "x": 130,
+        "y": 115
+      },
+      "rotation": 20
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": -140,
+        "y": 60
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": -112,
+        "y": 70
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": -150,
+        "y": 120
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": -118,
+        "y": 140
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": -56,
+        "y": -36
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": 82,
+        "y": 70
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": 150,
+        "y": -40
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": 40,
+        "y": -128
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    },
+    {
+      "kind": "ruin",
+      "name": "Fallen lodging",
+      "at": {
+        "x": 150,
+        "y": 150
+      },
+      "rotation": 0,
+      "size": {
+        "x": 6,
+        "y": 6
+      }
+    }
+  ],
+  "camps": [
+    {
+      "name": "Slag-hounds on the Warrens' tips",
+      "mob": "Slag-hound",
+      "tag": "slaghound",
+      "look": "wolf",
+      "center": {
+        "x": -164,
+        "y": -42
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 19,
+      "levelMax": 20,
+      "respawn": 90,
+      "canonStatus": "GAME-ONLY: feral dogs of the slag-heaps (slag-piles are CANON, book1 ch.16:349)"
+    },
+    {
+      "name": "Slag-hounds by the west pits",
+      "mob": "Slag-hound",
+      "tag": "slaghound",
+      "look": "wolf",
+      "center": {
+        "x": -168,
+        "y": -160
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 19,
+      "levelMax": 20,
+      "respawn": 90,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Blacklegs at the west pits",
+      "mob": "Blackleg",
+      "tag": "blackleg",
+      "look": "deserter",
+      "center": {
+        "x": -138,
+        "y": -116
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 19,
+      "levelMax": 20,
+      "respawn": 90,
+      "canonStatus": "GAME-ONLY: thugs the foremen hire against the smelters"
+    },
+    {
+      "name": "Crucible overseers (south-west)",
+      "mob": "Foundry overseer",
+      "tag": "overseer",
+      "look": "warden",
+      "center": {
+        "x": -88,
+        "y": -126
+      },
+      "radius": 8,
+      "count": 3,
+      "levelMin": 20,
+      "levelMax": 21,
+      "respawn": 90,
+      "canonStatus": "CANON-EXPANDED: the Council's foremen and overseers (DUNGEON_DESIGN.md: shared freely); these GAME-ONLY"
+    },
+    {
+      "name": "Foundry overseers",
+      "mob": "Foundry overseer",
+      "tag": "overseer",
+      "look": "warden",
+      "center": {
+        "x": -30,
+        "y": 50
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 20,
+      "levelMax": 21,
+      "respawn": 90,
+      "canonStatus": "CANON-EXPANDED: the Spoke raised in the Foundry (book1 ch.7:237); the overseers GAME-ONLY"
+    },
+    {
+      "name": "The Spoke's leak",
+      "mob": "Weave-Eater",
+      "tag": "weaveeater",
+      "look": "weaveeater",
+      "center": {
+        "x": 2,
+        "y": 60
+      },
+      "radius": 8,
+      "count": 3,
+      "levelMin": 21,
+      "levelMax": 22,
+      "respawn": 90,
+      "canonStatus": "CANON: Weave-Eaters, born of the High City's magical pollution (book1 ch.1:251); drawn to the Spoke GAME-ONLY"
+    },
+    {
+      "name": "Iron Pact at the yard gate",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "center": {
+        "x": -60,
+        "y": -16
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 21,
+      "levelMax": 22,
+      "respawn": 90,
+      "canonStatus": "CANON faction: the Iron Pact (world_bible.md); as the Council's guard here GAME-ONLY (DUNGEON_DESIGN.md: shared freely)"
+    },
+    {
+      "name": "Iron Pact crossbowmen in the yard",
+      "mob": "Iron Pact crossbowman",
+      "tag": "pactbow",
+      "look": "outrider",
+      "center": {
+        "x": -26,
+        "y": -14
+      },
+      "radius": 4,
+      "count": 3,
+      "levelMin": 21,
+      "levelMax": 22,
+      "respawn": 90,
+      "canonStatus": "CANON faction: the Iron Pact (world_bible.md); GAME-ONLY camp"
+    },
+    {
+      "name": "Blacklegs at the east pits",
+      "mob": "Blackleg",
+      "tag": "blackleg",
+      "look": "deserter",
+      "center": {
+        "x": 112,
+        "y": 34
+      },
+      "radius": 9,
+      "count": 4,
+      "levelMin": 20,
+      "levelMax": 21,
+      "respawn": 90,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Slag-hounds in the Slag Fields",
+      "mob": "Slag-hound",
+      "tag": "slaghound",
+      "look": "wolf",
+      "center": {
+        "x": 122,
+        "y": -118
+      },
+      "radius": 11,
+      "count": 5,
+      "levelMin": 20,
+      "levelMax": 20,
+      "respawn": 90,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Crucible overseers (north-east)",
+      "mob": "Foundry overseer",
+      "tag": "overseer",
+      "look": "warden",
+      "center": {
+        "x": 92,
+        "y": 136
+      },
+      "radius": 8,
+      "count": 4,
+      "levelMin": 21,
+      "levelMax": 22,
+      "respawn": 90,
+      "canonStatus": "CANON-EXPANDED: the Council's foremen; GAME-ONLY camp"
+    },
+    {
+      "name": "Iron Pact on the Crucible Way",
+      "mob": "Iron Pact soldier",
+      "tag": "pactsoldier",
+      "look": "outrider",
+      "center": {
+        "x": 58,
+        "y": 84
+      },
+      "radius": 8,
+      "count": 3,
+      "levelMin": 21,
+      "levelMax": 22,
+      "respawn": 90,
+      "canonStatus": "CANON faction: the Iron Pact (world_bible.md); GAME-ONLY camp"
+    },
+    {
+      "name": "Old Clinker",
+      "mob": "Old Clinker",
+      "tag": "clinker",
+      "look": "wolf",
+      "center": {
+        "x": 158,
+        "y": -150
+      },
+      "radius": 6,
+      "count": 1,
+      "levelMin": 20,
+      "levelMax": 20,
+      "respawn": 90,
+      "rare": 0.3,
+      "social": "solitary",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "The Spoke-Leech",
+      "mob": "The Spoke-Leech",
+      "tag": "spokeleech",
+      "look": "weaveeater",
+      "center": {
+        "x": -60,
+        "y": 165
+      },
+      "radius": 6,
+      "count": 1,
+      "levelMin": 22,
+      "levelMax": 22,
+      "respawn": 90,
+      "rare": 0.25,
+      "social": "solitary",
+      "canonStatus": "CANON-EXPANDED: Weave-Eaters (book1 ch.1:251); the Spoke-Leech GAME-ONLY"
+    }
+  ],
+  "life": {
+    "villagers": 0,
+    "mood": "afraid",
+    "names": [],
+    "critters": [
+      {
+        "kind": "crow",
+        "center": {
+          "x": 120,
+          "y": -120
+        },
+        "radius": 18,
+        "count": 4
+      },
+      {
+        "kind": "cat",
+        "center": {
+          "x": -130,
+          "y": -60
+        },
+        "radius": 16,
+        "count": 3
+      }
+    ],
+    "residents": [
+      {
+        "name": "Hesta Wode",
+        "role": "stranger",
+        "title": "Copper-Tithe Tally-Woman",
+        "place": "",
+        "at": {
+          "x": -156,
+          "y": -7
+        },
+        "canonStatus": "CANON-EXPANDED: the Copper-Tithe, sick of the Concord's taxes (book1 ch.24:140); Hesta GAME-ONLY",
+        "stories": [
+          "The Tithe takes a copper in ten off every pour for the Concord, and the Concord takes the other nine. I write both down. Somebody should.",
+          "I've a son in the Warrens and a brother in the Foundry. One of them coughs and one of them doesn't talk about his work. I don't know which is worse.",
+          "We're not thieves, whatever they say in the Lowtowns. Thieves get to keep what they take."
+        ]
+      },
+      {
+        "name": "Berrow Orr",
+        "role": "innkeeper",
+        "title": "Keeper of the Rust & Ruin",
+        "place": "bar",
+        "works": true,
+        "canonStatus": "GAME-ONLY: the books give the Rust & Ruin no keeper's name",
+        "stories": [
+          "The door's iron-banded because the last one got kicked in. The one before that too. I stopped counting doors and started counting bands.",
+          "Beer's stale because the cellar's warm. Everything's warm here. Even the rats sweat.",
+          "The Tithe drink here, the smelters drink here, and once a week an overseer comes in and nobody drinks at all till he goes."
+        ]
+      },
+      {
+        "name": "Old Aelric",
+        "role": "stranger",
+        "title": "Crucible-Hand",
+        "place": "",
+        "at": {
+          "x": -116,
+          "y": -126
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Forty years at the pour. I've the burns to show it, up both arms like sleeves. The Crucible doesn't care who you are.",
+          "When I was a boy the halls made pots and nails. Now they make whatever it is they're making up by the monolith, and nobody asks.",
+          "They take the bright ones. Children who light a lamp by looking at it. They write them on a list and then one day they're gone up."
+        ]
+      },
+      {
+        "name": "Elfa Raike",
+        "role": "stranger",
+        "title": "Herb-Woman of the Warrens",
+        "place": "",
+        "at": {
+          "x": -136,
+          "y": -72
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Ash-lung. Half the Warrens has it. Soot-wort eases it. Nothing cures it but leaving, and nobody leaves.",
+          "My mother said the air was sweet here once, before the halls were built over the houses. I don't believe her. I'd like to.",
+          "Since they started on the monolith the coughing's worse at night. I don't know why. The night air should be cleaner."
+        ]
+      },
+      {
+        "name": "Ade Heath",
+        "role": "stranger",
+        "title": "Bellows-Boy",
+        "place": "",
+        "at": {
+          "x": -100,
+          "y": 12
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "I work the bellows at the Warrens' hearth. Up, down, up, down, all day. My arms are bigger than my brother's and he's fourteen.",
+          "The Blacklegs take things off you if you're small. Bellows, bread, boots. They took my brother's boots and he walked home on the cinders.",
+          "One day I'll have my own hearth. A little one. Nails and hinges. Nothing for the monolith."
+        ]
+      },
+      {
+        "name": "Hamo Glaze",
+        "role": "stranger",
+        "title": "Slag-Glass Blower",
+        "place": "",
+        "at": {
+          "x": 104,
+          "y": 82
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "There's glass in the slag if you know where to look. Black glass, green glass, once a blue one. I blow it into beads for the Tithe-women.",
+          "The overseers don't mind me. I'm not making anything they want. That's the safest thing to be, here.",
+          "I made a bead the colour of the sea once. Nobody here had seen the sea. They all said it was the right colour anyway."
+        ]
+      }
+    ],
+    "households": [],
+    "workshops": [],
+    "stories": []
+  },
+  "secrets": [
+    {
+      "id": "secret.forge.slag-top",
+      "name": "On Top of the Slag",
+      "kind": "vista",
+      "at": {
+        "x": 160,
+        "y": -60
+      },
+      "radius": 6,
+      "text": "From the top of the heap the whole district lies below in the smog: the two bright rivers, the halls glowing, and the monolith in the middle of it all, humming. Far off in the north-east, over everything, the Crown.",
+      "clue": "Out in the east, where the black heaps stand highest, climb up and look back at everything.",
+      "hint": "Hamo Glaze says if you climb the tallest heap out east you can see the whole district at once. He goes up there to look for blue glass, and to look.",
+      "xp": 220,
+      "canonStatus": "CANON-EXPANDED: the Spoke (world_bible.md) and the Crown (world_bible.md Geography); the lookout GAME-ONLY"
+    },
+    {
+      "id": "secret.forge.tithe-stash",
+      "name": "A Runner's Stash",
+      "kind": "cache",
+      "at": {
+        "x": -168,
+        "y": 150
+      },
+      "prompt": "Search the loose stones",
+      "text": "Behind a loose stone at the foot of the district wall: a tin of coppers, a twist of salt and a scrap of the Tithe's own tally, every number crossed out.",
+      "clue": "In the far north-west corner, where the district wall comes down to the ground, one stone is looser than the rest.",
+      "hint": "Hesta Wode says the Tithe's runners used to hide their takings in the wall up at the north-west corner, before she came. She never went to look.",
+      "xp": 220,
+      "gold": 45,
+      "canonStatus": "CANON-EXPANDED: the Copper-Tithe (book1 ch.24:140); the stash GAME-ONLY"
+    },
+    {
+      "id": "secret.forge.chalk-w",
+      "name": "A Chalked Letter",
+      "kind": "note",
+      "at": {
+        "x": -46,
+        "y": -24
+      },
+      "prompt": "Look at the chalk",
+      "text": "Low on the yard's wall, where a child would sit, somebody has chalked a W. Under it, smaller: UP.",
+      "clue": "Outside the ring wall round the monolith, low down on its west side, a child's letter in chalk.",
+      "hint": "Old Aelric says the children they take sit by the ring wall's west side while they wait, and somebody chalks on it. He won't go and read it.",
+      "xp": 220,
+      "document": "doc.forge.chalk_w",
+      "canonStatus": "GAME-ONLY (Wren: peaks.json, lowtowns.json)"
+    }
+  ],
+  "nodes": [
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -145.5,
+        "y": 60
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -134.5,
+        "y": 60
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -117.5,
+        "y": 70
+      },
+      "rotation": 47
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -106.5,
+        "y": 70
+      },
+      "rotation": 47
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -155.5,
+        "y": 120
+      },
+      "rotation": 94
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -144.5,
+        "y": 120
+      },
+      "rotation": 94
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -123.5,
+        "y": 140
+      },
+      "rotation": 141
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -112.5,
+        "y": 140
+      },
+      "rotation": 141
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": -61.5,
+        "y": -36
+      },
+      "rotation": 188
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": -50.5,
+        "y": -36
+      },
+      "rotation": 188
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 76.5,
+        "y": 70
+      },
+      "rotation": 235
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": 87.5,
+        "y": 70
+      },
+      "rotation": 235
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 144.5,
+        "y": -40
+      },
+      "rotation": 282
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": 155.5,
+        "y": -40
+      },
+      "rotation": 282
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 34.5,
+        "y": -128
+      },
+      "rotation": 329
+    },
+    {
+      "node": "node.cinderbeam",
+      "at": {
+        "x": 45.5,
+        "y": -128
+      },
+      "rotation": 329
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 144.5,
+        "y": 150
+      },
+      "rotation": 16
+    },
+    {
+      "node": "node.slagiron",
+      "at": {
+        "x": 155.5,
+        "y": 150
+      },
+      "rotation": 16
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": -170,
+        "y": 90
+      },
+      "rotation": 0
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": -122,
+        "y": 166
+      },
+      "rotation": 61
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": -170,
+        "y": -100
+      },
+      "rotation": 122
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": -84,
+        "y": -40
+      },
+      "rotation": 183
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": -8,
+        "y": 160
+      },
+      "rotation": 244
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": 8,
+        "y": 30
+      },
+      "rotation": 305
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": 80,
+        "y": -22
+      },
+      "rotation": 6
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": 150,
+        "y": -10
+      },
+      "rotation": 67
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": 160,
+        "y": 100
+      },
+      "rotation": 128
+    },
+    {
+      "node": "node.sootwort",
+      "at": {
+        "x": 60,
+        "y": -150
+      },
+      "rotation": 189
+    }
+  ],
+  "stations": [
+    {
+      "kind": "forge",
+      "name": "Forge: the Warrens' hearth",
+      "at": {
+        "x": -140,
+        "y": 10
+      },
+      "rotation": 180,
+      "variant": 0,
+      "canonStatus": "GAME-ONLY (a smith's hearth, the bellows worked by hand)"
+    },
+    {
+      "kind": "fire",
+      "name": "The Tithe-booth's brazier",
+      "at": {
+        "x": -156,
+        "y": -12
+      },
+      "rotation": 0,
+      "canonStatus": "GAME-ONLY"
+    }
+  ]
+}

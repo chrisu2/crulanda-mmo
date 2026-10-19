@@ -30,7 +30,7 @@ namespace Crulanda.World
     /// </summary>
     public sealed partial class ZoneBuilder
     {
-        public const string VillageKit = "MedievalVillage1/Prefabs/";
+        public const string MedievalKit = "MedievalVillage1/Prefabs/";
         /// <summary>Where the Rust Market's smith keeps shop: the terrace plot nearest the market hearth (The Rust Market hearth, 72, 24).</summary>
         public static readonly Vector2 SmithyPlot = new Vector2(50.88f, 33.53f);
         public const float VillagePlinth = .3f, VillageStorey = 3f, VillageGallery = .9f;
@@ -47,7 +47,7 @@ namespace Crulanda.World
         {
             public string name; public float xMin, xMax, yMin, zMin, front, top, eaves; public bool glass; public Vector3 smoke;
             public bool ridgeAlongX; public float ridgeAt, mossMid, mossSpan, mossHalf, mossEaves, mossRidge;
-            public string Prefab { get { return VillageKit + name + "_Standard"; } }
+            public string Prefab { get { return MedievalKit + name + "_Standard"; } }
             public float Width { get { return (xMax - xMin) / 100; } }
             public float Depth { get { return (front - zMin) / 100; } }
             public float MidX { get { return (xMax + xMin) / 200; } }
@@ -203,20 +203,7 @@ namespace Crulanda.World
                 BoxPart(t, new Vector3(0, (VillagePlinth - drop) / 2, 0), new Vector3(w, VillagePlinth + drop, d), brick, null, 2);
                 float gr = Mathf.Min(LocalGround(t, 0, -d / 2 - .6f), 0);
                 parts.Box(WetSetts, new Vector3(0, gr + (VillagePlinth - gr) / 2 - .02f, -d / 2 - .45f), new Vector3(w - .2f, VillagePlinth - gr, .9f));
-                const float yard = 3.2f;
-                foreach (var h in row.houses)   // behind a house shallower than the plot (not through a deep one's back eaves)
-                    if (-d / 2 + h.model.Depth * h.scale < d / 2 - .6f)
-                    {
-                        parts.Box(brick, new Vector3(h.x, VillagePlinth + yard / 2, d / 2 - .15f), new Vector3(h.Width, yard, .3f));
-                        parts.Box(band, new Vector3(h.x, VillagePlinth + yard + .06f, d / 2 - .15f), new Vector3(h.Width + .05f, .12f, .4f));
-                    }
-                float left = row.houses[0].x - row.houses[0].Width / 2, right = row.houses[row.houses.Count - 1].x + row.houses[row.houses.Count - 1].Width / 2;
-                foreach (var (a, b) in new[] { (-w / 2, left), (right, w / 2) })
-                    if (b - a > .15f)
-                    {
-                        parts.Box(brick, new Vector3((a + b) / 2, VillagePlinth + yard / 2, 0), new Vector3(b - a, yard, d));
-                        parts.Box(band, new Vector3((a + b) / 2, VillagePlinth + yard + .06f, 0), new Vector3(b - a + .05f, .12f, d + .05f));
-                    }
+                YardWalls(t, parts, row, brick, band, row.houses[0].x - row.houses[0].Width / 2, row.houses[row.houses.Count - 1].x + row.houses[row.houses.Count - 1].Width / 2, g);
             }
             // The houses.
             int middle = row.houses.Count / 2;
@@ -236,7 +223,7 @@ namespace Crulanda.World
                     float[] tall = { .55f, .5f, .45f, .4f, .9f, .95f };
                     int k = (int)(R() * gear.Length) % gear.Length; float side = R() < .5f ? -1 : 1;
                     float gx = h.x + side * Mathf.Max(.6f, h.Width / 2 - .7f);
-                    if (Mathf.Abs(gx) < w / 2 - .4f) ModelProp(t, VillageKit + gear[k] + "_Standard", new Vector3(gx, row.underTop, -d / 2 - VillageGallery / 2), R() * 360, tall[k], false, VillageGallery - .1f);
+                    if (Mathf.Abs(gx) < w / 2 - .4f) ModelProp(t, MedievalKit + gear[k] + "_Standard", new Vector3(gx, row.underTop, -d / 2 - VillageGallery / 2), R() * 360, tall[k], false, VillageGallery - .1f);
                 }
             }
             if (row.smithy) SmithyDressing(t, row.houses[0], d);
@@ -265,53 +252,104 @@ namespace Crulanda.World
         }
 
         /// <summary>
-        /// The brick under a row (one or two storeys of soot brick, the old terrace's): doors on stoops every other bay on the street (the
-        /// middle one a household's when the terrace is named), windows (a few lit, most dark), a string course at each floor, a flat leaded
-        /// top under the houses, and a timber gallery along its front at the top on iron brackets, a rail on its edge, for the houses' doors.
+        /// The brick under a row (one or two storeys of soot brick, the old terrace's): a block under each house, its own footprint and a
+        /// hand more (the 2026-10-19 frames: one box for the whole plot read as a blank crate with a house overhanging it), doors on
+        /// stoops on the street, windows with sills, lintels and jambs on every face that shows (a few lit, most dark), a string course at
+        /// each floor, a leaded top; a timber gallery along the row's front at the top on iron brackets, a rail on its edge, for the houses'
+        /// doors. Where the plot runs on past the blocks (its ends, behind a shallow house) a brick yard wall (YardWalls).
         /// </summary>
         void Undercroft(Transform t, Batch parts, VillageRow row, Material brick, Material band, float drop, bool named, System.Random g)
         {
             float R() { return (float)g.NextDouble(); }
             float w = row.size.x, d = row.size.y, U = row.underTop;
-            BoxPart(t, new Vector3(0, (U - drop) / 2, 0), new Vector3(w, U + drop, d), brick, null, 2);
-            parts.Box(TarredTimber, new Vector3(0, U + .03f, 0), new Vector3(w + .04f, .06f, d + .04f));   // the leads
-            for (int s = 1; s <= row.under; s++)
-                foreach (int sz in new[] { -1, 1 }) parts.Box(band, new Vector3(0, VillagePlinth + s * VillageStorey - .1f, sz * (d / 2 + .06f)), new Vector3(w + .1f, .16f, .14f));
-            int bays = Mathf.Max(2, Mathf.RoundToInt(w / 2.6f)); float bay = w / bays;
             var lit = FireWindow; var dark = DarkPane; var frame = TarredTimber;
             var doorWood = new[] { Tint(art.timber, new Color(.22f, .14f, .1f)), Tint(art.timber, new Color(.16f, .18f, .2f)), Tint(art.timber, new Color(.26f, .12f, .09f)) };
-            int middle = bays / 2; if (middle % 2 != 0 && bays > 3) middle--;
-            for (int s = 0; s < row.under; s++)
-                for (int b = 0; b < bays; b++)
+            int middleHouse = row.houses.Count / 2; float rowLeft = w / 2, rowRight = -w / 2;
+            for (int hi = 0; hi < row.houses.Count; hi++)
+            {
+                var h = row.houses[hi];
+                float x0 = Mathf.Max(-w / 2, h.x - h.Width / 2 - .15f), x1 = Mathf.Min(w / 2, h.x + h.Width / 2 + .15f);
+                if (hi > 0) x0 = Mathf.Max(x0, row.houses[hi - 1].x + row.houses[hi - 1].Width / 2 + .15f);   // abutting its neighbour's block, not inside it
+                float back = Mathf.Min(d / 2, -d / 2 + h.model.Depth * h.scale + .2f), bw = x1 - x0, bd = back + d / 2, cx = (x0 + x1) / 2, cz = (back - d / 2) / 2;
+                rowLeft = Mathf.Min(rowLeft, x0); rowRight = Mathf.Max(rowRight, x1);
+                float dropHere = FootDrop(t, bw, bd, cz);
+                BoxPart(t, new Vector3(cx, (U - dropHere) / 2, cz), new Vector3(bw, U + dropHere, bd), brick, null, 2);
+                parts.Box(TarredTimber, new Vector3(cx, U + .03f, cz), new Vector3(bw + .04f, .06f, bd + .04f));   // the leads
+                for (int s = 1; s <= row.under; s++)
                 {
-                    float x = -w / 2 + bay * (b + .5f), y = VillagePlinth + s * VillageStorey + 1.55f;
-                    foreach (int sz in new[] { -1, 1 })
-                    {
-                        bool door = sz < 0 && s == 0 && (b % 2 == 0 || bays <= 3);
-                        if (door)
-                        {
-                            parts.Box(doorWood[(int)(R() * doorWood.Length) % doorWood.Length], new Vector3(x, VillagePlinth + 1.1f, -d / 2 - .04f), new Vector3(1.05f, 2.2f, .07f));
-                            parts.Box(SootIron, new Vector3(x + .3f, VillagePlinth + 1.05f, -d / 2 - .09f), new Vector3(.1f, .1f, .04f));
-                            parts.Box(frame, new Vector3(x, VillagePlinth + 2.3f, -d / 2 - .06f), new Vector3(1.3f, .16f, .14f));
-                            float gr = Mathf.Min(LocalGround(t, x, -d / 2 - .6f), 0);
-                            parts.Box(WetSetts, new Vector3(x, gr + (VillagePlinth - gr) / 2 - .02f, -d / 2 - .45f), new Vector3(1.6f, VillagePlinth - gr, .9f));
-                            if (named && b == middle) Doors.Add(new ZoneDoor { name = t.name, openable = false, position = t.TransformPoint(new Vector3(x, 1, -d / 2 - 1.35f)) });
-                            continue;
-                        }
-                        bool glow = R() < (s == 0 ? .3f : .2f), shard = glow && R() < .2f;   // a fire in most, a shard's violet in one in five (book1 ch.1:191; ch.3:133)
-                        parts.Box(glow ? (shard ? ShardWindow : lit) : dark, new Vector3(x, y, sz * (d / 2 + .02f)), new Vector3(.8f, 1.2f, .06f));
-                        parts.Box(band, new Vector3(x, y - .68f, sz * (d / 2 + .07f)), new Vector3(1.05f, .1f, .16f));
-                        parts.Box(frame, new Vector3(x, y + .66f, sz * (d / 2 + .05f)), new Vector3(1.0f, .14f, .12f));
-                    }
+                    float y = VillagePlinth + s * VillageStorey - .1f, th = s == row.under ? .26f : .16f;
+                    foreach (int sz in new[] { -1, 1 }) parts.Box(band, new Vector3(cx, y, sz < 0 ? -d / 2 - .06f : back + .06f), new Vector3(bw + .1f, th, .14f));
+                    foreach (int sx in new[] { -1, 1 }) parts.Box(band, new Vector3(sx < 0 ? x0 - .06f : x1 + .06f, y, cz), new Vector3(.14f, th, bd + .1f));
                 }
+                // The faces that show: the front (doors on the ground floor), the back, and an end that stands free.
+                var faces = new List<(Vector3 origin, Vector3 along, float len, bool front)> { (new Vector3(x0, 0, -d / 2), Vector3.right, bw, true), (new Vector3(x1, 0, back), Vector3.left, bw, false) };
+                if (hi == 0) faces.Add((new Vector3(x0, 0, back), Vector3.back, bd, false));
+                if (hi == row.houses.Count - 1) faces.Add((new Vector3(x1, 0, -d / 2), Vector3.forward, bd, false));
+                foreach (var f in faces)
+                {
+                    var outward = -Vector3.Cross(Vector3.up, f.along).normalized;   // out of the wall (along +x on the front: -z)
+                    var turn = Quaternion.LookRotation(outward);
+                    int bays = Mathf.Max(1, Mathf.RoundToInt(f.len / 2.6f)); float bay = f.len / bays; int middle = bays / 2;
+                    for (int s = 0; s < row.under; s++)
+                        for (int b = 0; b < bays; b++)
+                        {
+                            var at = f.origin + f.along * (bay * (b + .5f)); float y = VillagePlinth + s * VillageStorey;
+                            if (f.front && s == 0 && (b % 2 == 0 || bays <= 2))
+                            {
+                                parts.Box(doorWood[(int)(R() * doorWood.Length) % doorWood.Length], at + new Vector3(0, y + 1.1f, -.04f), new Vector3(1.05f, 2.2f, .07f));
+                                parts.Box(SootIron, at + new Vector3(.3f, y + 1.05f, -.09f), new Vector3(.1f, .1f, .04f));
+                                parts.Box(frame, at + new Vector3(0, y + 2.3f, -.06f), new Vector3(1.3f, .16f, .14f));
+                                float gr = Mathf.Min(LocalGround(t, at.x, -d / 2 - .6f), 0);
+                                parts.Box(WetSetts, new Vector3(at.x, gr + (VillagePlinth - gr) / 2 - .02f, -d / 2 - .45f), new Vector3(1.6f, VillagePlinth - gr, .9f));
+                                if (named && hi == middleHouse && b == 0) Doors.Add(new ZoneDoor { name = t.name, openable = false, position = t.TransformPoint(new Vector3(at.x, 1, -d / 2 - 1.35f)) });
+                                continue;
+                            }
+                            bool glow = R() < (s == 0 ? .3f : .2f), shard = glow && R() < .2f;   // a fire in most, a shard's violet in one in five (book1 ch.1:191; ch.3:133)
+                            var c = at + new Vector3(0, y + 1.55f, 0);
+                            parts.Box(glow ? (shard ? ShardWindow : lit) : dark, c + outward * .02f, new Vector3(.8f, 1.2f, .06f), turn);
+                            parts.Box(band, c + outward * .07f + Vector3.down * .68f, new Vector3(1.05f, .1f, .16f), turn);   // the sill
+                            parts.Box(frame, c + outward * .05f + Vector3.up * .66f, new Vector3(1.0f, .14f, .12f), turn);   // the lintel
+                            foreach (int k in new[] { -1, 1 }) parts.Box(frame, c + outward * .05f + turn * new Vector3(k * .44f, 0, 0), new Vector3(.08f, 1.25f, .08f), turn);   // the jambs
+                        }
+                }
+            }
+            YardWalls(t, parts, row, brick, band, rowLeft, rowRight, g);
             // The gallery: planks over the street above head height, a rail at its edge, iron brackets under it (nothing stands in the street).
-            float gz = -d / 2 - VillageGallery / 2;
-            parts.Box(TarredTimber, new Vector3(0, U - .06f, gz), new Vector3(w - .1f, .12f, VillageGallery));
-            parts.Box(TarredTimber, new Vector3(0, U + .95f, -d / 2 - VillageGallery + .04f), new Vector3(w - .1f, .07f, .07f));
-            for (float x = -w / 2 + .1f; x <= w / 2 - .05f; x += 1.2f)
+            float gl = rowLeft + .05f, gw = rowRight - rowLeft - .1f, gc = (rowLeft + rowRight) / 2, gz = -d / 2 - VillageGallery / 2;
+            parts.Box(TarredTimber, new Vector3(gc, U - .06f, gz), new Vector3(gw, .12f, VillageGallery));
+            parts.Box(TarredTimber, new Vector3(gc, U + .95f, -d / 2 - VillageGallery + .04f), new Vector3(gw, .07f, .07f));
+            for (float x = gl; x <= gl + gw + .01f; x += 1.2f)
                 parts.Box(TarredTimber, new Vector3(x, U + .47f, -d / 2 - VillageGallery + .04f), new Vector3(.06f, .95f, .06f));
-            for (float x = -w / 2 + .6f; x < w / 2 - .3f; x += 2.4f)
+            for (float x = gl + .5f; x < gl + gw - .3f; x += 2.4f)
                 Rod(t, new Vector3(x, U - .9f, -d / 2), new Vector3(x, U - .14f, -d / 2 - VillageGallery + .1f), .035f, SootIron);
+        }
+
+        /// <summary>
+        /// Brick yard walls where a row leaves its plot open (the plot's one collider box stands there): its ends past the row
+        /// (<paramref name="left"/>, <paramref name="right"/>) full depth, and behind each house shallower than the plot; a coping on top
+        /// and a plank gate with iron straps in the ends and in half the back walls, so none reads as a blank box.
+        /// </summary>
+        void YardWalls(Transform t, Batch parts, VillageRow row, Material brick, Material band, float left, float right, System.Random g)
+        {
+            float w = row.size.x, d = row.size.y; const float yard = 3.2f;
+            var gate = Tint(art.timber, new Color(.24f, .17f, .11f));
+            void Wall(Vector3 c, Vector3 size, Vector3 gateFace)
+            {
+                parts.Box(brick, c, size);
+                parts.Box(band, c + Vector3.up * (size.y / 2 + .06f), new Vector3(size.x + .05f, .12f, size.z + .05f));
+                if (gateFace == Vector3.zero) return;
+                float along = Mathf.Abs(gateFace.z) > .5f ? size.x : size.z; if (along < 1.6f) return;
+                var face = c + Vector3.Scale(gateFace, size / 2) + gateFace * .03f; face.y = VillagePlinth + 1.05f;
+                var q = Quaternion.LookRotation(gateFace);
+                parts.Box(gate, face, new Vector3(1.2f, 2.1f, .07f), q);
+                foreach (float k in new[] { -.55f, .55f }) parts.Box(SootIron, face + gateFace * .03f + Vector3.up * k, new Vector3(1.2f, .08f, .03f), q);
+                parts.Box(band, face + Vector3.up * 1.15f, new Vector3(1.45f, .14f, .16f), q);   // the lintel over it
+            }
+            if (left + w / 2 > .15f) Wall(new Vector3((-w / 2 + left) / 2, VillagePlinth + yard / 2, 0), new Vector3(left + w / 2, yard, d), Vector3.back);
+            if (w / 2 - right > .15f) Wall(new Vector3((right + w / 2) / 2, VillagePlinth + yard / 2, 0), new Vector3(w / 2 - right, yard, d), Vector3.back);
+            foreach (var h in row.houses)
+                if (-d / 2 + h.model.Depth * h.scale < d / 2 - .6f)
+                    Wall(new Vector3(h.x, VillagePlinth + yard / 2, d / 2 - .15f), new Vector3(h.Width, yard, .3f), g.NextDouble() < .5 ? Vector3.forward : Vector3.zero);
         }
 
         /// <summary>
@@ -370,21 +408,21 @@ namespace Crulanda.World
         }
 
         /// <summary>The smith's shop's gear under its front awning, beside the door (the pack's anvil on a stump, its table with a hammer,
-        /// its weapon stand with a sword, a spear and a shield, a cart wheel for mending) and its sign over the awning.</summary>
+        /// a weapon stand (the Fantasy kit's, as the forges have) with the pack's sword, spear and shield, a cart wheel for mending) and its sign over the awning.</summary>
         void SmithyDressing(Transform t, VillagePlace h, float d)
         {
             Vector3 At(float mx, float mz) { return new Vector3(h.x + h.scaleX * (h.model.MidX - mx / 100), h.baseY, h.scale * (h.model.front - mz) / 100 - d / 2); }
             // (model x: the door is on the left, -533..-224, so the gear stands on the right; model z: under the awning, 380..490)
-            ModelProp(t, VillageKit + "Stump_A_Standard", At(150, 440), 0, .55f);
-            var anvil = ModelProp(t, VillageKit + "Anvil_Standard", At(150, 440) + Vector3.up * .55f, 90, .34f);
-            ModelProp(t, VillageKit + "Blacksmith_Table_Standard", At(300, 445), 180, .86f);
-            ModelProp(t, VillageKit + "Hammer_Standard", At(300, 445) + Vector3.up * .86f, 30, .12f);
-            ModelProp(t, VillageKit + "Weapon_Stand_Standard", At(20, 470), 180, 1.28f);
-            ModelProp(t, VillageKit + "Sword_Standard", At(-30, 470) + Vector3.up * .1f, 180, 1.06f);
-            ModelProp(t, VillageKit + "Spear_Standard", At(60, 470) + Vector3.up * .05f, 180, 1.8f);
-            ModelProp(t, VillageKit + "Shield_Standard", At(390, 470), 200, .63f);
-            ModelProp(t, VillageKit + "Wood_Tyre_Standard", At(-150, 480), 170, 1.0f);
-            ModelProp(t, VillageKit + "Blacksmith_Logo_Standard", At(-600, 400) + Vector3.up * 1.05f, 180, .8f);   // on the wall left of the door
+            ModelProp(t, MedievalKit + "Stump_A_Standard", At(150, 440), 0, .55f);
+            var anvil = ModelProp(t, MedievalKit + "Anvil_Standard", At(150, 440) + Vector3.up * .55f, 90, .34f);
+            ModelProp(t, MedievalKit + "Blacksmith_Table_Standard", At(300, 445), 180, .86f);
+            ModelProp(t, MedievalKit + "Hammer_Standard", At(300, 445) + Vector3.up * .86f, 30, .12f);
+            ModelProp(t, "Fantasy/WeaponStand", At(20, 470), 180, 1.5f, false, 1.4f);   // (the pack's Built-in set has no weapon stand)
+            ModelProp(t, MedievalKit + "Sword_Standard", At(-30, 470) + Vector3.up * .1f, 180, 1.06f);
+            ModelProp(t, MedievalKit + "Spear_Standard", At(60, 470) + Vector3.up * .05f, 180, 1.8f);
+            ModelProp(t, MedievalKit + "Shield_Standard", At(390, 470), 200, .63f);
+            ModelProp(t, MedievalKit + "Wood_Tyre_Standard", At(-150, 480), 170, 1.0f);
+            ModelProp(t, MedievalKit + "Blacksmith_Logo_Standard", At(-600, 400) + Vector3.up * 1.05f, 180, .8f);   // on the wall left of the door
             if (anvil == null) Debug.LogWarning("LOWTOWNS_VILLAGE the smithy's anvil is missing from the pack.");
         }
 

@@ -615,7 +615,7 @@ rooftops, vibrant, unnatural neon moss" (b1 ch.7:17), tenements three and four s
 (ch.1:225), orange fires in the windows (ch.1:191). How each house stands is GAME-ONLY. Code: `ZoneBuilder.LowtownVillage` (new),
 `ZoneBuilder.Lowtowns` (the tenement kind calls it; the washing lines and the clutter mind the new houses).
 - **The pack:** MyDreamGameStudio's Medieval Village Pack Vol.1 (Asset Store EULA), in `Resources/Props/MedievalVillage1`: the ten
-  houses, the Blacksmith and 15 props (pots, tub, bucket, barrel, spinning wheel; the smith's stump, anvil, table, hammer, weapon stand,
+  houses, the Blacksmith and 14 props (pots, tub, bucket, barrel, spinning wheel; the smith's stump, anvil, table, hammer,
   sword, spear, shield, cart wheel and sign). Its own Built-in ("Standard") materials and prefabs from the nested package in the pack, so
   nothing is pink; every file keeps the pack's own .meta (its guid). The textures were cut from 2048 to 1024 (house colour maps) and 512
   (normal and metallic maps, doors, glass, chimneys, small props) on disk, and the importer holds them there (`ThirdPartyImport`); the
@@ -659,3 +659,9 @@ Lowtowns. **To capture (by day and at night):** the Rust Market and its smith's 
 Tenement Rows and Pell Row (the roof route's brick terraces among the new houses), one gallery close up, a roof's moss, a washing line.
 **To check in the captures:** that each house's door faces the street (the pack's doors are read as on the model's +z), the moss lies on
 the roofs (not floating), the smith's gear stands beside the door (not in it), and the soot tint reads as the Lowtowns, not a village.
+- **Fixed after the first run (2026-10-19, the lowtowns-art1 frames; PlayMode 31/31 passed):** the brick under a row is now a block
+  under each house (its own footprint and 15 cm more), not one box over the whole plot that read as a blank crate with a house
+  overhanging it; every face that shows has windows with sills, lintels and jambs (doors on the street front), and the yard walls left at
+  a row's ends and behind shallow houses have a coping and a plank gate with iron straps. The pack's Built-in set has no weapon stand (its
+  FBX is removed), so the smith's sword and spear lean on the Fantasy kit's stand, as the forges have. The EditMode test now looks for the
+  pack's own names only (VillageKit.cs is the Quaternius village kit, another pack). Not re-run.

@@ -52,7 +52,7 @@ namespace Crulanda.Tests
             Assert.GreaterOrEqual(rows.SelectMany(r => r.houses).Select(h => h.model.name).Distinct().Count(), 9, "Varied: most of the pack's houses are used.");
             Assert.That(rows.SelectMany(r => r.houses).Count(h => h.scaleX < 0), Is.InRange(rows.Sum(r => r.houses.Count) / 4, rows.Sum(r => r.houses.Count) * 3 / 4), "Some mirrored, some not.");
             // The dressing's prefabs are there too.
-            foreach (var n in new[] { "Pot_1", "Pot_2", "Wooden_Tub", "Wooden_Bucket", "Wooden_Barrel", "Wooden_Spinning_Wheel", "Stump_A", "Anvil", "Blacksmith_Table", "Hammer", "Weapon_Stand", "Sword", "Spear", "Shield", "Wood_Tyre", "Blacksmith_Logo" })
+            foreach (var n in new[] { "Pot_1", "Pot_2", "Wooden_Tub", "Wooden_Bucket", "Wooden_Barrel", "Wooden_Spinning_Wheel", "Stump_A", "Anvil", "Blacksmith_Table", "Hammer", "Sword", "Spear", "Shield", "Wood_Tyre", "Blacksmith_Logo" })
                 Assert.IsTrue(File.Exists(Path.Combine(Kit, "Prefabs", n + "_Standard.prefab")), n);
         }
 
@@ -131,9 +131,9 @@ namespace Crulanda.Tests
 
         [Test] public void The_pack_is_the_Lowtowns_own()
         {
-            // Only the Lowtowns' builder names the pack, and it builds nothing outside the Lowtowns.
+            // Only the Lowtowns' builder names the pack, and it builds nothing outside the Lowtowns.  (VillageKit.cs is the Quaternius village kit, another pack.)
             var scripts = Directory.GetFiles(Path.Combine(Application.dataPath, "Crulanda", "Scripts"), "*.cs", SearchOption.AllDirectories);
-            var users = scripts.Where(f => { var s = File.ReadAllText(f); return s.Contains("MedievalVillage1") || s.Contains("VillageKit"); }).Select(Path.GetFileName).ToList();
+            var users = scripts.Where(f => { var s = File.ReadAllText(f); return s.Contains("MedievalVillage1") || s.Contains("MedievalKit"); }).Select(Path.GetFileName).ToList();
             CollectionAssert.AreEquivalent(new[] { "ZoneBuilder.LowtownVillage.cs" }, users, "Only the Lowtowns' houses use the pack.");
             StringAssert.Contains("if (Zone.biome != \"lowtowns\") return false;", File.ReadAllText(scripts.Single(f => Path.GetFileName(f) == "ZoneBuilder.LowtownVillage.cs")));
             // No scene, prefab or asset outside the pack's folder points at any of its files.

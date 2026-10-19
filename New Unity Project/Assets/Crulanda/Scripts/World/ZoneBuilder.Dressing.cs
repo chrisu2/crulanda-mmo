@@ -95,7 +95,7 @@ namespace Crulanda.World
                 var at = On(s, p.x * h.Half[i]) + Vector3.up * p.y;
                 if (free != null && !free(at)) continue;
                 if (p.solid && h.Half[i] < 2.2f) continue;   // a narrow drift takes nothing solid
-                var go = ModelProp(root, p.path, at, q.eulerAngles.y + p.yaw, p.height);
+                var go = DressingProp(root, p, at, q.eulerAngles.y + p.yaw, false);
                 if (go == null) continue;
                 var b = BoundsIn(t, go);
                 // Its inner edge leaves the middle of the floor clear (a metre either side of the line, or most of a narrow way): else not placed.
@@ -110,6 +110,60 @@ namespace Crulanda.World
             }
         }
 
+        /// <summary>A dressing piece placed: the model, or the wood barrel dressed (<see cref="PropDressing.Piece.dress"/>).</summary>
+        GameObject DressingProp(Transform root, PropDressing.Piece p, Vector3 at, float yaw, bool solid)
+        {
+            if (p.dress == PropDressing.BarrelApples) return BarrelOfApples(root, at, yaw, p.height, solid);
+            if (p.dress == PropDressing.BarrelRack) return BarrelRack(root, at, yaw, p.height, solid);
+            return ModelProp(root, p.path, at, yaw, p.height, solid);
+        }
+        /// <summary>A holder for a dressed barrel: on <paramref name="at"/>, turned <paramref name="yaw"/>.</summary>
+        static Transform BarrelHolder(Transform root, string name, Vector3 at, float yaw)
+        {
+            var h = new GameObject(name).transform; h.SetParent(root, false); h.localPosition = at; h.localRotation = Quaternion.Euler(0, yaw, 0); return h;
+        }
+        static void SolidHolder(Transform h)
+        {
+            var b = PropBounds(h); var col = h.gameObject.AddComponent<BoxCollider>(); col.center = b.center; col.size = b.size; h.gameObject.AddComponent<NavBlocker>();
+        }
+        /// <summary>The wood barrel with apples heaped on its head (the kit's apple barrel, play note 247): the barrel 5 cm short of
+        /// <paramref name="height"/>, seven apples on the head inside its rim, the middle one riding on the others. Null without the barrel.</summary>
+        GameObject BarrelOfApples(Transform root, Vector3 at, float yaw, float height, bool solid)
+        {
+            var h = BarrelHolder(root, "Barrel of apples", at, yaw); float tall = height - .05f;
+            if (ModelProp(h, WoodBarrelPath, Vector3.zero, 0, tall) == null) { DestroyImmediate(h.gameObject); return null; }
+            float head = tall * .97f;   // the head sits 3% under the chime (the model: .969 of 1.0)
+            for (int k = 0; k < 7; k++)
+            {
+                float a = k * 60 * Mathf.Deg2Rad; var foot = k == 6 ? new Vector3(0, head + .045f, 0) : new Vector3(Mathf.Cos(a) * .11f, head, Mathf.Sin(a) * .11f);
+                SmallPiece(ModelProp(h, k % 3 == 2 ? "Food/Apple_Green" : "Food/Apple", foot, k * 53, .08f));
+            }
+            if (solid) SolidHolder(h);
+            return h.gameObject;
+        }
+        /// <summary>The wood barrel lying on a timber cradle (the kit's barrel holder, play note 247): two trestles with a saddle each, rails
+        /// between their feet, a spigot at the front end; the whole <paramref name="height"/> tall. Null without the barrel.</summary>
+        GameObject BarrelRack(Transform root, Vector3 at, float yaw, float height, bool solid)
+        {
+            var h = BarrelHolder(root, "Barrel rack", at, yaw);
+            const float y0 = .5f, length = .95f;
+            var lying = new GameObject("Lying").transform; lying.SetParent(h, false); lying.localRotation = Quaternion.Euler(0, 0, -90);   // its staves along +x
+            var cask = ModelProp(lying, WoodBarrelPath, Vector3.zero, 0, length); if (cask == null) { DestroyImmediate(h.gameObject); return null; }
+            float r = PropBounds(cask.transform).size.x * cask.transform.localScale.x / 2;   // its bilge's half-width
+            lying.localPosition = new Vector3(-length / 2, y0 + r, 0);
+            var wood = Tint(art.timber, new Color(.3f, .21f, .14f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f));
+            foreach (float x in new[] { -.3f, .3f })
+            {
+                foreach (float z in new[] { -.25f, .25f }) Part(PrimitiveType.Cube, h, new Vector3(x, y0 / 2, z), new Vector3(.07f, y0, .07f), wood);
+                Part(PrimitiveType.Cube, h, new Vector3(x, y0 - .04f, 0), new Vector3(.08f, .08f, .62f), wood);   // the saddle under the barrel
+            }
+            foreach (float z in new[] { -.25f, .25f }) Part(PrimitiveType.Cube, h, new Vector3(0, .15f, z), new Vector3(.75f, .06f, .06f), wood);
+            Part(PrimitiveType.Cube, h, new Vector3(length / 2 + .04f, y0 + r * .45f, 0), new Vector3(.08f, .035f, .035f), iron);   // the spigot
+            var b = PropBounds(h); if (b.size.y > .01f) h.localScale = Vector3.one * (height / b.size.y);
+            if (solid) SolidHolder(h);
+            return h.gameObject;
+        }
+
         /// <summary>A room's kit dressing (<see cref="PropDressing.Rooms"/>), in <paramref name="t"/>'s frame; top pieces on what is there.</summary>
         void DressRoom(Transform t, string key, float floor = 0)
         {
@@ -118,7 +172,7 @@ namespace Crulanda.World
             foreach (var p in room.pieces)
             {
                 var at = new Vector3(p.x, floor + p.y, p.z);
-                var go = ModelProp(root, p.path, at, p.yaw, p.height, p.solid && p.place == PropDressing.Place.Floor);
+                var go = DressingProp(root, p, at, p.yaw, p.solid && p.place == PropDressing.Place.Floor);
                 if (go == null) continue;
                 if (p.place == PropDressing.Place.Floor) KeepClear(t, at, .5f);
                 if (p.height < .5f) SmallPiece(go);

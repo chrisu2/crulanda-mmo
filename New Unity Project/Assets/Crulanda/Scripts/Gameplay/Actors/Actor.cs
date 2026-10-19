@@ -29,6 +29,7 @@ namespace Crulanda.Gameplay
 
         Disposition _disposition = Disposition.Neutral;
         ActorClassification _classification = ActorClassification.Normal;
+        ActorClassification? _classificationOverride;
         int _level = 1;
         string _resolvedName;
 
@@ -112,7 +113,7 @@ namespace Crulanda.Gameplay
 
             _level = _levelOverride > 0 ? _levelOverride : (_archetype != null ? _archetype.Level : 1);
             _disposition = _archetype != null ? _archetype.Disposition : Disposition.Neutral;
-            _classification = _archetype != null ? _archetype.Classification : ActorClassification.Normal;
+            _classification = _classificationOverride ?? (_archetype != null ? _archetype.Classification : ActorClassification.Normal);
 
             Stats.Changed -= OnStatChanged;
             Stats = new StatBlock();
@@ -143,6 +144,9 @@ namespace Crulanda.Gameplay
             Stats.SetBase(StatType.MaxPower, kind == ResourceKind.None ? 0 : maximum);
             Resource.Bind(kind, maximum);
         }
+
+        /// <summary>Its rank set outright, over its archetype's (the world boss: Boss, a raid's; Docs/WORLD_BOSS_1.md 1.2). Kept through a rebuild.</summary>
+        public void SetClassification(ActorClassification classification) { _classificationOverride = classification; _classification = classification; }
 
         public void SetLevel(int level)
         {

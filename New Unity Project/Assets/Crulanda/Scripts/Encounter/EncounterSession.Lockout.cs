@@ -23,13 +23,13 @@ namespace Crulanda.Encounter
         /// <summary>A mob that takes a lockout: a camp's elite (its boss, a rare one, the Rock-Eater under Nix), not a game animal.</summary>
         public static bool Lockable(EncounterEnemy e) { return e != null && e.Camp && e.Elite && !e.Game && Lockouts.KeyOf(e.persistentId) != null; }
         /// <summary>Its lockout's kind here: the zone's (a raid, a dungeon), else an open-world boss's (a boss's move) or an elite's.</summary>
-        public LockoutKind LockKindOf(EncounterEnemy e) { return Lockouts.KindFor(Zone != null ? Zone.Zone : null, e != null && e.Move != null && e.Move.boss); }
+        public LockoutKind LockKindOf(EncounterEnemy e) { return Lockouts.KindFor(Zone != null ? Zone.Zone : null, e != null && (e.RaidBoss || (e.Move != null && e.Move.boss))); }   // a raid boss in the open world: a world boss's week
         /// <summary>Locked for this character now.</summary>
         public bool LockedFor(EncounterEnemy e) { return Lockable(e) && Progress != null && Lockouts.Locked(Progress, Lockouts.KeyOf(e.persistentId)); }
         /// <summary>A quest you hold still needs it dead (QuestLog.StillNeedsKill): then it stands, locked or not, and drops no loot while locked.</summary>
         public bool QuestNeeds(EncounterEnemy e) { return e != null && Quests != null && Quests.StillNeedsKill(e.persistentId); }
         /// <summary>Kept away by its lockout: locked, not in a queued run's fresh dungeon, and no quest you hold needs it.</summary>
-        public bool KeptAway(EncounterEnemy e) { return LockedFor(e) && !QueueFresh && !QuestNeeds(e); }
+        public bool KeptAway(EncounterEnemy e) { return LockedFor(e) && !QueueFresh && !QuestNeeds(e) && !e.RaidBoss; }   // the world boss still rises for you locked: no loot (WORLD_BOSS_1.md 1.4)
 
         /// <summary>
         /// On a zone's load (Start and Load, once the quests are bound): the run-out lockouts dropped, then every boss and elite still locked

@@ -7534,8 +7534,8 @@
     {
       "node": "node.sootwort",
       "at": {
-        "x": -30,
-        "y": 200
+        "x": -36,
+        "y": 202
       },
       "rotation": 0
     }
@@ -7560,6 +7560,39 @@
       },
       "rotation": 200,
       "canonStatus": "GAME-ONLY"
+    }
+  ],
+  "shoals": [
+    {
+      "name": "The silt bar",
+      "kind": "silt",
+      "canonStatus": "GAME-ONLY: the Drain Reach's silt bar, where the Unraveller rises (WORLD_BOSS_1.md 1.3); the river is CANON (book1 ch.15:335)",
+      "center": { "x": -7.4, "y": 192 },
+      "size": { "x": 16, "y": 30 },
+      "rotation": 0,
+      "rise": 0.3,
+      "blend": 1.5,
+      "widen": 1.3
+    },
+    {
+      "name": "The silt bar's neck",
+      "kind": "silt",
+      "canonStatus": "GAME-ONLY: the mud that joins the silt bar to the west bank's apron",
+      "center": { "x": -19, "y": 183 },
+      "size": { "x": 8, "y": 6 },
+      "rotation": 0,
+      "rise": 0.3,
+      "blend": 1.2
+    },
+    {
+      "name": "The Drain Reach apron",
+      "kind": "apron",
+      "canonStatus": "GAME-ONLY: wet setts on the west bank of the Drain Reach",
+      "center": { "x": -27, "y": 192 },
+      "size": { "x": 9, "y": 30 },
+      "rotation": 0,
+      "rise": 0.42,
+      "blend": 0.75
     }
   ],
   "terraces": [

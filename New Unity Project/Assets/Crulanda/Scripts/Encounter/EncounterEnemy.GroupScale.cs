@@ -80,7 +80,7 @@ namespace Crulanda.Encounter
         /// <summary>Scales to the party now; only ever up during a fight (a sim falling does not heal the mob).</summary>
         void ScaleToGroup()
         {
-            if (Game || !actor.IsAlive || !FightingParty) return;   // a sim on its own fights it as it is (you and Mira are a party of two)
+            if (!ScalesWithGroup || !actor.IsAlive || !FightingParty) return;   // a sim on its own fights it as it is (you and Mira are a party of two); a raid boss is set for its raid, fixed (EncounterEnemy.Raid)
             float shares = SharesFor(session, actor.Level);
             if (shares <= GroupShares + .001f) return;
             GroupShares = shares; HealthShares = Mathf.Max(HealthShares, HealthSharesFor(session, actor.Level)); GroupToughness = Mathf.Max(GroupToughness, ToughnessOf(session));

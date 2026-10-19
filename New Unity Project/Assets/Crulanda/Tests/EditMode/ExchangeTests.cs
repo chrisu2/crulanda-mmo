@@ -246,7 +246,7 @@ namespace Crulanda.Tests
                 l.relisted = 2; w.exchange.history.Add(new ExchangeRecord { owner = "class.warrior", line = "Sold.", fresh = true }); w.exchange.sales.Add(new ExchangeSale { item = "potion.minor", each = 6, at = 1 });
                 w.exchange.hours = 3.5f; w.exchange.tickedTo = 3; Exchange.Stamp(w, new DateTime(2026, 10, 15, 21, 0, 0, DateTimeKind.Utc));
                 SimRoster.Save(root, w);
-                Assert.IsTrue(new SaveFileStore(root).TryRead("world", out var env, out _)); Assert.AreEqual(2, env.formatVersion); Assert.AreEqual(WorldSave.FormatVersion, env.formatVersion);
+                Assert.IsTrue(new SaveFileStore(root).TryRead("world", out var env, out _)); Assert.AreEqual(WorldSave.FormatVersion, env.formatVersion);   // 3 since the world boss (2026-10-19)
                 var back = SimRoster.Load(root, out var msg); Assert.NotNull(back, msg);
                 var bl = back.exchange.listings.Single(o => o.id == l.id);
                 Assert.AreEqual("potion.minor", bl.item); Assert.AreEqual(4, bl.count); Assert.AreEqual(50, bl.buyout); Assert.AreEqual(12, bl.startBid); Assert.AreEqual(l.deposit, bl.deposit);
@@ -278,7 +278,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(w.sims.Count, back.sims.Count); Assert.AreEqual(7, back.sims[2].level); Assert.AreEqual(w.sims[1].id, back.party.Single()); Assert.AreEqual(w.seed, back.seed);
                 Assert.NotNull(back.exchange); Assert.AreEqual(0, back.exchange.listings.Count); Assert.AreEqual(0, back.exchange.parcels.Count); Assert.AreEqual(1, back.exchange.nextId);
                 // A newer world than this build knows is refused, not read.
-                store.Write("world", new SaveEnvelope { formatVersion = 3, payloadType = WorldSave.PayloadType, gameVersion = "9", savedAtUtc = DateTime.UtcNow.ToString("O"), payloadJson = json });
+                store.Write("world", new SaveEnvelope { formatVersion = WorldSave.FormatVersion + 1, payloadType = WorldSave.PayloadType, gameVersion = "9", savedAtUtc = DateTime.UtcNow.ToString("O"), payloadJson = json });
                 Assert.IsNull(SimRoster.Load(root, out msg));
             }
             finally { if (Directory.Exists(root)) Directory.Delete(root, true); }

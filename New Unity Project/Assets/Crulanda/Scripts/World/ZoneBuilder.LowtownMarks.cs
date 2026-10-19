@@ -95,6 +95,7 @@ namespace Crulanda.World
             LowtownPunt = null;
             if (Zone == null || Zone.id != "zone.lowtowns") return;
             BuildStack(); BuildRagHouses(); BuildTurf(); BuildPuntFerry(); BuildWeir();
+            BuildDrainReach();   // the silt bar and apron where the Unraveller rises (ZoneBuilder.DrainReach)
             Debug.Log("Lowtowns: the Stack, the Rag Bridge's houses, " + TurfCorners.Length + " turf corners, the punt ferry and the weir built.");
         }
 

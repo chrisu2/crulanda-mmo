@@ -346,6 +346,7 @@ namespace Crulanda.Encounter
             var t = session.Target; var a = t.actor;
             Fill(new Rect(372, 22, 290, 64), new Color(0, 0, 0, .55f));
             Portrait(new Vector2(668, 54), 74, a.IsAlive ? new Color(.85f, .2f, .15f) : new Color(.4f, .4f, .4f), a.DisplayName.Substring(0, 1), a.IsAlive ? a.Level.ToString() : null);
+            if (t.RaidBoss) RaidSkull(new Rect(684, 18, 24, 24));   // a raid boss: the skull on her portrait, "Raid (10)" in her status (WithEnrage)
             Shadow(new Rect(380, 24, 240, 20), a.DisplayName, frameName, a.IsAlive ? ConColor(a.Level) : new Color(.7f, .7f, .7f));
             UnitBar(new Rect(378, 45, 244, 18), a.Health.Pool.Ratio, HealthGreen, a.IsAlive ? a.Health.Pool.Current + " / " + a.Health.Pool.Max : "Dead · press E at the body");
             if (a.IsAlive && t.Game) Shadow(new Rect(378, 67, 330, 20), GameLine, tiny, Color.white);
@@ -1048,6 +1049,7 @@ namespace Crulanda.Encounter
                 }
                 // Level-coloured names (grey, green, yellow, orange, red by how the enemy compares to you).
                 Outlined(new Rect(a.x - 150, a.y - 25, 300, 22), p.name, plateText, target ? gold : ConColor(p.e.actor.Level));
+                if (p.e.RaidBoss) RaidSkull(new Rect(a.x - TextWidth(plateText, p.name) / 2 - 24, a.y - 25, 20, 20));   // a raid boss: a skull before her name (WORLD_BOSS_1.md 1.2)
                 if (p.e.RaidMarked != RaidMark.None && p.e.actor.IsAlive)   // the raid mark above the name (CC step C3): an icon (Chris, 2026-10-11: "you say Moon it really need to show an ICon"); gone with the mob ("once the mob that was cc dies. take off the icon")
                 {
                     var icon = Mark(p.e.RaidMarked == RaidMark.Skull ? "skull" : p.e.RaidMarked == RaidMark.Moon ? "moon" : "cross");

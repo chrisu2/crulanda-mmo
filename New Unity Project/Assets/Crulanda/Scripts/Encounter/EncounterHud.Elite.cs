@@ -23,10 +23,18 @@ namespace Crulanda.Encounter
             Shadow(new Rect(378, 80, 330, 20), t.WindupRemaining.ToString("0.0") + "s  ·  step out of the mark" + (session.Warrior != null ? " or raise Guard" : ""), tiny, new Color(1, .86f, .5f));
             return true;
         }
+        /// <summary>A raid boss's skull (the raid mark's icon; a white [SKULL] where the icon is missing).</summary>
+        void RaidSkull(Rect r)
+        {
+            var icon = Mark("skull");
+            if (icon != null) { Fill(new Rect(r.x - 1, r.y - 1, r.width + 2, r.height + 2), new Color(0, 0, 0, .55f)); GUI.DrawTexture(r, icon); }
+            else Outlined(new Rect(r.x - 30, r.y, r.width + 30, r.height), "[SKULL]", tiny, Color.white);
+        }
         /// <summary>The target frame's status words with an elite's enrage in front.</summary>
         static string WithEnrage(EncounterEnemy t, string extra)
         {
             if (t != null && t.GroupNote != null) extra = string.IsNullOrEmpty(extra) ? t.GroupNote : extra + "  ·  " + t.GroupNote;   // scaled for your group
+            if (t != null && t.RankNote != null) extra = string.IsNullOrEmpty(extra) ? t.RankNote : t.RankNote + "  ·  " + extra;   // a raid boss: "Raid (10)" (EncounterEnemy.Raid)
             return t == null || !t.Enraged ? extra : "ENRAGED" + (string.IsNullOrEmpty(extra) ? "" : "  ·  " + extra);
         }
     }

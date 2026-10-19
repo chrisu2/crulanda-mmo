@@ -971,3 +971,5 @@ un-captures.
   theyll die" (OPEN: the leap marks one member; the rings under them; out before she lands or die).
 - 295 (2026-10-19 ~20:00; tune-10's first pull reached the feast at 15:53 with her at 31%) "cut about 10% health" (done: 340,000 to 306,000).
 - 296 (2026-10-19 ~20:05) "last tuning run for now then we move on to new zones, new classes, and pending phases".
+- 297 (2026-10-19 ~20:08) "just want everything up to level 20 for now with classes. can do forge district but no dungeon for now" (the cap
+  stays 20; new classes up to 20; the Forge District as a zone within 20, no dungeon yet).

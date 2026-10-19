@@ -132,6 +132,11 @@ group needed, guilds forming up); challenges (timed dungeon runs with a rating t
 rotating harder camps); rewards (set gear above the dungeons', titles, the Chronicle marking each kill). The pieces exist in small
 (elite camps and guards, group scaling, loot rolls, guilds, sim-led runs): raids and world bosses scale them up.
 
+**Next, after the Unraveller's tuning (Chris, 2026-10-19 ~20:05-20:08, verbatim):** "last tuning run for now then we move on to new zones,
+new classes, and pending phases" and "just want everything up to level 20 for now with classes. can do forge district but no dungeon for now".
+So: the cap stays 20; new classes (9.2) built and balanced to 20; the Forge District as a zone inside the cap (its band to be set within
+15-20), with no dungeon yet; the pending phases (8.5 helms on modelled pieces, the world boss's loot/forge/weapons, ambient sound).
+
 **The first world boss (Chris, 2026-10-19 ~11:00, verbatim):** "i'd like to have one mini world boss in the highest zone. the mob is
 level 30 but needs 10 people to kill. has to be a raid. so id like to balance it but definite on the hardest skill level to kill. drop
 components for legendary weapons for each class, but only one piece will need other world bosses at end game to complete".

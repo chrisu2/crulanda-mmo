@@ -877,3 +877,5 @@ un-captures.
 - 254 (2026-10-19 ~12:45) "some better sky boxes in my assets Stylized Skyboxes | FREE" (OPEN): Staggart Creations' pack (Asset Store
   cache, a UPM package: HDRI Noon, Noon (Cloudy), Noon (Overcast), Sunrise, Sunset, Dusk, Night, NightGalaxy, Aurora + Sky_*.mat; a URP
   demo). Skies through the day and night, each zone's weather its own.
+  Built on `lowtowns-village` (2026-10-19, WRITTEN, NOT RUN): the pack's own Built-in materials were in it (a nested package); 147
+  terraces rebuilt with its houses, the roof route's four kept; ZONE_LOWTOWNS.md "The houses". OPEN until Chris sees it in his build.

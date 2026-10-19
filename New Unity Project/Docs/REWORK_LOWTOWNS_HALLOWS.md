@@ -237,6 +237,8 @@ Sizes: **S** a day or less, mostly data; **M** two or three days, some new code;
 ### 5A. The Lowtowns (zone.lowtowns, 15-20)
 
 #### Looks flat and dull
+- (2026-10-19, play note 246) The terraces' look is now the Medieval Village Pack's houses on soot brick, Chris's pick ("i like this
+  better for lowtowns look and feel"): ZONE_LOWTOWNS.md "The houses". The levels, stairs, river, docks and roofs below are unchanged.
 1. **Built downhill (M). CANON-EXPANDED.** The books: the market against the Forge District's wall (ch.3:7), a causeway "down into
    the deep, dark slums" (ch.3:257), the whole at the mountain's base (WB:97); the city map shows the Lowtowns spread below the walled
    High City (map). The game: the **Rust Market** on a +6 shelf under the Forge wall (east); the **Burners' Yard** beside it at +4; the

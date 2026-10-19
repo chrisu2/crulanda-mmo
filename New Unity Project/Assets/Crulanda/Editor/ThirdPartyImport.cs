@@ -24,6 +24,9 @@ namespace Crulanda.EditorTools
             if (!Ours) return;
             var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") || assetPath.Contains("/DryTrees/") ? 1024 : 512; t.mipmapEnabled = true;   // DryTrees: the Dry Trees pack (play note 248), its 512 x 2048 bark and normal map to 256 x 1024
             var t = (TextureImporter)assetImporter; t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") || assetPath.Contains("/Alchemy/") ? 1024 : 512; t.mipmapEnabled = true;
+            var t = (TextureImporter)assetImporter;
+            if (assetPath.Contains("/MedievalVillage1/")) { t.maxTextureSize = VillageCap(assetPath); t.mipmapEnabled = true; return; }
+            t.maxTextureSize = assetPath.Contains("/Chest/") || assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Megapack/") || assetPath.Contains("/HQRocks/") || assetPath.Contains("/Village/") ? 1024 : 512; t.mipmapEnabled = true;
             if ((assetPath.Contains("/Fantasy/") || assetPath.Contains("/Nature/") || assetPath.Contains("/Village/")) && assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;   // (ends with: Bark_NormalTree.png and Leaves_NormalTree_C.png are colour)
             // The Free Alchemy and Magic Pack (StormBringer Studios, Asset Store EULA; Resources/Props/Alchemy, play note 253): 1024 px
             // maps, kept at 1024 (the 512 the other packs fall to would blur the mortar's stone and the flask's brass).
@@ -35,6 +38,20 @@ namespace Crulanda.EditorTools
                 if (assetPath.EndsWith("_Normal.png")) t.textureType = TextureImporterType.NormalMap;
                 if (assetPath.EndsWith("_MetallicSmoothness.png")) t.sRGBTexture = false;
             }
+        }
+        /// <summary>
+        /// The Medieval Village Pack Vol.1 (MyDreamGameStudio, Asset Store EULA; Resources/Props/MedievalVillage1, 2026-10-19, play note 246:
+        /// the Lowtowns' houses, ZoneBuilder.LowtownVillage). It ships 2048 px maps, three a material (colour, normal, metallic-smoothness):
+        /// the colour of a house's big parts (walls, roofs, planks, stone) at 1024, everything else (normal and metallic maps, doors, glass,
+        /// chimneys, the small props) at 512, so its hundred-odd materials stay a sane size in the build. The files were brought in at those
+        /// sizes already; the pack's own .meta files (normal maps marked) are kept.
+        /// </summary>
+        public static int VillageCap(string path)
+        {
+            string f = Path.GetFileNameWithoutExtension(path);
+            bool house = f.StartsWith("House_") || f.StartsWith("Blacksmith_Wall") || f.StartsWith("Blacksmith_Roof") || f.StartsWith("Blacksmith_Plank") || f.StartsWith("Blacksmith_Wood");
+            bool small = f.Contains("_Door") || f.Contains("_Glass") || f.Contains("_Smoker") || f.Contains("_Window") || f.Contains("_Rope");
+            return house && !small && f.EndsWith("_BaseColor") ? 1024 : 512;
         }
         void OnPreprocessModel()
         {

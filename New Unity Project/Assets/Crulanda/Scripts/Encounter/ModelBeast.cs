@@ -81,8 +81,44 @@ namespace Crulanda.Encounter
         static readonly Dictionary<string, GameObject> sources = new Dictionary<string, GameObject>();
         static GameObject Source(string kind)
         {
-            if (!sources.TryGetValue(kind, out var go)) { go = Resources.Load<GameObject>("Creatures/" + kind); sources[kind] = go; }
+            if (!sources.TryGetValue(kind, out var go))
+            {
+                go = Resources.Load<GameObject>("Creatures/" + kind);
+                if (go == null && Humanoid(kind)) go = Resources.Load<GameObject>(BestiaryPath + kind);
+                sources[kind] = go;
+            }
             return go;
+        }
+        /// <summary>Quaternius's Bestiary - Dungeon Monsters Kit (QAL licence; Chris's play note 233, "use this for some different
+        /// monsters"): two-legged monsters on the people's skeleton (pelvis, spine_01-03, neck_01, Head, the UE names), with no clips of
+        /// their own. Imported Humanoid with their own avatars (Editor/CharacterImport.cs) and moved by the people's humanoid clips.</summary>
+        public const string BestiaryPath = "Characters/Bestiary/";
+        static readonly string[] HumanoidKinds = { "Imp", "Puglin" };
+        /// <summary>A monster of the Bestiary kit: a human avatar, played the people's clips (<see cref="HumanClip"/>).</summary>
+        public static bool Humanoid(string kind) { return System.Array.IndexOf(HumanoidKinds, kind) >= 0; }
+        /// <summary>True for a model built on its human avatar (a Bestiary monster whose avatar came in human).</summary>
+        public bool OnHumanAvatar { get; private set; }
+        /// <summary>The people's clip for a Bestiary monster's slot (the Universal Animation Library's, or Kevin Iglesias's one-handed
+        /// blows and combat flinch where they are in the game): it stands, walks and jogs (the small ones sprint, their legs short), swings
+        /// its weapon three ways, flinches and dies as the people do. Null for a slot it has no clip for.</summary>
+        public static AnimationClip HumanClip(string kind, string slot)
+        {
+            AnimationClip Ki(string file) { return ModelFigure.KiClip(false, file); }
+            switch (slot)
+            {
+                case "idle": return ModelFigure.Clip("Idle_Loop");
+                case "idle2": return Ki("CombatIdle1H01") ?? ModelFigure.Clip("Sword_Idle");
+                case "walk": return ModelFigure.Clip("Walk_Loop");
+                case "run": return kind == "Puglin" ? ModelFigure.Clip("Sprint_Loop") ?? ModelFigure.Clip("Jog_Fwd_Loop") : ModelFigure.Clip("Jog_Fwd_Loop");
+                case "attack": case "kick": return ModelFigure.Clip("Sword_Attack");
+                case "attack2": return Ki("Attack1H01_R") ?? ModelFigure.Clip("Sword_Attack");
+                case "attack3": return Ki("Attack2H01") ?? ModelFigure.Clip("Punch_Jab");
+                case "hitL": return Ki("CombatDamage01") ?? ModelFigure.Clip("Hit_Chest");
+                case "hitR": return ModelFigure.Clip("Hit_Head");
+                case "death": return ModelFigure.Clip("Death01");
+                case "jump": return ModelFigure.Clip("Jump_Start");
+                default: return null;
+            }
         }
         /// <summary>True when the animal is in the build (and models are on).</summary>
         public static bool Available(string kind) { return Enabled && !string.IsNullOrEmpty(kind) && Source(kind) != null; }
@@ -297,7 +333,7 @@ namespace Crulanda.Encounter
             s.feet = b.min.y; s.top = b.max.y;
             // Facing: from the hips to the head, whichever way the file has it (the pack faces +Z, CraftPix's along X).
             var dir = Vector3.forward;
-            if (Head != null && Hips != null) { var d = inv.MultiplyPoint3x4(Head.position) - inv.MultiplyPoint3x4(Hips.position); d.y = 0; if (d.sqrMagnitude > 1e-8f) dir = d.normalized; }
+            if (Head != null && Hips != null && !OnHumanAvatar) { var d = inv.MultiplyPoint3x4(Head.position) - inv.MultiplyPoint3x4(Hips.position); d.y = 0; if (d.sqrMagnitude > 1e-8f) dir = d.normalized; }
             s.yaw = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
             var side = Vector3.Cross(Vector3.up, dir); s.back = float.MaxValue; s.front = float.MinValue; s.half = 0;
             foreach (var p in points) { float f = Vector3.Dot(p, dir); s.back = Mathf.Min(s.back, f); s.front = Mathf.Max(s.front, f); s.half = Mathf.Max(s.half, Mathf.Abs(Vector3.Dot(p, side))); }
@@ -320,11 +356,24 @@ namespace Crulanda.Encounter
             // A generic rig of its own bones (2026-10-13, Chris playing the orc: "the only thing on orc that move is belt, staff and teeth"):
             // a model that came with a human avatar (the orcs' packs) takes its own clips' bone curves only on the bones a human avatar
             // does not claim, so its body stood still while the staff swung.
-            if (b.Animator.avatar == null || b.Animator.avatar.isHuman || !b.Animator.avatar.isValid) b.Animator.avatar = AvatarBuilder.BuildGenericAvatar(go, "");
+            // A Bestiary monster keeps its human avatar: the people's humanoid clips move it. Without one (the import rule not applied) it is
+            // not built at all, rather than stand in its bind pose or be walked by the four-legged rig of ModelBeast.Proc.cs.
+            if (Humanoid(kind))
+            {
+                if (b.Animator.avatar == null || !b.Animator.avatar.isHuman || !b.Animator.avatar.isValid)
+                {
+                    Debug.LogWarning("ModelBeast: " + kind + " has no human avatar (Editor/CharacterImport.cs makes one)");
+                    if (Application.isPlaying) Object.Destroy(go); else Object.DestroyImmediate(go);
+                    return null;
+                }
+                b.OnHumanAvatar = true;
+            }
+            else if (b.Animator.avatar == null || b.Animator.avatar.isHuman || !b.Animator.avatar.isValid) b.Animator.avatar = AvatarBuilder.BuildGenericAvatar(go, "");
             b.Animator.applyRootMotion = false; b.Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms; b.Animator.runtimeAnimatorController = null;
             b.bones = new Dictionary<string, Transform>();
             foreach (var t in go.GetComponentsInChildren<Transform>(true)) if (!b.bones.ContainsKey(t.name)) b.bones[t.name] = t;
             b.Hips = b.Bone("Back") ?? b.Bone("Spine_2") ?? b.Bone("Body"); b.Head = b.Bone("Head"); b.Neck = b.Bone("Neck1") ?? b.Bone("Neck");
+            if (b.OnHumanAvatar) { b.Hips = b.Bone("pelvis"); b.Neck = b.Bone("neck_01"); }
             foreach (var r in go.GetComponentsInChildren<Renderer>(true))
             {
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true;
@@ -341,7 +390,10 @@ namespace Crulanda.Encounter
             var shape = b.Measure();
             float fileHeight = Mathf.Max(.01f, shape.top - shape.feet);
             b.Scale = height / fileHeight; b.Height = height; b.Length = (shape.front - shape.back) * b.Scale;
-            b.Model.localRotation = Quaternion.Euler(0, -shape.yaw, 0);
+            // A humanoid clip sets the body's facing itself, the way every clip in the game is made: toward the Animator's -Z (the
+            // Universal Animation Library's as made, Kevin's turned to match: Editor/CharacterImport.cs). So a Bestiary monster is turned
+            // round as a person's figure is (ModelFigure.Build), whichever way its file has it.
+            b.Model.localRotation = b.OnHumanAvatar ? Quaternion.Euler(0, 180, 0) : Quaternion.Euler(0, -shape.yaw, 0);
             b.Model.localScale = Vector3.one * b.Scale;
             b.Model.localPosition = new Vector3(0, ground - shape.feet * b.Scale, 0);
             b.basePos = b.Model.localPosition; b.baseRot = b.Model.localRotation; b.halfWidth = shape.half * b.Scale; b.groundLocal = ground;
@@ -390,6 +442,7 @@ namespace Crulanda.Encounter
         /// <summary>The clip a slot plays for this kind (null if the file has none of its clips).</summary>
         public static AnimationClip SlotClip(string kind, string slot)
         {
+            if (Humanoid(kind)) return HumanClip(kind, slot);   // a Bestiary monster: the people's clips
             foreach (var (s, names, _) in Motions) if (s == slot) foreach (var n in names) { var c = Clip(kind, n); if (c != null) return c; }
             return null;
         }
@@ -420,7 +473,7 @@ namespace Crulanda.Encounter
             mixer = AnimationMixerPlayable.Create(graph, found.Count); weights = new float[found.Count]; want = new float[found.Count];
             for (int i = 0; i < found.Count; i++)
             {
-                var p = AnimationClipPlayable.Create(graph, found[i].Item2); p.SetApplyFootIK(false);
+                var p = AnimationClipPlayable.Create(graph, found[i].Item2); p.SetApplyFootIK(OnHumanAvatar);   // a humanoid's feet kept to the ground as a person's are
                 graph.Connect(p, 0, mixer, i); slots.Add((p, found[i].Item2, found[i].Item3)); slotOf[found[i].Item1] = i;
                 if (found[i].Item3) p.SetTime(Stagger(label, i) * found[i].Item2.length);   // no two of a pack step in time
             }
@@ -448,6 +501,24 @@ namespace Crulanda.Encounter
         public bool Dead { get { return dead; } }
         /// <summary>A one-shot (an attack, a flinch) is playing.</summary>
         public bool Busy { get { return shot != null; } }
+        /// <summary>The one-shot playing now ("attack", "attack2", "hitL", "death"...), or null (captures tell a blow from a flinch by it).</summary>
+        public string Playing { get { return shot; } }
+        /// <summary>Which way its body faces now, flat (the humanoid's body as its clip poses it; the body it is built under otherwise).</summary>
+        public Vector3 Facing
+        {
+            get
+            {
+                // The humanoid's facing from its hips as posed: square to the line from its left thigh to its right (Animator.bodyRotation may
+                // be read only in OnAnimatorIK: read from the bestiary tour's frame loop it warned every frame, tour 4's log).
+                Vector3 f = Model != null && Model.parent != null ? Model.parent.forward : Vector3.forward;
+                if (OnHumanAvatar && Animator != null && Animator.isHuman)
+                {
+                    var l = Animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg); var r = Animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
+                    if (l != null && r != null) { var across = r.position - l.position; across.y = 0; if (across.sqrMagnitude > 1e-6f) f = Vector3.Cross(across, Vector3.up); }
+                }
+                f.y = 0; return f.sqrMagnitude > 1e-6f ? f.normalized : Vector3.forward;
+            }
+        }
         /// <summary>Plays a one-shot over whatever it is doing (attack, kick, hitL, hitR, jump), easing in and out.</summary>
         /// <summary>When a hit has no clip of its own (the thrall's Toon RTS undead has none), a short flinch: the model rocks back and recovers.</summary>
         float flinchAt = -1;

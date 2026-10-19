@@ -261,6 +261,13 @@
       "more": "Under the green moss in the crawl from the courts the stone is older than any drain, cut deep in patterns too fine for diggers. Nobody in the Lowtowns can read them, and the moss pulses over them like something breathing.",
       "secret": "secret.lowtowns.moss-carvings",
       "canonStatus": "CANON-EXPANDED: deep, intricate carvings beneath the pulsing bioluminescent moss of the under-ways (book1 ch.9:55); this wall GAME-ONLY"
+    },
+    {
+      "id": "lore.lowtowns.creatures.bank-snout",
+      "chapter": "creatures",
+      "subject": "Bank-snout",
+      "line": "Little pot-bellied things with pig snouts and tusks that root in the river's black mud and rob the barges at night. One squeals and the rest come running.",
+      "canonStatus": "GAME-ONLY creature; CANON-EXPANDED: the Chemical River's 'and worse' (book1 ch.15:391)"
     }
   ]
 }

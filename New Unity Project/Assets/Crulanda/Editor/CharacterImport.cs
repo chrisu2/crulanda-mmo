@@ -16,6 +16,11 @@ namespace Crulanda.EditorTools
     public sealed class CharacterImport : AssetPostprocessor
     {
         const string Root = "Assets/Crulanda/Resources/Characters/";
+        /// <summary>Quaternius's Bestiary - Dungeon Monsters Kit (QAL; play note 233): the Imp and the Puglin, imported by the same rule as
+        /// the people (a Humanoid with its own avatar, made from this model; no clips of their own, readable, no materials of their own:
+        /// ModelBeast and ActorVisual.BestiaryCoat dress them). Their rig is the people's (pelvis, spine_01-03, neck_01, Head), so the
+        /// avatar maps by name, and the people's humanoid clips move them. Their T_*_Normal maps come in as normal maps.</summary>
+        public const string Bestiary = Root + "Bestiary/";
         /// <summary>Bumped when the import settings change, so Unity imports the models and clips again.</summary>
         public override uint GetVersion() { return 11; }
         void OnPreprocessModel()

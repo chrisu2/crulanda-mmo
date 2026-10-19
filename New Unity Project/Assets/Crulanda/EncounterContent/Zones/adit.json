@@ -6127,6 +6127,52 @@
       "after": "event:greyline3"
     },
     {
+      "name": "Chained in the garden",
+      "mob": "Ember-bound",
+      "tag": "emberbound",
+      "look": "imp",
+      "canonStatus": "GAME-ONLY creature (the Ember-bound); CANON cult and tethers (the Cult of Ash, book1 ch.10; glowing chains, book1 ch.12:19)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 1200,
+      "social": "solitary",
+      "center": {
+        "x": 146.0,
+        "y": 74.0
+      },
+      "cave": "The Ash Garden",
+      "along": 57.0,
+      "aside": -12,
+      "wing": "vent",
+      "step": 2,
+      "gate": "Lusk's door"
+    },
+    {
+      "name": "Chained at the lake of fire",
+      "mob": "Ember-bound",
+      "tag": "emberbound",
+      "look": "imp",
+      "canonStatus": "GAME-ONLY creature (the Ember-bound); CANON cult and tethers (the Cult of Ash, book1 ch.10; glowing chains, book1 ch.12:19)",
+      "radius": 1.5,
+      "count": 2,
+      "levelMin": 11,
+      "levelMax": 11,
+      "respawn": 1200,
+      "social": "solitary",
+      "center": {
+        "x": 146.0,
+        "y": 140.07
+      },
+      "cave": "The Chapel of Embers",
+      "along": 27.6,
+      "aside": -12,
+      "wing": "chapel",
+      "step": 2,
+      "gate": "Lusk's door"
+    },
+    {
       "name": "The Quiet Miner",
       "mob": "The Quiet Miner",
       "tag": "quietminer",

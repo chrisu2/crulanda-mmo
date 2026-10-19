@@ -960,3 +960,4 @@ un-captures.
   ranged hitting 230-440 at once, spikes, the pulse) (OPEN).
 - 289 (2026-10-19 ~18:55, tune-8) "yeh still not enough time to move after telegraphing" and "i think the pet pulled the mob or was still
   alive and restarted the raid" (OPEN: every warning long enough to walk out; a pet goes with its owner and never pulls; a wipe ends cleanly).
+  Then: "still not jumping very far. need to jump out of melee and ranger range".

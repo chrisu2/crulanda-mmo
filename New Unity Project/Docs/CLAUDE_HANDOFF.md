@@ -2,6 +2,24 @@
 
 ## Start here
 
+**Update 2026-10-18 ~21:50: new art and fixes, tested headless, pictures waiting (Chris is playing another game: "please test headless").**
+Branch preview-1018c (worktree D:\code\mmo-preview-1018c) = feet-bow-adit-kit + bestiary + megakit-dress + fix-lowtown-trades +
+inn-seats + angular-gear. Headless round chainR228: EditMode 104/104, PlayMode 23/23. NOT yet built and looked at as a whole:
+the picture round D:\crulanda-work\chainR229.ps1 is written (wardrobe, oakhaven/khaven/lowtowns/crown/adit frames, both bestiary
+tours) and waits for Chris to say he's done. Then check the frames, merge the branches into feet-bow-adit-kit, publish.
+- bestiary (play notes 233): Quaternius's Imp = the Ember-bound (the Adit's Ember Vent, 2 chained pairs, Chain-Lash), the Puglin =
+  Bank-snouts (4 packs on the Lowtowns' river banks, kept 4 m off the water by the camp flag "dry"). Docs/BESTIARY_MONSTERS.md.
+  Adding camps shifted the rares' indices: a save that killed the Quiet Miner or the Lantern-Eater sees them alive again.
+- megakit-dress (234-235): 64 of the Fantasy kit's 94 props placed (dungeons, inns, the Crown, markets); 37 food models kept from the
+  food pack (only what the books support), FoodModels.Dishes for every food and buff item. Chris liked the Adit scriptorium drift (238).
+- fix-lowtown-trades (236): the capture's line-ups out of the river; villagers' wander spots never in water; mould not on the water.
+- inn-seats (237): sitters pinned on the seat's middle (the crowd pushed them 0.3-0.6 m off); seat heights per seat; one per seat;
+  window frames and a hearth at the Golden Cask and the Cracked Hearth. Open: the two share one floor plan (every zone unique).
+- angular-gear (239, 241): helms built from the head's own shape (no domes, CHOSAN model helms retired), gloves the hand's own skin
+  with a cuff, angular pauldrons. Chris turned down GanzSe's bodies ("i dont like the new characters"/"the old ones were better");
+  branch p85-ganzse kept, not merged.
+- LootRollTests fixed on trunk (legendaries outside the cap, as Loot.Roll counts).
+
 **Update 2026-10-18 ~18:05: two more publishes (17:49 and 18:00; save backups 20261018-1749- and -1800-before-update-publish).**
 - 17:49: the group run holds the party's level (no experience during a run), the dummy is inert, pets keep clear, the vaults' capture
   camera inside the hall. 18:00: the drowned vaults read as built vaults (unbroken rubble-stone rib arches on footings, mould pads on

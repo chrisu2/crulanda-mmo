@@ -21,7 +21,7 @@ namespace Crulanda.World
     /// - The Rust Market smith's shop is the pack's Blacksmith, on the terrace plot nearest the market hearth (<see cref="SmithyPlot"/>),
     ///   its anvil, table and weapon stand under its front awning.
     /// - The Lowtowns' colour on them: every material soot-darkened (two shades), their glass a fire's orange or a shard's violet in a
-    ///   few windows and dark in the rest, neon moss on the plain roofs, soot smoke from one chimney in three, lanterns (no light of their
+    ///   few windows and dark in the rest, thin moss on the roofs that follows the tiles (play note 257), soot smoke from one chimney in three, lanterns (no light of their
     ///   own) on some fronts; the yellow haze and the lane lamps are the zone's own, unchanged.
     /// - Colliders and the navmesh are the old ones: one box over the whole plot (Solid), as the tenement had, so nothing moves where
     ///   people walk. The houses only render.
@@ -40,41 +40,37 @@ namespace Crulanda.World
         /// <summary>
         /// One of the pack's buildings, measured from its FBX (centimetres, Y up, the front door on +z; tools: the FBX's vertices by
         /// material): its extent across (x) and front to back (z, <see cref="front"/> the face of its door wall), its top, its eaves, a
-        /// chimney's top (none when y is 0), and the ridge of a plain roof for the moss (ridge x or z, along x or z, its span and half
-        /// width, eaves and ridge heights; none when <see cref="mossSpan"/> is 0).
+        /// chimney's top (none when y is 0).
         /// </summary>
         public sealed class VillageModel
         {
             public string name; public float xMin, xMax, yMin, zMin, front, top, eaves; public bool glass; public Vector3 smoke;
-            public bool ridgeAlongX; public float ridgeAt, mossMid, mossSpan, mossHalf, mossEaves, mossRidge;
             public string Prefab { get { return MedievalKit + name + "_Standard"; } }
             public float Width { get { return (xMax - xMin) / 100; } }
             public float Depth { get { return (front - zMin) / 100; } }
             public float MidX { get { return (xMax + xMin) / 200; } }
-            public bool Moss { get { return mossSpan > 0; } }
         }
         static VillageModel VM(string n, float x0, float x1, float y0, float z0, float front, float top, float eaves, bool glass, Vector3 smoke) { return new VillageModel { name = n, xMin = x0, xMax = x1, yMin = y0, zMin = z0, front = front, top = top, eaves = eaves, glass = glass, smoke = smoke }; }
-        static VillageModel Moss(VillageModel m, bool alongX, float at, float mid, float span, float half, float e, float ridge) { m.ridgeAlongX = alongX; m.ridgeAt = at; m.mossMid = mid; m.mossSpan = span; m.mossHalf = half; m.mossEaves = e; m.mossRidge = ridge; return m; }
         public static readonly VillageModel[] VillageModels =
         {
-            Moss(VM("House_1", -216, 213, -4, -241, 214, 479, 224, false, new Vector3(-1, 479, -116)), false, 1, 0, 483, 211, 224, 417),
-            Moss(VM("House_2", -341, 348, -8, -324, 291, 1056, 445, false, new Vector3(2, 1056, -114)), false, 4, 8, 613, 344, 445, 877),
-            Moss(VM("House_3", -563, 576, -1, -382, 325, 871, 298, false, new Vector3(-428, 871, -25)), true, -15, 6, 1139, 366, 298, 749),
-            Moss(VM("House_4", -561, 579, -1, -396, 313, 912, 296, false, new Vector3(357, 912, -31)), true, -25, 9, 1140, 371, 296, 747),
-            Moss(VM("House_5", -506, 409, -6, -457, 399, 1573, 1073, false, new Vector3(10, 1573, -315)), false, 17, -6, 829, 391, 1073, 1380),
-            Moss(VM("House_6", -428, 433, -4, -533, 363, 1126, 650, true, new Vector3(-12, 1126, -345)), false, 2, -45, 926, 430, 650, 987),
-            VM("House_7", -617, 609, -5, -462, 380, 575, 309, false, Vector3.zero),
-            VM("House_8", -633, 593, -1, -454, 393, 772, 301, true, Vector3.zero),
+            VM("House_1", -216, 213, -4, -241, 214, 479, 224, false, new Vector3(-1, 479, -116)),
+            VM("House_2", -341, 348, -8, -324, 291, 1056, 445, false, new Vector3(2, 1056, -114)),
+            VM("House_3", -563, 576, -1, -382, 325, 871, 298, false, new Vector3(-428, 871, -25)),
+            VM("House_4", -561, 579, -1, -396, 313, 912, 296, false, new Vector3(357, 912, -31)),
+            VM("House_5", -506, 409, -6, -457, 399, 1573, 1073, false, new Vector3(10, 1573, -315)),
+            VM("House_6", -428, 433, -4, -533, 363, 1126, 650, true, new Vector3(-12, 1126, -345)),
             VM("House_9", -616, 610, -7, -471, 378, 888, 294, true, new Vector3(-414, 888, -157)),
-            Moss(VM("House_10", -289, 312, -6, -486, 377, 1189, 778, true, new Vector3(12, 1189, -348)), false, 12, -43, 874, 300, 778, 1099),
+            VM("House_10", -289, 312, -6, -486, 377, 1189, 778, true, new Vector3(12, 1189, -348)),
             VM("Blacksmith", -709, 443, 3, -526, 494, 733, 246, false, Vector3.zero),
         };
         public static VillageModel VillageModelNamed(string name) { foreach (var m in VillageModels) if (m.name == name) return m; return null; }
         /// <summary>The houses that stand on the setts alone (tall enough for a three-storey terrace), and those that stand on brick.</summary>
-        public static readonly string[] VillageTall = { "House_5", "House_6", "House_10" };
-        public static readonly string[] VillageOnBrick = { "House_2", "House_3", "House_4", "House_6", "House_8", "House_9", "House_10" };
-        /// <summary>The low ones: House_7 only on two storeys of brick; House_1 only to fill the end of a row on brick.</summary>
-        public const string VillageLow = "House_7", VillageFiller = "House_1";
+        public static readonly string[] VillageTall = { "House_5", "House_6", "House_9", "House_10" };
+        public static readonly string[] VillageOnBrick = { "House_2", "House_3", "House_4", "House_6", "House_10" };
+        // (2026-10-19, the lowtowns-art2 frames: House_9's deep dark-timbered porch front read as a black slab raised on the brick; it stands
+        // on the setts only, where it is a porch. House_7 and House_8, the same porch-fronted design and low, were taken out of the project.)
+        /// <summary>The small one: House_1 only to fill the end of a row on brick.</summary>
+        public const string VillageFiller = "House_1";
 
         /// <summary>One house of a row: its middle across the plot (x), its scale (front to back and up), its scale across (signed: a
         /// mirrored house is negative), and the height it stands on.</summary>
@@ -139,7 +135,6 @@ namespace Crulanda.World
             row.under = storeys >= 4 ? 2 : R() < .5f ? 1 : 0;
             row.underTop = VillagePlinth + row.under * VillageStorey;
             var pool = new List<string>(row.under == 0 ? VillageTall : VillageOnBrick);
-            if (row.under == 2) pool.Add(VillageLow);
             float usable = w - .4f, used = 0; string prev = null;
             var picks = new List<(VillageModel m, float s)>();
             for (int guard = 0; guard < 12; guard++)
@@ -177,7 +172,7 @@ namespace Crulanda.World
         public readonly List<(ZoneProp plot, VillagePlace place, Transform model)> VillageHouses = new List<(ZoneProp, VillagePlace, Transform)>();
 
         /// <summary>Soot over the pack's paint: two shades, a little warm (the smog's yellow).</summary>
-        static readonly Color[] VillageSoot = { new Color(.7f, .66f, .6f), new Color(.58f, .55f, .5f) };
+        static readonly Color[] VillageSoot = { new Color(.84f, .8f, .74f), new Color(.74f, .7f, .64f) };   // (lighter after the art2 frames: the pack's timber is dark already)
 
         /// <summary>
         /// A terrace plot filled with the pack's houses (front -z): its brick under them, the houses, their gallery, its yard walls, the
@@ -393,18 +388,102 @@ namespace Crulanda.World
                 rend.sharedMaterials = mats; rend.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; rend.receiveShadows = true;
             }
             // Neon moss on a plain roof (CANON, book1 ch.7:17), lying on its slopes either side of the ridge.
-            if (m.Moss)
-            {
-                var moss = new GameObject("Roof moss").transform; moss.SetParent(holder, false);
-                moss.localPosition = m.ridgeAlongX ? new Vector3(m.mossMid / 100, 0, m.ridgeAt / 100) : new Vector3(m.ridgeAt / 100, 0, m.mossMid / 100);
-                moss.localRotation = m.ridgeAlongX ? Quaternion.identity : Quaternion.Euler(0, 90, 0);
-                var mp = new Batch();
-                RoofMoss(mp, m.mossSpan / 100, m.mossHalf * 2 / 100, (m.mossRidge - m.mossEaves) / 100, m.mossEaves / 100, g);
-                mp.Flush(this, moss, "Moss");
-            }
+            // Moss on the roof as moss grows (play note 257, Chris: "Make it look like moss"): thin, uneven pads lying on the roof's own
+            // tiles, found on the model's roof triangles, gathered along the ridge, the eaves and round the chimney; dull by day.
+            if (R() < .62f) PackRoofMoss(holder, m, g);
             // Soot smoke from one chimney in three (on the plot, not under the house's scale).
             if (m.smoke.y > 0 && R() < .34f) Smoke(t, t.InverseTransformPoint(holder.TransformPoint(new Vector3(m.smoke.x / 100, m.smoke.y / 100 + .25f, m.smoke.z / 100))));
             return holder;
+        }
+
+        /// <summary>
+        /// Neon moss on one of the pack's roofs (CANON, book1 ch.7:17; play note 257, Chris, 2026-10-19: "Make it look like moss"): the roof's
+        /// own triangles (the submeshes whose material is a roof's) are read in the house's space and every pad is laid on the tile under it,
+        /// along its slope, a hand's breadth thick at most and lifted a few millimetres, so nothing floats and nothing is a flat sticker.
+        /// Where moss grows: strips along the ridge and the eaves (the roof's top and bottom tenth), clumps round the chimney's foot, a rare
+        /// cushion on the open slope; each a scatter of small pads of their own size, turn and green, so the edge is broken.
+        /// </summary>
+        void PackRoofMoss(Transform holder, VillageModel m, System.Random g)
+        {
+            float R() { return (float)g.NextDouble(); }
+            var tris = new List<Vector3>(); var toHolder = holder.worldToLocalMatrix;
+            foreach (var mf in holder.GetComponentsInChildren<MeshFilter>(true))
+            {
+                var mesh = mf.sharedMesh; var rend = mf.GetComponent<MeshRenderer>(); if (mesh == null || rend == null || !mesh.isReadable) continue;
+                var mats = rend.sharedMaterials; var verts = mesh.vertices; var mtx = toHolder * mf.transform.localToWorldMatrix;
+                for (int sm = 0; sm < mesh.subMeshCount && sm < mats.Length; sm++)
+                {
+                    if (mats[sm] == null || !mats[sm].name.Contains("_Roof") || mats[sm].name.Contains("Window")) continue;
+                    var idx = mesh.GetTriangles(sm);
+                    for (int i = 0; i + 2 < idx.Length; i += 3)
+                    {
+                        Vector3 a = mtx.MultiplyPoint3x4(verts[idx[i]]), b = mtx.MultiplyPoint3x4(verts[idx[i + 1]]), c = mtx.MultiplyPoint3x4(verts[idx[i + 2]]);
+                        var n = Vector3.Cross(b - a, c - a); if (n.sqrMagnitude < 1e-8f) continue;
+                        if (Mathf.Abs(n.normalized.y) < .25f) continue;   // a gable's face or a fascia: no moss on the upright
+                        tris.Add(a); tris.Add(b); tris.Add(c);
+                    }
+                }
+            }
+            if (tris.Count == 0) return;
+            const float cell = .5f; var grid = new Dictionary<(int, int), List<int>>();
+            float x0 = float.MaxValue, x1 = float.MinValue, z0 = float.MaxValue, z1 = float.MinValue, y0 = float.MaxValue, y1 = float.MinValue;
+            for (int t = 0; t < tris.Count; t += 3)
+            {
+                float ax = Mathf.Min(tris[t].x, Mathf.Min(tris[t + 1].x, tris[t + 2].x)), bx = Mathf.Max(tris[t].x, Mathf.Max(tris[t + 1].x, tris[t + 2].x));
+                float az = Mathf.Min(tris[t].z, Mathf.Min(tris[t + 1].z, tris[t + 2].z)), bz = Mathf.Max(tris[t].z, Mathf.Max(tris[t + 1].z, tris[t + 2].z));
+                x0 = Mathf.Min(x0, ax); x1 = Mathf.Max(x1, bx); z0 = Mathf.Min(z0, az); z1 = Mathf.Max(z1, bz);
+                for (int k = 0; k < 3; k++) { y0 = Mathf.Min(y0, tris[t + k].y); y1 = Mathf.Max(y1, tris[t + k].y); }
+                for (int gx = Mathf.FloorToInt(ax / cell); gx <= Mathf.FloorToInt(bx / cell); gx++)
+                    for (int gz = Mathf.FloorToInt(az / cell); gz <= Mathf.FloorToInt(bz / cell); gz++)
+                    { if (!grid.TryGetValue((gx, gz), out var l)) grid[(gx, gz)] = l = new List<int>(); l.Add(t); }
+            }
+            // The top of the roof over (x, z), and its slope there.
+            bool Top(float x, float z, out Vector3 hit, out Vector3 normal)
+            {
+                hit = default; normal = Vector3.up; bool any = false;
+                if (!grid.TryGetValue((Mathf.FloorToInt(x / cell), Mathf.FloorToInt(z / cell)), out var l)) return false;
+                foreach (int t in l)
+                {
+                    Vector3 a = tris[t], b = tris[t + 1], c = tris[t + 2];
+                    float d = (b.z - c.z) * (a.x - c.x) + (c.x - b.x) * (a.z - c.z); if (Mathf.Abs(d) < 1e-7f) continue;
+                    float u = ((b.z - c.z) * (x - c.x) + (c.x - b.x) * (z - c.z)) / d, v = ((c.z - a.z) * (x - c.x) + (a.x - c.x) * (z - c.z)) / d, w = 1 - u - v;
+                    if (u < -.001f || v < -.001f || w < -.001f) continue;
+                    float y = u * a.y + v * b.y + w * c.y;
+                    if (any && y <= hit.y) continue;
+                    hit = new Vector3(x, y, z); var n = Vector3.Cross(b - a, c - a).normalized; normal = n.y < 0 ? -n : n; any = true;
+                }
+                return any;
+            }
+            var batch = new Batch(); var greens = new[] { NeonMoss, NeonMossPale }; int pads = 0;
+            void Pad(float x, float z, float size, float stretch)
+            {
+                if (!Top(x, z, out var hit, out var n)) return;
+                var along = Vector3.Cross(Vector3.up, n); if (along.sqrMagnitude < 1e-4f) along = Vector3.right; along.Normalize();   // along the tiles' courses
+                var rot = Quaternion.AngleAxis((R() - .5f) * 40, n) * Quaternion.LookRotation(Vector3.Cross(along, n), n);
+                float thick = .01f + R() * .01f;
+                var dims = new Vector3(size * (.6f + R() * .7f) * stretch, thick, size * (.45f + R() * .5f));
+                batch.Box(greens[R() < .7f ? 0 : 1], hit + n * (.004f + thick / 2), dims, rot); pads++;
+            }
+            void Clump(float x, float z, float spread, int n, float stretch)
+            {
+                for (int i = 0; i < n; i++) { float f = i == 0 ? 0 : spread * (.3f + R() * .7f), a = R() * Mathf.PI * 2; Pad(x + Mathf.Cos(a) * f, z + Mathf.Sin(a) * f, (i == 0 ? .34f : .16f) + R() * .22f, stretch); }
+            }
+            // Walk the roof on a coarse grid; moss where it gathers (ridge, eaves, the chimney's foot), now and then on the open slope.
+            float rise = Mathf.Max(.1f, y1 - y0);
+            var chimney = m.smoke.y > 0 ? new Vector2(m.smoke.x / 100, m.smoke.z / 100) : new Vector2(1e6f, 1e6f);
+            for (float x = x0 + .2f; x < x1 - .2f; x += .55f)
+                for (float z = z0 + .2f; z < z1 - .2f; z += .55f)
+                {
+                    if (!Top(x, z, out var hit, out _)) continue;
+                    float rel = (hit.y - y0) / rise, chance = rel > .88f ? .22f : rel < .14f ? .2f : .015f;
+                    if ((new Vector2(x, z) - chimney).magnitude < 1.3f) chance = .45f;
+                    if (R() > chance) continue;
+                    Clump(x + (R() - .5f) * .3f, z + (R() - .5f) * .3f, .35f + R() * .35f, 2 + (int)(R() * 4), rel > .88f || rel < .14f ? 1.4f : 1);
+                    if (pads > 220) break;
+                }
+            if (pads == 0) return;
+            var root = new GameObject("Roof moss").transform; root.SetParent(holder, false);
+            batch.Flush(this, root, "Moss");
         }
 
         /// <summary>The smith's shop's gear under its front awning, beside the door (the pack's anvil on a stump, its table with a hammer,

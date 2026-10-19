@@ -865,3 +865,5 @@ un-captures.
 - 249 (2026-10-19 ~12:20) "here are some more weapon types in my assets - pbr medievel weapons" (OPEN): Cody Dream Studios' "PBR
   medieval Weapons" (Asset Store cache: Sword, Axe, Mace, Spear, shield; PBR materials). Added to the KayKit weapons work (branch
   kaykit-weapons) as more weapon looks.
+- 250 (2026-10-19 ~12:25) "here are some axes in myassets - mid poly axes collection" (OPEN): Sky Den Games' "Mid poly Axes
+  Collection" (Asset Store cache: one Axes.fbx holding the set, two materials). Added to the weapons work (branch kaykit-weapons).

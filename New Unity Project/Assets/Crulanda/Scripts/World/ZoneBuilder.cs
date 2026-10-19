@@ -3360,15 +3360,15 @@ namespace Crulanda.World
         }
         void Gallows(Transform t)
         {
-            // The Gallows Tree (CANON landmark, Chris's Khaven map: a big, gnarled dead tree with a noose from a limb): the stoutest dry
-            // tree (Dry8872), 9 m and broadened by a third. The crossbeam (the carpenter's, GAME-ONLY) is lashed to the trunk and rests on
+            // The Gallows Tree (CANON landmark, Chris's Khaven map: a big, gnarled dead tree with a noose from a limb): a dry tree
+            // with a clear trunk (GallowsDryTree, GallowsTall: some 2 m of trunk before the first fork), broadened. The crossbeam (the carpenter's, GAME-ONLY) is lashed to the trunk and rests on
             // the tree's heaviest low limb (read from the mesh: GallowsLimb); the rope and noose hang from its end over the platform.
             // The tree on its own child, so only the tree fades for the camera, not the platform and rope.
             var tree = new GameObject("Gallows tree").transform; tree.SetParent(t, false);
-            DeadTree(Vector2.zero, .75f, Tint(art.bark, new Color(.2f, .17f, .15f)), 3, statics, tree, -1, GallowsDryTree, 9, 1.35f);
+            DeadTree(Vector2.zero, .75f, Tint(art.bark, new Color(.2f, .17f, .15f)), 3, statics, tree, -1, GallowsDryTree, GallowsTall, GallowsBroad);
             string file = DryTreeModels[GallowsDryTree].Substring(DryTreeModels[GallowsDryTree].LastIndexOf('/') + 1);
             var model = tree.Find("Model " + file);
-            if (model != null && GallowsLimb(model, t, 9, out var limb))
+            if (model != null && GallowsLimb(model, t, GallowsTall, out var limb))
             {
                 // The tree turned on its trunk so that limb points along the gallows' own +x, where the platform always stood (clear of
                 // the yard's houses as the zone file placed it).

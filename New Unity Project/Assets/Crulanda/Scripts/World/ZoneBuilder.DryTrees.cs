@@ -21,9 +21,13 @@ namespace Crulanda.World
             "DryTrees/Model/Dry3333", "DryTrees/Model/Dry4195", "DryTrees/Model/Dry4910", "DryTrees/Model/Dry5818",
             "DryTrees/Model/Dry6524", "DryTrees/Model/Dry7509", "DryTrees/Model/Dry8872" };
         /// <summary>The three stoutest (Dry8872, Dry6524, Dry5818: the thickest trunks and broadest crowns, measured from the files), for
-        /// the massive dead oaks; and the Gallows Tree's own, the stoutest.</summary>
+        /// the massive dead oaks.</summary>
         public static readonly int[] StoutDryTrees = { 6, 4, 3 };
-        public const int GallowsDryTree = 6;
+        /// <summary>The Gallows Tree's own tree (Chris, 2026-10-19 on the art2 frame: "tree trunk too low"): Dry4910, whose trunk runs a
+        /// quarter of its height whole before the first fork (Dry8872, the stoutest, forks at a twenty-fifth: under half a metre) and which
+        /// carries one heavy limb at under half its height; at GallowsTall that clear trunk is some 2.25 m.</summary>
+        public const int GallowsDryTree = 2;
+        public const float GallowsTall = 9, GallowsBroad = 1.4f;
         /// <summary>Each tree's trunk radius low down, as a share of its height (the files' vertices 6-12 per cent up).</summary>
         public static readonly float[] DryTrunk = { .033f, .031f, .031f, .033f, .028f, .018f, .046f };
         /// <summary>Which of the seven a draw in [0, 1] picks (1 itself the last).</summary>
@@ -81,13 +85,72 @@ namespace Crulanda.World
             }
             Vector3 foot;
             if (pts.Count == 0) { var b = PropBounds(t); foot = new Vector3(b.center.x, b.min.y, b.center.z); }
-            else
-            {
-                float band = lo + (hi - lo) * .04f, x0 = float.MaxValue, x1 = float.MinValue, z0 = float.MaxValue, z1 = float.MinValue;
-                foreach (var p in pts) if (p.y <= band) { x0 = Mathf.Min(x0, p.x); x1 = Mathf.Max(x1, p.x); z0 = Mathf.Min(z0, p.z); z1 = Mathf.Max(z1, p.z); }
-                foot = new Vector3((x0 + x1) / 2, lo, (z0 + z1) / 2);
-            }
+            else foot = TrunkFoot(pts);
             dryBases[path] = foot; return foot;
+        }
+        /// <summary>
+        /// The trunk's own foot among a tree's vertices: the middle (x, z) of the lowest 4 per cent, and the lowest vertex of the trunk
+        /// there (within the nearer half of that band's vertices to the middle), not a root tip that dips below it to one side (three of
+        /// the trees' roots reach 0.5 to 3 per cent of their height under the trunk: standing on those lifted the trunk, and the old
+        /// bounds-foot read the whole tree as sunk or floating by them).
+        /// </summary>
+        public static Vector3 TrunkFoot(IList<Vector3> pts)
+        {
+            float lo = float.MaxValue, hi = float.MinValue; foreach (var p in pts) { lo = Mathf.Min(lo, p.y); hi = Mathf.Max(hi, p.y); }
+            float band = lo + (hi - lo) * .04f, x0 = float.MaxValue, x1 = float.MinValue, z0 = float.MaxValue, z1 = float.MinValue;
+            foreach (var p in pts) if (p.y <= band) { x0 = Mathf.Min(x0, p.x); x1 = Mathf.Max(x1, p.x); z0 = Mathf.Min(z0, p.z); z1 = Mathf.Max(z1, p.z); }
+            float cx = (x0 + x1) / 2, cz = (z0 + z1) / 2;
+            var near = new List<(float d, float y)>(); foreach (var p in pts) if (p.y <= band) near.Add((new Vector2(p.x - cx, p.z - cz).magnitude, p.y));
+            near.Sort((a, b) => a.d.CompareTo(b.d)); float y = float.MaxValue;
+            for (int i = 0; i < Mathf.Max(1, near.Count / 2); i++) y = Mathf.Min(y, near[i].y);
+            return new Vector3(cx, y, cz);
+        }
+        /// <summary>How far a foot sinks: to the lowest ground at the trunk's edge, and 5 cm more (only a few centimetres on the flat).</summary>
+        public static float FootSink(float centre, float lowestAtTrunk) { return Mathf.Max(0, centre - lowestAtTrunk) + .05f; }
+        /// <summary>
+        /// Where a tree first forks, in <paramref name="space"/>'s height (its foot at <paramref name="foot"/>): slices of 2.5 per cent of
+        /// its height from the foot up; in each, the mesh's triangles that cross it joined where they share a corner (corners at one place
+        /// are one, across the UV seams), and the pieces counted; the first slice with more pieces than the trunk's slice near the foot (a
+        /// tree may carry a loose root piece from the ground up). Joined by the mesh, not by distance, so a broadened trunk still reads
+        /// whole. (Read from the files: Dry4910 forks at a quarter of its height, Dry8872 at a twenty-fifth.)
+        /// </summary>
+        public static float DryForkHeight(Transform model, Transform space, float foot)
+        {
+            var pos = new List<Vector3>(); var tris = new List<int>(); var weld = new Dictionary<Vector3Int, int>(); var id = new List<int>();
+            var toSpace = space.worldToLocalMatrix; float hi = float.MinValue;
+            foreach (var mf in model.GetComponentsInChildren<MeshFilter>(true))
+            {
+                var mesh = mf.sharedMesh; if (mesh == null || !mesh.isReadable) continue; var m = toSpace * mf.transform.localToWorldMatrix;
+                int start = pos.Count;
+                foreach (var v in mesh.vertices)
+                {
+                    var p = m.MultiplyPoint3x4(v); pos.Add(p); hi = Mathf.Max(hi, p.y);
+                    var key = new Vector3Int(Mathf.RoundToInt(p.x * 500), Mathf.RoundToInt(p.y * 500), Mathf.RoundToInt(p.z * 500));
+                    if (!weld.TryGetValue(key, out int w)) weld[key] = w = weld.Count; id.Add(w);
+                }
+                foreach (var t in mesh.triangles) tris.Add(start + t);
+            }
+            float h = hi - foot; if (pos.Count == 0 || h <= 0) return 0;
+            int Pieces(float a, float b)
+            {
+                var parent = new Dictionary<int, int>();
+                int Find(int x) { while (parent[x] != x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; }
+                for (int t = 0; t + 2 < tris.Count; t += 3)
+                {
+                    float y0 = pos[tris[t]].y, y1 = pos[tris[t + 1]].y, y2 = pos[tris[t + 2]].y;
+                    if (Mathf.Min(y0, Mathf.Min(y1, y2)) > b || Mathf.Max(y0, Mathf.Max(y1, y2)) < a) continue;
+                    int r = -1;
+                    for (int c = 0; c < 3; c++)
+                    {
+                        int w = id[tris[t + c]]; if (!parent.ContainsKey(w)) parent[w] = w;
+                        if (r < 0) r = Find(w); else parent[Find(w)] = r;
+                    }
+                }
+                var roots = new HashSet<int>(); foreach (var k in new List<int>(parent.Keys)) roots.Add(Find(k)); return roots.Count;
+            }
+            int trunk = Pieces(foot + h * .025f, foot + h * .05f);
+            for (int k = 3; k < 30; k++) if (Pieces(foot + h * k * .0125f, foot + h * (k + 2) * .0125f) > trunk) return h * (k + 1) * .0125f;
+            return h * .4f;
         }
         /// <summary>
         /// How far (in <paramref name="root"/>'s own units) a trunk's foot sinks so no side of it hangs over a slope: to just under the
@@ -96,14 +159,14 @@ namespace Crulanda.World
         /// </summary>
         float DrySink(Transform root, float radius)
         {
-            var c = root.position; float low = Mathf.Min(HeightAt(c.x, c.z), MeshY(c.x, c.z)), r = Mathf.Max(.25f, radius);
+            // At the trunk's own edge only (it reached twice as far, which on a slope sank a broad trunk half a metre: "tree trunk too low").
+            var c = root.position; float low = Mathf.Min(HeightAt(c.x, c.z), MeshY(c.x, c.z)), r = Mathf.Max(.2f, radius);
             for (int k = 0; k < 12; k++)
-                foreach (float f in new[] { r, r * 2 })
-                {
-                    float x = c.x + Mathf.Cos(k * Mathf.PI / 6) * f, z = c.z + Mathf.Sin(k * Mathf.PI / 6) * f;
-                    low = Mathf.Min(low, Mathf.Min(HeightAt(x, z), MeshY(x, z)));
-                }
-            return (c.y - low + .06f) / Mathf.Max(.01f, root.lossyScale.y);
+            {
+                float x = c.x + Mathf.Cos(k * Mathf.PI / 6) * r, z = c.z + Mathf.Sin(k * Mathf.PI / 6) * r;
+                low = Mathf.Min(low, Mathf.Min(HeightAt(x, z), MeshY(x, z)));
+            }
+            return FootSink(c.y, low) / Mathf.Max(.01f, root.lossyScale.y);
         }
 
         /// <summary>
@@ -172,9 +235,8 @@ namespace Crulanda.World
             var pts = new Vector3[verts.Length];
             for (int i = 0; i < verts.Length; i++) { pts[i] = m.MultiplyPoint3x4(verts[i]); lo = Mathf.Min(lo, pts[i].y); hi = Mathf.Max(hi, pts[i].y); }
             if (hi - lo < .001f) return false;
-            float band = lo + (hi - lo) * .04f, x0 = float.MaxValue, x1 = float.MinValue, z0 = float.MaxValue, z1 = float.MinValue;
-            foreach (var p in pts) if (p.y <= band) { x0 = Mathf.Min(x0, p.x); x1 = Mathf.Max(x1, p.x); z0 = Mathf.Min(z0, p.z); z1 = Mathf.Max(z1, p.z); }
-            unit = Matrix4x4.Scale(Vector3.one / (hi - lo)) * Matrix4x4.Translate(-new Vector3((x0 + x1) / 2, lo, (z0 + z1) / 2)) * m;
+            var foot = TrunkFoot(pts);
+            unit = Matrix4x4.Scale(Vector3.one / (hi - foot.y)) * Matrix4x4.Translate(-foot) * m;
             mesh = least.sharedMesh; dryFar[pick] = (mesh, unit); return true;
         }
     }

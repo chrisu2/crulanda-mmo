@@ -65,6 +65,11 @@
   edge (by a wall, the Spoon's partitions), so their place was snapped up to 1.2 m off the stool and the agent can stand no nearer.
   Seated, the body is now set on the seat's own registered middle (the agent left where it is, not driving the body until the next
   walk). InnSeatPlayTests makes its own sitters where a zone has too few (it was Inconclusive in the Ash Rim and the Verdant Shore).
+- The second run failed with the same numbers: those seats are on the navmesh after all (the Spoon's four were the dice pit's kegs);
+  another villager's agent at or beside the same seat (the inn's own drinkers sit there by 11:00) pushed the sitter's agent off it by
+  about the agents' radius, and the body went with it. Now every seated sitter is pinned on the seat's middle (the agent no longer moves
+  the body until the next walk or warp), whether the place was moved or not. The test parks everyone else while it sits its sitters and
+  says which way each was seated (Villager.SeatedBy).
 - The Golden Cask and the Cracked Hearth inside: each ground-floor window framed on the inner wall with glazing bars and a sill (pale oak
   and a deep sill in the Cask; soot-dark timber under a stone lintel in the Hearth); the hearths a dark firebox with a grate and two
   logs; the Cask's oak mantel with candles and a mug, the Hearth's lintel split and dropped with soot up the stone.

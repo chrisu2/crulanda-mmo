@@ -1373,23 +1373,26 @@ namespace Crulanda.Encounter
         /// </summary>
         bool SitAtSeat()
         {
-            var seat = life.SeatNear(transform.position - Vector3.up * agent.baseOffset); if (!seat.HasValue) return false;
-            if (agent.isOnNavMesh) { WarpTo(seat.Value.at); agent.isStopped = true; }
-            // A seat off the navmesh's edge (by a wall, a partition, the hearth: the bake keeps half a metre clear of them, and the place
-            // was snapped up to 1.2 m off the seat; the Golden Cask's and the Rusty Spoon's in the run of 2026-10-18 sat 0.3-0.66 m
-            // from their stools): the agent stays on the navmesh where the walk ended and the body is set on the seat itself, until
-            // the next walk (Unseat).
+            var seat = life.SeatNear(transform.position - Vector3.up * agent.baseOffset);
+            if (!seat.HasValue) { SeatedBy = "no seat within 0.9 m of " + transform.position.ToString("0.00"); return false; }
+            if (!agent.isOnNavMesh) { SeatedBy = "off the navmesh: not seated"; return false; }
+            WarpTo(seat.Value.at); agent.isStopped = true;
+            // Pinned on the seat's own middle, the agent no longer carrying the body until the next walk or warp (Unseat). The lane A
+            // runs of 2026-10-18 had the Golden Cask's and the Rusty Spoon's sitters 0.29-0.66 m off their seats, the same both runs:
+            // another villager's agent at or by the same seat (the inn's own drinkers sat there at 11:00) and the crowd's separation
+            // pushed the sitter's agent off it, by about the agents' radius (0.3 m), and the body went with the agent. A seat off the
+            // navmesh's edge (its place snapped away from it) is handled the same way.
             var mid = seat.Value.middle;
-            if (agent.isOnNavMesh && new Vector2(mid.x - seat.Value.at.x, mid.z - seat.Value.at.z).sqrMagnitude > .0025f)
-            {
-                agent.updatePosition = false;
-                transform.position = new Vector3(mid.x, seat.Value.at.y + agent.baseOffset, mid.z);
-            }
+            agent.updatePosition = false;
+            transform.position = new Vector3(mid.x, seat.Value.at.y + agent.baseOffset, mid.z);
+            SeatedBy = "pinned on the seat's middle (" + new Vector2(mid.x - seat.Value.at.x, mid.z - seat.Value.at.z).magnitude.ToString("0.00") + " m from its navmesh place)";
             visual.SeatRise = Mathf.Max(0, seat.Value.top - ActorVisual.SitClipSeat);
             return true;
         }
+        /// <summary>Tests: how the last sit-down went (which path seated them), or null.</summary>
+        public string SeatedBy { get; private set; }
         /// <summary>Back on the navmesh's own position (after a seat off its edge, SitAtSeat): the body follows the agent again.</summary>
-        void Unseat() { if (agent != null && !agent.updatePosition) agent.updatePosition = true; }
+        void Unseat() { if (agent != null && !agent.updatePosition) agent.updatePosition = true; SeatedBy = null; }
         void WarpTo(Vector3 p) { Unseat(); agent.Warp(p); }
         void Go(Vector3 target, float speedScale = 1)
         {

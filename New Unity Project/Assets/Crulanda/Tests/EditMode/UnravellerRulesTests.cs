@@ -26,7 +26,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(File.Exists(File_), "the data file");
             var t = UnravellerTuning.Parse(File.ReadAllText(File_));
             var d = new UnravellerTuning();
-            Assert.AreEqual(d.health, t.health); Assert.AreEqual(165000, t.health, "tune-4: one in ten, near misses at 8-24%");
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(160000, t.health, "the Leap's lost time (play note 285); tune-4: one in ten, near misses at 8-24%");
             Assert.AreEqual(540, t.enrageSeconds, "the feast at 9:00");
             Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
@@ -276,6 +276,15 @@ namespace Crulanda.Tests
                 foreach (var mf in shard.GetComponentsInChildren<MeshFilter>(true)) foreach (var v in mf.sharedMesh.vertices) low = Mathf.Min(low, mf.transform.TransformPoint(v).y);
                 Assert.AreEqual(floorY, low, .05f, "a shard's lowest point on the floor (" + where + "), not in the air: " + low);
             }
+        }
+
+        [Test] public void She_leaps_at_three_marks_warned_and_releases_her_brood()
+        {
+            // Play note 285, Chris: "maybe a jump mechanic to get away and release her brood".
+            var t = T;
+            CollectionAssert.AreEqual(new[] { .75f, .5f, .25f }, new[] { t.leapAt1, t.leapAt2, t.leapAt3 });
+            Assert.That(t.leapWarn, Is.InRange(1.5f, 2.5f), "a red ring where she will land, about 2 s before");
+            Assert.Less(t.leapShare, EncounterEnemy.MaxBlowShare); Assert.Greater(t.leapRangeMin, t.leapRadius * 2, "far enough to make the raid move");
         }
 
         [Test] public void A_rotation_goes_round_passing_over_those_who_cannot()

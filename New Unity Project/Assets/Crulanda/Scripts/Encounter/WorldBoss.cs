@@ -131,6 +131,7 @@ namespace Crulanda.Encounter
         // ---------- her fight (WORLD_BOSS_1.md 3.3-3.4; build steps 4 and 5; GAME-ONLY lines) ----------
         public const string FeedingName = "The Feeding", BroodName = "Weave-Eater brood", UnmadeName = "Unmade ground", HuntName = "Erased", PulseName = "Unravelling";
         public const string SpikesName = "Spikes", SpikesThrown = "The spikes throw you up", SpikesWarning = "Violet cracks under you: the spikes are coming, step off!";
+        public const string LeapName = "Her leap", LeapWarning = "She gathers to leap: out of the red ring!", LeapLine = "The Unraveller tears free of the ropes and leaps across the bar; her brood boil up where she lands.";
         public const string SaltItem = "throw.salt_twist", HarpoonItem = "throw.bone_harpoon";
         public const string BroodLine = "...the little ones are hungry too...", MoreLine = "...more...", FeastLine = "...all of it...";
         public static string PhaseSystem(int phase) { return phase == 2 ? "The Brood: the river boils at the bar's edges, and her children come up out of it." : phase == 3 ? "The Unravelling: the air itself comes apart round her." : "The Hunger."; }

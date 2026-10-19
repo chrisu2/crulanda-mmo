@@ -97,6 +97,8 @@ namespace Crulanda.Encounter
             if (!actor.IsAlive || seconds <= 0) return;
             stunUntil = Mathf.Max(stunUntil, Time.time + seconds); CancelBlow(); if (Casting) { CancelCast(true); if (RaidBoss) FeedingsStopped++; } wasHeld = true;
         }
+        /// <summary>Torn free of the harpoons (her leap): no pin, no root.</summary>
+        public void TearFree() { pinnedUntil = 0; rootUntil = 0; }
         /// <summary>Moved onto <paramref name="to"/> whatever her pin (the hunt: "pinned or not").</summary>
         public bool DisplaceTo(Vector3 to)
         {

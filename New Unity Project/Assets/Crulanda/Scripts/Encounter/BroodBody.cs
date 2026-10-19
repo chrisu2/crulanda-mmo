@@ -92,7 +92,7 @@ namespace Crulanda.Encounter
             if (white) return;
             var at = transform.position; float moved = (at - lastPos).magnitude; lastPos = at;
             float swingIn = enemy.NextSwingIn;
-            if (swingIn > lastSwingIn + .5f && enemy.Engaged) Play(Random.value < .5f ? "attack1" : "attack2", .08f);
+            if (swingIn > lastSwingIn + .5f && enemy.Engaged) { var c = Random.value < .5f ? "attack1" : "attack2"; if (anim != null && anim[c] != null) { anim.Stop(); anim.Play(c); Playing = c; } }   // its bite plain to see
             else if (Playing == null || !Playing.StartsWith("attack") || anim == null || !anim.IsPlaying(Playing)) Play(moved > Time.deltaTime * .4f ? "walk" : "idle");
             lastSwingIn = swingIn;
         }

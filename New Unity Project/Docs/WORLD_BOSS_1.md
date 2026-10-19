@@ -813,6 +813,19 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      floats, so the melee keep a clear edge round her; a sim leaving the red drops a mend that would not land within 0.3 s; a pet that finds
      no clear spot goes to its keeper when its keeper stands clear. (Tune-5's first pull: the Ranger's wolf 65 s in the red, the Ranger 23,
      the Warrior tank 19, the Rogue 11, most of it the warnings' seconds while walking out.)
+   **The Leap (play note 285, 2026-10-19; WRITTEN, NOT RUN).** Chris, verbatim: "the spider needs an attack animation. maybe a jump mechanic
+   to get away and release her brood"; "if she lands on you after jump its an insta death".
+   - **Her strikes** play the spider's attack1/attack2 at once on each swing (stopping the walk or idle, a little slowed to be seen); the
+     brood's bites the same. The feet's settling keeps the planted legs down.
+   - **The Leap** (GAME-ONLY): at 75%, 50% and 25% of her health (not while she swallows, feeds or stands calcified: as soon as she is free)
+     she tears free of the harpoons and leaps 12-18 m to another part of the bar or the apron (never the water): two red rings where she
+     will land, 2 s before: the outer (5 m) and, solid, her body's own (about 2.9 m). Over 0.9 s her body goes up an arc of about 4 m (the
+     jump clip). Anyone under her body as she lands dies outright (past the 60% cap; the Shaman's Barrow-wake can raise them); anyone else in
+     the outer ring takes 35% and is thrown 4 m. A brood wave of three rises in a ring 7 m round where she lands. The raid moves: the main
+     tank takes her up again, the harpoons pin her afresh, the Trapper, the control and the kill order meet the new wave. The sims step
+     out of the rings as out of any red (the inner first: the deepest). Numbers in the data file (`leapAt1-3`, `leapWarn`, `leapSeconds`,
+     `leapRadius`, `leapShare`, `leapKnock`, `leapRangeMin/Max`); the log counts leaps.
+   - **Her health 160,000** (165,000) for the time the leaps cost.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

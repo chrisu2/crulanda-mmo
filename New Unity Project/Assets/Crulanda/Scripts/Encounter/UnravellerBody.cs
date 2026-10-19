@@ -195,6 +195,14 @@ namespace Crulanda.Encounter
                 else spider.position = new Vector3(spider.position.x, floorAt + legsBelowPivot + depth, spider.position.z);
             }
             if (crown != null) crown.position = new Vector3(crown.position.x, floorAt + (spider != null ? SpiderHeight * .9f : 2.6f) + depth, crown.position.z);
+            // Her leap (play note 285): the whole body along an arc from where she was to where she lands (her actor is there already), the jump clip.
+            if (s != null && s.LeapArc(enemy, out var lf, out var lt, out var lk))
+            {
+                var arcAt = Vector3.Lerp(lf, lt, lk); var off = arcAt - transform.position;
+                root.position = root.position + new Vector3(off.x, 0, off.z) + Vector3.up * (16 * lk * (1 - lk));   // up to 4 m at the top
+                if (Playing != "jump") { if (anim != null && anim["jump"] != null) { anim.Stop(); anim.Play("jump"); } Playing = "jump"; }
+                return;
+            }
             TickCrown();
             if (!enemy.actor.IsAlive)
             {
@@ -206,7 +214,7 @@ namespace Crulanda.Encounter
             float swingIn = enemy.NextSwingIn;
             // A swing: its timer jumped up. The blink: more than 2.5 m in a frame (the wrap leaves its afterimage): a jolt.
             if (moved > 2.5f) { jolted = Time.time + .35f; if (anim != null && anim["hit2"] != null) { anim.Stop(); anim.Play("hit2"); Playing = "hit2"; } }
-            else if (swingIn > lastSwingIn + .5f && enemy.Engaged) Play(Random.value < .5f ? "attack1" : "attack2", .1f);
+            else if (swingIn > lastSwingIn + .5f && enemy.Engaged) { var c = Random.value < .5f ? "attack1" : "attack2"; if (anim != null && anim[c] != null) { anim[c].speed = .8f; anim.Stop(); anim.Play(c); Playing = c; } }   // her strike plain to see (play note 285: "the spider needs an attack animation")
             else if (Time.time > jolted && (Playing == null || !Playing.StartsWith("attack") || anim == null || !anim.IsPlaying(Playing)))
                 Play(moved > Time.deltaTime * .4f ? "walk" : "idle");
             lastSwingIn = swingIn;

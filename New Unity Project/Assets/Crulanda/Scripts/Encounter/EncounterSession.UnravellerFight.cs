@@ -94,7 +94,7 @@ namespace Crulanda.Encounter
             RaidBossPinned = e.PinLeft; RaidBossEnrage = UnravellerRules.EnrageLeft(e.SincePull, t);
             if (e.PinLeft <= 0) { if (pinFreeSince < 0) pinFreeSince = now; else if (now - pinFreeSince > 1.5f && HarpoonRotation != null && HarpoonRotation.Current(HarpoonAble) == RaidGroup.You) { HarpoonRotation.Skip(); pinFreeSince = now; } }
             else pinFreeSince = -1;
-            TickSpikes(e, now); TickSnares();
+            TickSpikes(e, now); TickSnares(); TickLeap(e, now);
             if (!feasted && UnravellerRules.Feast(e.SincePull, t)) Feast(e);
         }
         // ---------- the ground spikes (raid 7): warned, then they burst ----------
@@ -164,7 +164,7 @@ namespace Crulanda.Encounter
         void BeginUnravellerFight(EncounterEnemy e)
         {
             float now = Time.time; e.PullAt = now; e.RaidPhase = 0; feasted = false; nextSpike = now + Random.Range(UT.spikeEveryMin, UT.spikeEveryMax); nextBrood = now + Mathf.Max(10, UT.broodEvery1);   // phase-1 adds (off by default)
-            HarmSeconds.Clear(); SnaresLaid = SnaresCaught = BroodHoldsRanOut = 0;
+            Leaps = 0; HarmSeconds.Clear(); SnaresLaid = SnaresCaught = BroodHoldsRanOut = 0;
             SpikeBursts = SpikeHits = BroodKilled = BroodBrokeFree = BroodRisen = BroodEaten = SwallowsFreed = SwallowsErased = HuntsMissed = HuntsLanded = Pulses = Feasts = HarpoonsThrown = SaltsThrown = 0;
             SetRotations();
             if (Unraveller.FightTrackReady) Crulanda.World.ZoneMusic.FightOverride = Unraveller.FightTrack;
@@ -181,6 +181,7 @@ namespace Crulanda.Encounter
             snares.Clear();
             foreach (var s in spikeSpots) if (s.mark != null) Destroy(s.mark.gameObject);
             spikeSpots.Clear(); spikeAt = -1; nextSpike = 0;
+            leapsDone = 0; leapWarnUntil = -1; leapArcStart = -1; if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide();
             var wrap = WrapOf(e); if (wrap != null) wrap.AutoErupt = true;
             if (SwallowedActor != null) Spit(e, SwallowedActor);
             Swallow.End(); SwallowedActor = null; SaltCall.Clear();
@@ -360,6 +361,69 @@ namespace Crulanda.Encounter
             if (a == null || seconds <= 0) return; string n = a == Player ? "you" : a.DisplayName.Split(' ')[0] + (a.DisplayName.Contains("'s ") ? " " + a.DisplayName.Split(' ').Last() : "");
             HarmSeconds.TryGetValue(n, out var was); HarmSeconds[n] = was + seconds;
         }
+        // ---------- the Leap (play note 285) ----------
+        int leapsDone; float leapWarnUntil = -1; Vector3 leapTo; BlowMark leapMark, leapCore;
+        /// <summary>Her leap in the air now: from, to, and how far through (0-1); false when she is not leaping (UnravellerBody draws the arc).</summary>
+        public bool LeapArc(EncounterEnemy e, out Vector3 from, out Vector3 to, out float t)
+        {
+            from = leapFrom; to = leapTo; t = leapArcStart < 0 ? 1 : (Time.time - leapArcStart) / Mathf.Max(.01f, UT.leapSeconds);
+            return e == UnravellerFoe && leapArcStart >= 0 && t < 1;
+        }
+        Vector3 leapFrom; float leapArcStart = -1;
+        public int Leaps;
+        float[] LeapMarks { get { var t = UT; return new[] { t.leapAt1, t.leapAt2, t.leapAt3 }; } }
+        void TickLeap(EncounterEnemy e, float now)
+        {
+            var t = UT;
+            if (leapArcStart >= 0 && now - leapArcStart >= t.leapSeconds) leapArcStart = -1;
+            if (leapWarnUntil >= 0)
+            {
+                if (leapMark != null) leapMark.Show(leapTo, t.leapRadius, Mathf.Clamp01(1 - (leapWarnUntil - now) / Mathf.Max(.01f, t.leapWarn)));
+                if (leapCore != null) leapCore.Show(leapTo, e.BodyRadius, 1);   // where her body lands: solid, death
+                if (now < leapWarnUntil) return;
+                // She leaps: torn free of the harpoons, an arc through the air, the ring struck and thrown, her brood up round her.
+                leapWarnUntil = -1; if (leapMark != null) leapMark.Hide(); if (leapCore != null) leapCore.Hide();
+                e.Pins.Clear(); e.TearFree();
+                leapFrom = e.transform.position; leapArcStart = now; Leaps++;
+                e.DisplaceTo(leapTo);
+                foreach (var a in PartyActors().ToArray())
+                {
+                    if (a == null || !a.IsAlive || a == SwallowedActor) continue;
+                    float d = Flat(a.transform.position - Vector3.up - leapTo); if (d > t.leapRadius) continue;
+                    // Under her body as she lands: dead outright, past the 60% cap (Chris: "if she lands on you after jump its an insta death").
+                    if (d <= e.BodyRadius) { NoteHit(a, "Crushed under her landing"); a.Health.ApplyDamage(EncounterEnemy.CapBlow(a.Health.Pool.Current, a.Health.Pool.Max, true, true)); FloatText(a.transform.position + Vector3.up, "Crushed", new Color(.69f, .08f, .12f)); continue; }
+                    Hurt(a, t.leapShare, Unraveller.LeapName, false); e.Knock(a, t.leapKnock);
+                }
+                Message(Unraveller.LeapLine);
+                SpawnBrood(e, t.broodCount, leapTo);
+                return;
+            }
+            if (leapsDone >= LeapMarks.Length || e.actor.Health.Pool.Ratio > LeapMarks[leapsDone]) return;
+            if (SwallowedActor != null || e.Feeding || e.Stunned) return;   // not while she swallows or feeds (or stands calcified): when she is free
+            leapsDone++;
+            leapTo = LeapSpot(e);
+            if (leapMark == null) leapMark = BlowMark.Create(GroundKind.Harmful, t.leapWarn + 1, Unraveller.LeapName);
+            leapMark.Show(leapTo, t.leapRadius, 0); leapWarnUntil = now + t.leapWarn;
+            if (leapCore == null) leapCore = BlowMark.Create(GroundKind.Harmful, t.leapWarn + 1, "Under her landing");
+            leapCore.Show(leapTo, e.BodyRadius, 1);
+            RaidWarning(Unraveller.LeapWarning);
+        }
+        /// <summary>Where she leaps to: another part of the bar or the apron, 12-18 m off, on the walkable ground.</summary>
+        Vector3 LeapSpot(EncounterEnemy e)
+        {
+            var t = UT; var bar = Zone != null ? Zone.SiltBar : null; var apron = Zone != null ? Zone.ReachApron : null;
+            for (int k = 0; k < 16; k++)
+            {
+                var p = e.transform.position + Quaternion.Euler(0, Random.Range(0f, 360f), 0) * Vector3.forward * Random.Range(t.leapRangeMin, t.leapRangeMax);
+                if (!NavMesh.SamplePosition(p, out var hit, 3, NavMesh.AllAreas)) continue;
+                if (Zone != null && Zone.ChemicalAt(hit.position + Vector3.up)) continue;   // onto the bar or the apron, not the water
+                var q = new Vector2(hit.position.x, hit.position.z);
+                bool onIt = bar == null || ZoneWaterInside(bar, q) || apron != null && ZoneWaterInside(apron, q);
+                if (onIt) return hit.position;
+            }
+            return bar != null ? Zone.Ground(bar.center) : e.transform.position;
+        }
+        static bool ZoneWaterInside(Crulanda.World.ZoneShoal s, Vector2 p) { return Crulanda.World.ZoneWater.ShoalOut(s, p.x, p.y) < 0; }
         /// <summary>Raisings this session (the Shaman's Barrow-wake; the run's log).</summary>
         public int Rezzes;
         /// <summary>The fallen one a Shaman at <paramref name="from"/> raises (RaidJobs.RezPick: a tank, a healer, a damage-dealer; not in marked ground).</summary>
@@ -463,14 +527,17 @@ namespace Crulanda.Encounter
         }
         /// <summary>Her brood out of the river (the Drain Courts' kind, level 22, a fifth of a camp elite's health, the Weave-Eaters' book rules),
         /// on both sides of the bar, going for the healers.</summary>
-        public List<EncounterEnemy> SpawnBrood(EncounterEnemy mother, int count)
+        public List<EncounterEnemy> SpawnBrood(EncounterEnemy mother, int count) { return SpawnBrood(mother, count, null); }
+        /// <summary>Her brood round <paramref name="around"/> (her leap's landing: a ring 7 m out, clear of her) or, with none, out of the river.</summary>
+        public List<EncounterEnemy> SpawnBrood(EncounterEnemy mother, int count, Vector3? around)
         {
             var made = new List<EncounterEnemy>(); var bar = Zone != null ? Zone.SiltBar : null; var t = UT;
             var healers = PartyActors().Where(a => a != null && a.IsAlive && IsRaidHealer(a)).ToList();
             for (int k = 0; k < count; k++)
             {
                 Vector3 want;
-                if (bar != null)
+                if (around.HasValue) want = around.Value + Quaternion.Euler(0, k * 360f / Mathf.Max(1, count) + Random.Range(-20f, 20f), 0) * Vector3.forward * 7;
+                else if (bar != null)
                 {
                     // Clear of her (run 1: risen beside the bar's middle, they passed by her on the way to the healers and she ate 23 of 36): out
                     // of the river off the bar's corners, one side and the other, one end and the other.

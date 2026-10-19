@@ -13,7 +13,7 @@ namespace Crulanda.Encounter
     public sealed class UnravellerTuning
     {
         // ---------- her, and the clock ----------
-        public int health = 165000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
+        public int health = 160000; public float hitBase = 190, swingEvery = 2.2f, enrageSeconds = 540, phase2At = .7f, phase3At = .4f;
         // ---------- the rules that hold all fight (3.3): the Weave-Eaters' own, scaled ----------
         public float lighthouseShare = .1f, lighthouseBeat = 2, lighthouseReach = 30;
         public float blinkEvery = 9, blinkReach = 12, touchShare = .6f, touchSilence = 3, wardReach = 10;
@@ -45,6 +45,11 @@ namespace Crulanda.Encounter
         /// <summary>A ring of salt on bone stakes: snareRadius across, snareSeconds on the ground or until it holds one; a brood crossing it calcified
         /// snareHold s; the Trapper lays snaresPerWave a wave, one each snareEvery s.</summary>
         public float snareSeconds = 30, snareHold = 12, snareRadius = 1.5f, snareEvery = 8; public int snaresPerWave = 3;
+        // ---------- the Leap (play note 285, Chris: "maybe a jump mechanic to get away and release her brood") ----------
+        /// <summary>At each share of her health (leapAt1-3) she tears free of the harpoons and leaps leapRange m (least to most) across the bar or
+        /// the apron: a deep-red ring where she will land leapWarn s before, a leapSeconds arc, leapShare of the health of anyone in the ring
+        /// (leapRadius) and thrown leapKnock m, and a brood wave of broodCount where she lands.</summary>
+        public float leapAt1 = .75f, leapAt2 = .5f, leapAt3 = .25f, leapWarn = 2, leapSeconds = .9f, leapRadius = 5, leapShare = .35f, leapKnock = 4, leapRangeMin = 12, leapRangeMax = 18;
         // ---------- the sims (3.5) ----------
         public float simRaidLift = 1.2f; public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;
         /// <summary>The chance a sim misses its part of a mechanic now and then: at 18, at 20, and what a careless one (rash: nerve over .75) adds.</summary>

@@ -896,3 +896,4 @@ un-captures.
   stacked over her) "woah too much cant even make out the spider" (OPEN): the void wrap thinned to a translucent edge, the spider first.
 - 260 (2026-10-19 ~15:05, watching raid 2) "she needs adds. smaller spiders with the original texture but purple" (OPEN): her brood as
   small spiders, the spider's own texture tinted purple.
+- 261 (2026-10-19 ~15:10, watching raid 2, pull 2; pull 1 had reached her 19%) "wipe but when down too fast when over 75% health" (OPEN).

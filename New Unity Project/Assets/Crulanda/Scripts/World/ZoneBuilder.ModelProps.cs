@@ -27,11 +27,9 @@ namespace Crulanda.World
             { "Fantasy/Barrel", new Vector3(-90, 0, 0) }, { "Fantasy/Stool", new Vector3(-90, 0, 0) }, { "Fantasy/Chandelier", new Vector3(-90, 0, 0) },
             { "Fantasy/Dummy", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_1", new Vector3(-90, 0, 0) }, { "Fantasy/Banner_2", new Vector3(-90, 0, 0) }, { "Fantasy/WeaponStand", new Vector3(-90, 0, 0) },   // the weapon stand made Z up too: it lay tipped against the yard's fence (Chris, 15:20) and in Vell's smithy   // Banner_2 made Z up like Banner_1 (2.08 m along z): lying flat it came in some 15 times too big (the 14:12 yard frame) { "Fantasy/CandleStick", new Vector3(0, 0, -90) },
             { "Medieval/Prefabs/CandleV1", new Vector3(-90, 0, 0) },
-            // icescreen's Wooden Canopy (play note 252): 3ds Max exports whose meshes are Z up (Canopy.fbx: x 8.8, y 4.8, z 3.8 m, the
-            // ridge at the top of z, six posts' feet at z 0); the file stands them up with a GeometricRotation of -90 about x, which
-            // Unity does not bake into the mesh, and the prefabs carry no turn, so they came in lying on their sides (lane B frame
-            // oakhaven-15-woodyard, 2026-10-19: one roof slope on the grass). WorkshopDataTests measures them standing.
-            { "WoodenCanopy/Prefab/Canopy", new Vector3(-90, 0, 0) }, { "WoodenCanopy/Prefab/FireWood", new Vector3(-90, 0, 0) }, { "WoodenCanopy/Prefab/Stair", new Vector3(-90, 0, 0) },
+            // icescreen's Wooden Canopy (play note 252) needs no entry: its 3ds Max files keep the mesh Z up under a GeometricRotation of
+            // -90 about x, and Unity bakes that in (lane A, 2026-10-19: with a -90 turn here the canopy measured 4.77 m on end, i.e. it
+            // had stood upright without one). WorkshopDataTests measures it standing.
             // Fantasy2/ (ithappy's Fantasy FREE, the market pieces, 2026-10-15) needs no entry: Blender's export with the turn baked in
             // (UpAxis Y, every node's rotation zero, metres), read from the files; MarketPropTests measures them standing.
             // The Small Props Pack's "Unity FBX" models stand on their heads: their vertices are the glTF copies' turned half round X (read

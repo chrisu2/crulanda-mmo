@@ -98,7 +98,7 @@ namespace Crulanda.World
             statics = new GameObject("Zone static scenery").transform; statics.SetParent(transform, false);
             PrepareRelief(); PrepareShapes(); Water = new ZoneWater(); Water.Prepare(Zone, (x, z) => HeightAt(x, z, false)); PrepareHollows(); PrepareCaveWorks(); PrepareOpenGround(); Lap("prepare");
             BuildLighting(); BuildGround(); Lap("ground"); BuildWater(); BuildWasting(); Lap("water"); BuildProps(); BuildPaving(); BuildCaveWorks(); BuildOpenGround(); BuildHomeDoors(); Lap("props"); BuildGroves(); BuildExits(); BuildWoods(); Lap("groves");
-            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); LowtownBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); DistantSkyline.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");   // the Lowtowns' roofs past the edge and the Crown (ZoneBuilder.Lowtowns)
+            BuildForestEdge(); BuildMeadow(); BuildCrops(); BuildBoundaries(); Lap("edge"); BuildBackdrop(); LowtownBackdrop(); ForgeBackdrop(); DistantRanges.Build(transform, Zone, Half + BackdropWidth); DistantSkyline.Build(transform, Zone, Half + BackdropWidth); Lap("backdrop");   // the Lowtowns' roofs past the edge and the Crown (ZoneBuilder.Lowtowns)
             if (art.grass != null && art.grass.Length > 0)
             {
                 // Gloom: the tufts are dry, greyed straw and no wildflowers bloom.
@@ -618,6 +618,8 @@ namespace Crulanda.World
             }
             bool lowtowns = Zone.biome == "lowtowns";   // the Lowtowns (ZoneBuilder.Lowtowns): sooty setts, the ways a wetter grey
             if (lowtowns) { dirt = new Color(.27f, .26f, .25f); rut = new Color(.19f, .185f, .18f); mud = new Color(.17f, .15f, .13f); }
+            bool forged = Forged;   // the Forge District (ZoneBuilder.Forge): soot-black ground, the ways dark setts
+            if (forged) { dirt = new Color(.2f, .19f, .18f); rut = new Color(.14f, .13f, .125f); mud = new Color(.12f, .11f, .1f); }
             var toSun =Quaternion.Euler(55, Zone.lighting.sunYaw, 0) * Vector3.back;   // the day sun, roughly (mountain counter-shading)
             float size = Zone.size, half = size / 2, texel = size / res;
             // Ash crust: petrified-ash plates, a Voronoi network with one jittered site per 5 m cell (sx/sz in cell units, three
@@ -710,7 +712,8 @@ namespace Crulanda.World
                         c = Color.Lerp(earth, sere, Mathf.Clamp01((Mathf.PerlinNoise(x * .05f + 70, z * .05f + 33) - .35f) * 2.2f));
                         c = Color.Lerp(c, new Color(.27f, .25f, .24f), Mathf.Clamp01((Mathf.PerlinNoise(x * .025f + 5, z * .025f + 81) - .64f) * 3) * .7f) * (.9f + n2 * .15f);
                     }
-                    if (lowtowns) c = LowtownGround(x, z, n1, n2, n3);   // sooty setts and black puddles (ZoneBuilder.Lowtowns)
+                    if (lowtowns) c = LowtownGround(x, z, n1, n2, n3);
+                    else if (forged) c = ForgeGround(x, z, n1, n2, n3);   // soot and cinders (ZoneBuilder.Forge)   // sooty setts and black puddles (ZoneBuilder.Lowtowns)
                     // Fields: tilled furrows or golden stubble, following each field's rotation.
                     foreach (var f in Zone.fields)
                     {
@@ -1364,6 +1367,7 @@ namespace Crulanda.World
                 case "leathershop": return LeatherShopSize / 2 + Vector2.one * .8f;
                 case "dryhut": return DryingHutSize / 2 + Vector2.one * .8f;
                 case "kitchen": return KitchenSize / 2 + new Vector2(.3f, .4f);
+                case "foundry_hall": case "lodging_row": case "furnace": case "crucible": case "the_spoke": return ForgeFootprint(p);   // the Forge District's buildings (ZoneBuilder.Forge)
                 case "archive" when !Zone.city: return Vector2.zero;   // Hallow's Creek's roofless Archive is its own (ZoneBuilder.Hallows), not the Crown's
                 default: return CityFootprint(p);   // a city's halls and houses (ZoneBuilder.Crown); zero for anything else
             }
@@ -3078,7 +3082,7 @@ namespace Crulanda.World
         /// <summary>A fraction (0 to 1) made from a value a prop has already drawn and a slot number: a ruin's extra shapes are laid out by these, so nothing more is drawn from the zone's stream.</summary>
         static float RuinHash(float drawn, int slot) { return Mathf.Repeat(drawn * 91.7f + slot * .618f, 1); }
         /// <summary>Whether green still grows on old stone here: not on the ash and not in the gloom, and only with leaf-card art.</summary>
-        bool Overgrown { get { return Zone.biome != "ash" && !Gloom && art.leafCards != null && art.leafCards.Length > 0; } }
+        bool Overgrown { get { return Zone.biome != "ash" && !Forged && !Gloom && art.leafCards != null && art.leafCards.Length > 0; } }
         /// <summary>
         /// Ivy up a wall face: leaf cards lying a finger off the wall from <paramref name="foot"/>, their tips no higher than
         /// <paramref name="tall"/> above it, wide at the root and thinning as it climbs. <paramref name="outward"/> is the way the face looks and
@@ -3819,6 +3823,7 @@ namespace Crulanda.World
             if (p.magnitude < Zone.flatRadius * .45f) open *= .35f;
             if (Zone.biome == "ash") return 0;                       // nothing grows in the ash
             if (Zone.biome == "lowtowns") return 0;                  // nor on the Lowtowns' setts (ZoneBuilder.Lowtowns)
+            if (Forged) return 0;                                    // nor in the Forge District's soot (ZoneBuilder.Forge)
             if (Zone.biome == "mountain")
             {
                 // Thin alpine turf in tufts: none on rock, scree or steep ground, under a face or round a crag's foot (the
@@ -3847,7 +3852,7 @@ namespace Crulanda.World
             vel.x = new ParticleSystem.MinMaxCurve(.25f, .5f); vel.y = new ParticleSystem.MinMaxCurve(0, 0); vel.z = new ParticleSystem.MinMaxCurve(.05f, .15f);
             // The Lowtowns' smoke is soot, short-lived: pale and six seconds long it climbed 40-50 m into the top of the Rust Market's view and
             // read as pale spikes hanging from the sky (SkyGhostDiagnostics' band list, 2026-10-18).
-            if (Zone.biome == "lowtowns") { main.startColor = new Color(.26f, .24f, .23f, .45f); main.startLifetime = 3.5f; vel.x = new ParticleSystem.MinMaxCurve(.15f, .3f); }
+            if (Zone.biome == "lowtowns" || Forged) { main.startColor = new Color(.26f, .24f, .23f, .45f); main.startLifetime = 3.5f; vel.x = new ParticleSystem.MinMaxCurve(.15f, .3f); }
             ps.GetComponent<ParticleSystemRenderer>().sharedMaterial = art.particle;
             HourTinted.Add(ps);   // grey by day, a dim wisp against the night sky
             return ps;
@@ -5939,7 +5944,8 @@ namespace Crulanda.World
         // ---------- edges ----------
         void BuildForestEdge()
         {
-            if (Zone.biome == "lowtowns") { LowtownEdge(); return; }   // a town's edge: blind backs of tenements and the setts (ZoneBuilder.Lowtowns)
+            if (Zone.biome == "lowtowns") { LowtownEdge(); return; }
+            if (Forged) { ForgeEdge(); return; }   // the district wall, not woods (ZoneBuilder.Forge)   // a town's edge: blind backs of tenements and the setts (ZoneBuilder.Lowtowns)
             // A ragged ring of woods: pine and autumn broadleaf; grey dead wood, dark pine and boulders in gloom. A Wasting holds the east side.
             float edge = Half - 5; var sides = Zone.wasting != null ? new[] { 0, 1, 2 } : new[] { 0, 1, 2, 3 };
             for (float s = -Half + 3; s < Half - 3; s += 3.2f)
@@ -6308,7 +6314,7 @@ namespace Crulanda.World
             // apart, and the ridge behind them was bare).
             bool wooded = !mountain && !ash;
             float treeline = mountain ? 32 : ash ? 22 : 90;
-            foreach (float row in Zone.biome == "lowtowns" ? new float[0] : wooded ? new[] { 8f, 14, 22, 32, 43, 53, 64, 76, 86 } : new[] { 8f, 14, 22, 32, 43, 53, 64 })   // the Lowtowns: roofs, not woods (LowtownBackdrop)
+            foreach (float row in Zone.biome == "lowtowns" || Forged ? new float[0] : wooded ? new[] { 8f, 14, 22, 32, 43, 53, 64, 76, 86 } : new[] { 8f, 14, 22, 32, 43, 53, 64 })   // the Lowtowns: roofs, not woods (LowtownBackdrop)
             {
                 bool rock = row > treeline; if (rock && !mountain && !ash) break;
                 // keep: near rows leave the roads' way out open; further out the woods close across it (the road goes into cover).

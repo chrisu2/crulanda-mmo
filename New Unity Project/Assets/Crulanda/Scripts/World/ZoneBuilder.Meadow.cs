@@ -14,7 +14,7 @@ namespace Crulanda.World
     {
         void BuildMeadow()
         {
-            if (Gloom || Zone.biome == "ash" || !KitTrees) return;
+            if (Gloom || Zone.biome == "ash" || Forged || !KitTrees) return;
             bool mountain = Zone.biome == "mountain";
             var mr = new System.Random(Zone.seed * 31 + 8423); float M() { return (float)mr.NextDouble(); }
             var root = new GameObject("Meadow").transform; root.SetParent(statics, false);

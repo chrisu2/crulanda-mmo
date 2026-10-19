@@ -185,6 +185,15 @@ namespace Crulanda.Encounter
                             TravelTo(new Crulanda.World.ZoneExit { to = "zone.lowtowns", name = "/lowtowns", arrive = to.spawns.player });
                             return;
                         }
+                    case "/forge":   // a tester's way to the Forge District (2026-10-19; Docs/ZONE_FORGE_DISTRICT.md), at level 19 at least
+                        {
+                            var to = Zone != null ? Zone.FindZone("zone.forge") : null; if (to == null) { Message("The Forge District is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            if (Progress.Level < 19) { Progress.experience = EncounterProgress.XpForLevel(19); ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); }
+                            Message("To the Forge District at level " + Progress.Level + "...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.forge", name = "/forge", arrive = to.spawns.player });
+                            return;
+                        }
                     case "/hallows":   // a tester's way there (2026-10-16, Chris: "just let me know when i can test/see the new zone"), at level 16 at least
                         {
                             var to = Zone != null ? Zone.FindZone("zone.hallows") : null; if (to == null) { Message("Hallow's Creek is not in this build."); return; }

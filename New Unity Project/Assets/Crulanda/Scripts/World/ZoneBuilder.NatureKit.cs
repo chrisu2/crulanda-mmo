@@ -59,7 +59,7 @@ namespace Crulanda.World
         static Texture GreenSheet { get { if (greenSheet == null) greenSheet = Resources.Load<Texture2D>("Props/Nature/Textures/Leaves_NormalTree_C"); return greenSheet; } }
         /// <summary>Whether rocks here are the kit's mossy ones (art round 3): the green zones; the mountains, the ash and gloom keep the
         /// painted rock (its moss-free top, the skirts and slope seating the crags need).</summary>
-        bool KitRocks { get { return !Gloom && Zone.biome != "mountain" && Zone.biome != "ash" && HasProp("Nature/Rock_Medium_1"); } }
+        bool KitRocks { get { return !Gloom && Zone.biome != "mountain" && Zone.biome != "ash" && !Forged && HasProp("Nature/Rock_Medium_1"); } }
         /// <summary>A kit rock under a root: one of the three mossy rocks by <paramref name="pick"/>, <paramref name="height"/> tall and
         /// no wider than <paramref name="width"/>, a touch into the ground so no edge floats on a slope.</summary>
         GameObject KitRock(Transform t, int pick, float height, float width, float yaw)

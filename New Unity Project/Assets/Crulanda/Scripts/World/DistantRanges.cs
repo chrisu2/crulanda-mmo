@@ -36,7 +36,7 @@ namespace Crulanda.World
             d.woodTint = mountain ? new Color(.17f, .27f, .27f) : biome == "gloom" ? new Color(.22f, .24f, .25f) : biome == "verdant" ? new Color(.13f, .3f, .2f) : new Color(.17f, .3f, .19f);
             // A walled city (the Lowtowns, 2026-10-16): no wood ring. Its crowns' notches read as trees hanging upside down from the
             // smog over the roofs; in their place the city itself runs on, roofs, gables and stacks, climbing toward the Crown.
-            if (biome == "lowtowns") { d.woodTint = new Color(.2f, .18f, .18f); d.wood = d.CityRing(go.transform, shader, reach * 1.35f, 70, seed + 77, CrownSkyline.Bearing); }
+            if (biome == "lowtowns" || biome == "forge") { d.woodTint = new Color(.2f, .18f, .18f); d.wood = d.CityRing(go.transform, shader, reach * 1.35f, 70, seed + 77, CrownSkyline.Bearing); }
             else if (!ash) d.wood = d.Ring(go.transform, shader, reach * 1.5f, mountain ? 95 : 82, 26, seed + 77, wastingYaw, .07f, 4320, 9, .3f);
             d.near = d.Ring(go.transform, shader, reach * (mountain ? 2.45f : 2.0f), mountain ? 110 * scale : ash ? 110 * scale : 150, mountain || ash ? 50 * scale : 60, seed, wastingYaw, .05f, 360, 0, .55f);
             d.far = d.Ring(go.transform, shader, reach * 2.75f, 175 * scale, 80 * scale, seed + 41, wastingYaw, .028f);

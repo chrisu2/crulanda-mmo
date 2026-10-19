@@ -57,6 +57,7 @@ namespace Crulanda.World
             { "zone.lowtowns", new Set { day = new[] { "Music/Last/RustAndSilence", "Music/Eastern/MysteriousCity" }, night = new[] { "Music/Dark/Cemetery", "Music/Eastern/RestlessNight" } } },   // the Lowtowns (Phase 9.1): rust and smog by day, the drains' night
             // Hallow's Creek, the second dungeon: silent out of doors, the dungeon's set in its cellars.
             { "zone.hallows", new Set { day = DungeonTracks, combat = DungeonFight, quiet = true } },
+            { "zone.forge", new Set { day = new[] { "Music/Eastern/DesertSunset", "Music/Dark/Crypt" }, night = new[] { "Music/Dark/ScaryCrypt" } } },   // the Forge District: heat-haze by day, the furnaces' dark by night; a set no other zone plays (every pack track is used somewhere; its own tracks go in Resources/Music/forge, played as extras)
             { "zone.crown", new Set { day = new[] { "Music/Eastern/MysteriousCity", "Music/Last/LastHope" }, night = new[] { "Music/Eastern/RestlessNight" } } },   // the Crown of Argentis (a city)
         };
         /// <summary>A zone's set; a zone not in <see cref="Sets"/> gets Oakhaven's.</summary>

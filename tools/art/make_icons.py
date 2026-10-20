@@ -2172,6 +2172,8 @@ QUEST = {
     'item.reckoners_slate': (shard, ('#e4e8ee', 'gem'), dict(glowc='#c8d4ff')), 'item.rest_candles': (sack, ('#8a7456', '#f0e6c0'), dict(tie='#5a3f28', knots=2)),
     'item.treenails': (log, ('#9a8462', '#efe0bc'), dict(ring='#b89a6a')), 'item.wystan_mask': (maskpiece,),
     'item.green_heartwood': (log, ('#8a8a8c', '#cfe4a4'), dict(ring='#5f9a48', glowc='#7fe08a')),
+    # the Sweep (2026-10-19): Lissa's chalk, a worn white stick (the Rules chalked by the spout)
+    'item.sweep_chalk': (shard, ('#ecebe4',), dict(thin=True)),
 }
 # what a kind looks like when an item has no picture of its own (new content): the resolver's second step
 KINDS = {
@@ -2782,29 +2784,6 @@ def leaf_spec(item):
     word = item.get('name', '').split("'")[0].replace('a ', '', 1).strip()
     return ('quest', leaf_page, (LEAF_MARK.get(word, '#b23a30'),))
 PROF_ICONS.update({'leatherworking': ('hide', pelt, ('#a8703a',)), 'weaving': ('herb', skein)})
-
-# ---- the Unraveller's components (WORLD_BOSS_1.md 4.3, step 7; GAME-ONLY imagery from the books' white crystal, glass-steel, bone,
-# amber-wood and salt-stone, book1 ch.20:181-205; no machines) ----
-GLASS = '#dfe8ee'
-ITEMS.update({
-    'comp.brood_crystal': ('quest', crystal, ('#f4f6f8', '#e8f0ff')),
-    'comp.unraveller_heart': ('quest', crystal, ('#f2f4f8', '#b48aff'), dict(n=1)),
-    'comp.blank.warrior': ('gear', shard, (GLASS,), dict(mat='gem', glowc='#f0f8ff', thin=True)),
-    'comp.blank.paladin': ('gear', shard, (GLASS,), dict(mat='gem', glowc='#f0f8ff')),
-    'comp.blank.rogue': ('gear', shard, (GLASS,), dict(mat='gem', glowc='#e0f0ff', thin=True, spark=True)),
-    'comp.blank.scoundrel': ('gear', shard, ('#e8eef4',), dict(mat='gem', glowc='#ffffff', thin=True, spark=True)),
-    'comp.blank.ranger': ('junk', bone, ('#d8cfb4',)),
-    'comp.blank.mage': ('gear', shard, ('#2c2a3c',), dict(mat='metal', glowc='#9a7aff', thin=True)),
-    'comp.blank.druid': ('wood', shard, ('#e0a040',), dict(mat='gem', glowc='#ffd080', thin=True)),
-    'comp.blank.archivist': ('junk', bone, ('#e6dcc4',)),
-    'comp.blank.saltmender': ('potion', salt, ('#f0f0ec',), dict(crust=True)),
-    'comp.blank.shaman': ('junk', fang, (), dict(bone='#e6dcc0', root='#d09030')),
-    'comp.blank.cleric': ('gear', shard, (GLASS,), dict(mat='gem', glowc='#fff0c0')),
-    'comp.verse.forge': ('quest', m_note, ('#ff9a50', '#ffffff')),
-    'comp.verse.deep': ('quest', m_note, ('#7ac8ff', '#ffffff')),
-    'comp.verse.crown': ('quest', m_note, ('#ffd860', '#ffffff')),
-    'comp.note_original_song': ('quest', m_note, ('#fff4d0', '#ffffff')),
-})
 
 # ---- the classes' standing buffs for the buff-up before a boss (2026-10-15, p86-buffs; Chris: "food buffs, alchemy buffs, class buffs";
 # GAME-ONLY imagery; Icons/ability/buff-class-<class>, by the status id). No machines. ----

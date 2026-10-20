@@ -451,6 +451,7 @@ namespace Crulanda.World
                 float R() { return (float)sr.NextDouble(); }
                 var t = new GameObject(string.IsNullOrEmpty(s.name) ? s.kind : s.name).transform; t.SetParent(all, false);
                 t.position = Ground(s.at); t.rotation = Quaternion.Euler(0, s.rotation, 0);
+                if (CourtStation(t, s, R)) { AddStation(s.kind, t.name, t.position, t); continue; }   // a Crafters' Court workshop's own (ZoneBuilder.CrownCourt)
                 switch (s.kind)
                 {
                     case "forge": FieldAnvil(t, s.variant, R); break;
@@ -557,13 +558,19 @@ namespace Crulanda.World
             }
             Part(PrimitiveType.Cube, t, new Vector3(0, .3f, 0), new Vector3(1.44f, .04f, .44f), dark);   // the shelf
             float on = top + .035f;
-            MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(-.55f, on, .02f), Tint(art.stone, new Color(.62f, .6f, .56f)));
-            Rod(t, new Vector3(-.55f, on + .07f, .02f), new Vector3(-.47f, on + .22f, .1f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            // The alchemy pack's mortar and flasks, this zone's own way (play note 253: ZoneBuilder.Alchemy.BenchSets); else the painted
+            // mortar and pestle and four stoppered vials.
+            bool alchemy = AlchemyOnBench(t, new Vector3(0, on, 0), BenchSetOf(Zone.id));
+            if (!alchemy)
+            {
+                MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(-.55f, on, .02f), Tint(art.stone, new Color(.62f, .6f, .56f)));
+                Rod(t, new Vector3(-.55f, on + .07f, .02f), new Vector3(-.47f, on + .22f, .1f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            }
             Jar(t, new Vector3(-.2f, on, .12f), new Color(.62f, .4f, .28f));
             Jar(t, new Vector3(.02f, on, .14f), new Color(.5f, .46f, .36f), .8f);
             Jar(t, new Vector3(.24f, on, .1f), new Color(.36f, .44f, .4f), 1.15f);
             var glass = Tint(art.stone, new Color(.34f, .5f, .4f)); var cork = Tint(art.timber, new Color(.6f, .46f, .3f));
-            for (int k = 0; k < 4; k++) { var v = new Vector3(.45f + k * .075f, on, -.14f); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .06f, 0), new Vector3(.05f, .06f, .05f), glass); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .135f, 0), new Vector3(.025f, .015f, .025f), cork); }
+            if (!alchemy) for (int k = 0; k < 4; k++) { var v = new Vector3(.45f + k * .075f, on, -.14f); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .06f, 0), new Vector3(.05f, .06f, .05f), glass); Part(PrimitiveType.Cylinder, t, v + new Vector3(0, .135f, 0), new Vector3(.025f, .015f, .025f), cork); }
             // A cut bunch laid ready, its heads to the front.
             Part(PrimitiveType.Capsule, t, new Vector3(-.05f, on + .03f, -.12f), new Vector3(.08f, .17f, .08f), Tint(art.foliage, Wither(new Color(.36f, .5f, .24f))), Quaternion.Euler(0, 75 + R() * 20, 90));
             for (int k = 0; k < 3; k++) Part(PrimitiveType.Sphere, t, new Vector3(-.2f + k * .04f, on + .05f, -.17f + (k % 2) * .03f), new Vector3(.07f, .05f, .07f), Tint(art.foliage, HerbHeads[k % HerbHeads.Length]));
@@ -605,7 +612,14 @@ namespace Crulanda.World
                 Rod(t, from, new Vector3(0, LocalGround(t, 0, 0) + .2f, 0) + q * new Vector3(0, 0, .06f), .11f, art.bark);
             }
             var tongue = PropMesh("Flame", () => ZoneMeshes.Cone(.1f, .34f, 6));
-            for (int k = 0; k < 3; k++) MeshPart(tongue, t, new Vector3((k - 1) * .07f, LocalGround(t, 0, 0) + .06f, (k % 2) * .06f - .03f), flame, Quaternion.Euler((k - 1) * 8, k * 50, (k - 1) * -10)).transform.localScale = new Vector3(1, .8f + k % 2 * .45f, 1);
+            var fire = Glow(t, new Vector3(0, LocalGround(t, 0, 0) + .45f, 0), 5, 1.1f, new Color(1, .55f, .25f), 1.9f);
+            if (!RealFire(t, new Vector3(0, LocalGround(t, 0, 0) + .05f, 0), .36f))   // real flames between the logs (2026-10-14), the painted tongues without the pack
+            for (int k = 0; k < 3; k++)
+            {
+                var lick = MeshPart(tongue, t, new Vector3((k - 1) * .07f, LocalGround(t, 0, 0) + .06f, (k % 2) * .06f - .03f), flame, Quaternion.Euler((k - 1) * 8, k * 50, (k - 1) * -10));
+                lick.transform.localScale = new Vector3(1, .8f + k % 2 * .45f, 1);
+                CandleFlame.Attach(lick, fire);   // wavering with the fire's light (the candle pack, 2026-10-15)
+            }
             // The tripod and the pot on its chain.
             var apex = new Vector3(0, g + 1.45f, 0);
             for (int k = 0; k < 3; k++) { float a = k * 2.094f + .3f; var fp = new Vector3(Mathf.Cos(a) * .82f, 0, Mathf.Sin(a) * .82f); fp.y = LocalGround(t, fp.x, fp.z) - .03f; Rod(t, fp, apex + (fp - apex).normalized * -.05f, .045f, iron); }
@@ -616,7 +630,6 @@ namespace Crulanda.World
             Part(PrimitiveType.Cylinder, t, new Vector3(0, potY + .285f, 0), new Vector3(.34f, .006f, .34f), Tint(art.cloth, new Color(.46f, .3f, .16f)));   // the stew
             foreach (int s in new[] { -1, 1 }) Rod(t, new Vector3(0, apex.y - .62f, 0), new Vector3(s * .2f, potY + .3f, 0), .015f, iron);   // its bail
             if (art.particle != null) Smoke(t, new Vector3(0, apex.y + .1f, 0));
-            Glow(t, new Vector3(0, LocalGround(t, 0, 0) + .45f, 0), 5, 1.1f, new Color(1, .55f, .25f), 1.9f);
             // A log to sit on, and a few split logs stacked by it.
             float lx = 1.45f, lz = .35f;
             Part(PrimitiveType.Cylinder, t, new Vector3(lx, LocalGround(t, lx, lz) + .17f, lz), new Vector3(.34f, .55f, .34f), art.bark, Quaternion.Euler(90, 20 + R() * 20, 0));

@@ -18,7 +18,8 @@
     {"id": "mk-bleeding-wounds", "name": "Bleeding Wounds", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Barbed Arrow bleeds for one more tick per rank.", "emphasis": {"damage": 0.8}, "impl": true},
     {"id": "mk-snap-shot", "name": "Snap Shot", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "clock", "desc": "After an Aimed Shot the next Quick Shot is free.", "emphasis": {"tempo": 1.5}, "impl": true},
     {"id": "mk-headshot", "name": "Headshot", "tier": 2, "col": 1, "max": 3, "req": "mk-steady-hand", "kind": "passive", "icon": "eye", "desc": "Aimed Shot hits 12% harder per rank against targets under 35% health.", "emphasis": {"damage": 1.5}, "impl": true},
-    {"id": "mk-double-nock", "name": "Double Nock", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Aimed Shot looses two arrows, the second at half.", "emphasis": {"damage": 2}, "impl": true}
+    {"id": "mk-double-nock", "name": "Double Nock", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Aimed Shot looses two arrows, the second at half.", "emphasis": {"damage": 2}, "impl": true},
+    {"id": "mk-practised-draw", "name": "Practised Draw", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "clock", "desc": "Aimed Shot is drawn 0.1s quicker per rank.", "emphasis": {"tempo": 1}, "impl": true}
    ]
   },
   {
@@ -34,7 +35,9 @@
     {"id": "bb-sic-fury", "name": "Sic Fury", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "flame", "desc": "Sic's first bite lands 25% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
     {"id": "bb-pack-sense", "name": "Pack Sense", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "eye", "desc": "Your wolf turns at once to whatever you shoot, and its first bite on it lands half again as hard.", "emphasis": {"tempo": 1}, "impl": true},
     {"id": "bb-howl", "name": "Howl", "tier": 2, "col": 1, "max": 1, "req": "bb-thick-coat", "kind": "passive", "icon": "wind", "desc": "Your wolf's bites hold attention like a tank's blows.", "emphasis": {"threat": 2}, "impl": true},
-    {"id": "bb-alpha", "name": "Alpha", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "skull", "desc": "Your wolf is an alpha: a quarter more health and bite.", "emphasis": {"damage": 1, "mitigation": 1}, "impl": true}
+    {"id": "bb-alpha", "name": "Alpha", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "skull", "desc": "Your wolf is an alpha: a quarter more health and bite.", "emphasis": {"damage": 1, "mitigation": 1}, "impl": true},
+    {"id": "bb-scarred-hide", "name": "Scarred Hide", "tier": 3, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Your wolf takes 3% less per rank.", "emphasis": {"mitigation": 1}, "impl": true},
+    {"id": "bb-shared-hunt", "name": "Shared Hunt", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "signature", "icon": "paw", "desc": "Each of your wolf's bites gives you back 2 Focus.", "emphasis": {"tempo": 1}, "impl": true}
    ]
   },
   {
@@ -50,7 +53,29 @@
     {"id": "pf-pin", "name": "Pin", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "target", "desc": "New action: an arrow through the foot that roots the target for 3s.", "emphasis": {"control": 3}, "impl": true},
     {"id": "pf-cover-of-leaves", "name": "Cover of Leaves", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "leaf", "desc": "Disengage grants a barrier worth 3% of your maximum health per rank for 6s.", "emphasis": {"mitigation": 1}, "impl": true},
     {"id": "pf-trapper", "name": "Trapper", "tier": 2, "col": 1, "max": 3, "req": "pf-pin", "kind": "passive", "icon": "gear", "desc": "Pin holds 1s longer per rank.", "emphasis": {"control": 1.5}, "impl": true},
-    {"id": "pf-pathfinder", "name": "Pathfinder", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "banner", "desc": "Hunter's Mark also slows its target by 15%.", "emphasis": {"control": 2}, "impl": true}
+    {"id": "pf-pathfinder", "name": "Pathfinder", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "banner", "desc": "Hunter's Mark also slows its target by 15%.", "emphasis": {"control": 2}, "impl": true},
+    {"id": "pf-lasting-mark", "name": "Lasting Mark", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "eye", "desc": "Hunter's Mark lasts 3s longer per rank.", "emphasis": {"control": 1}, "impl": true}
+   ]
+  },
+  {
+   "id": "skirmisher",
+   "name": "Skirmisher",
+   "role": "dps",
+   "loop": "Open with the bow, let the wolf take the pull, then bound in with Spear Lunge, whirl the haft through the pack, feint the blow that would hurt and leap clear with Disengage.",
+   "tradeoff": "The Skirmisher fights at a spear's length on a Ranger's leather: every second close is a risk the Marksman never takes.",
+   "nodes": [
+    {"id": "sk-long-haft", "name": "Long Haft", "tier": 0, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "target", "desc": "Spear Lunge reaches 1m further per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "sk-light-step", "name": "Light Step", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "wind", "desc": "You move 1% faster per rank while an enemy is within 5m.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "sk-bleeding-point", "name": "Bleeding Point", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Spear Lunge opens a wound that bleeds 2% of its hit a second for 6s per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sk-quick-recovery", "name": "Quick Recovery", "tier": 1, "col": 2, "max": 2, "req": null, "kind": "modifier", "icon": "clock", "desc": "Disengage comes back 1.5s sooner per rank.", "emphasis": {"tempo": 1, "mitigation": 0.5}, "impl": true},
+    {"id": "sk-feint", "name": "Feint", "tier": 2, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "eye", "desc": "New action: Feint: a false thrust; the target's next blow at you within 3s misses.", "emphasis": {"mitigation": 2}, "impl": true},
+    {"id": "sk-pack-tactics", "name": "Pack Tactics", "tier": 2, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "paw", "desc": "A foe you struck within 3s that your wolf is also on takes 3% more from the party per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sk-whirl-edge", "name": "Whirl Edge", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "modifier", "icon": "sword", "desc": "Whirling Spear hits 10% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "sk-hit-and-run", "name": "Hit and Run", "tier": 3, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "bolt", "desc": "After Disengage, your next Spear Lunge costs no Focus.", "emphasis": {"tempo": 2}, "impl": true},
+    {"id": "sk-thrown-spear", "name": "Thrown Spear", "tier": 4, "col": 1, "max": 1, "req": null, "kind": "modifier", "icon": "target", "desc": "Out of reach, Spear Lunge throws the spear from 15m instead.", "emphasis": {"damage": 1, "tempo": 1}, "impl": false},
+    {"id": "sk-second-wind", "name": "Catch Your Breath", "tier": 3, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "heart", "desc": "A kill in melee (within 5m) gives back 5 Focus per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "sk-dancer", "name": "Dancer", "tier": 5, "col": 1, "max": 3, "req": "sk-feint", "kind": "modifier", "icon": "wind", "desc": "Feint makes one more blow miss per rank.", "emphasis": {"mitigation": 1.5}, "impl": false},
+    {"id": "sk-untouchable", "name": "Untouchable", "tier": 6, "col": 1, "max": 1, "req": "sk-dancer", "kind": "capstone", "icon": "star", "desc": "For 4s after Whirling Spear, half of every blow at you is turned aside.", "emphasis": {"mitigation": 3}, "impl": false}
    ]
   }
  ]

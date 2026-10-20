@@ -1,0 +1,51 @@
+{
+  "items": [
+    {
+      "id": "throw.salt_twist",
+      "name": "Twist of salt",
+      "kind": "consumable",
+      "thrown": "salt",
+      "quality": 1,
+      "level": 15,
+      "value": 2,
+      "stack": 20,
+      "description": "Grey salt in a paper twist. Thrown at a Weave-Eater it goes white and still for a few heartbeats; at anything else it only stings.",
+      "canonStatus": "CANON: salt against the Weave-Eaters (book1 ch.20:199-203); the twist GAME-ONLY"
+    },
+    {
+      "id": "throw.bone_harpoon",
+      "name": "Bone harpoon",
+      "kind": "consumable",
+      "thrown": "harpoon",
+      "quality": 2,
+      "level": 16,
+      "value": 6,
+      "stack": 5,
+      "description": "A barbed head of old bone on a length of amber rope. Thrown into a spirit, it pins it where it is.",
+      "canonStatus": "CANON: bone harpoons on amber rope (book1 ch.20:177-191); this one GAME-ONLY"
+    }
+  ],
+  "vendors": [
+    {
+      "npc": "Tibb Marrow",
+      "items": [
+        "throw.salt_twist",
+        "potion.salt"
+      ]
+    },
+    {
+      "npc": "Ketta Rune",
+      "items": [
+        "throw.bone_harpoon"
+      ]
+    },
+    {
+      "npc": "Ottie Brack",
+      "items": [
+        "potion.healing",
+        "throw.salt_twist"
+      ],
+      "gearForZone": true
+    }
+  ]
+}

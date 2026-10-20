@@ -8,6 +8,67 @@ namespace Crulanda.World
     public static class ZoneMeshes
     {
         /// <summary>
+        /// A mesh cut into square cells of <paramref name="cell"/> metres over its own x and z (each triangle to the cell its middle
+        /// falls in), so each cell can be culled on its own (DetailCull, 2026-10-17). Every vertex attribute is kept (normals, colours,
+        /// tangents, uv 0 to 3 at their own widths). The mesh itself when it fits one cell; otherwise new meshes and the source destroyed.
+        /// </summary>
+        public static List<Mesh> SplitByCell(Mesh mesh, float cell)
+        {
+            var result = new List<Mesh>();
+            if (mesh == null) return result;
+            var b = mesh.bounds;
+            if (cell <= 0 || (b.size.x <= cell && b.size.z <= cell) || mesh.subMeshCount != 1) { result.Add(mesh); return result; }
+            var verts = mesh.vertices; var norms = mesh.normals; var cols = mesh.colors; var tans = mesh.tangents; var tris = mesh.triangles;
+            bool hasN = norms != null && norms.Length == verts.Length, hasC = cols != null && cols.Length == verts.Length, hasT = tans != null && tans.Length == verts.Length;
+            var uvs = new List<Vector4>[4]; var dims = new int[4];
+            for (int ch = 0; ch < 4; ch++)
+            {
+                var a = UnityEngine.Rendering.VertexAttribute.TexCoord0 + ch;
+                if (!mesh.HasVertexAttribute(a)) continue;
+                dims[ch] = mesh.GetVertexAttributeDimension(a); uvs[ch] = new List<Vector4>(); mesh.GetUVs(ch, uvs[ch]);
+                if (uvs[ch].Count != verts.Length) uvs[ch] = null;
+            }
+            var cells = new Dictionary<(int, int), List<int>>();
+            for (int i = 0; i + 2 < tris.Length; i += 3)
+            {
+                var mid = (verts[tris[i]] + verts[tris[i + 1]] + verts[tris[i + 2]]) / 3;
+                var key = (Mathf.FloorToInt((mid.x - b.min.x) / cell), Mathf.FloorToInt((mid.z - b.min.z) / cell));
+                if (!cells.TryGetValue(key, out var list)) cells[key] = list = new List<int>();
+                list.Add(tris[i]); list.Add(tris[i + 1]); list.Add(tris[i + 2]);
+            }
+            if (cells.Count <= 1) { result.Add(mesh); return result; }
+            foreach (var kv in cells)
+            {
+                var map = new Dictionary<int, int>(); var v = new List<Vector3>(); var n = new List<Vector3>(); var c = new List<Color>(); var t = new List<Vector4>();
+                var u = new List<Vector4>[4]; for (int ch = 0; ch < 4; ch++) if (uvs[ch] != null) u[ch] = new List<Vector4>();
+                var idx = new List<int>(kv.Value.Count);
+                foreach (int old in kv.Value)
+                {
+                    if (!map.TryGetValue(old, out int ni))
+                    {
+                        ni = v.Count; map[old] = ni; v.Add(verts[old]);
+                        if (hasN) n.Add(norms[old]);
+                        if (hasC) c.Add(cols[old]);
+                        if (hasT) t.Add(tans[old]);
+                        for (int ch = 0; ch < 4; ch++) if (u[ch] != null) u[ch].Add(uvs[ch][old]);
+                    }
+                    idx.Add(ni);
+                }
+                var m = new Mesh { name = mesh.name }; if (v.Count > 65000) m.indexFormat = UnityEngine.Rendering.IndexFormat.UInt32;
+                m.SetVertices(v); if (hasN) m.SetNormals(n); if (hasC) m.SetColors(c); if (hasT) m.SetTangents(t);
+                for (int ch = 0; ch < 4; ch++)
+                {
+                    if (u[ch] == null) continue;
+                    if (dims[ch] == 2) m.SetUVs(ch, u[ch].ConvertAll(q => new Vector2(q.x, q.y)));
+                    else if (dims[ch] == 3) m.SetUVs(ch, u[ch].ConvertAll(q => new Vector3(q.x, q.y, q.z)));
+                    else m.SetUVs(ch, u[ch]);
+                }
+                m.SetTriangles(idx, 0); m.RecalculateBounds(); result.Add(m);
+            }
+            if (Application.isPlaying) UnityEngine.Object.Destroy(mesh); else UnityEngine.Object.DestroyImmediate(mesh);
+            return result;
+        }
+        /// <summary>
         /// Gable roof: ridge runs along X; width (X) x depth (Z) footprint, ridge at +height. Pivot at eave centre. With
         /// <paramref name="verge"/> 0 the two ends are closed with triangles in the roof's own material: a roof with no wall
         /// under it (a well, a porch hood, a fallen roof). On a walled building <paramref name="verge"/> is how far the roof

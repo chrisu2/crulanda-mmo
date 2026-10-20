@@ -1,4 +1,4 @@
-using System.Linq;
+﻿using System.Linq;
 using System;
 using System.Collections;
 using System.Collections.Generic;
@@ -23,7 +23,7 @@ namespace Crulanda.Encounter
         }
         public static bool Requested
         {
-            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested; }
+            get { var a = Environment.GetCommandLineArgs(); return Array.IndexOf(a, "--crulanda-capture") >= 0 || Array.IndexOf(a, "--crulanda-ui-capture") >= 0 || Array.IndexOf(a, "--crulanda-world-capture") >= 0 || WardrobeCapture.Requested || TrainingCapture.Requested || CreatureTourCapture.Requested || BestiaryTourCapture.Requested || LootCapture.Requested || EliteCapture.Requested || LifeCapture.Requested || MotionCapture.Requested || CombatCapture.Requested || RunCapture.Requested || FixesCapture.Requested || Step4Capture.Requested || AditTourCapture.Requested; }
         }
         IEnumerator Start()
         {
@@ -34,10 +34,26 @@ namespace Crulanda.Encounter
             if (loot >= 0 && loot + 1 < args.Length) { yield return gameObject.AddComponent<LootCapture>().Run(session, args[loot + 1]); yield break; }
             int life = Array.IndexOf(args, LifeCapture.Flag);
             if (life >= 0 && life + 1 < args.Length) { yield return gameObject.AddComponent<LifeCapture>().Run(session, args[life + 1]); yield break; }
+            int step4 = Array.IndexOf(args, Step4Capture.Flag);
+            if (step4 >= 0 && step4 + 1 < args.Length) { yield return gameObject.AddComponent<Step4Capture>().Run(session, args[step4 + 1]); yield break; }
+            int tour = Array.IndexOf(args, CreatureTourCapture.Flag);
+            if (tour >= 0 && tour + 1 < args.Length) { yield return gameObject.AddComponent<CreatureTourCapture>().Run(session, args[tour + 1]); yield break; }
+            int bestiary = Array.IndexOf(args, BestiaryTourCapture.Flag);   // the Bestiary kit's monsters at their camps (Docs/BESTIARY_MONSTERS.md)
+            if (bestiary >= 0 && bestiary + 1 < args.Length) { yield return gameObject.AddComponent<BestiaryTourCapture>().Run(session, args[bestiary + 1]); yield break; }
+            int training = Array.IndexOf(args, TrainingCapture.Flag);
+            if (training >= 0 && training + 1 < args.Length) { yield return gameObject.AddComponent<TrainingCapture>().Run(session, args[training + 1]); yield break; }
+            int fixes = Array.IndexOf(args, FixesCapture.Flag);
+            if (fixes >= 0 && fixes + 1 < args.Length) { yield return gameObject.AddComponent<FixesCapture>().Run(session, args[fixes + 1]); yield break; }
+            int run = Array.IndexOf(args, RunCapture.Flag);
+            if (run >= 0 && run + 1 < args.Length) { yield return gameObject.AddComponent<RunCapture>().Run(session, args[run + 1]); yield break; }
+            int combat = Array.IndexOf(args, CombatCapture.Flag);
+            if (combat >= 0 && combat + 1 < args.Length) { yield return gameObject.AddComponent<CombatCapture>().Run(session, args[combat + 1]); yield break; }
             int motion = Array.IndexOf(args, MotionCapture.Flag);
             if (motion >= 0 && motion + 1 < args.Length) { yield return gameObject.AddComponent<MotionCapture>().Run(session, args[motion + 1]); yield break; }
             int elite = Array.IndexOf(args, EliteCapture.Flag);
             if (elite >= 0 && elite + 1 < args.Length) { yield return gameObject.AddComponent<EliteCapture>().Run(session, args[elite + 1]); yield break; }
+            int aditTour = Array.IndexOf(args, AditTourCapture.Flag);
+            if (aditTour >= 0 && aditTour + 1 < args.Length) { yield return gameObject.AddComponent<AditTourCapture>().Run(session, args[aditTour + 1]); yield break; }
             int ui = Array.IndexOf(args, "--crulanda-ui-capture");
             if (ui >= 0 && ui + 1 < args.Length) { yield return CaptureInterface(args[ui + 1]); yield break; }
             int world = Array.IndexOf(args, "--crulanda-world-capture");
@@ -467,6 +483,56 @@ namespace Crulanda.Encounter
             if (sel != null) { var f = Face(sel, 7f); while (f.MoveNext()) yield return f.Current; }
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "16-tracker.png")); yield return new WaitForSeconds(.4f);
         }
+        /// <summary>Where the line-ups (the trades', the errands', the animals', the figures') stand: the zone's middle, as in a
+        /// village, unless it is in water (play note 236, 2026-10-18: in the Lowtowns the middle is the Chemical River under the Sett
+        /// Bridge, and the trades were lined up waist-deep in it); then the first of the recovery spot, the player's spawn and the
+        /// companion's that is dry, level, open to the sky and clear of walls.</summary>
+        Vector2 lineup;
+        /// <summary>A point of a line-up, from the line-up's ground (<see cref="lineup"/>).</summary>
+        Vector2 G(float x, float y) { return lineup + new Vector2(x, y); }
+        /// <summary>The points a line-up uses round its ground: the row (x -4 to 4, y -7 to -11) and the camera's (to y -18).</summary>
+        public static readonly Vector2[] LineupPoints = BuildLineupPoints();
+        static Vector2[] BuildLineupPoints()
+        {
+            var l = new List<Vector2>();
+            foreach (float y in new[] { -7f, -8, -9, -11, -13, -15, -16.5f, -18 }) foreach (float x in new[] { -4.5f, -2.25f, 0, 2.25f, 4.5f }) l.Add(new Vector2(x, y));
+            return l.ToArray();
+        }
+        /// <summary>Whether a line-up at <paramref name="origin"/> keeps out of the zone's water (pure data: VillagePlacesWaterTests).</summary>
+        public static bool LineupDry(Crulanda.World.ZoneWater water, Vector2 origin)
+        {
+            if (water == null) return true;
+            foreach (var p in LineupPoints) if (water.InDrawnWater(origin + p, out _)) return false;
+            return true;
+        }
+        static Vector2 LineupGround(Crulanda.World.ZoneBuilder zone)
+        {
+            var z = zone.Zone; var tries = new List<Vector2> { Vector2.zero };
+            if (z.spawns != null) { tries.Add(z.spawns.recovery); tries.Add(z.spawns.player); tries.Add(z.spawns.companion); }
+            Physics.SyncTransforms();
+            foreach (var o in tries)
+            {
+                if (!LineupDry(zone.Water, o)) continue;
+                if (o == Vector2.zero) return o;   // the zone's middle, where every village has always lined up, is held only to the water
+                float base0 = zone.Ground(o + LineupPoints[0]).y; bool clear = true;
+                foreach (var p in LineupPoints)
+                {
+                    var g = zone.Ground(o + p);
+                    // Level (no terrace edge or stair in it), nothing standing in it at chest height (a wall, a cart) and open sky over
+                    // it (no bridge deck, no roof).
+                    if (Mathf.Abs(g.y - base0) > .5f || Solid(g + Vector3.up * 1.2f) || Physics.Raycast(g + Vector3.up * .3f, Vector3.up, 8, ~0, QueryTriggerInteraction.Ignore)) { clear = false; break; }
+                }
+                if (clear) return o;
+            }
+            return Vector2.zero;
+        }
+        /// <summary>Something built at a point (a wall, a cart): people and creatures do not count.</summary>
+        static bool Solid(Vector3 at)
+        {
+            foreach (var c in Physics.OverlapSphere(at, .4f, ~0, QueryTriggerInteraction.Ignore))
+                if (!(c is CharacterController) && c.GetComponentInParent<Villager>() == null && c.GetComponentInParent<Crulanda.Gameplay.Actor>() == null) return true;
+            return false;
+        }
         /// <summary>
         /// The animals' line-up (playtest notes 4 and 7: the sheep, the cats' tails): a black-faced, a white-faced and a dark sheep
         /// (one walking, head up), a cat standing with its tail hung and one at a trot with it up, side on from five metres at
@@ -475,6 +541,7 @@ namespace Crulanda.Encounter
         /// </summary>
         IEnumerator CaptureCritters(string directory, string prefix, Crulanda.World.ZoneBuilder zone)
         {
+            lineup = LineupGround(zone);
             var motor = session.Player.GetComponent<AdventurerMotor>();
             var row = new GameObject("Critter line-up").transform; var animals = new List<(CritterBody body, float v)>();
             var spec = new[] { ("sheep", .2f, 3f, 0f), ("sheep", .6f, 1f, .5f), ("sheep", .5f, 11f, 0f), ("cat", .1f, 2f, 0f), ("cat", .5f, 4f, 3f) };   // kind, colour, seed, pace (0: standing)
@@ -482,14 +549,15 @@ namespace Crulanda.Encounter
             {
                 var (kind, r, seed, v) = spec[i];
                 var t = new GameObject(kind).transform; t.SetParent(row, false);
-                t.position = zone.Ground(new Vector2(-3.4f + i * 1.7f, -11)); t.rotation = Quaternion.Euler(0, 90, 0);   // facing +X: side on to the camera
+                t.position = zone.Ground(G(-3.4f + i * 1.7f, -11)); t.rotation = Quaternion.Euler(0, 90, 0);   // facing +X: side on to the camera
                 animals.Add((CritterBody.Build(t, kind, r, seed), v));
             }
             var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), x => x.enabled); foreach (var x in body) x.enabled = false;
-            motor.Teleport(zone.Ground(new Vector2(0, -18), 1.1f)); motor.enabled = false; var view = session.View.transform;
+            motor.Teleport(zone.Ground(G(0, -18), 1.1f)); motor.enabled = false; var view = session.View.transform;
             foreach (var (shot, eye, focus) in new[] { ("lineup", new Vector3(0, 1.3f, -16), new Vector3(0, .35f, -11)), ("cats", new Vector3(2.55f, .75f, -13.4f), new Vector3(2.55f, .25f, -11)) })
             {
-                var cam = new Vector3(eye.x, zone.Ground(new Vector2(eye.x, eye.z)).y + eye.y, eye.z); var at = new Vector3(focus.x, zone.Ground(new Vector2(focus.x, focus.z)).y + focus.y, focus.z);
+                var e2 = G(eye.x, eye.z); var f2 = G(focus.x, focus.z);
+                var cam = new Vector3(e2.x, zone.Ground(e2).y + eye.y, e2.y); var at = new Vector3(f2.x, zone.Ground(f2).y + focus.y, f2.y);
                 var look = Quaternion.LookRotation(at - cam);
                 for (float w = 0; w < 1.4f; w += Time.deltaTime)
                 {
@@ -506,11 +574,11 @@ namespace Crulanda.Encounter
             foreach (var (look, variant, role, x, pace) in new[] { (ActorLook.Villager, 3, "farmer", -2.2f, 1.4f), (ActorLook.Warrior, 0, (string)null, 0f, 1.7f), (ActorLook.Villager, 8, "herbalist", 2.2f, 0f) })
             {
                 var go = new GameObject("Figure " + look); go.transform.SetParent(people, false); new GameObject("Body").transform.SetParent(go.transform, false);
-                var from = zone.Ground(new Vector2(x - pace * .9f, -11)) + Vector3.up; go.transform.SetPositionAndRotation(from, Quaternion.Euler(0, 90, 0));
+                var from = zone.Ground(G(x - pace * .9f, -11)) + Vector3.up; go.transform.SetPositionAndRotation(from, Quaternion.Euler(0, 90, 0));
                 var fig = ActorVisual.Attach(go, look, variant, false, role); if (pace == 0) fig.Pose = ActorPose.Sit;
                 walkers.Add((go.transform, from, pace));
             }
-            var eyeAt = zone.Ground(new Vector2(0, -14.6f)) + Vector3.up * 1.15f; var lookAt = Quaternion.LookRotation(zone.Ground(new Vector2(0, -11)) + Vector3.up * .95f - eyeAt);
+            var eyeAt = zone.Ground(G(0, -14.6f)) + Vector3.up * 1.15f; var lookAt = Quaternion.LookRotation(zone.Ground(G(0, -11)) + Vector3.up * .95f - eyeAt);
             float walked = 0;
             for (int shot = 1; shot <= 2; shot++)
             {
@@ -538,10 +606,11 @@ namespace Crulanda.Encounter
             // it as authored (facing the landmark, its own pitch and zoom). Any other landmark (and the exit) is shot from a
             // searched viewpoint with the player out of frame (LandmarkView); when none is clear, the old orbit framing from
             // its south-west (the exit's from the north-east) stands in.
-            var shots = new List<(string name, Vector2 at, float yaw, float pitch, float zoom, Vector2 mark, float radius, float bearing, Transform root)>();
+            var shots = new List<(string name, Vector2 at, float yaw, float pitch, float zoom, Vector2 mark, float radius, float bearing, Transform root, float high, float aim)>();
+            var caveViews = new Dictionary<string, (Vector3 eye, Vector3 focus, Vector3 floor)>();   // by shot name: a landmark under the land (ZoneLabel.viewCave)
             if (zone != null)
             {
-                var z = zone.Zone; shots.Add(("01-entrance", z.spawns.player, z.spawns.playerFacing, 16, 12, Vector2.zero, 0, 0, null));
+                var z = zone.Zone; shots.Add(("01-entrance", z.spawns.player, z.spawns.playerFacing, 16, 12, Vector2.zero, 0, 0, null, 0, 0));
                 int n = 2;
                 foreach (var l in z.landmarks)
                 {
@@ -555,14 +624,25 @@ namespace Crulanda.Encounter
                     Transform root = null;
                     if (prop != null) { root = zone.transform.Find("Zone props/" + prop.name); if (root == null) root = zone.transform.Find("Zone static scenery/" + prop.name); }
                     float bearing = prop != null && Array.IndexOf(Fronted, prop.kind) >= 0 ? prop.rotation + 205 : Mathf.Atan2(-.6f, -.8f) * Mathf.Rad2Deg;
-                    shots.Add(((n++).ToString("00") + "-" + l.name.ToLowerInvariant().Replace(' ', '-').Replace("'", ""), from, yaw, l.viewPitch > 0 ? l.viewPitch : 17, l.viewZoom > 0 ? l.viewZoom : 11,
-                        l.at, authored ? 0 : l.radius, bearing, root));
+                    string shotName = (n++).ToString("00") + "-" + l.name.ToLowerInvariant().Replace(' ', '-').Replace("'", "");
+                    shots.Add((shotName, from, yaw, l.viewPitch > 0 ? l.viewPitch : 17, l.viewZoom > 0 ? l.viewZoom : 11,
+                        l.at, authored ? 0 : l.radius, bearing, root, authored ? l.viewHeight : 0, l.viewAim));
+                    // A landmark under the land (ZoneLabel.viewCave): the camera in that cave, on its floor, looking at the landmark's
+                    // point on the same floor (lowtowns-19 was the street over the drowned vaults).
+                    var cave = string.IsNullOrEmpty(l.viewCave) ? null : Crulanda.World.Hollow.All.Find(hc => hc != null && hc.Name == l.viewCave);
+                    if (cave != null)
+                    {
+                        cave.Local(l.at, out float atAlong, out float atAside);
+                        caveViews[shotName] = (cave.At(l.viewAlong, l.viewAside) + Vector3.up * (l.viewHeight > 0 ? l.viewHeight : 1.7f),
+                            cave.At(atAlong, atAside) + Vector3.up * (l.viewAim > 0 ? l.viewAim : 1), cave.At(l.viewAlong, l.viewAside));
+                    }
+                    else if (!string.IsNullOrEmpty(l.viewCave)) Debug.LogWarning("World tour " + shotName + ": no cave named " + l.viewCave + "; shot from the land");
                 }
                 if (z.exits.Length > 0)
                 {
                     var x = z.exits[0];   // its waystone, seen from the zone's side looking out along the road
                     shots.Add(((n++).ToString("00") + "-exit", x.at + new Vector2(4, 4), 225, 15, 10, x.at, Mathf.Max(x.radius, 4), Mathf.Atan2(-x.at.x, -x.at.y) * Mathf.Rad2Deg,
-                        zone.transform.Find("Zone static scenery/Exit: " + x.name)));
+                        zone.transform.Find("Zone static scenery/Exit: " + x.name), 0, 0));
                 }
             }
             // Every tree's crown (its renderers' bounds): the camera keeps out of them, and they are counted in a sight line.
@@ -576,6 +656,34 @@ namespace Crulanda.Encounter
             foreach (var s in shots)
             {
                 string file = Path.Combine(directory, (zone != null ? zone.Zone.id.Replace("zone.", "") : "world") + "-" + s.name + ".png");
+                if (caveViews.TryGetValue(s.name, out var under))
+                {
+                    // In the cave: the player waits hidden on its floor under the camera, which looks along the cave at the landmark.
+                    motor.Teleport(under.floor + Vector3.up * 1.1f);
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform; var look = Quaternion.LookRotation(under.focus - under.eye);
+                    for (float w = 0; w < .8f; w += Time.deltaTime) { view.SetPositionAndRotation(under.eye, look); yield return null; }
+                    view.SetPositionAndRotation(under.eye, look); ScreenCapture.CaptureScreenshot(file);
+                    yield return new WaitForSeconds(.4f);
+                    motor.enabled = true; foreach (var r in body) r.enabled = true;
+                    continue;
+                }
+                if (zone != null && s.high > 0)
+                {
+                    // A free camera high over the ground at the view, aimed at the landmark (viewAim over its ground): a city seen whole
+                    // from over its walls ("The Crown of Argentis", as the city map draws it; p9-cityinn). The player waits hidden below it.
+                    var high = zone.Ground(s.at) + Vector3.up * s.high; var target = zone.Ground(s.mark) + Vector3.up * s.aim;
+                    motor.Teleport(zone.Ground(s.at, 1.1f));
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform; var look = Quaternion.LookRotation(target - high);
+                    for (float w = 0; w < .8f; w += Time.deltaTime) { view.SetPositionAndRotation(high, look); yield return null; }
+                    view.SetPositionAndRotation(high, look); ScreenCapture.CaptureScreenshot(file);
+                    yield return new WaitForSeconds(.4f);
+                    motor.enabled = true; foreach (var r in body) r.enabled = true;
+                    continue;
+                }
                 if (zone != null && s.radius > 0 && LandmarkView(zone, s.mark, s.radius, s.bearing, s.root, crowns, out var cam, out var focus, out var near))
                 {
                     // The camera goes straight to the viewpoint (the orbit rests); the player waits hidden just behind it, and
@@ -713,6 +821,7 @@ namespace Crulanda.Encounter
             var life = VillageLife.Active;
             if (zone != null && life != null)
             {
+                lineup = LineupGround(zone);
                 string prefix = zone.Zone.id.Replace("zone.", "") + "-";
                 Crulanda.World.WorldClock.Hour = 11;
                 EncounterHud.Hidden = false;
@@ -750,17 +859,19 @@ namespace Crulanda.Encounter
                 for (int g = 0; g * 4 < line.Count; g++)
                 {
                     for (int i = g * 4; i < Mathf.Min(line.Count, g * 4 + 4); i++)
-                        line[i].StandAt(zone.Ground(new Vector2((i - g * 4 - 1.5f) * 2.6f, -8)), 180);
+                        line[i].StandAt(zone.Ground(G((i - g * 4 - 1.5f) * 2.6f, -8)), 180);
                     // The others step out of sight (a parking row at -40,-40 turned up in the water shots, heaped on one bank).
                     for (int i = 0; i < line.Count; i++) if (i < g * 4 || i >= g * 4 + 4) line[i].Park();
-                    motor.Teleport(zone.Ground(new Vector2(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
+                    motor.Teleport(zone.Ground(G(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
                     yield return new WaitForSeconds(1.2f);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "98-trades-lineup-" + (g + 1) + ".png"));
                     yield return new WaitForSeconds(.4f);
                 }
                 for (int i = 0; i < line.Count; i++) line[i].Release(before[i]);   // back to their day, from where they were
                 // The errands: one of each trade with what they carry between the trades (eggs, water, grain, flour, bread, logs, a hide...).
-                var loads = new[] { ("henwife", Load.Eggs, 5), ("farmer", Load.Grain, 1), ("miller", Load.Flour, 1), ("baker", Load.Bread, 3), ("lumberjack", Load.Logs, 3), ("hunter", Load.Game, 1), ("herbalist", Load.Herbs, 1), ("gossip", Load.Bucket, 1), ("skinner", Load.Hide, 1), ("blacksmith", Load.Goods, 1), ("child", Load.Bucket, 1), ("leatherworker", Load.Goods, 1) };
+                var loads = new[] { ("henwife", Load.Eggs, 5), ("farmer", Load.Grain, 1), ("miller", Load.Flour, 1), ("baker", Load.Bread, 3), ("lumberjack", Load.Logs, 3), ("hunter", Load.Game, 1), ("herbalist", Load.Herbs, 1), ("gossip", Load.Bucket, 1), ("skinner", Load.Hide, 1), ("blacksmith", Load.Goods, 1), ("child", Load.Bucket, 1), ("leatherworker", Load.Goods, 1),
+                    // the Crown's carriers (p9-cityinn): the clerk's papers, the sweeper's besom, the lamplighter's pole, the porter's crate, the water-carrier's bucket, the server's tray
+                    ("clerk", Load.Papers, 1), ("sweeper", Load.Broom, 1), ("lamplighter", Load.Pole, 1), ("porter", Load.Goods, 1), ("watercarrier", Load.Bucket, 1), ("server", Load.Bread, 3) };
                 var carriers = new System.Collections.Generic.List<(Villager, Load, int)>();
                 foreach (var (role, what, count) in loads) { var v = life.Villagers.Find(x => x.Role == role && !x.Resident); if (v != null) carriers.Add((v, what, count)); }
                 var wasAt = carriers.ConvertAll(c => c.Item1.transform.position);
@@ -769,9 +880,9 @@ namespace Crulanda.Encounter
                     for (int i = 0; i < carriers.Count; i++)
                     {
                         if (i < g * 4 || i >= g * 4 + 4) { carriers[i].Item1.Park(); continue; }
-                        carriers[i].Item1.StandAt(zone.Ground(new Vector2((i - g * 4 - 1.5f) * 2.6f, -8)), 180); carriers[i].Item1.ShowLoad(carriers[i].Item2, carriers[i].Item3);
+                        carriers[i].Item1.StandAt(zone.Ground(G((i - g * 4 - 1.5f) * 2.6f, -8)), 180); carriers[i].Item1.ShowLoad(carriers[i].Item2, carriers[i].Item3);
                     }
-                    motor.Teleport(zone.Ground(new Vector2(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
+                    motor.Teleport(zone.Ground(G(0, -15), 1.1f)); motor.SetView(0, 6, 3.2f);
                     yield return new WaitForSeconds(1.2f);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "99-errands-lineup-" + (g + 1) + ".png"));
                     yield return new WaitForSeconds(.4f);
@@ -815,11 +926,15 @@ namespace Crulanda.Encounter
                 var closeUps = new[] { (innProp, new Vector3(-4.5f, 1.7f, -8.5f), new Vector3(-1, 2.9f, -.6f), 11f, "99-inn-front"), (innProp, new Vector3(-4.5f, 1.7f, -8.5f), new Vector3(-1, 2.9f, -.6f), 21.5f, "99-inn-front-night"),
                     (forgeProp, new Vector3(-4.2f, 1.7f, -5.5f), new Vector3(.4f, 1.5f, .4f), 11f, "99-smithy-front") };
                 bool hudWas = EncounterHud.Hidden;
-                foreach (var (building, eyeAt, focusAt, closeHour, closeShot) in closeUps)
+                foreach (var (building, eyeAt0, focusAt0, closeHour, closeShot) in closeUps)
                 {
                     if (building == null) continue;
                     var frame = zone.transform.Find("Zone props/" + building.name); if (frame == null) frame = zone.transform.Find("Zone static scenery/" + building.name); if (frame == null) continue;
                     float front = building.kind == "inn" ? -(building.size.y > 0 ? building.size.y : 8) / 2 : 0;
+                    // The city inn (variant 3, the Gilded Lantern: 22 m across, two storeys and its portico) is framed from further out and
+                    // higher on its front, so the whole face, the portico and the lantern on the ridge are in (p9-cityinn).
+                    bool city = building.kind == "inn" && building.variant == 3;
+                    var eyeAt = city ? new Vector3(-8.5f, 2.2f, -17) : eyeAt0; var focusAt = city ? new Vector3(0, 5.2f, -1) : focusAt0;
                     EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = closeHour;
                     var eye = frame.TransformPoint(new Vector3(eyeAt.x, 0, eyeAt.z + front)); eye.y = zone.Ground(new Vector2(eye.x, eye.z)).y + eyeAt.y;
                     var aim = frame.TransformPoint(focusAt + new Vector3(0, 0, front)); var behind = new Vector2(eye.x - aim.x, eye.z - aim.z).normalized;
@@ -830,6 +945,21 @@ namespace Crulanda.Encounter
                     for (float w = 0; w < (closeHour > 20 ? 2 : .8f); w += Time.deltaTime) { lens.SetPositionAndRotation(eye, toward); Crulanda.World.TreeFade.UpdateAll(eye, aim, aim); yield return null; }
                     lens.SetPositionAndRotation(eye, toward);
                     ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + closeShot + ".png")); yield return new WaitForSeconds(.4f);
+                    motor.enabled = true; foreach (var r in hidden) r.enabled = true;
+                }
+                // A far place on the skyline (DistantSkyline; Oakhaven's Crown of Argentis up its North road, p9-cityinn): from part way
+                // out along its bearing, at eye height, looking at it a little up: <zone>-83-skyline-<kind>.png.
+                foreach (var sky in zone.Zone.skyline ?? new Crulanda.World.ZoneSkyline[0])
+                {
+                    if (sky == null) continue;
+                    float rad = sky.bearing * Mathf.Deg2Rad; var dir = new Vector2(Mathf.Sin(rad), Mathf.Cos(rad));
+                    var from = dir * (zone.Zone.size / 2 * .55f); var eye = zone.Ground(from) + Vector3.up * 1.7f;
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 10.5f;
+                    motor.Teleport(zone.Ground(from - dir * 2, 1.1f));
+                    var hidden = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled); foreach (var r in hidden) r.enabled = false;
+                    motor.enabled = false; var lens = session.View.transform; var toward = Quaternion.LookRotation(new Vector3(dir.x, .2f, dir.y));
+                    for (float w = 0; w < 1.2f; w += Time.deltaTime) { lens.SetPositionAndRotation(eye, toward); yield return null; }
+                    ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + "83-skyline-" + sky.kind + ".png")); yield return new WaitForSeconds(.4f);
                     motor.enabled = true; foreach (var r in hidden) r.enabled = true;
                 }
                 EncounterHud.Hidden = hudWas;
@@ -960,6 +1090,14 @@ namespace Crulanda.Encounter
                     if (drop > 0) views.Add((drop - 2.5f, drop + 7, dropPitch, "88-hollow-drop" + hs));
                     if (stores > 0) views.Add((stores - 8, stores + 1, 10, "89-hollow-stores" + hs));
                     views.Add((hollow.Length - 13, hollow.Length - 5, 10, "86-hollow-hall" + hs));
+                    // The built halls from the other way too (D9, 2026-10-10: Chris looks at a room from the side, the front and the back),
+                    // and the first chamber off the drift from its door (the Ember Vent's ash-garden).
+                    if (stores > 0) views.Add((stores + 8, stores - 1, 10, "90-hollow-stores-back" + hs));
+                    views.Add((hollow.Length - 9, hollow.Length - 18, 10, "91-hollow-hall-back" + hs));
+                    float entry = -1; for (int i = 0; i < hollow.Centre.Count && entry < 0; i++) if (hollow.Along[i] > 8 && hollow.Half[i] > 6) entry = hollow.Along[i];
+                    if (entry > 0) views.Add((entry - 1.5f, entry + 7, 10, "92-hollow-entry" + hs));
+                    var shown = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in shown) r.enabled = false;   // the rooms, not the tourist (a level-1 visitor lay dead in every one)
                     foreach (var (from, toward, pitch, shot) in views)
                     {
                         var stand = hollow.At(from); var ahead = hollow.At(toward) - stand;
@@ -967,6 +1105,69 @@ namespace Crulanda.Encounter
                         yield return new WaitForSeconds(1.2f);
                         ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
                     }
+                    foreach (var r in shown) if (r != null) r.enabled = true;
+                }
+                // A Hollow Man close to, from in front and from its side (2026-10-10, Chris: "hallow man should be ghostly/apparitions").
+                var hollowMan = session.Enemies.Find(e => e != null && e.Name == "Hollow Man");
+                if (hollowMan != null)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    var at = hollowMan.transform.position; motor.Teleport(at + hollowMan.transform.forward * 6 + Vector3.up * .2f);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform;
+                    foreach (var (turn, shot) in new[] { (0f, "93-hollow-man-front"), (90f, "93-hollow-man-side") })
+                    {
+                        var dir = Quaternion.Euler(0, turn, 0) * hollowMan.transform.forward; dir.y = 0; dir.Normalize();
+                        var eye = at + dir * 2.6f + Vector3.up * 1.5f; var look = Quaternion.LookRotation(at + Vector3.up * .95f - eye);
+                        for (float w = 0; w < .6f; w += Time.deltaTime) { view.SetPositionAndRotation(eye, look); yield return null; }
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
+                    }
+                    motor.enabled = true; foreach (var r in body) if (r != null) r.enabled = true;
+                }
+                // The Rock-Eater with Nix in the saddle, from in front, the side and behind (Chris, 2026-10-11: "more machines!!!!!  i told you
+                // NO Machines!"; it is a great burrowing beast now).
+                var rockEater = session.Enemies.Find(e => e != null && e.MobName == EncounterSession.RockEaterName && e.actor.IsAlive);
+                if (rockEater != null)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    var at = rockEater.transform.position; motor.Teleport(at + rockEater.transform.forward * 9 + Vector3.up * .2f);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform;
+                    var rockLook = rockEater.GetComponent<ActorVisual>(); var saddleNow = rockEater.GetComponentsInChildren<Transform>(true).FirstOrDefault(x => x.name == "Saddle");
+                    Debug.Log("ROCKEATER_CAPTURE fitted " + (rockLook != null && rockLook.GearFitted) + ", saddle " + (saddleNow != null ? (saddleNow.position - rockEater.transform.position).ToString("F2") + " on " + saddleNow.parent.name : "none") + ", seat " + (rockLook != null && rockLook.RiderSeat != null ? (rockLook.RiderSeat.position - rockEater.transform.position).ToString("F2") : "none") + ", forward " + rockEater.transform.forward.ToString("F2"));
+                    foreach (var (turn, shot) in new[] { (0f, "94-rock-eater-front"), (90f, "94-rock-eater-side"), (180f, "94-rock-eater-back") })
+                    {
+                        var dir = Quaternion.Euler(0, turn, 0) * rockEater.transform.forward; dir.y = 0; dir.Normalize();
+                        var eye = at + dir * 6.5f + Vector3.up * 2.6f; var look = Quaternion.LookRotation(at + Vector3.up * 1.4f - eye);
+                        for (float w = 0; w < .6f; w += Time.deltaTime) { view.SetPositionAndRotation(eye, look); yield return null; }
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + shot + ".png")); yield return new WaitForSeconds(.4f);
+                    }
+                    motor.enabled = true; foreach (var r in body) if (r != null) r.enabled = true;
+                }
+                // The Adit's things made by hand (Chris, 2026-10-11, no machines): the ore wagons and their mules, a cage with its goblin, the
+                // winch gate; each madeFrom a few metres off, the player out of frame.
+                var madeShots = new System.Collections.Generic.List<(Vector3 madeFocus, Vector3 madeFrom, string name)>();
+                foreach (var madeThing in zone.Interactables)
+                {
+                    if (madeThing.kind == "carriage") { var f = madeThing.position + Vector3.up * .8f; madeShots.Add((f, f + (zone.RailTeam != null && zone.RailTeam.Length > 0 ? (madeThing.position - zone.RailTeam[0]).normalized * -3 : Vector3.zero) + Quaternion.Euler(0, 90, 0) * (madeThing.position - (zone.RailTeam != null && zone.RailTeam.Length > 0 ? zone.RailTeam[0] : madeThing.position)).normalized * 7 + Vector3.up * 2.5f, "95-ore-wagons")); }
+                    if (madeThing.kind == "cage" && madeThing.root != null && !madeShots.Exists(x => x.name == "96-cage")) { var f = madeThing.root.position + Vector3.up * .8f; var door = madeThing.root.Find("Door"); var outward = door != null ? madeThing.root.TransformDirection(new Vector3(door.localPosition.x > 0 ? 1 : -1, 0, 0)) : madeThing.root.forward; madeShots.Add((f, f + outward * 3.2f + madeThing.root.forward * 1.2f + Vector3.up * .9f, "96-cage")); }
+                    if (madeThing.kind == "liftgate" && madeThing.gate != null) { var f = madeThing.gate.transform.position + Vector3.up * 2; madeShots.Add((f, f - madeThing.gate.transform.forward * 8 + madeThing.gate.transform.right * 2 + Vector3.up * 1.5f, "97-winch-gate")); }
+                }
+                if (madeShots.Count > 0)
+                {
+                    EncounterHud.Hidden = true; Crulanda.World.WorldClock.Hour = 15;
+                    var body = Array.FindAll(session.Player.GetComponentsInChildren<Renderer>(), r => r.enabled);
+                    foreach (var r in body) r.enabled = false;
+                    motor.enabled = false; var view = session.View.transform;
+                    foreach (var (madeFocus, madeFrom, madeShot) in madeShots)
+                    {
+                        motor.Teleport(madeFocus + Vector3.up * 20); var look = Quaternion.LookRotation(madeFocus - madeFrom);
+                        for (float w = 0; w < .8f; w += Time.deltaTime) { view.SetPositionAndRotation(madeFrom, look); yield return null; }
+                        ScreenCapture.CaptureScreenshot(Path.Combine(directory, prefix + madeShot + ".png")); yield return new WaitForSeconds(.4f);
+                    }
+                    motor.enabled = true; foreach (var r in body) if (r != null) r.enabled = true;
                 }
                 // A hidden find up close, one a zone (its first chest, cache, herb, note or key): from the side you come to it (its
                 // frame's -Z), a little above, the player out of frame and the HUD hidden. Secrets are on no map: this is their picture.
@@ -1070,6 +1271,11 @@ namespace Crulanda.Encounter
             lines.Add("COUNT enabled renderers " + visible + ", distinct materials " + mats.Count);
             var top = new List<KeyValuePair<string, int>>(groups); top.Sort((x, y) => y.Value.CompareTo(x.Value));
             for (int i = 0; i < top.Count && i < 15; i++) lines.Add("GROUP " + top[i].Key + " " + top[i].Value);
+            // What stands high over the zone's ground (the Lowtowns' sky showed upside-down roofs, 2026-10-16): every renderer whose
+            // lowest point is 25 m up or more, by name and height, so a stray backdrop or skyline piece can be named from the file.
+            foreach (var hr in UnityEngine.Object.FindObjectsByType<Renderer>(FindObjectsSortMode.None))
+                if (hr != null && hr.enabled && hr.bounds.min.y > 25 && !(hr is ParticleSystemRenderer))
+                    lines.Add("HIGH " + hr.name + " (" + (hr.transform.parent != null ? hr.transform.parent.name : "") + ") y " + hr.bounds.min.y.ToString("0") + ".." + hr.bounds.max.y.ToString("0") + " at " + hr.bounds.center.x.ToString("0") + "," + hr.bounds.center.z.ToString("0") + " scale " + hr.transform.lossyScale.ToString("0.0"));
             File.WriteAllLines(Path.Combine(directory, zone.Zone.id.Replace("zone.", "") + "-perf.txt"), lines);
             Application.targetFrameRate = 60;
         }
@@ -1123,6 +1329,8 @@ namespace Crulanda.Encounter
                     float score = Mathf.Abs(turn) / 45 + j * .6f; if (score >= best) continue;
                     var p = at + outward * distances[j];
                     if (Mathf.Abs(p.x) > lim || Mathf.Abs(p.y) > lim) continue;
+                    // Never down in a chasm (Hallow's Creek, 2026-10-16: the bridge was shot from the chasm's floor, a blank wall).
+                    if (zone.FogFloor(p, out _)) continue;
                     float floor = zone.HeightAt(p.x, p.y) + 2.2f;
                     if (zone.WaterAt(p, out float s, out _)) floor = Mathf.Max(floor, s + 2);
                     var cam = new Vector3(p.x, Mathf.Max(focus.y + distances[j] * rise, floor), p.y);

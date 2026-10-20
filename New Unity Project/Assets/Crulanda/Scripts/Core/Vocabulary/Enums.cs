@@ -21,7 +21,7 @@ namespace Crulanda.Core
     public enum ActorClassification { Normal = 0, Elite = 1, Rare = 2, Boss = 3 }
 
     /// <summary>PROVISIONAL placeholder resource kinds. Real class resources will come from Crulanda canon.</summary>
-    public enum ResourceKind { None = 0, Mana = 1, Vigor = 2, Focus = 3, Breath = 4 }
+    public enum ResourceKind { None = 0, Mana = 1, Vigor = 2, Focus = 3, Breath = 4, Salt = 5 }   // Salt: the Salt-Mender's (2026-10-11)
 
     /// <summary>Relative level difficulty ("con"). Thresholds live in LevelCon.</summary>
     public enum ConDifficulty { Trivial = 0, Easy = 1, Even = 2, Tough = 3, Dangerous = 4, Deadly = 5 }

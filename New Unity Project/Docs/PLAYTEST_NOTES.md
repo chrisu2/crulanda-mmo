@@ -551,7 +551,7 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - **88 (again, 2026-10-08): "Helms still garbage."** For now (round 31): Esc > Display has "Show helms", off by default, so nobody wears a visible head piece until the helms are remade (the worn helm still counts).
 - **97. "Seems like the scaling is in, but I can't move the UI. Should be able to drag where I want."** (screenshot: 21:9, the panels in the middle 16:9) DONE (round 31): Esc > Display > Unlock UI; the frames, minimap, tracker and bottom bar drag anywhere and are kept; on a wide screen they start at the edges.
 - **98. "People get stuck in inn door."** DONE (round 31): a sim close to the inn door that is no longer getting anywhere goes in.
-- **99. The Sealed Adit, first look (2026-10-08, five screenshots):** "hole in the floor" (the Grey Breach's pit: a white ring) DONE, a dark broken rim; "can't tell what lvl Mira is" DONE, her level on her frame; "not sure what this is" (a dark band across the Gallery's floor: a branch's floor showing) DONE; "lights not working" (white cards: the grey patches; white blobs: the steam) DONE, dull grey rock patches, no steam, lamps twice as bright and further; "hollow men should be ghostly, not with no textures" OPEN; "not even holding the axe?" (a mob answering a call fights with its weapon sheathed) OPEN; "good start overall but needs to be deeper, and will be hard to do since we don't have any CC classes yet, so that is something we need to look at next" OPEN: crowd control next (ROADMAP).
+- **99. The Sealed Adit, first look (2026-10-08, five screenshots):** "hole in the floor" (the Grey Breach's pit: a white ring) DONE, a dark broken rim; "can't tell what lvl Mira is" DONE, her level on her frame; "not sure what this is" (a dark band across the Gallery's floor: a branch's floor showing) DONE; "lights not working" (white cards: the grey patches; white blobs: the steam) DONE, dull grey rock patches, no steam, lamps twice as bright and further; "hollow men should be ghostly, not with no textures" DONE in frames 2026-10-10 (apparitions: see-through ashen grey, violet eyes, the shard glowing through; Chris asked again that night, "hallow man should be ghostly/apparitions"; GAME-ONLY look), to check in play; "not even holding the axe?" (a mob answering a call fights with its weapon sheathed) OPEN; "good start overall but needs to be deeper, and will be hard to do since we don't have any CC classes yet, so that is something we need to look at next" OPEN: crowd control next (ROADMAP).
 - **100. "Can't move chat panel."** DONE: in Unlock UI the chat has its own box and drags whole.
 - **101. (screenshot, Oakhaven road, 2026-10-09)** "His armour looks like crap" (Orla Oxley, a sim Warrior 1: a torn white shirt under tan pauldrons, bracers and greaves that do not match), "and her wand should not be on her back: either in hand or on her belt" (the Mage's stowed wand, slung across the back like a sword). The wand: the Apprentice's Wand has no look family ("Wand" is no piece word in Gear/looks.json), so it draws as the main-hand fallback, a blade, slung across the back like one. NEXT SESSION: a `wand` family (a short rod, a gem at the tip), the word in looks.json, its gear icon, and short one-handers stowed at the right hip (ActorVisual.Gear.Mount). The sim's armour: for the next art round (SimGear.Dress at level 1: the starter pieces' tints and the bleached shirt).
 - **102. "There should be an invite button for Mira."** DONE (2026-10-10): Invite on her party row and her frame, and /invite mira.
@@ -559,5 +559,426 @@ CHANGELOG). Also: the camera orbits below level (Chris: "camera should also have
 - **104. "This barn is backwards"; "missing straw"** (screenshots: Carder's and the Cider Barn) DONE: the doors in the gable end, an aisle between stalls, straw bedding, racks and bales.
 - **105. "Windmill should be animated when wind blowing."** DONE: the sails had been frozen by static batching; they turn with the wind.
 - **106. "Horizon still looks empty. Compare the horizon in WoW in Elwynn Forest."** DONE (first pass): woods over the ridge, a wooded hill ring, nearer mountains, thinner fog. To judge in play.
-- **107. "Jumping animation still borked. Still feel floaty and when you land feet twist together."** DONE (to judge in play): quicker jump, the right clips in the air, quick blends.
-- **108. "Still no bow animations on ranger."** DONE (posed, no clips exist): draw, hold, loose. Real archery clips are a purchase (ROADMAP 8.5).
+- **107. "Jumping animation still borked. Still feel floaty and when you land feet twist together."** CONFIRMED FIXED BY CHRIS in the capture with 111 (2026-10-10, 20:26); earlier: (Chris, 2026-10-10 evening: "still lots of foot errors"; "i told you the feet were wrong many times"). Partly addressed in the 18:04 build (quicker jump, the right clips in the air); the feet themselves were not checked then.
+- **109. "NPC still walking around with hoes/tools stuck to their arm. If a hoe it should be carried like a staff, etc."** (note 95 again) DONE (2026-10-10, evening): a trade's tool hangs from its own holder at the fist; a long one stands upright like a staff while walking, a short one hangs head-down; at work they follow the arm.
+- **111. "During the jump the feet land awkwardly bending inward and then run on tip toes afterwards."** CONFIRMED FIXED BY CHRIS in the motion capture (2026-10-10, 20:26: "finally looks fixed"); to check in his playable build. The cause, found after two hours of wrong fixes ("feet backwards", "missing part of foot", "floppy", "running backwards"): Editor/CharacterImport forced every clip to build its avatar from its own file, so Kevin Iglesias's clips were retargeted against the skeleton as each clip file holds it, not his character's T-pose. They now copy their avatar from his HumanM/HumanF models (as he set them up). Editor/FootDiag measured it: his run stands flat on his model and ours (30 degrees heel-up before). Every runtime foot correction was removed; the clips play as made (Chris chose Kevin's run over Unity's Starter Assets run). See memory note animation-import-check-first.
+- **112. Open after the feet and bow (2026-10-10, 20:45):** (a) at full draw the bowstring is not drawn back to the hand and no arrow shows (the live string and nocked arrow of ActorVisual.BowString read no draw); (b) FootTests, now animating in batch runs, flags Morro Motion's standing idles (a foot turned out ~50 degrees: they still build their avatar from their own files) and the walk's toes dipping 3-6 cm in places. Chris said move forward; not started.
+- **113. "the whole place needs to be bigger. doesnt seem like deadmines or wailing caves like wow dungeons"** (the Sealed Adit, Chris, 2026-10-10 evening; then "3x, full-length run", "if need to make it its on zone you zone into so there are no limitations", "not just bigger but more too do!") IN PROGRESS: drawn out three times (1,353 m of cave, chambers 2.5x wide and 2x tall; commit 2f92b31), not yet published (the escort test first); the "more to do" content is next (DUNGEON_DESIGN 0.25).
+- **114-118. A playtest report Chris pasted (2026-10-10, about 22:20; from a tester's notes, on the 20:41 build), verbatim:** all OPEN.
+  - **114.** "The HUD gets cut off on the left and top edges. The chat panel and party frame are clipped, and I never saw the player frame or minimap."
+  - **115.** "After alt-tabbing or using chat, the game ignored keys until I clicked inside the window. That's why the character kept standing still."
+  - **116.** "The shop didn't close on "Goodbye", and I didn't close the bags."
+  - **117.** "The camera goes inside walls when you walk into a building."
+  - **118.** "/invite Thatch didn't work, though the who list's Invite button did."
+- **119. "farmers hoes still going thru the arm and not held like a staff."** (Chris, 2026-10-11, about 00:48, on the 00:33 build;
+  screenshot: a farmer in an orange shirt standing, talking to Jory, her pitchfork running from the ground, tines down by her feet,
+  diagonally up through her left forearm.) Notes 95 and 109 again: the third time. OPEN. Found: the farmer's fork was never put on
+  the tool holder that note 109's fix added (it is built straight onto the arm, ActorVisual.cs farmer case), and VillageDayTests'
+  upright check only measured the holder's tools (the woodcutter's axe), so it passed without looking at a farmer.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:04 (VillageDayTests), committed, not yet published or seen by Chris.
+- **120. "GOING IN A BUILDING MAKES IT DISAPPEAR."** (Chris, 2026-10-11, about 00:49; screenshot: the player inside Quill's shop in
+  Oakhaven, the camera behind and above, the whole building, far walls too, drawn see-through so the village shows through every
+  wall.) Notes 26 and 65 again, and the tester's 117. OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:20 (CameraAndTargetTests), committed, not yet published or seen by Chris.
+- **121. "going full screen at 3440x1440 everything is blurry and screw up my text on computer screen so not sure what it is doing after
+  i tab out"** (Chris, 2026-10-11, about 00:53, on the 00:33 build.) The game blurry in full screen at his monitor's own size, and his
+  desktop's text wrong after alt-tab: the full-screen mode or the display's scaling is being changed. Note 94 (resolution choices) again,
+  and goes with the tester's 115 (keys after alt-tab). OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:17 (EncounterRulesTests; the screen itself only Chris can see), committed, not yet published.
+- **122. "damn u. the druids are still not healing party members!"** (Chris, 2026-10-11, about 00:53.) A repeat ("still"). OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:10 (SimPartyTests), committed, not yet published or seen by Chris.
+- **123. "trap set up in the air . i am tired of repeating issues and not fixed."** (Chris, 2026-10-11, about 00:55; screenshot: the
+  Ranger's Snare Trap, a flat disc, hanging in the air at about knee height beside the archer, its shadow on the ground.) OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:04 (RangerLoopTests), committed, not yet published or seen by Chris.
+- **124. "no way to turn off auto shot"** (Chris, 2026-10-11, about 00:56; the Ranger, "Auto shot: move closer" on the bar.) OPEN.
+  Status: OPEN until Chris confirms. TESTED 2026-10-11 01:17 (RangerLoopTests: Esc stops it, then the target, then the menu), committed, not yet published.
+- **125. "says open the cage but it is obviously broken and nothing in it."** (Chris, 2026-10-11, about 00:59; screenshot: a cage in
+  the Sealed Adit, bars on two sides only, its floor slab raised and loose, nobody inside, the prompt "[G] Open the cage".) OPEN.
+- **126. "very sparse mob density."** (Chris, 2026-10-11, about 01:00; screenshot: the drawn-out Sealed Adit, a wide dark hall along
+  the rail with two mobs in sight.) The camps were spread over three times the length without more of them (note 113's "more to do",
+  DUNGEON_DESIGN 0.25). OPEN.
+- **127. "more nothingness"** (Chris, 2026-10-11, about 01:01; screenshot: in the drawn-out Adit, a vast flat grey floor to the
+  horizon, no wall, rock or dressing in sight, two mobs far off and an echo-jar.) With 126: the halls were drawn out (2.5 times as wide,
+  twice as tall) without their rocks, dressing and camps multiplied to fill them, and published before the fill. OPEN.
+- **128. "looks terrible"** (Chris, 2026-10-11, about 01:02; screenshot: a built hall in the Adit, its end wall two flat black slabs
+  with a plain arch between, untextured, in the dark.) The room builder's halls (D9, 2026-10-10), never shown to Chris before. OPEN.
+- **129. "more machines!!!!!  i told you NO Machines!"** (Chris, 2026-10-11, about 01:02; screenshot: the Rock-Eater, a drill engine
+  on rails with a cone drill, wheels and a funnel, on the berth's tiled floor.) The rule is no machines at all, not only no machine
+  words (CRULANDA_CANON, memory no-machines). OPEN: the Rock-Eater, and the carriage and cage-lift to ask about.
+- **130. "room full of nothing."** (Chris, 2026-10-11, about 01:04; screenshot: the Singing Gallery, a bare dark floor to the edges,
+  a row of spikes far off, an echo-jar; the HUD cut off at the left and the window short of the screen's right edge, notes 114 and 121.)
+  With 126 and 127. OPEN.
+- **131. "shouldnt spawn almost on top of each other. should all patrol. all mobs just stand in one place"** (Chris, 2026-10-11, about
+  01:05; screenshot: two cave bears in the Adit overlapping, nose to flank.) No mob anywhere walks a patrol or wanders its ground, and a
+  camp's mobs are set closer than their bodies are wide. OPEN.
+- **132. "all you did in the dungeon was make it bigger which in turn has less mobs and would not take 60-75mins to complete"** (Chris,
+  2026-10-11, about 01:21.) The brief for the Adit: a 60-75 minute run (DUNGEON_DESIGN 0.06). The scale-up spread the same camps over
+  three times the length; the content that makes the time (mobs, patrols, side rooms, events) was not built. OPEN.
+- **133. "thats just a bear"** (Chris, 2026-10-11, 16:36, of the Rock-Eater captures: the bear's body tinted violet with crystals and a
+  saddle.) He chose a rework of the bear over a new model; shown the rework at 16:46 (stone hide, rock slabs, digging claws, horned
+  snout): **"this model is horrific, i like the original better."** The 16:26 bear is kept (commit e7bc6bb). CLOSED by his choice.
+- **134. "need to show a test run of the dungeon with a group"** (Chris, 2026-10-11, 16:50.) Built: RunCapture (--crulanda-run-capture),
+  a party of five running the Sealed Adit, timed and photographed, on his screen. The runs since are in D:\crulanda-work
+un-captures.
+- **135. "so once again no healing from the druid?? and no groups?"** (Chris, 2026-10-11, 16:58, the first run: a party of four dying
+  at the first camp.) Measured: the Druid mended 155 times in nine minutes; the group scaling for four sims had made each picket 2,106
+  health hitting for 72 against people of 415. Scaling eased (EncounterEnemy.GroupScale: .6 health, .2 damage a share). TESTED by the
+  17:09 run (camps falling); not VERIFIED.
+- **136. "need a paladin, ranger pet, etc..."** and **"need a cc class also"** (Chris, 2026-10-11, 16:59-17:01.) The party holds four sims
+  now (five with you); a sim Ranger brings its wolf; the run's party: you the Paladin, a Warrior tank leading, a Druid, a Ranger and
+  wolf, a Rogue for the holds. TESTED in the 17:09 run.
+- **137. "they need to loot to test the loot db"** (Chris, 2026-10-11, 17:11.) The run's player searches every body within 12 m, each
+  thing taken logged by name, upgrades worn (17:27 run). **"dont see looting"** (17:24): it was logged by item id and nothing worn; fixed.
+- **138. "also its not showing who is in the party"**, **"still can't see party on screen"** (Chris, 2026-10-11, 17:11, 17:24.) The capture
+  window (1440x900) drew the panels at his 3440x1440 positions, the party frame off the screen; captures draw the panels at their
+  defaults now (EncounterHud.DefaultPanels). Seen in the 17:28 shot. In his own game the frames are where he put them.
+- **139. "need to give the warrior some gear he is being decimated."**, **"kill it its not working implement fixes and give the warrior
+  some better gear"** (Chris, 2026-10-11, 17:12, 17:16.) The sims had no armour at all (only a health formula); now the armour of their
+  class's pieces at their level (SimCompanion.ArmourFor: the Warrior 207-222), and the run's sims carry bought upgrades. **"also a
+  little unbalanced now that warrior has gear and other not equiping gear?"** (17:25): every member is geared the same way (the log
+  lists each one's armour); the sims never take loot, they buy upgrades in their economy; only you wear what you loot.
+- **140. "you say Moon it really need to show an ICon to see it better"** and **"show who is CCd"** (Chris, 2026-10-11, 17:12-17:13.)
+  The raid marks are icons over the name (Icons/mark: skull, moon, cross) and a held mob shows its hold's icon (held, stunned, feared,
+  silenced) with the plate tinted. Seen in the 17:28 shot.
+- **141. "also need to show a dps meter and a healing meter to check balance on classes"**, **"put the class next to name in dps meter"**,
+  **"i see there name but not their class"** (Chris, 2026-10-11, 17:14, 17:24, 17:25.) /meter: damage and healing a member with its
+  class, each a second over the party's fighting time; /meter reset. In the run's summary too. Seen in the 17:28 shot.
+- **142. "once the mob that was cc dies. take off the icon"** (Chris, 2026-10-11, 17:41.) A raid mark dies with its mob. TESTED (GroupRunTests).
+- **143. "what dropped off the first elite? you need to have a run down of dps deaths loot drops etc. kinda like a scorecard when a dungeon
+  is complete. maybe an mvp"**, **"final boss kill can also call the scorecard"** (Chris, 2026-10-11, 17:44-17:46.) The scorecard
+  (DUNGEON_DESIGN 0.08): on the leader's call or the last boss; /scorecard. TESTED (GroupRunTests). The first elite that run: a Veridian
+  Shield of the Oak and 22 coin.
+- **144. "party doesnt ignore the CC mobs"** (Chris, 2026-10-11, 17:45.) Sims, wolves and the run's player leave a held mob alone while
+  anything else stands. BUILT (SimCompanion.Held); seen in the 17:56 run.
+- **145. "warrior needs to wait on party"** (Chris, 2026-10-11, 17:46.) The leader stops while anyone alive is more than 12 m behind and
+  pulls nothing until all are up. BUILT; seen in the 17:56 run.
+- **146. "so the duo boss needs to be tougher. maybe perm CC one while killing one?"**, **"rock caller fell pretty fast"** (Chris,
+  2026-10-11, 17:47.) The duo rebuilt (DUNGEON_DESIGN 0.07): Nix leaps down to be held; free, he goads the beast; held, it is calm; the
+  Rock-Eater's health 1.6. TESTED (RockEaterTests) once the suites pass.
+- **147. "needs some of the bosses to stun or cc members of the party? maybe freeze? stun? fear? disorient?"** (Chris, 2026-10-11, 17:49.)
+  Holds on the party (EliteMove.cc): Haddo floors, the Rock-Eater shakes (disorient), Nix and Ysolt fear, Danner chains (root). BUILT.
+- **148. "looks like party is stuck"**, **"definitely still stuck"** (Chris, 2026-10-11, 17:50-17:52; the 17:37 run at the Lava ledge,
+  an Ash mender up where no one reached it.) A leader gives a camp up after 45 s with nothing to fight; strollers keep to their floor.
+  BUILT; the 17:56 run passed the Lava ledge.
+- **149. "rogue should have daggers. and maybe a crossbow to pull but mainly melee"** (Chris, 2026-10-11, 18:00.) A pair of Lowtown
+  dirks from the first, one in each hand (the second knife in the left fist: knife.off); Throw Knife, a knife thrown at 20 m, the pull (no
+  crossbow: a thrown knife has no mechanism, and a crossbow is on the no-machines line); sim Rogues carry the pair. BUILT, tests written.
+- **110. New dungeon pieces for the Adit** (Chris's download, 41 FBX: modular stone walls, floor, columns, stairs, an entrance arch, torches, candelabra, chests, barrels, bones, rocks, bars, books, potions). Chris chose: dress the whole Adit and rebuild its built rooms from the modular pieces; raw cave stays rock. In progress.
+- **108. "Still no bow animations on ranger."** Kevin Iglesias's archer clips (load, hold, release) since 2026-10-10; then "bow still twisted", "bow is backwards", "not facing target": the archer turns side-on as the clips are made, turns to her target while fighting standing (AdventurerMotor turned her only while moving), and the bow is set by its own mesh axes (rounded back to the mark, string to the archer). Chris, 20:45: "bow looks better" ... "move forward". To check in play.
+- **150. Farmers digging and ploughing** (Chris, 2026-10-12, 00:28, as relayed: he needs to SEE farmers digging and plowing the field; on note 119: "yes better now"). OPEN. Built so far (WIP, uncommitted capture review): a hoeing farmer's two-handed stroke (ActorVisual.Field.cs: raise, strike, pull back, step along the row; both fists on the shaft; tines into the soil; a soil puff), a horse-drawn wooden plough team on a bare field 07:00-18:00 (PlowTeam.cs; a furrow trail; no machines). FieldWorkTests pass (2/2) in lane A.
+- **151. "give the mage a necro build."** (Chris, 2026-10-12, 00:39.) OPEN. Death/bone magic and minions; lore status to label.
+- **152. "archivist needs a dps (like shadow priest), and support like disciple)"** (Chris, 2026-10-12, 00:39.) OPEN. A damage-over-time build (unmaking, Wasting-flavoured) and a Discipline-like support build (shields, damage into healing).
+- **153. "salt mender should have a healer spec"** (Chris, 2026-10-12, 00:39) and **"Finish the Salt-Mender: a 4th build, sims, and its own figure"**. OPEN.
+- **154. "ok since they do use salt and chants they can be a bard like healer" + "with some shamanistic"** (Chris, 2026-10-12, 00:47.) OPEN. The Salt-Mender's healer: chants held to heal over time (Mender-Craft, "I seal the Wound!"), salt circles, a couple of direct wound-sealing heals, placed salt cairns/wards (healing, cleansing the Wasting's grey, grounding damage like the canon Salt-Wall), earth/spirit calling. CANON-EXPANDED; no machines. Built 2026-10-12 (the Mender path: Close the Cut, Mender-Craft, Salt Circle, Salt Cairn, Call the Deep Earth; sims; its own figure); TESTED in lane A, not seen by Chris: still OPEN.
+- **155. "looks like they are just banging into onto the ground. research and look up videos online to see how people actually use hoes"** (Chris, 2026-10-12, 09:47.) OPEN. Reference: Docs/HOE_TECHNIQUE.md (draw hoe, thumbs-up grip, modest lift, angled entry, draw back toward the feet).
+
+- **156. 'Rework existing paths into the new builds'** (Chris, 2026-10-12, 10:33, his choice on the open decision: keep four paths a class). OPEN. The Mage's Cinderwright becomes the necromancer (the Bonecaller); the Archivist's Archive becomes the damage-over-time build (the Unwriting) and its Silent Vow the shield/support build (the Still Vow). Saves: points in a retired path are refunded (TalentMigration); Chris's saves backed up first to D:\crulanda-work\save-backups\20261012-1040-before-path-rework.
+
+## 2026-10-12 12:53-12:57 (Chris, verbatim; OPEN)
+- 158 (12:53) "publish and finish what is not done" (OPEN)
+- 159 (12:54) "there should not be see thru houses." (OPEN; fix: outdoors no building fades, only the one you stand in; CameraAndTargetTests.Outdoors_a_house_between_camera_and_player_stays_solid)
+- 160 (12:54) "i think claude fixed the feet" (OPEN; FootTests on feet-bow-adit-kit 12:58: still FAILS, toes sink up to 6 cm walking, standing right foot turned 52 degrees)
+- 161 (12:55) "i dont want a bunch of candidates. only need 3 at most" (OPEN; pruned to the newest 3)
+- 162 (12:56) "only foot issue i see so far is it fall below the ground" (OPEN)
+- 163 (12:57) "and these are hovering above the ground" (OPEN; NPCs/sims on the path)
+- 164 (12:58) "i dont want see thru houses like this . i just wanted a fix for the camera when i was behind something. doesnt out inside." (OPEN; batched part meshes gave fade boxes the size of the village, fixed; only the part in the way fades)
+- 165 (12:59) "i cant invite mira ." (OPEN; InviteTarget, /invite alone, villager-frame Invite; InviteTests)
+- 166 (12:59) "inside the inn is working fine" (kept as it was)
+- 167 (12:59) "tree disappeared." (OPEN; a tree at the lens fades to 10%, never gone; test)
+- 168 (13:01) "animation on horse plow and hoeing look better but his arms are out of place or awkward." (OPEN; top fist below the chest and 34 cm ahead; FieldWorkTests checks fists under the shoulders, 25 cm ahead, elbows low)
+- 169 (13:05) "leash is too short on fighting boards. they keep reseting even while fighting" (OPEN; no break-off within 5 s of a blow; far leash 40 m; LeashTests)
+- 170 (13:09) "the dps/healing meter is missing" (OPEN; it was off by default; now shown, /meter toggles)
+- 171 (13:10) "skeleton bone dude for mage look lousy" (OPEN)
+- 172 (13:12) "otherwise seems to work well. map seems a big desolate need to fill in a bit more to resemble elwyn forest in wow" (OPEN; plan in Docs/ZONE_FILL_PLAN.md, after the publish)
+- 173 (17:06) "did you animate the skeleton? id like to see how he moves" (OPEN; new thrall on the old rig's six clips; in-game video in outputs/thrall-*.mp4)
+- 174 (17:13) "ok definitely keep working and test all the new classes and all the new test builds and compare dps and hps to see if they are viable builds" (OPEN; balance harness, Docs/BALANCE_REPORT.md)
+- 175 (17:21) "maybe put a helm or hood on him. his head is TOO round" (OPEN; narrower skull, brow ridge, cheekbones, angular jaw, a tattered grave-cloth hood)
+- 176 (17:53) "just keep it for now" / "we have other things to accomplish" (OPEN; thrall kept as is)
+- 177 (18:22) "control classes should not be top tier dps for sure" / "or healers" (OPEN; role DPS caps: healer <= 50%, control/support <= 75% of the DPS median; RoleCapTests)
+- 178 (19:18) "still need other healers to test. paladin, cleric (new class) , shaman (new class), salt mender" (OPEN; party heal test with Mira + 3 sims queued; Cleric and Shaman queued after a canon check and design doc; classes 8 -> 10)
+
+- TODO (Chris 23:13, parked): foot work. FootTests is down to 1 problem after 0f81dbe (standing to the higher sole): 'running after a jump left foot at 0.161s: down but turned 178 degrees' (the 179-degree reading again; the foot near vertical on landing). Pick up later.
+- TODO: party heal test has no sims because PlayableEncounter has no SimPopulation ('[no SimPopulation]'). Load Oakhaven, or add a SimPopulation for the test.
+
+## 2026-10-14 (Chris, verbatim)
+- 179 (11:40) "Filling the zones in the Elwynn style. is next." (OPEN; note 172 and Docs/ZONE_FILL_PLAN.md, every zone, Oakhaven first)
+- 180 (11:40) "you can start expanding adit so not so empty next on the agenda." (OPEN; after the zone fill; Docs/ADIT_REWORK.md on branch adit-rework)
+- 181 (11:45) "we need more spell animations and melee animations also" (OPEN; Kevin Iglesias' Human Melee Animations FREE is downloaded but was never imported: five attacks, combat idles, a hit, a death; for spells, his Human Spellcasting Animations FREE, which Chris must download from the Asset Store)
+- 182 (12:05) "here is elwyn very dense area for good level adventures. use these for reference and search online for more images and ideas." (with eight pictures: two zone maps, the region map, five views at ground level; OPEN). Lessons taken (no names, layouts or assets copied): the map is one canopy, with the roads, a river, lakes, farms and camps cut into it; at eye level, huge thick-trunked trees stand far apart under a high, closed canopy, the floor open (grass, bushes, fallen logs, stumps, flowers) so you see between the trunks; homes and small camps tucked among the trunks; red dirt roads with fences, signposts and lamp posts; mountains framing two sides, a river along a third; a sight every 100-150 m.
+- 183 (11:50) "you now have these animations to implement in game. they are in myassets" (Kevin Iglesias' Human Spellcasting, Crafting and Throwing Animations FREE, beside his Melee; IN PROGRESS: ModelFigure.KiActs/KiWork, ActorVisual.Motions)
+- 184 (12:00) "id like to keep some of the trees we have now. only the big tree in some areas maybe making it a dense forest area." (DONE in the woods: the zone's own trees, the great oaks only in a few old-forest patches)
+- 185 (12:00) "ploughing would be good one to use on the hoe and etc..." (DONE: the ploughing clip works the farmer's body under the hand-set hoe stroke; gathering and the pick for herbs, wood and ore)
+- 186 (12:05) "we need new spell effects also for ALL spells" and 12:10 "i added some spell effects, aoe effects, melee effects, fire to myassets look these over to use." (IN PROGRESS: SpellFx with Hovl's Magic Effects FREE, Matthew Guz's Slash Effects FREE and Vefects' Free Fire VFX, its URP shaders written again for the built-in pipeline)
+- 187 (13:55) "still a couple are backwards" (screenshot: the training yard's archery butts; IN PROGRESS: each butt turned by its own shape to face its lane, ZoneBuilder.FaceLane)
+- 188 (14:05) "traps need to be something besides a circle on the ground" (IN PROGRESS: the Snare Trap a jaw trap with teeth, a pan, springs and a chain to a stake; it snaps shut on what it catches)
+- 189 (18:55, the 18:24 build, three pictures) "when orc jump his legs dont move or bend. these mushroom looking tree tops dont actually fit the vibe. dont like these trees new bottoms/roots. these tree roots need to be a little more randomized. coloring is off" (the great oaks' flat dark caps in the woods; the fallen trunk's black end and moss; the giant's uniform green buttresses; OPEN)
+- 190 (19:05) "we need a buff ui so i know what buff/songs are on the party" (OPEN; a row of the buffs and songs on you and on each party member, with their time left, by the party frames)
+- 191 (19:10) "also need to see how much nerve the scoundrel has built up" (OPEN: the player frame shows the resource pool; Nerve starts empty and builds with Quick Cut)
+- 192 (19:20) "birds hop around funny..looks like maybe back and forth." (OPEN; the Living Birds on the ground)
+- 193 (19:25, a picture from the creek bank by Hollin farm, the Wasting on the right) "still empty feeling. back is to hollin farm." (OPEN: the open meadow between the creek and the grey; the woods kept 30 m off the Wasting and clear of the farm, their glades 90 m wide and bare)
+- 194 (19:30, a picture at Vell's smithy: a sword rack and a barrel of blades by a plank wall) "some reason this sparks or lights up" (OPEN)
+- 194a (19:35, a picture inside the Golden Cask: Quill and another sim on the floor, the tables and benches on their sides, tankards in the air) "something wrong with Quill and the other guy is sitting weirdly because all the tables and benches are turned on their sides", then (19:40) "all this is wrong" (the Fantasy pack's one-mesh files carry Blender's -90 on the prefab root and ModelProp zeroed it: every Fantasy table, bench, stool and mug lay on its side, the mugs set at table height floating; the root's turn is kept now; KitPropTests; BUILT 19:54 and seen standing in the 20:12 tour frame `world-captures/oakhaven-99-inn-drinkers-night.png`; OPEN until Chris sees the inn)
+- 194b (19:37) "no that glint was coming from the blacksmith" (the fire pack's stand-in spark and trail emitters, off; see 194)
+- 194c (19:38, a picture by the skinner's hut) "item is floating next to skinner", and (19:42, the farmer with the sack) "wrong" (the Morro villagers' avatars: what they carried floated with their arms spread; back on their own avatars, see 189)
+- 195 (19:45, a picture at Harrow farm by the hen-wife) "bottom of this barn flashes when walking buy it alternating from brick to wood and it should be turn around 180 so the cows nearby can get in to sleep at night" (OPEN)
+- 196 (19:50, a picture of the Old Fold with Mira) "does anyone feed or tend to this flock of sheep?" (a sheep stood in the fold's wall: the flock's radius 8 of a 7 m fold, now 5; the shepherd below; BUILT 19:54, the flock inside its walls and the shepherd shearing in `world-captures/oakhaven-23-the-old-fold-night.png`; OPEN until Chris sees it)
+- 197 (19:55) "or extract their wool for market?" (a shepherd a flock: Tam and Nell Sedge for Oakhaven's two; the count at the gate at first light, the shearing through the morning, the fleeces to the produce stall after the midday meal, the afternoon feed; the merchant offers the fleeces; BUILT 19:54, VillageDayTests counts them, the shepherd at the shearing in the 20:12 fold frame; OPEN until Chris sees them)
+- 198 (20:00) "all need an exit command to close the .exe" (OPEN)
+- 199 (19:34, two pictures of the Scoundrel combat capture at the training yard's fence, Mira in the grass outside) "why do they run test outside the area?" (CombatCapture stood the player on the line from the spawn to the dummy, through the fence; now in front of the dummy along its facing, into the yard; OPEN until the next capture)
+- 200 (23:15, back after the shutdown) "birds still hopping" (the Living Birds are a Biped: the hop's travel sits on "Bip01", a child of the file's root, so the clips' root locks of 192 did nothing; Bip01 is the motion node now, creature import version 7; TESTED 23:44, BirdMotionTests: a crow's Bip01 strays under 15 cm over 2.5 s of hopping; BUILT 23:30; OPEN until Chris's eyes)
+- 201 (23:15) "scoundrel nerve should start at 0. you shouldnt be able to use a finished at start of fight" (the pool was bound full; now emptied when the kit wakes, on a respawn or a load, and six seconds after the last blow it drains at ten a second, never while auto-attacking a dummy; OPEN)
+- 202 (23:20) "shouldn't get nerve on auto attack" (the swing's 3 Nerve gone; the cuts and the verses build it; OPEN)
+- 203 (23:30) "so what is the phases look like? the villagers and npcs need better ai" (a brief: the villagers' and NPCs' AI; OPEN, to be planned)
+- 204 (23:35) "more things to do. more incentives for gathering/professions. make better gear. have gear change the way your character looks when equipping" (a brief; queued in ROADMAP.md with 203; OPEN)
+- 205 (23:40, asked what the villagers did) "running into each other and sometimes get stuck or delayed at door of inn..prob need double doors and inn a bit bigger so for people. need more / better loot obtained from crafting armor/weapons/potions/food buffs. find recipes/ book of lore/still havent found many secrets. all this for ALL Zones" (ROADMAP Phase 8.6; OPEN)
+- 206 (01:05) "launch a bot that fills in some open areas in oakhaven. work on new dungeons. improve polish, secrets, lore, clues, stories from npcs, etc" (three helpers launched: Oakhaven's open ground; the second dungeon's design; secrets, clues, lore and villagers' stories in every zone; OPEN)
+- 207 (01:10, the Adit camera tour's chapel frame: a bleached stone wall with an arch, the lake of fire glowing through it) "still not sure what this is and looks bad" (the Chapel of Embers from outside its east wall, the tour's lamp far too strong; the lamp cut to a quarter and the camera moved inside the nave; OPEN)
+- 208 (01:12, of the same chapel frame) "just the shape and design is bad" (the chapter-house rooms are flat slabs with a kit arch set in: to be rebuilt as architecture, pilasters, arched doorways the room's height, a vaulted nave, the cloister a colonnade, from the dungeon kit; OPEN)
+- 209 (01:14) "use some of the dungeon assedt not just plain walls and arch" (the chapter-house rooms rebuilt from the dungeon kit: ModularStoneWall and its tops, the EntranceTop over arched doors, the Modular columns, Window, Torch_wall, Stairs; OPEN)
+- 210 (01:16) "dungeon modular pack and stylized hand painted dungeon in myassets and kaykit dungeon pack in downloads can be used to fix some of those issues" (three packs to bring into the dungeon builder; OPEN)
+- 211 (01:20, a picture of the Downloads folder) "i have downloaded some shaders: stylized water, interactive grass, and candle flicker. use these where appropriate.  I have some music: dark realm, eastern life, last zone. Some Unity 6 and FBX fantasy assets you may want to use. They are in the downloads folder." (OPEN: to be brought in by helpers as slots free)
+- 212 (01:25, a picture captioned "Fly Out buttons are amazing QoL": a hotbar slot with a small arrow that opens sideways into a row of three related abilities, each with its charge count, the last used on the slot's face) "keep this in mind when designing hotbar and ui." (recorded in ACTION_BAR.md as a design note; OPEN, for the next hotbar pass)
+- 213 (02:05, the Scriptorium frame from the Adit tour: a KayKit stone wall whose arch is filled with stone) "now this looks blocked??" "does the door open?" (walkable, 4 m clear on the navmesh; the pack's blind arch was placed where its open doorway belongs; swapped; OPEN until a frame shows it)
+- 214 (02:25) "when a node is harvest it needs to disappear for a certain amount of time. i guess it depends on population" (a worked node
+  had only its ore hidden, the seam's rock standing: now the whole node goes, the seam's rock and the fallen trunk too; it is gone for its
+  own respawn with nobody about, shorter the more people are in the zone (the sims there and your party): half with ten, two fifths at
+  most. OPEN until Chris sees it.)
+- 215 (02:30) "need to be able to mute/adjust sliders for music, sounds, enviromental sounds, combat music, etc." (a Sound panel in the
+  pause menu: Master, Music, Combat music, Sound effects, Ambient sounds, each a slider and a Mute; kept between runs. The game's only
+  sound so far is the zone music: the effects and ambient sliders are ready for sounds still to come. OPEN.)
+- 216 (02:45, three pictures of a walk-in barn's plank wall with a stone band at its foot coming and going) "when i move these textures
+  change. ive seen it mostly on barns and houses" (the walk-in barn's stone sill was built at the boards' own face, 15 cm out both: the
+  two fought for the same pixels. The sill now stands 10 cm proud; the building test measures every building for a face in its footing's.
+  The painted barn had the same fault fixed 2026-10-14 19:45. OPEN.)
+- 217 (02:50, the Nerve panel at 97 / 100 out of combat) "goes up and down from 90-100..never reset to 0 and should not fill up until i
+  start fighting" (the class's resting regeneration, 12 a second, refilled what the drain took. The Scoundrel has none now: Nerve fills
+  only in a fight and drains to 0 after. OPEN.)
+- 218 (03:00, the Sealed Adit's yard with the party and two Sandthrone pickets at the mouth) "outside the cave is very slow and laggy"
+  (not yet known why. The Adit camera tour now times the yard's view with each suspect off in turn: shadows, the point lights, the grass,
+  each big group of the zone's scenery (the caves behind the hill among them), and Unity's counters: adit-perf.txt beside the frames.
+  OPEN.)
+- 219 (03:10) "mira never runs out of mana healing. need to slow the progress down" (her heal grew 15% a level and its cost did not, and
+  she was full again 15 s after a fight. Now her pool grows with your level as her heal does, a heal costs that much more and a quarter
+  again, she says when she runs low and when she is out, and she drinks between fights at the old rate: about 40 s from empty at level
+  11. Whether "the progress" also means levelling more slowly is asked. OPEN.)
+- 220 (03:20, the Flooded Working's pool: black water streaked with fine white lines) "looks bad with these white ripples" (the water
+  lit its painted highlights, the sun's glints and tonight's caustics by the sun, in a cave. With the camera inside a cave they are off now
+  (UndergroundShading, the shader's _CrulandaUnderground). OPEN until the tour frame and Chris's look.)
+- 221 (03:25, two pictures in a cave: a flat pale grey sheet with a hard edge under dark rock and timber) "weird effect. seems to not fit"
+  (taken to be a cave pool: the water's colour was lit by the sun as well as the ambient, so in the dark it read as a pale sheet. With the
+  camera in a cave the sun is out of it now, as in note 220. If it is not water, it is still OPEN: ask where. OPEN.)
+- 222 (03:30, two pictures of a cave floor under a pale sheet, thin jagged white lines across it) "weird on the floor. i move and it
+  changes" (a flood's water lies a few centimetres over a rough floor and its foam traced every ridge near the surface, moving with the
+  eye's depth. With the camera in a cave the foam all but goes, and none where the water is under 3 cm. OPEN.)
+- 223 (03:35) "mira/druid should have some damage spells when not healing" (she had only a free 7-power bolt. Now, while everyone is
+  above 80% and she is above half mana: Briar Lash, instant every 8 s, and Kindled Seed, a 2 s cast; both cost mana and grow with your
+  level as her heal does; the bolt stays as her free filler. GAME-ONLY names. OPEN.)
+- 224 (03:40) "need mobs patrolling more instead of just standing in one spot" (camp mobs strolled only inside their camp, resting 3-9 s at
+  each spot, and only the Adit had patrol roads. Now in every other open-air camp of two or more, its last mob roams a loop of five points
+  well outside the camp, there and back, while anyone is within 70 m; and a camp's mobs rest 2-6 s. RoamerTests. OPEN.)
+- 225 (03:45, after 218) "whole zone needs optimized laggy" (the Adit's probe at 03:27, the frame cap off: 13 fps at the yard, 17 in the
+  Tally Hall. Shadows, the 250 point lights and the grass cost nothing; the zone's props (15,857 renderers, 56 million triangles, 82,000
+  draw passes: the whole dungeon drawn wherever you stand) about 38 ms of 79, and the 186 mobs about 30 ms. Now in a zone with caves a
+  prop more than 70 m from the camera is not drawn (PropCull), and a camp's mob alive, idle and standing more than 85 m from you sleeps,
+  its update, figure, animators and drawing off, until you are within 75 m or it is pulled (EncounterEnemy.Dormant). OPEN until the next
+  probe and Chris's look.)
+- 226 (2026-10-15 ~12:40, after the 04:30 shutdown) "continue working. phase 8 and 9" then "i told you to finish adit before shutting
+  down". The Adit first: its four open questions put to him (ADIT_REWORK section 1): Q1 "20 minute respawn", Q2 "Keep ~75 min
+  (Recommended)", Q3 "Build the Cove", Q4 "Yes, add them". Then Phase 8.6 and 9.
+- 227 (~13:00) "also what has been done on the new dungeons? and the bandit king? how is loot determined/created?" (answered in chat:
+  Hallow's Creek, the Deep Veins and the Transit Hub designed, not built; Caddock as he was; the three loot layers) and then: "loot: we
+  need set pieces like 6 pieces. 2/6 give 1 special, 4/6 another special ability 6/6 full set 3 special abilities and these are class
+  specific." (loot DESIGN.md 3.6 and 3.8. OPEN.)
+- 228 (~13:05) "most of the higher 6/6 pieces are raid..but no raid is made yet" (the Adit's class sets are the dungeon tier, tier 1;
+  higher tiers come from raids; the first raid is to be designed: ROADMAP's endgame, a ten-player raid of you and sims. OPEN.)
+  Asked (the question prompt): the first raid now at 15 or the Spire at 30: "Wait for the Spire at 30"; raid size: "20".
+- 229 (~13:10) "can you produce a complete map of the dungeon? so i can verify locations" then "ok i also need a step by step progression
+  to make sure everything links together" (tools/wip/dungeon/adit_map.py: the map page with the run order and 74 links checked; /loc).
+- 230 (14:50-16:30, watching the group runs) "been standing about 5-10 mins"; "is the warrior tanking? as a support/tank role he is
+  putting out more dps than the dps"; "someone fell off the path"; "now stuck party"; "unstuck. but still getting caught on
+  environment"; "just standing in water. not full group i guess"; "tank is really doing too much damage compared to actual dps users";
+  "also most mobs dont seem to be cc or aoe still a thing?"; "i do see a cc" / "i assume by rogue"; "fell off again when it reached the
+  planks/scaffolding"; "wiped because he fell off". And: "it needs to be fixed and soon. i have a deadline today at 6pm". (CHANGELOG
+  2026-10-15 12:40-18:00: the leader's give-up and long walk, the bot's corners and water, the bridge rails, damage by role. Nix too
+  hard and crowd control/area moves left OPEN.)
+
+## 2026-10-18 (Chris, verbatim)
+
+- 231 "for buffs need icons or something bc this is messy and hard to read screen" (his screenshot: the party frames each followed by
+  a row of text tags, "Well fed 741s", "Sworn to the Colours 741s", "Scree salve 741s", "Steel Your Arms 741s", wide and cluttering).
+  WRITTEN, NOT CHECKED IN GAME (branch fx-icons): the text tags are gone. Each buff is a 22 px square icon (`BuffIcons`,
+  `EncounterHud.DrawBuffs`): a dish shows the food picture, a tincture or salve the potion flask, a class buff its class's buff icon
+  (Icons/ability/buff-class-*), a status with an ability of its id that ability's icon, else a drawn glyph (a plate, a flask, the class
+  colour with an initial). Time left in the corner ("12m"; seconds under a minute), a green border for a help and a red one for a harm
+  (debuffs on the same row, after the helps), and the name, time and effect ("+6 Stamina, +4 Agility") on hover. Party rows sit beside
+  each frame and are no wider than it (six fit: `BuffIconTests`); more than fit end in a "+N" square. Your own row is at the top, right
+  of the target frame (twelve).
+- 232 (2026-10-18 ~18:10-18:20) Asked the Modular Hero pack's name: "GanzSe FREE Modular Character - Fantasy Low Poly Pack"; "i dont
+  see chosan pack anywhere"; chose "GanzSe (Recommended)" for Phase 8.5 and "Gear overhaul now (Recommended)" (ROADMAP Phase 8.5).
+- 233 (2026-10-18 ~18:15) "in downloads use this for some different monsters. Bestiary - Dungeon Monsters Kit[Standard]" (OPEN):
+  Quaternius's free Bestiary (QAL licence: free use in the game, no credit needed, no reselling the files): the Imp and the Puglin, three
+  colourings each, rigged on the UE-style skeleton our clips drive, no clips of their own. Names and places in the game to follow the
+  books (label each), not the kit's names.
+- 234 (2026-10-18 ~18:20) "in downloads Modular Character Outfits - Fantasy" (the same files as the game's people: nothing new) and
+  "Fantasy Props MegaKit for dungeons and other places" (OPEN): the kit is in since 2026-10-07 (Resources/Props/Fantasy, 96 props) but
+  about 18 are placed; dress the dungeons and other places with the rest, each zone's own choice (every zone unique).
+- 235 (2026-10-18 ~18:25) "FBX-20261018T221927Z-1-001 for foods and buff items." (OPEN): Downloads, 103 food FBX, no licence file
+  (names match Quaternius's food pack; source to confirm with Chris). Only what fits the books' world: meat, fish, eggs, bread, cheese,
+  fruit, roots and greens, pots, pans, plates and bottles; no burgers, pizza, sushi, ice cream, soda, sauces in bottles, doughnuts.
+  Then (verbatim): "dont use the non crulanda food but some can be used" (keep what the books and the zones support).
+  Note 233 answered (question prompt, verbatim): the Imp "Ember-bound (Recommended)" (the Adit's Ember Vent, 10-12), the Puglin
+  "Bank-snouts (Recommended)" (the Lowtowns' river banks, 15-20). Docs/BESTIARY_MONSTERS.md (branch bestiary).
+- 236 (2026-10-18 ~19:20, his view of my test round's Lowtowns capture, not his game; his screenshot: the Lowtowns, a cook in a white hat standing in the river under a bridge, a pale green
+  glowing slab on the water to the left) "some professions in the water under bridge" (OPEN).
+- 237 (2026-10-18 ~19:55, on the test capture oakhaven-99-inn-drinkers: the Golden Cask, two drinkers at a table) "inn still not
+  polished. this guy not even sitting on a chair." (OPEN): the man in purple sits in the air, his stool beside him, not under him.
+- 238 (2026-10-18 ~20:00, on the test capture adit-85-hollow-camp-the-scriptorium: the Adit's warm orange-lit drift, candles on
+  the walls, a bookcase down the passage) "i like this look." Keep that warm cave look.
+- 239 (2026-10-18 ~20:10, on the wardrobe line-up 04-sets-front, today's figures and the GanzSe ones) "helms and gauntlet still
+  tooo round" then "in the 04-sets-front" (OPEN): the drawn helms are domes and the drawn gauntlets balls; on the GanzSe bodies the
+  drawn caps and bands sit on top. Phase 8.5: helms and gauntlets from the pack's angular pieces, no round drawn ones.
+- 240 (2026-10-18 ~20:15, on the GanzSe line-up beside today's figures) "i dont like the new characters": GanzSe's bodies are out;
+  the p85-ganzse work stops (ROADMAP Phase 8.5).
+  Then (verbatim): "the old ones were better". Today's figures (Quaternius) stay; Phase 8.5 goes on with note 239 on them.
+- 241 (2026-10-18 ~20:45, on wardrobe 06-helms-f: the CHOSAN model helms Headgear.B.013-016 perched and tilted on the skull) "none
+  fit on the head" (OPEN): branch angular-gear retires those helms and builds every helm from the head's own outline.
+- 242 (2026-10-19 ~10:55, watching the picture round's wardrobe line-up of branch angular-gear) "i think we have reverted too much
+  bring back what we had before. helm dont fit. most sit around the head a too large for the head. hood is awful" (OPEN). Asked, he
+  chose (verbatim) "Old helms, new gloves (Recommended)": helms back as in his game, keep the new gloves and shoulder plates, then the
+  hood (the oilskin hood stands out round the head like a bell).
+- 243 (2026-10-19 ~11:00) the first world boss (brief, verbatim in ROADMAP "The first world boss"): one mini world boss in the highest
+  zone, level 30, a 10-player raid, the hardest to kill, drops components for each class's legendary weapon; one piece needs the other
+  world bosses at end game (OPEN).
+- 244 (2026-10-19 ~11:35, on wardrobe-angular-3 06-helms-b: the new cloth hood and coif, the old scarf and kettle) "these look
+  pitiful. not sure why we keep going back and forth and get poor results. do i need to download more helms?? or can you design" (OPEN).
+- 245 (2026-10-19 ~11:40) "weapons . KayKit : Fantasy Weapons Bits" (OPEN): Downloads\KayKit_FantasyWeaponsBits_1.0_FREE.zip (Kay
+  Lousberg, CC0): 31 models (swords A-E, axes A-C, hammers A-C, daggers A-B, bows A-B with strings, staffs A-B, wand, spear, halberd,
+  fist weapons, arrows, shields A-C). Bring them in as the weapons people carry (Phase 8.5).
+- 246 (2026-10-19 ~12:00) "i like this better for lowtowns look and feel. Free Medieval Village Pack Vol.1 it is in myassets" (OPEN):
+  MyDreamGameStudio's pack (Asset Store cache, 839 MB): 10 houses, a tavern, a blacksmith, an animal shed, 21 props, "aged" 2048 textures,
+  URP materials (the project is Built-in: rebuild them). The water wheel and windmill stay out (no machines). These go to the Lowtowns
+  only (every zone unique).
+- 247 (2026-10-19 ~12:10) "replace all wooden barrels with this in myassets .  simple wood barrel" (OPEN): Kraken XR's "Simple Wood
+  Barrel" (Asset Store cache: one FBX BARREL_1, albedo/normal/metallic textures). Every wooden barrel in every zone becomes it.
+- 248 (2026-10-19 ~12:15) "replace all dead trees with this pack in myassets - dry trees" (OPEN): DigitalAntichrist's "Dry Trees"
+  (Asset Store cache: 7 FBX Dry3333/4195/4910/5818/6524/7509/8872, one bark material, HDRP demo). Every dead tree/snag becomes one of them.
+- 249 (2026-10-19 ~12:20) "here are some more weapon types in my assets - pbr medievel weapons" (OPEN): Cody Dream Studios' "PBR
+  medieval Weapons" (Asset Store cache: Sword, Axe, Mace, Spear, shield; PBR materials). Added to the KayKit weapons work (branch
+  kaykit-weapons) as more weapon looks.
+- 250 (2026-10-19 ~12:25) "here are some axes in myassets - mid poly axes collection" (OPEN): Sky Den Games' "Mid poly Axes
+  Collection" (Asset Store cache: one Axes.fbx holding the set, two materials). Added to the weapons work (branch kaykit-weapons).
+- 251 (2026-10-19 ~12:30) "more music tracks for in game. myassets Free 25 Fantasy RPG Tracks Vol. 3" (OPEN): alkakrab's pack (Asset
+  Store cache): Tracks (Ambient 1-10, Ambience 1-5, Dark 1-5, Action 1-5, Fx 1-3) and Loops (Ambient 1-10, Action 1-5), WAV (~800 MB:
+  compress on import). Spread over the zones, dungeons and fights, each zone its own.
+- 252 (2026-10-19 ~12:35) "good for lumberjack in myassets - Wooden Canopy" (OPEN): icescreen's "Wooden Canopy" (Asset Store cache:
+  Canopy.fbx (a timber shelter), Stair.fbx, FireWood.fbx (a log stack); big TGA maps: cap at 1024). For the lumberjack's woodyard.
+- 253 (2026-10-19 ~12:40) "assets for alchemy - myassets Free Alchemy and Magic Pack" (OPEN): StormBringer Studios' pack (Asset Store
+  cache: Mortar, Cristal_Flask, Flask). For the alchemy trade's benches and the potions' looks.
+- 254 (2026-10-19 ~12:45) "some better sky boxes in my assets Stylized Skyboxes | FREE" (OPEN): Staggart Creations' pack (Asset Store
+  cache, a UPM package: HDRI Noon, Noon (Cloudy), Noon (Overcast), Sunrise, Sunset, Dusk, Night, NightGalaxy, Aurora + Sky_*.mat; a URP
+  demo). Skies through the day and night, each zone's weather its own.
+  Built on `lowtowns-village` (2026-10-19, WRITTEN, NOT RUN): the pack's own Built-in materials were in it (a nested package); 147
+  terraces rebuilt with its houses, the roof route's four kept; ZONE_LOWTOWNS.md "The houses". OPEN until Chris sees it in his build.
+- 255 (2026-10-19 ~13:15, his screenshot: a brazier, its bowl lit, the flame cone standing beside the bowl on the floor) "fire goes
+  around the bazier", then "it was dancing around the brazier" (OPEN): the flame wanders round the bowl instead of burning in it.
+- 256 (2026-10-19 ~14:15, watching the first Unraveller raid; his meter: Archivist 81/s, Ranger 76, Mage 58, Rogue 50, Paladin (the bot)
+  23, Scoundrel 17, Warrior 11; Cleric, Druid and Shaman each exactly 10,637 damage, heals 50/45/25 a second) "seems a bit unbalanced and
+  need a better mob skin/monster skin for the boss" (OPEN). Asked how she should look, he chose (verbatim) "Both": a creature body (a model
+  he picks) wrapped in the books' void-and-aether (b1 ch.20:119). Asked to pick a model: a giant leech/eel/worm, a tentacled river
+  horror, or a big crawler (waiting on his download).
+  Then (verbatim): "maybe use this with the purple spike or some conglomeration. myassets free fantasy spider": Kalamona's "Free Fantasy
+  Spider" (Asset Store cache: spider_myOldOne.FBX with one animation take, textures, Standard materials) as her body, with the purple
+  spikes and the void-and-aether.
+- 257 (2026-10-19 ~14:50, his crop of the test copy's Lowtowns roofs) "what is the green stuff?" (the neon moss: flat bright-green blobs on
+  the tiles). He chose (verbatim) "Make it look like moss (Recommended)": thin uneven patches along the tiles and gutters, dull by day,
+  a faint glow at night (OPEN).
+- 258 (2026-10-19 ~15:00, on the test copy's Gallows Tree, khaven-art2) "tree trunk too low" (OPEN): the tree is sunk, its fork at the
+  ground and the trunk buried.
+- 259 (2026-10-19 ~15:00, watching raid 2: his screenshot, the Unraveller hidden behind a wall of tall black shards, the damage numbers
+  stacked over her) "woah too much cant even make out the spider" (OPEN): the void wrap thinned to a translucent edge, the spider first.
+- 260 (2026-10-19 ~15:05, watching raid 2) "she needs adds. smaller spiders with the original texture but purple" (OPEN): her brood as
+  small spiders, the spider's own texture tinted purple.
+- 261 (2026-10-19 ~15:10, watching raid 2, pull 2; pull 1 had reached her 19%) "wipe but when down too fast when over 75% health" (OPEN).
+- 262 (2026-10-19 ~15:15, watching raid 2) "archivist now doing 80dps" and "shaman healing much lower than others" (Druid 44/s, Cleric 43,
+  Shaman 24) (OPEN).
+- 263 (2026-10-19 ~15:15, watching raid 3; meter: Ranger 86/s, Archivist 85, Scoundrel 61, Rogue 59, Mage 52, Warrior 43, Paladin 32;
+  heals Shaman 49, Cleric 48, Druid 46) "seems too easy now. dont make the purple spikes permanently coming out of ground. randomly
+  every 5-7secs" (OPEN).
+- 264 (2026-10-19 ~15:20, watching raid 4) "something needs to be done about the swirling bowl spike above the mob..make it smaller and
+  blink on and off randomly" and "ground damage should be increased" (OPEN): her purple crown smaller, flickering in and out at
+  random; the grey ground hits harder.
+- 265 (2026-10-19 ~15:25, watching raid 4) "more brood per wave..need CC baby" (OPEN): bigger brood waves that crowd control must hold.
+  Then (verbatim): "once they are cc they need to be killed systematically or they will break and eventually kill the raid" (a kill
+  order on the held brood; holds break; a raid that lets them run out is overrun).
+  Then: "sims are not attacking adds" and "off tank and dps kill adds while main tank stay on main spider" (the raid's split on a wave).
+  Then: "but there still needs to be cc while they take down the adds systematically" and "if all is cc'd then the tank still needs to
+  grab ONE and the dps assist him and not break other cc" (the off-tank pulls one held add at a time, the damage assists the off-tank,
+  no area damage near the held ones).
+- 266 (2026-10-19 ~15:35, watching raid 6) "ok maybe 5 is too many. drop to 4" (done: four brood a wave) and "are they buffed up? with
+  raid food buffs? elixir? group buffs?" (OPEN: they were not; a raid buff-up before each pull: class buffs on all ten, food, elixirs). Then: "need to wait or build a
+  rain buff food" (a raid feast to cook and set down before a pull).
+- 267 (2026-10-19 ~15:45, watching raid 7) "i guess there needs to be a sign or warning where the spikes will pop before hand if they
+  do damage"; asked, he chose (verbatim) "Yes, with a warning (Recommended)": the spikes hurt, a glowing crack shows ~1.5 s before (OPEN).
+- 268 (2026-10-19 ~15:50, watching raid 7) "mare down to 3 spiders per add" (three brood a wave).
+- 269 (2026-10-19 ~15:52) "i want it extremely hard but not impossible" (the Unraveller's target: a disciplined raid wins about 1 in 4,
+  near the end of the clock; any sloppiness wipes; replaces "1 in 2").
+- 270 (2026-10-19 ~16:00, watching the tuning batch) "the spikes are launching in the air. not on the ground" (OPEN).
+- 271 (2026-10-19 ~16:05, watching the tuning batch) "paladin always seems to be the first one to die every round. something wrong with
+  his kit or armor?" (OPEN): the run bot's Paladin tank enters with 1,111 health against the Warrior tank's 1,303.
+- 272 (2026-10-19 ~16:08) "one class. the shaman needs 1 in raid resurection" (OPEN): the Shaman gets one combat resurrection per boss
+  fight.
+  Then (verbatim): "give the pally some hear. he's down again" and "gear" (the Paladin tank to wear full level-20 tank gear).
+- 273 (2026-10-19 ~16:12) "all members should have lvl 20 gear. no need to test the fight if all members are BIS" (the raid's tuning runs
+  with all ten in level-20 best-in-slot gear for their part). Then: "or at least good gear" and "that is the point of a raid".
+- 274 (2026-10-19 ~16:15, his screenshot: the dead Paladin on a huge glowing orange disc over the bar; the meter's Ranger at 166/s) "also
+  should not stay on the ground permanently" (OPEN).
+- 275 (2026-10-19 ~16:18) "how can you tell which is good and which are bad. no way to know to get out or stand in it" (OPEN): one look
+  for every ground effect: harmful red/violet and jagged with a warning, helpful soft gold/green; a HUD line naming what you stand in.
+  Then: "nothing should be permanent onscreen" (every effect has a lifetime; all clear at the fight's end).
+- 276 (2026-10-19 ~16:22, the tuning batch with buffs; meter over 687 s: Mage ~186/s, Ranger ~140, Archivist ~128, Rogue ~121,
+  Scoundrel ~120, Warrior 64, Paladin 33) "mage doesnt look balanced now" (OPEN: every damage class far over its band with buffs).
+  Then: "cleric almost twice the healing as well" (Cleric ~104/s, Shaman 67, Druid 59).
+- 277 (2026-10-19 ~16:25) "can we kill the raid. all respawned while main spider at half health and make necessary changes as noted"
+  (the batch stopped; no reviving mid-fight but the Shaman's one; a wipe ends the pull) (OPEN).
+- 278 (2026-10-19 ~16:40, on the corrected raid numbers: Mage ~74/s, Ranger 56, Archivist 51, Rogue/Scoundrel 48 vs a band of 88; heals
+  Cleric 41, Shaman 27, Druid 23) "still not on target" (OPEN).
+- 279 (2026-10-19 ~16:42) "hybrids 75% of target" (the hybrids' damage at 75% of the pure damage band; replaces "a bit lower", 90%).
+- 280 (2026-10-19 ~16:45, watching tune-2) "people still standing in red areas. they need to evacuate" and "some reds under her are
+  staying a long time and pets just standing in it" (OPEN).
+- 281 (2026-10-19 ~16:50) "need some type of mechanism to trap the brook..someone that can do an extra job" (OPEN): a salt-ring snare
+  (salt and bone hold Weave-Eaters, b1 ch.20; no machines) laid by an assigned Trapper (the Ranger by default) on the brood's path.
+- 282 (2026-10-19 ~17:50, watching tune-5; the boss's crown and plate hanging in the air) "i think instead of the mobs floating but them
+  on the ground!" and "but make the main spider about 15% bigger" (OPEN). Tune-4 had gone 1 of 10 (a kill at 7:12, wipes at 8-24%).
+- 283 (2026-10-19 ~17:55, watching tune-5) "still not moving out of red...it really looks pink so make it a deeper red" (OPEN).
+- 284 (2026-10-19 ~18:15, tune-6: the spider beside the raid, her claws above their shadows) "still floating a bit" (OPEN).
+- 285 (2026-10-19 ~18:20, watching tune-6) "the spider needs an attack animation. maybe a jump mechanic to get away and release her brood"
+  (OPEN): her attack clips seen; the Leap: a warned landing ring, a jump away, a brood wave where she lands. Then: "if she lands on
+  you after jump its an insta death".
+- 286 (2026-10-19 ~18:35; tune-6 had killed her in 4:58 and 5:57) "needs to be a 10-15min kill at least" (OPEN: the feast moved to ~16:00,
+  her health raised for a 12-14 minute kill).
+- 287 (2026-10-19 ~18:45, watching tune-8) "leaps are too quick and not properly telegraphed" (OPEN: a wind-up, rings shown ~4 s ahead, a
+  slower higher arc, a growing shadow, a raid warning). Then: "also distance is too short" (25-40 m).
+- 288 (2026-10-19 ~18:50, tune-8) "not sure what took everyone out around 40% mark" (the phase-3 change at 40%: grey ground under the
+  ranged hitting 230-440 at once, spikes, the pulse) (OPEN).
+- 289 (2026-10-19 ~18:55, tune-8) "yeh still not enough time to move after telegraphing" and "i think the pet pulled the mob or was still
+  alive and restarted the raid" (OPEN: every warning long enough to walk out; a pet goes with its owner and never pulls; a wipe ends cleanly).
+  Then: "still not jumping very far. need to jump out of melee and ranger range".
+- 290 (2026-10-19 ~19:00, tune-8) "i dont see the salt or harpoons is that a visible item?" (OPEN: thrown bone harpoons with glowing amber
+  ropes while she is pinned (b1 ch.20), a white salt spray, the barrel and rack on the apron).
+- 291 (2026-10-19 ~19:05, tune-8) "healing seems lower..cant tell with dps" (the meter cuts off the damage rate on big totals) and "camera
+  gets inside the spider alot hard to see" (OPEN).
+- 292 (2026-10-19 ~19:08, tune-8) "when she is in the water hard to see the telegraphs. try to keep her out of water" (OPEN).
+- 293 (2026-10-19 ~19:30, tune-9) "jumped a little too far..maybe down 1/4th of total distance" (done: 35-55 m to 30-41 m). Then: "not sure where i respawned but not near the raid" (a recovery point by the apron for her raid).
+- 294 (2026-10-19 ~19:45, tune-10) "when she leaps she would target on raid member and if that member does not move out of the range
+  theyll die" (OPEN: the leap marks one member; the rings under them; out before she lands or die).
+- 295 (2026-10-19 ~20:00; tune-10's first pull reached the feast at 15:53 with her at 31%) "cut about 10% health" (done: 340,000 to 306,000).
+- 296 (2026-10-19 ~20:05) "last tuning run for now then we move on to new zones, new classes, and pending phases".
+- 297 (2026-10-19 ~20:08) "just want everything up to level 20 for now with classes. can do forge district but no dungeon for now" (the cap
+  stays 20; new classes up to 20; the Forge District as a zone within 20, no dungeon yet).
+  Then (verbatim): "new zone still up to lvl 22"; asked, he chose "Keep cap 20": the Forge District's mobs run to 22 (harder ground for
+  geared level-20s), no levels past 20.
+- 298 (2026-10-19 ~20:15) The new classes (Docs/CLASSES_9_2.md, branch classes-92); his picks at the question prompt (verbatim): first class
+  "Pact-Blade"; the Seer's paths "Maker/Keeper/Breaker (Recommended)"; names "Seer + Sight (Recommended)"; races "Seer human, Ash-Walker orc
+  (Recommended)". Pact-Blade (Veyra's Iron Pact two-sword fighting, pure damage in heavy armour) is built first.
+- 299 (2026-10-19 ~20:20) The Forge District (branch forge-district; ZONE_FORGE_DISTRICT.md): his answers (verbatim) levels "19-22
+  (Recommended)", the Spoke "Seen, not entered (Recommended)", the inn "Fully its own now (Recommended)", Rook "Not yet (Recommended)".

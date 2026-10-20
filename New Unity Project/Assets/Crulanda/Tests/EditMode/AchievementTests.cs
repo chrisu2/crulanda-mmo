@@ -20,7 +20,7 @@ namespace Crulanda.Tests
         [Test] public void Every_landmark_is_a_place_to_explore_once()
         {
             var a = Fresh(out var p);
-            Assert.AreEqual(5, a.Zones.Count, "The five zones.");
+            Assert.AreEqual(7, a.Zones.Count, "The five zones, the Lowtowns (Phase 9.1) and the Crown of Argentis (a city: places to explore and things hidden, no camps or quests yet).");
             var oak = a.Zones.First(z => z.id == "zone.oakhaven"); var place = Achievements.Pois(oak).First();
             Assert.Greater(a.PoisIn(oak), 30, "Oakhaven's landmarks are its places.");
             Assert.IsFalse(a.Explored(oak, place));
@@ -40,7 +40,7 @@ namespace Crulanda.Tests
             {
                 string s = z.id.Substring(5);
                 Assert.IsTrue(a.All.Any(x => x.id == "explore." + s), z.id + " explore");
-                Assert.IsTrue(a.All.Any(x => x.id == "quests." + s), z.id + " quests");
+                if (!z.city) Assert.IsTrue(a.All.Any(x => x.id == "quests." + s), z.id + " quests");   // the Crown has no quests yet
             }
             Assert.IsTrue(a.All.Any(x => x.id == "elites.peaks"), "The Peaks have camp elites (the captain, Old Scree-Tusk).");
             Assert.AreEqual(Achievements.EliteKeys(a.Zones.First(z => z.id == "zone.peaks")).Count, a.All.First(x => x.id == "elites.peaks").goal);

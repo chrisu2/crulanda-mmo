@@ -40,7 +40,7 @@ namespace Crulanda.Encounter
         {
             if (Zone == null || Zone.RailWaves == null) return;
             if (Progress.keys.Contains(WeaverLock)) { Zone.QuietCarriage(); return; }
-            if (!EscortPossible) return;
+            if (!EscortPossible || CoveFinale) return;   // (S6) in the Cove's finale Danner keeps his barge: he never lies in the hall's dark
             var danner = Danner(); if (danner != null) danner.Hide();
         }
         /// <summary>The quiet way in: the goblin who hummed the gate open is Mother Quillet, and she waits on the hall's side of it.</summary>
@@ -102,7 +102,7 @@ namespace Crulanda.Encounter
         /// <summary>The lock half matched: Danner stands up out of the dark and comes for her.</summary>
         public void WeaverHalfway(AditWeaver w)
         {
-            var d = Danner();
+            var d = CoveFinale ? null : Danner();   // (S6) the halfway rise is gone with Danner to his barge in the Black Cove
             if (d == null) { w.Say("Half of it. Don't you talk to me, I'll lose the note."); return; }
             bool hid = d.Hidden; d.Rise(w.actor);
             Message(hid ? DannerName + " stands up out of the dark at the end of the platform. \"Who let a goblin at my carriage?\"" : DannerName + " roars down the platform: \"Off my carriage!\"");
@@ -113,7 +113,7 @@ namespace Crulanda.Encounter
             if (!Progress.keys.Contains(WeaverLock)) Progress.keys.Add(WeaverLock);
             if (Zone != null) Zone.QuietCarriage();
             FloatText(w.LockAt + Vector3.up * 2, "The lock is matched", new Color(.8f, .65f, 1));
-            Message("The lock's note slides into the right one. One by one the geodes in the carriage gutter and go dark, and the whole hall is quieter for it. The carriage will not run again.");
+            Message("The lock's note slides into the right one. One by one the geodes in the carriage gutter and go dark, and the whole hall is quieter for it. The carriage will not carry the Company's stones again.");
             w.Say("There. Let go, all of them. Whatever they held is back in the stone where it belongs.");
             ReconcileQuests(); Save(false);
         }

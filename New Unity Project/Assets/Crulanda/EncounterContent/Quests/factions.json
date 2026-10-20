@@ -11,8 +11,8 @@
       "id": "saltmenders",
       "name": "The Salt-Menders",
       "start": 0,
-      "canonStatus": "CANON",
-      "description": "Rebels of the Alliance who meet in old tunnels and mean to 'break the machine'. They move people the Concord wants."
+      "canonStatus": "CANON-EXPANDED: the forerunners of book 3's Salt-Menders (the refugees of the Western Coast after the exodus); their tunnels and their work in the game's time are GAME-ONLY",
+      "description": "Folk of the Alliance who meet in old tunnels and mend what the Concord breaks. They move people the Concord wants. In years to come, their name will go west with the refugees."
     },
     {
       "id": "preservationists",

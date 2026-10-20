@@ -19,17 +19,34 @@ namespace Crulanda.Encounter
     {
         public const string Flag = "--crulanda-motion-capture";
         public static bool Requested { get { return Array.IndexOf(Environment.GetCommandLineArgs(), Flag) >= 0; } }
+        /// <summary>--crulanda-motion-bow-only: straight to the bow, without the jumps, runs and strides (2026-10-10, Chris: "why do
+        /// you keep playing the jump/running animations again and again ... after approval").</summary>
+        static bool BowOnly { get { return Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-motion-bow-only") >= 0; } }
         Camera side; Transform watch; Vector3 offset; readonly StringBuilder report = new StringBuilder();
         void LateUpdate()
         {
             if (side == null || watch == null) return;
             side.transform.position = watch.position + watch.rotation * offset;
-            side.transform.LookAt(watch.position + Vector3.down * .1f);   // the actor's origin is about a metre up: head to feet in frame
+            side.transform.LookAt(watch.position + Vector3.down * (offset.y < -.3f ? .6f : .1f));   // the actor's origin is about a metre up: head to feet in frame, or the feet close
         }
+        Transform aimMark;
         IEnumerator Shot(string directory, string name, AdventurerMotor motor, float since)
         {
             ScreenCapture.CaptureScreenshot(Path.Combine(directory, name + ".png"));
-            report.AppendLine(name + "  t=" + since.ToString("0.00") + "  airborne=" + motor.Airborne + " rising=" + motor.Rising + " landedAge=" + motor.LandedAge.ToString("0.00") + " y=" + motor.transform.position.y.ToString("0.00"));
+            var fig = motor.GetComponent<ActorVisual>()?.Figure; string feet = "";
+            if (fig != null && fig.FootL != null && fig.FootR != null)
+            {
+                var z = Crulanda.World.ZoneBuilder.Active; var p = motor.transform.position; float ground = z != null ? z.Ground(new Vector2(p.x, p.z)).y : 0;
+                feet = " feet L" + (fig.FootL.position.y - ground).ToString("0.00") + " R" + (fig.FootR.position.y - ground).ToString("0.00") + " hips " + (fig.Hips.position.y - ground).ToString("0.00");
+            }
+            if (aimMark != null && fig != null && fig.HandL != null && fig.UpperArmL != null)
+            {
+                var to = aimMark.position - motor.transform.position; to.y = 0;
+                var arm = fig.HandL.position - fig.UpperArmL.position; arm.y = 0;
+                var vis = motor.GetComponent<ActorVisual>();
+                feet += "  facing-vs-mark " + Vector3.SignedAngle(to, motor.transform.forward, Vector3.up).ToString("0") + " archer-turn " + (vis != null ? vis.ArcherTurn.ToString("0") : "?") + " bow-arm-vs-mark " + Vector3.SignedAngle(to, arm, Vector3.up).ToString("0");
+            }
+            report.AppendLine(name + "  t=" + since.ToString("0.00") + "  airborne=" + motor.Airborne + " rising=" + motor.Rising + " landedAge=" + motor.LandedAge.ToString("0.00") + " y=" + motor.transform.position.y.ToString("0.00") + feet + "  mix " + (fig != null ? fig.Mix : ""));
             yield return null;
         }
         /// <summary>A jump, framed at these game-time offsets from the jump.</summary>
@@ -62,6 +79,8 @@ namespace Crulanda.Encounter
             var main = Camera.main; watch = s.Player.transform; offset = new Vector3(4.8f, .1f, .4f);   // on the figure's right
             side = new GameObject("Motion camera").AddComponent<Camera>(); side.CopyFrom(main); side.depth = main.depth + 1; side.fieldOfView = 40;
             float[] frames = { .02f, .08f, .14f, .2f, .26f, .32f, .38f, .44f, .5f, .55f, .6f, .66f, .74f, .85f, 1.0f };
+            if (!BowOnly)
+            {
             Time.timeScale = .25f;
             yield return Jump(directory, "jump-stand", motor, frames);
             Time.timeScale = 1; yield return new WaitForSeconds(1);
@@ -69,15 +88,34 @@ namespace Crulanda.Encounter
             AdventurerMotor.Running = true; EncounterInput.Scripted = new Vector2(0, 1);
             yield return new WaitForSeconds(1.2f);
             Time.timeScale = .25f;
-            yield return Jump(directory, "jump-run", motor, frames);
+            for (int b = 1; b <= 3; b++) { yield return new WaitForSeconds(.03f); yield return Shot(directory, "run-before-0" + b, motor, 0); }   // the run before, to set beside the run after
+            yield return Jump(directory, "jump-run", motor, new[] { .02f, .08f, .14f, .2f, .26f, .32f, .38f, .44f, .5f, .55f, .6f, .66f, .74f, .85f, 1.0f, 1.2f, 1.4f, 1.7f, 2.0f });
+            // The run from in front and from behind, low and close on the feet (2026-10-10, Chris: "still lots of foot errors"): whether
+            // the feet turn in or twist shows here, not from the side.
+            Time.timeScale = .35f;
+            foreach (var (view, at) in new[] { ("run-front", new Vector3(0, -.55f, 3.2f)), ("run-back", new Vector3(.3f, -.5f, -3.2f)) })
+            {
+                offset = at; yield return new WaitForSeconds(.2f);
+                for (int k = 1; k <= 4; k++) { yield return new WaitForSeconds(.09f); yield return Shot(directory, view + "-0" + k, motor, 0); }
+            }
+            // The stride from the side, close on the feet, with foot IK on and then off (2026-10-10: the lifted foot's toes pulled up).
+            var fig = motor.GetComponent<ActorVisual>()?.Figure;
+            foreach (var (tag, ik) in new[] { ("stride-ik", true), ("stride-noik", false) })
+            {
+                fig?.SetFootIK(ik); offset = new Vector3(3.4f, -.55f, .2f); yield return new WaitForSeconds(.25f);
+                for (int k = 1; k <= 6; k++) { yield return new WaitForSeconds(.07f); yield return Shot(directory, tag + "-0" + k, motor, 0); }
+            }
+            fig?.SetFootIK(true);
+            offset = new Vector3(4.8f, .1f, .4f);
             Time.timeScale = 1; EncounterInput.Scripted = null; AdventurerMotor.Running = false;
             yield return new WaitForSeconds(1);
+            }
             // The bow: the nearest boar or wolf, stunned where it stands, 13 m in front of the archer; seen from her left.
             EncounterEnemy mark = null; float near = float.MaxValue;
             foreach (var e in s.Enemies) if (e != null && e.actor.IsAlive && !e.Game) { float d = Vector3.Distance(e.transform.position, s.Player.transform.position); if (d < near) { near = d; mark = e; } }
             if (mark == null || s.Kit == null || !s.Kit.RangedAutoAttacks) { report.AppendLine("no bow shots: no mark, or not a Ranger"); Done(directory); yield break; }
             mark.actor.Stats.SetBase(Crulanda.Core.StatType.MaxHealth, 100000); mark.actor.Health.ApplyHealing(100000);
-            mark.Apply("stun", s.Player, 120);
+            mark.Apply("stun", s.Player, 120); aimMark = mark.transform;
             var toMark = mark.transform.position - s.Player.transform.position; toMark.y = 0;
             var stand = mark.transform.position - toMark.normalized * 13; motor.Teleport(s.Zone.Ground(new Vector2(stand.x, stand.z), 1.1f));
             motor.SetView(Mathf.Atan2(toMark.x, toMark.z) * Mathf.Rad2Deg, 10, 5);

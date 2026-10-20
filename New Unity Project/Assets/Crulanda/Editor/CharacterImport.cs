@@ -16,8 +16,13 @@ namespace Crulanda.EditorTools
     public sealed class CharacterImport : AssetPostprocessor
     {
         const string Root = "Assets/Crulanda/Resources/Characters/";
+        /// <summary>Quaternius's Bestiary - Dungeon Monsters Kit (QAL; play note 233): the Imp and the Puglin, imported by the same rule as
+        /// the people (a Humanoid with its own avatar, made from this model; no clips of their own, readable, no materials of their own:
+        /// ModelBeast and ActorVisual.BestiaryCoat dress them). Their rig is the people's (pelvis, spine_01-03, neck_01, Head), so the
+        /// avatar maps by name, and the people's humanoid clips move them. Their T_*_Normal maps come in as normal maps.</summary>
+        public const string Bestiary = Root + "Bestiary/";
         /// <summary>Bumped when the import settings change, so Unity imports the models and clips again.</summary>
-        public override uint GetVersion() { return 7; }
+        public override uint GetVersion() { return 11; }
         void OnPreprocessModel()
         {
             if (!assetPath.StartsWith(Root)) return;
@@ -26,6 +31,29 @@ namespace Crulanda.EditorTools
             m.materialImportMode = ModelImporterMaterialImportMode.ImportViaMaterialDescription;   // for their names: ModelFigure maps them to the kit's materials
             m.importCameras = false; m.importLights = false; m.importBlendShapes = false; m.importVisibility = false;
             m.importAnimation = anim; m.isReadable = !anim;
+            // Kevin's and Unity's clips are made on their own characters and must take their avatar from them, as their vendors set
+            // them up ("Copy From Other Avatar"). Each made from its own file, a clip's avatar was the skeleton as that file holds it:
+            // Unity's run files hold it mid-stride, so the left leg's twist was taken from a running pose and every clip turned the
+            // left foot out and round (2026-10-10, Chris: "the left foot is always pointing backwards while running").
+            string src = SourceModel(assetPath);
+            if (src != null)
+            {
+                context.DependsOnArtifact(src);
+                var avatar = AssetDatabase.LoadAssetAtPath<Avatar>(src);
+                if (avatar != null && avatar.isHuman) { m.avatarSetup = ModelImporterAvatarSetup.CopyFromOther; m.sourceAvatar = avatar; }
+                else Debug.LogWarning("CharacterImport: no avatar yet in " + src + " for " + assetPath);
+            }
+        }
+        /// <summary>The character a clip was made on (its avatar's source), or null for a model or a clip made on ours.</summary>
+        static string SourceModel(string path)
+        {
+            const string ki = Root + "Animations/KI/", unity = Root + "Animations/Unity/";
+            if (path.StartsWith(ki + "Male/")) return ki + "Models/HumanM_Model.fbx";
+            if (path.StartsWith(ki + "Female/")) return ki + "Models/HumanF_Model.fbx";
+            if (path.StartsWith(unity) && !path.EndsWith("/Armature.fbx")) return unity + "Armature.fbx";
+            // (Morro Motion's idles on Morro's own man was tried 2026-10-14 (note 112b) and taken out the same evening: retargeted from his
+            // avatar the villagers stood with their arms spread and what they carried floated beside their heads, Chris 19:40.)
+            return null;
         }
         /// <summary>The library's clips: the "_Loop" ones loop, and every one keeps its root where it was made (turn, height and
         /// ground position baked into the pose), so a sitting or dying figure goes down instead of hovering (the game moves the
@@ -42,14 +70,22 @@ namespace Crulanda.EditorTools
             // jump's middle and the fall); the turns, the jump's start and landing and the idles' crossings play once.
             string file = Path.GetFileNameWithoutExtension(assetPath); bool ki = assetPath.Contains("/Animations/KI/");
             bool kiLoop = ki && (file.Contains("@Walk01") || file.Contains("@Run01") || file.Contains("@Sprint01") || file.Contains("@Talk01") || file.Contains("@Fall01")
-                || file.EndsWith("@Idle01") || file.EndsWith("@Idle02") || file.EndsWith("@Jump01"));
+                || file.EndsWith("@Idle01") || file.EndsWith("@Idle02") || file.EndsWith("@Jump01")
+                // his melee, spellcasting, throwing and crafting sets (2026-10-14, Chris: "we need more spell animations and melee
+                // animations"): the combat stances, the cast held, the work's loops, the gathering and the pick's strokes loop
+                || file.Contains("@CombatIdle") || file.Contains("@CastingIdle") || file.EndsWith(" - Loop") || file.Contains("@Gathering") || file.Contains("@MiningOneHand"));
+            // Unity's Starter Assets third-person clips (Animations/Unity, 2026-10-10; the forward walk and run since Kevin's go on their
+            // toes): the walk, run, idle and in-air loop; they face the other way from ours, as Kevin's do (without the turn everyone ran
+            // backwards: Chris, "still running backwards").
+            bool unity = assetPath.Contains("/Animations/Unity/");
+            bool unityLoop = unity && !file.Contains("_Land") && (file.Contains("Walk_N") || file.Contains("Run_N") || file.Contains("Stand--Idle") || file.Contains("InAir"));
             foreach (var c in clips)
             {
-                c.loopTime = c.name.EndsWith("_Loop") || kiLoop || assetPath.Contains("/Animations/Morro/");   // Morro Motion's idles all loop
+                c.loopTime = c.name.EndsWith("_Loop") || kiLoop || unityLoop || assetPath.Contains("/Animations/Morro/");   // Morro Motion's idles all loop
                 // Kevin's strafes and diagonals face forward by the body's own heading, not the root's as authored (as authored, a
                 // strafe to the left turned the whole figure a quarter round).
                 c.lockRootRotation = true; c.keepOriginalOrientation = true;
-                if (ki || assetPath.Contains("/Animations/Morro/")) c.rotationOffset = 180;   // the KI and Morro files face the other way from the Quaternius figures (2026-10-05: everyone walked backwards)
+                if (ki || unity || assetPath.Contains("/Animations/Morro/")) c.rotationOffset = 180;   // the KI and Morro files face the other way from the Quaternius figures (2026-10-05: everyone walked backwards)
                 c.lockRootHeightY = true; c.keepOriginalPositionY = true;
                 c.lockRootPositionXZ = true; c.keepOriginalPositionXZ = true;
             }

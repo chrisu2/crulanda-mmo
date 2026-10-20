@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
@@ -12,7 +12,7 @@ namespace Crulanda.Encounter
     /// </summary>
     public sealed partial class EncounterSession
     {
-        public const int MaxPartySims = 3, InviteLevelGap = 5;
+        public const int MaxPartySims = 4, InviteLevelGap = 5;   // a party of five with you (the dungeons are five-player: DUNGEON_DESIGN; was 3 until 2026-10-11)
         public const float BusyBelow = .15f;
         public readonly List<SimCompanion> PartySims = new List<SimCompanion>();
         /// <summary>The who list (O): every adventurer online (EncounterHud.Who).</summary>
@@ -33,7 +33,7 @@ namespace Crulanda.Encounter
         }
         public bool InParty(string simId) { return PartySims.Exists(x => x != null && x.sim.id == simId); }
         public SimCompanion PartySim(string simId) { return PartySims.Find(x => x != null && x.sim.id == simId); }
-        public void SelectSim(string simId) { FocusSimId = simId; if (simId != null) { FocusVillager = null; FocusMira = false; Target = null; AutoAttack = false; } }
+        public void SelectSim(string simId) { FocusSimId = simId; if (simId != null) { FocusVillager = null; FocusMira = false; FocusMending = false; Target = null; AutoAttack = false; } }
 
         /// <summary>Why this sim would not join (null: it will).</summary>
         public string InviteRefusal(SimAdventurer s)
@@ -59,13 +59,37 @@ namespace Crulanda.Encounter
             var fig = pop.Find(s.id); if (fig == null) { Message(s.name + " is not here."); return false; }
             var at = fig.transform.position; pop.Figures.Remove(fig); Destroy(fig.gameObject);
             if (NavMesh.SamplePosition(at, out var hit, 6, NavMesh.AllAreas)) at = hit.position + Vector3.up;
-            var a = SpawnActor(s.name, content.player, at, EncounterHud.ClassColour(s.classId), s.id, LookForClass(s.classId), s.level, s.variant);
+            var a = SpawnActor(s.name, content.player, at, EncounterHud.ClassColour(s.classId), s.id, LookForClass(s.classId), s.level, s.variant, s.Race == Races.Orc);
             AddAgent(a.gameObject, 4.6f);
             var c = a.gameObject.AddComponent<SimCompanion>(); a.gameObject.SetActive(true); c.Init(a, this, s, FreeSlot());
             SimGear.Dress(a.GetComponent<ActorVisual>(), s, Items);
             PartySims.Add(c);
+            if (s.classId == "class.ranger") SummonSimWolf(c);   // a sim Ranger brings its wolf (2026-10-11)
+            else if (s.classId == "class.mage" && SimCompanion.Bonecaller(s)) SummonSimWolf(c, ActorLook.Skeleton);   // a Bonecaller its bone thrall (2026-10-12)
             if (!returning) Message(s.name + " has joined your party.");
             return true;
+        }
+        /// <summary>The party sims' wolves (a sim Ranger's), party members the enemies can turn on (PartyActor).</summary>
+        public readonly List<RangerPet> SimPets = new List<RangerPet>();
+        public RangerPet SummonSimWolf(SimCompanion c, ActorLook look = ActorLook.Wolf)
+        {
+            if (c == null) return null; DismissSimWolf(c);
+            var point = c.transform.position - c.transform.forward * 1.5f + c.transform.right * 1.2f;
+            if (NavMesh.SamplePosition(point, out var hit, 8, NavMesh.AllAreas)) point = hit.position + Vector3.up;
+            var wolf = SpawnActor(c.sim.name.Split(' ')[0] + (look == ActorLook.Skeleton ? "'s bone thrall" : "'s wolf"), content.player, point, new Color(.45f, .44f, .42f), "pet." + c.sim.id, look, c.sim.level);
+            AddAgent(wolf.gameObject, 5.5f, .5f);
+            var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Master = c; if (look == ActorLook.Skeleton) pet.Kind = "thrall"; wolf.gameObject.SetActive(true); pet.Init(wolf, this, new SimPetMaster());
+            SimPets.Add(pet); return pet;
+        }
+        public void DismissSimWolf(SimCompanion c)
+        {
+            foreach (var p in SimPets.ToArray())
+            {
+                if (p == null) { SimPets.Remove(p); continue; }
+                if (p.Master != c) continue;
+                foreach (var e in Enemies) if (e != null && e.Victim == p.actor) e.ResetFight();
+                SimPets.Remove(p); Destroy(p.gameObject);
+            }
         }
         /// <summary>How long a sim takes to come from another zone when invited (seconds; tests shorten it).</summary>
         public static float InviteTravelSeconds = 30;
@@ -75,24 +99,41 @@ namespace Crulanda.Encounter
         /// face to face.</summary>
         public bool InviteMira()
         {
-            if (Companion == null) { Message("Mira isn't here."); return false; }
+            if (Companion == null) { Message("Mira isn't in this zone. Find her in Oakhaven."); return false; }
             if (Progress.recruited) { Message("Mira is already in your party."); return false; }
             Progress.recruited = true; Progress.relationship++; Message("Mira: I'll keep you standing. Lead the way."); ReconcileQuests();
             return true;
         }
         /// <summary>/invite by name (Round 24, playtest note 67): a sim standing here joins at once; one online elsewhere accepts by
         /// the same rules, sets out, and arrives at the road's end nearest you after <see cref="InviteTravelSeconds"/>.</summary>
+        /// <summary>A typed name fits a sim's whole name, its start, or any one of its names (a byname alone: "Thatch").</summary>
+        public static bool NameFits(string full, string typed)
+        {
+            if (string.IsNullOrEmpty(full) || string.IsNullOrEmpty(typed)) return false; typed = typed.Trim();
+            if (full.StartsWith(typed, StringComparison.OrdinalIgnoreCase)) return true;
+            foreach (var w in full.Split(' ')) if (w.StartsWith(typed, StringComparison.OrdinalIgnoreCase)) return true;
+            return false;
+        }
+        /// <summary>Invite whoever you have targeted (Chris 12:59, "i cant invite mira ."): Mira, a sim, or a clear word why not. Never silent.</summary>
+        public bool InviteTarget()
+        {
+            if (FocusMira || (FocusVillager != null && string.Equals(FocusVillager.Name, "Mira", StringComparison.OrdinalIgnoreCase))) return InviteMira();
+            if (FocusSim != null) return Invite(FocusSim.id);
+            if (FocusVillager != null) { Message(FocusVillager.Name + " has work of their own and won't join a party."); return false; }
+            Message("Target someone to invite, or type /invite <name>."); return false;
+        }
         public bool InviteByName(string name)
         {
             if (string.Equals(name, "Mira", StringComparison.OrdinalIgnoreCase)) return InviteMira();
-            var pop = SimPopulation.Active; if (pop == null || string.IsNullOrEmpty(name)) { Message("Invite whom? /invite <name>."); return false; }
+            if (string.IsNullOrWhiteSpace(name)) return InviteTarget();   // /invite alone: your target
+            var pop = SimPopulation.Active; if (pop == null) { Message("Nobody is online to invite."); return false; }
             // The name as typed, else by its start (a first name): among those online, one standing here before one away (first names repeat).
             var s = pop.World.sims.Find(x => string.Equals(x.name, name, StringComparison.OrdinalIgnoreCase));
             if (s == null)
             {
                 var hour = Crulanda.World.WorldClock.Hour;
-                var like = pop.World.sims.FindAll(x => x.name.StartsWith(name, StringComparison.OrdinalIgnoreCase) && (x.IsOnlineAt(hour) || InParty(x.id)));
-                s = like.Find(x => x.zone == ZoneId && pop.Find(x.id) != null) ?? (like.Count > 0 ? like[0] : pop.World.sims.Find(x => x.name.StartsWith(name, StringComparison.OrdinalIgnoreCase)));
+                var like = pop.World.sims.FindAll(x => NameFits(x.name, name) && (x.IsOnlineAt(hour) || InParty(x.id)));   // a first name or a byname ("/invite Thatch", note 118)
+                s = like.Find(x => x.zone == ZoneId && pop.Find(x.id) != null) ?? (like.Count > 0 ? like[0] : pop.World.sims.Find(x => NameFits(x.name, name)));
             }
             if (s == null) { Message("Nobody called " + name + "."); return false; }
             if (!s.IsOnlineAt(Crulanda.World.WorldClock.Hour) && !InParty(s.id)) { Message(s.name + " is not online."); return false; }
@@ -162,34 +203,39 @@ namespace Crulanda.Encounter
             Message(c.sim.name + " leads the way to the " + camp.ToLower() + ".");
             return true;
         }
-        /// <summary>/dungeon (round 27): a party sim (the boldest) leads you through the zone's dungeon, camp by camp.</summary>
-        public bool LeadDungeon()
+        /// <summary>/dungeon (round 27): a party sim (the boldest) leads you through the zone's dungeon, camp by camp. "/dungeon quick" leaves
+        /// what may be left, "/dungeon full" takes every side room too (the Adit rework, DungeonPlan).</summary>
+        public bool LeadDungeon(string mode = null)
         {
             if (PartySims.Count == 0) { Message("You are not in a party: /invite someone first."); return false; }
             if (InCombat) { Message("Not while you are fighting."); return false; }
             var c = PartySims.Find(x => x != null && x.sim.bold > .5f) ?? PartySims.Find(x => x != null); if (c == null) return false;
             foreach (var p in PartySims) if (p != null && p != c) p.StopLeading();
-            if (c.LeadDungeon(out var why) == null) { Message(c.sim.name + ": " + why); return false; }
-            Message(c.sim.name + " leads the way into " + c.Dungeon + " (" + c.CampsLeft + " camps)."); return true;
+            if (c.LeadDungeon(mode, out var why) == null) { Message(c.sim.name + ": " + why); return false; }
+            Message(c.sim.name + " leads the way into " + c.Dungeon + " (" + c.CampsLeft + " camps" + (c.RunMode == DungeonPlan.Mode.Standard ? "" : ", " + DungeonPlan.Describe(c.RunMode)) + ")."); return true;
         }
         /// <summary>Sends a party sim back to the world where it stands.</summary>
         public void LeaveParty(string simId, bool kicked = false)
         {
             var c = PartySim(simId); if (c == null) return;
             c.Remember(kicked);
+            DismissSimWolf(c);
             foreach (var e in Enemies) if (e != null && e.Victim == c.actor) e.ResetFight();
             c.sim.x = c.transform.position.x; c.sim.z = c.transform.position.z;
             PartySims.Remove(c); Destroy(c.gameObject);
             Message(c.sim.name + " leaves your party.");
             SimPopulation.Active?.Refresh();
         }
-        void HealPartySimsAfterRecover()
+        /// <summary>After you recover: the party comes to the stone with you, healed; while some of it is still fighting, only the fallen
+        /// (revived) come, and the rest fight on where they are.</summary>
+        void HealPartySimsAfterRecover(bool fighting = false)
         {
             foreach (var c in PartySims)
             {
-                if (c == null) continue;
+                if (c == null || (fighting && c.actor.IsAlive)) continue;
                 if (!c.actor.IsAlive) c.actor.Health.Revive(c.actor.Health.Pool.Max); else c.actor.Health.ApplyHealing(c.actor.Health.Pool.Max);
-                var agent = c.GetComponent<NavMeshAgent>(); if (agent != null) agent.Warp(RecoveryPoint + Vector3.left * (2 + c.slot) - Vector3.up * .1f);
+                // Beside where you wake (in a dungeon, the checkpoint: EncounterSession.Checkpoints).
+                var agent = c.GetComponent<NavMeshAgent>(); if (agent != null) agent.Warp(WakeBeside(Vector3.left * (2 + c.slot) - Vector3.up * .1f));
             }
         }
     }

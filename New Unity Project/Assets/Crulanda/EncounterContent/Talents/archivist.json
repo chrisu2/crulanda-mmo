@@ -3,22 +3,168 @@
  "name": "Archivist",
  "resource": "Mana",
  "resourceDesc": "Mana pays for every song and spell; one song (Cadence or Dirge) can be sung at a time.",
- "identity": "A song-caster of the Silent Pilgrims: little damage, the purest crowd control. Lull a pull to sleep, bind the worst of it, hush the casters. (GAME-ONLY kit on CANON roots: the Original Song, the echo-jars.)",
+ "identity": "A song-caster of the Silent Pilgrims: the purest crowd control, and as the Unwriting a slow grey death, as the Still Vow wards and atonement. Lull a pull to sleep, bind the worst of it, hush the casters. (GAME-ONLY kit on CANON roots: the Original Song, the echo-jars.)",
  "branches": [
   {
-   "id": "silent-vow",
-   "name": "The Silent Vow",
-   "role": "control",
-   "loop": "Hush the blow or the cast that matters; keep the casters quiet.",
-   "tradeoff": "Answers, not damage.",
+   "id": "the-still-vow",
+   "name": "The Still Vow",
+   "role": "support",
+   "loop": "Lay a Vow of Stillness on whoever is about to be hit, keep Shard Note going so its Atonement mends the party, and ward two at once when the blow everyone sees coming lands.",
+   "tradeoff": "The Still Vow heals through wards and through the notes you hit with: stop singing at the foe and the mending stops too.",
+   "canon": "CANON-EXPANDED (Chris, 2026-10-12: a Discipline-like support); reworked from the Silent Vow. The Silent Pilgrims' silence as wards. No machines.",
    "nodes": [
-    {"id": "sv-quick-hush", "name": "Quick Hush", "tier": 0, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Hush's cooldown is 2 seconds shorter per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "sv-long-hush", "name": "Long Hush", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "note", "desc": "Hush silences 1 second longer per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "sv-still-air", "name": "Still Air", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "wind", "desc": "A hushed mob is also slowed 20% per rank for 5 seconds.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "sv-vow", "name": "The Vow", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "passive", "icon": "chain", "desc": "Hush also stuns for 1 second.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "sv-quiet-step", "name": "Quiet Step", "tier": 2, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "wind", "desc": "Mobs notice you 1 metre closer per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "sv-no-word", "name": "No Word", "tier": 2, "col": 2, "max": 2, "req": null, "kind": "passive", "icon": "skull", "desc": "A silenced mob takes 5% more damage from your party per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "sv-silence", "name": "The Great Silence", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "capstone", "icon": "moon", "desc": "Hush silences every mob within 6 metres of the target.", "emphasis": {"control": 1}, "impl": true}
+    {
+     "id": "vw-stillness",
+     "name": "Vow of Stillness",
+     "tier": 0,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "shield",
+     "desc": "New action: Vow of Stillness: a ward of silence on the most hurt within 30m for 10s.",
+     "emphasis": {
+      "support": 3,
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-thick-silence",
+     "name": "Thick Silence",
+     "tier": 0,
+     "col": 2,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "shield",
+     "desc": "Vow of Stillness wards 8% more per rank.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-grace",
+     "name": "Grace",
+     "tier": 0,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Vow of Stillness also mends 4% of maximum health per rank.",
+     "emphasis": {
+      "healing": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-atonement",
+     "name": "Atonement",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": "vw-stillness",
+     "kind": "passive",
+     "icon": "note",
+     "desc": "A Shard Note that lands mends the most hurt for 15% of its damage per rank.",
+     "emphasis": {
+      "healing": 2,
+      "damage": 0.5
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-quiet-ward",
+     "name": "Quiet Ward",
+     "tier": 1,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Vow of Stillness comes back 1s sooner per rank.",
+     "emphasis": {
+      "tempo": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-hushed-pain",
+     "name": "Hushed Pain",
+     "tier": 1,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "Whoever bears your Vow of Stillness takes 3% less per rank while it lasts.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-second-ward",
+     "name": "Second Ward",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Vow of Stillness also wards the next most hurt at half its worth.",
+     "emphasis": {
+      "support": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-steady-voice",
+     "name": "Steady Voice",
+     "tier": 2,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "bolt",
+     "desc": "Shard Note is sung 0.15s quicker per rank.",
+     "emphasis": {
+      "tempo": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-vow-kept",
+     "name": "The Vow Kept",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": "vw-atonement",
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Atonement mends everyone of your party within 10m of you, not the most hurt alone.",
+     "emphasis": {
+      "healing": 3
+     },
+     "impl": true
+    },
+    {
+     "id": "vw-long-stillness",
+     "name": "Long Stillness",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Vow of Stillness's ward, and Hushed Pain with it, lasts 1s longer per rank.",
+     "emphasis": {
+      "mitigation": 1
+     },
+     "impl": true
+    }
    ]
   },
   {
@@ -28,29 +174,302 @@
    "loop": "Lull the pull before it starts; keep the sleepers asleep; Unsong the one that wakes.",
    "tradeoff": "The longest holds, and nothing else.",
    "nodes": [
-    {"id": "lu-deep-sleep", "name": "Deep Sleep", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "moon", "desc": "Lull lasts 2 seconds longer per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "lu-unsong", "name": "Unsong", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "passive", "icon": "spiral", "desc": "A mob woken from Lull or Echo Bind by damage is slowed by half for 6 seconds.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "lu-soft", "name": "Soft Voice", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Lull's cooldown is 5 seconds shorter per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "lu-wide", "name": "Wide Lull", "tier": 1, "col": 0, "max": 2, "req": null, "kind": "passive", "icon": "wind", "desc": "Lull reaches 1 metre further around the target per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "lu-fourth", "name": "A Fourth Sleeper", "tier": 2, "col": 1, "max": 1, "req": null, "kind": "passive", "icon": "star", "desc": "Lull takes up to four mobs.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "lu-dreams", "name": "Dreams", "tier": 2, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "heart", "desc": "Lull costs 5 less Mana per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "lu-mesmer", "name": "Mesmer", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "capstone", "icon": "eye", "desc": "Echo Bind on a boss stuns it for 4 seconds instead of failing.", "emphasis": {"control": 1}, "impl": true}
+    {
+     "id": "lu-deep-sleep",
+     "name": "Deep Sleep",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "moon",
+     "desc": "Lull lasts 2 seconds longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-unsong",
+     "name": "Unsong",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "A mob woken from Lull or Echo Bind by damage is slowed by half for 6 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-soft",
+     "name": "Soft Voice",
+     "tier": 1,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Lull's cooldown is 5 seconds shorter per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-wide",
+     "name": "Wide Lull",
+     "tier": 1,
+     "col": 0,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "Lull reaches 1 metre further around the target per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-fourth",
+     "name": "A Fourth Sleeper",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "passive",
+     "icon": "star",
+     "desc": "Lull takes up to four mobs.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-dreams",
+     "name": "Dreams",
+     "tier": 2,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "Lull costs 5 less Mana per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-mesmer",
+     "name": "Mesmer",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "eye",
+     "desc": "Echo Bind on a boss stuns it for 4 seconds instead of failing.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-long-echo",
+     "name": "Long Echo",
+     "tier": 3,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "spiral",
+     "desc": "Echo Bind holds 2 seconds longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "lu-half-waking",
+     "name": "Half-Waking",
+     "tier": 3,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "moon",
+     "desc": "A mob woken early from your Lull or Echo Bind strikes 3% softer per rank for 6 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    }
    ]
   },
   {
-   "id": "the-archive",
-   "name": "The Archive",
+   "id": "the-unwriting",
+   "name": "The Unwriting",
    "role": "dps",
-   "loop": "Shard Note between holds; Echo-jar when the pull goes wrong; sing the right song.",
-   "tradeoff": "Some damage, shorter holds.",
+   "loop": "Unwrite every foe worth the Mana, let the grey eat them while you Shard Note, and Erasure what is already unwritten; the Hollow Echo of it mends the party.",
+   "tradeoff": "The Unwriting is slow to bite: a fight that ends in ten seconds ends before the grey has done its work.",
+   "canon": "CANON-EXPANDED (Chris, 2026-10-12: a shadow-priest-like damage-over-time build); reworked from the Archive. The Wasting's unmaking is the books'; the Archivist's use of it is the game's. No machines.",
    "nodes": [
-    {"id": "ar-resonance", "name": "Resonance", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "crystal", "desc": "Shard Note hits 4% harder per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "ar-full-jar", "name": "A Fuller Jar", "tier": 1, "col": 1, "max": 2, "req": "ar-resonance", "kind": "passive", "icon": "flask", "desc": "Echo-jar's fear lasts 2 seconds longer per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "ar-chorus", "name": "Chorus", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "note", "desc": "While you sing Cadence, your party hits 2% harder per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "ar-low-dirge", "name": "Low Dirge", "tier": 2, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Dirge slows 10% more per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "ar-second-jar", "name": "A Second Jar", "tier": 2, "col": 1, "max": 1, "req": null, "kind": "passive", "icon": "flask", "desc": "Echo-jar's cooldown is 30 seconds shorter.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "ar-catalogue", "name": "The Catalogue", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "passive", "icon": "gear", "desc": "Shard Note hits a silenced or fleeing mob 25% harder.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "ar-original", "name": "The Original Song", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "capstone", "icon": "star", "desc": "The Original Song: the first Lull of each fight takes every mob within 10 metres of the target.", "emphasis": {"control": 1}, "impl": true}
+    {
+     "id": "uw-unwrite",
+     "name": "Unwrite",
+     "tier": 0,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "spiral",
+     "desc": "New action: Unwrite: the target sung out of the record, a little every 2s for 12s.",
+     "emphasis": {
+      "damage": 3
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-deep-unwriting",
+     "name": "Deep Unwriting",
+     "tier": 0,
+     "col": 2,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "skull",
+     "desc": "Unwrite strikes 5% harder per rank.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-long-silence",
+     "name": "Long Silence",
+     "tier": 0,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Unwrite strikes once more per rank.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-erasure",
+     "name": "Erasure",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": "uw-unwrite",
+     "kind": "active",
+     "icon": "bolt",
+     "desc": "New action: Erasure: a hard note that strikes out what is written; half again on an unwritten foe.",
+     "emphasis": {
+      "damage": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-hollow-echo",
+     "name": "Hollow Echo",
+     "tier": 1,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Each strike of Unwrite mends the most hurt of your party for 10% of it per rank.",
+     "emphasis": {
+      "healing": 1,
+      "sustain": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-grey-note",
+     "name": "Grey Note",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "Shard Note strikes an unwritten foe 8% harder per rank.",
+     "emphasis": {
+      "damage": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-void-hum",
+     "name": "Void Hum",
+     "tier": 2,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "modifier",
+     "icon": "wind",
+     "desc": "Unwrite costs 3 less Mana per rank.",
+     "emphasis": {
+      "tempo": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-quick-erasure",
+     "name": "Quick Erasure",
+     "tier": 2,
+     "col": 2,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Erasure comes back 1.5s sooner per rank.",
+     "emphasis": {
+      "tempo": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-spreading-grey",
+     "name": "Spreading Grey",
+     "tier": 2,
+     "col": 1,
+     "max": 1,
+     "req": "uw-erasure",
+     "kind": "signature",
+     "icon": "star",
+     "desc": "When an unwritten foe dies, the nearest foe within 8m is unwritten in its place.",
+     "emphasis": {
+      "damage": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "uw-the-unwritten",
+     "name": "The Unwritten",
+     "tier": 3,
+     "col": 1,
+     "max": 1,
+     "req": "uw-spreading-grey",
+     "kind": "capstone",
+     "icon": "eye",
+     "desc": "Erasure on an unwritten foe unwrites every foe within 6m of it.",
+     "emphasis": {
+      "damage": 3
+     },
+     "impl": true
+    }
    ]
   },
   {
@@ -60,21 +479,233 @@
    "loop": "Sing the Song of Mending under the fight, a Mending Phrase on whoever falls behind, and the Chorus when the blow everyone sees coming lands.",
    "tradeoff": "A Cantor's songs are its healing: singing the Song of Mending means no Cadence and no Dirge, and its holds wait while it mends.",
    "nodes": [
-    {"id": "ca-clear-voice", "name": "Clear Voice", "tier": 0, "col": 1, "max": 5, "req": null, "kind": "passive", "icon": "note", "desc": "Mending Phrase heals 4% more per rank.", "emphasis": {"healing": 1}, "impl": true},
-    {"id": "ca-breath", "name": "Breath", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Mending Phrase is sung 0.15s quicker per rank.", "emphasis": {"healing": 0.8}, "impl": true},
-    {"id": "ca-held-note", "name": "Held Note", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "drop", "desc": "Mending Phrase leaves a held note: 1% of maximum health a second for 5s per rank.", "emphasis": {"healing": 1.2}, "impl": true},
-    {"id": "ca-chorus", "name": "Chorus of the Weave", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "shield", "desc": "New action: Chorus of the Weave: every party member within 15m takes a barrier for 8s.", "emphasis": {"mitigation": 2}, "impl": true},
-    {"id": "ca-long-song", "name": "Long Song", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "note", "desc": "The Song of Mending mends 0.5% more of maximum health a second per rank.", "emphasis": {"healing": 1.2}, "impl": true},
-    {"id": "ca-echoing-mend", "name": "Echoing Mend", "tier": 2, "col": 0, "max": 1, "req": null, "kind": "signature", "icon": "heart", "desc": "Mending Phrase on someone below 35% health heals 30% more.", "emphasis": {"healing": 2}, "impl": true},
-    {"id": "ca-resonant-ward", "name": "Resonant Ward", "tier": 2, "col": 1, "max": 3, "req": "ca-chorus", "kind": "modifier", "icon": "shield", "desc": "Chorus of the Weave's barriers are 25% larger per rank.", "emphasis": {"mitigation": 1.5}, "impl": true},
-    {"id": "ca-quiet-mind", "name": "Quiet Mind", "tier": 2, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "crystal", "desc": "Mending Phrase costs 3 less Mana per rank.", "emphasis": {"sustain": 1}, "impl": true},
-    {"id": "ca-weave", "name": "The Weave", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "wind", "desc": "The Song of Mending reaches 2m further per rank.", "emphasis": {"healing": 1, "support": 1}, "impl": true},
-    {"id": "ca-symphony", "name": "Symphony of Mending", "tier": 3, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Chorus of the Weave also heals each ally it shields for 8% of maximum health.", "emphasis": {"healing": 2}, "impl": true},
-    {"id": "ca-second-voice", "name": "Second Voice", "tier": 4, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "note", "desc": "Mending Phrase also heals the next most hurt for 30% of it per rank.", "emphasis": {"healing": 1.5}, "impl": false},
-    {"id": "ca-desert-of-echoes", "name": "Desert of Echoes", "tier": 4, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "wind", "desc": "The Song of Mending can be sung beside Cadence or Dirge: two songs at once.", "emphasis": {"healing": 1, "support": 1.5}, "impl": false},
-    {"id": "ca-last-verse", "name": "Last Verse", "tier": 5, "col": 1, "max": 3, "req": "ca-second-voice", "kind": "passive", "icon": "heart", "desc": "An ally who would fall within your Song is left at 1 health instead, once every 60/45/30s.", "emphasis": {"healing": 2}, "impl": false},
-    {"id": "ca-choir", "name": "Choir", "tier": 5, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "clock", "desc": "Chorus of the Weave's cooldown is halved.", "emphasis": {"mitigation": 1.5}, "impl": false},
-    {"id": "ca-the-mending-song", "name": "The Mending Song", "tier": 6, "col": 1, "max": 1, "req": "ca-last-verse", "kind": "capstone", "icon": "star", "desc": "Once a fight, sing the whole party back to full health.", "emphasis": {"healing": 3}, "impl": false}
+    {
+     "id": "ca-clear-voice",
+     "name": "Clear Voice",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "Mending Phrase heals 4% more per rank.",
+     "emphasis": {
+      "healing": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-breath",
+     "name": "Breath",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "clock",
+     "desc": "Mending Phrase is sung 0.15s quicker per rank.",
+     "emphasis": {
+      "healing": 0.8
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-held-note",
+     "name": "Held Note",
+     "tier": 1,
+     "col": 0,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "drop",
+     "desc": "Mending Phrase leaves a held note: 1% of maximum health a second for 5s per rank.",
+     "emphasis": {
+      "healing": 1.2
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-chorus",
+     "name": "Chorus of the Weave",
+     "tier": 1,
+     "col": 1,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "shield",
+     "desc": "New action: Chorus of the Weave: every party member within 15m takes a barrier for 8s.",
+     "emphasis": {
+      "mitigation": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-long-song",
+     "name": "Long Song",
+     "tier": 1,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "The Song of Mending mends 0.5% more of maximum health a second per rank.",
+     "emphasis": {
+      "healing": 1.2
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-echoing-mend",
+     "name": "Echoing Mend",
+     "tier": 2,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "heart",
+     "desc": "Mending Phrase on someone below 35% health heals 30% more.",
+     "emphasis": {
+      "healing": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-resonant-ward",
+     "name": "Resonant Ward",
+     "tier": 2,
+     "col": 1,
+     "max": 3,
+     "req": "ca-chorus",
+     "kind": "modifier",
+     "icon": "shield",
+     "desc": "Chorus of the Weave's barriers are 25% larger per rank.",
+     "emphasis": {
+      "mitigation": 1.5
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-quiet-mind",
+     "name": "Quiet Mind",
+     "tier": 2,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "crystal",
+     "desc": "Mending Phrase costs 3 less Mana per rank.",
+     "emphasis": {
+      "sustain": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-weave",
+     "name": "The Weave",
+     "tier": 3,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "wind",
+     "desc": "The Song of Mending reaches 2m further per rank.",
+     "emphasis": {
+      "healing": 1,
+      "support": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-symphony",
+     "name": "Symphony of Mending",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Chorus of the Weave also heals each ally it shields for 8% of maximum health.",
+     "emphasis": {
+      "healing": 2
+     },
+     "impl": true
+    },
+    {
+     "id": "ca-second-voice",
+     "name": "Second Voice",
+     "tier": 4,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "note",
+     "desc": "Mending Phrase also heals the next most hurt for 30% of it per rank.",
+     "emphasis": {
+      "healing": 1.5
+     },
+     "impl": false
+    },
+    {
+     "id": "ca-desert-of-echoes",
+     "name": "Desert of Echoes",
+     "tier": 4,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "wind",
+     "desc": "The Song of Mending can be sung beside Cadence or Dirge: two songs at once.",
+     "emphasis": {
+      "healing": 1,
+      "support": 1.5
+     },
+     "impl": false
+    },
+    {
+     "id": "ca-last-verse",
+     "name": "Last Verse",
+     "tier": 5,
+     "col": 1,
+     "max": 3,
+     "req": "ca-second-voice",
+     "kind": "passive",
+     "icon": "heart",
+     "desc": "An ally who would fall within your Song is left at 1 health instead, once every 60/45/30s.",
+     "emphasis": {
+      "healing": 2
+     },
+     "impl": false
+    },
+    {
+     "id": "ca-choir",
+     "name": "Choir",
+     "tier": 5,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "clock",
+     "desc": "Chorus of the Weave's cooldown is halved.",
+     "emphasis": {
+      "mitigation": 1.5
+     },
+     "impl": false
+    },
+    {
+     "id": "ca-the-mending-song",
+     "name": "The Mending Song",
+     "tier": 6,
+     "col": 1,
+     "max": 1,
+     "req": "ca-last-verse",
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Once a fight, sing the whole party back to full health.",
+     "emphasis": {
+      "healing": 3
+     },
+     "impl": false
+    }
    ]
   }
  ]

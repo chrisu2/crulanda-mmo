@@ -1134,7 +1134,7 @@ def g_neck(c, P, fam, v, glow):
 def draw_gear(c, P, family, variant, glow=False):
     f = family
     if f.startswith('sword.'): g_sword(c, P, f, variant, glow)
-    elif f == 'knife': g_knife(c, P, variant, glow)
+    elif f == 'knife' or f == 'knife.off': g_knife(c, P, variant, glow)
     elif f.startswith('axe.'): g_axe(c, P, f, variant, glow)
     elif f == 'cleaver': g_cleaver(c, P, variant, glow)
     elif f == 'club': g_club(c, P, variant, glow)
@@ -1156,7 +1156,7 @@ def draw_gear(c, P, family, variant, glow=False):
 
 FAMILIES = {
     'sword.short': ('plain', 'notched'), 'sword.arming': ('straight', 'curved', 'disc'), 'sword.falchion': ('clipped', 'heavy'), 'sword.sabre': ('officer', 'broken'),
-    'sword.leaf': ('bronze', 'root'), 'sword.great': ('steel', 'wood', 'living'), 'knife': ('hooked', 'needle', 'glass', 'sickle'), 'axe.hand': ('wedge', 'hatchet'),
+    'sword.leaf': ('bronze', 'root'), 'sword.great': ('steel', 'wood', 'living'), 'knife': ('hooked', 'needle', 'glass', 'sickle'), 'knife.off': ('hooked', 'needle', 'glass', 'sickle'), 'axe.hand': ('wedge', 'hatchet'),
     'axe.bearded': ('plain', 'hooked'), 'axe.crescent': ('plain', 'spiked'), 'cleaver': ('slab', 'notched'), 'club': ('plain', 'studded', 'bound', 'tusk', 'tankard'),
     'mace.flanged': ('six', 'fist'), 'hammer.war': ('pick', 'maul'), 'mace.root': ('burl', 'antler', 'briar'), 'polearm': ('spear', 'harpoon', 'fork', 'billhook', 'spade'),
     'staff': ('knob', 'crook', 'forked', 'skull'), 'shield.buckler': ('plain', 'tusk', 'chitin'), 'shield.round': ('boards', 'hide', 'cask', 'lid'),
@@ -2110,6 +2110,12 @@ ITEMS = {
     'mat.yarrow': ('herb', herb_yarrow), 'mat.mourners_cap': ('herb', herb_cap), 'mat.tarnwort': ('herb', herb_tarnwort), 'mat.cinder_thistle': ('herb', herb_thistle), 'mat.dewfern': ('herb', herb_fern),
     'herb.moonbell': ('herb', herb_bell, ('#a8c8ff',), dict(glowc='#a8c8ff')), 'herb.widows_lamp': ('herb', herb_lamp), 'herb.frostbell': ('herb', herb_bell, ('#f0fbff',), dict(glowc='#9fe8ff', leaf='#8ab8b0', n=2)),
     'herb.last_light': ('herb', herb_lastlight), 'herb.lantern_moss': ('herb', herb_moss),
+    # tier 6, the Lowtowns' (the cap of 20, 2026-10-16; GAME-ONLY): slag-iron, cinder-beam, soot-wort, lamp-lichen, grey-bell, gutter-hound hide, dock sacking
+    'mat.slagiron_ore': ('ore', ore, ('#3a3430', '#b0603a')), 'mat.slagiron_bar': ('ore', bar, ('#5e4e46',)),
+    'mat.cinderbeam': ('wood', log, ('#2a2422', '#8a5a34'), dict(char=True)),
+    'mat.sootwort': ('herb', herb_yarrow, (), dict(flower='#8a8680', leaf='#4a5048')), 'mat.lamp_lichen': ('herb', herb_cap, (), dict(cap='#c8c8a0', gill='#8a8a60', stem='#b0aa90', glowc='#ffd890')),
+    'herb.grey_bell': ('herb', herb_bell, ('#b8b8b4',), dict(leaf='#5a6058', n=2)),
+    'junk.gutter_hide': ('hide', pelt, ('#5a504a',), dict(belly='#7a6e64', spots='#3a3430')), 'mat.dock_sacking': ('food', sack, ('#7a6440', '#9a8460')),
     'mat.charcoal': ('ore', charcoal), 'mat.flour': ('food', sack, (), dict(mark='wheat')), 'mat.salt': ('food', salt), 'mat.vial': ('potion', flask, (None,), dict(shape='vial')),
     # hides
     'junk.wolf_pelt': ('hide', pelt, ('#8d9096',)), 'junk.ash_hide': ('hide', pelt, ('#4a4648',), dict(belly='#6a6462')), 'junk.moss_hide': ('hide', pelt, ('#6a7a4a',), dict(belly='#8aa05a')),
@@ -2153,6 +2159,21 @@ QUEST = {
     'item.adit_tally_book': (book, ('#5a3a22', '#9a9aa0'), dict(wrap='#3a2a1a')), 'item.adit_echo_jar': (flask, ('#c8a888',), dict(shape='round', glowc='#ffd0e0', cork='#8a5a3a')),
     'item.ysolt_ash_brand': (shard, ('#3a2a26', 'metal'), dict(glowc='#ff7a30', spark=True)), 'item.unmade_shard': (shard, ('#a8a8ac',), dict(glowc='#d8d8e0', thin=True)),
     'item.adit_sealed_letter': (letter, ('#2a2a30',), dict(broken=False)),
+    # Hallow's Creek (2026-10-16): the Picker-Master's black tally with the Bureau's sunburst, the Warden's papers in grey tape
+    'item.hallows_pickers_tally': (book, ('#1c1c22', '#8d96a3'), dict(seal='#2a2a30')), 'item.hallows_wardens_papers': (letter, ('#9a9890',), dict(broken=False, pouch_=True)),
+    # the zones filled with quests (2026-10-13, Chris: "all zones full of quests")
+    'item.brook_mark': (pelt, ('#5e4636',), dict(small=True, bristle=True, belly='#7a5e4a', spots='#1a1410')), 'item.wether_bell': (bell,),
+    'item.hesk_tally': (book, ('#6b4a2c', '#8d96a3'), dict(wrap='#3e2c1c')),
+    'item.miners_names': (letter, ('#8a8680',), dict(broken=False)), 'item.grey_bristle': (pelt, ('#6a5040',), dict(small=True, bristle=True, belly='#a8a8ac')),
+    'item.scree_tusk_hide': (pelt, ('#a4a4a8',), dict(stone=True, bristle=True, belly='#c4c4c8')),
+    'item.hunters_pouch': (pouch, ('#6e6458',), dict(tie='#f0a83a')), 'item.knoll_harpoon': (fang, (), dict(bone='#cfc8b8', root='#c8862e', curve=.4)),
+    'item.violet_grit': (crystal, ('#c8b0e8', '#a64dff'), dict(n=3)), 'item.tear_daub': (salt, ('#8a3ab0',)),
+    'item.harls_noose': (_cordloop, ('#6b5236',), dict(w=7)), 'item.picket_orders': (letter, ('#c9963a',), dict(broken=False, pouch_=True)),
+    'item.reckoners_slate': (shard, ('#e4e8ee', 'gem'), dict(glowc='#c8d4ff')), 'item.rest_candles': (sack, ('#8a7456', '#f0e6c0'), dict(tie='#5a3f28', knots=2)),
+    'item.treenails': (log, ('#9a8462', '#efe0bc'), dict(ring='#b89a6a')), 'item.wystan_mask': (maskpiece,),
+    'item.green_heartwood': (log, ('#8a8a8c', '#cfe4a4'), dict(ring='#5f9a48', glowc='#7fe08a')),
+    # the Sweep (2026-10-19): Lissa's chalk, a worn white stick (the Rules chalked by the spout)
+    'item.sweep_chalk': (shard, ('#ecebe4',), dict(thin=True)),
 }
 # what a kind looks like when an item has no picture of its own (new content): the resolver's second step
 KINDS = {
@@ -2384,6 +2405,7 @@ def build_all(C):
             look = parse_look(lk) if lk else (fallbacks.get(it.get('slot'), 'sword.arming'), FAMILIES[fallbacks.get(it.get('slot'), 'sword.arming')][0], 'oakhaven', False)
             out.append(('item/' + safe(id_), gear_icon(id_, looks, look, id_), it['name'], q, False))
         elif id_ in ITEMS: out.append(('item/' + safe(id_), plain_icon(id_, ITEMS[id_]), it['name'], q, False))
+        elif kind == 'recipe': out.append(('item/' + safe(id_), plain_icon(id_, leaf_spec(it)), it['name'], q, False))   # a leaf (Phase 8.6)
         else: missing.append('item ' + id_)
     for r in C['prof'].get('recipes') or []:
         if not any(i['id'] == r['output'] for i in C['items']): missing.append('recipe output ' + r['output'])
@@ -2407,6 +2429,8 @@ def build_all(C):
             out.append(('gear/' + safe(fam) + '__' + pal, gear_icon(fam + pal, looks, (fam, FAMILIES[fam][0], pal, False)), fam + '/' + pal, 1, False))
     # by kind (new content without a picture yet) and by slot (the Armoury's unknown pieces: grey)
     for k, spec in KINDS.items(): out.append(('kind/' + k, plain_icon('kind' + k, spec), 'kind:' + k, 1, False))
+    for k, (bg, fn) in MARKS.items():
+        c = Icon('mark' + k, bg); fn(c); out.append(('mark/' + k, c, 'mark:' + k, 1, False))
     for slot, (fam, var) in SLOT_SILHOUETTE.items():
         c = Icon('slot' + slot, SLOT_FALLBACK_BG); draw_gear(c, mkpal(GREY), fam, var, False); out.append(('slot/' + slot, c, 'slot:' + slot, 0, False))
     return out, missing
@@ -2430,6 +2454,363 @@ SAMPLE = ['ability/ability-strike', 'ability/ability-challenge', 'ability/abilit
           'item/tool-hatchet', 'item/bag-ore_poke', 'item/junk-wolf_fang', 'item/item-training_blade', 'item/loot-oak-broken_oath_sabre', 'item/craft-bogiron_hatchet', 'item/craft-veridian_shield',
           'item/craft-bogiron_helm', 'item/craft-bogiron_hauberk', 'item/loot-oak-due_boots', 'item/loot-oak-whitefoot_fang', 'item/loot-kha-mourners_iron_band', 'quest/item-bureau_ledger',
           'quest/item-brood_heart', 'talent/tk-timed-guard', 'talent/rm-slow-sap', 'trade/mining', 'gear/sword-short__oakhaven', 'gear/sword-short__veridian', 'slot/head']
+
+# ---- ranger, the Skirmisher (2026-10-11, TALENT_DEPTH.md): the short spear's lunge, its whirl and the feint ----
+def m_spear(c, rot, dx=0, dy=0, alpha=1.0):
+    c.push(rot=rot, sc=1.0, dx=dx, dy=dy)
+    c.part(c.rect(47.5, 28, 52.5, 96, 2), '#7a5434', 'matte', alpha=alpha)   # the ash haft
+    c.part(c.rect(46, 30, 54, 36, 1.5), '#3a2a1e', 'matte', alpha=alpha)   # its binding
+    head = [(43, 32), (50, 6), (57, 32), (50, 28)]
+    if alpha >= 1: _blade(c, head, col(lite(IRONC, .3)), y0=10, y1=28)
+    else: c.part(c.poly(head), lite(IRONC, .3), 'metal', alpha=alpha)
+    c.pop()
+def a_spear_lunge(c):
+    c.back(c.ell(56, 44, 36), '#e0c080', .4, 10)
+    for y in (40, 56, 72): c.glow(c.taper([(8, y + 14), (34, y)], .5, 4, smooth=False), '#f0e0b0', halo=5, power=.5)
+    m_spear(c, 45, dx=6, dy=-4); c.spark(80, 20, 9, '#ffffff', .9)
+def a_whirling_spear(c):
+    rings(c, 50, 50, (42, 34), '#f0c890', .6, a0=30, a1=320, w=3.5)
+    m_spear(c, 90); slash(c, [(14, 70), (50, 86), (86, 66)], 4, '#e8b060')
+def a_feint(c):
+    c.back(c.ell(50, 50, 38), '#9fc8ff', .35, 10)
+    m_spear(c, 20, dx=-12, alpha=.35); m_spear(c, 60, dx=8, dy=4); c.spark(26, 26, 8, '#d0e8ff', .8)
+ABILITIES.update({'ranger.spear_lunge': ('#3a2e1e', a_spear_lunge), 'ranger.whirling_spear': ('#3a2a1a', a_whirling_spear), 'ranger.feint': ('#22283a', a_feint)})
+BRANCH.update({'skirmisher': ('#33281c', ['#e0c080', '#f0e0b0', '#9fc8ff', '#d83a2a', '#8a9098'])})
+
+# ---- rogue, the Swashbuckler (2026-10-11, TALENT_DEPTH.md): the opening cut, the flourish, the tumble ----
+def a_opening_cut(c):
+    c.back(c.ell(50, 50, 38), '#ffb050', .4, 10)
+    c.push(rot=40, sc=.95); _blade(c, [(45, 70), (45, 22), (50, 8), (55, 22), (55, 70)], col(lite(IRONC, .35)), y0=12)
+    c.part(c.rect(36, 68, 64, 73, 2), GOLD, 'metal'); c.part(c.rect(46, 73, 54, 90, 2), '#5a3a26', 'matte'); c.pop()
+    slash(c, [(14, 30), (52, 54), (86, 82)], 5, '#ff9040')
+def a_rallying_flourish(c):
+    rings(c, 50, 50, (40,), '#ffd070', .6, a0=200, a1=340, w=3)
+    c.push(rot=-20, sc=.9); _blade(c, [(46, 74), (46, 18), (50, 6), (54, 18), (54, 74)], col(lite(IRONC, .4)), y0=10)
+    c.part(c.rect(34, 72, 66, 77, 2), GOLD, 'metal'); c.part(c.rect(46, 77, 54, 94, 2), '#5a3a26', 'matte'); c.pop()
+    for x, y, r in ((22, 30, 8), (78, 26, 7), (82, 70, 6), (20, 72, 6)): c.spark(x, y, r, '#fff2b0', .8)
+def a_tumble(c):
+    c.back(c.ell(50, 50, 38), '#9fc8ff', .35, 10)
+    rings(c, 50, 54, (30,), '#d8e8ff', .7, a0=40, a1=330, w=5)
+    c.part(c.ell(50, 54, 10), '#3a3040', 'matte'); c.part(c.poly([(70, 20), (84, 30), (72, 38)]), '#d8e8ff', 'soft', ink=False)
+ABILITIES.update({'rogue.opening_cut': ('#3a2418', a_opening_cut), 'rogue.rallying_flourish': ('#3a3018', a_rallying_flourish), 'rogue.tumble': ('#22283a', a_tumble)})
+BRANCH.update({'swashbuckler': ('#3a2a1e', ['#ffb050', '#ffd070', '#9fc8ff', '#e0b040', '#d83a2a'])})
+
+# ---- mage, the Cinderwright (2026-10-11, TALENT_DEPTH.md): the ember hound, stoking it, its burst ----
+def m_hound_head(c, x, y, s, fur, glow):
+    head = c.poly([(x - 14 * s, y - 2 * s), (x - 8 * s, y - 16 * s), (x - 2 * s, y - 8 * s), (x + 6 * s, y - 16 * s), (x + 10 * s, y - 4 * s),
+                   (x + 20 * s, y + 4 * s), (x + 8 * s, y + 12 * s), (x - 10 * s, y + 10 * s)], smooth=True, n=3)
+    c.part(head, fur, 'matte'); c.glow(c.ell(x + 3 * s, y - 2 * s, 2.6 * s), glow, halo=5, power=.9)
+def a_kindle_hound(c):
+    c.back(c.ell(50, 56, 38), '#ff7a2a', .5, 12)
+    m_hound_head(c, 46, 50, 1.6, '#2a120a', '#ffd070')
+    for x, y, r in ((26, 78, 7), (70, 80, 6), (52, 84, 5)): c.spark(x, y, r, '#ffb040', .8)
+def a_stoke(c):
+    c.back(c.ell(50, 50, 36), '#ff9a3a', .5, 10)
+    c.glow(c.poly([(50, 14), (64, 44), (58, 42), (66, 70), (50, 86), (34, 70), (42, 42), (36, 44)], smooth=True, n=3), '#ff7a2a', core='#fff2c0', halo=10, power=.9)
+    c.part(c.rect(30, 84, 70, 90, 2), '#3a2418', 'matte')
+def a_cinder_burst(c):
+    rings(c, 50, 54, (40, 30), '#ff7a2a', .7, w=4)
+    m_hound_head(c, 46, 54, 1.1, '#2a120a', '#ffd070')
+    for x, y in ((18, 22), (82, 24), (16, 80), (84, 82), (50, 12)): c.spark(x, y, 7, '#ffd070', .8)
+ABILITIES.update({'mage.kindle_hound': ('#3a1e10', a_kindle_hound), 'mage.stoke': ('#40200e', a_stoke), 'mage.cinder_burst': ('#3a1a0e', a_cinder_burst)})
+BRANCH.update({'cinderwright': ('#3a1e10', ['#ff7a2a', '#ffd070', '#ffb040', '#e0503a', '#fff2c0'])})
+
+# ---- the Salt-Mender (Phase 9.2, 2026-10-11; CLASS_BUILD_MATRIX.md): salt shards, the binding, the ward, the seal, the line, the wall,
+# the sifting song, calcify ----
+SALT = '#eeeee4'
+def m_crystal(c, x, y, h, w, rot, color=SALT, glow=None):
+    c.push(rot=rot, cx=x, cy=y)
+    shard = c.poly([(x - w, y + h * .2), (x, y - h * .6), (x + w, y + h * .2), (x, y + h * .5)])
+    c.part(shard, color, 'gem'); c.part(c.AND(shard, c.rect(0, -20, x, 140)), lite(color, .5), 'gem', ink=False, light=.5)
+    c.pop()
+def a_salt_shard(c):
+    c.back(c.ell(50, 50, 36), '#cfe8ff', .35, 10)
+    for y in (34, 50, 66): c.glow(c.taper([(10, y + 10), (36, y)], .5, 3, smooth=False), '#f4f4ea', halo=4, power=.4)
+    m_crystal(c, 60, 46, 44, 11, 45); c.spark(80, 22, 8, '#ffffff', .8)
+def a_binding_salt(c):
+    c.back(c.ell(50, 52, 38), '#e8e8dc', .45, 10)
+    for i in range(9): m_crystal(c, 22 + (i % 5) * 14, 40 + (i // 5) * 22 + (i % 2) * 6, 22, 6, (i * 37) % 60 - 30)
+    rings(c, 50, 52, (38,), '#ffffff', .6, w=3)
+def a_salt_ward(c):
+    c.back(c.ell(50, 50, 38), '#dfe8f0', .4, 10)
+    m_shield(c, '#d8d8cc', '#ffffff'); m_crystal(c, 50, 48, 30, 8, 0)
+def a_seal_wound(c):
+    c.back(c.ell(50, 50, 36), '#f0e8d0', .4, 10)
+    c.part(c.ell(50, 54, 22, 14), '#5a2a26', 'matte'); c.part(c.rect(28, 50, 72, 58, 3), SALT, 'gem')
+    for x in (30, 50, 70): m_crystal(c, x, 30, 18, 5, (x - 50) * .6)
+def a_draw_line(c):
+    c.back(c.ell(50, 50, 38), '#e0d8c0', .35, 10)
+    c.part(c.rect(10, 60, 90, 68, 3), SALT, 'gem'); c.spark(50, 64, 10, '#ffffff', .8)
+    c.part(c.poly([(50, 18), (62, 40), (54, 38), (54, 52), (46, 52), (46, 38), (38, 40)]), '#d83a2a', 'soft')
+def a_sung_wall(c):
+    c.back(c.ell(50, 50, 40), '#cfe8ff', .4, 12)
+    for i in range(6): m_crystal(c, 18 + i * 13, 58 - abs(i - 2.5) * 4, 40, 8, 0)
+    rings(c, 50, 56, (40,), '#ffffff', .5, a0=200, a1=340, w=3)
+def a_sifting(c):
+    c.back(c.ell(50, 34, 30), '#f4f4ea', .4, 10)
+    for i in range(14): x = 16 + (i * 29) % 70; y = 22 + (i * 17) % 60; c.spark(x, y, 4 + (i % 3), '#ffffff', .7)
+    c.part(c.ell(50, 82, 30, 8), '#cfcfc4', 'matte')
+def a_calcify(c):
+    c.back(c.ell(50, 50, 38), '#e8e8dc', .45, 10)
+    body = c.poly([(36, 86), (34, 50), (40, 30), (50, 22), (60, 30), (66, 50), (64, 86)], smooth=True, n=3)
+    c.part(body, '#8a8a84', 'matte'); c.part(body, SALT, 'gem', alpha=.55)
+    for x, y in ((40, 40), (60, 46), (46, 66), (58, 74)): m_crystal(c, x, y, 16, 5, (x * 7) % 40 - 20)
+ABILITIES.update({'salt.shard': ('#2a3440', a_salt_shard), 'salt.binding': ('#30302a', a_binding_salt), 'salt.ward': ('#2a3038', a_salt_ward),
+                  'salt.seal': ('#3a2a24', a_seal_wound), 'salt.line': ('#33302a', a_draw_line), 'salt.sung_wall': ('#24303c', a_sung_wall),
+                  'salt.sifting': ('#2e2e2a', a_sifting), 'salt.calcify': ('#30302c', a_calcify)})
+BRANCH.update({'salt-speaker': ('#30302a', ['#eeeee4', '#cfe8ff', '#d8d0b0', '#ffffff', '#c8c0a0']),
+               'mason': ('#2e2c28', ['#d8d8cc', '#8a8a84', '#cfe8ff', '#e0b040', '#c8c0b0']),
+               'sifter': ('#28303a', ['#f4f4ea', '#9fc8ff', '#cfcfc4', '#ffffff', '#e0e8f0'])})
+
+# ---- the Salt-Mender's fourth path, the Mender (2026-10-12; CANON-EXPANDED healer: chant, circle, cut, cairn) ----
+def a_close_cut(c):
+    c.back(c.ell(50, 50, 38), '#9fe8c0', .4, 10)
+    c.part(c.ell(50, 54, 24, 12, rot=-30), '#7a3a32', 'matte'); c.part(c.line([(30, 66), (70, 42)], 6), SALT, 'gem')
+    for x, y in ((34, 30), (66, 74)): m_crystal(c, x, y, 18, 5, 20)
+    c.spark(78, 24, 8, '#d0ffe0', .9)
+def a_mender_craft(c):
+    c.back(c.ell(50, 50, 40), '#cfeedd', .4, 12)
+    m_note(c, SALT, '#9fe8c0'); rings(c, 50, 54, (30, 40), '#a0f0c0', .55, a0=200, a1=340, w=3)
+    c.spark(24, 30, 6, '#ffffff', .8); c.spark(78, 66, 6, '#d0ffe0', .8)
+def a_salt_circle(c):
+    c.back(c.ell(50, 56, 40, 26), '#9fe8c0', .35, 12)
+    c.part(c.sub(c.ell(50, 60, 40, 20), c.ell(50, 60, 33, 15)), SALT, 'gem')
+    for x in (38, 50, 62): c.part(c.rect(x - 3, 40, x + 3, 64, 2), '#d8d0b0', 'soft')
+    c.spark(50, 30, 9, '#d0ffe0', .8)
+def a_salt_cairn(c):
+    c.back(c.ell(50, 54, 38), '#bfe8cf', .35, 12)
+    for y, rx, ry in ((76, 28, 11), (60, 22, 10), (46, 15, 8)): c.part(c.ell(50, y, rx, ry), '#bdbcb4', 'soft')
+    m_crystal(c, 50, 28, 26, 7, 0); c.part(c.ell(50, 88, 36, 5), SALT, 'gem', alpha=.8)
+ABILITIES.update({'salt.close_cut': ('#1e342c', a_close_cut), 'salt.mender_craft': ('#20302c', a_mender_craft),
+                  'salt.circle': ('#1e2e2a', a_salt_circle), 'salt.cairn': ('#2a2e2a', a_salt_cairn)})
+BRANCH.update({'mender': ('#1e302a', ['#eeeee4', '#9fe8c0', '#bdbcb4', '#d0ffe0', '#cfe8ff'])})
+
+# ---- the reworked paths (2026-10-12): the Mage's Bonecaller (the necromancer, GAME-ONLY), the Archivist's Unwriting (damage over
+# time) and Still Vow (wards and atonement), both CANON-EXPANDED ----
+BONE = '#e4dcc4'
+def m_skullhead(c, x, y, s, colr=BONE):
+    head = c.U_(c.ell(x, y, s, s * .9), c.rect(x - s * .55, y + s * .4, x + s * .55, y + s * 1.05, 3))
+    c.part(head, colr, 'soft')
+    for dx in (-.38, .38): c.part(c.ell(x + dx * s, y + s * .05, s * .24, s * .28), '#1c1a20', 'matte')
+    c.part(c.poly([(x, y + s * .3), (x - s * .1, y + s * .5), (x + s * .1, y + s * .5)]), '#1c1a20', 'matte')
+def a_raise_thrall(c):
+    c.back(c.ell(50, 60, 38, 28), '#7fb08a', .35, 12)
+    c.part(c.ell(50, 86, 34, 8), '#3a3228', 'matte')
+    for x, r in ((30, -20), (70, 20)): c.part(c.line([(x, 86), (x + r * .3, 60)], 5), BONE, 'soft')
+    m_skullhead(c, 50, 40, 20); c.spark(78, 22, 7, '#c8ffd0', .8)
+def a_marrow_drain(c):
+    c.back(c.ell(50, 50, 38), '#6fbf80', .35, 12)
+    c.part(c.line([(18, 30), (40, 48), (60, 52), (82, 72)], 5, smooth=True), '#9fe8a8', 'gem')
+    c.part(c.rect(16, 22, 30, 38, 4), BONE, 'soft'); c.part(c.ell(78, 74, 10), '#9fe8a8', 'gem')
+    for x, y in ((40, 48), (60, 52)): c.spark(x, y, 5, '#d8ffd8', .7)
+def a_bone_spikes(c):
+    c.back(c.ell(50, 70, 40, 24), '#c8c0a8', .35, 12)
+    for i, x in enumerate((18, 32, 46, 60, 74, 86)):
+        h = 30 + (i % 3) * 12; c.part(c.poly([(x - 6, 86), (x + 1, 86 - h * 1.4), (x + 6, 86)]), BONE, 'soft')
+    c.part(c.ell(50, 88, 40, 6), '#3a3228', 'matte')
+def a_unwrite(c):
+    c.back(c.ell(50, 50, 38), '#8a80a8', .4, 12)
+    pg = c.rect(26, 18, 74, 82, 4); c.part(pg, '#d8d0c0', 'soft')
+    for y in (30, 42, 54, 66): c.part(c.rect(32, y, 68 - (y % 24), y + 4, 2), '#5a5068', 'matte')
+    c.part(c.ell(60, 62, 18, 22), '#2a2634', 'matte', alpha=.8); rings(c, 60, 62, (24,), '#b0a0d0', .5, w=3)
+def a_erasure(c):
+    c.back(c.ell(50, 50, 38), '#a090c0', .4, 10)
+    c.part(c.rect(22, 30, 78, 70, 4), '#d8d0c0', 'soft')
+    c.part(c.line([(18, 74), (82, 26)], 9), '#3a3448', 'matte'); c.glow(c.line([(18, 74), (82, 26)], 4), '#c8b8ff', halo=6, power=.6)
+def a_stillness(c):
+    c.back(c.ell(50, 50, 40), '#bfd8ff', .4, 12)
+    m_shield(c, '#dfeeff', '#ffffff'); c.part(c.rect(36, 46, 64, 52, 2), '#3a5a8a', 'matte')
+    c.spark(76, 24, 8, '#ffffff', .8)
+ABILITIES.update({'mage.raise_thrall': ('#1e2a22', a_raise_thrall), 'mage.marrow_drain': ('#1c2a20', a_marrow_drain), 'mage.bone_spikes': ('#2a2822', a_bone_spikes),
+                  'archivist.unwrite': ('#241f30', a_unwrite), 'archivist.erasure': ('#28223a', a_erasure), 'archivist.stillness': ('#1e2a3a', a_stillness)})
+BRANCH.update({'bonecaller': ('#1e261e', [BONE, '#9fe8a8', '#c8c0a8', '#6fbf80', '#ffffff']),
+               'the-unwriting': ('#221e2c', ['#b0a0d0', '#8a80a8', '#d8d0c0', '#c8b8ff', '#6a6080']),
+               'the-still-vow': ('#1e2634', ['#dfeeff', '#bfd8ff', '#ffffff', '#9fc8ff', '#e0e8f0'])})
+
+# ---- the marks over a mob's name (2026-10-11, Chris: "you say Moon it really need to show an ICon", "show who is CCd"): the raid
+# marks (skull, moon, cross) and the holds (held, stunned, feared, silenced). Icons/mark/<id>, drawn by EncounterHud on the nameplate.
+def k_skull(c):
+    c.part(c.ell(50, 44, 26, 24), '#f4f4ee', 'matte'); c.part(c.rect(36, 60, 64, 76, 4), '#f4f4ee', 'matte')
+    for x in (40, 60): c.part(c.ell(x, 44, 7, 8), '#1a1a22', 'matte')
+    c.part(c.poly([(50, 54), (45, 62), (55, 62)]), '#1a1a22', 'matte')
+    for x in (42, 50, 58): c.part(c.rect(x - 2, 66, x + 2, 76, 1), '#1a1a22', 'matte')
+def k_moon(c):
+    c.part(c.sub(c.ell(50, 50, 30), c.ell(62, 44, 26)), '#bfe0ff', 'soft'); c.spark(72, 30, 7, '#ffffff', .8)
+def k_cross(c):
+    c.part(c.poly([(28, 22), (38, 22), (50, 40), (62, 22), (72, 22), (56, 50), (72, 78), (62, 78), (50, 60), (38, 78), (28, 78), (44, 50)]), '#ff5a48', 'soft')
+def k_held(c):
+    for i, (x, y) in enumerate(((26, 30), (42, 46), (58, 62))):
+        r = 45 if i % 2 == 0 else -45
+        c.part(c.sub(c.ell(x, y, 13, 8, rot=r), c.ell(x, y, 7, 3, rot=r)), '#dfe6ee', 'metal')
+    c.part(c.sub(c.ell(70, 72, 12), c.ell(70, 72, 6)), '#dfe6ee', 'metal')
+def k_stunned(c):
+    for x, y, r in ((30, 40, 9), (50, 26, 11), (70, 40, 9)): c.spark(x, y, r, '#fff0a0', .9)
+    c.part(c.poly([(46, 44), (60, 44), (52, 60), (62, 60), (40, 84), (46, 66), (38, 66)]), '#ffd040', 'soft')
+def k_feared(c):
+    for y in (36, 52, 68): c.glow(c.taper([(14, y), (74, y - 6)], .5, 4, smooth=False), '#c8b0ff', halo=5, power=.6)
+    c.part(c.poly([(70, 22), (88, 44), (70, 66), (74, 44)]), '#e0d0ff', 'soft')
+def k_silenced(c):
+    c.part(c.ell(50, 50, 28), '#8a94a0', 'matte'); c.part(c.ell(50, 50, 20), '#2a2e36', 'matte')
+    c.part(c.rect(24, 46, 76, 54, 3), '#ff5a48', 'soft')
+MARKS = {'skull': ('#30303a', k_skull), 'moon': ('#1e2a44', k_moon), 'cross': ('#3a2222', k_cross), 'held': ('#2a2e36', k_held), 'stunned': ('#3a3418', k_stunned), 'feared': ('#2c2440', k_feared), 'silenced': ('#2a2e36', k_silenced)}
+
+# ---- the Rogue's thrown knife (2026-10-11): the pull ----
+def a_throw_knife(c):
+    c.back(c.ell(56, 44, 34), '#c8ccd2', .35, 10)
+    for y in (40, 56, 72): c.glow(c.taper([(8, y + 12), (34, y)], .5, 3, smooth=False), '#e8ecf0', halo=4, power=.4)
+    c.push(rot=40, sc=.9, dx=6, dy=-4); g_knife(c, _P(), 'needle', False); c.pop(); c.spark(82, 22, 8, '#ffffff', .8)
+ABILITIES.update({'rogue.throw_knife': ('#2a2e36', a_throw_knife)})
+
+# ---- the Cleric and the Shaman (2026-10-13; Docs/CLASS_CLERIC_SHAMAN.md): nine more motif words their talents use, their abilities, their branches ----
+def m_sun(c, A, B):
+    rays(c, 50, 50, 22, 46, 12, lite(A, .3), .6, 7); c.part(c.ell(50, 50, 20), A, 'gem'); c.shine(c.ell(44, 44, 6, 4), .7)
+def m_ring(c, A, B):
+    c.part(c.sub(c.ell(50, 50, 34), c.ell(50, 50, 22)), A, 'metal'); c.spark(72, 30, 8, lite(A, .5), .8)
+def m_cloud(c, A, B):
+    cl = c.poly([(16, 62), (24, 44), (40, 36), (56, 30), (74, 38), (86, 52), (84, 66), (20, 68)], smooth=True, n=3); c.part(cl, A, 'soft')
+    for x in (34, 50, 66): c.part(c.line([(x, 74), (x - 6, 90)], 3), B, 'soft')
+def m_fist(c, A, B):
+    c.part(c.poly([(30, 40), (70, 40), (74, 70), (60, 84), (34, 84), (26, 66)], smooth=True, n=3), A, 'matte')
+    for x in (36, 48, 60): c.part(c.rect(x - 4, 32, x + 4, 48, 3), lite(A, .25), 'matte')
+def m_root(c, A, B):
+    c.part(c.rect(46, 10, 54, 46, 2), B, 'matte')
+    for pts in (((50, 46), (34, 62), (22, 84)), ((50, 46), (52, 66), (46, 90)), ((50, 46), (66, 60), (80, 82))): c.part(c.taper(list(pts), 4, 1.5, smooth=True), A, 'matte')
+def m_snow(c, A, B):
+    for r in (0, 60, 120): c.push(rot=r); c.part(c.rect(47, 12, 53, 88, 2), A, 'gem'); c.pop()
+    c.spark(50, 50, 10, '#ffffff', .9)
+def m_stone(c, A, B):
+    st = c.poly([(26, 70), (30, 40), (50, 26), (72, 36), (78, 62), (62, 82), (38, 82)], smooth=True, n=2); c.part(st, A, 'matte'); c.part(c.poly([(40, 44), (56, 36), (62, 52)]), lite(A, .3), 'matte', ink=False)
+MOTIFS.update(dict(fire=m_flame, ring=m_ring, sun=m_sun, cloud=m_cloud, fist=m_fist, link=m_chain, root=m_root, snow=m_snow, stone=m_stone))
+
+def _ab(bg, fn): return (bg, fn)
+def a_cl_rebuke(c): c.back(c.ell(50, 50, 38), '#ffe9a0', .4, 10); m_sun(c, '#ffd860', '#ffffff'); c.part(c.rect(44, 60, 56, 92, 3), '#6a4a30', 'matte')
+def a_cl_mend(c): c.back(c.ell(50, 50, 38), '#9fe8c0', .45, 10); m_heart(c, '#ffd0d8', '#ffffff'); c.spark(76, 26, 8, '#fff8d0', .8)
+def a_cl_long_mend(c): c.back(c.ell(50, 50, 40), '#70d0a0', .4, 12); m_heart(c, '#ffd0d8', '#ffffff'); rings(c, 50, 52, (40,), '#d0ffe0', .6, w=3)
+def a_cl_vigil(c): c.back(c.ell(50, 50, 38), '#ffe9a0', .4, 10); m_eye(c, '#ffd860', '#ffffff'); c.spark(50, 20, 10, '#ffffff', .9)
+def a_cl_litany(c): c.back(c.ell(50, 50, 38), '#cfe8ff', .4, 10); m_note(c, '#ffe9a0', '#ffffff'); rings(c, 50, 54, (40,), '#ffe9a0', .5, w=3)
+def a_cl_ward(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_shield(c, '#ffe9a0', '#ffffff')
+def a_cl_brand(c): c.back(c.ell(50, 50, 36), '#ff9a3a', .45, 10); m_flame(c, '#ffb040', '#ffffff'); c.part(c.rect(46, 70, 54, 94, 2), '#5a3a26', 'matte')
+def a_cl_sunburst(c): rays(c, 50, 50, 10, 48, 16, '#ffd860', .7, 9); c.part(c.ell(50, 50, 16), '#fff2c0', 'gem')
+def a_cl_absolve(c): c.back(c.ell(50, 50, 38), '#d0ffe0', .4, 10); m_hand(c, '#ffe9a0', '#ffffff'); c.spark(74, 28, 8, '#ffffff', .8)
+def a_cl_hymn(c): c.back(c.ell(50, 50, 40), '#cfe8ff', .4, 12); m_note(c, '#ffffff', '#ffe9a0'); rings(c, 50, 50, (46,), '#ffffff', .4, w=3)
+def a_cl_sanctuary(c): c.back(c.ell(50, 50, 40), '#ffe9a0', .45, 12); rings(c, 50, 56, (40, 30), '#fff2c0', .6, w=3); m_sun(c, '#ffd860', '#ffffff')
+def a_cl_steadfast(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_shield(c, '#d8d8cc', '#ffffff'); m_sun(c, '#ffd860', '#ffffff')
+def a_sh_squall(c): c.back(c.ell(50, 50, 38), '#8a98c0', .4, 10); m_wind(c, '#bfe0ff', '#ffffff'); m_bolt(c, '#ffe070', '#ffffff')   # a storm's bolt, not a drop: it read as a heal (Chris, 2026-10-13)
+def a_sh_tide_mend(c): c.back(c.ell(50, 50, 38), '#70d0e0', .45, 10); m_drop(c, '#9fe8ff', '#ffffff'); c.spark(76, 26, 8, '#ffffff', .8)
+def a_sh_rain_call(c): c.back(c.ell(50, 50, 40), '#70b0ff', .4, 12); m_cloud(c, '#dfe8f0', '#9fc8ff')
+def a_sh_chain_mend(c): c.back(c.ell(50, 50, 38), '#70d0e0', .4, 10); m_chain(c, '#9fe8ff', '#ffffff'); m_heart(c, '#d0ffe0', '#ffffff')
+def a_sh_thunderhead(c): c.back(c.ell(50, 50, 40), '#8a90b0', .4, 12); m_cloud(c, '#5a607a', '#ffd860'); m_bolt(c, '#ffd860', '#ffffff')
+def a_sh_hailfall(c): c.back(c.ell(50, 50, 38), '#cfe8ff', .4, 10); m_snow(c, '#ffffff', '#cfe8ff'); m_cloud(c, '#9fb0c8', '#ffffff')
+def a_sh_earthskin(c): c.back(c.ell(50, 50, 38), '#c8b080', .4, 10); m_stone(c, '#8a8a84', '#c8c0a0'); m_shield(c, '#c8b080', '#ffffff')
+def a_sh_rooting_stamp(c): c.back(c.ell(50, 50, 38), '#9be05a', .4, 10); m_root(c, '#7a5434', '#a0a050'); m_fist(c, '#c8a060', '#ffffff')
+def a_sh_cairn(c): c.back(c.ell(50, 50, 38), '#c8c0a0', .4, 10); m_stone(c, '#8a8a84', '#c8c0a0'); rings(c, 50, 56, (40,), '#eeeee4', .5, w=3)
+def a_sh_moor_wind(c): c.back(c.ell(50, 50, 38), '#c8b0ff', .4, 10); m_wind(c, '#e0d0ff', '#ffffff')
+def a_sh_mist(c): c.back(c.ell(50, 50, 40), '#dfe8f0', .5, 14); m_cloud(c, '#eeeee4', '#dfe8f0'); m_eye(c, '#8a90b0', '#ffffff')
+def a_sh_barrow_call(c): c.back(c.ell(50, 50, 38), '#8a90b0', .4, 10); m_skull(c, '#eeeee4', '#c8c0a8'); m_wind(c, '#c8b0ff', '#ffffff')
+ABILITIES.update({'cleric.rebuke': _ab('#4a3a1a', a_cl_rebuke), 'cleric.mend': _ab('#1e3a34', a_cl_mend), 'cleric.long_mend': _ab('#1e3a2c', a_cl_long_mend), 'cleric.vigil': _ab('#4a3a1a', a_cl_vigil),
+                  'cleric.litany': _ab('#22304a', a_cl_litany), 'cleric.ward': _ab('#24304a', a_cl_ward), 'cleric.brand': _ab('#40200e', a_cl_brand), 'cleric.sunburst': _ab('#4a3a1a', a_cl_sunburst),
+                  'cleric.absolve': _ab('#1e3a34', a_cl_absolve), 'cleric.hymn': _ab('#22304a', a_cl_hymn), 'cleric.sanctuary': _ab('#4a3a1a', a_cl_sanctuary), 'cleric.steadfast': _ab('#24304a', a_cl_steadfast),
+                  'shaman.squall': _ab('#22304a', a_sh_squall), 'shaman.tide_mend': _ab('#1e3440', a_sh_tide_mend), 'shaman.rain_call': _ab('#22304a', a_sh_rain_call), 'shaman.chain_mend': _ab('#1e3440', a_sh_chain_mend),
+                  'shaman.thunderhead': _ab('#2a2e3a', a_sh_thunderhead), 'shaman.hailfall': _ab('#2a3440', a_sh_hailfall), 'shaman.earthskin': _ab('#3a3222', a_sh_earthskin), 'shaman.rooting_stamp': _ab('#2a3a22', a_sh_rooting_stamp),
+                  'shaman.cairn': _ab('#30302a', a_sh_cairn), 'shaman.moor_wind': _ab('#2c2440', a_sh_moor_wind), 'shaman.mist': _ab('#2a2e36', a_sh_mist), 'shaman.barrow_call': _ab('#2a2e36', a_sh_barrow_call)})
+BRANCH.update({'lantern': ('#4a3a1a', ['#ffd860', '#fff2c0', '#ffe9a0', '#d0a060', '#ffffff']), 'choir': ('#22304a', ['#cfe8ff', '#ffe9a0', '#ffffff', '#9fc8ff', '#dfeeff']),
+               'censure': ('#40200e', ['#ffb040', '#ffd860', '#ff7a2a', '#fff2c0', '#e0503a']), 'warden': ('#24304a', ['#9fc8ff', '#d8d8cc', '#ffe9a0', '#ffffff', '#8fb8e8']),
+               'rainspeaker': ('#1e3440', ['#9fe8ff', '#70b0ff', '#dfe8f0', '#ffffff', '#70d0e0']), 'stormcaller': ('#2a2e3a', ['#ffd860', '#8a90b0', '#bfe0ff', '#ffffff', '#5a607a']),
+               'stonebound': ('#3a3222', ['#c8b080', '#8a8a84', '#9be05a', '#c8c0a0', '#7a5434']), 'gravewind': ('#2c2440', ['#c8b0ff', '#eeeee4', '#8a90b0', '#e0d0ff', '#c8c0a8'])})
+
+# ---- the slower group heals (2026-10-13: "yes give a slower group heal") ----
+def a_mending_oath(c): c.back(c.ell(50, 50, 40), '#ffe9a0', .4, 12); rings(c, 50, 54, (40, 28), '#fff2c0', .6, w=3); m_heart(c, '#ffd0d8', '#ffffff'); c.spark(50, 18, 9, '#ffffff', .9)
+def a_mending_verse(c): c.back(c.ell(50, 50, 40), '#9fe8c0', .4, 12); rings(c, 50, 54, (42, 30), '#d0ffe0', .6, w=3); m_note(c, '#d0ffe0', '#ffffff')
+def a_wound_seal(c): c.back(c.ell(50, 50, 40), '#eeeee4', .4, 12); rings(c, 50, 54, (42, 30), '#ffffff', .5, w=3); m_hand(c, '#eeeee4', '#ffffff')
+ABILITIES.update({'paladin.mending_oath': ('#4a3c20', a_mending_oath), 'archivist.mending_verse': ('#1e3a34', a_mending_verse), 'salt.wound_seal': ('#1e342c', a_wound_seal)})
+
+# ---- the Scoundrel (2026-10-14; Docs/CLASS_SCOUNDREL.md): a coin for its dealing, its twelve, its three paths (singing, no instrument, no machines) ----
+def m_coin(c, A, B):
+    c.part(c.ell(50, 50, 36), A, 'metal'); c.part(c.sub(c.ell(50, 50, 29), c.ell(50, 50, 25)), lite(A, .35), 'metal', ink=False)
+    c.part(c.star(50, 50, 14, 6, 5), B, 'metal'); c.shine(c.ell(38, 36, 8, 5, rot=-30), .55)
+MOTIFS.update(dict(coin=m_coin))
+def a_sc_quick_cut(c): c.back(c.ell(50, 50, 38), '#e07a8a', .35, 10); m_dagger(c, '#d8d0c0', '#c04a5a'); slash(c, [(12, 84), (40, 56), (68, 30), (90, 12)], 5, '#ffd0d8')
+def a_sc_jeer(c): c.back(c.ell(50, 50, 38), '#ffb0c0', .4, 10); rings(c, 22, 50, (24, 36, 48), '#ffd0d8', .55, a0=-45, a1=45, w=3); m_note(c, '#ffd0d8', '#ffffff')
+def a_sc_settle_score(c): c.back(c.ell(50, 50, 40), '#c0303a', .45, 12); m_dagger(c, '#e8e0d0', GOLD); slash(c, [(8, 30), (40, 50), (70, 66), (94, 80)], 7, '#ff7070'); c.spark(80, 22, 9, '#fff2c0', .9)
+def a_sc_poisoned_wine(c):
+    c.back(c.ell(50, 50, 38), '#7ad070', .35, 10); m_flask(c, '#8a1e40', GOLD)
+    for x, y in ((24, 30), (78, 34), (70, 84)): c.glow(c.ell(x, y, 4), '#9be05a', halo=5, power=.7)
+def a_sc_mark_debt(c): c.back(c.ell(50, 50, 38), GOLD, .4, 10); m_coin(c, GOLD, '#8a2a30'); slash(c, [(14, 30), (52, 54), (86, 82)], 5, '#c0303a')
+def a_sc_glimmer(c): rays(c, 50, 50, 16, 46, 12, '#fff2c0', .6, 6); c.back(c.ell(50, 50, 30), '#fff8e0', .35, 10); m_note(c, '#fff8e0', '#ffffff'); c.spark(78, 22, 8, '#ffffff', .9)
+def a_sc_jagged_verse(c): c.back(c.ell(50, 50, 38), '#c8a0ff', .4, 10); m_note(c, '#e0d0ff', '#ffffff'); slash(c, [(8, 88), (30, 66), (22, 56), (52, 40), (44, 30), (92, 10)], 4, '#ffe070')
+def a_sc_stay(c): c.back(c.ell(50, 50, 38), '#9fc8ff', .4, 10); m_hand(c, IVORY, '#9fc8ff'); rings(c, 50, 50, (44,), '#dfeeff', .5, w=3)
+def a_sc_war_verse(c): c.back(c.ell(50, 50, 40), '#ff9070', .4, 12); m_banner(c, '#c0303a', GOLD); c.spark(82, 78, 8, '#fff2c0', .8)
+def a_sc_rallying_verse(c): c.back(c.ell(50, 50, 40), '#9fe8c0', .4, 12); rings(c, 50, 54, (42, 30), '#d0ffe0', .6, w=3); m_note(c, '#d0ffe0', '#ffffff')
+def a_sc_bribe(c):
+    c.back(c.ell(50, 50, 38), GOLD, .35, 10); m_hand(c, IVORY, '#c8a060')
+    c.push(sc=.42, dx=18, dy=-22); m_coin(c, GOLD, '#8a6a20'); c.pop()
+def a_sc_favour(c): c.back(c.ell(50, 50, 38), '#70d0c0', .4, 10); m_chain(c, GOLD, '#ffffff'); c.spark(76, 24, 8, '#ffffff', .8)
+ABILITIES.update({'scoundrel.quick_cut': ('#3a1a20', a_sc_quick_cut), 'scoundrel.jeer': ('#3a2028', a_sc_jeer), 'scoundrel.settle_score': ('#3a1418', a_sc_settle_score),
+                  'scoundrel.poisoned_wine': ('#2a1a2a', a_sc_poisoned_wine), 'scoundrel.mark_debt': ('#3a3018', a_sc_mark_debt), 'scoundrel.glimmer': ('#3a3420', a_sc_glimmer),
+                  'scoundrel.jagged_verse': ('#2a2440', a_sc_jagged_verse), 'scoundrel.stay': ('#22304a', a_sc_stay), 'scoundrel.war_verse': ('#3a1e18', a_sc_war_verse),
+                  'scoundrel.rallying_verse': ('#1e3a2c', a_sc_rallying_verse), 'scoundrel.bribe': ('#3a3018', a_sc_bribe), 'scoundrel.favour': ('#1e3434', a_sc_favour)})
+BRANCH.update({'cutthroat': ('#3a1418', ['#c0303a', '#e8e0d0', '#9be05a', GOLD, '#ff9070']), 'silver-tongue': ('#2a2440', ['#e0d0ff', '#fff2c0', '#c8a0ff', '#9fc8ff', '#ffffff']),
+               'fixer': ('#3a3018', [GOLD, '#c0303a', '#9fe8c0', '#fff2c0', '#d07050'])})
+
+# ---- Phase 8.6 (2026-10-15, p86-craft): the leaves (found recipes), the simples, the dishes and feasts, the fleece and the geode chip;
+# Leatherworking and Weaving's trade icons. GAME-ONLY imagery. The crafted gear itself is drawn from its look (gear_icon). ----
+def leaf_page(c, mark='#b23a30', ink='#6b4a2c'):
+    """A leaf torn from a trade's book: a parchment page with a ragged edge, ruled lines and the trade's mark."""
+    c.push(rot=-12)
+    b = c.poly([(22, 10), (78, 12), (82, 28), (76, 44), (82, 62), (76, 78), (80, 92), (24, 90), (20, 52)], smooth=False)
+    c.part(b, '#efe6cc', 'matte')
+    for y in (24, 32, 40, 48, 56, 64): c.flat(c.line([(28, y), (68, y)], 1.3), ink, .55, clip=b)
+    s = c.blob(60, 76, 8, 7, n=10, jit=.1, smooth=True); c.part(s, mark, 'gem')
+LEAF_MARK = {'smith': '#8d96a3', 'tanner': '#a8703a', 'weaver': '#4a7ab0', 'bowyer': '#6e8a3a', 'herbalist': '#3f8a4a', 'cook': '#c06a18'}
+ITEMS.update({
+    'mat.fleece': ('hide', pelt, ('#e8e2d4',), dict(belly='#f4f0e6', small=True)),
+    'mat.geode_chip': ('ore', shard, ('#a8b4c4',), dict(mat='gem', glowc='#cfe0ff', thin=True)),
+    'potion.tincture_ox': ('potion', flask, ('#b05030',), dict(shape='vial')), 'potion.tincture_hare': ('potion', flask, ('#c8a050',), dict(shape='vial')),
+    'potion.tincture_owl': ('potion', flask, ('#5a70c8',), dict(shape='vial')), 'potion.tincture_hearth': ('potion', flask, ('#d08840',), dict(shape='vial')),
+    'potion.tincture_bear': ('potion', flask, ('#6a4a2a',), dict(shape='vial')),
+    'potion.cordial_ox': ('potion', flask, ('#b05030',), dict(shape='tall', label='#c9b48a')), 'potion.cordial_hare': ('potion', flask, ('#c8a050',), dict(shape='tall', label='#c9b48a')),
+    'potion.cordial_owl': ('potion', flask, ('#5a70c8',), dict(shape='tall', label='#c9b48a')), 'potion.cordial_hearth': ('potion', flask, ('#d08840',), dict(shape='tall', label='#c9b48a')),
+    'potion.cordial_bear': ('potion', flask, ('#6a4a2a',), dict(shape='tall', label='#c9b48a')),
+    'potion.draught_mana': ('potion', flask, ('#3a6ae0',)), 'potion.draught_vigor': ('potion', flask, ('#d04a2a',)), 'potion.draught_focus': ('potion', flask, ('#4ac0a0',)),
+    'potion.draught_nerve': ('potion', flask, ('#a03a8a',)), 'potion.draught_breath': ('potion', flask, ('#70b0d0',)), 'potion.draught_salt': ('potion', flask, ('#e8eef2',)),
+    'potion.clean_blood': ('potion', flask, ('#7a1a2a',), dict(shape='tri')),
+    'salve.tallow': ('potion', tallow), 'salve.scree': ('potion', salt, ('#8a8a88',), dict(crust=True)),
+    'food.cask_stew': ('food', bowl_stew, ('#8a4a20',)), 'food.harvest_feast': ('food', pie, ('#d9a04a', '#c8a050')),
+    'food.bear_broth': ('food', bowl_stew, ('#6a3a20', '#5a3a24')), 'food.passfire_feast': ('food', roast, ('#5a2a18', '#c86a4a')),
+    'food.sap_venison': ('food', meat_chop, ('#8a3a2a', '#d8b070'), dict(glaze='#40e080')), 'food.shore_feast': ('food', pie, ('#b8d070', '#6a3a30')),
+})
+def leaf_spec(item):
+    """A leaf's picture: its trade's mark, read off its name ("a smith's leaf: ...")."""
+    word = item.get('name', '').split("'")[0].replace('a ', '', 1).strip()
+    return ('quest', leaf_page, (LEAF_MARK.get(word, '#b23a30'),))
+PROF_ICONS.update({'leatherworking': ('hide', pelt, ('#a8703a',)), 'weaving': ('herb', skein)})
+
+# ---- the classes' standing buffs for the buff-up before a boss (2026-10-15, p86-buffs; Chris: "food buffs, alchemy buffs, class buffs";
+# GAME-ONLY imagery; Icons/ability/buff-class-<class>, by the status id). No machines. ----
+def a_bf_warrior(c): rays(c, 50, 50, 18, 46, 10, '#ffb070', .5, 6); c.back(c.ell(50, 50, 36), '#c05030', .4, 10); m_fist(c, '#c8a060', '#ffffff')
+def a_bf_paladin(c): c.back(c.ell(50, 50, 40), '#ffe9a0', .4, 12); m_banner(c, '#c0303a', GOLD); rings(c, 50, 54, (44,), '#fff2c0', .45, w=3)
+def a_bf_druid(c):
+    c.back(c.ell(50, 50, 38), '#7fbf50', .4, 10); m_leaf(c, '#5f9a48', '#7a5434')
+    c.push(sc=.46, dx=18, dy=-20); m_heart(c, '#d0ffe0', '#ffffff'); c.pop()
+def a_bf_ranger(c): c.back(c.ell(50, 50, 38), '#c8a050', .35, 10); m_paw(c, '#8a6a40', '#efe6cf'); m_wind(c, '#e0f0d0', '#ffffff')
+def a_bf_mage(c):
+    c.back(c.ell(50, 50, 40), '#ff9040', .45, 12); m_flame(c, '#ff7a2a', '#ffd860')
+    c.push(sc=.42, dx=18, dy=-22); m_eye(c, '#fff2c0', '#ffffff'); c.pop()
+def a_bf_rogue(c): c.back(c.ell(50, 50, 38), '#9fb0c8', .35, 10); m_hand(c, IVORY, '#8a90b0'); c.spark(76, 24, 9, '#ffffff', .9); c.spark(26, 30, 6, '#dfeeff', .7)
+def a_bf_archivist(c): c.back(c.ell(50, 50, 40), '#9fc8ff', .4, 12); rings(c, 50, 54, (42, 30), '#dfeeff', .55, w=3); m_note(c, '#e0e8ff', '#ffffff')
+def a_bf_saltmender(c): c.back(c.ell(50, 50, 38), '#eeeee4', .4, 10); m_stone(c, '#e8e6dc', '#ffffff'); m_snow(c, '#ffffff', '#dfe8f0')
+def a_bf_cleric(c): rays(c, 50, 50, 16, 46, 12, '#fff2c0', .55, 6); c.back(c.ell(50, 50, 32), '#ffe9a0', .4, 10); m_flame(c, '#ffd860', '#fff6e0'); rings(c, 50, 52, (40,), GOLD, .5, w=3)
+def a_bf_scoundrel(c):
+    c.back(c.ell(50, 50, 38), GOLD, .35, 10); m_flask(c, '#c87a2a', GOLD)
+    c.push(sc=.4, dx=20, dy=-22); m_coin(c, GOLD, '#8a6a20'); c.pop()
+def a_bf_shaman(c):
+    c.back(c.ell(50, 50, 40), '#70b0ff', .4, 12); m_sun(c, '#ffd860', '#fff2c0')
+    c.push(sc=.7, dy=14); m_cloud(c, '#dfe8f0', '#9fc8ff'); c.pop()
+BUFF_ICONS = {'buff.class.warrior': ('#4a2220', a_bf_warrior), 'buff.class.paladin': ('#4a2a24', a_bf_paladin), 'buff.class.druid': ('#1e3420', a_bf_druid),
+              'buff.class.ranger': ('#3a3018', a_bf_ranger), 'buff.class.mage': ('#40200e', a_bf_mage), 'buff.class.rogue': ('#26283a', a_bf_rogue),
+              'buff.class.archivist': ('#22304a', a_bf_archivist), 'buff.class.saltmender': ('#2a3038', a_bf_saltmender), 'buff.class.cleric': ('#4a3a1a', a_bf_cleric),
+              'buff.class.scoundrel': ('#3a3018', a_bf_scoundrel), 'buff.class.shaman': ('#22304a', a_bf_shaman)}
+ABILITIES.update(BUFF_ICONS)
 
 def main():
     here = os.path.dirname(os.path.abspath(__file__))

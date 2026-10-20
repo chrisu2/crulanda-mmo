@@ -16,10 +16,11 @@ using Crulanda.World;
 namespace Crulanda.Tests
 {
     /// <summary>
-    /// The Weaver's unlocking (DUNGEON_DESIGN.md section 4, dungeon step D4): with The Pressed done, Danner lies in the dark and the goblin who
-    /// opens the platform gate quietly is Mother Quillet, who waits by it as one of your party; spoken to, she walks to the carriage's lock with
-    /// two waves coming for her and Danner standing up at half the lock; matched, the geodes go dark, "adit.lock" is kept and Pib's quest moves
-    /// on; if she falls the waves go back into the dark and she is by the gate again a little later.
+    /// The Weaver's unlocking (DUNGEON_DESIGN.md section 4, dungeon step D4): with The Pressed done, the goblin who opens the platform gate
+    /// quietly is Mother Quillet, who waits by it as one of your party; spoken to, she walks to the carriage's lock with two waves coming for
+    /// her; matched, the geodes go dark, "adit.lock" is kept and Pib's quest moves on; if she falls the waves go back into the dark and she is
+    /// by the gate again a little later. (S6, the Black Cove: Danner keeps the stern castle of his barge down the Dead Line, so he no longer
+    /// lies in the hall's dark nor stands up at half the lock; ADIT_REWORK.md section 20.)
     /// </summary>
     public class AditWeaverTests
     {
@@ -80,11 +81,12 @@ namespace Crulanda.Tests
             }
         }
 
-        [UnityTest] public IEnumerator A_quiet_gate_brings_Mother_Quillet_and_Danner_lies_in_the_dark()
+        [UnityTest] public IEnumerator A_quiet_gate_brings_Mother_Quillet_and_Danner_keeps_his_barge()
         {
-            var danner = Danner(); Assert.NotNull(danner, "Danner is in the hall");
-            Assert.IsTrue(danner.Hidden, "he lies in the dark while the escort can happen");
-            Assert.IsFalse(danner.CanAnswer, "and no call draws him out");
+            var danner = Danner(); Assert.NotNull(danner, "Danner is in the Adit");
+            Assert.IsTrue(session.CoveFinale, "(S6) his camp stands in the Black Cove");
+            Assert.AreEqual("The Black Cove", session.Zone.Zone.camps[danner.CampIndex].cave, "on his barge");
+            Assert.IsFalse(danner.Hidden, "he does not lie in the hall's dark: he is on his stern castle");
             Assert.IsNull(session.Weaver, "nobody at the gate yet");
             var gate = Thing("platformgate");
             session.UseInteractable(gate); yield return Frames(3);
@@ -97,12 +99,13 @@ namespace Crulanda.Tests
             var path = new NavMeshPath();
             Assert.IsTrue(NavMesh.CalculatePath(w.Gate, w.LockAt, NavMesh.AllAreas, path) && path.status == NavMeshPathStatus.PathComplete, "a way down the platform to the lock");
             Assert.Less(Vector3.Distance(w.LockAt, session.Zone.RailLock), 2, "she stands at the lock, by the carriage");
-            Assert.Greater(Vector3.Distance(w.LockAt, danner.transform.position), 9, "out of Danner's notice: he waits for the half-way mark");
+            Assert.Greater(Vector3.Distance(w.LockAt, danner.transform.position), 100, "Danner is far down the Dead Line, out of it all");
             Assert.IsFalse(CarriageDark, "the carriage's geodes glow");
         }
 
-        [UnityTest] public IEnumerator She_walks_to_the_lock_through_two_waves_and_Danner_and_the_geodes_go_dark()
+        [UnityTest, Timeout(360000)] public IEnumerator She_walks_to_the_lock_through_two_waves_and_Danner_and_the_geodes_go_dark()
         {
+            float realMatch = AditWeaver.MatchSeconds;   // the game's time at the lock (the test's is short)
             AditWeaver.MatchSeconds = 4;
             session.Progress.experience = EncounterProgress.XpForLevel(11);   // Pib's quests are for level 10 and up
             var quests = session.Quests; Assert.IsTrue(quests.Accept(quests.Def(EncounterSession.WeaverQuest), "zone.peaks"), "Pib's quest taken");
@@ -117,33 +120,56 @@ namespace Crulanda.Tests
             session.UseInteractable(w.talk); yield return null;
             Assert.AreEqual(AditWeaver.Stage.Walking, w.Now, "spoken to, she sets off");
             // Each of the waves' people is cut down as soon as it picks someone to fight; Danner too, once he is up.
-            var cameFor = new Dictionary<EncounterEnemy, Actor>(); float walkedAtFirst = -1, walkedAtSecond = -1, matchedWhenRose = -1; Actor dannerFor = null;
-            yield return Walk(w, 90, () => w.Now == AditWeaver.Stage.Done, () => {
+            var cameFor = new Dictionary<EncounterEnemy, Actor>(); float leftAtFirst = -1, leftAtSecond = -1; Actor dannerFor = null;
+            // On until the lock is matched AND both waves have come for her (the test's lock is short: the second wave, out of the far dark,
+            // can still be on its way when she is done), with a time limit (2026-10-10: the drawn-out Adit; a review Chris pasted).
+            float waveSpeed = 0;
+            yield return Walk(w, 240, () => w.Now == AditWeaver.Stage.Done && cameFor.Count >= 2 * EncounterSession.WaveSize, () => {
+                // How far from the lock she was when each wave came out (the list keeps every one spawned; only a fall clears it).
+                var left = w.LockAt - w.transform.position; left.y = 0;
+                if (leftAtFirst < 0 && session.WeaverWaves.Count > 0) leftAtFirst = left.magnitude;
+                if (leftAtSecond < 0 && session.WeaverWaves.Count > EncounterSession.WaveSize) leftAtSecond = left.magnitude;
+                foreach (var e in session.WeaverWaves) if (e != null && waveSpeed == 0) { var ag = e.GetComponent<NavMeshAgent>(); if (ag != null) waveSpeed = ag.speed; }
                 foreach (var e in session.WeaverWaves)
                 {
                     if (e == null || cameFor.ContainsKey(e)) continue;
-                    if (walkedAtFirst < 0) walkedAtFirst = w.Walked; else if (walkedAtSecond < 0 && cameFor.Count >= EncounterSession.WaveSize) walkedAtSecond = w.Walked;
                     if (e.Victim == null) continue;
                     cameFor[e] = e.Victim; e.actor.Health.ApplyDamage(e.actor.Health.Pool.Max * 3);
                 }
-                if (matchedWhenRose < 0 && !danner.Hidden) matchedWhenRose = w.Matched;
                 if (guard != null && guard.Activity == "Guarding " + AditWeaver.Name) guarded = true;
                 if (dannerFor == null && danner.actor.IsAlive && danner.Victim != null) { dannerFor = danner.Victim; danner.actor.Health.ApplyDamage(danner.actor.Health.Pool.Max * 3); }
             });
             Assert.AreEqual(AditWeaver.Stage.Done, w.Now, "the lock is matched");
-            Assert.AreEqual(2 * EncounterSession.WaveSize, cameFor.Count, "two waves of three");
+            // The second wave must be able to reach her while she is still at the lock in play, or it never threatens it: its run from where
+            // it comes out of the dark to the lock is well inside the game's time at the lock.
+            var flat = new Vector3(1, 0, 1); float run = Vector3.Distance(Vector3.Scale(session.Zone.RailWaves[1], flat), Vector3.Scale(session.Zone.RailLock, flat));
+            Assert.Greater(waveSpeed, 0, "the waves walk");
+            Assert.Less(run / waveSpeed, realMatch * .5f, "the second wave reaches the lock (" + run.ToString("0.0") + " m at " + waveSpeed + " m/s) in the first half of her " + realMatch + " s there");
+            string waves = string.Join("; ", session.WeaverWaves.Select(e => e == null ? "gone" : (e.actor.IsAlive ? "alive" : "dead") + " victim " + (e.Victim != null ? e.Victim.name : "none") + " " + Vector3.Distance(e.transform.position, w.transform.position).ToString("0.0") + " m from her, path " + (e.GetComponent<NavMeshAgent>() is NavMeshAgent ag && ag.isOnNavMesh ? ag.pathStatus.ToString() : "off the mesh")));
+            Assert.AreEqual(2 * EncounterSession.WaveSize, cameFor.Count, "two waves of three [" + waves + "] (spawned " + session.WeaverWaves.Count + ", metres from the lock at the first " + leftAtFirst + ", at the second " + leftAtSecond + ", the waves' places " + string.Join(" ", session.Zone.RailWaves.Select(p => p.ToString())) + ", the lock " + session.Zone.RailLock + ")");
             Assert.IsTrue(cameFor.Values.All(a => a == w.actor), "every one of them came for her");
-            Assert.That(walkedAtFirst, Is.InRange(.3f, .5f), "the first wave a third of the way down");
-            Assert.That(walkedAtSecond, Is.InRange(.63f, .85f), "the second at two thirds");
-            Assert.That(matchedWhenRose, Is.InRange(.5f, .7f), "Danner stood up with the lock half matched");
-            Assert.AreSame(w.actor, dannerFor, "and came for her");
+
+            Assert.That(leftAtFirst, Is.InRange(AditWeaver.Wave1At - 3, AditWeaver.Wave1At + .5f), "the first wave as she nears the carriage");
+            Assert.That(leftAtSecond, Is.InRange(AditWeaver.Wave2At - 3, AditWeaver.Wave2At + .5f), "the second when she is close");
+            Assert.IsNull(dannerFor, "(S6) Danner never came for her: he keeps his barge in the Black Cove");
+            Assert.IsFalse(danner.Hidden, "and never lay hidden");
             Assert.IsTrue(guarded, "the sim guarded her on the way (D7)");
             Assert.Contains(EncounterSession.WeaverLock, session.Progress.keys, "kept for good");
             Assert.IsTrue(CarriageDark, "the geodes have gone dark");
             Assert.AreEqual(1, quests.State(EncounterSession.WeaverQuest).step, "Pib's quest: back to Pib");
             // A new visit: the carriage is still dark, Danner is on his feet, and the goblin at the gate has nothing left to do here.
-            session.Save(false); yield return Load();
-            Assert.IsTrue(CarriageDark, "still dark");
+            // Save as a player would, once the fight is over (a save is refused in combat: the test now runs on through the second wave).
+            for (float until = Time.time + 20; session.InCombat && Time.time < until;) yield return null;
+            Assert.IsFalse(session.InCombat, "the fight is over before the save (still fighting: " + string.Join(", ", session.Enemies.Where(e => e != null && e.FightingParty).Select(e => e.Name + (e.actor.IsAlive ? "" : " (dead)") + " " + Vector3.Distance(e.transform.position, session.Player.transform.position).ToString("0") + " m")) + "; target " + session.FightingTarget + ")");
+            Assert.IsTrue(session.Player.IsAlive, "you are alive to save (health " + session.Player.Health.Pool.Current + ")");
+            Assert.IsTrue(session.Progress.keys.Contains(EncounterSession.WeaverLock), "the lock is in the progress being saved");
+            session.Save(false);
+            var onDisk = Directory.GetFiles(root, "*", SearchOption.AllDirectories).Where(f => File.ReadAllText(f).Contains(EncounterSession.WeaverLock)).Select(Path.GetFileName).ToList();
+            Assert.IsNotEmpty(onDisk, "the save on disk holds the lock (files: " + string.Join(", ", Directory.GetFiles(root, "*", SearchOption.AllDirectories).Select(Path.GetFileName)) + ")");
+            yield return Load(); yield return Frames(10);
+            string after = "reloaded from " + session.SaveRoot + ": zone " + session.Progress.zoneId + ", xp " + session.Progress.experience + ", keys " + session.Progress.keys.Count + " [" + string.Join(", ", session.Progress.keys) + "]; on disk: " + string.Join(", ", Directory.GetFiles(root, "*", SearchOption.AllDirectories).Select(f => Path.GetFileName(f) + " " + new FileInfo(f).Length + " B " + File.GetLastWriteTime(f).ToString("HH:mm:ss.fff")));
+            var geodeLights = session.Zone.RailGeodes.Select(g => g.GetComponent<Light>()).Where(l => l != null).ToList();
+            Assert.IsTrue(CarriageDark, "still dark (" + after + "; the lock kept: " + session.Progress.keys.Contains(EncounterSession.WeaverLock) + "; geode lights " + geodeLights.Count + ", on: " + string.Join(", ", geodeLights.Where(l => l.enabled).Select(l => l.name + " " + l.intensity.ToString("0.00"))) + ")");
             Assert.IsFalse(Danner().Hidden, "no more lying in wait");
             session.UseInteractable(Thing("platformgate")); yield return Frames(3);
             Assert.IsTrue(Thing("platformgate").gate.Open);
@@ -157,7 +183,7 @@ namespace Crulanda.Tests
             session.UseInteractable(gate); yield return Frames(3);
             var w = session.Weaver; w.GetComponent<NavMeshAgent>().speed = 7;
             session.UseInteractable(w.talk);
-            yield return Walk(w, 30, () => session.WeaverWaves.Count > 0);
+            yield return Walk(w, 60, () => session.WeaverWaves.Count > 0);   // (the first wave comes 27 m from the lock, some 20 s down the drawn-out hall)
             var wave = session.WeaverWaves.ToList();
             Assert.AreEqual(EncounterSession.WaveSize, wave.Count(e => e != null && e.actor.IsAlive), "the first wave is out");
             w.actor.Health.ApplyDamage(w.actor.Health.Pool.Max * 3); yield return Frames(2);

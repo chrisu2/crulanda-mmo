@@ -45,6 +45,9 @@ namespace Crulanda.World
         void Footing(Transform t, float w, float d, float top, float thick, float climb, float gap = 0, Vector2? backGap = null, Material stone = null)
         {
             const float course = .3f, length = 1.4f;
+            // 3 cm further out all round than asked (2026-10-15, note 216 and the building test's flush check): thirteen buildings had
+            // timber lying in the footing's own face (barns' boards and posts, houses' rails, ruins' beams), flickering stone and wood.
+            w += .06f; d += .06f;
             var blocks = new List<CombineInstance>(); var caps = new List<CombineInstance>(); var vents = new List<CombineInstance>();
             float hw = w / 2, hd = d / 2;
             // The sides: along x or z, the face's plane, the way it looks, and the stretch along it (front and back take the corners).
@@ -90,7 +93,7 @@ namespace Crulanda.World
                     if (tall > 1.05f && index % 2 == 1 && step > .9f && vy - .12f > hi + .08f && vy + .2f < crown - .12f)
                     {
                         float mid = (u0 + u1) / 2;
-                        Block(vents, mid - .24f, mid + .24f, vy - .12f, vy + .12f, .015f, .05f);
+                        Block(vents, mid - .24f, mid + .24f, vy - .12f, vy + .12f, .03f, .05f);   // 3 cm proud: at 1.5 it lay all but in the footing's face
                         Block(caps, mid - .34f, mid + .34f, vy + .12f, vy + .2f, .03f, .05f);
                     }
                 }
@@ -169,14 +172,17 @@ namespace Crulanda.World
             if (!primitives.TryGetValue(type, out var m) || m == null) { var o = GameObject.CreatePrimitive(type); m = o.GetComponent<MeshFilter>().sharedMesh; DestroyImmediate(o); primitives[type] = m; }
             return m;
         }
-        /// <summary>How far an inn's porch reaches out from its front wall's face (InnFront), and half its posts' spacing.</summary>
-        const float InnPorchDeep = 2.3f, InnPorchHalf = 1.3f;
-        /// <summary>Whether a point stands under an inn's porch roof, out past the inn's footprint (UnderRoof: no rain falls there).</summary>
+        /// <summary>How far an inn's porch reaches out from its front wall's face (InnFront), and half its posts' spacing: half a metre
+        /// past each jamb of the double door (Phase 8.6, 2026-10-15; at 1.3 the posts left the way between them 1.2 m, narrower than
+        /// the door it leads to).</summary>
+        const float InnPorchDeep = 2.3f, InnPorchHalf = InnDoorW / 2 + .5f;
+        /// <summary>Whether a point stands under an inn's porch roof, out past the inn's footprint (UnderRoof: no rain falls there). A
+        /// waystation (variant 2) has no porch: its door stands under the roof's eaves.</summary>
         bool UnderPorch(Vector2 p)
         {
             foreach (var b in Zone.props)
             {
-                if (b == null || b.kind != "inn") continue;
+                if (b == null || b.kind != "inn" || b.variant == 2) continue;
                 float d = b.size.x > 0 ? b.size.y : 8, face = d / 2 + .15f, r = b.rotation * Mathf.Deg2Rad, c = Mathf.Cos(r), s = Mathf.Sin(r); var q = p - b.at;
                 float lx = q.x * c - q.y * s, lz = q.x * s + q.y * c;   // along its local x and z (as InBuilding)
                 if (Mathf.Abs(lx) <= InnPorchHalf + .6f && lz <= -face + .1f && lz >= -(face + InnPorchDeep + .1f)) return true;
@@ -274,9 +280,9 @@ namespace Crulanda.World
             foreach (float x in frontWindows) FlowerBox(t, new Vector3(x, .86f, face - .25f), 1.05f, R);
             // The porch: two posts and their plates back to the wall, a beam across, a small gable roof with its end boarded and
             // a king post and barge boards on it; the lantern hangs from its ridge round the inn's lantern light.
-            // The posts and timbers stand under the roof's flat ceiling (eave - .12). Both inns take the same depth: the Cracked
-            // Hearth's posts then stand clear of Khaven's barrels at (-7, 12).
-            float deep = InnPorchDeep, px = InnPorchHalf, eave = 2.7f, rise = .85f, zp = face - deep + .3f, span = px * 2 + .9f;
+            // The posts and timbers stand under the roof's flat ceiling (eave - .12). Both inns take the same depth, and the posts stand
+            // half a metre past the door's jambs (2026-10-15: Khaven's barrels moved out of their way, to (-4.74, 12.39)).
+            float deep = InnPorchDeep, px = doorW / 2 + .5f, eave = 2.7f, rise = .85f, zp = face - deep + .3f, span = px * 2 + .9f;
             foreach (int k in new[] { -1, 1 })
             {
                 float g = LocalGround(t, k * px, zp);
@@ -329,8 +335,8 @@ namespace Crulanda.World
                 Part(PrimitiveType.Cube, t, new Vector3(sx, ly - .1f, zb), new Vector3(.19f, .03f, .19f), iron);
                 foreach (int a in new[] { -1, 1 }) foreach (int b in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(sx + a * .075f, ly - .005f, zb + b * .075f), new Vector3(.016f, .19f, .016f), iron);
                 Part(PrimitiveType.Cylinder, t, new Vector3(sx, ly - .045f, zb), new Vector3(.05f, .045f, .05f), Tint(art.timber, new Color(.92f, .86f, .7f)));   // the candle
-                Part(PrimitiveType.Sphere, t, new Vector3(sx, ly + .025f, zb), new Vector3(.028f, .05f, .028f), Glowing(new Color(1, .74f, .32f), 2.6f));   // its flame
-                Glow(t, new Vector3(sx, ly, zb), 4.5f, .4f, new Color(1, .7f, .38f), 1.1f);
+                var flame = Part(PrimitiveType.Sphere, t, new Vector3(sx, ly + .025f, zb), new Vector3(.028f, .05f, .028f), Glowing(new Color(1, .74f, .32f), 2.6f));   // its flame
+                CandleFlame.Attach(flame, Glow(t, new Vector3(sx, ly, zb), 4.5f, .4f, new Color(1, .7f, .38f), 1.1f));   // wavering with its light (the candle pack, 2026-10-15)
             }
             // A bench under the first front window, and barrels at the far corner, clear of the window boxes.
             float bx = frontWindows.Count > 0 ? frontWindows[0] : -w / 2 + 1.5f, bz = face - .32f, bg = LocalGround(t, bx, bz);

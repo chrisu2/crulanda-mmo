@@ -42,6 +42,17 @@ namespace Crulanda.Encounter
         /// <summary>Whole seconds left until <paramref name="until"/>, rounded up, with a hair of slack: now + 10 read back in float can be 10.000008, and that must say 10, not 11.</summary>
         static int Left(float until) { return Mathf.CeilToInt(until - Time.time - .005f); }
         bool IsBoss { get { return Elite && Move != null && Move.boss; } }
+        /// <summary>A dungeon's boss (an elite whose move says so): the party's sims put no hold of theirs on it (SimCompanion.Fight).</summary>
+        public bool Boss { get { return IsBoss; } }
+        /// <summary>Whether a hold of this kind would take now, without trying it (a sim checks before it spends its move, so "Immune" is not
+        /// floated over a mob again and again): not a long hold on a boss, not a third of the same kind inside <see cref="DrWindow"/>.</summary>
+        public bool Takes(string kind)
+        {
+            if (!actor.IsAlive || Game) return false;
+            bool holdable = Elite && Move != null && Move.holdable;
+            if (IsBoss && !holdable && (kind == "incap" || kind == "fear")) return false;
+            return holdable || !(diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow && was.n >= 1);
+        }
         /// <summary>Seconds left on whatever control shows (0 when free).</summary>
         public float ControlSecondsLeft
         {
@@ -59,12 +70,14 @@ namespace Crulanda.Encounter
         public string Apply(string kind, Actor by, float seconds)
         {
             if (!actor.IsAlive || Game || seconds <= 0) return "Nothing to hold";
-            if (IsBoss && (kind == "incap" || kind == "fear")) { session.FloatText(transform.position, "Immune", Color.white); return "Immune"; }
-            var d = diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow ? (Time.time, was.n + 1) : (Time.time, 0);
-            if (d.Item2 >= 2) { diminish[kind] = (was.at, was.n); session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }
-            diminish[kind] = d;
-            if (d.Item2 == 1) seconds *= .5f;
-            if (Elite && (kind == "incap" || kind == "fear")) seconds *= EliteHold;
+            if (Elite && kind != "silence") { if (!OnceAFight(kind, ref seconds)) return "Immune (once a fight)"; }   // Chris's rule (CC_DESIGN.md); an interrupt is not a hold
+            else
+            {
+                var d = diminish.TryGetValue(kind, out var was) && Time.time - was.at < DrWindow ? (Time.time, was.n + 1) : (Time.time, 0);
+                if (d.Item2 >= 2) { diminish[kind] = (was.at, was.n); session.FloatText(transform.position, "Immune", Color.white); return "Immune (too soon)"; }
+                diminish[kind] = d;
+                if (d.Item2 == 1) seconds *= .5f;
+            }
             float until = Time.time + seconds;
             switch (kind)
             {
@@ -79,10 +92,30 @@ namespace Crulanda.Encounter
             return null;
         }
         float lostUntil;
+        /// <summary>The holds an elite has had this fight (Chris, 2026-10-15: "you can't CC elites, bosses, world bosses", then "normal CCs are cut
+        /// in half the duration and can't imply the same CC after the first"; of the Nix duo "CC duration cut in half and can only have one cc
+        /// type one time"). Cleared when the fight resets or it rises again.</summary>
+        readonly HashSet<string> heldOnce = new HashSet<string>();
+        /// <summary>An elite, a boss or a world boss: each kind of hold once a fight, for half its time. False (and "Immune") for a second.</summary>
+        public bool OnceAFight(string kind, ref float seconds)
+        {
+            if (!Elite) return true;
+            if (!heldOnce.Add(kind)) { session.FloatText(transform.position, "Immune", Color.white); return false; }
+            seconds *= .5f; return true;
+        }
+        public void ForgetHolds() { heldOnce.Clear(); }
+        /// <summary>(Hallow's Creek, E3) Stone for <paramref name="seconds"/>: the Waking Hour's loop snapping holds the Examiner whatever his
+        /// holds this fight (it is the town's, not the party's), and he can be hit all the while.</summary>
+        public void StandStone(float seconds)
+        {
+            if (!actor.IsAlive || seconds <= 0) return;
+            stunUntil = Mathf.Max(stunUntil, Time.time + seconds); CancelBlow(); CancelCast(true); wasHeld = true;
+            session.FloatText(transform.position, "Stone", new Color(.8f, .8f, .85f));
+        }
         /// <summary>Its raid mark (Ctrl+1 skull, Ctrl+2 moon, Ctrl+3 cross, Ctrl+4 clears; one mob a mark).</summary>
         public RaidMark RaidMarked { get; set; }
         /// <summary>What the party's helpers (sims, Mira, the Ranger's companion) don't hit: a held mob, or one marked moon or cross.</summary>
-        public bool LeaveAlone { get { return Incapacitated || RaidMarked == RaidMark.Moon || RaidMarked == RaidMark.Cross; } }
+        public bool LeaveAlone { get { return Incapacitated || (RaidMarked == RaidMark.Moon && (!Elite || Controlled)) || RaidMarked == RaidMark.Cross; } }   // an elite's Moon only while it is held: its one hold a fight spent, the party fights it (Chris's rule, 2026-10-15)
         /// <summary>Lets a hold or a fear go early (an Archivist binding another mob).</summary>
         public void Release() { incapUntil = 0; fearUntil = 0; }
         /// <summary>A Rogue's Vanish: this mob forgets <paramref name="who"/> (its threat on them is gone) and doesn't notice them again

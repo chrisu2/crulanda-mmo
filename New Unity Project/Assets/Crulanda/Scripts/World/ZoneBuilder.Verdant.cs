@@ -18,16 +18,22 @@ namespace Crulanda.World
         /// leaf from about 16 m to 30 m, reaching about 12 m out. Variant 0 deep green, 1 yellow-green, 2 autumn gold. Solid trunk,
         /// a navmesh obstacle, and it fades when it hides you (TreeFade). Returns the bole's height.
         /// </summary>
-        float GiantTree(Transform t, int variant)
+        float GiantTree(Transform t, int variant, bool frontClear = false)
         {
             LeafTrees.Add(t.position);
             var tr = TreeRandom(t.position); float T() { return (float)tr.NextDouble(); }
+            // A tree with a walk-in house at its foot (frontClear: the Hearth-Tree, 2026-10-15) keeps its buttresses and surface roots
+            // out of the house's floor to its front (-Z): a buttress at about 90 degrees here points that way. Its draws are as before.
+            bool Front(float a) { return frontClear && Mathf.Abs(Mathf.DeltaAngle(a * Mathf.Rad2Deg, 90)) < 55; }
             var bark = Tint(art.bark, Wither(Color.Lerp(new Color(.34f, .27f, .2f), new Color(.4f, .34f, .27f), T())));
-            var moss = Tint(art.bark, Wither(Color.Lerp(new Color(.2f, .27f, .13f), new Color(.26f, .33f, .15f), T())));   // the flare and roots, mossed over
+            // The flare and roots: bark with a little moss in it, each tree its own (Chris, 2026-10-14: "these tree roots need to be a
+            // little more randomized. coloring is off": they were one flat green).
+            var moss = Tint(art.bark, Wither(Color.Lerp(new Color(.3f, .25f, .17f), new Color(.27f, .3f, .16f), T() * .6f)));
             float h = 15 + T() * 3, r0 = 2.05f + T() * .4f;
             float lx = (T() - .5f) * .03f, lz = (T() - .5f) * .03f, bend = (T() - .5f) * .8f, ph = T() * 6.3f, seed = T() * 60;
-            const int Buttresses = 7; var bAt = new float[Buttresses]; var bW = new float[Buttresses];
-            for (int i = 0; i < Buttresses; i++) { bAt[i] = (i + (T() - .5f) * .55f) * 2 * Mathf.PI / Buttresses; bW[i] = .7f + T() * .5f; }
+            int Buttresses = 5 + (int)(T() * 3.99f); var bAt = new float[Buttresses]; var bW = new float[Buttresses];   // five to eight, unevenly round, some slight and some great
+            for (int i = 0; i < Buttresses; i++) { bAt[i] = (i + (T() - .5f) * .9f) * 2 * Mathf.PI / Buttresses; bW[i] = .35f + T() * 1.05f; }
+            for (int i = 0; i < Buttresses; i++) if (Front(bAt[i])) bW[i] *= .15f;   // a slight swell where the house's back wall meets it
             Vector3 Axis(float y) { float s = Mathf.Sin(y / h * 2.6f + ph) * bend; return new Vector3(lx * y + s, y, lz * y + s * .6f); }
             float Girth(float y, float a)
             {
@@ -45,7 +51,9 @@ namespace Crulanda.World
             var roots = new List<CombineInstance>();
             for (int i = 0; i < Buttresses; i++)
             {
-                float a = bAt[i], len = 3.2f + T() * 2.6f, rr = .55f * bW[i] + .2f, wig = (T() - .5f) * 1.2f, ph2 = T() * 6;
+                float a = bAt[i], len = 1.8f + T() * 4.4f, rr = .55f * bW[i] + .15f, wig = (T() - .5f) * 2, ph2 = T() * 6;
+                if (T() < .2f) continue;   // a buttress with no root running out
+                if (Front(a)) continue;   // none under the walk-in house's floor
                 var dir = new Vector3(Mathf.Cos(a), 0, -Mathf.Sin(a)); var across = new Vector3(-dir.z, 0, dir.x);
                 Vector3 C(float s) { var p = dir * (r0 * 1.5f + len * s) + across * (wig * Mathf.Sin(s * 3 + ph2) * s); return new Vector3(p.x, LocalGround(t, p.x, p.z) + .45f - .8f * s, p.z); }
                 float R(float s, float ang) { return Mathf.Lerp(rr, .1f, s) * (1 - .4f * Mathf.Abs(Mathf.Cos(ang))); }
@@ -87,15 +95,24 @@ namespace Crulanda.World
         /// tree with a round house of timber and wattle grown into the front of its flare (door, porch and lantern to its -Z, round
         /// windows lit warm), a platform of planks round the trunk at about nine metres on struts, with a smaller house on it under a
         /// tiled cone of a roof, a rail, lanterns, and a stair of planks winding up the trunk to it. The houses are scenery (not
-        /// entered); the round house is solid.
+        /// entered); the round house is solid. With <paramref name="walkIn"/> (style "inn": the Hearth-Tree) the round house is the
+        /// Keepers' hearth-house instead, walked into (HearthHouse).
         /// </summary>
-        void Treehouse(Transform t, int variant)
+        void Treehouse(Transform t, int variant, bool walkIn = false)
         {
-            GiantTree(t, variant);
+            GiantTree(t, variant, walkIn);
             var tr = new System.Random(TreeRandom(t.position).Next() ^ 0x5eed); float T() { return (float)tr.NextDouble(); }
             var wood = Tint(art.timber, new Color(.36f, .25f, .16f)); var dark = Tint(art.timber, new Color(.22f, .15f, .1f));
             var wattle = Tint(art.plaster, new Color(.74f, .68f, .54f)); var tile = Tint(art.slate, new Color(.62f, .3f, .19f)); var stone = Dressed(new Color(.5f, .48f, .44f));
             if (robeCone == null) robeCone = ZoneMeshes.Cone(1, 1, 14);
+            if (walkIn) HearthHouse(t, wood, dark, wattle, tile, stone);
+            else RoundHouse(t, wood, dark, wattle, tile, stone);
+            Platform(t, T, wood, dark, wattle, tile);
+        }
+        /// <summary>The round house in the flare's front: wattle walls between timber posts, a tiled cone of a roof with a deep eave, a
+        /// round-headed plank door under a little hooded porch with its lantern, round windows; solid, never entered.</summary>
+        void RoundHouse(Transform t, Material wood, Material dark, Material wattle, Material tile, Material stone)
+        {
             // The round house, in the flare's front: wattle walls between timber posts, a tiled cone of a roof with a deep eave.
             var house = new Vector3(0, 0, -3.6f); float hr = 2.7f, wall = 3;
             float floor = Mathf.Max(LocalGround(t, house.x, house.z), LocalGround(t, house.x, house.z - hr)) - .1f;
@@ -123,7 +140,11 @@ namespace Crulanda.World
             Glow(t, house + new Vector3(0, floor + 2, -hr - 1.5f), 6, 0, new Color(1, .7f, .4f), .9f);   // the windows' light on the porch at night
             var solid = new GameObject("Round house").transform; solid.SetParent(t, false); solid.localPosition = house + new Vector3(0, floor + 1.8f, 0);
             solid.gameObject.AddComponent<CapsuleCollider>().radius = hr + .1f; solid.GetComponent<CapsuleCollider>().height = 4; solid.gameObject.AddComponent<NavBlocker>();
-            // The platform round the trunk on struts, its rail and lanterns; the small house on it; the stair up.
+        }
+        /// <summary>The platform round the trunk on struts, its rail and lanterns; the small house on it; the stair up (the tree's own
+        /// stream, <paramref name="T"/>: the round house below draws none, so a walk-in one leaves these as they were).</summary>
+        void Platform(Transform t, System.Func<float> T, Material wood, Material dark, Material wattle, Material tile)
+        {
             float py = 8.6f + T() * 1.2f, inner = 2.6f, outer = 5.6f; int segs = 18;
             for (int i = 0; i < segs; i++)
             {
@@ -155,6 +176,90 @@ namespace Crulanda.World
             }
         }
         Mesh robeCone;
+        /// <summary>The hearth-house's radius to the middle of its wall, the wall's height, and the seats' ring round its fire.</summary>
+        public const float HearthHouseRadius = 3, HearthHouseSeats = 1.6f;
+
+        /// <summary>
+        /// The Keepers' hearth-house at the Hearth-Tree's foot (Phase 8.6 decision 12, 2026-10-15: "taprooms in every zone", so a sim
+        /// rests indoors on the Shore too; the Keepers are CANON-EXPANDED, the house GAME-ONLY): the round house walked into, standing
+        /// just clear of the tree's foot (its buttresses and roots kept out of the floor: GiantTree's frontClear) instead of in its
+        /// flare. Wattle walls in twenty panels between timber posts on a stone kerb, each panel its own collider and navigation
+        /// blocker; a flat front in the ring holds a double door (InnDoorW, as the inns') under a tiled hood; round windows; the tiled
+        /// cone of a roof over a ceiling of boards; inside, a fire pit in the middle with five seats round it on the far side from the
+        /// door. Registered as an inn (style "hearth") with its doorway lane; it fades where it hides you (RoofFade).
+        /// </summary>
+        void HearthHouse(Transform t, Material wood, Material dark, Material wattle, Material tile, Material stone)
+        {
+            const float hr = HearthHouseRadius, wall = 3, thick = .2f, doorH = 2.2f; float doorW = InnDoorW, jamb = doorW / 2 + .45f;
+            float footR = 0; foreach (var c in t.GetComponents<CapsuleCollider>()) footR = Mathf.Max(footR, c.radius);
+            var at = new Vector3(0, 0, -(footR + hr + .1f));   // its back wall just clear of the tree's foot (its navmesh hole, NavPad and all)
+            var house = new GameObject("Hearth house").transform; house.SetParent(t, false); house.localPosition = new Vector3(at.x, LocalGround(t, at.x, at.z), at.z);
+            float face = -Mathf.Sqrt(hr * hr - jamb * jamb);   // the flat front's line, where the ring meets it
+            int n = 20; float seg = 2 * Mathf.PI * hr / n + .06f;
+            for (int i = 0; i < n; i++)
+            {
+                float a = (i + .5f) * 360f / n, r = a * Mathf.Deg2Rad; var p = new Vector3(Mathf.Cos(r) * hr, 0, Mathf.Sin(r) * hr);
+                if (p.z < 0 && Mathf.Abs(p.x) < jamb) continue;   // the front, flat for the door
+                var turn = Quaternion.Euler(0, -(a + 90), 0);   // the panel's length along the ring's tangent
+                var panel = BoxPart(house, p + Vector3.up * wall / 2, new Vector3(seg, wall, thick), wattle, turn);
+                panel.AddComponent<BoxCollider>(); panel.AddComponent<NavBlocker>();
+                BoxPart(house, p + Vector3.up * .2f, new Vector3(seg, .44f, thick + .12f), stone, turn, 1);   // the kerb along its foot
+            }
+            for (int i = 0; i < 10; i++)
+            {
+                float r = i * Mathf.PI / 5; var p = new Vector3(Mathf.Cos(r) * hr, wall / 2, Mathf.Sin(r) * hr);
+                if (p.z < 0 && Mathf.Abs(p.x) < jamb + .2f) continue;
+                Part(PrimitiveType.Cylinder, house, p, new Vector3(.24f, wall / 2 + .05f, .24f), wood);
+            }
+            // The flat front: a jamb either side (their colliders a little short of the opening, as the inns'), the lintel, two posts.
+            float side = jamb - doorW / 2;
+            foreach (int s in new[] { -1, 1 })
+            {
+                var j = BoxPart(house, new Vector3(s * (doorW / 2 + side / 2), wall / 2, face), new Vector3(side, wall, thick + .04f), wattle);
+                var box = j.AddComponent<BoxCollider>(); box.size -= new Vector3(JambShort, 0, 0); box.center += new Vector3(s * JambShort / 2, 0, 0);
+                j.AddComponent<NavBlocker>();
+                Part(PrimitiveType.Cylinder, house, new Vector3(s * (doorW / 2 + .1f), wall / 2, face - .06f), new Vector3(.26f, wall / 2 + .05f, .26f), wood);
+            }
+            var lintel = BoxPart(house, new Vector3(0, doorH + (wall - doorH) / 2, face), new Vector3(doorW, wall - doorH, thick + .04f), wattle);
+            lintel.AddComponent<BoxCollider>(); lintel.AddComponent<NavBlocker>();
+            Part(PrimitiveType.Cube, house, new Vector3(0, doorH + .06f, face - .1f), new Vector3(doorW + .5f, .14f, .14f), dark);
+            // The roof: the wall plate, the cone, a ceiling of boards under it (the camera pulls in under it), the hood over the door.
+            Part(PrimitiveType.Cylinder, house, new Vector3(0, wall + .05f, 0), new Vector3(hr * 2 + .25f, .1f, hr * 2 + .25f), wood);
+            MeshPart(robeCone, house, new Vector3(0, wall + .1f, 0), tile).transform.localScale = new Vector3(hr + .9f, 2.8f, hr + .9f);
+            var ceiling = Part(PrimitiveType.Cylinder, house, new Vector3(0, wall - .08f, 0), new Vector3(hr * 2 - .1f, .05f, hr * 2 - .1f), Tint(art.timber, new Color(.3f, .22f, .15f)));
+            ceiling.AddComponent<MeshCollider>();
+            MeshPart(ZoneMeshes.GableRoof(1.2f, doorW + 1, .55f, .1f), house, new Vector3(0, doorH + .35f, face - .55f), tile, Quaternion.Euler(0, 90, 0));
+            // Round windows either side, lit after dark; the floor of boards; the step at the door.
+            foreach (int s in new[] { -1, 1 })
+            {
+                float r = (270 + s * 55) * Mathf.Deg2Rad; var w = new Vector3(Mathf.Cos(r) * (hr + .11f), 1.9f, Mathf.Sin(r) * (hr + .11f));
+                Part(PrimitiveType.Cylinder, house, w, new Vector3(.7f, .04f, .7f), art.glass, Quaternion.LookRotation(new Vector3(w.x, 0, w.z)) * Quaternion.Euler(90, 0, 0));
+            }
+            Part(PrimitiveType.Cylinder, house, new Vector3(0, .03f, 0), new Vector3(hr * 2 - .2f, .03f, hr * 2 - .2f), Tint(art.timber, new Color(.4f, .3f, .2f)));
+            DoorSteps(house, 0, face, .05f, doorW + .4f, thick, stone);
+            // The door: two leaves, kept open; the Keepers' lantern by it.
+            var door = DoubleDoor(house, face, doorW, doorH, dark, t.name);
+            Doors.Add(door); door.SetOpen(true);
+            var lantern = new Vector3(jamb + .25f, 2.1f, face - .3f);
+            Part(PrimitiveType.Cube, house, lantern, new Vector3(.22f, .3f, .22f), art.glass);
+            Glow(house, lantern, 7, .3f, new Color(1, .74f, .42f), 1.4f);
+            // Inside: the fire pit (stones round embers, solid), and five seats on its far side from the door, a stump each, facing it.
+            var pit = Part(PrimitiveType.Cylinder, house, new Vector3(0, .15f, 0), new Vector3(1, .15f, 1), stone);
+            var pitBox = pit.AddComponent<BoxCollider>(); pitBox.size = new Vector3(.9f, 2, .9f); pit.AddComponent<NavBlocker>();
+            Part(PrimitiveType.Cylinder, house, new Vector3(0, .31f, 0), new Vector3(.7f, .02f, .7f), art.glass);   // the embers
+            var fire = new GameObject("Hearth fire").AddComponent<Light>(); fire.transform.SetParent(house, false);
+            fire.transform.localPosition = new Vector3(0, .9f, 0); fire.type = LightType.Point; fire.range = 7; fire.intensity = 1.6f; fire.color = new Color(1, .58f, .28f);
+            var inn = RegisterInn(house, "hearth", door, null, new Vector2(hr - thick / 2, hr - thick / 2), true);
+            foreach (float deg in new[] { 0f, 45, 90, 135, 180 })
+            {
+                float r = deg * Mathf.Deg2Rad; var seat = new Vector3(Mathf.Cos(r), 0, Mathf.Sin(r)) * HearthHouseSeats;
+                Part(PrimitiveType.Cylinder, house, seat + Vector3.up * .22f, new Vector3(.5f, .22f, .5f), dark); SeatMark(house, new Vector2(seat.x, seat.z), HearthStumpTop);
+                inn.seats.Add(new InnSeat { at = house.TransformPoint(seat), face = house.TransformPoint(Vector3.zero), top = HearthStumpTop });
+            }
+            var fade = house.gameObject.AddComponent<RoofFade>(); fade.Half = new Vector2(hr, hr); fade.Walled = true;   // the room stays a room when you are in it
+        }
+        /// <summary>The hearth-house's stumps' tops over its floor (m).</summary>
+        public const float HearthStumpTop = .44f;
 
         /// <summary>
         /// A giant tree lying where it fell (the Fallen Ghost-Oak): its trunk along local +x, <paramref name="length"/> long and about
@@ -351,8 +456,10 @@ namespace Crulanda.World
     public sealed class FallingWater : MonoBehaviour
     {
         public float speed = .6f; Material m; Color tint;
+        /// <summary>Underground (a fall in a cave, the Adit rework): its tint stays as made, whatever the hour outside.</summary>
+        public bool steady;
         void Start() { var r = GetComponent<Renderer>(); if (r != null) { m = r.material; tint = m.GetColor("_TintColor"); } }
         // The sheet is unlit: its tint takes the hour's light, so the fall is moonlit at night and not the brightest thing in view.
-        void Update() { if (m == null) return; m.mainTextureOffset = new Vector2(0, -Time.time * speed); m.SetColor("_TintColor", HourTint.Of(tint)); }
+        void Update() { if (m == null) return; m.mainTextureOffset = new Vector2(0, -Time.time * speed); m.SetColor("_TintColor", steady ? tint : HourTint.Of(tint)); }
     }
 }

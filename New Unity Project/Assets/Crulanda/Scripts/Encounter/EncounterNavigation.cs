@@ -15,6 +15,7 @@ namespace Crulanda.Encounter
     {
         NavMeshData data;
         NavMeshDataInstance instance;
+        readonly List<NavMeshLinkInstance> links = new List<NavMeshLinkInstance>();
         void Awake()
         {
             var zone = ZoneBuilder.Active;
@@ -23,9 +24,19 @@ namespace Crulanda.Encounter
             Physics.SyncTransforms();
             var reach = new Bounds(Vector3.zero, new Vector3(size, 40, size));
             if (zone != null) reach = Crulanda.World.Hollow.Reach(reach);   // cave passages may run on under the hills past the edge
+            // (Hallow's Creek) Decks on open ground stand higher than the caves' reach: the belfry's floor 18 m over the yard, and the head-room over it.
+            if (zone != null) foreach (var d in zone.DeckSpots) if (d.cave == null && d.mid != null) foreach (var m in d.mid) reach.Encapsulate(m + Vector3.up * 3);
             data = NavMeshBuilder.BuildNavMeshData(NavMesh.GetSettingsByIndex(0), sources, reach, Vector3.zero, Quaternion.identity);
+            // A bigger share of the search each frame (Unity's 100 is shared by every agent): a long way up a tower's flights is worked out
+            // in a few frames, not starved by the fight's other chasers (2026-10-18, hallows-8; MobChase).
+            NavMesh.pathfindingIterationsPerFrame = Mathf.Max(NavMesh.pathfindingIterationsPerFrame, 400);
             if (data != null) instance = NavMesh.AddNavMeshData(data);
             else Debug.LogError("Could not build encounter navigation.");
+            // (The Adit rework) The caves' one-way drops (ZoneDrop): a link down off each lip, never back up. A camp's mobs keep off them
+            // (their agents leave DropArea out of their mask).
+            if (zone != null && data != null)
+                foreach (var d in zone.Drops)
+                    links.Add(NavMesh.AddLink(new NavMeshLinkData { startPosition = d.from, endPosition = d.to, width = d.width, bidirectional = false, area = DropArea, agentTypeID = NavMesh.GetSettingsByIndex(0).agentTypeID }));
         }
         static List<NavMeshBuildSource> ZoneSources(ZoneBuilder zone)
         {
@@ -45,13 +56,16 @@ namespace Crulanda.Encounter
                     {
                         // Oriented box: a rotated wall must not blank out the axis-aligned area around it (e.g. an inn interior).
                         var tr = box.transform; var scale = tr.lossyScale;
-                        var size = Vector3.Scale(box.size, new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z))) + new Vector3(.2f, 0, .2f);
-                        sources.Add(new NavMeshBuildSource { shape = NavMeshBuildSourceShape.Box, size = size,
-                            transform = Matrix4x4.TRS(tr.TransformPoint(box.center), tr.rotation, Vector3.one), area = 1 });
+                        var size = Vector3.Scale(box.size, new Vector3(Mathf.Abs(scale.x), Mathf.Abs(scale.y), Mathf.Abs(scale.z))) + new Vector3(2 * ZoneBuilder.NavPad, 0, 2 * ZoneBuilder.NavPad);   // the pad the doorways are measured with (ZoneBuilder.NavGap)
+                        var at = Matrix4x4.TRS(tr.TransformPoint(box.center), tr.rotation, Vector3.one);
+                        sources.Add(new NavMeshBuildSource { shape = NavMeshBuildSourceShape.Box, size = size, transform = at, area = 1 });
+                        // And the box's inside: a Box source is its faces, and a floor under a block with head-room between them stayed
+                        // walkable (the island under Lusk's tally stage, the Adit rework, 2026-10-14); the modifier marks the volume.
+                        sources.Add(new NavMeshBuildSource { shape = NavMeshBuildSourceShape.ModifierBox, size = size, transform = at, area = 1 });
                         continue;
                     }
                     var b = col.bounds;
-                    sources.Add(new NavMeshBuildSource { shape = NavMeshBuildSourceShape.Box, size = b.size + new Vector3(.2f, 0, .2f),
+                    sources.Add(new NavMeshBuildSource { shape = NavMeshBuildSourceShape.Box, size = b.size + new Vector3(2 * ZoneBuilder.NavPad, 0, 2 * ZoneBuilder.NavPad),
                         transform = Matrix4x4.TRS(b.center, Quaternion.identity, Vector3.one), area = 1 });
                 }
             // Water: shallow (wading) water is walkable but costly (area 3), so agents prefer bridges yet can follow you in.
@@ -87,10 +101,20 @@ namespace Crulanda.Encounter
                         }
                     }
                 }
-            }            return sources;
+            }
+            // (The Adit rework) The caves' pools, streams and flooded stretches (ZoneCaveWater), as the land's water: wading costs, swim-deep is not walked.
+            foreach (var (centre, rot, size, swim) in zone.CaveWaterAreas) sources.Add(Modifier(centre, rot, size, swim ? 1 : ShallowsArea));
+            // (Hallow's Creek, N4) The hungry shadows: walkable, but dear, so agents walk round them (they never cover a whole way).
+            NavMesh.SetAreaCost(HazardArea, Crulanda.World.ZoneHazard.EncounterNavigationCost);
+            foreach (var (centre, rot, size) in zone.HazardAreas) sources.Add(Modifier(centre, rot, size, HazardArea));
+            return sources;
         }
         /// <summary>Navigation area for wadeable water: walkable, but agents avoid it when a dry way exists.</summary>
         public const int ShallowsArea = 3;
+        /// <summary>Navigation area of the caves' one-way drops (the Adit rework): the party may take them down; a camp's mobs keep off them.</summary>
+        public const int DropArea = 4;
+        /// <summary>Navigation area of hazard ground (Hallow's Creek's hungry shadows): walkable at a high cost.</summary>
+        public const int HazardArea = 5;
         static NavMeshBuildSource Modifier(Vector3 centre, Quaternion rot, Vector3 size, int area)
         { return new NavMeshBuildSource { shape = NavMeshBuildSourceShape.ModifierBox, size = size, transform = Matrix4x4.TRS(centre, rot, Vector3.one), area = area }; }
         static List<NavMeshBuildSource> LegacySources()
@@ -129,6 +153,11 @@ namespace Crulanda.Encounter
             }
             return sources;
         }
-        void OnDestroy() { if (instance.valid) instance.Remove(); if (data != null) Destroy(data); }
+        void OnDestroy()
+        {
+            foreach (var l in links) NavMesh.RemoveLink(l);
+            links.Clear();
+            if (instance.valid) instance.Remove(); if (data != null) Destroy(data);
+        }
     }
 }

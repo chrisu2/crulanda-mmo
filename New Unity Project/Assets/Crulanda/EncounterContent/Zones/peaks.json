@@ -3,7 +3,7 @@
   "displayName": "The Shattered Peaks",
   "subtitle": "The Sandthrone toll road over the eastern border mountains",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (book1 ch.5). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder. The grown ring (2026-09-30): old mining tunnels under the Peaks are CANON (book2 ch.19), and so is the void eating the stone (world_bible.md); the signal tower, the goatherd's shieling, the sealed adit, the Cold Tarn, the Listening Shrine (the Silent Pilgrims are CANON), the Broken Post, the avalanche scar with its grey head, and their camps are GAME-ONLY. The filled-out ring (2026-10-03): Hollow Men out of the Sealed Adit (CANON creature, CANON tunnels), pale shadows at the Cold Tarn and one Pale Thing watching from under the Umbra scarp (CANON-EXPANDED: the Pale Things as watchers), grey-robed false pilgrims at the Broken Post (GAME-ONLY; the Silent Pilgrims are CANON and are not these), and their quests. Mountain bears in the high pines (2026-10-04): GAME-ONLY. The Sealed Adit's quest-givers (2026-10-08): Pib, a goblin out of the Sandthrone's cages (goblins are CANON), Brother Cael, a Silent Pilgrim at the Listening Shrine (the order is CANON), and Lisle Tamber, a Salt-Mender scholar (the faction is CANON); all three people GAME-ONLY.",
+  "canonNote": "Canon: the Shattered Peaks are a jagged range on the eastern border that holds back the Wasting while the void slowly eats through the stone (world_bible.md), and Sandthrone mercenaries hold them and charge a toll (CANON-EXPANDED: the draft chapter_5.md). GAME-ONLY / PROVISIONAL: this pass and its toll gate, the toll-house, the pilgrims' rest and its people, the ruined waystation, the pilgrims' cairns, the levelling camps and all placement. Mount Umbra is named on the game's world map image but not in the lore folder. The grown ring (2026-09-30): old mining tunnels under the Peaks are CANON (book2 ch.19), and so is the void eating the stone (world_bible.md); the signal tower, the goatherd's shieling, the sealed adit, the Cold Tarn, the Listening Shrine (the Silent Pilgrims are CANON), the Broken Post, the avalanche scar with its grey head, and their camps are GAME-ONLY. The filled-out ring (2026-10-03): Hollow Men out of the Sealed Adit (CANON creature, CANON tunnels), pale shadows at the Cold Tarn and one Pale Thing watching from under the Umbra scarp (CANON-EXPANDED: the Pale Things as watchers), grey-robed false pilgrims at the Broken Post (GAME-ONLY; the Silent Pilgrims are CANON and are not these), and their quests. Mountain bears in the high pines (2026-10-04): GAME-ONLY. The Sealed Adit's quest-givers (2026-10-08): Pib, a goblin out of the Sandthrone's cages (goblins are CANON), Brother Cael, a Silent Pilgrim at the Listening Shrine (the order is CANON), and Lisle Tamber, a Salt-Mender scholar (the faction is CANON); all three people GAME-ONLY. The residents' and villagers' stories, and the secrets' clues and hints (2026-10-15), are GAME-ONLY lines about the canon things named here; the book of lore's two pages here are labelled on the page.",
   "size": 430,
   "levelMin": 9,
   "levelMax": 12,
@@ -31,8 +31,8 @@
     }
   ],
   "worldMapPosition": {
-    "x": 0.53,
-    "y": 0.55
+    "x": 0.565,
+    "y": 0.575
   },
   "worldMapNote": "Placed on Mount Umbra's south-east foothills of the game map, on the road from Khaven; exact spot provisional.",
   "flatRadius": 30,
@@ -50,6 +50,7 @@
     "fogStart": 80,
     "fogEnd": 300,
     "skyTint": "#6B87B8",
+    "aurora": true,
     "skyExposure": 1.15,
     "skyHaze": 0.9
   },
@@ -110,7 +111,7 @@
       },
       "arrive": {
         "x": 0,
-        "y": -112
+        "y": -382
       },
       "radius": 1.6
     }
@@ -710,7 +711,7 @@
         "y": -128
       },
       "radius": 9,
-      "canonStatus": "GAME-ONLY. The Sandthrone holding the Peaks' toll is CANON (book1 ch.5)."
+      "canonStatus": "GAME-ONLY. The Sandthrone holding the Peaks' toll is CANON-EXPANDED (the draft chapter_5.md)."
     },
     {
       "name": "Goatherd's Shieling",
@@ -775,7 +776,7 @@
   ],
   "props": [
     {
-      "kind": "house",
+      "kind": "inn",
       "name": "Pilgrims' Rest",
       "at": {
         "x": -16,
@@ -1853,6 +1854,7 @@
       "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
     }
   ],
+  "woods": { "cover": 0.45, "from": 60, "ramp": 50, "spacing": 8, "edge": 12, "scale": 70, "deepAbove": 1, "oaks": 0, "snags": 0.08, "pineAbove": 0, "floor": 0.6 },
   "groves": [
     {
       "name": "Wolf pines",
@@ -2384,7 +2386,12 @@
         "at": {
           "x": -11,
           "y": 1
-        }
+        },
+        "stories": [
+          "The Rest was my father's, and his father's. Pilgrims paid in stones for the cairns and a tale by the fire. The Company pays in nothing and takes the firewood.",
+          "I keep a book of everyone who crosses. The toll-book has their coin. Mine has their names. One of those books will matter, one day.",
+          "The mountain holds the grey back. You can hear it chewing the stone at night from the east wall, like a mouse in a wainscot. We don't talk about it at the fire."
+        ]
       },
       {
         "name": "Yara Quell",
@@ -2393,7 +2400,12 @@
         "at": {
           "x": -28,
           "y": -2
-        }
+        },
+        "stories": [
+          "I've driven mules over this pass for twenty years. The toll used to be a cup of wine for the gatekeeper. Now it's a tenth, and the gatekeeper's a boy with a spear.",
+          "A goblin came over the pass once with a map of the whole range, drawn in a hand like lace. The Company took it for 'contraband'. I'd have paid a mule for it.",
+          "There's a pale shape under the Umbra scarp that counts my mules going up and counts them coming down. The numbers are never the same. I've stopped checking."
+        ]
       },
       {
         "name": "Tarsk",
@@ -2402,7 +2414,12 @@
         "at": {
           "x": -2,
           "y": -12
-        }
+        },
+        "stories": [
+          "The Ash-Walkers sent me north to watch the grey from above. From the ledge you see where it is going. It is going everywhere, slowly.",
+          "Salt of the First Sea. We bind the Eaters with it. Mother Vane says the salt remembers the sea, and the sea remembers when the world was whole. I carry a pouch. It is heavier than it looks.",
+          "The pale ones on the ledge do not watch the road. They watch who climbs it. I have been climbed past by one. It did not step aside. It did not need to."
+        ]
       },
       {
         "name": "Hadrik Sull",
@@ -2411,7 +2428,12 @@
         "at": {
           "x": -36,
           "y": 10
-        }
+        },
+        "stories": [
+          "The Company's a company. We hold the pass because somebody pays us to, and we'll hold it for whoever pays next. Don't look at me like that. Your Council pays us too.",
+          "Zarytha Vex commands in the south. I've met her once. She asked my name, and then she asked it again, and I understood she'd not be asking a third time.",
+          "I've a sister in Port Caelum who thinks I sell wine. Every letter I send her, I sell wine."
+        ]
       },
       {
         "name": "Pib",
@@ -2420,7 +2442,12 @@
         "at": {
           "x": -23,
           "y": 1
-        }
+        },
+        "stories": [
+          "My people kept the records of the High City once. Every light, every name. Then came the Purge, and the Warrens, and the cages. I remember. Stone remembers. We are alike, stone and I.",
+          "The Company kept me in a cage at the gate for making a map. A map! Of the pass! It was a very good map. I have it in my head still. They cannot cage that.",
+          "The Hollow Men from the mine were miners. Grey stone remembers their names, if you hold it to your ear. I wrote them down for Maddoc's book. Somebody should have, before."
+        ]
       },
       {
         "name": "Brother Cael",
@@ -2429,7 +2456,12 @@
         "at": {
           "x": 6,
           "y": 140
-        }
+        },
+        "stories": [
+          "The Archive of Silence keeps the Original Song, what is left of it. The pass still holds three notes of it: at the tarn, at the shrine, at the spur. I came to write down where it is thin.",
+          "An echo-jar holds a fragment of a lost era. Unstop one and you hear a kitchen, a market, a child. We have four hundred in the south. The Company thinks they are wine.",
+          "Elder Orym warned the Council against the Spoke before my grandfather was born. They did not listen. The Archive is the sound of not being listened to, kept carefully."
+        ]
       },
       {
         "name": "Lisle Tamber",
@@ -2438,7 +2470,22 @@
         "at": {
           "x": -6,
           "y": -4
-        }
+        },
+        "stories": [
+          "I came north to learn whether the grey takes a beast from the outside in or the inside out. The rockhides say the outside. The Hollow Men say the inside. Both are right, which is the worst answer.",
+          "The Menders don't pin and don't burn. We mend. It means standing in the cold with a pouch of salt and a notebook, mostly. Nobody writes songs about it.",
+          "Quill, in Oakhaven, taught me the salt-knot. Three turns and a pull. Tamsin Rook in Khaven ties the same knot for a different reason. Everything on this road is the same knot."
+        ]
+      }
+    ],
+    "stories": [
+      {
+        "name": "Tam Sedge",
+        "lines": [
+          "The goatherd before me went up the drove track with forty goats the autumn the Company came and never came down. I keep what's left of the flock at the shieling. Wolves have the pines. I have a stick.",
+          "The pilgrims pay the Rest in stones. They pay me in cheese they carry up from the south, hard as the stones. I'd not trade it.",
+          "Up at the fold you hear the mountain chewing on a still night. Maddoc says it's the wind in the scar. There is no wind, some nights."
+        ]
       }
     ]
   },
@@ -2453,6 +2500,8 @@
       },
       "radius": 5,
       "text": "From the ledge's lip the toll road winds down and away east, toward the grey. This is what the pale shapes stand here watching, day and night: the road, and whoever comes up it.",
+      "clue": "Climb to the lip of the ledge in the north-east, above where the toll road winds down to the grey, and see what the pale shapes stand watching.",
+      "hint": "Tarsk says the pale ones on the ledge above the east road aren't looking at the Rest. Stand where they stand, he says, and look where they look.",
       "xp": 110,
       "canonStatus": "CANON-EXPANDED: the Pale Things as watchers and auditors are CANON (world_bible.md); this lookout is GAME-ONLY."
     },
@@ -2467,6 +2516,8 @@
       },
       "rotation": 270,
       "text": "A cold fire on a shelf above the waystation, where the goat path gives out. Six hollows in the scree where six people slept, and a bundle left by the ashes with a note tucked in its knot.",
+      "clue": "Above the old waystation in the south-west, where the goat path gives out, six hollows in the scree and a bundle by a cold fire.",
+      "hint": "Yara Quell says six pilgrims went up the goat path above the old waystation and only the goats came down. Their camp's still up there on the shelf, she thinks.",
       "item": "food.mountain_jerky",
       "document": "doc.peaks.goat_path",
       "xp": 100,
@@ -2484,6 +2535,8 @@
       },
       "rotation": 250,
       "text": "An oilcloth bundle wedged between two rocks, a stone's throw from the pilgrims' cairn. Inside, wrapped in grey wool, a stoppered clay jar that whispers when you unstop it.",
+      "clue": "A stone's throw from the pilgrims' cairn on the eastern descent, an oilcloth bundle is wedged between two rocks. It whispers.",
+      "hint": "Brother Cael says a pilgrim hid an echo-jar near the cairn on the eastern descent rather than let the Company have it. Between two rocks, he said, wrapped in grey wool.",
       "item": "item.echo_jar",
       "document": "doc.peaks.echo",
       "xp": 120,
@@ -2500,9 +2553,11 @@
       },
       "rotation": 315,
       "text": "Weighted under a flat stone where the crag gives out above the toll wall, a sentry's perch, the ink run by snow: a letter home. It was never sent, and it won't be now.",
+      "clue": "Where the crag gives out above the toll wall, a sentry's perch to the north, a flat stone weighs down a letter the snow has got at.",
+      "hint": "Hadrik Sull says one of the toll sentries wrote letters home on the crag above the wall and never sent one. Under a flat stone up there, if the snow's left anything.",
       "document": "doc.peaks.letter_home",
       "xp": 90,
-      "canonStatus": "GAME-ONLY: the letter, its writer and his sister. The Sandthrone toll in the Peaks is CANON (book1 ch.5)."
+      "canonStatus": "GAME-ONLY: the letter, its writer and his sister. The Sandthrone toll in the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
     },
     {
       "id": "secret.peaks.frostbells",
@@ -2514,6 +2569,8 @@
         "y": 100.8
       },
       "text": "Ice-blue bells in the lee of the north wall, where the snow lies longest. Pilgrims chew one against the cold and swear it keeps the heart going on the high road.",
+      "clue": "Ice-blue bells in the lee of the north wall, where the snow lies longest. Pilgrims chew one against the cold.",
+      "hint": "Maddoc Vire says the frostbells still come up in the lee of the north wall, where the snow lies longest. Pilgrims chew one for the high road. He keeps none for sale.",
       "item": "herb.frostbell",
       "xp": 90,
       "canonStatus": "GAME-ONLY"
@@ -2529,10 +2586,12 @@
       },
       "rotation": 90,
       "text": "Wedged between two stones at the foot of the signal tower, where whoever has the watch can reach it without leaving the fire: a dented tin of clipped toll coin. Somebody has been skimming the Company's toll.",
+      "clue": "At the foot of the tower on the south-west ridge, between two stones within reach of the watch-fire, a dented tin of clipped coin.",
+      "hint": "Hadrik Sull says the toll comes up light, and the pickets at the tower on the south-west ridge won't look him in the eye. Whoever's skimming keeps it within reach of their fire, he reckons.",
       "item": "potion.healing",
       "xp": 100,
       "gold": 30,
-      "canonStatus": "GAME-ONLY: the picket and his skim. The Sandthrone toll in the Peaks is CANON (book1 ch.5)."
+      "canonStatus": "GAME-ONLY: the picket and his skim. The Sandthrone toll in the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
     },
     {
       "id": "secret.peaks.adit-seal",
@@ -2546,6 +2605,8 @@
       "rotation": 270,
       "height": 0.45,
       "text": "Pushed into a crack in the adit's sealing wall, under a warning scored into the mortar: a folded page, the last notice of the working's foreman.",
+      "clue": "West of the Rest, under a warning scored into the mortar of the sealed mine's wall, a folded page is pushed into a crack.",
+      "hint": "Pib says the stone at the old mine west of the Rest has writing on it, scored in the mortar, and a page in a crack under the writing. He wouldn't go close enough to read it.",
       "document": "doc.peaks.adit_notice",
       "xp": 110,
       "canonStatus": "CANON-EXPANDED: old mining tunnels under the Shattered Peaks (book2 ch.19) and the void eating the Peaks' stone (world_bible.md) are CANON; this adit, its seal and the notice are GAME-ONLY."
@@ -2560,8 +2621,97 @@
       },
       "radius": 3,
       "text": "From the end of the spur the whole pass lies under you: the tarn's cold eye at your shoulder, the gate and the smoke of the Rest below, and the road going down and down toward Khaven. Pilgrims have left a little cairn of stones here, one for every crossing.",
+      "clue": "Walk the spur north past the shrine to its very end, where the pilgrims leave a stone for every crossing. The whole pass lies under you.",
+      "hint": "Brother Cael says the pilgrims walk out to the end of the spur beyond the shrine and leave a stone, one for every crossing. From there you can see the road all the way down to Khaven.",
       "xp": 110,
       "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible.md); the spur, the shrine and this lookout are GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.crossings",
+      "name": "The Pilgrims' Crossings",
+      "kind": "note",
+      "prompt": "Draw the page out from between the cairn stones",
+      "at": {
+        "x": 12.2,
+        "y": 138.8
+      },
+      "rotation": 180,
+      "height": 0.4,
+      "text": "Pressed between two flat stones low in the cairn at the spur's end, out of the wind: a page in the careful hand of the Silent Pilgrims, one stone's worth of every crossing.",
+      "clue": "At the very end of the spur in the north, where every crossing leaves a stone, two flat stones in the cairn keep a page between them.",
+      "hint": "Brother Cael says the pilgrims leave more than stones at the spur's end. There's a page pressed in the cairn, between two flat ones, that tells where the song still holds in the pass. He'd like it left there. He'd like it read.",
+      "document": "doc.peaks.crossings",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, the Archive of Silence and the Original Song are CANON (world_bible.md); the cairn, the crossings and the page are GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.watchers",
+      "name": "A Leaf from a Mender's Notebook",
+      "kind": "note",
+      "prompt": "Lift the stone off the notebook leaf",
+      "at": {
+        "x": 82.9,
+        "y": 91.5
+      },
+      "rotation": 220,
+      "text": "Weighted with a stone on the ledge's lip, where the pale shapes stand: a leaf torn from a notebook, in the small, quick hand of a Salt-Mender scholar. Four nights' watching, worked out.",
+      "clue": "On the ledge in the north-east above the east road, where the pale shapes stand, a scholar weighted a leaf of her notebook with a stone.",
+      "hint": "Lisle Tamber spent four nights on the ledge where the pale ones stand, above the east road, and left a leaf of her notebook up there under a stone. She says she couldn't carry what she'd worked out. She says that's a joke.",
+      "document": "doc.peaks.watchers",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: the Pale Things as cosmic auditors are CANON (world_bible.md); Lisle Tamber, the Salt-Menders' scholar, and her notebook are GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.cairn-book",
+      "name": "The Cairn-Book",
+      "kind": "read",
+      "prompt": "Read the book on the cairn",
+      "at": {
+        "x": -6,
+        "y": 150
+      },
+      "rotation": 33,
+      "text": "A pilgrims' cairn above the water behind the north wall, stone on stone to a man's chest, and on its flat top a book wrapped in oilcloth under a slate. Every crossing writes a line in it.",
+      "clue": "Above the water held behind the north wall, a cairn stands to a man's chest, and every pilgrim who crosses writes a line in what lies on top of it.",
+      "hint": "Maddoc Vire says the pilgrims keep a book on a cairn above the tarn, and every crossing writes a line. He's never read it. He says it isn't his to read.",
+      "document": "doc.peaks.cairn_book",
+      "xp": 100,
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible.md); the cairn and its book are GAME-ONLY."
+    },
+    {
+      "id": "secret.peaks.old-post-roll",
+      "name": "The Old Garrison's Roll",
+      "kind": "carving",
+      "prompt": "Read the names cut in the stone",
+      "at": {
+        "x": 160,
+        "y": -76
+      },
+      "rotation": 0,
+      "text": "A stone by the old east watch, its face cut with names in a soldier's hand, one under another, the last half finished. Whoever held the pass before the Sandthrone kept their roll in stone.",
+      "clue": "East, where the old watch looked down the road before the Sandthrone came, a stone keeps a roll of names, the last one half cut.",
+      "hint": "Yara Quell says the men who held the pass before the Sandthrone cut their names in a stone by their old post, east along the road. The last name isn't finished. She thinks about that.",
+      "xp": 100,
+      "canonStatus": "GAME-ONLY: the old garrison and its roll. The Sandthrone toll on the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
+    },
+    {
+      "id": "secret.peaks.slide-runner",
+      "name": "A Toll-Runner Under the Scree",
+      "kind": "remains",
+      "prompt": "Search the satchel in the scree",
+      "at": {
+        "x": 128,
+        "y": 40
+      },
+      "rotation": 200,
+      "text": "Half under the scree where the mountainside came down: bones, a cap dented by the stones, and a satchel strapped tight. He was going round the gate, not through it.",
+      "clue": "Where half a mountainside came down east of the road, someone going round the gate was caught under the scree. His satchel is still strapped.",
+      "hint": "Hadrik Sull says a runner tried the high way round the gate the night the slope came down, east of the switchbacks. The Sandthrone never found him to fine him. He laughs at that.",
+      "item": "craft.ridgesteel_pauldrons",
+      "document": "doc.peaks.runners_reckoning",
+      "xp": 120,
+      "gold": 24,
+      "canonStatus": "GAME-ONLY: the runner and his reckoning. The Sandthrone toll on the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
     }
   ],
   "nodes": [

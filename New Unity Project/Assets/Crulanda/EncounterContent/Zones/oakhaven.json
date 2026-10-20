@@ -44,6 +44,14 @@
   "seed": 1771,
   "wildFrom": 160,
   "wildDensity": 0.45,
+  "skyline": [
+    {
+      "kind": "crown",
+      "name": "The Crown of Argentis",
+      "bearing": 355,
+      "canonStatus": "CANON place (Argentis, the Sky Bastion, up the North road from Oakhaven, the overworld map; the High City's white-and-gold towers, the city map); its far silhouette GAME-ONLY (Chris, 2026-10-16: \"maybe see a castle off in the distance when looking north\")"
+    }
+  ],
   "lighting": {
     "sunPitch": 27,
     "sunYaw": -38,
@@ -66,8 +74,8 @@
     },
     "playerFacing": 15,
     "companion": {
-      "x": -16.5,
-      "y": -12.8
+      "x": -18.4,
+      "y": -11.91
     },
     "recovery": {
       "x": -8,
@@ -152,6 +160,45 @@
       "arrive": {
         "x": 4.4,
         "y": 199
+      },
+      "radius": 5
+    },
+    {
+      "to": "zone.lowtowns",
+      "name": "South-east road to Argentis (dangerous, 15-20)",
+      "at": {
+        "x": 50,
+        "y": -273
+      },
+      "arrive": {
+        "x": -226,
+        "y": 2
+      },
+      "radius": 5
+    },
+    {
+      "to": "zone.hallows",
+      "name": "Hallow's Creek (dangerous, 15-20)",
+      "at": {
+        "x": 247,
+        "y": 126.5
+      },
+      "arrive": {
+        "x": 0,
+        "y": -377
+      },
+      "radius": 4
+    },
+    {
+      "to": "zone.crown",
+      "name": "North road to Argentis (the Crown)",
+      "at": {
+        "x": -6,
+        "y": 271
+      },
+      "arrive": {
+        "x": 146,
+        "y": 10
       },
       "radius": 5
     }
@@ -260,6 +307,38 @@
         "y": 20
       },
       "radius": 5
+    },
+    {
+      "name": "Training yard",
+      "center": {
+        "x": 58,
+        "y": 26
+      },
+      "radius": 11
+    },
+    {
+      "name": "Picket ground",
+      "center": {
+        "x": 224,
+        "y": 98
+      },
+      "radius": 6
+    },
+    {
+      "name": "Hesper's yard",
+      "center": {
+        "x": -172,
+        "y": 114
+      },
+      "radius": 5
+    },
+    {
+      "name": "Foragers' ground",
+      "center": {
+        "x": 84,
+        "y": 150
+      },
+      "radius": 6
     }
   ],
   "roads": [
@@ -756,6 +835,66 @@
           "y": 240
         }
       ]
+    },
+    {
+      "name": "South-east road",
+      "width": 4.5,
+      "points": [
+        {
+          "x": -34,
+          "y": -226
+        },
+        {
+          "x": -18,
+          "y": -244
+        },
+        {
+          "x": 4,
+          "y": -256
+        },
+        {
+          "x": 28,
+          "y": -265
+        },
+        {
+          "x": 48,
+          "y": -271
+        },
+        {
+          "x": 50,
+          "y": -278
+        }
+      ]
+    },
+    {
+      "name": "Argentis road",
+      "width": 4,
+      "points": [
+        {
+          "x": -19,
+          "y": 168
+        },
+        {
+          "x": -14,
+          "y": 192
+        },
+        {
+          "x": -12,
+          "y": 214
+        },
+        {
+          "x": -13,
+          "y": 240
+        },
+        {
+          "x": -9,
+          "y": 262
+        },
+        {
+          "x": -6,
+          "y": 280
+        }
+      ]
     }
   ],
   "water": [
@@ -1189,7 +1328,7 @@
       "name": "Thorne's bakehouse",
       "text": "The oven has not gone cold in forty years.",
       "at": {
-        "x": -35,
+        "x": -30.5,
         "y": -11
       },
       "radius": 6
@@ -1198,8 +1337,8 @@
       "name": "Tannery yard",
       "text": "Downwind of the village, for good reason.",
       "at": {
-        "x": -58,
-        "y": -16
+        "x": -23,
+        "y": -41
       },
       "radius": 6
     },
@@ -1207,8 +1346,8 @@
       "name": "Woodyard",
       "text": "Stacked for a winter that may come early.",
       "at": {
-        "x": -24,
-        "y": 60
+        "x": -40,
+        "y": 55
       },
       "radius": 6
     },
@@ -1459,6 +1598,125 @@
       },
       "radius": 14,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "name": "Training yard",
+      "text": "A fenced sparring ground: straw for blades, butts for arrows, bandages for prayers.",
+      "at": {
+        "x": 58.0,
+        "y": 26.0
+      },
+      "radius": 10
+    },
+    {
+      "name": "The Hollin skeps",
+      "at": {
+        "x": 212,
+        "y": 8
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY (the Hollins and their bees); the Wasting greying the east is CANON (book1 ch.4, world_bible.md)",
+      "text": "Ada Hollin's bees, carried over the creek on a hurdle the night the east field went grey. The skeps are here. The bees are not."
+    },
+    {
+      "name": "The grey picket",
+      "at": {
+        "x": 224,
+        "y": 98
+      },
+      "radius": 10,
+      "canonStatus": "CANON-EXPANDED: the Council's Seekers closing the road at Hallow's Creek as a 'quarantine' is CANON (lore_stories.md); the Concord's picket at Oakhaven's grey, and its wardens, are GAME-ONLY",
+      "text": "A Concord fire by the ruts into the grey. The wardens turn back anyone who goes to look, and write down who asked."
+    },
+    {
+      "name": "The Silent Watcher",
+      "at": {
+        "x": 237,
+        "y": 166
+      },
+      "radius": 12,
+      "canonStatus": "CANON-EXPANDED: the Silent Statues, giant faceless monoliths standing in the Wasting, are CANON (world_bible.md); that one stands at Oakhaven's grey, and its name, are GAME-ONLY",
+      "text": "A hooded figure of pale stone, taller than the Watchtower, standing to its knees in the grey with nothing in its hood. Nobody raised it. It was there when the grey came, and the grey has not taken it."
+    },
+    {
+      "name": "Wick's cot",
+      "at": {
+        "x": 150,
+        "y": -78
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY",
+      "text": "Ferris Wick's cottage, burnt to its footings in the spring. He burned it himself, the village says, and everything he had carried over from the Hollins' side, and he sleeps in the Brook barn now and will not say why."
+    },
+    {
+      "name": "The Farrows' stand",
+      "at": {
+        "x": 52,
+        "y": -200
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY",
+      "text": "Where the Farrows cut the Cask's winter wood: the pile, the cart and Pim's first axe-mark on the big stump. The carts stopped coming south when the stalkers took to the tall grass."
+    },
+    {
+      "name": "The Old Delf",
+      "at": {
+        "x": -140,
+        "y": -228
+      },
+      "radius": 12,
+      "canonStatus": "GAME-ONLY",
+      "text": "The village cut its stone here: the well's kerb, the mill's footings, the Bound Stone itself. The face came down the winter the old miller died, and nobody has dug it out."
+    },
+    {
+      "name": "The Harrow knoll",
+      "at": {
+        "x": -214,
+        "y": -122
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY",
+      "text": "A knob of the west downs over the Khaven road. Sel Harrow climbs it on the seventh day of every week and comes down slower than he went up."
+    },
+    {
+      "name": "Hesper's hut",
+      "at": {
+        "x": -172,
+        "y": 118
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY",
+      "text": "Hesper Crane's hut on the downs: Lisbet's grandmother, who taught her the yarrow and the feverfew. She went up here when the collectors came and will not come down while they are in the village."
+    },
+    {
+      "name": "The foragers' camp",
+      "at": {
+        "x": 84,
+        "y": 150
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY band (Caddock's, out of Crowsfoot Hollow); the Sandthrone company they deserted is CANON",
+      "text": "Caddock's foragers, down from the hollow to rob the north farms: the Carder barn's seed-corn went up this hill. They keep a fire and no watch worth the name."
+    },
+    {
+      "name": "The webbed sallows",
+      "at": {
+        "x": 206,
+        "y": -190
+      },
+      "radius": 10,
+      "canonStatus": "GAME-ONLY",
+      "text": "The wet sallows east of the bottom, where the Brook pigs went wild. Something has webbed the lower boughs from trunk to trunk, and the pigs do not go in there any more."
+    },
+    {
+      "name": "The wolf pit",
+      "at": {
+        "x": 36,
+        "y": 204
+      },
+      "radius": 8,
+      "canonStatus": "GAME-ONLY",
+      "text": "The north farms' wolf-pit, dug when Old Whitefoot's grandsire ran the Top field. Kerbed with stone, deep as a man, and the last thing it caught was not a wolf."
     }
   ],
   "props": [
@@ -1484,8 +1742,8 @@
       "kind": "hitch",
       "name": "The Cask's hitching rail",
       "at": {
-        "x": -21.2,
-        "y": -24.3
+        "x": -22.51,
+        "y": -25.81
       },
       "rotation": 41
     },
@@ -1493,13 +1751,13 @@
       "kind": "inn",
       "name": "The Golden Cask",
       "at": {
-        "x": -14,
-        "y": -16
+        "x": -15.41,
+        "y": -16.1
       },
       "rotation": 221,
       "size": {
-        "x": 12,
-        "y": 8
+        "x": 14,
+        "y": 10
       },
       "variant": 0
     },
@@ -1757,12 +2015,12 @@
     {
       "kind": "hedge",
       "at": {
-        "x": -21,
-        "y": -9
+        "x": -21.31,
+        "y": -7.0
       },
       "rotation": 261,
       "size": {
-        "x": 7
+        "x": 3
       }
     },
     {
@@ -2104,7 +2362,7 @@
         "x": -78,
         "y": 56
       },
-      "rotation": 180,
+      "rotation": 0,
       "size": {
         "x": 12,
         "y": 8
@@ -2449,7 +2707,7 @@
       "kind": "oven",
       "name": "Thorne's bakehouse",
       "at": {
-        "x": -35,
+        "x": -30.5,
         "y": -11
       },
       "rotation": 270
@@ -2458,8 +2716,8 @@
       "kind": "tannery",
       "name": "Tannery yard",
       "at": {
-        "x": -58,
-        "y": -16
+        "x": -23,
+        "y": -41
       },
       "rotation": 0
     },
@@ -2467,10 +2725,11 @@
       "kind": "woodpile",
       "name": "Woodyard",
       "at": {
-        "x": -24,
-        "y": 60
+        "x": -40,
+        "y": 55
       },
-      "rotation": 20
+      "rotation": 90,
+      "variant": 1
     },
     {
       "kind": "lamp",
@@ -3552,8 +3811,8 @@
       "kind": "board",
       "name": "Notice board",
       "at": {
-        "x": -22,
-        "y": -27
+        "x": -23.31,
+        "y": -28.51
       },
       "rotation": 40,
       "interact": "Read the notices",
@@ -3609,8 +3868,8 @@
       "kind": "kitchen",
       "name": "The Cask's kitchen",
       "at": {
-        "x": -20,
-        "y": -18.3
+        "x": -22.49,
+        "y": -18.76
       },
       "rotation": 41
     },
@@ -3622,8 +3881,479 @@
         "y": 137
       },
       "rotation": 45
+    },
+    {
+      "kind": "training_yard",
+      "name": "Training yard",
+      "at": {
+        "x": 58.0,
+        "y": 26.0
+      },
+      "rotation": 245.9,
+      "size": {
+        "x": 22,
+        "y": 16
+      }
+    },
+    {
+      "kind": "training_dummy",
+      "name": "Training dummy",
+      "at": {
+        "x": 58.8,
+        "y": 22.7
+      },
+      "rotation": 335.9
+    },
+    {
+      "kind": "mending_dummy",
+      "name": "Mending dummy",
+      "at": {
+        "x": 56.6,
+        "y": 31.5
+      },
+      "rotation": 245.9
+    },
+    {
+      "kind": "skep",
+      "name": "The Hollin skeps",
+      "at": {
+        "x": 212,
+        "y": 8
+      },
+      "rotation": 350
+    },
+    {
+      "kind": "cart",
+      "name": "Hollin honey cart",
+      "at": {
+        "x": 218,
+        "y": 13
+      },
+      "rotation": 70
+    },
+    {
+      "kind": "brazier",
+      "name": "Picket fire",
+      "at": {
+        "x": 224,
+        "y": 95
+      },
+      "variant": 0
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 219,
+        "y": 101
+      },
+      "rotation": 30,
+      "variant": 1
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 229,
+        "y": 101
+      },
+      "variant": 1
+    },
+    {
+      "kind": "cart",
+      "name": "Picket cart",
+      "at": {
+        "x": 231,
+        "y": 95
+      },
+      "rotation": 110
+    },
+    {
+      "kind": "banner",
+      "name": "Concord standard",
+      "at": {
+        "x": 222,
+        "y": 104
+      },
+      "rotation": 180
+    },
+    {
+      "kind": "monolith",
+      "name": "The Silent Watcher",
+      "at": {
+        "x": 237,
+        "y": 166
+      },
+      "rotation": 100,
+      "scale": 0.85
+    },
+    {
+      "kind": "ruined_house",
+      "name": "Wick's cot",
+      "at": {
+        "x": 150,
+        "y": -78
+      },
+      "rotation": 20,
+      "size": {
+        "x": 6,
+        "y": 5
+      },
+      "variant": 1
+    },
+    {
+      "kind": "cart",
+      "name": "Wick's cart",
+      "at": {
+        "x": 158,
+        "y": -82
+      },
+      "rotation": 300
+    },
+    {
+      "kind": "barrels",
+      "name": "Wick's water butt",
+      "at": {
+        "x": 144,
+        "y": -74
+      },
+      "variant": 0
+    },
+    {
+      "kind": "woodpile",
+      "name": "The Farrows' stand",
+      "at": {
+        "x": 52,
+        "y": -200
+      },
+      "rotation": 30
+    },
+    {
+      "kind": "cart",
+      "name": "Wood cart",
+      "at": {
+        "x": 46,
+        "y": -205
+      },
+      "rotation": 300
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 57,
+        "y": -196
+      },
+      "rotation": 10,
+      "variant": 1
+    },
+    {
+      "kind": "perch",
+      "name": "The Old Delf",
+      "at": {
+        "x": -140,
+        "y": -228
+      },
+      "rotation": 180,
+      "size": {
+        "x": 7,
+        "y": 0
+      }
+    },
+    {
+      "kind": "cart",
+      "name": "Stone cart",
+      "at": {
+        "x": -152,
+        "y": -221
+      },
+      "rotation": 60
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -130,
+        "y": -220
+      },
+      "rotation": 20,
+      "variant": 2
+    },
+    {
+      "kind": "perch",
+      "name": "Harrow knoll rocks",
+      "at": {
+        "x": -214,
+        "y": -122
+      },
+      "rotation": 180,
+      "size": {
+        "x": 4,
+        "y": 0
+      }
+    },
+    {
+      "kind": "barn",
+      "name": "Hesper's hut",
+      "at": {
+        "x": -172,
+        "y": 118
+      },
+      "rotation": 25,
+      "size": {
+        "x": 5,
+        "y": 4
+      }
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": -168,
+        "y": 112
+      },
+      "rotation": 20,
+      "variant": 1
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": -176,
+        "y": 115
+      },
+      "variant": 2
+    },
+    {
+      "kind": "lamp",
+      "at": {
+        "x": -170,
+        "y": 112.5
+      },
+      "rotation": 25,
+      "variant": 1
+    },
+    {
+      "kind": "brazier",
+      "name": "Foragers' fire",
+      "at": {
+        "x": 84,
+        "y": 147
+      },
+      "variant": 0
+    },
+    {
+      "kind": "crates",
+      "at": {
+        "x": 79,
+        "y": 152
+      },
+      "rotation": 40,
+      "variant": 2
+    },
+    {
+      "kind": "barrels",
+      "at": {
+        "x": 89,
+        "y": 153
+      },
+      "variant": 1
+    },
+    {
+      "kind": "cart",
+      "name": "Carder's stolen cart",
+      "at": {
+        "x": 90,
+        "y": 145
+      },
+      "rotation": 230
+    },
+    {
+      "kind": "perch",
+      "name": "Webbed sallows rocks",
+      "at": {
+        "x": 210,
+        "y": -192
+      },
+      "rotation": 180,
+      "size": {
+        "x": 3,
+        "y": 0
+      }
+    },
+    {
+      "kind": "perch",
+      "name": "Wolf pit kerb",
+      "at": {
+        "x": 36,
+        "y": 204
+      },
+      "rotation": 0,
+      "size": {
+        "x": 2.5,
+        "y": 0
+      }
+    },
+    {
+      "kind": "market",
+      "name": "Hollin honey stall",
+      "at": {
+        "x": 3,
+        "y": 22
+      },
+      "rotation": 90,
+      "variant": 0
+    },
+    {
+      "kind": "market",
+      "name": "Honeycomb table",
+      "at": {
+        "x": 3.2,
+        "y": 24.3
+      },
+      "rotation": 90,
+      "variant": 1
+    },
+    {
+      "kind": "market",
+      "name": "Honey jug table",
+      "at": {
+        "x": 1.3,
+        "y": 19.4
+      },
+      "rotation": 0,
+      "variant": 2
+    },
+    {
+      "kind": "market",
+      "name": "Honey jug",
+      "at": {
+        "x": 1.2,
+        "y": 19.0
+      },
+      "rotation": 20,
+      "variant": 5,
+      "lift": 0.78
+    },
+    {
+      "kind": "market",
+      "name": "Honey jug, spouted",
+      "at": {
+        "x": 1.45,
+        "y": 19.9
+      },
+      "rotation": 40,
+      "variant": 4,
+      "lift": 0.78
+    },
+    {
+      "kind": "market",
+      "name": "Flour sack",
+      "at": {
+        "x": -14.6,
+        "y": 18.3
+      },
+      "rotation": 15,
+      "variant": 11
+    },
+    {
+      "kind": "market",
+      "name": "Flour box",
+      "at": {
+        "x": -14.8,
+        "y": 20.9
+      },
+      "rotation": 290,
+      "variant": 18
+    },
+    {
+      "kind": "market",
+      "name": "Potter's box",
+      "at": {
+        "x": -14.7,
+        "y": 11.0
+      },
+      "rotation": 20,
+      "variant": 15
+    },
+    {
+      "kind": "market",
+      "name": "Produce barrel",
+      "at": {
+        "x": 4.3,
+        "y": 13.6
+      },
+      "rotation": 30,
+      "variant": 20
+    },
+    {
+      "kind": "market",
+      "name": "Produce bucket",
+      "at": {
+        "x": 4.0,
+        "y": 15.8
+      },
+      "rotation": 0,
+      "variant": 19
+    },
+    {
+      "kind": "market",
+      "name": "The Cask's yard table",
+      "at": {
+        "x": -13.73,
+        "y": -8.81
+      },
+      "rotation": 311,
+      "variant": 2
+    },
+    {
+      "kind": "market",
+      "name": "The Cask's yard jug",
+      "at": {
+        "x": -14.03,
+        "y": -8.52
+      },
+      "rotation": 200,
+      "variant": 4,
+      "lift": 0.78
+    },
+    {
+      "kind": "market",
+      "name": "The Cask's yard plate",
+      "at": {
+        "x": -13.33,
+        "y": -9.21
+      },
+      "rotation": 0,
+      "variant": 8,
+      "lift": 0.78
+    },
+    {
+      "kind": "market",
+      "name": "The Cask's ale butt",
+      "at": {
+        "x": -8.2,
+        "y": -13.9
+      },
+      "rotation": 60,
+      "variant": 20
+    },
+    {
+      "kind": "market",
+      "name": "The Cask's log store",
+      "at": {
+        "x": -16.99,
+        "y": -23.34
+      },
+      "rotation": 311,
+      "variant": 23
+    },
+    {
+      "kind": "market",
+      "name": "The Cask's hand cart",
+      "at": {
+        "x": -19.82,
+        "y": -28.01
+      },
+      "rotation": 24,
+      "variant": 27
     }
   ],
+  "woods": { "cover": 0.78, "from": 85, "ramp": 60, "spacing": 8, "edge": 12, "scale": 64, "deepAbove": 0.64, "deepOaks": 0.55, "oaks": 0, "snags": 0.04, "pineAbove": 0.64, "floor": 1 },
   "groves": [
     {
       "name": "The Old Orchard",
@@ -4170,7 +4900,7 @@
           "x": -156,
           "y": 64
         },
-        "radius": 8,
+        "radius": 5,
         "count": 6
       },
       {
@@ -4367,6 +5097,15 @@
         "title": "Innkeeper",
         "place": "bar",
         "works": true
+      },
+      {
+        "name": "Hesper Crane",
+        "role": "herbalist",
+        "title": "Hedge-wife",
+        "at": {
+          "x": -172,
+          "y": 112
+        }
       }
     ],
     "households": [
@@ -5028,6 +5767,74 @@
       "levelMin": 4,
       "levelMax": 4,
       "respawn": 180
+    },
+    {
+      "name": "The grey picket",
+      "mob": "Concord warden",
+      "tag": "warden",
+      "look": "warden",
+      "canonStatus": "GAME-ONLY picket; the Council's Seekers closing the road to Hallow's Creek and calling it a quarantine is CANON (lore_stories.md)",
+      "center": {
+        "x": 224,
+        "y": 98
+      },
+      "radius": 6,
+      "count": 3,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 150,
+      "social": "call"
+    },
+    {
+      "name": "Downs hart",
+      "mob": "Red hart",
+      "tag": "stag",
+      "look": "stag",
+      "canonStatus": "GAME-ONLY (the red hart of the west downs; it lies up in the Carr wood by day)",
+      "center": {
+        "x": -200,
+        "y": -142
+      },
+      "radius": 6,
+      "count": 1,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 150,
+      "social": "solitary"
+    },
+    {
+      "name": "Foragers' camp",
+      "mob": "Hollow forager",
+      "tag": "forager",
+      "look": "deserter",
+      "canonStatus": "GAME-ONLY band (Caddock's foragers, down from Crowsfoot Hollow to rob the north farms); the Sandthrone company they deserted is CANON",
+      "center": {
+        "x": 84,
+        "y": 150
+      },
+      "radius": 6,
+      "count": 3,
+      "levelMin": 4,
+      "levelMax": 5,
+      "respawn": 150,
+      "social": "call"
+    },
+    {
+      "name": "Sallow spiders",
+      "mob": "Carr spider",
+      "tag": "spider",
+      "look": "spider",
+      "canonStatus": "GAME-ONLY",
+      "center": {
+        "x": 204,
+        "y": -186
+      },
+      "radius": 7,
+      "count": 3,
+      "levelMin": 3,
+      "levelMax": 4,
+      "respawn": 90,
+      "social": "pack"
     }
   ],
   "lakes": [
@@ -5372,6 +6179,46 @@
       "radius": 5,
       "height": 5,
       "blend": 10
+    },
+    {
+      "name": "The Old Delf pit",
+      "center": {
+        "x": -140,
+        "y": -228
+      },
+      "radius": 7,
+      "height": -2.2,
+      "blend": 5
+    },
+    {
+      "name": "Harrow knoll",
+      "center": {
+        "x": -214,
+        "y": -122
+      },
+      "radius": 4,
+      "height": 3,
+      "blend": 10
+    },
+    {
+      "name": "Spider knob",
+      "center": {
+        "x": 210,
+        "y": -192
+      },
+      "radius": 3,
+      "height": 2,
+      "blend": 6
+    },
+    {
+      "name": "The wolf pit",
+      "center": {
+        "x": 36,
+        "y": 204
+      },
+      "radius": 2.5,
+      "height": -1.8,
+      "blend": 3
     }
   ],
   "secrets": [
@@ -5380,8 +6227,8 @@
       "name": "The Road's End",
       "kind": "vista",
       "at": {
-        "x": 244.39,
-        "y": 129.96
+        "x": 242.0,
+        "y": 133.2
       },
       "radius": 6,
       "rotation": 78,
@@ -5608,6 +6455,161 @@
       "xp": 30,
       "gold": 7,
       "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.bee-wifes-tin",
+      "name": "The Bee-wife's Tin",
+      "kind": "cache",
+      "prompt": "Reach in under the skep bench",
+      "at": {
+        "x": 212,
+        "y": 9.6
+      },
+      "rotation": 350,
+      "text": "Pushed in under the bench where the bee-wife sat to watch the flight holes: a tin with her honey-money in it, a twist of comb gone hard, and a honey cake wrapped in a dock leaf. Three skeps, and not a bee in any of them: they went in the night, all together, and west.",
+      "item": "food.hearth_cake",
+      "xp": 30,
+      "gold": 5,
+      "canonStatus": "GAME-ONLY: the Hollins and their bees. The Wasting unmaking the east is CANON (world_bible.md)."
+    },
+    {
+      "id": "secret.oakhaven.under-the-watcher",
+      "name": "Under the Watcher",
+      "kind": "vista",
+      "at": {
+        "x": 230,
+        "y": 164
+      },
+      "radius": 5,
+      "rotation": 100,
+      "text": "Close under the hood there is only shadow, and the shadow does not move with the sun. At noon it lies west, toward the village, the wrong way, and it is the only shadow on this ground that lies anywhere at all.",
+      "xp": 35,
+      "canonStatus": "CANON-EXPANDED: the Silent Statues in the Wasting are CANON (world_bible.md); shadows lying the wrong way at noon before Hallow's Creek went is CANON (lore_stories.md); the lookout is GAME-ONLY."
+    },
+    {
+      "id": "secret.oakhaven.cowmans-tin",
+      "name": "A Cowman's Tin",
+      "kind": "cache",
+      "prompt": "Lift the fallen door-stone",
+      "at": {
+        "x": 146.5,
+        "y": -83.5
+      },
+      "rotation": 20,
+      "text": "Under the door-stone, which the fire did not want: Ferris Wick's tin, with the Brook farm's cow-money in it and a draught against the ague, and scratched inside the lid, over and over, one word: CLEAN.",
+      "item": "potion.minor",
+      "xp": 30,
+      "gold": 7,
+      "canonStatus": "GAME-ONLY: Wick and his cot. The grey spreading from the Hollins' east field is the game's showing of the Wasting, which is CANON (book1 ch.4, world_bible.md)."
+    },
+    {
+      "id": "secret.oakhaven.cutters-tin",
+      "name": "The Cutter's Tin",
+      "kind": "cache",
+      "prompt": "Feel under the fallen trunk",
+      "at": {
+        "x": 55,
+        "y": -193
+      },
+      "rotation": 200,
+      "text": "Pushed under the trunk where the cutters sit for their bread: Osk Farrow's tin, with a Harrow pasty in a cloth, a whetstone, and the pay he owes the Cask for the last load, counted out and never carried in.",
+      "item": "food.harrow_pasty",
+      "xp": 30,
+      "gold": 5,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.quarrymans-tin",
+      "name": "The Quarryman's Tin",
+      "kind": "cache",
+      "prompt": "Search the cleft in the fallen rock",
+      "at": {
+        "x": -140,
+        "y": -226
+      },
+      "rotation": 180,
+      "text": "Wedged in the cleft where the face came down: the quarryman's tin, with his wedges' money in it, a lump of chalk, and a mason's mark cut in the lid, the same mark that is cut on the underside of the well's kerb, if you ever look.",
+      "xp": 30,
+      "gold": 9,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.elins-cairn",
+      "name": "Wren's Cairn",
+      "kind": "vista",
+      "at": {
+        "x": -212.6,
+        "y": -120.6
+      },
+      "radius": 5,
+      "rotation": 180,
+      "text": "A pile of stones on the crown of the knoll, one on another, thirty and more. Sel Harrow climbs up on the seventh day of every week and puts a stone on it: one for each week since the collectors' wagon went down the West road with Wren in it. From here you can see the road all the way to the Bound Stone. He watched it out of sight from here.",
+      "xp": 35,
+      "canonStatus": "GAME-ONLY: the Harrows and their daughter, and the cairn. The Concord's taking of resonance candidates from Oakhaven is CANON (book1 ch.4)."
+    },
+    {
+      "id": "secret.oakhaven.hespers-simples",
+      "name": "Hesper's Simples",
+      "kind": "cache",
+      "prompt": "Look under the drying board",
+      "at": {
+        "x": -171,
+        "y": 122.3
+      },
+      "rotation": 205,
+      "text": "Under the board where Hesper dries her simples: a tin of what she will not sell, a dried moonbell in a twist of paper, and a note in Lisbet's hand: Gran, come down. The well is better. It isn't.",
+      "item": "herb.moonbell",
+      "xp": 25,
+      "gold": 3,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.foragers-sack",
+      "name": "The Foragers' Sack",
+      "kind": "cache",
+      "prompt": "Search the sack kicked under the bush",
+      "at": {
+        "x": 74,
+        "y": 158
+      },
+      "rotation": 140,
+      "text": "Kicked under a bush at the camp's edge to be carried up the hill later: a sack with the Carder mark, a loaf, the seed-corn's purse, and a tally of what the north farms have left, barn by barn, in a careful hand that is not a forager's.",
+      "item": "food.brown_loaf",
+      "xp": 30,
+      "gold": 8,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.swineherds-bundle",
+      "name": "A Swineherd's Bundle",
+      "kind": "cache",
+      "prompt": "Pull the bundle out of the sallow roots",
+      "at": {
+        "x": 196,
+        "y": -199
+      },
+      "rotation": 60,
+      "text": "Col Pennock's bundle, wedged in the sallow roots where he dropped it: a pot of lard, a knife, and his boots, which he says the webs took. He went in after the pigs at the first frost and came out barefoot, and would not go back for them.",
+      "item": "food.salt_flank",
+      "xp": 30,
+      "gold": 5,
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "secret.oakhaven.foragers-pack",
+      "name": "A Forager's Pack",
+      "kind": "cache",
+      "prompt": "Search the pack at the bottom of the pit",
+      "at": {
+        "x": 36,
+        "y": 202
+      },
+      "rotation": 0,
+      "text": "At the bottom of the pit, where he left it to climb out: one of Caddock's foragers' packs, with the north farms' eggs in it, broken, a draught, and a letter from his mother that he never answered.",
+      "item": "potion.minor",
+      "xp": 30,
+      "gold": 6,
+      "canonStatus": "GAME-ONLY (the pit and the forager); the Sandthrone company the foragers deserted is CANON"
     }
   ],
   "nodes": [

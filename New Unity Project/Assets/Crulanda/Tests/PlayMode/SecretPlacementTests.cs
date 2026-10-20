@@ -24,7 +24,11 @@ namespace Crulanda.Tests
     ///   start or where you arrive from another zone;
     /// - each zone has a lookout and at least two things to search;
     /// - ids are unique across the zones and name their own zone, every needs names a secret in the same zone (a key no chest
-    ///   needs is an error), and every item and Chronicle page a secret gives exists.
+    ///   needs is an error), and every item and Chronicle page a secret gives exists;
+    /// - (Phase 8.6 step 8) the new kinds (carving, read, grave, remains, shrine) are known kinds and build something to see; one
+    ///   placed in a cave (the Root-Mother's Deep) stands in its cave (on its floor, or cut in its wall); every secret, as the game has it (its zone's side file
+    ///   merged), has a clue for the book and a hint for a villager, neither naming one of its zone's landmarks; and the zones hold
+    ///   their targets (decision 7: about 90 in all, 8 to 14 in each of Khaven, the Peaks, the Rim and the Shore).
     /// </summary>
     public class SecretPlacementTests
     {
@@ -119,6 +123,12 @@ namespace Crulanda.Tests
                     else if (!walked) problems.Add(q + "can't be walked to from the start");
                     // Where it stands.
                     var at = new Vector2(spot.position.x, spot.position.z);
+                    if (!string.IsNullOrEmpty(d.cave))
+                    {
+                        var cave = Hollow.All.Find(h => h.Name == d.cave);
+                        if (cave == null) problems.Add(q + "names the cave '" + d.cave + "', which the zone has not");
+                        else if (!cave.FloorAt(at, out _) && !Hollow.InsideAny(spot.position + Vector3.up * .3f, 0)) problems.Add(q + "is not in its cave (" + d.cave + ")");   // on its floor, or cut in its wall (E's own test of inside)
+                    }
                     if (zone.InBuilding(at)) problems.Add(q + "stands in a building");
                     if (zone.WaterAt(at, out _, out _)) problems.Add(q + "stands in the water");
                     foreach (var r in z.roads) if (r != null && r.points.Length > 1 && ToPath(at, r.points) < r.width / 2 + (Searchable(d) ? 1 : .5f)) problems.Add(q + "stands on " + r.name);
@@ -138,7 +148,8 @@ namespace Crulanda.Tests
             var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
             Assert.IsNotNull(s.Items, "Items load."); Assert.IsNotNull(s.Quests, "Quest content (the Chronicle pages) loads.");
             var problems = new List<string>(); var seen = new Dictionary<string, string>(StringComparer.Ordinal);
-            var kinds = new[] { "vista", "cache", "note", "herb", "chest", "key" };
+            var kinds = new[] { "vista", "cache", "note", "herb", "chest", "key", "carving", "read", "grave", "remains", "shrine" };
+            CollectionAssert.AreEquivalent(kinds, DiscoveryLog.Kinds, "The kinds the book knows are the kinds the builder builds.");
             var zones = s.Zone.AllZones();
             foreach (var z in zones)
                 foreach (var d in z.secrets ?? new ZoneSecret[0])
@@ -169,7 +180,21 @@ namespace Crulanda.Tests
                     if (!string.IsNullOrEmpty(d.item) && s.Items.Get(d.item) == null) problems.Add(q + "gives the unknown item '" + d.item + "'");
                     if (!string.IsNullOrEmpty(d.document) && !s.Quests.Db.Documents.ContainsKey(d.document)) problems.Add(q + "gives the unknown Chronicle page '" + d.document + "'");
                     if (d.xp < 0 || d.gold < 0) problems.Add(q + "negative rewards");
+                    // Its clue and its hint (2026-10-15; Phase 8.6 decision 6), as the game has them after the zone's side file.
+                    ZoneLore.Apply(z);
+                    if (string.IsNullOrEmpty(d.clue) || string.IsNullOrEmpty(d.hint)) problems.Add(q + "needs a clue for the book and a hint for a villager");
+                    foreach (var l in landmarks) if (DiscoveryLog.Mentions(d.clue, l) || DiscoveryLog.Mentions(d.hint, l)) problems.Add(q + "its clue or hint names the landmark '" + l + "'");
                 }
+            }
+            // The targets (decision 7): about ninety in all, eight to fourteen in each of the middle zones.
+            int total = zones.Sum(z => (z.secrets ?? new ZoneSecret[0]).Count(x => x != null));
+            if (total < 110 || total > 126) problems.Add(total + " secrets in all, not about ninety, the Lowtowns' fifteen, Hallow's Creek's eight and the Crown's three");
+            foreach (var id in new[] { "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns" })
+            {
+                var z = zones.Find(x => x.id == id); int n = z == null ? 0 : z.secrets.Count(x => x != null);
+                // (2026-10-18) The Lowtowns' fifteenth: the carvings under the moss in the drowned vaults' crawl (pick 11).
+                int most = id == "zone.lowtowns" ? 15 : 14;
+                if (n < 8 || n > most) problems.Add(id + " holds " + n + " secrets, not 8-" + most);
             }
             Assert.Greater(seen.Count, 0, "The zones have secrets.");
             Assert.IsEmpty(problems, string.Join("\n", problems));

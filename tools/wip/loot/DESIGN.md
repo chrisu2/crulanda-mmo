@@ -374,6 +374,11 @@ Rules for named items:
 Cut from v1: random-roll treasure chests, rare spawns, salvage (section 4).
 
 ### 3.6 Sets and unique effects
+**Chris, 2026-10-15 (~13:00, verbatim): "loot: we need set pieces like 6 pieces. 2/6 give 1 special, 4/6 another special ability 6/6
+full set 3 special abilities and these are class specific."** So: class sets of six pieces (one class each); at 2 worn the first
+special, at 4 the second, at 6 the third (three in all with the whole set). Specials are class abilities changed or added, not plain
+stats. Section 3.8 (below) is the plan; the four-piece Crowsfoot set and the zone sets stay as they are.
+
 
 Two sets, both four pieces including the existing boss crown (`ITEMS_V1.md`): The Deserter King's Due (Crowsfoot Hollow) and Vigil of the Root-Mother (the Root-Mother's Deep). Bonuses switch on by pieces worn and are recomputed whenever equipment changes; nothing is saved.
 
@@ -394,7 +399,100 @@ Caps: coins and luck +30% in total, restRegen +20, onKillHeal 60. Crit, dodge, b
 
 `ITEMS_V1.md`: 104 named items (49 uncommon, 48 rare, 7 epic) with slot, required level, quality, stats, effect, source, look and flavour, plus the two sets, a drop list per boss, and looks for the 12 existing named items and the 21 crafted pieces. Every zone has named gear in all nine slots. Every stat line was checked against its budget by script.
 
+### 3.8 Class sets: six pieces, three specials (plan and as built, 2026-10-15)
+
+From Chris's brief in 3.6, and his follow-up the same day (verbatim): **"most of the higher 6/6 pieces are raid..but no raid is made yet"**.
+So the sets built now are **tier 1, the dungeon tier**, from the Sealed Adit. Higher tiers come from raids (ten-player raid bosses);
+no raid is built yet, so there is no tier 2 yet. Everything below is data, so a raid tier is added by data alone (see "A raid tier").
+All names GAME-ONLY. Status: BUILT (compiles; tests written, not yet run in Unity; not yet seen in Chris's build).
+
+**The rules**
+- One set per class, all eleven (warrior, druid, paladin, ranger, mage, rogue, archivist, saltmender, cleric, shaman, scoundrel).
+  Six pieces: head, shoulders, chest, hands, legs, feet. Rare, required level 11 (the Adit's band), on the generated curve
+  (armour 29 / 45, value 48) with a 5k stat budget (25 points), unique, boss pieces.
+- **Class only.** `ItemDef.classOnly` ("class.mage"). `Inventory.Equip` refuses another class ("Only a Rogue can wear that."), the
+  tooltip shows "Class: Rogue" (red when it is not yours), and the upgrade arrow never points at another class's piece.
+- **Specials, not stats.** One at 2 worn, one at 4, one at 6: three with the whole set. Each changes one of the class's own
+  abilities. The 6-piece one is always a proc on the class's core loop. They switch off as pieces come off (worked out again from the
+  equipment on every change, like the older sets; nothing is saved).
+- **Where they drop.** Each slot comes from a different boss, in the run's order, and every class's piece of a slot from the same
+  boss: hands Gang-Boss Haddo Lusk, feet Overseer Grael Vosk, shoulders Urn-Keeper Sabel, legs Cinder-Warden Ysolt, head The
+  Foreman Who Forgot, chest Quartermaster Brannigan Sorrel. Rail-Captain Danner is left out (his place is moving with the Cove work).
+- **How they drop.** A boss's drop list in `loot.sets.json` has one *class set group* (`classSet: true`): 40% a kill (lucky), and
+  only the pieces of classes in the party can drop. The player's class weighs 3 to each sim's 1 (`LootDatabase.ClassSetOwnWeight`).
+  A piece the player owns leaves the pool (that kill can still give a sim's). Pity 8: the player's own piece is certain on the 8th
+  kill without it (the counter is one more `lootLuck` entry: no save change). The group neither spends nor is blocked by the
+  named-item cap. In a party a piece is rolled for as now; a sim Needs only its own class's piece and Greeds the rest.
+  Rough maths: a party of five different classes gives the player's piece from a boss about one run in six, never more than eight,
+  so the whole set takes several runs.
+
+**The effect kinds** (`GearEffect`: `ability`, `other`, `chance` are new fields; caps in `GearEffects.Cap`)
+
+| Kind | What it does | Cap |
+|---|---|---|
+| `abilityCost` | the ability costs `amount` less (or `amount`% with `percent`) | 50 / 50% |
+| `abilityCooldown` | its cooldown is `amount` s shorter (or %) | 60 s / 50% |
+| `abilityCastTime` | its cast is `amount` s quicker (or %); never under 0.3 s | 2 s / 50% |
+| `abilityPower` | its hits and heals as it resolves are `amount`% stronger | 50% |
+| `procResource` | when it resolves (`ability: "auto"`: a landed swing or auto-shot), `chance`% to give `amount` resource | 50 |
+| `procReset` | when it resolves, `chance`% to take `amount` s off `other`'s cooldown (600: ready at once) | 600 s |
+| `procEcho` | when it resolves, `chance`% that it resolves again, free, at `amount`% power (an echo has no procs) | 100% |
+
+**The one hook.** Every kit's ability goes through `EncounterSession.StartAbility`. There the ability is swapped for
+`GearEffects.Adjust`'s copy (same id, so the same cooldown; cost, cooldown and cast time changed), and the effect runs inside
+`ResolveWithGear`: `GearPowerNow` is the ability's power scale while it resolves (read by `DamageScaleFor` for the player's hits and
+`PlayerHealScale` for the kits' heals), then the procs fire (`GearEffects.Proc`). The weapon swing calls `GearSwingProcs` for "auto".
+Limits: power counts for hits and heals as the ability resolves, not later ticks of a damage or heal over time, and not for heals a
+kit makes without `PlayerHealScale` (the Mage's, the Warrior's barrier). **Sims do not get set bonuses**: their fighting does not
+use the class kits, so the hook does not reach them. They can win and wear the pieces (the look), with no specials.
+
+**The eleven tier 1 sets** (loot.sets.json; looks: one palette per set, the family to the class's kit)
+
+| Class | Set | 2 worn | 4 worn | 6 worn |
+|---|---|---|---|---|
+| Warrior | The Shoring-Warden's Iron (tollroad plate) | Shield Bash 3 s shorter cooldown | Strike 20% harder | Second Wind: a landed swing 25% to give 10 vigor |
+| Paladin | The Lamp-Oath Plate (concord plate) | Judgement 1.5 s shorter cooldown | Mend 0.3 s quicker | Lamp-Lit Verdict: Smite 20% to make Judgement ready |
+| Druid | The Hollow-Oak Raiment (veridian bark) | Quickbloom 0.3 s quicker | Thornbolt 20% harder | Twin Rake: Rake 25% to strike again at full power |
+| Ranger | The Sump-Stalker's Leathers (khaven hide) | Aimed Shot 0.3 s quicker | Barbed Arrow 5 focus cheaper | Sump-Sight: Quick Shot 20% to make Aimed Shot ready |
+| Mage | The Ash-Garden Vestments (cult cloth) | Scorch 2 s shorter cooldown | Flare 20% hotter | Ash Bloom: Ember Bolt 20% to make Flare ready |
+| Rogue | The Lamp-Thief's Blacks (sandthrone leather) | Gouge 10 focus cheaper | Eviscerate 15% deeper | Second Cut: Sinister Strike 20% to strike again (another combo point) |
+| Archivist | The Undersong Vestments (pale cloth) | Hush 3 s shorter cooldown | Mending Phrase 0.3 s quicker | Undersong: Shard Note 20% to sound twice |
+| Salt-Mender | The Brine-Cantor's Cloth (pilgrim cloth) | Salt-Ward 3 s shorter cooldown | Close the Cut 0.3 s quicker | Brine Tide: Salt Shard 15% to make Seal the Wound ready |
+| Cleric | The Lantern-Bearer's Vestments (concord cloth) | Vigil 2 s shorter cooldown | Mend heals 15% more | Lantern Grace: Mend 25% to give back its 12 mana |
+| Shaman | The Barrow-Wind Hides (ashwalker mail and bone) | Thunderhead 2 s shorter cooldown | Tide Mend 0.4 s quicker | Barrow-Gale: Squall 20% to make Thunderhead ready |
+| Scoundrel | The Fence's Finery (oakhaven) | Jeer 3 s shorter cooldown | Quick Cut 20% harder | Fence's Nerve: a landed swing 20% to give 8 Nerve |
+
+All numbers are first guesses for Chris's balance pass; they sit in `loot.sets.json`.
+
+**A raid tier.** Add to `loot.sets.json` (or a new loot file): eleven sets with `"tier": 2, "tierName": "Raid"`, ids `set.t2.<class>`
+and `loot.set.t2_<class>_<slot>`, stronger amounts with the same kinds, and drop lists for the raid's bosses (their zone and mob)
+with a class set group. The tests check tier 1 for every class; nothing in the code knows a tier's number.
+
+**Files.** `Scripts/Encounter/Loot.cs` (fields, kinds, caps, `Adjust`/`PowerScale`/`Proc`, the class set roll, the tooltip's
+tier), `Items.cs` (`classOnly`, `CanEquip`/`ClassMayWear`), `EncounterSession.cs` (`StartAbility`, the swing),
+`EncounterSession.Loot.cs` (`ResolveWithGear`, procs, `PartyClasses`), `EncounterSession.RoleScale.cs` (`GearPowerNow`),
+`EncounterHud.Items.cs`/`.Loot.cs` (the class line, the upgrade arrow), `SimCompanion.cs` (the sims' rolls), the new
+`EncounterContent/Items/loot.sets.json` (registered in `Encounter.asset`), tests `ClassSetTests` and `LootDataTests` (counts),
+`LootIdBaseline.txt`, `NamedLootTests` (its count had not caught up with the reworked Adit either).
+
 ---
+
+### 3.9 Party rolls: a sim Needs its upgrades (2026-10-18)
+
+Chris, 2026-10-18 (verbatim): "group is not rolling on loot..if upgrade they need to get it"
+
+GAME-ONLY. The roll itself (Round 25, note 72: Need over Greed, the highest roll of the top tier wins, all passing leaves it to you, twenty
+seconds) was only for uncommon and better, so a common piece a sim needed went straight to your bags. As built:
+- In a party, a drop is rolled for when it is uncommon or better, or when it is gear of any quality that is an upgrade for one of the
+  party's sims. Common gear no sim needs is still simply taken (`EncounterSession.Rolled`, `PartyLoot.cs`).
+- A sim rolls Need for gear that fits it (class, weight, slot, level) and beats what it wears in that slot by its armour, weapon damage and
+  stats (`SimGear.IsUpgrade`, the same check the Exchange's buyers use; before, only quality and item level were compared). A class set's
+  piece is as in 3.8. Anything else it could sell is Greed; what is no use to it, Pass (`SimCompanion.RollFor`).
+- You roll with the buttons as before. The group run's bot rolls Need when the piece is an upgrade for it (`LootJudge.IsUpgrade`, the
+  tooltip's check), else Pass (`EncounterSession.YourRollFor`, `RunCapture`); before, it never chose and its time ran out as a pass.
+- In Party chat: "Isolde rolls Need (87) for X", "passes on X", then "won X, equipping it, ty". A sim that wins with Need wears the piece
+  at once (`SimEconomy.PutOn`: the old piece goes to its spares or is sold). The scorecard's "Loot: X (from) to Y" lines are unchanged.
+- Test: `PartyLootTests.A_common_upgrade_for_a_sim_is_rolled_for_and_the_sim_needs_and_wears_it`. Compiles; not run in Unity yet.
 
 ## 4. Thrill features
 
@@ -665,3 +763,5 @@ Not verified:
 - Mob tuning against a player in full boss rares and set bonuses.
 - Whether the hunting and skinning work will edit `ActorVisual.cs` or `EncounterEnemy.cs`; there is no build plan for it in `tools/wip/professions` yet.
 - Palette colours, recipe sizes and day estimates are first guesses, to be tuned from the wardrobe shots.
+
+- **Chris, 2026-10-18 (later), verbatim:** "dont roll on common gear. i just didnt see people win rolls". So: rolls for uncommon and better only (commons are taken as before); the sims Need what is a real upgrade for them (SimGear.IsUpgrade) and wear what they win; each win is said in party chat ("won X, ty") and on screen ("Y wins X.").

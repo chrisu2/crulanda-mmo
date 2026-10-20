@@ -1,0 +1,72 @@
+{
+  "zone": "zone.adit",
+  "canonStatus": "GAME-ONLY: every clue and hint here is the game's. What they tell of is CANON or CANON-EXPANDED as adit.json's canonNote says: old mining tunnels under the Shattered Peaks and the rail deep down (book2 ch.19), the Silent Pilgrims (world_bible.md), the Cult of Ash (book1 ch.10), aether-geodes (book1 ch.3). Pib, Lisle Tamber, Tarsk and Brother Cael are the Peaks' people (GAME-ONLY). Written 2026-10-15 (Phase 8.6 step 8).",
+  "secrets": [
+    {
+      "id": "secret.adit.shoulder",
+      "clue": "Before the way in, up on the shoulder over the cut, two rocks keep the wind off something grey and woollen.",
+      "hint": "Brother Cael says a pilgrim who went in ahead of the Company left his bundle up in the rocks over the cut at the mouth. Grey wool, and a slate in the knot."
+    },
+    {
+      "id": "secret.adit.nail_key",
+      "clue": "Deep in the dark drift, where the glowing lichen gives out for a stride or two, something hangs on a nail behind a fallen prop.",
+      "hint": "Pib says the miners hung a chest's key on a nail down the dark drift, behind a fallen prop, where the glowing moss stops. No lamp ever went that far."
+    },
+    {
+      "id": "secret.adit.behind_falls",
+      "clue": "Where water falls in a sheet down the long hall's wall, there is a dry place behind it, and an old lock waiting for an old key.",
+      "hint": "Pib says there's a dry hollow behind the falling water in the great hall, and a miners' chest in it. Locked. The key is somewhere down in the dark."
+    },
+    {
+      "id": "secret.adit.lamp_niche",
+      "clue": "High on the trestles, at the back of a landing, the lamp-men cut a niche for their oil and their pay.",
+      "hint": "Pib says the lamp-men kept their pay in a niche at the back of the high trestle landing, up where they filled the lamps. Nobody climbs up there now but the moths."
+    },
+    {
+      "id": "secret.adit.censored_room",
+      "clue": "Behind the shelves where the ash-priests copied, a reading desk holds a history with whole pages inked over.",
+      "hint": "Lisle Tamber says the Cult's copyists kept a room behind their shelves for what they struck out. One page, she's sure, the censor missed."
+    },
+    {
+      "id": "secret.adit.censored_box",
+      "clue": "Under the censor's own desk, an iron-bound box of fines taken from copyists who wrote what they should not.",
+      "hint": "Lisle Tamber says the censor fined his copyists for every word he struck, and kept the fines in a box under his own desk. Of course he did, she says."
+    },
+    {
+      "id": "secret.adit.grey_key",
+      "clue": "At the dead end of a drift where a miner lay down and went quiet, a key with no colour hangs over his grey cot.",
+      "hint": "Pib says the quiet miner had a cot at the end of his drift, and a key over it on a nail. Grey now. Everything of his is grey now."
+    },
+    {
+      "id": "secret.adit.foremans_box",
+      "clue": "Where the grey has broken into the workings from below, the Foreman's strongbox has gone dull, waiting for a key with no colour.",
+      "hint": "Pib says the Foreman kept a strongbox down where the grey broke in, and the only key that fits it is as grey as he is."
+    },
+    {
+      "id": "secret.adit.drowned_purse",
+      "clue": "In the black pool off the river under the mountain, where something lurks, a hand under the water finds a month's pay.",
+      "hint": "Pib says a bargeman lost his month's pay in the lurker's pool down by the dark river. Snagged on a rock, he reckons. He wasn't going back in for it."
+    },
+    {
+      "id": "secret.adit.ember_cap",
+      "clue": "Low on the wall of the cloister stair, where a fire chapel's heat comes through the rock, small red caps glow like coals.",
+      "hint": "Tarsk says the ash-priests' stair down to their fire chapel grows a red cap on its walls that glows like coals. Cousin to the pale flower of the ash, he calls it."
+    },
+    {
+      "id": "secret.adit.scaffold_a",
+      "clue": "On the barge scaffold in the cove, under a loose plank of the first tier, a rigger kept a tin against a wet week.",
+      "hint": "Pib says the riggers on the barge scaffold kept twine and a few coins under the planks. The first tier is loose; anyone could find it, but nobody looks."
+    },
+    {
+      "id": "secret.adit.scaffold_b",
+      "clue": "Under the scaffold's top tier, where the bargemen go aboard, a purse hangs on a nail that nobody came back for.",
+      "hint": "Pib says one of the bargemen hung his purse under the top tier of the scaffold, where they board, and went out on the water and didn't come back."
+    },
+    {
+      "id": "secret.adit.kettle_tally",
+      "clue": "At the end of the platform past the stacked sleepers, a chalked board keeps count of the pitch and who boils it.",
+      "hint": "Pib says the pitch-boiler chalks his barrels on a board at the platform's end. Old Kettle, they call him. Don't wake him, Pib says."
+    }
+  ],
+  "stories": []
+}

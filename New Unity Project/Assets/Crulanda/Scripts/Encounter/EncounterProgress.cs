@@ -15,6 +15,8 @@ namespace Crulanda.Encounter
     public sealed class EncounterProgress
     {
         public string classId = "class.warrior";
+        /// <summary>The player's people (Docs/RACES.md). Empty in a save from before races: read as human (Races.Normalize).</summary>
+        public string raceId = Races.Human;
         /// <summary>Zone the saved position belongs to. Empty = the original Quiet Trail test map.</summary>
         public string zoneId;
         public List<TalentRank> talents = new List<TalentRank>();
@@ -33,6 +35,10 @@ namespace Crulanda.Encounter
         public List<string> inventory = new List<string>();
         /// <summary>Bag slots (Inventory.BagSize) and worn gear by EquipSlot. Format 6.</summary>
         public List<ItemStack> bag = new List<ItemStack>();
+        /// <summary>This character's own vault at the Treasury (2026-10-16, Chris: "the remainder is character only"): 48 slots and the
+        /// rows of 12 it has bought (vaultRows). The shared shelf of 3 is the profile's (CharacterProfile).</summary>
+        public List<ItemStack> vault = new List<ItemStack>();
+        public int vaultRows;
         public List<ItemStack> equipment = new List<ItemStack>();
         public List<EnemyRecord> enemies = new List<EnemyRecord>();
         // ---------- notice boards (2026-10-03; older saves load with zero days and no boards, and draw on first use) ----------
@@ -58,6 +64,11 @@ namespace Crulanda.Encounter
         public List<string> keys = new List<string>();
         /// <summary>The spirit stones touched (ZoneInteractable.Key): where you wake in that zone after a fall (D3).</summary>
         public List<string> spiritStones = new List<string>();
+        /// <summary>The chosen action bar (ActionBarRules; Docs/ACTION_BAR.md): book keys, "" for an empty slot. Within format 10: a save
+        /// without it loads with the default ten.</summary>
+        public List<string> bar = new List<string>();
+        /// <summary>Bar slots bought with alternate advancement points past the level cap (0-4).</summary>
+        public int aaSlots;
         // ---------- quests (save format 4; older saves load with these empty) ----------
         public List<QuestState> quests = new List<QuestState>();
         public List<string> questsDone = new List<string>();
@@ -68,6 +79,14 @@ namespace Crulanda.Encounter
         public List<string> questItems = new List<string>();
         /// <summary>One-shot interactables already emptied ("zone|name|x|z"), e.g. a crate you took the iron from.</summary>
         public List<string> usedInteractables = new List<string>();
+        // ---------- lockouts (save format 11, with the found recipes; older saves load with this empty; here, not at the end, so payloads still end as they did) ----------
+        /// <summary>The bosses and elites killed and not yet to be looted again (Chris, 2026-10-15: "bosses/elites will not respawn"): each
+        /// one's key and when its lockout ends, as UTC ticks (Lockouts; run-out ones are dropped as the session goes).</summary>
+        public List<Lockout> lockouts = new List<Lockout>();
+        // ---------- found recipes (save format 11; older saves load with this empty; here, not at the end, so payloads still end as they did) ----------
+        /// <summary>The found recipes learned from a leaf, by recipe id, in the order learned (Phase 8.6 step 5). Taught recipes are not
+        /// listed: they follow from the skill. See ProfessionLog.UseLeaf.</summary>
+        public List<string> recipes = new List<string>();
         // ---------- discoveries (save format 7; older saves load with this empty) ----------
         /// <summary>Hidden finds already found, by id ("secret.&lt;zone&gt;.&lt;slug&gt;"): each pays out once, ever. See DiscoveryLog.</summary>
         public List<string> discoveries = new List<string>();
@@ -88,9 +107,9 @@ namespace Crulanda.Encounter
         public List<LootLuck> lootLuck = new List<LootLuck>();
 
         // ---------- levels (save format 5) ----------
-        /// <summary>The highest level (13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). A talent point a level
+        /// <summary>The highest level (19 since the Lowtowns, Phase 9.1; 15 from round 29, 13 since the Verdant Shore, 2026-09-30; it was 10 for the first four zones). A talent point a level
         /// to <see cref="TalentCap"/>, which is this.</summary>
-        public const int LevelCap = 15;   // 15 now, 30 in the end (Chris, 2026-10-07; ROADMAP: Phase 9)
+        public const int LevelCap = 20;   // 20 (Chris, 2026-10-16: "raise top level to 20. make sure there is a zone for 15-20 and a dungeon for the same range"), 30 in the end (2026-10-07)
         /// <summary>A point a level to the level cap (TALENT_DEPTH.md, Chris's decision of 2026-10-09: "1 a level (as now)", 16 points at 15,
         /// enough for a path's tier 3). It had stayed at 10 when the levels went to 15, so the Vanguard's, the Jailer's and the Cantor's
         /// third tiers could not be reached in play (caught 2026-10-10 by the Jailer's test).</summary>
@@ -189,8 +208,14 @@ namespace Crulanda.Encounter
             return best;
         }
         public void Clear() { values.Clear(); forced = null; until = 0; }
+        /// <summary>Whether anyone is on it (a sleeping mob with threat wakes: EncounterSession.TickDormant).</summary>
+        public bool Any { get { return values.Count > 0 || forced != null; } }
         public void Remove(string id) { if (id != null) values.Remove(id); if (forced == id) { forced = null; until = 0; } }
         public bool IsEmpty { get { return values.Count == 0; } }
+        /// <summary>The highest threat anyone holds (0 for none): the Lowtowns' Weave-Eaters' lighthouse adds a share of it (WeaveEaterRules).</summary>
+        public float Top { get { float max = 0; foreach (var v in values.Values) max = Math.Max(max, v); return max; } }
+        /// <summary>The threat held by one party member (0 if none); the balance harness's tank test reads it.</summary>
+        public float Of(string id) { return id != null && values.TryGetValue(id, out var v) ? v : 0; }
     }
 }
 

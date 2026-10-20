@@ -285,8 +285,13 @@ namespace Crulanda.World
             Part(PrimitiveType.Cube, t, new Vector3(bx, .9f, .5f), new Vector3(.6f, .07f, 2.2f), art.timber);
             foreach (int sx in new[] { -1, 1 }) foreach (int sz in new[] { -1, 1 }) Part(PrimitiveType.Cube, t, new Vector3(bx + sx * .24f, .43f, .5f + sz * 1.02f), new Vector3(.08f, .86f, .08f), dark);
             Part(PrimitiveType.Cube, t, new Vector3(bx, .35f, .5f), new Vector3(.5f, .04f, 2.04f), dark);
-            MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(bx, .935f, 1.3f), Tint(art.stone, new Color(.62f, .6f, .56f)));
-            Rod(t, new Vector3(bx, 1, 1.3f), new Vector3(bx - .1f, 1.16f, 1.22f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            // (play note 253) the alchemy pack's mortar at the back, a crystal flask on its stand between the jars and the still; else painted
+            if (ModelProp(t, AlchemyMortar, new Vector3(bx, .935f, 1.3f), 200, MortarHeight) == null)
+            {
+                MeshPart(PropMesh("Mortar", () => Turned(new[] { new Vector2(0, 0), new Vector2(.08f, 0), new Vector2(.13f, .12f), new Vector2(.13f, .15f), new Vector2(.1f, .15f), new Vector2(.06f, .05f), new Vector2(0, .05f) }, 10)), t, new Vector3(bx, .935f, 1.3f), Tint(art.stone, new Color(.62f, .6f, .56f)));
+                Rod(t, new Vector3(bx, 1, 1.3f), new Vector3(bx - .1f, 1.16f, 1.22f), .035f, Tint(art.stone, new Color(.7f, .68f, .62f)));
+            }
+            ModelProp(t, AlchemyCrystal, new Vector3(bx + .04f, .935f, .1f), -30, CrystalHeight);
             Jar(t, new Vector3(bx + .05f, .935f, .85f), new Color(.62f, .4f, .28f));
             Jar(t, new Vector3(bx - .08f, .935f, .6f), new Color(.5f, .46f, .36f), .85f);
             Jar(t, new Vector3(bx + .06f, .935f, .36f), new Color(.36f, .44f, .4f), 1.15f);
@@ -295,7 +300,7 @@ namespace Crulanda.World
             foreach (int k in new[] { 0, 1, 2 }) Rod(t, new Vector3(bx + Mathf.Cos(k * 2.094f) * .12f, .99f, -.25f + Mathf.Sin(k * 2.094f) * .12f), new Vector3(bx + Mathf.Cos(k * 2.094f) * .1f, 1.1f, -.25f + Mathf.Sin(k * 2.094f) * .1f), .02f, iron);   // the trivet
             MeshPart(PropMesh("Still", () => Turned(new[] { new Vector2(0, 0), new Vector2(.09f, 0), new Vector2(.13f, .08f), new Vector2(.12f, .16f), new Vector2(.05f, .24f), new Vector2(.07f, .3f), new Vector2(.03f, .36f), new Vector2(0, .37f) }, 10)), t, new Vector3(bx, 1.1f, -.25f), copper);
             Rod(t, new Vector3(bx, 1.42f, -.25f), new Vector3(bx - .04f, 1.12f, -.62f), .025f, copper);
-            Jar(t, new Vector3(bx - .04f, .935f, -.66f), new Color(.4f, .5f, .46f), .8f);
+            if (ModelProp(t, AlchemyFlask, new Vector3(bx - .04f, .935f, -.66f), 0, FlaskHeight) == null) Jar(t, new Vector3(bx - .04f, .935f, -.66f), new Color(.4f, .5f, .46f), .8f);   // the still's flask (play note 253)
             Glow(t, new Vector3(bx - .25f, 1.15f, -.25f), 3.5f, .9f, new Color(1, .6f, .3f), 1.5f);
             // A shelf of jars on the back wall; a stool, two baskets of cut herbs and a sack in the back corner.
             Part(PrimitiveType.Cube, t, new Vector3(-.7f, 1.45f, d / 2 - .2f), new Vector3(2.2f, .04f, .24f), dark);
@@ -337,14 +342,17 @@ namespace Crulanda.World
         {
             float w = KitchenSize.x, d = KitchenSize.y; const float wallTop = 2.5f, slope = .2794f, pitch = 15.6f;   // the roof drops .95 m over 3.4 m
             var dark = Tint(art.timber, new Color(.26f, .17f, .11f)); var boards = Tint(art.timber, new Color(.4f, .28f, .18f)); var iron = Tint(art.metal, new Color(.2f, .2f, .22f));
+            // In the Lowtowns (the Rusty Spoon's): a lean-to of tarred timber with a soot-brick end wall, roofed in tarred boards.
+            bool low = Zone.biome == "lowtowns"; var endWall = low ? SootBrick(2) : Masonry; var roof = low ? TarredTimber : art.slate;
+            if (low) { dark = TarredTimber; boards = Tint(art.timber, new Color(.17f, .14f, .12f)); }
             float Under(float z) { return 2.863f + (z + .2f) * slope; }   // the roof slab's underside over local z
             float drop = FootDrop(t, w + .3f, d + .3f);
             BoxPart(t, new Vector3(.2f, .02f, .05f), new Vector3(w - .5f, .05f, d - .2f), Tint(Masonry, new Color(.62f, .6f, .56f)), null, 1.2f);   // flagged floor
             // The stone end wall, boarded from its top up to the roof; the roof on a ledger along the inn's wall, five rafters
             // and a beam carried by the end wall and one post.
-            BoxPart(t, new Vector3(-w / 2 + .175f, (wallTop - drop) / 2, .05f), new Vector3(.35f, wallTop + drop, d - .1f), Masonry, null, 1.5f);
+            BoxPart(t, new Vector3(-w / 2 + .175f, (wallTop - drop) / 2, .05f), new Vector3(.35f, wallTop + drop, d - .1f), endWall, null, 1.5f);
             MeshPart(PropMesh("Kitchen gable", () => Cutout(new[] { new Vector2(-1.45f, wallTop), new Vector2(1.5f, wallTop), new Vector2(1.5f, 3.34f), new Vector2(-1.45f, 2.52f) }, .12f)), t, new Vector3(-w / 2 + .175f, 0, 0), boards, Quaternion.Euler(0, -90, 0));
-            BoxPart(t, new Vector3(.1f, 2.925f, -.2f), new Vector3(w + .8f, .12f, 3.53f), art.slate, Quaternion.Euler(-pitch, 0, 0), 2.5f);
+            BoxPart(t, new Vector3(.1f, 2.925f, -.2f), new Vector3(w + .8f, .12f, 3.53f), roof, Quaternion.Euler(-pitch, 0, 0), 2.5f);
             Part(PrimitiveType.Cube, t, new Vector3(.1f, 3.3f, d / 2 - .06f), new Vector3(w + .6f, .14f, .12f), dark);
             foreach (float x in new[] { -1.6f, -.6f, .4f, 1.4f, 2.35f }) Bar(t, new Vector3(x, Under(1.42f) - .06f, 1.42f), new Vector3(x, Under(-1.7f) - .06f, -1.7f), .12f, .08f, dark);
             Part(PrimitiveType.Cube, t, new Vector3(.1f, 2.38f, -1.4f), new Vector3(w - .1f, .16f, .16f), art.timber);
@@ -382,6 +390,7 @@ namespace Crulanda.World
             Part(PrimitiveType.Sphere, t, new Vector3(.2f, .95f, 1.1f), Vector3.one * .2f, Tint(art.foliage, new Color(.42f, .6f, .28f)));
             Part(PrimitiveType.Cube, t, new Vector3(-.2f, .87f, .82f), new Vector3(.26f, .01f, .035f), art.metal, Quaternion.Euler(0, 20, 0));
             Jar(t, new Vector3(.42f, .855f, 1.25f), new Color(.5f, .46f, .36f), 1.4f);
+            CounterFare(t, new Vector3(-.02f, .855f, 1.32f), new Vector3(.45f, .855f, .85f), 2, 3);   // the zone's fare on the board (playtest note 235)
             Part(PrimitiveType.Cube, t, new Vector3(-.2f, 1.6f, d / 2 - .16f), new Vector3(1.5f, .04f, .26f), dark);
             foreach (float x in new[] { -.8f, .4f }) Part(PrimitiveType.Cube, t, new Vector3(x, 1.5f, d / 2 - .13f), new Vector3(.05f, .05f, .22f), dark, Quaternion.Euler(35, 0, 0));
             for (int i = 0; i < 4; i++) Jar(t, new Vector3(-.75f + i * .37f, 1.62f, d / 2 - .16f), i % 2 == 0 ? new Color(.62f, .4f, .28f) : new Color(.5f, .46f, .36f), .9f + (i % 3) * .15f);

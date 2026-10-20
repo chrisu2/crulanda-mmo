@@ -39,6 +39,14 @@ namespace Crulanda.Encounter
         public static string StartClassOverride;
         public ClassDefinition ClassDef { get; private set; }
         public TalentTree Talents { get; private set; }
+        /// <summary>The party's damage and healing meter (/meter; CombatMeter).</summary>
+        public CombatMeter Meter { get { if (meter == null) { meter = new CombatMeter(this); Combatant.Healed += OnHealed; } return meter; } }
+        CombatMeter meter; public bool MeterOpen = true;   // shown from the start (Chris 13:09, "the dps/healing meter is missing"); /meter hides it
+        /// <summary>The run's scorecard (CombatMeter.Scorecard): shown when a sim-led run is called cleared or the dungeon's last boss falls, and
+        /// by /scorecard (Chris, 2026-10-11).</summary>
+        public bool ScorecardOpen; public string ScorecardTitle;
+        public void ShowScorecard(string title) { ScorecardTitle = title; ScorecardOpen = true; Message("The scorecard: " + title + " (/scorecard shows it again)."); QueueRunDone(); }
+        void OnHealed(Actor by, Actor who, int amount) { meter?.Heal(by, amount); }
         public ClassKit Kit { get; private set; }
         public WarriorKit Warrior { get { return Kit as WarriorKit; } }
         // ---------- zone (generated world) or the legacy Quiet Trail defaults ----------
@@ -55,32 +63,54 @@ namespace Crulanda.Encounter
         public PaladinKit Paladin { get { return Kit as PaladinKit; } }
         public RangerKit Ranger { get { return Kit as RangerKit; } }
         public MageKit Mage { get { return Kit as MageKit; } }
-        /// <summary>The Ranger's wolf (RangerPet), while one is called.</summary>
         /// <summary>/invis (a tester's switch, Chris 2026-10-08): mobs do not notice you; hit one and it fights as ever.</summary>
         public static bool Unseen;
+        /// <summary>The pet at heel (RangerPet): the Ranger's wolf or the Mage's ember hound, while one is called.</summary>
         public RangerPet Pet { get; private set; }
         /// <summary>The companion bar's orders (playtest note 93): attack your target, assist (follow and join your fights), stay.</summary>
         public bool PetAttack()
         {
             if (Pet == null || !Pet.actor.IsAlive) return false;
-            if (Target == null || !Target.actor.IsAlive || Target.Game) { Message("Your wolf needs a target: select one first."); return false; }
+            if (Target == null || !Target.actor.IsAlive || Target.Game) { Message("Your " + Pet.Kind + " needs a target: select one first."); return false; }
             Pet.Hunt(Target, 1); return true;
         }
         public void PetOrder(RangerPet.Order o)
         {
             if (Pet == null) return; Pet.Command(o);
-            Message(o == RangerPet.Order.Stay ? "Your wolf stays where it is." : "Your wolf follows you and joins your fights.");
+            Message(o == RangerPet.Order.Stay ? "Your " + Pet.Kind + " stays where it is." : "Your " + Pet.Kind + " follows you and joins your fights.");
         }
         /// <summary>Whistles up the Ranger's wolf beside the player (the old one, if any, let go first).</summary>
-        public RangerPet SummonWolf(RangerKit kit)
+        public RangerPet SummonWolf(IPetMaster kit) { return SummonPet(kit, "Your wolf", "wolf"); }
+        /// <summary>Calls a pet on the wolf's body beside the player (the old one, if any, let go first): the Ranger's wolf, or the Mage's
+        /// bone thrall (the Bonecaller's, on the risen dead's skeleton).</summary>
+        public RangerPet SummonPet(IPetMaster kit, string name, string kind, ActorLook look = ActorLook.Wolf)
         {
             DismissPet();
             var point = Player.transform.position - Player.transform.forward * 1.5f + Player.transform.right * 1.2f;
             if (NavMesh.SamplePosition(point, out var hit, 8, NavMesh.AllAreas)) point = hit.position + Vector3.up;
-            var wolf = SpawnActor("Your wolf", content.player, point, new Color(.45f, .44f, .42f), "pet." + Progress.playerId, ActorLook.Wolf, Progress.Level);
+            var wolf = SpawnActor(name, content.player, point, new Color(.45f, .44f, .42f), "pet." + Progress.playerId, look, Progress.Level);
             AddAgent(wolf.gameObject, 5.5f, .5f);
-            var pet = wolf.gameObject.AddComponent<RangerPet>(); wolf.gameObject.SetActive(true); pet.Init(wolf, this, kit);
+            var pet = wolf.gameObject.AddComponent<RangerPet>(); pet.Kind = kind; wolf.gameObject.SetActive(true); pet.Init(wolf, this, kit);
             Pet = pet; return pet;
+        }
+        /// <summary>The spirit at your shoulder that nobody commands (SpiritCompanion): the Stormcaller's aether butterfly, the Rootmend's
+        /// glade-fire. It comes with the build you have spent most in and goes when you change it (checked twice a second).</summary>
+        public SpiritCompanion Spirit { get; private set; }
+        float spiritCheckAt;
+        public static SpiritCompanion.Kinds? SpiritFor(string leadBuild)
+        {
+            switch (leadBuild) { case "class.shaman/stormcaller": return SpiritCompanion.Kinds.Butterfly; case "class.druid/rootmend": return SpiritCompanion.Kinds.GladeFire; default: return null; }
+        }
+        void TendSpirit()
+        {
+            if (Time.time < spiritCheckAt || Player == null) return; spiritCheckAt = Time.time + .5f;
+            var want = SpiritFor(LeadBuild);
+            if (Spirit != null && (want == null || Spirit.Kind != want.Value)) { Destroy(Spirit.gameObject); Spirit = null; }
+            if (Spirit == null && want != null)
+            {
+                Spirit = new GameObject("Spirit " + SpiritCompanion.NameOf(want.Value)).AddComponent<SpiritCompanion>(); Spirit.Init(this, want.Value);
+                Message("Your " + SpiritCompanion.NameOf(want.Value) + " comes to your shoulder.");
+            }
         }
         public void DismissPet()
         {
@@ -91,7 +121,7 @@ namespace Crulanda.Encounter
         /// <summary>The figure a class wears and the tint of its capsule stand-in (the classes added 2026-10-05 included).</summary>
         public static ActorLook LookForClass(string classId)
         {
-            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": return ActorLook.Ranger; case "class.mage": case "class.archivist": return ActorLook.Mage; default: return ActorLook.Warrior; }
+            switch (classId) { case "class.druid": return ActorLook.Druid; case "class.paladin": return ActorLook.Paladin; case "class.ranger": case "class.rogue": case "class.scoundrel": return ActorLook.Ranger; case "class.saltmender": return ActorLook.SaltMender; case "class.mage": case "class.archivist": case "class.cleric": return ActorLook.Mage; case "class.shaman": return ActorLook.Druid; default: return ActorLook.Warrior; }   // the Cleric robed, the Shaman in moor leathers (an orc figure to come: Chris, 2026-10-13, "shaman is not an orc")
         }
         public static Color TintForClass(string classId)
         {
@@ -103,6 +133,10 @@ namespace Crulanda.Encounter
                 case "class.mage": return new Color(.4f, .3f, .7f);
                 case "class.rogue": return new Color(.22f, .2f, .24f);
                 case "class.archivist": return new Color(.78f, .76f, .7f);
+                case "class.saltmender": return new Color(.9f, .9f, .86f);
+                case "class.cleric": return new Color(.93f, .88f, .7f);   // a hill shrine's undyed wool and gold thread
+                case "class.shaman": return new Color(.36f, .42f, .5f);   // rain on the high moors
+                case "class.scoundrel": return new Color(.42f, .12f, .16f);   // a claret doublet, wine-dark (2026-10-14)
                 default: return new Color(.2f, .58f, .72f);
             }
         }
@@ -195,6 +229,7 @@ namespace Crulanda.Encounter
             var list = Quests.For(npc, Zone.Zone.id, Progress.Level);
             // Merchants open on the list (so "Browse wares" is always one click away); others go straight to a single quest.
             bool shop = IsVendor(VillageLife.Active?.Find(npc));
+            CouncilErrands.Filter(list, Progress);   // an errand of the halls handed in today waits for tomorrow (EncounterSession.Halls)
             if (list.Count > 0) { Conversation = new QuestConversation { npc = npc, entries = list, selected = list.Count == 1 && !shop ? list[0].quest : null, where = where }; return true; }
             return handled;
         }
@@ -214,8 +249,9 @@ namespace Crulanda.Encounter
             var bagItems = q.rewards?.bagItems; int worth = 0;
             if (bagItems != null && Items != null) foreach (var id in bagItems) { var d = Items.Get(id); if (d != null && !(d.kind == "bag" && Inventory.Owns(Progress, id))) worth += Inventory.Price(d); }
             if (!Quests.TurnIn(q, out _, choice)) return;
-            if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
-            if (q.kind == "bounty") { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
+            if (HallQuest(q)) CouncilErrands.MarkDone(Progress, q.id);   // the Council's errands and the guilds' asks: once a day, not the board's (EncounterSession.Halls)
+            else if (q.kind == "bounty" && Boards != null) { Boards.Finished(ZoneId, q.id); if (q.rare) DespawnCourier(); }
+            if (q.kind == "bounty" && !HallQuest(q)) { Progress.bounties++; if (q.rare) Progress.rares++; }   // Achievements count them
             if (worth > 0) VillageLife.Active?.Paid(q.turnIn, worth);
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             ReconcileQuests(); Save(false); ReopenConversation();
@@ -224,6 +260,7 @@ namespace Crulanda.Encounter
         {
             if (Conversation == null) return;
             var list = Conversation.npc == Bounties.BoardName && Boards != null ? Boards.Entries(ZoneId, Progress.Level) : Quests.For(Conversation.npc, ZoneId, Progress.Level);
+            CouncilErrands.Filter(list, Progress);
             if (list.Count == 0) { Conversation = null; return; }
             Conversation.entries = list; Conversation.selected = list.Count == 1 ? list[0].quest : null;
         }
@@ -274,6 +311,7 @@ namespace Crulanda.Encounter
             if (d != null && d.kind == "consumable") return UseItem(bagIndex);
             if (d != null && d.kind == "tool") return UseTool(bagIndex);
             if (d != null && d.kind == "bag") return WearBag(bagIndex);
+            if (d != null && d.kind == "recipe") return UseLeaf(bagIndex);
             if (d != null && d.kind == "material") { Message(Inventory.IsHide(d) ? HideLine : MaterialLine); return false; }
             string why;
             bool ok = Items != null ? Inventory.Equip(Progress, Items, bagIndex, Progress.Level, out why) : LegacyEquip(bagIndex, out why);
@@ -299,21 +337,54 @@ namespace Crulanda.Encounter
             if (i < 0 || i >= Progress.bag.Count || Progress.bag[i].Empty) return;
             Message("Destroyed " + ItemName(Progress.bag[i].item) + "."); Inventory.Destroy(Progress, i); Save(false);
         }
-        /// <summary>Potions heal at once (30 s cooldown); food heals over 10 s and only out of combat.</summary>
+        /// <summary>
+        /// Potions heal at once (30 s cooldown); food heals over 10 s and only out of combat. Phase 8.6 step 4 (Consumables): a dish from
+        /// Cooking 20 leaves you well fed too, and a feast the party with you (Mira and the party sims within Consumables.FeastRange, five
+        /// in all); a tincture or cordial raises one stat and a salve armour for half an hour (the buff row shows them; never saved); a
+        /// draught fills its class's pool and a cure lifts poisons, bleeds and the grey, both on the potion's cooldown. A draught for
+        /// another class's pool, or food in a fight, is refused and kept (Consumables.Refusal).
+        /// </summary>
         public bool UseItem(int i)
         {
             var d = Items?.Get(Progress.bag[i].item); if (d == null || d.kind != "consumable") return false;
-            if (d.food)
+            if (WeaveEaterRules.ThrownKind(d) != null) return ThrowItem(d);   // salt and the bone harpoon are thrown at the target (EncounterSession.Lowtowns)
+            string why = Consumables.Refusal(d, InCombat, ClassDef);
+            if (why != null) { Message(why); return false; }
+            bool potion = Consumables.OnPotionCooldown(d);
+            if (potion && Time.time < potionReadyAt) { Message("Potion not ready (" + Mathf.CeilToInt(potionReadyAt - Time.time) + "s)."); return false; }
+            if (d.food) { if (d.heal > 0) { foodUntil = Time.time + 10; foodPerSecond = d.heal / 10f; } }
+            else if (d.heal > 0) Player.Health.ApplyHealing(d.heal);
+            if (potion) potionReadyAt = Time.time + 30;
+            if (d.restore > 0 && Player.Resource != null) Player.Resource.Pool.Change(d.restore);
+            var mine = Player.GetComponent<Combatant>();
+            int lifted = d.cure && mine != null && mine.Statuses != null ? mine.Statuses.RemoveHarmful() : 0;
+            Message("Used " + d.name + "."); Inventory.Remove(Progress, d.id, 1);
+            if (Consumables.HasBuff(d))
             {
-                if (InCombat) { Message("You can't eat while fighting."); return false; }
-                foodUntil = Time.time + 10; foodPerSecond = d.heal / 10f;
+                if (d.buff.party)
+                {
+                    int fed = Consumables.Feed(d, FeastParty(), Time.time);
+                    Message(fed > 1 ? "The party eats with you: " + fed + " of you are well fed." : "Nobody near to share it with. You are well fed.");
+                }
+                else if (mine != null && mine.Statuses != null) Consumables.Apply(d, mine.Statuses, Time.time);
             }
-            else
+            if (d.cure) Message(lifted > 0 ? "It burns going down, and whatever was on you is gone." : "Nothing on you to lift.");
+            return true;
+        }
+        /// <summary>Who shares a feast: you first, then Mira (recruited) and the party sims within Consumables.FeastRange, alive (the first
+        /// five are fed).</summary>
+        List<Crulanda.Combat.StatusEffectRuntime> FeastParty()
+        {
+            var list = new List<Crulanda.Combat.StatusEffectRuntime>();
+            void Add(Actor a)
             {
-                if (Time.time < potionReadyAt) { Message("Potion not ready (" + Mathf.CeilToInt(potionReadyAt - Time.time) + "s)."); return false; }
-                potionReadyAt = Time.time + 30; Player.Health.ApplyHealing(d.heal);
+                if (a == null || !a.IsAlive || (a != Player && Vector3.Distance(a.transform.position, Player.transform.position) > Consumables.FeastRange)) return;
+                var c = a.GetComponent<Combatant>(); if (c != null && c.Statuses != null) list.Add(c.Statuses);
             }
-            Message("Used " + d.name + "."); Inventory.Remove(Progress, d.id, 1); return true;
+            Add(Player);
+            if (Companion != null && Progress.recruited) Add(Companion.actor);
+            foreach (var s in PartySims) if (s != null) Add(s.actor);
+            return list;
         }
         float foodCarry;
         void TickItems()
@@ -325,6 +396,7 @@ namespace Crulanda.Encounter
                 if (whole > 0) { foodCarry -= whole; Player.Health.ApplyHealing(whole); }
             }
             if (VendorNpc != null && Vector3.Distance(Player.transform.position, vendorAt) > 6) CloseVendor();   // walked away
+            TickCapital();   // the vault's or the Exchange's counter, the same
         }
         public float PotionCooldown { get { return Mathf.Max(0, potionReadyAt - Time.time); } }
         // Merchants.
@@ -338,19 +410,28 @@ namespace Crulanda.Encounter
             var stock = Items.StockFor(v.Name, v.Role, band); if (stock.Count == 0) return;
             // A trade bag you wear or carry is off the list: one of each is all anyone makes you. Another merchant's open window keeps its list.
             stock.RemoveAll(id => Items.Get(id)?.kind == "bag" && Inventory.Owns(Progress, id));
+            // A leaf whose recipe you have learned is off the list too (Phase 8.6 step 5).
+            if (Professions != null) stock.RemoveAll(id => { var d = Items.Get(id); return d != null && d.kind == "recipe" && Professions.Knows(Professions.Db.Recipe(d.teaches)); });
             if (stock.Count == 0) { Message(v.Name + ": " + AllBagsLine); v.Say(AllBagsLine, 6); return; }
             VendorStock = stock;
             // What the village brought the stall today (the hen-wife's eggs): sold on while they last.
             if (v.Role == "merchant" && VillageLife.Active != null && VillageLife.Active.Count("stall.eggs") > 0 && Items.Get(FreshEggs) != null) VendorStock.Insert(0, FreshEggs);
-            VendorNpc = v.Name; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
+            CloseCapital();   // one counter at a time
+            if (VendorNpc == null) bagsForShop = !InventoryOpen;
+            VendorNpc = v.Name; vendorRole = v.Role; vendorAt = at ?? v.transform.position; InventoryOpen = true; Conversation = null; TradesOpen = false; v.Hold(30);
+            if (Charm.Haggle(Progress, VendorNpc)) Message("You haggle with " + VendorNpc + ": a further twentieth off what you buy here today.");   // the Scoundrel (Charm.cs)
         }
         public const string FreshEggs = "food.fresh_eggs";
-        public void CloseVendor() { VendorNpc = null; VendorSim = null; VendorStock = new List<string>(); }
+        /// <summary>The bags were opened by the shop (they were shut when it opened).</summary>
+        bool bagsForShop;
+        /// <summary>Shuts the shop, and the bags with it if the shop opened them (the tester's note 116, 2026-10-10: "The shop didn't close
+        /// on 'Goodbye', and I didn't close the bags": the shop's window went, the bags it had opened stayed).</summary>
+        public void CloseVendor() { Charm.Current = null;  if (VendorNpc != null && bagsForShop) InventoryOpen = false; bagsForShop = false; VendorNpc = null; VendorSim = null; VendorStock = new List<string>(); }
         // ---------- trading with a sim (round 27) ----------
         /// <summary>The sim whose goods the merchant window shows, if it is a sim you trade with (null for a village merchant).</summary>
         public SimAdventurer VendorSim { get; private set; }
         /// <summary>What an item costs from this window: a sim asks twice its value (a merchant four times).</summary>
-        public int VendorPrice(ItemDef d) { return d == null ? 0 : VendorSim != null ? Math.Max(1, d.value * 2) : Inventory.Price(d); }
+        public int VendorPrice(ItemDef d) { return d == null ? 0 : VendorSim != null ? Math.Max(1, d.value * 2) : Charm.Ask(Progress, Inventory.Price(d)); }   // a Scoundrel's charm at a merchant (Charm.cs)
         /// <summary>What a sim pays for a stack: its value, half as much again for what its own trade uses (ore to a smith, herbs to a brewer).</summary>
         public int SimOffer(SimAdventurer s, ItemDef d, int count)
         {
@@ -365,7 +446,7 @@ namespace Crulanda.Encounter
             if (s == null || Items == null) return false;
             if (Player != null && Vector3.Distance(Player.transform.position, at) > 6) { Message(s.name + " is too far away to trade with."); return false; }
             if (SimMemory.Refuses(s)) { Message(s.name + " won't trade with you."); return false; }
-            CloseVendor(); VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
+            CloseVendor(); CloseCapital(); bagsForShop = !InventoryOpen; VendorSim = s; VendorNpc = s.name; vendorAt = at; InventoryOpen = true; Conversation = null; TradesOpen = false;
             VendorStock = new List<string>(); foreach (var id in s.goodIds) if (Items.Get(id) != null) VendorStock.Add(id);
             if (VendorStock.Count == 0) Message(s.name + " has nothing to sell just now, but will buy (" + s.coin + " crowns on them).");
             return true;
@@ -399,6 +480,9 @@ namespace Crulanda.Encounter
             // A material sold in a village is that day's delivery to its trade (ore to the forge, herbs to the stall), and the trades
             // notice; "sold." + the trade marks it as the player's (the herbalist brings the stall herbs herself every day).
             if (d != null && !string.IsNullOrEmpty(d.trade) && VillageLife.Active != null) { VillageLife.Active.Deliver(d.trade, count); VillageLife.Active.Deliver("sold." + d.trade, count); }
+            // The village stall buys surplus ore and timber too (Phase 8.6): sold at the merchant's, it is on the stall today, and she says so.
+            if (d != null && (d.pouch == "ore" || d.pouch == "timber") && d.kind == "material" && VillageLife.Active != null && VillageLife.Active.Find(VendorNpc)?.Role == "merchant")
+            { VillageLife.Active.Deliver("stall." + d.pouch, count); VillageLife.Active.Deliver("sold.stall." + d.pouch, count); }
             Message("Sold " + n + (count > 1 ? " x" + count : "") + " for " + gold + " crowns."); Save(false);
         }
         public void SellJunk()
@@ -418,10 +502,11 @@ namespace Crulanda.Encounter
             if (Inventory.Buy(Progress, Items, item, out var why))
             {
                 Message("Bought " + ItemName(item) + "." + (d != null && d.kind == "bag" ? " Use it from your bags to wear it." : "")); Save(false);
+                ServeBought(d);   // an inn's food on its table (playtest note 235)
                 if (item == FreshEggs) { VillageLife.Active.Take("stall.eggs"); if (VillageLife.Active.Count("stall.eggs") == 0) VendorStock.Remove(item); }
                 if (d != null && d.kind == "bag") VendorStock.Remove(item);
                 // The coin goes to the seller's household (ADDENDUM C: the purses, step 7, spend it).
-                VillageLife.Active?.Paid(VendorNpc, Inventory.Price(d));
+                VillageLife.Active?.Paid(VendorNpc, Charm.Ask(Progress, Inventory.Price(d)));
             }
             else Message(why);
         }
@@ -464,6 +549,7 @@ namespace Crulanda.Encounter
                 var tier = skill > 1 ? db.NodesFor(id).Find(n => n.skill == skill) : null;
                 if (tier != null) ShowToast(trade.name.ToUpperInvariant(), "You can work " + tier.name.ToLowerInvariant() + "s now");
             };
+            Professions.Learned = r => ShowToast((db.Profession(r.profession)?.name ?? "A LEAF").ToUpperInvariant(), "Learned: " + r.name);
         }
         /// <summary>The zone builder asks what a kind of node is (IZoneNodeKinds): from the trades' content, before the session starts.</summary>
         public Crulanda.World.ZoneNodeKind NodeKind(string id)
@@ -491,7 +577,7 @@ namespace Crulanda.Encounter
         {
             if (open && Professions == null) { Message("You have no trade to speak of yet."); return; }
             TradesOpen = open;
-            if (open) { CharacterOpen = false; CloseVendor(); InventoryOpen = true; }
+            if (open) { CharacterOpen = false; CloseVendor(); CloseCapital(); InventoryOpen = true; }
         }
         /// <summary>A trade bag used from the bags: worn for good, its slots added under the bags' 24, or refused and kept ("You already carry one.").</summary>
         bool WearBag(int bagIndex)
@@ -507,6 +593,14 @@ namespace Crulanda.Encounter
         {
             if (Professions == null) { Message("You have no use for that yet."); return false; }
             if (!Professions.UseTool(bagIndex, out var why)) { if (why != null) Message(why); return false; }
+            Save(false); return true;
+        }
+        /// <summary>A leaf used from the bags (Phase 8.6 step 5): its found recipe is learned and the leaf is used up, or it is refused and
+        /// kept ("You know that one already.", or the trade it wants).</summary>
+        bool UseLeaf(int bagIndex)
+        {
+            if (Professions == null) { Message("You have no use for that yet."); return false; }
+            if (!Professions.UseLeaf(bagIndex, out var why)) { if (why != null) Message(why); return false; }
             Save(false); return true;
         }
 
@@ -535,6 +629,7 @@ namespace Crulanda.Encounter
             if (Inventory.Room(Progress, Items, def.item) == 0 && !questWants) { Message(ProfessionLog.BagsFullLine); return; }
             var trade = Professions.Db.Profession(def.profession);
             StartWork(WorkLabel(trade.verb), Professions.WorkSeconds(def, hard), () => GatherNow(i));
+            workPose = trade.verb == "Mine" ? ActorPose.Mine : trade.verb == "Cut" ? ActorPose.Chop : ActorPose.Gather;   // the work shows (Kevin's crafting clips, 2026-10-14)
         }
         /// <summary>"Mining", "Cutting", "Gathering": the work bar's label from the trade's verb.</summary>
         static string WorkLabel(string verb)
@@ -555,19 +650,31 @@ namespace Crulanda.Encounter
             if (i == null || i.node == null || Professions == null || Zone == null) return false;
             var def = Professions.Db.Node(i.node); if (def == null) return false;
             int got = Professions.Gather(def, gatherRng, out string why);
-            if (got > 0) FloatText(i.position, "+" + got + " " + ItemName(def.item), new Color(.86f, .95f, .66f));
+            if (got > 0) { FloatText(i.position, "+" + got + " " + ItemName(def.item), new Color(.86f, .95f, .66f)); NoteWorked(def.id, def.name); }   // the book of lore's Herbs and Ores
             bool quest = QuestUse(i);
             if (got == 0 && !quest) { if (why != null) Message(why); return false; }   // nothing went in and no quest took it: the node stays
-            RestNode(i, def.respawn);
+            RestNode(i, NodeRespawn(def));
             Save(false);
             return got > 0;
         }
-        /// <summary>A worked node rests: it cannot be used until then, and its part (or all of it) is hidden until it comes back.</summary>
+        /// <summary>
+        /// How long a worked node stays gone (Chris, 2026-10-15: "when a node is harvest it needs to disappear for a certain amount of
+        /// time. i guess it depends on population"): its own respawn with nobody else about, shorter the more people are in the zone
+        /// (the sims here and online, and your party): half with ten, two fifths at most from fifteen on.
+        /// </summary>
+        public float NodeRespawn(NodeDef def)
+        {
+            int people = (SimPopulation.Active != null ? SimPopulation.Active.Figures.Count : 0) + PartySims.Count;
+            return NodeRespawn(def.respawn, people);
+        }
+        public static float NodeRespawn(float respawn, int people) { return respawn * Mathf.Max(.4f, 1f / (1 + Mathf.Max(0, people) / 10f)); }
+        /// <summary>A worked node rests: it cannot be used until then, and the whole of it (the seam's rock too, the fallen trunk)
+        /// is gone until it comes back.</summary>
         void RestNode(Crulanda.World.ZoneInteractable i, float seconds)
         {
             if (seconds <= 0 || Zone == null) return;
             i.hiddenUntil = Time.time + seconds; nodeReadyAt[i.Key(Zone.Zone.id)] = i.hiddenUntil;
-            var hide = i.part != null ? i.part : i.root;
+            var hide = i.root != null ? i.root : i.part;
             if (hide != null) StartCoroutine(HideFor(hide, seconds));
         }
         bool nodesRested;
@@ -585,16 +692,19 @@ namespace Crulanda.Encounter
         public bool Working { get { return workDone != null; } }
         void StartWork(string name, float seconds, Action done, RecipeDef recipe = null)
         {
-            workRecipe = recipe; workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
+            workInFight = false; workPose = ActorPose.None; workRecipe = recipe; workName = name; workStart = Time.time; workSeconds = Mathf.Max(.1f, seconds); workAt = Player.transform.position; workHealth = Player.Health.Pool.Current; workDone = done;
         }
         /// <summary>Stops the work in hand, if any (nothing is gathered), saying so when <paramref name="say"/>.</summary>
+        /// <summary>Saves and closes the game (the pause menu's Quit, /exit and /quit; Chris, 2026-10-14).</summary>
+        public void Quit() { try { if (Player != null && Player.IsAlive && !InCombat) Save(); } catch (Exception) { } Application.Quit(); }
         public void CancelWork(bool say = false) { if (workDone == null) return; workDone = null; workName = null; if (say) Message(WorkStoppedLine); }
         void TickWork()
         {
             if (workDone == null) return;
             var p = Player.transform.position; int health = Player.Health.Pool.Current;
             if (!Player.IsAlive) { CancelWork(); return; }
-            if (new Vector2(p.x - workAt.x, p.z - workAt.z).magnitude > .3f || health < workHealth || InCombat) { CancelWork(true); return; }
+            // (breaking the anchor-well may be done in a fight: EncounterSession.HollowCellars)
+            if (new Vector2(p.x - workAt.x, p.z - workAt.z).magnitude > .3f || health < workHealth || (InCombat && !workInFight)) { workInFight = false; CancelWork(true); return; }
             workHealth = health;   // it may climb (resting heals); only a fall stops the work
             if (Time.time - workStart < workSeconds) return;
             var done = workDone; workDone = null; workName = null; done();
@@ -687,6 +797,7 @@ namespace Crulanda.Encounter
             int n = Math.Max(1, r.count);
             Message("You make " + ItemName(r.output) + (n > 1 ? " x" + n : "") + ".");
             FloatText(Player.transform.position, "+" + n + " " + ItemName(r.output), new Color(.86f, .95f, .66f));
+            ShowCooked(r);   // the dish by the fire (playtest note 235, EncounterSession.Dishes)
             Save(false);
             if (more > 0) { if (Professions.CanCraft(r, StationOk, out var stop)) StartWork(r.name, StartCraft(r), () => MakeOne(r, more - 1), r); else Message(stop); }
         }
@@ -702,6 +813,9 @@ namespace Crulanda.Encounter
         /// The nearest villager of a trade (blacksmith, herbalist) within <paramref name="range"/> (ground distance, as E measures) who is
         /// awake and about: in sight, not abed or on the way there, not slumped over a table. Null when there is none, or no village.
         /// </summary>
+        /// <summary>A craft's trainer awake within TrainerRange: a villager of its trainer role (a blacksmith), or one of the Crown's trade
+        /// trainers ("profession-trainer:blacksmithing", the Crafters' Court, ZoneBuilder.Crown).</summary>
+        Villager CraftTrainerNear(ProfessionDef d) { return d == null ? null : TradeNpcNear(d.trainerRole, TrainerRange) ?? TradeNpcNear("profession-trainer:" + d.id, TrainerRange); }
         public Villager TradeNpcNear(string role, float range)
         {
             if (string.IsNullOrEmpty(role) || Player == null || VillageLife.Active == null) return null;
@@ -724,7 +838,7 @@ namespace Crulanda.Encounter
             if (!Professions.CanLearn(id, out why)) return false;
             var d = Professions.Db.Profession(id);
             foreach (var kind in ProfessionDatabase.Stations(d.station)) if (StationNear(kind) != null) return true;
-            if (TradeNpcNear(d.trainerRole, TrainerRange) != null) return true;
+            if (CraftTrainerNear(d) != null || TradeNpcNear(d.trainerRole, TrainerRange) != null || HallTradeTrainerNear(id) != null) return true;   // its trainer: in the village, or in the Crown (ZoneBuilder.Crown, EncounterSession.Halls)
             why = d.name + " is taken up at " + ProfessionLog.StationWords(d.station) + (string.IsNullOrEmpty(d.trainerRole) ? "." : ", or from a " + d.trainerRole + ".");
             return false;
         }
@@ -737,7 +851,7 @@ namespace Crulanda.Encounter
         public bool LearnCraft(string id)
         {
             if (!CanTakeUp(id, out var why)) { if (why != null) Message(why); return false; }
-            var d = Professions.Db.Profession(id); var trainer = TradeNpcNear(d.trainerRole, TrainerRange);
+            var d = Professions.Db.Profession(id); var trainer = CraftTrainerNear(d);
             if (!Professions.Learn(id, out why)) { Message(why); return false; }
             var line = trainer != null ? ProfessionDatabase.LineFor(d.trainerLines, trainer.Name) : null;
             if (line != null) { Message(trainer.Name + ": " + line); trainer.Say(line, 7); trainer.FacePlayer(); }
@@ -858,11 +972,22 @@ namespace Crulanda.Encounter
             if (i.kind == "board") { OpenBoard(i); return; }
             if (i.kind == "chest") { OpenChest(i); return; }   // EncounterSession.Loot.cs
             if (UseAditThing(i)) return;   // the Sealed Adit's gates, powder and spirit stone (EncounterSession.Adit.cs)
+            // the Rusty Spoon's Triad table (EncounterSession.Spoon)
+            if (UseSpoonThing(i)) return;
+            // Dead Man's Drop's iron rungs (EncounterSession.NightMarket)
+            if (UseDropThing(i)) return;
+            // the Lowtowns' punt ferry (EncounterSession.LowtownMarks)
+            if (UsePuntThing(i)) return;
+            // the roofs' rain-spout, fire escape, washing and water tower (EncounterSession.Roofs)
+            if (UseRoofThing(i)) return;
+            // the Sweep's child, found and led (EncounterSession.Sweep)
+            if (UseSweepThing(i)) return;
             if (i.node != null && Professions != null) { TryGather(i); return; }   // a node (a seam, a windfall, a herb) is worked with its trade
             if (Quests == null) { Message("Nothing here you need."); return; }
             if (!QuestUse(i)) { Message(string.IsNullOrEmpty(i.item) ? "You look it over, but find nothing you need right now." : "You don't need any of this right now."); return; }
             // Used up: once-only things stay done (saved); herbs regrow after a while.
             if (i.once) { Progress.usedInteractables.Add(i.Key(Zone.Zone.id)); if (i.Vanishes && i.root != null) HideProp(i.root); }
+            if (i.kind == "cage") FreeGoblin(i);   // its door swings open and its goblin is gone (EncounterSession.Adit, note 125)
             else if (i.Vanishes) { i.hiddenUntil = Time.time + 90; if (i.root != null) StartCoroutine(HideFor(i.root, 90)); }
             Save(false);
         }
@@ -944,7 +1069,7 @@ namespace Crulanda.Encounter
         void TickFeats()
         {
             if (Zone == null || Progress == null || Player == null) return;
-            if (Feats == null) { Feats = new Achievements(Progress, Zone.AllZones(), Quests != null ? Quests.Db : null); Feats.Earned = OnEarned; featsPrimed = false; }
+            if (Feats == null) { Feats = new Achievements(Progress, Zone.AllZones(), Quests != null ? Quests.Db : null, Lore); Feats.Earned = OnEarned; featsPrimed = false; }   // with the book of lore's chapters
             if (!Exploring || Paused || !Player.IsAlive) return;
             if (!featsPrimed)
             {
@@ -963,7 +1088,7 @@ namespace Crulanda.Encounter
             foreach (var l in Achievements.Pois(z))
             {
                 if (Feats.Explored(z, l) || new Vector2(p.x - l.at.x, p.z - l.at.y).magnitude > Achievements.Reach(l)) continue;
-                Feats.Explore(z, l); int before = Progress.Level, xp = Achievements.PoiXp(z);
+                Feats.Explore(z, l); int before = Progress.Level, xp = LevelHeld ? 0 : Achievements.PoiXp(z);
                 Progress.experience += xp;
                 Message("Discovered: " + l.name + "  +" + xp + " XP");
                 toasts.Enqueue(("DISCOVERED", l.name)); AdvanceToast();
@@ -1034,7 +1159,7 @@ namespace Crulanda.Encounter
                 Crulanda.World.ZoneSecretSpot best = null; float bestD = UseRange;
                 foreach (var spot in SecretSpots)
                 {
-                    if (DiscoveryLog.IsVista(spot.def) || Discoveries.IsFound(spot.def)) continue;
+                    if (DiscoveryLog.IsVista(spot.def) || (Discoveries.IsFound(spot.def) && !UsableAgain(spot))) continue;   // a herb grown back, a wayshrine: E again
                     float d = GroundDistance(spot.position); if (d < bestD) { best = spot; bestD = d; }
                 }
                 return best;
@@ -1055,6 +1180,7 @@ namespace Crulanda.Encounter
         public DiscoveryLog.Result Search(Crulanda.World.ZoneSecretSpot spot)
         {
             if (spot == null || spot.def == null || Discoveries == null) return DiscoveryLog.Result.AlreadyFound;
+            if (UsableAgain(spot)) { UseAgain(spot); return DiscoveryLog.Result.AlreadyFound; }   // a herb picked again, a crown left (EncounterSession.Lore.cs)
             var r = Find(spot);
             if (r == DiscoveryLog.Result.Locked) Message(DiscoveryLog.ShutLine(spot.def));
             else if (r == DiscoveryLog.Result.BagsFull) Message(DiscoveryLog.BagsFullLine);
@@ -1068,6 +1194,7 @@ namespace Crulanda.Encounter
             if (r != DiscoveryLog.Result.Found) return r;
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); Message("Level " + Progress.Level + "! Talent points are waiting [B]."); }
             if (DiscoveryLog.Pocketed(spot.def)) Pocket(spot);
+            if (spot.def.kind == "shrine") Bless(spot);   // found, a wayshrine blesses you at once; after that, for a crown
             Save(false);
             return r;
         }
@@ -1077,6 +1204,7 @@ namespace Crulanda.Encounter
             if (Discoveries == null || Zone == null || Time.time < nextSecretCheck) return;
             nextSecretCheck = Time.time + .5f;
             if (!pocketedSynced) { pocketedSynced = true; SyncPocketed(); }
+            TickRegrowth();   // a rare herb picked yesterday shows again
             string waiting = null;
             foreach (var spot in SecretSpots)
             {
@@ -1107,19 +1235,46 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>
-        /// The quest book's Discoveries tab: every zone, this one first and the rest by level, with how many secrets each holds and
-        /// the ones found (the rest are only counted). This zone's are the ones in play here (SecretSpots); other zones' come from
-        /// their data.
+        /// The quest book's Discoveries tab: every zone, this one first and the rest by level, with how many secrets each holds, the
+        /// ones found and a clue for the rest (ZoneLore merges a zone's side file of clues in first). This zone's are the ones in play
+        /// here (SecretSpots); other zones' come from their data.
         /// </summary>
         public List<DiscoveryLog.Tally> DiscoveryTallies()
         {
             var list = new List<DiscoveryLog.Tally>();
             if (Discoveries == null || Zone == null) return list;
+            ZoneLore.Apply(Zone.Zone);
             var here = new List<Crulanda.World.ZoneSecret>(); foreach (var spot in SecretSpots) here.Add(spot.def);
-            list.Add(Discoveries.TallyOf(Zone.Zone.id, Zone.Zone.displayName, here, true));
+            list.Add(Discoveries.TallyOf(Zone.Zone.id, Zone.Zone.displayName, here, true, Zone.Zone.landmarks));   // with the count by region (decision 6)
             var others = Zone.AllZones().FindAll(z => z != null && z.id != Zone.Zone.id);
             others.Sort((a, b) => a.levelMin != b.levelMin ? a.levelMin.CompareTo(b.levelMin) : string.CompareOrdinal(a.id, b.id));
-            foreach (var z in others) list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false));
+            foreach (var z in others) { ZoneLore.Apply(z); list.Add(Discoveries.TallyOf(z.id, z.displayName, z.secrets, false, z.landmarks)); }
+            return list;
+        }
+        /// <summary>A page of the book of lore (<see cref="LorePages"/>): the page, the zone whose hidden find holds it, whether it is found.</summary>
+        public sealed class LorePage { public DocumentDef doc; public string zoneName; public bool found; }
+        /// <summary>
+        /// The book of lore (the quest book's Lore tab; 2026-10-15, Chris: "book of lore"): every page of kind "lore" in the quest
+        /// content, zone by zone in the Discoveries tab's order (this zone first, then by level) as their hidden finds hold them, and
+        /// last any held by no find (given another way, or not placed yet: its zone is empty).
+        /// </summary>
+        public List<LorePage> LorePages()
+        {
+            var list = new List<LorePage>(); var seen = new HashSet<string>(StringComparer.Ordinal);
+            if (Quests == null || Progress == null) return list;
+            if (Zone != null)
+            {
+                var zones = new List<Crulanda.World.ZoneDefinition> { Zone.Zone };
+                var others = Zone.AllZones().FindAll(z => z != null && z.id != Zone.Zone.id);
+                others.Sort((a, b) => a.levelMin != b.levelMin ? a.levelMin.CompareTo(b.levelMin) : string.CompareOrdinal(a.id, b.id));
+                zones.AddRange(others);
+                foreach (var z in zones)
+                    foreach (var s in z.secrets ?? NoSecrets)
+                        if (s != null && !string.IsNullOrEmpty(s.document) && seen.Add(s.document) && Quests.Db.Documents.TryGetValue(s.document, out var doc) && doc.IsLore)
+                            list.Add(new LorePage { doc = doc, zoneName = z.displayName, found = Progress.documents.Contains(doc.id) });
+            }
+            foreach (var doc in Quests.Db.Documents.Values)
+                if (doc != null && doc.IsLore && seen.Add(doc.id)) list.Add(new LorePage { doc = doc, zoneName = "", found = Progress.documents.Contains(doc.id) });
             return list;
         }
 
@@ -1159,8 +1314,8 @@ namespace Crulanda.Encounter
                 if (abilities.IsCasting && Kit != null && !Kit.MeleeAutoAttacks) return "Casting " + abilities.Casting.name;
                 if (Kit != null && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) return "No weapon swings in this form";
                 bool bow = Kit != null && Kit.RangedAutoAttacks; string what = bow ? "Auto shot" : "Auto attack", next = bow ? "Next shot: " : "Next swing: ";
-                return !AutoAttack ? what + (bow ? ": shoot to begin" : ": use a melee ability") : Target == null || !Target.actor.IsAlive ? what + ": no target" :
-                    Distance(Target) >= Kit.AutoAttackRange ? what + ": move closer" : next + SwingRemaining.ToString("0.0") + "s";
+                return !AutoAttack ? what + (bow ? ": shoot to begin" : ": a melee ability or " + KeyBindings.InteractLabel + " begins it") : Target == null || !Target.actor.IsAlive ? what + ": no target" :
+                    Distance(Target) >= Kit.AutoAttackRange ? what + ": move closer (Esc stops)" : next + SwingRemaining.ToString("0.0") + "s (Esc stops)";
             }
         }
         public int ActionCount { get { return Kit == null ? 0 : Kit.ActionCount; } }
@@ -1174,32 +1329,53 @@ namespace Crulanda.Encounter
         public float CooldownRemaining(AbilityDefinition ability) { return abilities.Remaining(ability, Time.time); }
         /// <summary>A cast in progress, or work (gathering) on the same bar.</summary>
         public bool PlayerCasting { get { return abilities.IsCasting || Working; } }
+        /// <summary>A status effect's name for the HUD's buff row (its id when the content has no name for it).</summary>
+        public string StatusName(string id)
+        {
+            var food = Consumables.StatusName(id); if (food != null) return food;   // a dish's, a tincture's or a salve's (Phase 8.6)
+            var steel = WeaveEaterRules.StatusName(id); if (steel != null) return steel;   // blackened steel (the Lowtowns' Weave-Eaters)
+            var standing = ClassBuffs.StatusName(id); if (standing != null) return standing;   // a class's standing buff (the buff-up before a boss)
+            var d = content != null ? content.FindStatus(id) : null; return d != null && !string.IsNullOrEmpty(d.name) ? d.name : id == DiscoveryLog.BlessingId ? DiscoveryLog.BlessingName : id;   // a shrine's blessing (the lore pass)
+        }
         /// <summary>The player's figure (blows, flinches and casts on it: playtest note 25).</summary>
-        ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
-        ActorVisual playerFigure; bool castPosed;
+        public ActorVisual PlayerFigure { get { if (playerFigure == null && Player != null) playerFigure = Player.GetComponent<ActorVisual>(); return playerFigure; } }
+        ActorVisual playerFigure; bool castPosed; string castMotion; ActorPose workPose; (GameObject hand, GameObject circle) castFx;
         /// <summary>A cast being drawn holds the spell pose; when it ends standing (not moved off it), the spell is let fly.</summary>
         void TickCastPose()
         {
             var f = PlayerFigure; if (f == null) return;
             bool drawing = abilities.IsCasting;
-            if (castPosed && !drawing && Player.IsAlive && !Player.GetComponent<AdventurerMotor>().Moving) f.CastRelease();
+            if (castPosed && !drawing && Player.IsAlive && !Player.GetComponent<AdventurerMotor>().Moving) f.CastRelease(castMotion);
+            if (drawing && !castPosed) { castMotion = ActorVisual.MotionFor(abilities.Casting); castFx = SpellFx.CastBegin(abilities.Casting, f.RightHandle, Player.transform); }   // what the drawn cast lets fly (ActorVisual.Motions.cs), its glow in the hand (SpellFx)
+            if (!drawing && castPosed) SpellFx.CastEnd(castFx);
             if (drawing != castPosed) { f.Casting = drawing; castPosed = drawing; }
         }
         public float PlayerCastProgress { get { return abilities.IsCasting ? abilities.CastProgress(Time.time) : Working ? Mathf.Clamp01((Time.time - workStart) / workSeconds) : 0; } }
         public string PlayerCastName { get { return abilities.IsCasting ? abilities.Casting.name : workName; } }
 
         // ---------- helpers for class kits ----------
-        /// <summary>Spends the player's class resource and starts the ability (casts complete later via Update).</summary>
+        /// <summary>Spends the player's class resource and starts the ability (casts complete later via Update). Every kit's abilities
+        /// pass through here, so this is where worn class set bonuses work (loot DESIGN.md 3.8): the cost, cooldown and cast time are
+        /// the set's (GearEffects.Adjust), and the effect resolves through ResolveWithGear (power and procs).</summary>
         public AbilityStartResult StartAbility(AbilityDefinition a, Action effect)
         {
-            var result = abilities.TryStart(a, Time.time, cost => {
+            var use = GearEffects.Adjust(a, GearFx);
+            var result = abilities.TryStart(use, Time.time, cost => {
                 if (Player.Resource.Pool.Current < cost) return false;
                 Player.Resource.Pool.Change(-cost); return true;
-            }, effect);
-            if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + ClassDef.resource + ".");
+            }, effect == null ? null : (Action)(() => SpellFx.Run(a, this, () => ResolveWithGear(a, effect))));   // shown as it resolves (SpellFx: every ability's effect)
+            if (result == AbilityStartResult.InsufficientResource) Message("Not enough " + (string.IsNullOrEmpty(ClassDef.resourceName) ? ClassDef.resource.ToString() : ClassDef.resourceName) + ".");
             // An instant blow or spell on a target shows (playtest note 25): a swing in melee, a release at range. Casts are TickCastPose's.
-            if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive)
-            { if (Kit.MeleeAutoAttacks || a.range <= 5 || (Distance(Target) < 3.5f && !Kit.RangedAutoAttacks)) PlayerFigure?.Strike(); else PlayerFigure?.CastRelease(); }   // a bow's shot is loosed at any range
+            if (result == AbilityStartResult.Started && a.castTime <= 0 && Target != null && Target.actor.IsAlive && !Kit.OwnBlow(a))
+            {
+                string motion = ActorVisual.MotionFor(a);
+                bool spell = motion == "call" || motion == "omni" || (motion != null && motion.StartsWith("bolt"));
+                if (a.range <= .5f && motion == null) { }   // a buff on oneself with no motion of its own (a guard, a stance)
+                else if (!spell && (Kit.MeleeAutoAttacks || a.range <= 5 || (Distance(Target) < 3.5f && !Kit.RangedAutoAttacks))) PlayerFigure?.Strike(motion);
+                else PlayerFigure?.CastRelease(motion);   // a bow's shot is loosed at any range
+            }
+            // What works round the caster shows with no target too (a shout, a song, a ward on the ground, a thrall raised).
+            else if (result == AbilityStartResult.Started && a.castTime <= 0 && !Kit.OwnBlow(a) && ActorVisual.ShowsUntargeted(a)) PlayerFigure?.CastRelease(ActorVisual.MotionFor(a));
             return result;
         }
         public bool EnemyInRange(EncounterEnemy enemy, float range) { return enemy != null && enemy.actor.IsAlive && Distance(enemy) <= range; }
@@ -1233,9 +1409,31 @@ namespace Crulanda.Encounter
             AutoAttack = true;
         }
         public void StopAutoAttack() { AutoAttack = false; }
+        /// <summary>Esc, a step at a time: an open window first (loot, a conversation, a shop, the trades, the who list, your bags, the quest
+        /// book, the map), then your auto shot or auto attack, then your target, and only then the pause menu (playtest note 124, Chris,
+        /// 2026-10-11: "no way to turn off auto shot"; Esc went past it to the menu).</summary>
+        public void Escape()
+        {
+            if (SpellbookOpen && !Paused) { SpellbookOpen = false; BookPick = null; }
+            else if (LootOpen && !Paused) CloseLoot();
+            else if (Conversation != null && !Paused) Conversation = null;
+            else if (Hall != null && !Paused) Hall = null;
+            else if ((BankOpen || ExchangeOpen) && !Paused) CloseCapital();
+            else if (VendorNpc != null && !Paused) CloseVendor();
+            else if (TradesOpen && !Paused) TradesOpen = false;
+            else if (WhoOpen && !Paused) WhoOpen = false;
+            else if (QueueOpen && !Paused) QueueOpen = false;
+            else if (ScorecardOpen && !Paused) ScorecardOpen = false;
+            else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
+            else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
+            else if (MapOpen && !Paused) MapOpen = false;
+            else if (AutoAttack && !Paused) { StopAutoAttack(); Message(Kit != null && Kit.RangedAutoAttacks ? "Auto shot stopped." : "Auto attack stopped."); }
+            else if (Target != null && !Paused) Target = null;
+            else { Paused = !Paused; Time.timeScale = Paused ? 0 : 1; }
+        }
         public readonly List<string> Messages = new List<string>();
         public readonly List<CombatText> Floating = new List<CombatText>();
-        public bool InCombat { get { return FightingTarget || Enemies.Exists(e => e != null && e.FightingParty); } }   // a sim's fight elsewhere is not yours
+        public bool InCombat { get { return FightingTarget || Enemies.Exists(e => e != null && e.FightingParty) || TrainingBusy; } }   // a sim's fight elsewhere is not yours
         public int WeaponDamage { get { return Player == null ? 0 : Player.Stats.GetRounded(StatType.AttackPower); } }
         float nextSwing, nextRegen, nextSave;
         EncounterSave saves;
@@ -1261,6 +1459,10 @@ namespace Crulanda.Encounter
             // in a test that forgets to point the session elsewhere: the real folder is the player's, shared by every build.
             bool testRun = Application.isEditor && (Application.isBatchMode || Array.IndexOf(Environment.GetCommandLineArgs(), "-runTests") >= 0);
             Exploring = !testRun && !UseTempSave && !EncounterCapture.Requested && SaveDirectoryOverride == null;
+            // A preview build's own save folder (2026-10-16, the castle preview: Chris plays a copy of his saves there, so a newer save
+            // format never reaches the real folder his published build reads): --crulanda-save-dir <folder>.
+            { var sa = Environment.GetCommandLineArgs(); int at = Array.IndexOf(sa, "--crulanda-save-dir");
+              if (at >= 0 && at + 1 < sa.Length && SaveDirectoryOverride == null && !testRun) { SaveDirectoryOverride = sa[at + 1]; Exploring = true; } }
             if ((UseTempSave || testRun || Array.IndexOf(Environment.GetCommandLineArgs(), "--crulanda-temp-save") >= 0) && SaveDirectoryOverride == null)
             {
                 // Test runs: a fresh throwaway character that never touches the real save folder. One folder for the whole
@@ -1292,6 +1494,7 @@ namespace Crulanda.Encounter
                 Progress = FreshProgress(ClassDef.id); ArmNewCharacter();
                 if (message != "File not found.") { Message("Save could not be loaded: " + message); saveBlocked = true; }
             }
+            Progress.raceId = Races.For(ClassDef.id, Progress.raceId);   // a save from before races is human; a Shaman is an orc (Docs/RACES.md)
             if (StartClassOverride == null) CharacterProfile.Remember(root, ClassDef.id);
             // The scene builds its opening zone first; if this character is saved elsewhere, rebuild that zone instead.
             if (Zone != null && !saveBlocked && !string.IsNullOrEmpty(Progress.zoneId) && Progress.zoneId != Zone.Zone.id && Zone.HasZone(Progress.zoneId))
@@ -1307,14 +1510,19 @@ namespace Crulanda.Encounter
             if (Zone != null && Zone.Zone.life != null) new GameObject("Village life").AddComponent<VillageLife>().Init(this);
             // The other adventurers (Phase 5.2): the roster from the world slot, figures for those here and online.
             if (Zone != null) new GameObject("Sims").AddComponent<SimPopulation>().Init(this, SaveRoot);
+            if (Zone != null) Crulanda.World.ZoneMusic.Begin(Zone.Zone, () => InCombat, () => Player != null ? Player.transform.position : Vector3.zero);   // the zone's music (2026-10-15, Chris's three packs: ZoneMusic; /music in the chat)
             StartQuests(); StartDiscoveries(); StartArmoury(); StartAdit();
+            // A dungeon's checkpoints, none reached (EncounterSession.Checkpoints; after StartAdit: the navmesh is cut by then).
+            StartCheckpoints();
             Message(Zone != null ? Zone.Zone.displayName + ". " + Objective(0, "") + "." : "Recruit the healer at camp [" + KeyBindings.InteractLabel + "], then follow the path to the sentries.");
             ReconcileQuests();
+            SweepLockouts();   // the bosses and elites locked for you are not there (EncounterSession.Lockout; after the quests, for their exception)
+            ArriveQueued();   // a queued run arriving at its dungeon's door (EncounterSession.Queue)
             nextSave = Time.time + 30;
         }
-        public static EncounterProgress FreshProgress(string classId = "class.warrior")
+        public static EncounterProgress FreshProgress(string classId = "class.warrior", string raceId = null)
         {
-            var p = new EncounterProgress { classId = classId, playerId = EntityId.New().Value, companionId = EntityId.New().Value };
+            var p = new EncounterProgress { classId = classId, raceId = Races.For(classId, raceId), playerId = EntityId.New().Value, companionId = EntityId.New().Value };
             Inventory.Ensure(p); return p;
         }
         /// <summary>A look's odd variant from the mob's name: ash hounds, withered or grey Keepers and briars, the Hollow Root-Warden, a doe.</summary>
@@ -1334,7 +1542,7 @@ namespace Crulanda.Encounter
             UnityEngine.SceneManagement.SceneManager.LoadScene(gameObject.scene.name);
             return true;
         }
-        Actor SpawnActor(string label, Crulanda.Data.ActorArchetypeDefinition definition, Vector3 point, Color color, string id, ActorLook look, int level = 1, int variant = -1)
+        Actor SpawnActor(string label, Crulanda.Data.ActorArchetypeDefinition definition, Vector3 point, Color color, string id, ActorLook look, int level = 1, int variant = -1, bool orc = false, string role = null)
         {
             var go = new GameObject(label);
             go.SetActive(false); go.transform.SetParent(actorsRoot.transform); go.transform.position = point;
@@ -1346,7 +1554,7 @@ namespace Crulanda.Encounter
             var actor = go.AddComponent<Actor>();
             actor.Initialize(definition, label, label == "You" ? Progress.Level : level, new EntityId(id));
             go.AddComponent<Combatant>();
-            ActorVisual.Attach(go, look, variant >= 0 ? variant : LookVariant(label));
+            ActorVisual.Attach(go, look, variant >= 0 ? variant : LookVariant(label), false, role, orc);   // role: a villager's dress (Hallow's Creek's Warden, "warden")
             return actor;
         }
         void SpawnParty()
@@ -1365,7 +1573,7 @@ namespace Crulanda.Encounter
                 if (Progress.Level < 11) Progress.experience = EncounterProgress.XpForLevel(11);
             }
             actorsRoot = new GameObject("Encounter Actors");
-            Player = SpawnActor("You", content.player, new Vector3(Progress.x, Progress.y, Progress.z), TintForClass(ClassDef.id), Progress.playerId, LookForClass(ClassDef.id));
+            Player = SpawnActor("You", content.player, new Vector3(Progress.x, Progress.y, Progress.z), TintForClass(ClassDef.id), Progress.playerId, LookForClass(ClassDef.id), orc: Races.For(ClassDef.id, Progress.raceId) == Races.Orc);
             var controller = Player.gameObject.AddComponent<CharacterController>(); controller.height = 2; controller.radius = .4f; controller.stepOffset = .35f;
             controller.minMoveDistance = 0;
             var motor = Player.gameObject.AddComponent<AdventurerMotor>(); motor.session = this; motor.view = View;
@@ -1382,6 +1590,7 @@ namespace Crulanda.Encounter
             ApplyEquipment();
             SetHealth(Player, Progress.health);
             Player.Health.Died += h => {
+                Meter.Death(Player);
                 AutoAttack = false; abilities.Interrupt(); CancelWork(); Message("You fell. Press R to recover at camp. Your equipment is kept.");
                 var look = Player.GetComponent<ActorVisual>(); if (look != null) look.Pose = ActorPose.None;   // no swimming or sneaking corpse
             };
@@ -1412,7 +1621,7 @@ namespace Crulanda.Encounter
                 else if (spawn.veteran) a.Stats.SetBase(StatType.MaxHealth, content.veteranHealth);
                 if (Progress.FindEnemy(spawn.id).dead) enemy.RestoreDead();
             }
-            SpawnCamps(); SpawnGame();
+            SpawnCamps(); SpawnGame(); SpawnTrainingField();
             restoring = false;
         }
         struct EnemySpawn { public string id, name; public Vector3 point; public bool veteran; public ActorLook look; public int level; }
@@ -1447,8 +1656,12 @@ namespace Crulanda.Encounter
                 case "stag": return ActorLook.Stag;
                 case "spider": return ActorLook.Spider;
                 case "bramble": return ActorLook.Bramble;
+                case "eel": return ActorLook.Eel;     // the Chemical River's sludge-eels (Lowtowns pick 6, book1 ch.15:391)
+                case "croc": return ActorLook.Croc;   // and its mutated crocodile
                 case "bear": return ActorLook.Bear;
                 case "skeleton": return ActorLook.Skeleton;
+                case "imp": return ActorLook.Imp;         // the Bestiary kit (play note 233; Docs/BESTIARY_MONSTERS.md: what they are is Chris's pick)
+                case "puglin": return ActorLook.Puglin;
                 default: return veteran ? ActorLook.Warden : ActorLook.Collector;
             }
         }
@@ -1456,6 +1669,30 @@ namespace Crulanda.Encounter
         /// Levelling camps from the zone data: packs of mobs at levels inside the camp's band. They respawn somewhere in
         /// the camp after RespawnSeconds and are never saved. Ids: mob.&lt;tag&gt;.&lt;zone&gt;.&lt;camp&gt;.&lt;n&gt;.
         /// </summary>
+        /// <summary>How far apart two of a camp stand (playtest note 131, Chris, 2026-10-11: "shouldnt spawn almost on top of each other"):
+        /// a bear's or a Weave-Eater's length, a wolf's or a boar's, a man's shoulders and a step; an elite's a little more.</summary>
+        public static float GapFor(ActorLook look, bool elite)
+        {
+            float g = look == ActorLook.Bear || look == ActorLook.WeaveEater ? 3f : ActorVisual.IsBeast(look) ? 2.2f : 1.4f;
+            return elite ? g * 1.2f : g;
+        }
+        /// <summary>A spot clear of those already placed by <paramref name="gap"/>: turned round the camp's centre by the golden angle and a
+        /// little further out each try, with no more draws from the camp's dice (so no other camp's mobs move).</summary>
+        public static Vector2 Spaced(Vector2 spot, Vector2 centre, float gap, List<Vector2> placed)
+        {
+            bool ClearOfPlaced(Vector2 s) { foreach (var q in placed) if (Vector2.Distance(q, s) < gap) return false; return true; }
+            if (ClearOfPlaced(spot)) return spot;
+            var off = spot - centre; float r = Mathf.Max(off.magnitude, gap * .75f); float a = Mathf.Atan2(off.y, off.x);
+            for (int k = 1; k <= 40; k++)
+            {
+                float rr = r + gap * .25f * k, aa = a + k * 2.39996f;
+                var s = centre + new Vector2(Mathf.Cos(aa), Mathf.Sin(aa)) * rr;
+                if (ClearOfPlaced(s)) return s;
+            }
+            return spot;
+        }
+        /// <summary>The side of a patrol's road (square to its first leg), for walking side by side.</summary>
+        static Vector2 Side(Vector2[] road) { var d = road[1] - road[0]; return d.sqrMagnitude > 1e-4f ? new Vector2(-d.y, d.x).normalized : Vector2.right; }
         void SpawnCamps()
         {
             if (Zone == null || Zone.Zone.camps == null) return;
@@ -1464,26 +1701,83 @@ namespace Crulanda.Encounter
             for (int c = 0; c < Zone.Zone.camps.Length; c++)
             {
                 var camp = Zone.Zone.camps[c]; if (camp == null) continue;
+                if (!string.IsNullOrEmpty(camp.after)) continue;   // (the Adit rework) one released later (a boss's relief, an event's wave): not here at the start; EncounterSession.Release.cs brings it
                 if (camp.rare > 0 && RareDice() >= camp.rare) continue;   // a rare camp, not here this visit (last in the list: no other camp's draws move)
+                SpawnCampMobs(c, rng, zoneShort);
+            }
+            SpawnOutliers();
+        }
+        /// <summary>
+        /// One camp's mobs, drawn from <paramref name="rng"/> (the zone's camp stream at the start; a released camp's own stream later), each
+        /// stood on the navmesh, armed and made social; the list of those that stood. Factored out of SpawnCamps on 2026-10-15 (the Adit
+        /// rework) so a camp released later (ZoneCamp.after: a boss's relief shift, an event's wave) spawns exactly as it would have at the
+        /// start, with the same ids (mob.&lt;tag&gt;.&lt;zone&gt;.&lt;camp&gt;.&lt;n&gt;: deeds, quests and loot read the camp from them); EncounterSession.Release.cs.
+        /// </summary>
+        List<EncounterEnemy> SpawnCampMobs(int c, System.Random rng, string zoneShort)
+        {
+            var camp = Zone.Zone.camps[c]; var spawned = new List<EncounterEnemy>();
+            {
                 var look = LookFor(camp.look, camp.elite); bool beast = ActorVisual.IsBeast(look);
                 string tag = string.IsNullOrEmpty(camp.tag) ? (camp.look ?? "mob") : camp.tag;
+                float gap = GapFor(look, camp.elite); var placed = new List<Vector2>(); var stood = new List<Vector3>();
                 for (int n = 0; n < camp.count; n++)
                 {
                     var spot = camp.center + new Vector2((float)rng.NextDouble() - .5f, (float)rng.NextDouble() - .5f) * camp.radius * 2;
                     // Hunters in hiding lie where the tall grass is sure to be, not out at the corners of the camp.
                     if (camp.ambush) spot = camp.center + Vector2.ClampMagnitude(spot - camp.center, camp.radius) * EncounterEnemy.AmbushSpread(camp.radius);
-                    var point = Zone.StandAt(spot, float.NegativeInfinity, 1);   // a camp in a cave stands on its floor
-                    if (NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) point = hit.position + Vector3.up; else continue;
+                    // A patrol sets out from the head of its road, side by side; the rest a body's width from the others of the camp.
+                    bool patrol = camp.route != null && camp.route.Length > 1;
+                    if (patrol) spot = camp.route[0] + Side(camp.route) * gap * 1.15f * (n - (camp.count - 1) / 2f);
+                    else spot = Spaced(spot, camp.center, gap, placed);
+                    // A camp in a cave stands on its floor (or up on its deck: the Adit rework). The navmesh's nearest point to two spaced
+                    // spots can be one point (a camp on a 3 m deck against a wall: the bowl's rim's overseers 1.2 m apart, AditTests 19:24),
+                    // so a spot whose footing lands on another's is drawn again, up to eight times, then let go.
+                    Vector3 point = default; bool footed = false;
+                    for (int tries = 0; tries < 8 && !footed; tries++)
+                    {
+                        if (tries > 0) spot = Spaced(camp.center + new Vector2((float)rng.NextDouble() - .5f, (float)rng.NextDouble() - .5f) * camp.radius * 2, camp.center, gap, placed);
+                        point = Zone.StandAt(spot, DeckHeight(camp, spot), 1);
+                        if (!NavMesh.SamplePosition(point, out var hit, 3, NavMesh.AllAreas)) { if (patrol) break; continue; }
+                        point = hit.position + Vector3.up; footed = true;
+                        if (patrol) break;
+                        foreach (var w in stood) { var d = w - point; d.y = 0; if (d.magnitude < gap * .9f) { footed = false; break; } }
+                        if (footed && camp.dry && NearWater(point)) footed = false;   // a dry camp's (the Bank-snouts): never in or by the water (EncounterSession.Dry)
+                    }
+                    // Eight draws all footed on another's place (or off the navmesh): spots turned round the camp's centre by the golden
+                    // angle, a little further out each, with no more draws from the dice, so no later camp's mobs move (the bowl's rim's
+                    // third overseer on its 3 m walk against the wall, ZoneContentTests 2026-10-16: "spawned 2/3").
+                    if (!footed && !patrol) footed = FootingRound(camp, gap, stood, out point, out spot);
+                    // A footing off the camp's own deck (a draw past a narrow loft's edge stood on the floor under it: the Picker-Master's
+                    // sorters, both on the Granary's floor under the north loft, HallowsNavTests 2026-10-16) is found again round the camp's
+                    // centre on its deck, with no more draws from the dice (so no later camp moves); kept where it was only if none is.
+                    if (footed && !patrol && OffDeck(camp, spot, point) && FootingRound(camp, gap, stood, out var onDeck, out var deckSpot)) { point = onDeck; spot = deckSpot; }
+                    if (!footed) continue;
+                    placed.Add(spot); stood.Add(point);
                     int level = camp.levelMin + rng.Next(Mathf.Max(1, camp.levelMax - camp.levelMin + 1));
                     // Only the first mob of an elite camp is the elite (its pack stays normal).
                     bool elite = camp.elite && n == 0;
                     string id = "mob." + tag + "." + zoneShort + "." + c + "." + n;
-                    var a = SpawnActor(elite ? camp.mob + " (elite)" : camp.mob, content.enemy, point, Color.grey, id, look, level);
+                    // A Puglin pack mixes the kit's three skins, green, red and blue, one after another (the Bank-snouts, Docs/BESTIARY_MONSTERS.md).
+                    var a = SpawnActor(elite ? camp.mob + " (elite)" : camp.mob, content.enemy, point, Color.grey, id, look, level, look == ActorLook.Puglin ? n : -1);
                     AddAgent(a.gameObject, look == ActorLook.Wolf ? 4.2f : look == ActorLook.Boar ? 3.8f : look == ActorLook.Bear ? 4f : look == ActorLook.WeaveEater ? 3.4f : 2.8f, beast ? .6f : .45f);
+                    a.GetComponent<NavMeshAgent>().areaMask &= ~(1 << EncounterNavigation.DropArea);   // (the Adit rework) a camp's mobs never take a one-way drop: they would be gone from their camp for good
                     var enemy = a.gameObject.AddComponent<EncounterEnemy>(); enemy.actor = a; enemy.persistentId = id; enemy.session = this;
-                    enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius;
+                    enemy.Camp = true; enemy.Elite = elite; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = camp.center; enemy.CampRadius = camp.radius; enemy.KeepDry = camp.dry;
                     enemy.Ambusher = camp.ambush; enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear;
                     enemy.FleeAt = elite ? 0 : camp.flee;   // bolts at low health (D5; EncounterEnemy.Flee)
+                    enemy.Gap = gap;
+                    enemy.NightOnly = camp.night;   // a night camp (the Drain Courts): gone by day (EncounterEnemy.Night)
+                    if (camp.route != null && camp.route.Length > 1)   // a patrol: its road, each a little to the side of the next
+                    {
+                        var road = new Vector3[camp.route.Length]; var side = Side(camp.route) * gap * 1.15f * (n - (camp.count - 1) / 2f);
+                        for (int r = 0; r < road.Length; r++) road[r] = Zone.StandAt(camp.route[r] + side, float.NegativeInfinity, 1);   // on its cave's floor, as the camps
+                        enemy.Patrol = road;
+                    }
+                    else if (!camp.ambush && !elite && camp.count >= 2 && n == camp.count - 1 && c % 2 == 0 && !Zone.Zone.groupZone && !Crulanda.World.Hollow.InsideAny(point, 2))
+                    {
+                        var loop = RoamLoop(camp, c);
+                        if (loop != null) { enemy.Patrol = loop; enemy.Roamer = true; }
+                    }
                     a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
                     if (camp.ambush) enemy.Hide();
                     bool tough = Zone.Zone.groupZone && !elite; enemy.Tough = tough;   // a group zone: every mob at an elite's strength (round 29)
@@ -1492,10 +1786,32 @@ namespace Crulanda.Encounter
                     enemy.HitBase = EncounterEnemy.MobHit(level, false, elite || tough);
                     if (elite) a.transform.localScale = Vector3.one * 1.18f; else if (tough) a.transform.localScale = Vector3.one * 1.08f;
                     ConfigureSocial(enemy, camp, c, level, beast);   // its kind, its kin and, for the elite, its move (EncounterSession.Social)
-                    if (elite && camp.mob == NixName) SpawnRockEater(enemy, camp, c, level);   // his engine, and him inside it (EncounterSession.RockEater)
+                    if (elite && camp.mob == NixName) SpawnRockEater(enemy, camp, c, level);   // his beast, and him in its saddle (EncounterSession.RockEater)
+                    spawned.Add(enemy);
                 }
             }
-            SpawnOutliers();
+            return spawned;
+        }
+        /// <summary>A camp mob's footing found without the dice: spots round the camp's centre (the golden angle, each a quarter gap further
+        /// out, from half a gap to two gaps past the camp's radius), the first whose navmesh point is clear of those stood already and on the
+        /// camp's own level (within 1.5 m of the height it is stood nearest: not the floor under its deck). False when none is.</summary>
+        bool FootingRound(Crulanda.World.ZoneCamp camp, float gap, List<Vector3> stood, out Vector3 point, out Vector2 spot)
+        {
+            for (int k = 0; k < 24; k++)
+            {
+                float r = gap * .5f + gap * .25f * k, a = k * 2.39996f;
+                if (r > camp.radius + gap * 2) break;
+                spot = camp.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * r;
+                var want = Zone.StandAt(spot, DeckHeight(camp, spot), 1);
+                if (!NavMesh.SamplePosition(want, out var hit, 3, NavMesh.AllAreas) || Mathf.Abs(hit.position.y + 1 - want.y) > 1.5f) continue;
+                point = hit.position + Vector3.up;
+                if (OffDeck(camp, spot, point)) continue;
+                if (camp.dry && NearWater(point)) continue;   // a dry camp keeps off the water (EncounterSession.Dry)
+                bool clear = true;
+                foreach (var w in stood) { var d = w - point; d.y = 0; if (d.magnitude < gap * .9f) { clear = false; break; } }
+                if (clear) return true;
+            }
+            point = default; spot = camp.center; return false;
         }
         /// <summary>
         /// Outlying mobs (playtest note 92, 2026-10-07: "still need more camps, pretty deserted to level up"): round each outdoor camp of
@@ -1539,7 +1855,7 @@ namespace Crulanda.Encounter
                         enemy.Camp = true; enemy.RespawnSeconds = Mathf.Max(20, camp.respawn); enemy.CampCenter = at; enemy.CampRadius = 4;
                         enemy.Skinnable = look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.Stag || look == ActorLook.Bear; enemy.FleeAt = camp.flee;
                         a.gameObject.SetActive(true); enemy.Initialize(); Enemies.Add(enemy);
-                        enemy.Tough = Zone.Zone.groupZone;
+                        enemy.Tough = Zone.Zone.groupZone; enemy.NightOnly = camp.night;
                         a.Stats.SetBase(StatType.MaxHealth, EncounterEnemy.MobHealth(level, false, enemy.Tough, beast));
                         a.Health.ApplyHealing(a.Health.Pool.Max);
                         enemy.HitBase = EncounterEnemy.MobHit(level, false, enemy.Tough); if (enemy.Tough) a.transform.localScale = Vector3.one * 1.08f;
@@ -1548,14 +1864,41 @@ namespace Crulanda.Encounter
                 }
             }
         }
+        /// <summary>Whether a camp mob's footing (<paramref name="point"/>, a metre over the navmesh) is off the open-ground deck its camp
+        /// stands on (Hallow's Creek: a slab, a loft, a landing): more than 1.5 m from the deck's height (<see cref="DeckHeight"/>). A camp on
+        /// the land, or in a cave (whose decks are measured from the cave's floor), is never off it.</summary>
+        static bool OffDeck(Crulanda.World.ZoneCamp camp, Vector2 spot, Vector3 point)
+        {
+            if (camp == null || !string.IsNullOrEmpty(camp.cave)) return false;
+            float deck = DeckHeight(camp, spot);
+            return !float.IsNegativeInfinity(deck) && Mathf.Abs(point.y - 1 - deck) > 1.5f;
+        }
+        /// <summary>
+        /// The height a camp's mob is stood nearest (ZoneBuilder.StandAt): a camp up on a deck in a cave (ZoneCamp.rise: a trestle's landing,
+        /// a catwalk, a bridge's tower; the Adit rework) its cave's floor there plus its rise, so it stands on the deck and not on the floor
+        /// under it; every other camp float.NegativeInfinity (the first cave floor there, as every camp stood).
+        /// </summary>
+        public static float DeckHeight(Crulanda.World.ZoneCamp camp, Vector2 spot)
+        {
+            if (camp != null && string.IsNullOrEmpty(camp.cave) && Mathf.Abs(camp.rise) > .01f && Crulanda.World.ZoneBuilder.Active != null)
+                return Crulanda.World.ZoneBuilder.Active.Datum + camp.rise;   // (Hallow's Creek) on open ground: on the deck that high over the yard
+            if (camp == null || camp.rise <= 0 || string.IsNullOrEmpty(camp.cave)) return float.NegativeInfinity;
+            var cave = Crulanda.World.Hollow.All.Find(h => h.Name == camp.cave); if (cave == null) return float.NegativeInfinity;
+            return (cave.FloorAt(spot, out float floor) ? floor : cave.At(camp.along, camp.aside).y) + camp.rise;
+        }
         /// <summary>Story enemies of this zone (saved, stay dead) as opposed to camp mobs.</summary>
-        public List<EncounterEnemy> StoryEnemies { get { return Enemies.FindAll(e => !e.Camp); } }
+        public List<EncounterEnemy> StoryEnemies { get { return Enemies.FindAll(e => !e.Camp && e != TrainingDummy); } }   // not the yard's dummy: it never stays down, and the zone would never be clear
         /// <summary>Collider and agent. Beasts and Weave-Eaters are bulkier than a person: wider apart, and they stop further off.</summary>
         static void AddAgent(GameObject go, float speed, float radius = .45f)
         {
             var collider = go.AddComponent<CapsuleCollider>(); collider.height = 2; collider.radius = radius;
             var agent = go.AddComponent<NavMeshAgent>(); agent.speed = speed; agent.angularSpeed = 540;
             agent.acceleration = 16; agent.stoppingDistance = 1.8f + (radius - .45f) * 2; agent.radius = radius; agent.height = 2; agent.baseOffset = 1;
+            // (2026-10-18, "bad pathing" on the ramps) Never wider than the navmesh was eroded for (NavAgentRadius): a wider agent's body
+            // hangs over a ramp's edge; the path is worked out again when a rail or a gate changes the way; the best avoidance, so a
+            // party bunched on a loft or a flight sidesteps along it rather than shoving one another to its edge.
+            agent.radius = Mathf.Min(radius, Crulanda.World.ZoneBuilder.NavAgentRadius);
+            agent.autoRepath = true; agent.obstacleAvoidanceType = ObstacleAvoidanceType.HighQualityObstacleAvoidance;
         }
         static void SetHealth(Actor actor, int value)
         {
@@ -1568,50 +1911,89 @@ namespace Crulanda.Encounter
             if (Player != null && Player.EntityId.Value == id) return Player;
             if (Companion != null && Progress.recruited && Companion.actor.EntityId.Value == id) return Companion.actor;
             if (Pet != null && Pet.actor != null && Pet.actor.EntityId.Value == id) return Pet.actor;   // the Ranger's wolf (RangerPet)
+            foreach (var p in SimPets) if (p != null && p.actor != null && p.actor.EntityId.Value == id) return p.actor;   // the sim Rangers' wolves
             foreach (var c in PartySims) if (c != null && c.actor != null && c.actor.EntityId.Value == id) return c.actor;   // invited sims (Phase 5.2b)
             if (Weaver != null && Weaver.actor != null && Weaver.actor.EntityId.Value == id) return Weaver.actor;   // Mother Quillet on her way to the lock (D4)
+            if (Warden != null && Warden.actor != null && Warden.actor.EntityId.Value == id) return Warden.actor;   // (Hallow's Creek, E2) Warden Elvet: the walk's waves come at her
             return null;
         }
         public bool IsLivingPartyMember(string id) { var a = PartyActor(id); return a != null && a.IsAlive; }
         /// <summary>Whom a mob may fight: your party, or a sim in the world that came for it (Phase 5.3a).</summary>
         public Actor CombatActor(string id) { return PartyActor(id) ?? SimPopulation.Active?.FighterActor(id); }
         public bool IsLivingCombatant(string id) { var a = CombatActor(id); return a != null && a.IsAlive; }
+        /// <summary>
+        /// A roamer's loop (Chris, 2026-10-15: "need mobs patrolling more instead of just standing in one spot"): in every other open-air camp
+        /// of two or more, its last mob walks five points on a ring well outside the camp (two and a half times its radius and 6 m more),
+        /// there and back, each point on the walkable ground; its own dice, so no other spawn moves. Null if fewer than three points stand.
+        /// </summary>
+        Vector3[] RoamLoop(Crulanda.World.ZoneCamp camp, int c)
+        {
+            var r = new System.Random(c * 7919 + (Zone.Zone.id ?? "").Length * 104729 + 17);
+            float ring = camp.radius * 2.5f + 6, turn = (float)r.NextDouble() * Mathf.PI * 2;
+            var points = new List<Vector3>();
+            for (int k = 0; k < 5; k++)
+            {
+                float a = turn + k * Mathf.PI * 2 / 5 + ((float)r.NextDouble() - .5f) * .5f, reach = ring * (.8f + (float)r.NextDouble() * .4f);
+                var p = Zone.StandAt(camp.center + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * reach, float.NegativeInfinity, 1);
+                if (NavMesh.SamplePosition(p, out var hit, 3, NavMesh.AllAreas) && !(camp.dry && NearWater(hit.position))) points.Add(hit.position);   // a dry camp's roamer never wades (EncounterSession.Dry)
+            }
+            if (points.Count < 3) return null;
+            points.Add(points[0]);   // round the loop and back the same way (EncounterEnemy walks a road back and forth)
+            return points.ToArray();
+        }
         /// <summary>A sim worked a node: it rests until its respawn as if you had (nothing comes to you).</summary>
         public NodeDef SimGathered(Crulanda.World.ZoneInteractable i)
         {
             if (i == null || i.node == null || Professions == null || Zone == null) return null;
-            var def = Professions.Db.Node(i.node); if (def != null) RestNode(i, def.respawn);
+            var def = Professions.Db.Node(i.node); if (def != null) RestNode(i, NodeRespawn(def));
             return def;
         }
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.Session");
         void Update() { using (perfMark.Auto()) UpdateTimed(); }
+        float nextDormant;
+        /// <summary>Twice a second: far, idle camp mobs sleep, near ones wake (EncounterEnemy.Dormant). A sleeper whose camp is
+        /// drawn into a fight (Victim set) is woken by its own pull.</summary>
+        void TickDormant()
+        {
+            if (Time.time < nextDormant || Player == null) return;
+            nextDormant = Time.time + .5f; var at = Player.transform.position;
+            foreach (var e in Enemies)
+            {
+                if (e == null) continue;
+                float d2 = (e.transform.position - at).sqrMagnitude;
+                if (e.Dormant) { if (d2 < EncounterEnemy.WakeRange * EncounterEnemy.WakeRange || !e.actor.IsAlive || e.threat.Any) e.SetDormant(false); }
+                else if (d2 > EncounterEnemy.SleepRange * EncounterEnemy.SleepRange && e.CanSleep) e.SetDormant(true);
+            }
+        }
         void UpdateTimed()
         {
             if (Player == null) return;
+            TickDormant();
+            TickNight();   // the Lowtowns' night camps up out of the drains and back down (EncounterSession.Lowtowns)
+            // the Lowtowns' Night Market keepers out after dark, and Dead Man's Drop's fall and net (EncounterSession.NightMarket)
+            TickNightMarket(); TickDrop();
+            // the Iron Teeth's corner of the day (EncounterSession.LowtownMarks)
+            TickTurf();
+            // the roofs' climbs and drops offered only at their own height (EncounterSession.Roofs)
+            TickRoofs();
+            // the Sweep: the horns, the warders in Pell Row, the child you lead over the roofs (EncounterSession.Sweep)
+            TickSweep();
+            TickRiver();   // the Chemical River: its poison, and the tracking it hides you from (EncounterSession.River)
             AdvanceToast();
             // The day turns at six in the morning: the boards draw again (Bounties). A rare posting taken on keeps its courier abroad.
             if (lastHour >= 0 && Bounties.DayTurned(lastHour, Crulanda.World.WorldClock.Hour)) Progress.days++;
             lastHour = Crulanda.World.WorldClock.Hour; Crulanda.World.CropField.Day = Progress.days;   // the crops grow by the game's days (note 76)
             if (courier == null && Boards != null && Zone != null && Boards.ActiveRare(ZoneId) != null && !courierDone) SpawnCourier();
             if (courier != null && !courier.actor.IsAlive) courierDone = true;
-            if (EncounterInput.Press(KeyCode.Escape))
-            {
-                // Esc closes open windows (conversation, quest book, map) before it pauses.
-                if (LootOpen && !Paused) CloseLoot();
-                else if (Conversation != null && !Paused) Conversation = null;
-                else if (VendorNpc != null && !Paused) CloseVendor();
-                else if (TradesOpen && !Paused) TradesOpen = false;
-                else if (WhoOpen && !Paused) WhoOpen = false;
-                else if ((CharacterOpen || InventoryOpen) && !Paused) { CharacterOpen = false; InventoryOpen = false; }
-                else if (QuestBookOpen && !Paused) { QuestBookOpen = false; ReadingDocument = null; }
-                else if (MapOpen && !Paused) MapOpen = false;
-                else { Paused = !Paused; Time.timeScale = Paused ? 0 : 1; }
-            }
+            if (EncounterInput.Press(KeyCode.Escape)) Escape();
             if (!Paused && EncounterInput.Press(KeyCode.M)) MapOpen = !MapOpen;
             if (!Paused && Quests != null && EncounterInput.Press(KeyCode.L)) { QuestBookOpen = !QuestBookOpen; if (!QuestBookOpen) ReadingDocument = null; }
             if (!Paused && SimPopulation.Active != null && EncounterInput.Press(KeyCode.O)) WhoOpen = !WhoOpen;
+            if (!Paused && Zone != null && EncounterInput.Press(KeyCode.J)) QueueOpen = !QueueOpen;   // the dungeon queue (Gather a Party)
             if (Paused) return;
+            // the Rusty Spoon's smell, ballad and brawl (EncounterSession.Spoon)
+            TickSpoon();
             if (EncounterInput.Press(KeyCode.B)) BuildOpen = !BuildOpen;
             // Moving interrupts the player's own cast-time abilities (instant abilities are unaffected).
             abilities.Tick(Time.time, Player.IsAlive && !Player.GetComponent<AdventurerMotor>().Moving);
@@ -1624,11 +2006,13 @@ namespace Crulanda.Encounter
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F11)) { Crulanda.World.WorldClock.Advance(1); Message("Time skips ahead: " + Crulanda.World.WorldClock.Text + " (dev)."); }
             if (Debug.isDebugBuild && EncounterInput.Press(KeyCode.F8) && Crulanda.World.WorldWeather.Active != null) Message("Weather: " + Crulanda.World.WorldWeather.Active.CycleForced() + " (dev).");
             TickLoot();
+            // (A dungeon's checkpoints) reached by a party member near one, you alive or not.
+            TickCheckpoints();
             if (!Player.IsAlive) { if (EncounterInput.Press(KeyCode.R)) Recover(); return; }
             TickQuests(); TickItems(); TickDiscoveries(); TickPlaces(); TickFeats(); TickNodes(); TickWork(); TickCastPose();
             if (Zone != null && Player.GetComponent<CharacterController>().isGrounded && !Zone.WaterAt(new Vector2(Player.transform.position.x, Player.transform.position.z), out _, out _)) lastDry = Player.transform.position;
             var motor = Player.GetComponent<AdventurerMotor>(); var look = Player.GetComponent<ActorVisual>();
-            if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : ActorPose.None;
+            if (look != null) look.Pose = motor.Swimming ? ActorPose.Swim : motor.Sneaking ? ActorPose.Sneak : workDone != null ? workPose : ActorPose.None;
             if (!BuildOpen && EncounterInput.Press(KeyCode.Tab)) CycleTarget();
             if (EncounterInput.Click && !EncounterHud.BlocksPointer(EncounterInput.Pointer))
             {
@@ -1649,39 +2033,50 @@ namespace Crulanda.Encounter
             if (!BuildOpen && EncounterInput.Press(KeyCode.E)) Interact();
             if (EncounterInput.Press(KeyCode.H)) Hail();   // playtest note 83
             TickInvite();   // a sim's invitation lapses after thirty seconds (round 27)
+            TickLockouts(); TickQueue(); TickHallows();   // lockouts run out; the dungeon queue gathers its party, leads it and breaks it up (EncounterSession.Lockout, .Queue)
+            // (Hallow's Creek) the Ash Road's time-squalls and stone leaves, the bridge's tipping slab (EncounterSession.AshRoad)
+            TickAshRoad();
 
             bool marking = EncounterInput.Sneak;   // Ctrl+1-4: raid marks on your target (CC step C3); Ctrl alone still sneaks
-            for (int slot = 0; slot < (marking ? 4 : ActionCount); slot++)
-                if (!BuildOpen && slot < 13 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else UseAbility(slot); }
-            Kit.Tick(InCombat);
+            if (!BuildOpen && EncounterInput.Press(KeyCode.P)) { SpellbookOpen = !SpellbookOpen; BookPick = null; }   // the spellbook (Docs/ACTION_BAR.md)
+            var stances = Kit.StanceSlots;
+            if (!marking && stances.Length > 0 && EncounterInput.Shifted)   // Shift+1-4: the stance bar (the Druid's forms)
+            { for (int i = 0; i < stances.Length && i < 9; i++) if (!BuildOpen && EncounterInput.Press(EncounterInput.SlotKey(i))) UseAbility(stances[i]); }
+            else
+                for (int slot = 0; slot < (marking ? 4 : BarSlots); slot++)   // the chosen bar: 1-0, then the slots bought with AA (EncounterSession.Bar)
+                    if (!BuildOpen && slot < 14 && EncounterInput.Press(EncounterInput.SlotKey(slot))) { if (marking) MarkTarget((RaidMark)((slot + 1) % 4)); else { int kit = BarKitSlot(slot); if (kit >= 0) UseAbility(kit); } }
+            Kit.Tick(InCombat); Meter.Tick(InCombat, Time.deltaTime); TickDuo(); TendSpirit(); TendTraining();
             if (AutoAttack && !Kit.MeleeAutoAttacks && !Kit.RangedAutoAttacks) AutoAttack = false;
             // The swing in melee, or the bow's auto-shot at its range (the Ranger: ClassKit.RangedAutoAttacks).
             if (AutoAttack && Target != null && Target.actor.IsAlive && Time.time >= nextSwing && Distance(Target) < Kit.AutoAttackRange && !PlayerStunned && !PlayerDisarmed)
             {
                 nextSwing = Time.time + Kit.SwingInterval(content.playerSwingInterval);
-                if (Kit.MeleeAutoAttacks) PlayerFigure?.Strike(); else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
-                Target.Receive(WeaponDamage, Player); Kit.OnAutoHit();
+                if (Kit.MeleeAutoAttacks) { PlayerFigure?.Strike(); SpellFx.Slash(Player.transform, Target.transform, false, .6f); } else { PlayerFigure?.CastRelease(); Bolt(Target, new Color(.9f, .88f, .8f), .1f, true); }
+                // A swing takes the kit's own swing scale (the Shaman's: its build scales were tuned on its spells; ClassKit.SwingDamageScale).
+                int swing = WeaponDamage; float build = PlayerDamageScale, own = Kit.SwingDamageScale(build);
+                if (!Mathf.Approximately(own, build)) swing = Mathf.Max(1, Mathf.RoundToInt(swing * own / Mathf.Max(.01f, build)));
+                Target.Receive(swing, Player); Kit.OnAutoHit(); GearSwingProcs();   // a class set's procs on a landed swing (loot DESIGN.md 3.8)
             }
             if (Time.time >= nextRegen)
             {
-                nextRegen = Time.time + 1; Player.Resource.Pool.Change(InCombat ? ClassDef.combatRegen : ClassDef.restingRegen);
+                nextRegen = Time.time + 1; Player.Resource.Pool.Change(InCombat ? ClassDef.combatRegen : Kit.RestingResourceRegen ? ClassDef.restingRegen : 0);
                 if (!InCombat) { Player.Health.ApplyHealing(RestRegen); if (Companion.actor.IsAlive) Companion.actor.Health.ApplyHealing(7); }
             }
             if (!InCombat && Time.time > nextSave) { Save(false); nextSave = Time.time + 30; }
             Floating.RemoveAll(f => f.expires < Time.time);
         }
         public float Distance(EncounterEnemy enemy) { return Vector3.Distance(Player.transform.position, enemy.transform.position); }
-        public void Select(EncounterEnemy enemy) { Target = enemy; AutoAttack = false; if (enemy != null) { FocusVillager = null; FocusMira = false; FocusSimId = null; } }
+        public void Select(EncounterEnemy enemy) { Target = enemy; AutoAttack = false; if (enemy != null) { FocusVillager = null; FocusMira = false; FocusSimId = null; FocusMending = false; } }
         // ---------- friendly target (left-click a villager or Mira) ----------
         /// <summary>The villager you clicked (null = none). E talks to the selected friend first when they are in reach.</summary>
         public Villager FocusVillager { get; private set; }
         public bool FocusMira { get; private set; }
-        public bool HasFriendlyFocus { get { return FocusMira || (FocusVillager != null && FocusVillager.Visible) || FocusSimBody != null; } }
-        public string FocusName { get { return FocusMira ? "Mira" : FocusVillager != null ? FocusVillager.Name : FocusSim?.name; } }
-        public Vector3 FocusPosition { get { var sb = FocusSimBody; return FocusMira && Companion != null ? Companion.transform.position : FocusVillager != null ? FocusVillager.transform.position : sb != null ? sb.position : Vector3.zero; } }
+        public bool HasFriendlyFocus { get { return FocusMending || FocusMira || (FocusVillager != null && FocusVillager.Visible) || FocusSimBody != null; } }
+        public string FocusName { get { return FocusMending ? "Mending dummy" : FocusMira ? "Mira" : FocusVillager != null ? FocusVillager.Name : FocusSim?.name; } }
+        public Vector3 FocusPosition { get { if (FocusMending && MendingDummy != null) return MendingDummy.transform.position; var sb = FocusSimBody; return FocusMira && Companion != null ? Companion.transform.position : FocusVillager != null ? FocusVillager.transform.position : sb != null ? sb.position : Vector3.zero; } }
         public void SelectFriendly(Villager v, bool mira)
         {
-            FocusVillager = mira ? null : v; FocusMira = mira; FocusSimId = null;
+            FocusVillager = mira ? null : v; FocusMira = mira; FocusSimId = null; FocusMending = false;
             if (mira || v != null) { Target = null; AutoAttack = false; }
         }
         /// <summary>
@@ -1708,6 +2103,8 @@ namespace Crulanda.Encounter
             if (SimPopulation.Active != null) foreach (var f in SimPopulation.Active.Figures) if (f != null && !f.Hidden && Hit(f.transform.position, .95f, out float sd) && sd < best) { best = sd; simPick = f.sim.id; }
             foreach (var c in PartySims) if (c != null && Hit(c.transform.position, .95f, out float cd) && cd < best) { best = cd; simPick = c.sim.id; }
             if (simPick != null) { SelectSim(simPick); return; }
+            // The mending dummy (the training field): nearer than anyone else under the pointer.
+            if (MendingDummy != null && Hit(MendingDummy.transform.position, .95f, out float dd) && dd < best) { SelectMending(); return; }
             SelectFriendly(pick, mira);
         }
         /// <summary>Who E would talk to: the selected friend when in reach, otherwise the nearest of Mira and the villagers. In reach
@@ -1745,6 +2142,8 @@ namespace Crulanda.Encounter
         {
             if (Paused || Player == null || !Player.IsAlive || !ActionUnlocked(index)) return false;
             if (PlayerStunned) { Message("You are stunned."); return false; }
+            if (PlayerFeared) { Message("You are running: nothing comes to hand."); return false; }
+            if (PlayerDisoriented) { Message("The cave swims: you can't make the move."); return false; }
             if (PlayerDisarmed && WeaponMove(index)) { Message("Your weapon is locked."); return false; }
             if (CooldownRemaining(index) > 0) return false;
             bool used = Kit.Use(index);
@@ -1814,7 +2213,7 @@ namespace Crulanda.Encounter
         }
         /// <summary>A body that still has something to take (camp mobs until looted; story enemies by their saved record).</summary>
         public bool CanLoot(EncounterEnemy e) { return e != null && !e.actor.IsAlive && (e.Camp ? !e.Looted : !Progress.FindEnemy(e.persistentId).looted); }
-        EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))) ?? SkinnableBody; } }
+        public EncounterEnemy LootableCorpse { get { return Enemies.Find(e => CanLoot(e) && Distance(e) < 3.6f && (!e.Camp || CanTakeAny(e))) ?? SkinnableBody; } }
         public Crulanda.World.ZoneDoor NearbyDoor
         {
             get
@@ -1823,6 +2222,7 @@ namespace Crulanda.Encounter
                 Crulanda.World.ZoneDoor best = null; float bestDistance = DoorRange;
                 foreach (var door in Zone.Doors)
                 {
+                    if (door.kind == "bunk") continue;   // a waystation's bunks are a bed, not a door (2026-10-15)
                     float dist = Vector3.Distance(Player.transform.position, door.position);
                     if (dist < bestDistance) { best = door; bestDistance = dist; }
                 }
@@ -1838,11 +2238,13 @@ namespace Crulanda.Encounter
                 if (LootOpen) return "Take all";
                 var exit = NearbyExit; if (exit != null) return exit.name;
                 var body = LootableCorpse; if (body != null) return body.Game || body.Skinnable ? GameAnimals.SkinPrompt : "Search the body";
+                // the Spoon's Triad table, its drinkers round it
+                var cards = SpoonTableAtHand(); if (cards != null) return SpoonPrompt(cards);
                 var (villager, mira) = TalkTarget();
                 if (mira) return !Progress.recruited ? "Recruit Mira" : !Companion.actor.IsAlive ? "Revive Mira" : "Talk to Mira";
-                if (villager != null) return "Talk to " + villager.Name;
+                if (villager != null) return SpoonTalkPrompt(villager) ?? "Talk to " + villager.Name;
                 var (usable, secret) = NearestUse();
-                if (secret != null) return SearchPrompt(secret.def);
+                if (secret != null) return SecretPrompt(secret);
                 if (usable != null) return InteractPromptFor(usable);
                 var door = NearbyDoor;
                 if (door != null) return door.openable ? (door.Open ? "Close the door" : "Open the door") + " · " + door.name : (door.kind == "rooms" ? "Try the door · " : "Knock · ") + door.name;
@@ -1874,6 +2276,8 @@ namespace Crulanda.Encounter
                 }
                 return;
             }
+            // the Spoon's Triad table (EncounterSession.Spoon)
+            var cards = SpoonTableAtHand(); if (cards != null) { UseSpoonThing(cards); return; }
             var (talkTo, toMira) = TalkTarget();
             if (toMira)
             {
@@ -1884,8 +2288,13 @@ namespace Crulanda.Encounter
             }
             if (talkTo != null)
             {
+                // a brawler in the Spoon's brawl: you wade in (EncounterSession.Spoon)
+                if (SpoonJoin(talkTo)) return;
                 SelectFriendly(talkTo, false);
+                NoteMet(talkTo.Name);   // the book of lore's People
                 if (QuestTalk(talkTo.Name, talkTo.transform.position)) talkTo.FacePlayer();
+                else if (HallTalk(talkTo)) talkTo.FacePlayer();   // the capital's halls: the audience, the Archive, a guild, a trainer (EncounterSession.Halls)
+                else if (CapitalTalk(talkTo)) { }   // the Treasury's banker, the Exchange's auctioneer (EncounterSession.Capital.cs)
                 else if (IsVendor(talkTo)) { OpenVendor(talkTo); talkTo.FacePlayer(); }
                 else VillageLife.Active.Talk(talkTo);
                 return;
@@ -1902,6 +2311,13 @@ namespace Crulanda.Encounter
                 return;
             }
             var station = StationNear(null); if (station != null) { WorkAtStation(station); return; }
+            // Nothing else here and a foe targeted: your weapon swings at it (2026-10-17, Chris: the Shaman "still had no auto attack"; no key
+            // began a swing, only a class's own melee blows).
+            if (Target != null && Target.actor.IsAlive && !Target.Game && Kit != null && (Kit.MeleeAutoAttacks || Kit.RangedAutoAttacks))
+            {
+                BeginAutoAttack(); Message((Kit.RangedAutoAttacks ? "Auto shot at the " : "Auto attack on the ") + Target.actor.DisplayName + (Distance(Target) >= Kit.AutoAttackRange ? " (move closer)." : "."));
+                return;
+            }
             Message("Nothing to interact with here.");
         }
         /// <summary>What answering a knock says when someone home has wares or quest business for you (GAME-ONLY).</summary>
@@ -1930,19 +2346,31 @@ namespace Crulanda.Encounter
         {
             if (restoring) return;
             if (enemy.Game) { GameDied(enemy); return; }   // no experience, no coin, no "zone clear" (EncounterSession.Hunt)
+            OpenGatesOf(enemy);   // (the Adit rework) a boss's door opens as he falls, whoever brought him down
+            GreySeepOnDeath(enemy);   // (S7) the Foreman's death stops the Grey Spreads (EncounterSession.GreySpread.cs)
             // A sim's kill (it hit first, out of your party): nothing for you, no loot on the body (Phase 5.3a; classic tagging).
             if (enemy.TappedBy != null && enemy.TappedBy != Player.EntityId.Value && PartyActor(enemy.TappedBy) == null) { if (Target == enemy) AutoAttack = false; return; }
+            Kit?.OnFoeDown(enemy);   // the kit's own kill talents (Catch Your Breath, Crowd Pleaser)
+            // Lockouts (EncounterSession.Lockout): a boss or elite locked for you already (a queued run's fresh dungeon, a quest's kill) gives
+            // no loot; one that was not is locked from now.
+            bool lockedKill = LockedFor(enemy); enemy.NoLoot = lockedKill;
+            if (lockedKill) Message("No loot: " + enemy.Name + " is locked for you for another " + Lockouts.Words(Lockouts.Left(Progress, Lockouts.KeyOf(enemy.persistentId), Lockouts.UtcNow())) + ".");
+            else LockOnKill(enemy);
             if (enemy.Camp) RollCorpse(enemy);   // the loot is decided as it dies, so the body can show it
+            NoteSlain(enemy);   // its kind in the book of lore's Creatures
             if (NamedElite(enemy)) { if (Feats != null) Feats.Slain(enemy.persistentId); else { var k = Achievements.EliteKey(enemy.persistentId); if (k != null && !Progress.elitesSlain.Contains(k)) Progress.elitesSlain.Add(k); } }   // the camp's own elite, not a machine it rides
             if (enemy.Camp) TakeKey(enemy);   // a sigil boss's key (EncounterSession.Adit.cs)
+            // The dungeon's last boss down: the run's scorecard (Chris, 2026-10-11: "final boss kill can also call the scorecard").
+            if (Zone != null && Zone.Zone.dungeon && enemy.Elite && enemy.Move != null && enemy.Move.boss && !Enemies.Exists(o => o != null && o != enemy && o.Camp && o.Elite && o.Move != null && o.Move.boss && o.actor.IsAlive))
+                ShowScorecard(Zone.Zone.displayName + ": " + enemy.Name + " has fallen");
             BreakOut(enemy);   // the Rock-Eater's rider jumps out (EncounterSession.RockEater.cs)
             OnKillEffects();
             int before = Progress.Level;
-            int xp = EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite || enemy.Tough);
+            int xp = LevelHeld ? 0 : EncounterProgress.KillXp(enemy.actor.Level, Progress.Level, enemy.Elite || enemy.Tough);   // a run capture holds the level
             if (enemy.Camp) Progress.experience += xp;
             else { if (!Progress.AwardKill(enemy.persistentId, xp)) return; if (Progress.recruited) Progress.relationship++; }
-            Message(enemy.actor.DisplayName + " defeated · " + (xp > 0 ? "+" + xp + " XP" : "no experience (too weak)") + " · press " + KeyBindings.InteractLabel + " at the body to loot.");
-            foreach (var c in PartySims) if (c != null && c.actor.IsAlive) c.GainXp(EncounterProgress.KillXp(enemy.actor.Level, c.sim.level, enemy.Elite || enemy.Tough) / 2);   // the party's kill: half shares for the sims (5.3b)
+            Message(enemy.actor.DisplayName + " defeated · " + (xp > 0 ? "+" + xp + " XP" : LevelHeld ? "no experience (the run holds your level)" : "no experience (too weak)") + " · press " + KeyBindings.InteractLabel + " at the body to loot.");
+            foreach (var c in PartySims) if (c != null && c.actor.IsAlive) c.GainXp(LevelHeld ? 0 : EncounterProgress.KillXp(enemy.actor.Level, c.sim.level, enemy.Elite || enemy.Tough) / 2);   // the party's kill: half shares for the sims (5.3b)
             if (Progress.Level > before) { ApplyLevel(); Player.Health.ApplyHealing(40); Message("Level " + Progress.Level + "! Health and weapon damage increased."); }
             if (Target == enemy) AutoAttack = false;
             if (Quests != null)
@@ -1951,6 +2379,14 @@ namespace Crulanda.Encounter
                 if (Progress.Level > before) ApplyLevel();
             }
             if (!enemy.Camp && StoryEnemies.TrueForAll(e => !e.actor.IsAlive)) Message(ZoneTitle + " is clear for now. " + (Inventory.IsEquipped(Progress, content.itemId) ? "Save [F5]." : "Equip your reward [I], then save [F5]."));
+        }
+        /// <summary>The doors a camp's mob holds shut (ZoneGate.OpensOn: Lusk's door, the chute door, the cloister door, the sluice-boards; the
+        /// Adit rework) open as it dies, for this visit (they shut again on the next).</summary>
+        void OpenGatesOf(EncounterEnemy enemy)
+        {
+            if (Zone == null || enemy == null || !enemy.Camp || string.IsNullOrEmpty(enemy.MobName)) return;
+            foreach (var g in Zone.Gates)
+                if (g != null && !g.Open && g.OpensOn == enemy.MobName) { g.SetOpen(true); Message(g.Title + " opens as " + enemy.Name + " falls."); }
         }
         void ApplyLevel()
         {
@@ -1975,6 +2411,10 @@ namespace Crulanda.Encounter
                 case "class.mage": return (13 + L, 8 + L / 2, 10 + L / 2, 22 + 2 * L, 20 + 2 * L);
                 case "class.rogue": return (16 + (3 * L) / 2, 14 + L, 22 + 2 * L, 8 + L / 2, 10 + L / 2);
                 case "class.archivist": return (14 + L, 8 + L / 2, 10 + L / 2, 20 + 2 * L, 22 + 2 * L);
+                case "class.saltmender": return (17 + (3 * L) / 2, 12 + L, 10 + L / 2, 16 + 2 * L, 18 + 2 * L);
+                case "class.cleric": return (16 + (3 * L) / 2, 12 + L, 14 + L, 18 + 2 * L, 20 + 2 * L);   // 2026-10-13: its own (it had the Warrior's); balance-neutral (ApplyInnate)
+                case "class.shaman": return (18 + (3 * L) / 2, 15 + L, 14 + L, 17 + 2 * L, 18 + 2 * L);
+                case "class.scoundrel": return (15 + (3 * L) / 2, 12 + L, 20 + 2 * L, 12 + L, 16 + 2 * L);   // quick hands and a ready tongue (2026-10-14); balance-neutral (ApplyInnate)
                 default: return (20 + 2 * L, 20 + 2 * L, 15 + L, 8 + L / 2, 10 + L / 2);   // the Warrior
             }
         }
@@ -2006,17 +2446,46 @@ namespace Crulanda.Encounter
             int i = Progress.bag.FindIndex(s => s.item == content.itemId);
             if (i >= 0) EquipFromBag(i);
         }
+        /// <summary>A living member of your party (a sim, or Mira when recruited) within 40 m of the mob: its fight goes on while you are down.</summary>
+        public bool PartyNear(EncounterEnemy e)
+        {
+            if (e == null) return false;
+            foreach (var c in PartySims) if (c != null && c.actor.IsAlive && Vector3.Distance(c.transform.position, e.transform.position) < 40) return true;
+            return Progress.recruited && Companion != null && Companion.actor.IsAlive && Vector3.Distance(Companion.transform.position, e.transform.position) < 40;
+        }
         public void Recover()
         {
             if (Player.IsAlive) return;
+            // A party still fighting goes on without you (2026-10-15, the run's party at Nix: you fell, got up at the stone, and every sim was
+            // pulled back with you and the duo reset to full while they had it at 86%: every group run wiped there). Only the fallen come to
+            // the stone with you, and only a fight with nobody left alive in it resets. A whole party down is as it always was.
+            // In a fight: a mob alive and in it (on someone, or with threat on its list) with a living party member within 40 m of it. Not
+            // "a mob on a living member": at your death Nix was on you, and the three sims beside him at 7% were pulled out (R150).
+            bool InIt(EncounterEnemy e) { return e != null && e.actor.IsAlive && (e.Victim != null || e.threat.Any) && PartyNear(e); }
+            bool fighting = Enemies.Exists(InIt);
+            // A wipe (nobody left in a fight): the buffs went with the deaths, and the leader stops to buff up again before the boss.
+            if (!fighting) CountWipe();
             Player.Health.Revive(Player.Health.Pool.Max);
-            Player.GetComponent<AdventurerMotor>().Teleport(RecoveryPoint);
-            Companion.actor.Health.Revive(Companion.actor.Health.Pool.Max);
-            Companion.actor.Health.ApplyHealing(1000); Companion.actor.Resource.Pool.Fill();
-            Companion.GetComponent<NavMeshAgent>().Warp(RecoveryPoint + Vector3.right * 2.5f - Vector3.up * .1f);
-            HealPartySimsAfterRecover();
-            foreach (var e in Enemies) e.ResetFight();
-            Message((BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
+            // (Chris, 2026-10-16) In a dungeon, the latest checkpoint reached this visit; else the spirit stone or the zone's camp.
+            Player.GetComponent<AdventurerMotor>().Teleport(RecoverAt);
+            if (!fighting || !Companion.actor.IsAlive)
+            {
+                Companion.actor.Health.Revive(Companion.actor.Health.Pool.Max);
+                Companion.actor.Health.ApplyHealing(1000); Companion.actor.Resource.Pool.Fill();
+                Companion.GetComponent<NavMeshAgent>().Warp(WakeBeside(Vector3.right * 2.5f - Vector3.up * .1f));
+            }
+            // Whoever gets up at the stone has left the fight: off every mob's list, so a mob turns to the party still at it rather than
+            // chasing the revived tank across the dungeon past its leash and resetting (R154: Nix at 426 with three sims on him).
+            var gone = new List<string> { Player.EntityId.Value };
+            foreach (var c in PartySims) if (c != null && !c.actor.IsAlive) gone.Add(c.actor.EntityId.Value);
+            if (Companion != null && !Companion.actor.IsAlive) gone.Add(Companion.actor.EntityId.Value);
+            HealPartySimsAfterRecover(fighting);
+            foreach (var e in Enemies) if (e != null) foreach (var id in gone) e.threat.Remove(id);
+            foreach (var e in Enemies)
+                if (e != null && (!fighting || !InIt(e))) e.ResetFight();
+                else if (e != null && e.Victim == Player) e.threat.Remove(Player.EntityId.Value);   // it turns to the party still at it
+            WokeAt = LatestCheckpoint != null ? LatestCheckpoint.def.name : BoundStone() != null ? "the spirit stone" : "camp";
+            Message((LatestCheckpoint != null ? "You wake at the checkpoint: " + LatestCheckpoint.def.name + "." : BoundStone() != null ? "You wake beside the spirit stone." : "Recovered at camp.") + " Defeated enemies and collected rewards remain recorded.");
         }
         public void Save(bool announce = true)
         {
@@ -2042,6 +2511,8 @@ namespace Crulanda.Encounter
             if (Professions != null) Professions.Bind(Progress);
             if (Armoury != null) Armoury.Bind(Progress);
             if (Feats != null) { Feats.Bind(Progress); featsPrimed = false; }
+            SweepLockouts();   // the loaded character's lockouts (EncounterSession.Lockout)
+            if (lore != null) lore.Bind(Progress);   // the book of lore reads the loaded character (its Achievements too)
         }
         public void RepeatTrail()
         {
@@ -2055,11 +2526,13 @@ namespace Crulanda.Encounter
         public void Message(string text) { Messages.Add(text); if (Messages.Count > 6) Messages.RemoveAt(0); ChatSay(ChatChannel.System, null, text); }
         public void FloatText(Vector3 point, string text, Color color) { Floating.Add(new CombatText { position = point + Vector3.up * 1.5f, text = text, color = color, expires = Time.time + 1.3f }); }
         public void Resume() { Paused = false; Time.timeScale = 1; }
-        void OnDestroy() { Time.timeScale = 1; Crulanda.World.WorldWeather.Turned -= OnWeatherTurned; }
+        void OnDestroy() { Time.timeScale = 1; Crulanda.World.WorldWeather.Turned -= OnWeatherTurned; if (meter != null) Combatant.Healed -= OnHealed; }
         /// <summary>The zone's weather turns: a line in the chat ("It starts to rain.").</summary>
         void OnWeatherTurned(Crulanda.World.WeatherKind from, Crulanda.World.WeatherKind to)
         {
             var line = Crulanda.World.WeatherSchedule.Herald(from, to);
+            // (Hallow's Creek's time-squalls, decision 9) a zone's own words for its squall blowing in.
+            if (to == Crulanda.World.WeatherKind.AshSquall && Zone != null && !string.IsNullOrEmpty(Zone.Zone.squallText)) line = Zone.Zone.squallText;
             if (line != null) Message(line);
         }
         void OnApplicationQuit() { if (Player != null) Save(false); }

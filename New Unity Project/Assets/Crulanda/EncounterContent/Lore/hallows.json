@@ -1,0 +1,145 @@
+{
+  "zone": "zone.hallows",
+  "canonStatus": "GAME-ONLY: Hallow's Creek's chapter of the book of lore, its lines the game's. What they tell of is CANON or CANON-EXPANDED as hallows.json's canonNote says: the paused town, the bridge's slabs, the crater and the red door, the Old Archive and the hungry shadows (book1 ch.15-21), the Hollow (book1 ch.4), the Bureau (book1 ch.3). Written 2026-10-16.",
+  "entries": [
+    {
+      "id": "lore.hallows.places.the-ash-road",
+      "chapter": "places",
+      "subject": "The Ash Road",
+      "line": "The last road into the town the Wasting took first, its stone trees laying long shadows across it that you should not stand in.",
+      "canonStatus": "CANON (book1 ch.17: the hungry shadows); GAME-ONLY: the road as a way in"
+    },
+    {
+      "id": "lore.hallows.places.the-fossilised-farm",
+      "chapter": "places",
+      "subject": "The Fossilised Farm",
+      "line": "A farmhouse turned to stone with its farmer at the gate and its dog in the yard, the dog sitting up as if someone had just called its name.",
+      "canonStatus": "CANON (book1 ch.17)"
+    },
+    {
+      "id": "lore.hallows.places.the-bridge-of-shattered-glass",
+      "chapter": "places",
+      "subject": "The Bridge of Shattered Glass",
+      "line": "The old bridge was blown apart and the blast stopped mid-air. You cross the chasm on its hanging slabs.",
+      "canonStatus": "CANON (book1 ch.17)"
+    },
+    {
+      "id": "lore.hallows.places.the-bridge-head-gatehouse",
+      "chapter": "places",
+      "subject": "The bridge-head gatehouse",
+      "line": "Where the Iron Pact holds the bridge's far end for the Bureau.",
+      "canonStatus": "GAME-ONLY (the Iron Pact is CANON, book1 ch.2)"
+    },
+    {
+      "id": "lore.hallows.places.main-street",
+      "chapter": "places",
+      "subject": "Main Street",
+      "line": "White houses, white fences without a speck of peeling paint, roses of red quartz, a baker in his doorway with a tray, a ball hanging in the air over the gravel. Everyone on it is stone, and watching you.",
+      "canonStatus": "CANON (book1 ch.18)"
+    },
+    {
+      "id": "lore.hallows.places.the-square",
+      "chapter": "places",
+      "subject": "The Square",
+      "line": "Where the town hall stood there is a bowl of glass, and a red door hanging over it with nothing to open into.",
+      "canonStatus": "CANON (book1 ch.19: the crater and the red door; the door is never reached)"
+    },
+    {
+      "id": "lore.hallows.places.the-granary-on-the-race",
+      "chapter": "places",
+      "subject": "The Granary on the race",
+      "line": "The town's tithe barn, where the Bureau's pickers size what they cut into crates for the coast.",
+      "more": "The Picker-Master's tally: forty of the paused cut, twelve stone of yield, and a line about the cellars he was told not to number.",
+      "page": "doc.hallows.pickers_tally",
+      "canonStatus": "GAME-ONLY (the Bureau is CANON, book1 ch.3)"
+    },
+    {
+      "id": "lore.hallows.places.the-old-archive",
+      "chapter": "places",
+      "subject": "The Old Archive",
+      "line": "A First Era library: columns twisted like pulled taffy, a crest of an open book with an eye, a maze of stone shelves. The Preservationists kept it once.",
+      "more": "A page of the High Archivist's log, found loose in the stacks: the children came to the steps to hear the readings.",
+      "page": "doc.hallows.archivist_page",
+      "canonStatus": "CANON (book1 ch.18)"
+    },
+    {
+      "id": "lore.hallows.places.the-bell-tower",
+      "chapter": "places",
+      "subject": "The Bell Tower",
+      "line": "The tower over the town, its great bell hung mid-swing and its painted dial a minute short of noon. Paint on stone: nothing in it turns.",
+      "more": "Four names chalked low on the inside wall, the ringers' practice marks, the last stopping half way through the word.",
+      "secret": "secret.hallows.ringers-names",
+      "canonStatus": "CANON-EXPANDED (book1 ch.21: the tower; the bell, the dial and the ringers GAME-ONLY)"
+    },
+    {
+      "id": "lore.hallows.places.the-cut-store",
+      "chapter": "places",
+      "subject": "The Cut-Store",
+      "line": "The cellar where the Bureau's cutters throw what they have broken. What they throw there does not stay thrown.",
+      "canonStatus": "GAME-ONLY (the Hollow are CANON, book1 ch.4)"
+    },
+    {
+      "id": "lore.hallows.creatures.road-captain-everard-hurst",
+      "chapter": "creatures",
+      "subject": "Road-Captain Everard Hurst",
+      "line": "The Pact captain who keeps the Ash Road for the Bureau's carts and puts anyone in his way down in the ash.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.hallows.creatures.sergeant-wymond-tredway",
+      "chapter": "creatures",
+      "subject": "Sergeant Wymond Tredway",
+      "line": "He holds the gate at the bridge's far end. He says the span is his, and the span has not argued.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.hallows.creatures.assessor-piers-upcott",
+      "chapter": "creatures",
+      "subject": "Assessor Piers Upcott",
+      "line": "The Bureau man who walks the street with chalk, marking the paused for the cut. A cross on a door is a cross on a person.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.hallows.creatures.picker-master-fulke-yelland",
+      "chapter": "creatures",
+      "subject": "Picker-Master Fulke Yelland",
+      "line": "He sizes memory-quartz into crates and keeps a tally of everything but what walks after the cut.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.hallows.creatures.first-cut",
+      "chapter": "creatures",
+      "subject": "First-Cut",
+      "line": "The first of the paused the Bureau cut. Its shell broke. What was inside it did not go anywhere.",
+      "canonStatus": "GAME-ONLY (the Hollow are CANON, book1 ch.4: they pour from cellar doors)"
+    },
+    {
+      "id": "lore.hallows.creatures.registrar-dunstan-pardew",
+      "chapter": "creatures",
+      "subject": "Registrar Dunstan Pardew",
+      "line": "He keeps the Archive's register for the Bureau now, and says hush to anyone who speaks above a whisper in it.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.hallows.creatures.bureau-examiner-thurstan-vowell",
+      "chapter": "creatures",
+      "subject": "Bureau Examiner Thurstan Vowell",
+      "line": "The Examiner learned the town's one trick: a bell rung at the frozen minute wakes the square, and the grey breathes a field wider.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.hallows.creatures.the-lamplighter",
+      "chapter": "creatures",
+      "subject": "The Lamplighter",
+      "line": "A Hollow who walks the street at the hour, lighting lamps that give no light. Not every night.",
+      "canonStatus": "GAME-ONLY (the Hollow are CANON, book1 ch.4)"
+    },
+    {
+      "id": "lore.hallows.creatures.the-old-ram",
+      "chapter": "creatures",
+      "subject": "The Old Ram",
+      "line": "Grey and light as paper, it stood in the east meadow when the meadow went pale. Sometimes it wakes.",
+      "canonStatus": "GAME-ONLY (Bet's letter is already in the game)"
+    }
+  ]
+}

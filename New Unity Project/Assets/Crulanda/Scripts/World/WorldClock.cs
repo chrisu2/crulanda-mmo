@@ -34,12 +34,25 @@ namespace Crulanda.World
         struct Look { public Color sun, sky, equator, ground, fog; public float intensity, exposure; }
         Look dayLook, dawn, dusk, night;
         Color skyTint = Color.grey; float atmosphere = 1, sunSize = .04f;
+        /// <summary>The stylized sky (StylizedSky, play note 254) in place of the procedural one; the zone's tint, haze and own day sky.</summary>
+        bool stylized; Color zoneTint = Color.white; float zoneHaze; int daySky = -1;
+        /// <summary>The skies shown now and their weights (tests and captures read it); empty on the procedural sky.</summary>
+        public System.Collections.Generic.List<(int sky, float weight)> SkyMix { get; private set; } = new System.Collections.Generic.List<(int, float)>();
+        /// <summary>Which night it is (constant from noon to noon): the weather clock and the hour run together, so their difference holds.</summary>
+        static int NightNumber { get { double k = (WorldWeather.Clock > 0 ? WorldWeather.Clock : 0) / (RealMinutesPerDay * 60) - Hour / 24; return (int)System.Math.Round(k) + (Hour >= 12 ? 1 : 0); } }
 
         public void Init(Light sunLight, ZoneLighting lighting, Material skybox, System.Collections.Generic.List<NightLight> nightLights)
         {
             Instance = this; sun = sunLight; day = lighting; lamps = nightLights;
             TwinMoons.Ensure(transform);   // The Eye and The Tear (CANON)
-            if (skybox != null)
+            // The stylized sky unless the zone keeps the procedural one (skyStyle "procedural") or the pack is missing.
+            var styled = day.skyStyle != "procedural" ? StylizedSky.NewMaterial() : null;
+            if (styled != null)
+            {
+                sky = styled; RenderSettings.skybox = sky; stylized = true;
+                zoneTint = StylizedSky.ZoneTint(day.skyTint); zoneHaze = StylizedSky.ZoneHaze(day.skyHaze); daySky = StylizedSky.IndexOf(day.skyDay);
+            }
+            else if (skybox != null)
             {
                 sky = new Material(skybox); RenderSettings.skybox = sky;
                 if (sky.HasProperty("_SkyTint")) skyTint = sky.GetColor("_SkyTint");
@@ -56,6 +69,8 @@ namespace Crulanda.World
             // Moonlit night: a clear blue moon and a blue ambient floor carry the night's colour (the grade no longer drains it), so
             // faces turned from the moon stay readable; the sky stays dark (exposure .3).
             night = new Look { sun = new Color(.45f, .6f, 1f), intensity = .4f, sky = new Color(.24f, .32f, .55f), equator = new Color(.18f, .24f, .42f), ground = new Color(.1f, .12f, .2f), fog = new Color(.09f, .1f, .15f), exposure = .3f };
+            // A zone's own night air (ZoneLighting.nightFog): the Lowtowns' smog stays grey and warm from the fires under it, not moonlit blue.
+            if (!string.IsNullOrEmpty(day.nightFog)) { night.fog = ZoneColors.Parse(day.nightFog, night.fog); dusk.fog = Color.Lerp(dusk.fog, night.fog, .5f); }
             Apply();
         }
         /// <summary>Sky-only reflection probe (water and glossy surfaces reflect the current sky, not a fixed default one).</summary>
@@ -97,7 +112,7 @@ namespace Crulanda.World
             float loss = w.dim * Mathf.Lerp(.5f, 1, lit), lift = 1 + (.08f * w.dim - .45f * w.rain) * lit + flash * .7f;   // overcast skylight is a little bright; rain is gloomy, a storm dark
             // The same light plays sun by day and moon by night; it swings across the sky with the hour.
             bool moon = Hour >= 20.2f || Hour < 5.6f;
-            // Noon height: the default arc, or the zone's own (sunHigh: Khaven's sun never climbs out of the evening).
+            // Noon height: the default arc, or the zone's own (sunHigh: Hallow's Creek's low light under its grey sky).
             float high = day.sunHigh > 0 ? day.sunHigh : Mathf.Max(day.sunPitch * 1.6f, 45);
             float elevation = moon ? 38 : Mathf.Lerp(4, high, Mathf.Sin(Mathf.Clamp01((Hour - 5.6f) / 14.6f) * Mathf.PI));
             float yaw = day.sunYaw + (moon ? 180 : (Hour - 12) * 12);
@@ -111,6 +126,12 @@ namespace Crulanda.World
             }
             RenderSettings.ambientSkyColor = Flat(look.sky, .35f * loss) * lift; RenderSettings.ambientEquatorColor = Flat(look.equator, .35f * loss) * lift;
             RenderSettings.ambientGroundColor = Flat(look.ground, .3f * loss) * (1 + .5f * flash);
+            if (stylized)
+            {
+                // The sky by the hour and the weather (its light on the skylight below, once Unlit has read the zone's own).
+                StylizedSky.Cloud(w, out float cloudy, out float overcast);
+                SkyMix = StylizedSky.Weights(Hour, cloudy, overcast, day.aurora && StylizedSky.AuroraNight(NightNumber), daySky);
+            }
             float cave = Mathf.Lerp(1, .2f, under);
             RenderSettings.ambientSkyColor *= cave; RenderSettings.ambientEquatorColor *= cave; RenderSettings.ambientGroundColor *= cave;
             // Unlit things take what is left of the light: the skylight and the sun or moon now against the zone's clear noon, a
@@ -119,11 +140,28 @@ namespace Crulanda.World
             float left = Mathf.Clamp((ag + .5f * (look.intensity * (1 - .7f * loss) + flash * .45f)) / (ng + .5f * dayLook.intensity), 0, 1.2f) * (1 - .2f * dark);
             var hue = new Color(Hue(amb.r / ag, noon.r / ng), Hue(amb.g / ag, noon.g / ng), Hue(amb.b / ag, noon.b / ng));
             Unlit = new Color(Mathf.Lerp(1, hue.r, .5f) * left, Mathf.Lerp(1, hue.g, .5f) * left, Mathf.Lerp(1, hue.b, .5f) * left, 1);
+            if (stylized)
+            {
+                // The skylight leans a third of the way to the sky's own colours, its brightness the zone's own (no GI update, no cost).
+                StylizedSky.Light(SkyMix, out var above, out var horizon);
+                RenderSettings.ambientSkyColor = StylizedSky.HueToward(RenderSettings.ambientSkyColor, above, .35f);
+                RenderSettings.ambientEquatorColor = StylizedSky.HueToward(RenderSettings.ambientEquatorColor, horizon, .35f);
+            }
             var fog = Color.Lerp(Weathered(look.fog, w, lit), new Color(.05f, .045f, .04f, look.fog.a), .9f * under);   // smoky cave air
             RenderSettings.fogColor = fog;
             // The fog closes in with the weather, never nearer than 55 m at its far end (enemies stay in sight).
             RenderSettings.fogStartDistance = Mathf.Lerp(day.fogStart * w.fog, 1.5f, under); RenderSettings.fogEndDistance = Mathf.Lerp(Mathf.Max(day.fogEnd * w.fog, Mathf.Min(day.fogEnd, 55)), 34, under);
-            if (sky != null)
+            if (day.nightClear > 0) RenderSettings.fogEndDistance *= 1 + day.nightClear * dark * (1 - under);   // the Lowtowns' smog thins after dark (ZoneLighting.nightClear)
+            // Hallow's Creek's bubble of static reality pushes the fog back (b1 ch.21:19, "The fog here was thinner").
+            if (WorldWeather.StillClear > 0) { RenderSettings.fogStartDistance *= 1 + WorldWeather.StillClear * (1 - under); RenderSettings.fogEndDistance *= 1 + WorldWeather.StillClear * (1 - under); }
+            if (sky != null && stylized)
+            {
+                // The painted sun stands where the light comes from (the light shines along its yaw, so the sun is behind it).
+                StylizedSky.Set(sky, SkyMix, yaw + 180);
+                sky.SetFloat("_Exposure", (day.skyExposure > 0 ? day.skyExposure / 1.05f : 1) * (1 - .15f * w.dim) * (1 - .2f * w.rain) * (1 + flash));
+                sky.SetColor("_Tint", zoneTint); sky.SetFloat("_Haze", zoneHaze); sky.SetColor("_Ground", fog);
+            }
+            else if (sky != null)
             {
                 float exposure = look.exposure * (1 - .3f * w.dim) * (1 - .25f * w.rain) * (1 + flash);
                 sky.SetFloat("_Exposure", exposure);
@@ -198,6 +236,19 @@ namespace Crulanda.World
     }
 
     /// <summary>A chicken coop: hens roost inside at night. The hen-wife opens it in the morning and shuts it at dusk.</summary>
+    /// <summary>A fold of sheep (the Old Fold; Chris, 2026-10-14: "does anyone feed or tend to this flock of sheep?", "or extract
+    /// their wool for market?"): the yard the flock stands in, its gate toward the village, the feed trough, and the fleeces the
+    /// shepherd has shorn and not yet carried to the stall. GAME-ONLY.</summary>
+    public sealed class ZoneFold
+    {
+        public string name; public Vector3 yard, gate, trough; public float radius = 6; public int sheep;
+        /// <summary>Fleeces shorn today and waiting at the fold; the day they were shorn (one shearing a day).</summary>
+        public int Wool; public bool Shorn;
+        public float FedAt = -999; public Vector3 FeedSpot;
+        public bool Feeding { get { return Time.time - FedAt < 28; } }
+        /// <summary>The shearing: a fleece a sheep, once a day (Shorn is cleared with the coops' LaidToday at 4-5).</summary>
+        public int Shear() { if (Shorn) return 0; Shorn = true; Wool += sheep; return sheep; }
+    }
     public sealed class ZoneCoop
     {
         public string name;

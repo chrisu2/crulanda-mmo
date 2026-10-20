@@ -32,6 +32,15 @@ namespace Crulanda.Combat
             Statuses?.Clear(); ClearBarrier();
         }
         public void ClearBarrier() { Barrier = 0; barrierUntil = 0; }
+        /// <summary>Takes up to <paramref name="amount"/> off the barrier without a blow (a Lowtowns Weave-Eater eating a ward, WeaveEaterRules);
+        /// returns how much went.</summary>
+        public int EatBarrier(int amount)
+        {
+            if (Barrier <= 0 || amount <= 0) return 0;
+            int took = Mathf.Min(Barrier, amount); Barrier -= took;
+            if (Barrier == 0) barrierUntil = 0;
+            return took;
+        }
         public bool AddBarrier(int amount, float duration)
         {
             if (actor == null || !actor.IsAlive || amount <= 0 || !(duration > 0) || float.IsInfinity(duration)) return false;
@@ -51,7 +60,17 @@ namespace Crulanda.Combat
             }
             return mitigated > 0 ? actor.Health.ApplyDamage(mitigated) : 0;
         }
-        public int Heal(int amount) { return actor.Health.ApplyHealing(amount); }
+        /// <summary>Raised on every mend with a named healer (healer, healed, amount): the party's meter listens (CombatMeter).</summary>
+        public static event System.Action<Actor, Actor, int> Healed;
+        /// <summary>Every mend with a named healer, asked and got (healer, healed, amount, applied): overheal is the difference.</summary>
+        public static event System.Action<Actor, Actor, int, int> HealAttempted;
+        public int Heal(int amount, Actor by = null)
+        {
+            int healed = actor.Health.ApplyHealing(amount);
+            if (by != null) HealAttempted?.Invoke(by, actor, amount, healed);   // the balance harness's overheal (asked against got)
+            if (by != null && healed > 0) Healed?.Invoke(by, actor, healed);
+            return healed;
+        }
         public bool Apply(StatusEffectDefinition definition)
         {
             Statuses.Tick(Time.time);

@@ -18,7 +18,8 @@
     {"id": "og-censure", "name": "Censure", "tier": 1, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "hand", "desc": "New action: a blow that holds the target's next swing back for 2s.", "emphasis": {"control": 3}, "impl": true},
     {"id": "og-unbroken-oath", "name": "Unbroken Oath", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Ward lasts 1s longer per rank.", "emphasis": {"mitigation": 0.8}, "impl": true},
     {"id": "og-vigil", "name": "Vigil", "tier": 2, "col": 1, "max": 3, "req": "og-censure", "kind": "passive", "icon": "eye", "desc": "Oath of Ward also holds the attention of 1/2/3 other enemies within 6m.", "emphasis": {"threat": 2}, "impl": true},
-    {"id": "og-hallowed-ground", "name": "Hallowed Ground", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "chain", "desc": "Enemies standing on your consecrated ground hit 10% softer.", "emphasis": {"mitigation": 2}, "impl": true}
+    {"id": "og-hallowed-ground", "name": "Hallowed Ground", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "chain", "desc": "Enemies standing on your consecrated ground hit 10% softer.", "emphasis": {"mitigation": 2}, "impl": true},
+    {"id": "og-iron-oath", "name": "Iron Oath", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Under the Ward you take 2% less per rank.", "emphasis": {"mitigation": 1}, "impl": true}
    ]
   },
   {
@@ -34,7 +35,8 @@
     {"id": "ju-burning-light", "name": "Burning Light", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "flame", "desc": "Judgement leaves the target burning: three ticks over 6s, scaling with rank and level.", "emphasis": {"damage": 1}, "impl": true},
     {"id": "ju-swift-verdict", "name": "Swift Verdict", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "bolt", "desc": "A Judgement thrown at three pips gives back 10 Mana.", "emphasis": {"sustain": 1}, "impl": true},
     {"id": "ju-executioner", "name": "Executioner", "tier": 2, "col": 1, "max": 3, "req": "ju-weighted-judgement", "kind": "passive", "icon": "dagger", "desc": "Judgement hits 10% harder per rank against targets under 35% health.", "emphasis": {"damage": 1.5}, "impl": true},
-    {"id": "ju-crusade", "name": "Crusade", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Smite also strikes one other enemy within 4m of its target for half.", "emphasis": {"damage": 2}, "impl": true}
+    {"id": "ju-crusade", "name": "Crusade", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "star", "desc": "Smite also strikes one other enemy within 4m of its target for half.", "emphasis": {"damage": 2}, "impl": true},
+    {"id": "ju-sentence-passed", "name": "Sentence Passed", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "target", "desc": "Judgement hits 3% harder per rank.", "emphasis": {"damage": 1}, "impl": true}
    ]
   },
   {
@@ -50,7 +52,8 @@
     {"id": "sa-aegis-of-faith", "name": "Aegis of Faith", "tier": 1, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Aegis's barrier is 15% larger and lasts 2s longer per rank.", "emphasis": {"mitigation": 1}, "impl": true},
     {"id": "sa-beacon", "name": "Beacon", "tier": 1, "col": 2, "max": 1, "req": null, "kind": "modifier", "icon": "star", "desc": "Lay On also grants its target an Aegis.", "emphasis": {"healing": 1, "mitigation": 0.5}, "impl": true},
     {"id": "sa-mercy", "name": "Mercy", "tier": 2, "col": 1, "max": 3, "req": "sa-grace", "kind": "passive", "icon": "hand", "desc": "Lay On heals 8% more of the target's maximum health per rank.", "emphasis": {"healing": 1.5}, "impl": true},
-    {"id": "sa-sanctuary", "name": "Sanctuary", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "moon", "desc": "Each second of Consecrate also heals you and Mira on the ground for 3% of maximum health.", "emphasis": {"healing": 2}, "impl": true}
+    {"id": "sa-sanctuary", "name": "Sanctuary", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "signature", "icon": "moon", "desc": "Each second of Consecrate also heals you and Mira on the ground for 3% of maximum health.", "emphasis": {"healing": 2}, "impl": true},
+    {"id": "sa-shared-mercy", "name": "Shared Mercy", "tier": 3, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "heart", "desc": "Lay On also mends the rest of your party within 10m for 3% of their maximum health per rank.", "emphasis": {"healing": 1}, "impl": true}
    ]
   },
   {

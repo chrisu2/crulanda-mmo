@@ -1,0 +1,17 @@
+class,build,seed,seconds,members,hps,overheal_pct,others_share_pct,mana_max,mana_used,mana_left,low_member_seconds
+# party class.paladin sanctuary: 0 sims joined: 
+class.paladin,sanctuary,0,90.0,2,54.9,1,38,100,960,100,44.1
+class.paladin,sanctuary,1,90.0,2,53.8,1,44,100,842,98,42.9
+class.paladin,sanctuary,2,90.0,2,55.4,2,38,100,960,100,45.2
+# party class.saltmender mender: 0 sims joined: 
+class.saltmender,mender,0,90.0,2,48.5,1,32,100,1080,100,47.3
+class.saltmender,mender,1,90.0,2,48.5,1,39,100,1080,100,35.1
+class.saltmender,mender,2,90.0,2,48.5,1,37,100,1080,100,46.6
+# party class.archivist the-cantor: 0 sims joined: 
+class.archivist,the-cantor,0,90.0,2,73.3,25,38,100,1020,100,0.0
+class.archivist,the-cantor,1,90.0,2,64.9,32,39,100,843,97,0.0
+class.archivist,the-cantor,2,90.0,2,71.3,25,40,100,1020,100,0.0
+# party class.druid rootmend: 0 sims joined: 
+class.druid,rootmend,0,90.0,2,32.6,3,46,100,0,100,93.4
+class.druid,rootmend,1,90.0,2,35.9,2,37,100,0,100,60.3
+class.druid,rootmend,2,90.0,2,37.3,3,45,100,0,100,83.7

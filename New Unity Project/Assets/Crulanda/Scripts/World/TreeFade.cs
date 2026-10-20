@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 using UnityEngine;
 
 namespace Crulanda.World
@@ -22,6 +22,9 @@ namespace Crulanda.World
         public const float FadedAlpha = .22f;
         /// <summary>A blocking part this close to the camera (a trunk right in front of the lens) is hidden outright, not dithered.</summary>
         public const float NearHide = 3.5f;
+        /// <summary>How much of a tree right at the lens still shows (faint, never culled).</summary>
+        public const float NearAlpha = .1f;
+        public float Alpha { get { return alpha; } }
         static readonly Dictionary<Material, Material> fadeCopies = new Dictionary<Material, Material>();
         static MaterialPropertyBlock block;
 
@@ -57,7 +60,7 @@ namespace Crulanda.World
                 if (!t.ready) t.Prepare();
                 // In front of you: see-through. Around or right in front of the camera (inside a crown, a trunk at the lens):
                 // gone, shadow kept.
-                int hides = t.Hides(camera, head, body); t.target = hides == 2 ? 0 : hides == 1 ? FadedAlpha : 1;
+                int hides = t.Hides(camera, head, body); t.target = hides == 2 ? NearAlpha : hides == 1 ? FadedAlpha : 1;   // never gone outright (Chris 12:59: "tree disappeared.")
                 if (Mathf.Approximately(t.alpha, t.target)) continue;
                 t.alpha = Mathf.MoveTowards(t.alpha, t.target, dt * 4);   // about a quarter of a second either way
                 t.Apply();

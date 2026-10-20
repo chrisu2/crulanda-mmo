@@ -56,6 +56,19 @@ namespace Crulanda.Tests
             Assert.AreEqual(1, definition.incomingDamageMultiplier);
         }
         [Test]
+        public void The_grey_makes_its_bearer_take_a_tenth_more_never_stacks_and_is_lifted_by_a_cleanse()
+        {
+            // Handoff item 8 (2026-10-13): a Hollow Man's blow greys; the cleanses (Absolve, the Salt Cairn's sifting) lift it.
+            var effects = new StatusEffectRuntime(new StatBlock());
+            Assert.IsTrue(effects.Apply(EncounterEnemy.GreyDefinition, 0)); Assert.IsTrue(effects.Has(EncounterEnemy.GreyId));
+            Assert.AreEqual(EncounterEnemy.GreyTaken, effects.IncomingDamageMultiplier, 1e-5f);
+            Assert.IsTrue(effects.Apply(EncounterEnemy.GreyDefinition, 5)); Assert.AreEqual(1, effects.Count, "a second blow refreshes it");
+            Assert.AreEqual(EncounterEnemy.GreyTaken, effects.IncomingDamageMultiplier, 1e-5f, "never stacks");
+            effects.Tick(5 + EncounterEnemy.GreySeconds - .1f); Assert.IsTrue(effects.Has(EncounterEnemy.GreyId), "refreshed from the second blow");
+            Assert.AreEqual(1, effects.RemoveHarmful(), "a cleanse lifts it"); Assert.IsFalse(effects.Has(EncounterEnemy.GreyId));
+            Assert.AreEqual(1, effects.IncomingDamageMultiplier);
+        }
+        [Test]
         public void Invalid_status_is_rejected_atomically()
         {
             var effects = new StatusEffectRuntime(new StatBlock());

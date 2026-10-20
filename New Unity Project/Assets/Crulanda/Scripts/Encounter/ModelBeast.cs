@@ -37,6 +37,16 @@ namespace Crulanda.Encounter
             /// <summary>Under a painted skin: light of this colour where the mask is white (a treant's moss, its sap-light).</summary>
             public Texture GlowMap; public Color GlowColour;
             public Coat Lit(Texture mask, Color colour) { GlowMap = mask; GlowColour = colour; return this; }
+            /// <summary>A texture for the materials whose names hold <paramref name="part"/> ("" for every other): a model with its own
+            /// maps (the Orc Shaman's skin and its staff), each kept on its own material.</summary>
+            public readonly List<(string part, Texture map)> Maps = new List<(string, Texture)>();
+            public Coat Map(string part, Texture map) { if (map != null) Maps.Add((part, map)); return this; }
+            public Texture MapFor(string material)
+            {
+                foreach (var (part, map) in Maps) if (part.Length > 0 && material.IndexOf(part, System.StringComparison.OrdinalIgnoreCase) >= 0) return map;
+                foreach (var (part, map) in Maps) if (part.Length == 0) return map;
+                return null;
+            }
             public string Key
             {
                 get
@@ -45,6 +55,7 @@ namespace Crulanda.Encounter
                     var s = new System.Text.StringBuilder();
                     foreach (var k in keys) s.Append(k).Append('=').Append(Hex(Colours[k])).Append(Glowing.Contains(k) ? "*" : "").Append(';');
                     if (Albedo != null) s.Append("skin=").Append(Albedo.name).Append('/').Append(Normal != null ? Normal.name : "-").Append('/').Append(Hex(Tint)).Append(';');
+                    foreach (var (part, map) in Maps) s.Append("map=").Append(part).Append('/').Append(map.name).Append(';');
                     if (GlowMap != null) s.Append("lit=").Append(GlowMap.name).Append('/').Append(GlowColour.ToString("0.00")).Append(';');
                     return s.ToString();
                 }
@@ -70,8 +81,44 @@ namespace Crulanda.Encounter
         static readonly Dictionary<string, GameObject> sources = new Dictionary<string, GameObject>();
         static GameObject Source(string kind)
         {
-            if (!sources.TryGetValue(kind, out var go)) { go = Resources.Load<GameObject>("Creatures/" + kind); sources[kind] = go; }
+            if (!sources.TryGetValue(kind, out var go))
+            {
+                go = Resources.Load<GameObject>("Creatures/" + kind);
+                if (go == null && Humanoid(kind)) go = Resources.Load<GameObject>(BestiaryPath + kind);
+                sources[kind] = go;
+            }
             return go;
+        }
+        /// <summary>Quaternius's Bestiary - Dungeon Monsters Kit (QAL licence; Chris's play note 233, "use this for some different
+        /// monsters"): two-legged monsters on the people's skeleton (pelvis, spine_01-03, neck_01, Head, the UE names), with no clips of
+        /// their own. Imported Humanoid with their own avatars (Editor/CharacterImport.cs) and moved by the people's humanoid clips.</summary>
+        public const string BestiaryPath = "Characters/Bestiary/";
+        static readonly string[] HumanoidKinds = { "Imp", "Puglin" };
+        /// <summary>A monster of the Bestiary kit: a human avatar, played the people's clips (<see cref="HumanClip"/>).</summary>
+        public static bool Humanoid(string kind) { return System.Array.IndexOf(HumanoidKinds, kind) >= 0; }
+        /// <summary>True for a model built on its human avatar (a Bestiary monster whose avatar came in human).</summary>
+        public bool OnHumanAvatar { get; private set; }
+        /// <summary>The people's clip for a Bestiary monster's slot (the Universal Animation Library's, or Kevin Iglesias's one-handed
+        /// blows and combat flinch where they are in the game): it stands, walks and jogs (the small ones sprint, their legs short), swings
+        /// its weapon three ways, flinches and dies as the people do. Null for a slot it has no clip for.</summary>
+        public static AnimationClip HumanClip(string kind, string slot)
+        {
+            AnimationClip Ki(string file) { return ModelFigure.KiClip(false, file); }
+            switch (slot)
+            {
+                case "idle": return ModelFigure.Clip("Idle_Loop");
+                case "idle2": return Ki("CombatIdle1H01") ?? ModelFigure.Clip("Sword_Idle");
+                case "walk": return ModelFigure.Clip("Walk_Loop");
+                case "run": return kind == "Puglin" ? ModelFigure.Clip("Sprint_Loop") ?? ModelFigure.Clip("Jog_Fwd_Loop") : ModelFigure.Clip("Jog_Fwd_Loop");
+                case "attack": case "kick": return ModelFigure.Clip("Sword_Attack");
+                case "attack2": return Ki("Attack1H01_R") ?? ModelFigure.Clip("Sword_Attack");
+                case "attack3": return Ki("Attack2H01") ?? ModelFigure.Clip("Punch_Jab");
+                case "hitL": return Ki("CombatDamage01") ?? ModelFigure.Clip("Hit_Chest");
+                case "hitR": return ModelFigure.Clip("Hit_Head");
+                case "death": return ModelFigure.Clip("Death01");
+                case "jump": return ModelFigure.Clip("Jump_Start");
+                default: return null;
+            }
         }
         /// <summary>True when the animal is in the build (and models are on).</summary>
         public static bool Available(string kind) { return Enabled && !string.IsNullOrEmpty(kind) && Source(kind) != null; }
@@ -138,7 +185,7 @@ namespace Crulanda.Encounter
                 for (int i = 0; i < own.Length; i++)
                 {
                     string n = own[i] != null ? own[i].name.Replace(" (Instance)", "") : "";
-                    var atlas = Atlas(own[i], n);
+                    var atlas = (coat != null ? coat.MapFor(n) : null) ?? Atlas(own[i], n);
                     Color c = coat != null && coat.Colours.TryGetValue(n, out var set) ? set : atlas != null ? Color.white : FileColour(own[i]);
                     bool glowing = coat != null && coat.Glowing.Contains(n);
                     if (!glowing && !Shiny(n)) c = new Color(c.r * shade, c.g * shade, c.b * shade, 1);   // no two of a herd quite alike
@@ -286,7 +333,7 @@ namespace Crulanda.Encounter
             s.feet = b.min.y; s.top = b.max.y;
             // Facing: from the hips to the head, whichever way the file has it (the pack faces +Z, CraftPix's along X).
             var dir = Vector3.forward;
-            if (Head != null && Hips != null) { var d = inv.MultiplyPoint3x4(Head.position) - inv.MultiplyPoint3x4(Hips.position); d.y = 0; if (d.sqrMagnitude > 1e-8f) dir = d.normalized; }
+            if (Head != null && Hips != null && !OnHumanAvatar) { var d = inv.MultiplyPoint3x4(Head.position) - inv.MultiplyPoint3x4(Hips.position); d.y = 0; if (d.sqrMagnitude > 1e-8f) dir = d.normalized; }
             s.yaw = Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg;
             var side = Vector3.Cross(Vector3.up, dir); s.back = float.MaxValue; s.front = float.MinValue; s.half = 0;
             foreach (var p in points) { float f = Vector3.Dot(p, dir); s.back = Mathf.Min(s.back, f); s.front = Mathf.Max(s.front, f); s.half = Mathf.Max(s.half, Mathf.Abs(Vector3.Dot(p, side))); }
@@ -306,14 +353,31 @@ namespace Crulanda.Encounter
             var go = Object.Instantiate(src, parent, false); go.name = "Model"; b.Model = go.transform;
             b.Model.localPosition = Vector3.zero; b.Model.localRotation = Quaternion.identity; b.Model.localScale = Vector3.one;
             b.Animator = go.GetComponent<Animator>(); if (b.Animator == null) b.Animator = go.AddComponent<Animator>();
+            // A generic rig of its own bones (2026-10-13, Chris playing the orc: "the only thing on orc that move is belt, staff and teeth"):
+            // a model that came with a human avatar (the orcs' packs) takes its own clips' bone curves only on the bones a human avatar
+            // does not claim, so its body stood still while the staff swung.
+            // A Bestiary monster keeps its human avatar: the people's humanoid clips move it. Without one (the import rule not applied) it is
+            // not built at all, rather than stand in its bind pose or be walked by the four-legged rig of ModelBeast.Proc.cs.
+            if (Humanoid(kind))
+            {
+                if (b.Animator.avatar == null || !b.Animator.avatar.isHuman || !b.Animator.avatar.isValid)
+                {
+                    Debug.LogWarning("ModelBeast: " + kind + " has no human avatar (Editor/CharacterImport.cs makes one)");
+                    if (Application.isPlaying) Object.Destroy(go); else Object.DestroyImmediate(go);
+                    return null;
+                }
+                b.OnHumanAvatar = true;
+            }
+            else if (b.Animator.avatar == null || b.Animator.avatar.isHuman || !b.Animator.avatar.isValid) b.Animator.avatar = AvatarBuilder.BuildGenericAvatar(go, "");
             b.Animator.applyRootMotion = false; b.Animator.cullingMode = AnimatorCullingMode.CullUpdateTransforms; b.Animator.runtimeAnimatorController = null;
             b.bones = new Dictionary<string, Transform>();
             foreach (var t in go.GetComponentsInChildren<Transform>(true)) if (!b.bones.ContainsKey(t.name)) b.bones[t.name] = t;
             b.Hips = b.Bone("Back") ?? b.Bone("Spine_2") ?? b.Bone("Body"); b.Head = b.Bone("Head"); b.Neck = b.Bone("Neck1") ?? b.Bone("Neck");
+            if (b.OnHumanAvatar) { b.Hips = b.Bone("pelvis"); b.Neck = b.Bone("neck_01"); }
             foreach (var r in go.GetComponentsInChildren<Renderer>(true))
             {
                 r.shadowCastingMode = UnityEngine.Rendering.ShadowCastingMode.On; r.receiveShadows = true;
-                bool painted = coat != null && coat.Albedo != null;
+                bool painted = coat != null && (coat.Albedo != null || coat.Maps.Count > 0);   // a model with its own maps (the orcs) is not rounded: rounding pulled the Orc Shaman's teeth off its jaw (Chris, 2026-10-13: "their mouth and teeth dont line up")
                 if (r is SkinnedMeshRenderer sk)
                 {
                     sk.updateWhenOffscreen = false; sk.skinnedMotionVectors = false;
@@ -326,7 +390,10 @@ namespace Crulanda.Encounter
             var shape = b.Measure();
             float fileHeight = Mathf.Max(.01f, shape.top - shape.feet);
             b.Scale = height / fileHeight; b.Height = height; b.Length = (shape.front - shape.back) * b.Scale;
-            b.Model.localRotation = Quaternion.Euler(0, -shape.yaw, 0);
+            // A humanoid clip sets the body's facing itself, the way every clip in the game is made: toward the Animator's -Z (the
+            // Universal Animation Library's as made, Kevin's turned to match: Editor/CharacterImport.cs). So a Bestiary monster is turned
+            // round as a person's figure is (ModelFigure.Build), whichever way its file has it.
+            b.Model.localRotation = b.OnHumanAvatar ? Quaternion.Euler(0, 180, 0) : Quaternion.Euler(0, -shape.yaw, 0);
             b.Model.localScale = Vector3.one * b.Scale;
             b.Model.localPosition = new Vector3(0, ground - shape.feet * b.Scale, 0);
             b.basePos = b.Model.localPosition; b.baseRot = b.Model.localRotation; b.halfWidth = shape.half * b.Scale; b.groundLocal = ground;
@@ -339,14 +406,19 @@ namespace Crulanda.Encounter
         /// <summary>Its motions, a mixer slot each, and the clips that can fill them (the first the file has): standing, grazing
         /// and the head-low idle loop; walk and gallop loop with the ground; the rest are one-shots.</summary>
         static readonly (string slot, string[] clips, bool loop)[] Motions = {
-            ("idle", new[] { "Idle", "idle" }, true), ("idle2", new[] { "Idle_2" }, true), ("headlow", new[] { "Idle_2_HeadLow", "Idle_Headlow" }, true),
-            ("eat", new[] { "Eating", "Eat" }, true), ("walk", new[] { "Walk", "WalkForward", "Run", "move_slow" }, true), ("run", new[] { "Gallop", "RunForward", "move_fast" }, true),
-            ("attack", new[] { "Attack", "Attack_Headbutt", "Attack_1", "Attack1", "attack_01" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
-            ("attack2", new[] { "Attack2" }, false), ("attack3", new[] { "Attack3" }, false),
-            ("hitL", new[] { "Idle_HitReact_Left", "GetHitFromFront", "hit_01" }, false), ("hitR", new[] { "Idle_HitReact_Right", "Idle_HitReact_Left", "GetHitFromFront", "hit_01" }, false),
-            ("death", new[] { "Death", "Death1", "death_01" }, false), ("death2", new[] { "Death2" }, false), ("death3", new[] { "Death3" }, false),
-            ("jump", new[] { "Gallop_Jump", "Jump_toIdle", "Jump_ToIdle" }, false), ("roar", new[] { "Buff" }, false),
-            ("takeoff", new[] { "takeoff" }, false), ("land", new[] { "land" }, false) };
+            ("idle", new[] { "Idle", "idle", "watch01" }, true), ("idle2", new[] { "Idle_2", "Idle2", "preen", "watch02" }, true), ("headlow", new[] { "Idle_2_HeadLow", "Idle_Headlow" }, true),
+            ("eat", new[] { "Eating", "Eat", "peck" }, true), ("walk", new[] { "Walk", "Walking", "WalkForward", "Run", "move_slow", "Running" }, true),
+            // The Living Birds have no walk, only hops (2026-10-16, Chris: "birds still hoppy/jumpy. they need to walk normal and maybe hop
+            // occasionally"): their hop is a one-shot now, and their walk a step done by CritterBody.Stride on the standing clip.
+            ("hop", new[] { "hopForward" }, false),
+            ("run", new[] { "Gallop", "RunForward", "move_fast", "Run", "Running", "flyStraight" }, true),   // (2026-10-13: the wild boar, the squirrel, the Living Birds)
+            ("attack", new[] { "Attack", "Attack_Headbutt", "Attack_1", "Attack1", "attack_01", "Attack01", "Attack_Charge_Gore" }, false), ("kick", new[] { "Attack_Kick", "Attack" }, false),
+            ("attack2", new[] { "Attack2", "Attack02", "Attack_Bite_Forward_Lunge_Tear" }, false), ("attack3", new[] { "Attack3", "Attack03" }, false),
+            ("hitL", new[] { "Idle_HitReact_Left", "GetHitFromFront", "hit_01", "Hit", "Get_Hit", "worried" }, false), ("hitR", new[] { "Idle_HitReact_Right", "Idle_HitReact_Left", "GetHitFromFront", "hit_01", "Hit", "Get_Hit", "worried" }, false),
+            ("death", new[] { "Death", "Death1", "death_01", "Die", "Dying", "die" }, false), ("death2", new[] { "Death2" }, false), ("death3", new[] { "Death3" }, false),
+            ("jump", new[] { "Gallop_Jump", "Jump_toIdle", "Jump_ToIdle", "Jump" }, false), ("roar", new[] { "Buff", "BattleCry" }, false),
+            ("cast", new[] { "CastSpell" }, false), ("spell", new[] { "Spell" }, false), ("block", new[] { "Block" }, false),   // the Orc Shaman's (2026-10-13)
+            ("takeoff", new[] { "takeoff", "flyStraight" }, false), ("land", new[] { "land", "landing" }, false) };
         // (The treants have one cycle, "Run", a heavy stride: it is their walk, its rate following the ground all the way up. Blink's
         // bear has a file per clip, Creatures/BearClips; ChillLands' Ashen Marches creatures name theirs in lower case.)
         static readonly Dictionary<string, AnimationClip[]> clipsOf = new Dictionary<string, AnimationClip[]>();
@@ -356,7 +428,7 @@ namespace Crulanda.Encounter
             if (!clipsOf.TryGetValue(kind, out var all))
             {
                 all = Resources.LoadAll<AnimationClip>("Creatures/" + kind);
-                var more = Resources.LoadAll<AnimationClip>("Creatures/" + kind + "Clips");   // a file per clip (the bear)
+                var more = Resources.LoadAll<AnimationClip>(kind.StartsWith("Bird") ? "Creatures/BirdClips" : "Creatures/" + kind + "Clips");   // a file per clip (the bear); the Living Birds share one set (BirdClips)
                 if (more.Length > 0) { var both = new AnimationClip[all.Length + more.Length]; all.CopyTo(both, 0); more.CopyTo(both, all.Length); all = both; }
                 clipsOf[kind] = all;
             }
@@ -370,6 +442,7 @@ namespace Crulanda.Encounter
         /// <summary>The clip a slot plays for this kind (null if the file has none of its clips).</summary>
         public static AnimationClip SlotClip(string kind, string slot)
         {
+            if (Humanoid(kind)) return HumanClip(kind, slot);   // a Bestiary monster: the people's clips
             foreach (var (s, names, _) in Motions) if (s == slot) foreach (var n in names) { var c = Clip(kind, n); if (c != null) return c; }
             return null;
         }
@@ -400,7 +473,7 @@ namespace Crulanda.Encounter
             mixer = AnimationMixerPlayable.Create(graph, found.Count); weights = new float[found.Count]; want = new float[found.Count];
             for (int i = 0; i < found.Count; i++)
             {
-                var p = AnimationClipPlayable.Create(graph, found[i].Item2); p.SetApplyFootIK(false);
+                var p = AnimationClipPlayable.Create(graph, found[i].Item2); p.SetApplyFootIK(OnHumanAvatar);   // a humanoid's feet kept to the ground as a person's are
                 graph.Connect(p, 0, mixer, i); slots.Add((p, found[i].Item2, found[i].Item3)); slotOf[found[i].Item1] = i;
                 if (found[i].Item3) p.SetTime(Stagger(label, i) * found[i].Item2.length);   // no two of a pack step in time
             }
@@ -414,15 +487,45 @@ namespace Crulanda.Encounter
             return (h & 0xffff) / 65536f;
         }
         public void StopMotion() { if (graph.IsValid()) graph.Destroy(); }
+        /// <summary>Sets its bones as its motion first stands them (one evaluation, seen or not), so what is fixed to them is placed on the
+        /// pose it will have and not on the file's rest pose (the Rock-Eater's saddle: RockEaterGear).</summary>
+        public void Settle()
+        {
+            if (!graph.IsValid() || Animator == null) return;
+            var cull = Animator.cullingMode; Animator.cullingMode = AnimatorCullingMode.AlwaysAnimate;
+            graph.Evaluate(0); Animator.cullingMode = cull;
+        }
         public bool Moving { get { return graph.IsValid(); } }
         public bool Has(string slot) { return proc ? procLengths.ContainsKey(slot) : slotOf.ContainsKey(slot); }
         /// <summary>Dead: its death played and its last frame held (<see cref="Die"/>) until <see cref="Revive"/>.</summary>
         public bool Dead { get { return dead; } }
         /// <summary>A one-shot (an attack, a flinch) is playing.</summary>
         public bool Busy { get { return shot != null; } }
+        /// <summary>The one-shot playing now ("attack", "attack2", "hitL", "death"...), or null (captures tell a blow from a flinch by it).</summary>
+        public string Playing { get { return shot; } }
+        /// <summary>Which way its body faces now, flat (the humanoid's body as its clip poses it; the body it is built under otherwise).</summary>
+        public Vector3 Facing
+        {
+            get
+            {
+                // The humanoid's facing from its hips as posed: square to the line from its left thigh to its right (Animator.bodyRotation may
+                // be read only in OnAnimatorIK: read from the bestiary tour's frame loop it warned every frame, tour 4's log).
+                Vector3 f = Model != null && Model.parent != null ? Model.parent.forward : Vector3.forward;
+                if (OnHumanAvatar && Animator != null && Animator.isHuman)
+                {
+                    var l = Animator.GetBoneTransform(HumanBodyBones.LeftUpperLeg); var r = Animator.GetBoneTransform(HumanBodyBones.RightUpperLeg);
+                    if (l != null && r != null) { var across = r.position - l.position; across.y = 0; if (across.sqrMagnitude > 1e-6f) f = Vector3.Cross(across, Vector3.up); }
+                }
+                f.y = 0; return f.sqrMagnitude > 1e-6f ? f.normalized : Vector3.forward;
+            }
+        }
         /// <summary>Plays a one-shot over whatever it is doing (attack, kick, hitL, hitR, jump), easing in and out.</summary>
+        /// <summary>When a hit has no clip of its own (the thrall's Toon RTS undead has none), a short flinch: the model rocks back and recovers.</summary>
+        float flinchAt = -1;
+        public bool Flinching { get { return flinchAt >= 0 && Time.time - flinchAt < .35f; } }
         public void Play(string slot)
         {
+            if ((slot == "hitL" || slot == "hitR") && !proc && !slotOf.ContainsKey(slot) && !dead && Model != null) { flinchAt = Time.time; return; }
             if (dead) return;
             if (proc) { if (procLengths.ContainsKey(slot)) { shot = slot; shotTime = 0; } return; }
             if (!slotOf.TryGetValue(slot, out int i)) return;
@@ -456,6 +559,12 @@ namespace Crulanda.Encounter
             if (tipping) { TipTick(dt); if (!graph.IsValid() || !graph.IsPlaying()) return; }
             if (proc) { ProcTick(dt); return; }
             if (!graph.IsValid()) return;
+            if (flinchAt >= 0 && !tipping)
+            {
+                float f = (Time.time - flinchAt) / .35f;
+                if (f >= 1) { flinchAt = -1; Model.localRotation = baseRot; }
+                else Model.localRotation = Quaternion.Euler(-14 * Mathf.Sin(f * Mathf.PI), 0, 0) * baseRot;   // rocked back and up again
+            }
             float speed = pace;
             System.Array.Clear(want, 0, want.Length);
             bool gallops = slotOf.ContainsKey("run");

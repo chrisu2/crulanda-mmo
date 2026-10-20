@@ -383,8 +383,15 @@ MonoBehaviour:
   m_EditorClassIdentifier: Crulanda.World::Crulanda.World.ZoneBuilder
   zoneJson: {fileID: 4900000, guid: d924e7ff1a5647029c378a7596dc1d40, type: 3}
   zones:
+  - {fileID: 4900000, guid: 411a2554124736a41a10dabf4808834b, type: 3}
+  - {fileID: 4900000, guid: f98f4c1881af452988ac6153ca05b43c, type: 3}
+  - {fileID: 4900000, guid: e8b8a4d41a524386b21e15c7d959b72b, type: 3}
   - {fileID: 4900000, guid: de246f0a92c544d8a2e88623d312b1cf, type: 3}
   - {fileID: 4900000, guid: d924e7ff1a5647029c378a7596dc1d40, type: 3}
+  - {fileID: 4900000, guid: c24be396ee6c4f6b89eafbd784ba5728, type: 3}
+  - {fileID: 4900000, guid: bec93d1859aa4dbba872b93e8926c3cc, type: 3}
+  - {fileID: 4900000, guid: ad61192cc18a47969439a04cd2d1fd1d, type: 3}
+  - {fileID: 4900000, guid: 3b40de14b59c445a883ad600ab25d371, type: 3}
   art: {fileID: 11400000, guid: 2c4c36cd32c1d3f4895798ea0a48ecd6, type: 2}
 --- !u!4 &2017415192
 Transform:

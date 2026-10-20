@@ -33,7 +33,7 @@ namespace Crulanda.Encounter
                 case "sword.sabre": Sabre(k, root); break;
                 case "sword.leaf": SwordLeaf(k, root); break;
                 case "sword.great": Greatsword(k, root); break;
-                case "knife": Knife(k, root); break;
+                case "knife": case "knife.off": Knife(k, root); break;
                 case "axe.hand": HandAxe(k, root); break;
                 case "axe.bearded": BeardedAxe(k, root); break;
                 case "axe.crescent": CrescentAxe(k, root); break;

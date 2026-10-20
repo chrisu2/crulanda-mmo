@@ -1,0 +1,223 @@
+{
+  "zone": "zone.peaks",
+  "canonStatus": "GAME-ONLY: the Shattered Peaks' chapter of the book of lore, its lines the game's; the Sandthrone toll is CANON-EXPANDED (the draft chapter_5.md), the Silent Pilgrims and the Pale Things CANON (world_bible.md), as each line says.",
+  "entries": [
+    {
+      "id": "lore.peaks.places.the-toll-gate",
+      "chapter": "places",
+      "subject": "The Toll Gate",
+      "more": "The toll-book at the gate lists everything that passed and what it paid: salt-carters, pilgrims at a sovereign each, and on the seventeenth day two small ones from Oakhaven, received from the Bureau's escort.",
+      "page": "doc.peaks.toll_book",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone toll on the Peaks (the draft chapter_5.md) and the Bureau's collecting at Oakhaven (book1 ch.4); the toll-book is GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.places.captain-s-eyrie",
+      "chapter": "places",
+      "subject": "Captain's eyrie",
+      "more": "The captain holds a warrant under a Seeker's seal: the Bureau's escort passes the gate without toll or search, with its cargo. Two, collected at Oakhaven.",
+      "page": "doc.peaks.warrant",
+      "canonStatus": "CANON-EXPANDED: Seekers and the Investigation Bureau are CANON (book1 ch.4); the warrant is GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.places.ruined-waystation",
+      "chapter": "places",
+      "subject": "Ruined waystation",
+      "more": "Grenna kept the waystation and its hearth. Her last page counts the toll on bread, and the torches coming up the lower road the night she sent the pilgrims out by the goat path.",
+      "page": "doc.peaks.journal",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.peaks.places.the-sealed-adit",
+      "chapter": "places",
+      "subject": "The Sealed Adit",
+      "more": "The foreman closed the Umbra working when the deep level went grey and smooth and stopped ringing under the pick. Then somebody walled it up from the outside.",
+      "page": "doc.peaks.adit_notice",
+      "canonStatus": "CANON-EXPANDED: old mining tunnels under the Shattered Peaks are CANON (book2 ch.19); the foreman and his notice are GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.places.the-cold-tarn",
+      "chapter": "places",
+      "subject": "The Cold Tarn",
+      "more": "Brother Cael heard the tarn sing one note after dark, clear as struck glass. He wrote that the water remembers.",
+      "page": "doc.peaks.song",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and the Original Song are CANON (world_bible.md); what the tarn sang is GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.places.the-listening-shrine",
+      "chapter": "places",
+      "subject": "The Listening Shrine",
+      "more": "Above the tarn the pilgrims keep a book on a cairn, a line for every crossing. The shrine is where they stop to listen before they write.",
+      "page": "doc.peaks.cairn_book",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible.md); the shrine, the cairn and its book are GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.places.the-high-ledge",
+      "chapter": "places",
+      "subject": "The High Ledge",
+      "more": "Lisle Tamber spent four nights on the ledge and worked out that the pale shapes do not watch the road. They watch what comes up it, and they count.",
+      "page": "doc.peaks.watchers",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Pale Things as cosmic auditors are CANON (world_bible.md); this one is GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.places.the-broken-post",
+      "chapter": "places",
+      "subject": "The Broken Post",
+      "more": "Before the Sandthrone the pass was held by men who cut their names in a stone by the post, one under another. The last name is half cut. Nobody knows who held the chisel.",
+      "secret": "secret.peaks.old-post-roll",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.peaks.places.avalanche-scar",
+      "chapter": "places",
+      "subject": "Avalanche scar",
+      "more": "A runner meant to go round the gate by the old slide, because nothing comes down it twice. His reckoning ends in a line with nothing after it.",
+      "page": "doc.peaks.runners_reckoning",
+      "canonStatus": "GAME-ONLY: the runner. The Sandthrone toll on the Peaks is CANON-EXPANDED (the draft chapter_5.md)."
+    },
+    {
+      "id": "lore.peaks.people.pib",
+      "chapter": "people",
+      "subject": "Pib",
+      "more": "He listened at the grey stone by the old adit and wrote down the names it remembered, large and careful, in letters he is not used to.",
+      "page": "doc.peaks.miners_names",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.peaks.people.brother-cael",
+      "chapter": "people",
+      "subject": "Brother Cael",
+      "line": "A Silent Pilgrim. He writes on a slate, rubs it out, and listens to the pass.",
+      "more": "He let you unstop a pilgrim's echo-jar: a voice, very far off, in no tongue you know, and you understood it. The river said its own name, it said, and that was the first song.",
+      "page": "doc.peaks.echo",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims, their echo-jars and the Original Song are CANON (world_bible.md); Cael and the jar's words are GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.people.maddoc-vire",
+      "chapter": "people",
+      "subject": "Maddoc Vire",
+      "more": "Six pilgrims went out of the waystation by the goat path the night the torches came. Maddoc keeps the Rest now, and writes down everyone who passes, because Grenna did.",
+      "page": "doc.peaks.goat_path",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.peaks.people.hadrik-sull",
+      "chapter": "people",
+      "subject": "Hadrik Sull",
+      "more": "One of the toll's sentries wrote to his sister at the Dry Wells and never sent it. The broker knew him. He says the pay was good, as they promised.",
+      "page": "doc.peaks.letter_home",
+      "canonStatus": "GAME-ONLY: the sentry and his letter. The Sandthrone are CANON (world_bible.md)."
+    },
+    {
+      "id": "lore.peaks.creatures.sandthrone-toll-guard",
+      "chapter": "creatures",
+      "subject": "Sandthrone toll-guard",
+      "line": "The gate's guards. They take one in ten and call it the road's price.",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone mercenary company is CANON (world_bible.md); these men are GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.creatures.mountain-wolf",
+      "chapter": "creatures",
+      "subject": "Mountain wolf",
+      "line": "Big pale wolves of the high pines. In a flurry you see their eyes first.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.peaks.creatures.old-scree-tusk",
+      "chapter": "creatures",
+      "subject": "Old Scree-Tusk",
+      "line": "The rockhide boar that owns the slope under the scar, older than the slide and twice as hard to shift.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.peaks.creatures.rockhide-boar",
+      "chapter": "creatures",
+      "subject": "Rockhide boar",
+      "line": "Boar with hides like the scree they sleep on. Arrows skip off them.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.peaks.creatures.sandthrone-captain",
+      "chapter": "creatures",
+      "subject": "Sandthrone captain",
+      "line": "The captain of the Peaks toll, up in his eyrie with his warrant and his view of the road.",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone mercenary company is CANON (world_bible.md); these men are GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.creatures.pale-watcher",
+      "chapter": "creatures",
+      "subject": "Pale watcher",
+      "line": "Pale shapes that stand on the ledge over the road east, day and night, and watch what comes up it.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Pale Things as cosmic auditors are CANON (world_bible.md); this one is GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.creatures.the-umbra-watcher",
+      "chapter": "creatures",
+      "subject": "The Umbra Watcher",
+      "line": "A pale thing at the scarp's foot that has watched the mountain so long the mountain has begun to watch back.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Pale Things as cosmic auditors are CANON (world_bible.md); this one is GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.creatures.sandthrone-picket",
+      "chapter": "creatures",
+      "subject": "Sandthrone picket",
+      "line": "The pickets by the signal fire, who light it when anyone comes up from Khaven, and skim the toll when they think nobody counts.",
+      "canonStatus": "CANON-EXPANDED: the Sandthrone mercenary company is CANON (world_bible.md); these men are GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.creatures.hollow-man",
+      "chapter": "creatures",
+      "subject": "Hollow Man",
+      "line": "A miner once, by what is left of the coat. The old working gives them up now and then.",
+      "canonStatus": "CANON-EXPANDED: the Hollow Men are a CANON creature (book1 ch.4); this telling is GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.creatures.pale-shadow",
+      "chapter": "creatures",
+      "subject": "Pale shadow",
+      "line": "A shadow that stands where nothing casts it. It is cold, and it is counting.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Pale Things as cosmic auditors are CANON (world_bible.md); this one is GAME-ONLY."
+    },
+    {
+      "id": "lore.peaks.creatures.grey-robed-false-pilgrim",
+      "chapter": "creatures",
+      "subject": "Grey-robed false pilgrim",
+      "line": "They wear the Silent Pilgrims' grey and do not keep their silence. True pilgrims will not walk the same road.",
+      "canonStatus": "GAME-ONLY: the false pilgrims. The Silent Pilgrims are CANON (world_bible.md)."
+    },
+    {
+      "id": "lore.peaks.creatures.mountain-bear",
+      "chapter": "creatures",
+      "subject": "Mountain bear",
+      "line": "Bears of the high pines, half asleep in the snow and wholly awake when you come close.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.peaks.herbs.adit",
+      "chapter": "herbs",
+      "subject": "node.adit",
+      "line": "Iron from the Umbra working's spoil: good grey ore the Company left lying when the deep level was walled up.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.peaks.herbs.stonepine",
+      "chapter": "herbs",
+      "subject": "node.stonepine",
+      "line": "Stone-pine, the slow tree of the high ground. Its windfalls lie for years before they rot, and burn hot as coal.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.peaks.herbs.tarnwort",
+      "chapter": "herbs",
+      "subject": "node.tarnwort",
+      "line": "A tough little herb of the tarn's shore, sharp to smell. Pilgrims chew it to keep their heads clear on the pass.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    },
+    {
+      "id": "lore.peaks.herbs.frostbell",
+      "chapter": "herbs",
+      "subject": "herb.frostbell",
+      "line": "An ice-blue bell in the lee of the walls where the snow lies longest. Chewed against the cold, it keeps the heart going on the high road, the pilgrims say.",
+      "canonStatus": "GAME-ONLY: the trades' herbs and metals."
+    }
+  ]
+}

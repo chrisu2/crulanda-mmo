@@ -1,9 +1,9 @@
 {
   "id": "zone.khaven",
   "displayName": "Khaven Village",
-  "subtitle": "A walled village of gallows and crypts beside the Whispering Wood",
+  "subtitle": "A walled village of gallows and crypts beside the Stillwood",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Whispering Wood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Whispering Wood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk, and Tamsin Rook, the gallows-keeper (2026-10-08, for the Sealed Adit quest Embers Below). Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY. The 340 m growth (2026-09-30) adds, all GAME-ONLY in placement and story: the Hush and the Listener's Hut deeper in the Whispering Wood (the Listener is a Silent Pilgrim; the Silent Pilgrims are CANON), the corpse road with its coffin stones and bridge, the gibbet crossroads on the Gloom road, the plague pit, the drowned fields, the Carrion Heights and the Charnel Barrow above the Carrion Cliffs (the cliffs are CANON), the Old Bound Wall and the Fallen Watch on the north road, and the Pale Reckoner (the Pale Things are CANON). The Scarp hollows, the Thicket deserters, the Heights scree spiders, the Hush-Mother and the Thicket (2026-10-03) are GAME-ONLY. The drowned dead (2026-10-04): the old bones the creek gave back, risen at the drowned graveyard; GAME-ONLY.",
+  "canonNote": "Canon (Khaven Village map): walled village with the Cracked Hearth, two Fallen Smithies, the Blood-Stone Well, the Gallows Tree and the Crypt-Keeper's Hovel; the Stillwood to the west, Gloom Creek, and the Carrion Cliffs. GAME-ONLY / PROVISIONAL: the Sandthrone outriders holding it, the Pale watcher at the crypt, the crypt itself, road links to Oakhaven and all exact placement. Also GAME-ONLY: the wilderness beyond the walls (the deep Stillwood, the north road to the Peaks, the drowned graveyard and creek barrow), the levelling camps, and the residents Wenna Coyle, Ansel Morrow and Cato Brisk, and Tamsin Rook, the gallows-keeper (2026-10-08, for the Sealed Adit quest Embers Below). Hollow Men are a CANON creature (book1 ch.4); their presence here is GAME-ONLY. The 340 m growth (2026-09-30) adds, all GAME-ONLY in placement and story: the Hush and the Listener's Hut deeper in the Stillwood (the Listener is a Silent Pilgrim; the Silent Pilgrims are CANON), the corpse road with its coffin stones and bridge, the gibbet crossroads on the Gloom road, the plague pit, the drowned fields, the Carrion Heights and the Charnel Barrow above the Carrion Cliffs (the cliffs are CANON), the Old Bound Wall and the Fallen Watch on the north road, and the Pale Reckoner (the Pale Things are CANON). The Scarp hollows, the Thicket deserters, the Heights scree spiders, the Hush-Mother and the Thicket (2026-10-03) are GAME-ONLY. The drowned dead (2026-10-04): the old bones the creek gave back, risen at the drowned graveyard; GAME-ONLY. The residents' and villagers' stories, and the secrets' clues and hints (2026-10-15), are GAME-ONLY lines about the canon things named here; the book of lore's two pages here are labelled on the page.",
   "size": 410,
   "levelMin": 5,
   "levelMax": 9,
@@ -31,7 +31,7 @@
     }
   ],
   "worldMapPosition": {
-    "x": 0.605,
+    "x": 0.615,
     "y": 0.665
   },
   "worldMapNote": "Position provisional: canon gives no location; placed west of Oakhaven because the roads connect.",
@@ -51,7 +51,6 @@
     "fogColor": "#7A5F66",
     "fogStart": 24,
     "fogEnd": 112,
-    "sunHigh": 17,
     "skyTint": "#A67884",
     "skyExposure": 0.8,
     "skyHaze": 1.4
@@ -829,9 +828,10 @@
       "depth": 0.8
     }
   ],
+  "woods": { "cover": 0.6, "from": 70, "ramp": 50, "spacing": 8, "edge": 12, "scale": 80, "deepAbove": 1, "oaks": 0, "snags": 0.3, "pineAbove": 0.45, "floor": 0.8 },
   "groves": [
     {
-      "name": "The Whispering Wood",
+      "name": "The Stillwood",
       "kind": "dead",
       "center": {
         "x": -50,
@@ -870,7 +870,7 @@
       "count": 22
     },
     {
-      "name": "Deep Whispering Wood",
+      "name": "Deep Stillwood",
       "kind": "dead",
       "center": {
         "x": -130.83,
@@ -961,7 +961,7 @@
       "count": 24
     },
     {
-      "name": "Whispering Wood (west)",
+      "name": "Stillwood (west)",
       "kind": "dead",
       "center": {
         "x": -131,
@@ -1178,7 +1178,7 @@
       "viewZoom": 16
     },
     {
-      "name": "The Whispering Wood",
+      "name": "The Stillwood",
       "text": "Grey trunks that talk when the wind stops.",
       "at": {
         "x": -50,
@@ -1196,7 +1196,7 @@
       "radius": 10
     },
     {
-      "name": "Deep Whispering Wood",
+      "name": "Deep Stillwood",
       "text": "Past the walls the grey trunks crowd close enough to touch.",
       "at": {
         "x": -130.83,
@@ -1343,13 +1343,13 @@
     },
     {
       "name": "The Hush",
-      "text": "The trunks crowd too close for any wind. Here even the Whispering Wood keeps quiet.",
+      "text": "The trunks crowd too close for any wind. Here even the Stillwood keeps quiet.",
       "at": {
         "x": -138,
         "y": 130
       },
       "radius": 18,
-      "canonStatus": "CANON-EXPANDED: the Whispering Wood is CANON (the Khaven village map); the Hush is GAME-ONLY."
+      "canonStatus": "CANON-EXPANDED: the Stillwood is CANON (the Khaven village map); the Hush is GAME-ONLY."
     },
     {
       "name": "The Thicket",
@@ -1453,13 +1453,13 @@
       "kind": "inn",
       "name": "The Cracked Hearth",
       "at": {
-        "x": -12,
-        "y": 15
+        "x": -12.63,
+        "y": 15.78
       },
       "rotation": 321,
       "size": {
-        "x": 11,
-        "y": 7
+        "x": 13,
+        "y": 9
       },
       "variant": 1
     },
@@ -1667,8 +1667,8 @@
     {
       "kind": "barrels",
       "at": {
-        "x": -7,
-        "y": 12
+        "x": -4.74,
+        "y": 12.39
       },
       "variant": 2
     },
@@ -3062,7 +3062,12 @@
         "at": {
           "x": -15,
           "y": -12
-        }
+        },
+        "stories": [
+          "Mourner's cap grows on the creek bank where the low row was. I pick it with my eyes shut. The salve's good. I don't say what it's good for.",
+          "The collectors' wagon stopped at the well for water. Two small faces at the grille, one of them the Harrow girl. I gave them bread through the bars. The outriders laughed.",
+          "My mother was hedge-witch before me, and hers before. The Council call it 'unlicensed resonance'. They'd tax the dew if it would sit still."
+        ]
       },
       {
         "name": "Ansel Morrow",
@@ -3071,7 +3076,12 @@
         "at": {
           "x": 17,
           "y": -2
-        }
+        },
+        "stories": [
+          "I keep the crypt. I kept the register too, till the creek took the low row and gave the boxes back empty. I sleep with the lamp lit. I'd advise it.",
+          "The pale thing at the crypt door doesn't look at me. It counts. I've heard it, nights. Not words. Sums.",
+          "Salt on the tongue, a coin for the road: that's how Khaven buries. Harl Emmet got neither, and Harl Emmet walks. Draw your own conclusions."
+        ]
       },
       {
         "name": "Cato Brisk",
@@ -3080,7 +3090,12 @@
         "at": {
           "x": 22,
           "y": -9
-        }
+        },
+        "stories": [
+          "I make candles of carrion-boar tallow. They stink and they burn blue. In Khaven nobody complains about a light.",
+          "The outriders took my stock as 'toll' and sold it back to me a week later. Sandthrone trade. I kept the receipts. One day there'll be a court.",
+          "I had a cousin in Port Caelum who sailed on the glass ships. Sent me a bottle of blue salt once. I keep it for the day I need to be sure of something."
+        ]
       },
       {
         "name": "Tamsin Rook",
@@ -3089,7 +3104,12 @@
         "at": {
           "x": 7,
           "y": -3
-        }
+        },
+        "stories": [
+          "I've hanged nine on the Company's word and two on Khaven's. The two sleep. The nine don't, and Harl Emmet least of all.",
+          "Three turns and a tuck. My father taught me the knot when I was seven. I'd give the hands back if I could keep the rest of him.",
+          "The gallows was a hanging tree before it was a gallows, and a tree before that. Ansel says it listens. I say it remembers, which is worse."
+        ]
       }
     ],
     "households": [
@@ -3156,11 +3176,61 @@
           }
         ]
       }
+    ],
+    "stories": [
+      {
+        "name": "Hollis Grane",
+        "lines": [
+          "I carried Khaven's dead down the Corpse Road for thirty years. Two coffin stones to rest at, and a chalk mark on each for every box. I stopped counting at four hundred.",
+          "The night the fever came we lit the beacon on the mound for Oakhaven to see. Nobody came. I don't blame them. I'd not have come.",
+          "Hollow Men came out of the Stillwood when I was a boy, three of them, grey as ash. My father put them down with a mattock. He wasn't the same after. Nor were they."
+        ]
+      },
+      {
+        "name": "Dorra Vey",
+        "lines": [
+          "I dye wool. Spider-silk from the Heights takes a colour nothing else will, and I'll not tell you what colour, or who it's for.",
+          "My father's Old Kestrel. His true name went down the well the night he was born, as names did then. He's spent eighty years wanting it back and I've spent fifty telling him it's a story.",
+          "The Cracked Hearth's chimney split the winter the well went red. Mattock says lightning. There was no storm."
+        ]
+      },
+      {
+        "name": "Mattock Jenn",
+        "lines": [
+          "I sell wolf's-tooth charms to the frightened. The Sandthrone are my best customers. They'd never admit it. They pay in toll coin, which is to say in ours.",
+          "My wife Siv farms the Long Acre, what the flood left of it. I married above myself and I know it.",
+          "There's a thing on the Heights that counts. Old Kestrel says it's adding up Khaven. I say let it. We don't add up to much."
+        ]
+      },
+      {
+        "name": "Siv Harl",
+        "lines": [
+          "The Long Acre was my mother's barley ground. The creek drowned half and the boars root up the rest. I sow it anyway. Ground that isn't sown goes grey quicker. Ask the Drowned Fields.",
+          "I was a Harl before I was a Jenn. Harl Emmet was my cousin. I didn't go to the hanging. I went to the salt-laying after, and that was worse.",
+          "There's a line where the barley stops and the grey starts, east of the fields. It was a furrow further out last year. I pace it every spring and tell nobody the number."
+        ]
+      },
+      {
+        "name": "Old Kestrel",
+        "lines": [
+          "My true name went down the Blood-Stone Well the night I was born. That was the custom: give the well your name and it'll not be taken by anything else. I've never been sure it worked.",
+          "The Listener sat in his hut in the Hush for eleven years, writing down what the wood said. The wood said a great deal. Then it said him.",
+          "The pale ones count. I've watched the one at the crypt all night. It isn't counting the dead. It's counting what's left."
+        ]
+      },
+      {
+        "name": "Wynn Tabor",
+        "lines": [
+          "Nobody will make a coffin of Stillwood timber. It talks, the wood does, after dark, and nobody wants that in the ground with their mother. So I sew the poor in hide.",
+          "I made the gallows' crossbeam, before I knew what it was for. Tamsin paid me fair. I've not touched the money.",
+          "My father was a smith at the second smithy, the one that fell in the fever year. The anvil's still under the roof-beams. Some nights it rings."
+        ]
+      }
     ]
   },
   "camps": [
     {
-      "name": "Whispering Wood wolves",
+      "name": "Stillwood wolves",
       "mob": "Grey wolf",
       "tag": "wolf",
       "look": "wolf",
@@ -3621,6 +3691,8 @@
       "radius": 5,
       "rotation": 20,
       "text": "Fire-cracked stones ring the crown of the mound where Khaven once lit its beacon. From up here the village sits in its dusk: the red well, the gallows, the split chimney glowing.",
+      "clue": "East of the walls a mound still wears a ring of fire-cracked stones. From its crown Khaven sits in its dusk.",
+      "hint": "Hollis Grane remembers the beacon lit on the mound east of the walls, the night the fever came. Nobody's climbed it since. The stones are still up there.",
       "xp": 60,
       "canonStatus": "GAME-ONLY: the mound and its beacon. The Blood-Stone Well, the Gallows Tree and the Cracked Hearth are CANON (the Khaven village map)."
     },
@@ -3636,6 +3708,8 @@
       "rotation": 200,
       "height": 0.38,
       "text": "A brass key on a greasy thong, hung from a nail under the gallows boards, where no one in Khaven will put a hand. Desert brass. Not a village key.",
+      "clue": "Under the gallows boards, where no one in Khaven will put a hand, something brass hangs on a greasy thong.",
+      "hint": "Tamsin Rook says one of the outriders used to feel about under the gallows boards when he thought no one watched. She didn't look. Nobody in Khaven would.",
       "xp": 40,
       "canonStatus": "GAME-ONLY: the key and its owner. The Sandthrone is a CANON mercenary company; its hold on Khaven is GAME-ONLY."
     },
@@ -3651,6 +3725,8 @@
       "rotation": 255,
       "needs": "secret.khaven.outriders-key",
       "text": "An iron-banded box tucked in against a fallen grey trunk, deep where the wood talks. The brass key turns stiffly. Inside is an outrider's private share of Khaven's 'toll', and his tally of it.",
+      "clue": "West in the dead wood, deep where it talks, an iron-banded box is tucked against a fallen grey trunk. Desert brass turns its lock.",
+      "hint": "Cato Brisk says the outriders' 'toll' never all reached the captain. One of them walked into the wood west of the walls with a box and came out without it.",
       "item": "item.outriders_knife",
       "document": "doc.khaven.skim",
       "xp": 70,
@@ -3669,6 +3745,8 @@
       "rotation": 10,
       "height": 0.5,
       "text": "A page torn from the sexton's register, folded into a crack in the drowned chapel's wall and gone soft with damp. Most of it still reads.",
+      "clue": "In the drowned chapel's wall, far south across the creek, a page from the sexton's register has gone soft in a crack. Most of it still reads.",
+      "hint": "Ansel Morrow says a page is torn out of the sexton's register, the one with the low row in it. He thinks the old sexton hid it in the drowned chapel's wall before the creek came up.",
       "document": "doc.khaven.low_row",
       "xp": 55,
       "canonStatus": "GAME-ONLY: the register, its names and the salt custom. Hollow Men are a CANON creature (book1 ch.4)."
@@ -3683,6 +3761,8 @@
         "y": -94
       },
       "text": "Pale bells no bigger than a thumbnail, lit from inside like lamps left in a window. Khaven calls them widow's-lamps and won't pick them after dark.",
+      "clue": "Pale bells no bigger than a thumbnail, lit from inside, in the scrub south-west of the walls. Khaven won't pick them after dark.",
+      "hint": "Wenna Coyle says the widow's-lamps still come up south-west of the walls, toward the creek. She'll pick them by day. Nobody picks them by night.",
       "item": "herb.widows_lamp",
       "xp": 45,
       "canonStatus": "GAME-ONLY"
@@ -3698,6 +3778,8 @@
       "radius": 5,
       "rotation": 270,
       "text": "A cairn of skull-sized stones on the lip of the Carrion Heights, where the crows sit in rows and wait. The old cliffs break out of the scrub below, Gloom Creek runs dull as lead past their feet, and somewhere west in the murk lies Khaven, keeping its lamps lit.",
+      "clue": "On the lip of the heights east of the village, where the crows sit in rows, someone has piled a cairn of skull-sized stones.",
+      "hint": "Dorra Vey says the crows sit in rows on the lip of the heights, east over the cliffs, waiting. There's a cairn up there. She didn't say who for.",
       "xp": 70,
       "canonStatus": "GAME-ONLY: the heights and the cairn. The Carrion Cliffs and Gloom Creek are CANON (the Khaven village map)."
     },
@@ -3713,6 +3795,8 @@
       "rotation": 18,
       "height": 1,
       "text": "Leaves of a daybook, folded small and pushed into a chink in the hut wall where the damp couldn't reach them. The hand is careful, then less careful.",
+      "clue": "Far west in the wood, in the wall of the hut where the Listener sat, leaves of a daybook are folded into a chink, out of the damp.",
+      "hint": "Old Kestrel says the Listener kept a daybook, and the wood didn't take the book, only the man. Look in the walls of his hut far west in the trees, he says, where the damp couldn't reach.",
       "document": "doc.khaven.listener",
       "xp": 55,
       "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and their 'Original Song' are CANON, and so are the Pale Things as cosmic auditors (world_bible.md); the Listener and his daybook are GAME-ONLY."
@@ -3728,10 +3812,97 @@
       },
       "rotation": 200,
       "text": "Travellers on the Gloom road leave a coin under the stone for the hanged, so the hanged won't follow them home. Nobody in Khaven would take one back. There is a tin under there, heavy with years of them, and a draught somebody left for the same reason.",
+      "clue": "At the crossroads on the Gloom road, south-west, travellers leave a coin under the flat stone for the hanged. Years of coins, and nobody takes one back.",
+      "hint": "Mattock Jenn says there's a stone at the foot of the crossroads grave on the Gloom road, and under it every coin a traveller ever left for the hanged. Not that he'd touch one.",
       "item": "potion.healing",
       "xp": 45,
       "gold": 16,
       "canonStatus": "GAME-ONLY: the crossroads burial and the coin custom."
+    },
+    {
+      "id": "secret.khaven.beacon-roll",
+      "name": "The Beacon Roll",
+      "kind": "note",
+      "prompt": "Lift the fire-cracked stone",
+      "at": {
+        "x": 72.3,
+        "y": 25.4
+      },
+      "rotation": 200,
+      "text": "Under one of the fire-cracked stones at the crown of the mound, wrapped in oiled hide: a slate, scratched with every night Khaven lit its beacon, and who it was lit for.",
+      "clue": "Under the fire-cracked stones on the mound east of the walls, a slate kept the nights Khaven asked for help.",
+      "hint": "Hollis Grane says they kept a roll of every night the beacon was lit, on a slate under the stones on the mound. He's not been up to read it since the fever year.",
+      "document": "doc.khaven.beacon_roll",
+      "xp": 55,
+      "canonStatus": "GAME-ONLY: the beacon, the mound and the roll. The Blood-Stone Well and the Cracked Hearth are CANON (the Khaven village map)."
+    },
+    {
+      "id": "secret.khaven.crow-count",
+      "name": "Old Kestrel's Tin",
+      "kind": "note",
+      "prompt": "Draw the tin out from under the cairn stone",
+      "at": {
+        "x": 135.2,
+        "y": -21.7
+      },
+      "rotation": 250,
+      "text": "A tin pushed in under the lowest stone of the cairn where the crows wait, and in it a page in Old Kestrel's crabbed hand: nine nights on the heights, and what the crows are waiting for.",
+      "clue": "On the heights east of the village, under the cairn where the crows sit in rows, someone left a tin and a page about what the crows are waiting for.",
+      "hint": "Dorra Vey says her father sat nine nights on the heights with the crows and left what he learned up there under the cairn, in a tin. He won't say what. She won't ask.",
+      "document": "doc.khaven.crow_count",
+      "xp": 55,
+      "canonStatus": "CANON-EXPANDED: the Pale Things as cosmic auditors are CANON (world_bible.md), and so are the Carrion Cliffs (the Khaven village map); Old Kestrel, the Reckoner and the tin are GAME-ONLY."
+    },
+    {
+      "id": "secret.khaven.fever-nurse",
+      "name": "The Fever-Nurse's Stone",
+      "kind": "grave",
+      "prompt": "Read the headstone",
+      "at": {
+        "x": -44,
+        "y": -124
+      },
+      "rotation": 319,
+      "text": "A headstone on its own, a long stone's throw from the fever pit, kept clear of moss when nothing round it is. Cut in it: MAEL COYLE. SHE NURSED THEM. Fresh pebbles on its top.",
+      "clue": "One stone stands apart from the fever's dead, south of the walls, kept clean when nothing round it is. Somebody still leaves pebbles.",
+      "hint": "Wenna Coyle says her mother's stone stands apart from the fever's dead, out past the south gate. She keeps it clean. She'd like somebody else to read it, once.",
+      "xp": 60,
+      "canonStatus": "GAME-ONLY: Mael Coyle and her stone. Khaven's fever year is the game's."
+    },
+    {
+      "id": "secret.khaven.picket-in-the-wood",
+      "name": "A Picket-Man Who Ran",
+      "kind": "remains",
+      "prompt": "Search the dead man's satchel",
+      "at": {
+        "x": -118,
+        "y": 36
+      },
+      "rotation": 90,
+      "text": "Bones in a Sandthrone coat gone grey, sitting with his back to a trunk as if he had only stopped for breath. His satchel is still buckled, and his helm lies where it rolled.",
+      "clue": "West of the walls, where the grey trunks crowd, a deserter sat down against a tree and never got up. His satchel is still buckled.",
+      "hint": "Ansel Morrow says one of the Sandthrone pickets ran into the grey wood west of the walls last winter and never came out. The crypt-keeper doesn't go after the ones who don't want burying.",
+      "item": "craft.bogiron_helm",
+      "document": "doc.khaven.deserters_leaf",
+      "xp": 70,
+      "gold": 14,
+      "canonStatus": "GAME-ONLY: the deserter and his leaf. The Sandthrone are a CANON mercenary company (world_bible.md)."
+    },
+    {
+      "id": "secret.khaven.bearers-shrine",
+      "name": "The Bearers' Shrine",
+      "kind": "shrine",
+      "prompt": "Kneel at the bearers' shrine",
+      "at": {
+        "x": -140,
+        "y": -64
+      },
+      "rotation": 270,
+      "text": "A wayshrine where the coffin-bearers set their load down: a crown in the dish for the road, and the bearers' small saint in his niche, his face worn smooth by thumbs.",
+      "clue": "Where the bearers rested the dead on their way out of the woods, a little roofed saint still takes a crown for the road.",
+      "hint": "Hollis Grane says the bearers always left a crown at their saint where they set the coffins down, out west by the woods. Thirty years he left one. For the road, he says. He doesn't say whose.",
+      "xp": 50,
+      "canonStatus": "GAME-ONLY: the bearers, their saint and his shrine."
     }
   ],
   "nodes": [

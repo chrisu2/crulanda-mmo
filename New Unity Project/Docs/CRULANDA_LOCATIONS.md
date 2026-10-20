@@ -7,7 +7,7 @@ canon; GAME-ONLY / PROVISIONAL = invented for play and awaiting author approval.
 | Location | What canon says | Map in source | Game status |
 |---|---|---|---|
 | Oakhaven | Eastern agricultural hub erased by an accelerated Wasting to hide Council abductions of resonance candidates | oakhaven_village_map.png | **Built** (zone.oakhaven, CANON-EXPANDED) |
-| Khaven Village | Walled village: Cracked Hearth, Fallen Smithy, Blood-Stone Well, Gallows Tree, Crypt-Keeper's Hovel; Whispering Wood, Gloom Creek, Carrion Cliffs nearby | khaven_village_map.png | Strong candidate for a darker second zone + crypt dungeon |
+| Khaven Village | Walled village: Cracked Hearth, Fallen Smithy, Blood-Stone Well, Gallows Tree, Crypt-Keeper's Hovel; Whispering Wood (on the map; in the game the Stillwood, since book 3 gives the name to the Western Coast's forest: Chris, 2026-10-10), Gloom Creek, Carrion Cliffs nearby | khaven_village_map.png | Strong candidate for a darker second zone + crypt dungeon |
 | Argentis (capital) | The Crown (white stone and gold, Council) above the Lowtowns (industry, poverty) | argentis_city_map.png | City hub candidate |
 | Rust Market / Sector 4 | Lowtown slum in the Spire's shadow; smugglers, syndicates enforcing the Council's will | (interactive map) | City district candidate |
 | Forge District | (district map) | forge_district_map.png | Candidate |

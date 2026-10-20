@@ -231,6 +231,13 @@ namespace Crulanda.World
         public static WorldWeather Active { get; private set; }
         /// <summary>This frame's weather (<see cref="WeatherLook.None"/> where no zone has weather).</summary>
         public static WeatherLook Now { get { return Active != null ? Active.shown : WeatherLook.None; } }
+        /// <summary>
+        /// How far the camera stands inside the zone's bubble of still air (ZoneDefinition.bubble; Hallow's Creek, b1 ch.21:19: "There was
+        /// no wind to stir the dead leaves"), 0..1: the wind the grass, leaves and haze feel is the weather's times what is left of it, and no
+        /// mist or squall's dust is born inside it. <see cref="StillClear"/>: how much further off the fog stands there (WorldClock).
+        /// </summary>
+        public static float Still { get; private set; }
+        public static float StillClear { get; private set; }
         /// <summary>A lightning flash, 0..~1.2 for a moment in a storm: the clock, the post and the clouds brighten by it.</summary>
         public static float Flash { get; private set; }
         /// <summary>Wind direction on the ground plane (x east, y north); it veers slowly with the weather clock.</summary>
@@ -252,6 +259,11 @@ namespace Crulanda.World
         public float Wet { get { return wet; } }
 
         ZoneBuilder zone; Light sun; WeatherLook shown; float wet; WeatherKind? forced; WeatherKind scheduled;
+        /// <summary>The zone's squall colour (ZoneDefinition.squallTint), clear for none: Hallow's Creek's silver time-squalls.</summary>
+        Color squallTint;
+        /// <summary>Whether this zone's squalls are tinted (a time-squall: Hallow's Creek), and the tint (tests read it).</summary>
+        public bool SquallTinted { get { return squallTint.a > 0; } }
+        public Color SquallTint { get { return squallTint; } }
         Material clouds, haze, droplets; Mesh domeMesh; Transform dome; ParticleSystem rain, splash, snow, drift;
         Material ground; Color groundColor; float groundGloss = -1;
         float splashDue, hazeDue, nextBolt, boltAt = -99; bool sheltered; Vector3 lastFocus; System.Random fx;
@@ -259,6 +271,8 @@ namespace Crulanda.World
         public void Init(ZoneBuilder builder, Light sunLight)
         {
             Active = this; zone = builder; sun = sunLight; fx = new System.Random(builder.Zone.seed + 4099);
+            // (Hallow's Creek's time-squalls, decision 9) a squall's dust in the zone's own colour: silver there, dun everywhere else.
+            squallTint = !string.IsNullOrEmpty(builder.Zone.squallTint) && ColorUtility.TryParseHtmlString(builder.Zone.squallTint, out var st) ? st : Color.clear;
             Schedule = WeatherSchedule.For(builder.Zone);
             if (Clock < 0) Clock = Schedule.CalmFrom(UnityEngine.Random.Range(0, 48) * (double)WeatherSchedule.SpellSeconds);
             shown = Schedule.LookAt(Clock, out scheduled); Kind = scheduled; wet = Soaked(shown) ? 1 : 0;
@@ -334,7 +348,11 @@ namespace Crulanda.World
             float dark = WorldClock.Darkness;
             float veer = .64f + (float)(Math.Sin(Clock / 530.0) * .7 + Math.Sin(Clock / 173.0) * .2);
             var dir = new Vector2(Mathf.Cos(veer), Mathf.Sin(veer)); WindDirection = dir;
-            Shader.SetGlobalVector("_WeatherWind", new Vector4(dir.x, dir.y, shown.wind, 0));
+            // (Hallow's Creek) Inside the bubble of still air nothing is stirred.
+            var bubble = zone.Zone.bubble; var view = Camera.main;
+            Still = bubble != null && view != null ? bubble.StillAt(view.transform.position.x, view.transform.position.z) : 0;
+            StillClear = bubble != null ? Still * bubble.clear : 0;
+            Shader.SetGlobalVector("_WeatherWind", new Vector4(dir.x, dir.y, shown.wind * (1 - Still), 0));
             Shader.SetGlobalVector("_WeatherTone", new Vector4(shown.dim * (1 - .5f * dark), shown.rain, 0, 0));   // the water dulls and roughens
             var drifted = CloudDrift + dir * (2.5f + 10 * shown.wind) * dt;
             CloudDrift = new Vector2(Mathf.Repeat(drifted.x, CloudTile * 10), Mathf.Repeat(drifted.y, CloudTile * 10));   // whole tiles of both noise scales (1 and 2.7): no jump
@@ -433,7 +451,8 @@ namespace Crulanda.World
             float mist = shown.mist, ash = shown.ash * .85f; dust = ash > mist;
             var fog = RenderSettings.fogColor; float g = fog.grayscale;
             tint = dust ? Color.Lerp(fog, new Color(g * 1.08f, g, g * .9f), .8f) : Color.Lerp(fog, Color.white, Mathf.Lerp(.3f, .1f, dark));
-            float amount = Mathf.Max(mist, ash); tint.a = (dust ? .3f : .34f) * amount;   // a squall's dust is thick and dun
+            if (dust && squallTint.a > 0) tint = Color.Lerp(fog, new Color(squallTint.r * 1.15f, squallTint.g * 1.15f, squallTint.b * 1.2f), .85f);   // a time-squall's silver, a little brighter than the fog
+            float amount = Mathf.Max(mist, ash) * (1 - Still); tint.a = (dust ? .3f : .34f) * Mathf.Max(mist, ash);   // a squall's dust is thick and dun
             wind = new Vector3(dir.x, 0, dir.y) * (dust ? 1.5f + 4 * shown.wind : .25f + .6f * shown.wind) + Vector3.up * .03f;
             return amount;
         }
@@ -442,6 +461,8 @@ namespace Crulanda.World
             float a = (float)fx.NextDouble() * Mathf.PI * 2, d = Mathf.Lerp(9, 70, Mathf.Sqrt((float)fx.NextDouble()));
             var p = new Vector2(focus.x + Mathf.Cos(a) * d, focus.z + Mathf.Sin(a) * d);
             if (Mathf.Abs(p.x) > zone.Half + 30 || Mathf.Abs(p.y) > zone.Half + 30) return;
+            // None is born inside the bubble of still air (Hallow's Creek: the fog is held back there, b1 ch.21:19).
+            if (zone.Zone.bubble != null && zone.Zone.bubble.StillAt(p.x, p.y) > .5f) return;
             float y = zone.HeightAt(p.x, p.y) + (dust ? 1 + (float)fx.NextDouble() * 5 : .3f + (float)fx.NextDouble() * 1.6f);   // mist hugs the ground
             drift.Emit(new ParticleSystem.EmitParams { position = new Vector3(p.x, y, p.y), velocity = wind, startColor = tint,
                 startSize = (dust ? 5 : 7) + (float)fx.NextDouble() * 6, startLifetime = life, rotation = (float)fx.NextDouble() * 360 }, 1);
@@ -599,7 +620,7 @@ namespace Crulanda.World
         }
         void OnDestroy()
         {
-            if (Active == this) { Active = null; Flash = 0; Shader.SetGlobalVector("_WeatherWind", Vector4.zero); Shader.SetGlobalVector("_WeatherTone", Vector4.zero); }
+            if (Active == this) { Active = null; Flash = 0; Still = 0; StillClear = 0; Shader.SetGlobalVector("_WeatherWind", Vector4.zero); Shader.SetGlobalVector("_WeatherTone", Vector4.zero); }
             if (ground != null) { ground.color = groundColor; if (groundGloss >= 0) ground.SetFloat("_Glossiness", groundGloss); }
             if (clouds != null) Destroy(clouds);
             if (haze != null) Destroy(haze);

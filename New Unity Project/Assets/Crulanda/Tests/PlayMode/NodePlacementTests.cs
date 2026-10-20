@@ -27,8 +27,8 @@ namespace Crulanda.Tests
     ///   nodes array in the open (in no wood and on no field; a herb prop worked as a node stands where the zone always had it,
     ///   and on no field), a seam near a crag or rock or on a ridge's rocky crown.
     /// Every herb lies on the ground it grows from, nothing of it over a slope (EveryHerb_LiesOnTheGround).
-    /// And every zone's stations (step 9; CheckStations): the kinds it should have, each walkable to within reach on its side of its
-    /// walls (an inn's hearth from the taproom); its own (Oakhaven
+    /// And every zone's stations (step 9; CheckStations): the kinds it should have, each walkable to within reach on its side of its walls
+    /// (an inn's hearth from the taproom) and on no field; its own (Oakhaven
     /// has none) built where the data puts them, clear of water, buildings, roads, nodes, secrets and trunks, with no colliders.
     /// </summary>
     public class NodePlacementTests
@@ -75,9 +75,20 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(600000)] public IEnumerator EveryNodeAndStation_IsReachable()
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
-            var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
-            Assert.AreEqual(5, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim and the Verdant Shore are registered.");
+            var zones = first.Zone.AllZones().Where(z => !z.dungeon && !z.city).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own; a city (the Crown) no nodes
+            Assert.AreEqual(6, zones.Count, "Oakhaven, Khaven, the Peaks, the Ashland Rim, the Verdant Shore and the Lowtowns are registered.");
             var problems = new List<string>();
+            // A city's stations only (the Crown's Crafters' Court and its inn's hearth): every one walked to within reach from the start.
+            foreach (var id in first.Zone.AllZones().Where(z => z.city).Select(z => z.id).ToList())
+            {
+                ZoneBuilder.RequestedZoneId = id;
+                yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+                for (int f = 0; f < 4; f++) yield return null;
+                var cs = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
+                if (cs.Zone.Zone.id != id) { problems.Add(id + ": built " + cs.Zone.Zone.id + " instead"); continue; }
+                if (!NavMesh.SamplePosition(cs.Zone.Ground(cs.Zone.Zone.spawns.player), out var cityStart, 2.5f, NavMesh.AllAreas)) { problems.Add(id + ": the player's start is not walkable"); continue; }
+                CheckStations(cs, new List<ZoneInteractable>(), cityStart.position, problems);
+            }
             foreach (var id in zones)
             {
                 ZoneBuilder.RequestedZoneId = id;
@@ -99,7 +110,7 @@ namespace Crulanda.Tests
         [UnityTest, Timeout(600000)] public IEnumerator EveryHerb_LiesOnTheGround()
         {
             var first = UnityEngine.Object.FindFirstObjectByType<EncounterSession>();
-            var zones = first.Zone.AllZones().Where(z => !z.dungeon).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own
+            var zones = first.Zone.AllZones().Where(z => !z.dungeon && !z.city).Select(z => z.id).ToList();   // a dungeon has no nodes, herbs or trees of its own; nor a city
             var problems = new List<string>(); int herbs = 0; float steepest = 0; string steepestAt = "";
             foreach (var id in zones)
             {
@@ -209,15 +220,20 @@ namespace Crulanda.Tests
                 float foot = ZoneBuilder.NodeFootprint(def.look) - .05f;
                 foreach (var cp in z.camps) if (cp != null && Vector2.Distance(at, cp.center) < cp.radius * 1.42f + foot) problems.Add(q + "stands in the camp '" + cp.name + "'");
                 foreach (var spot in zone.KeepClearSpots) if (Vector2.Distance(at, spot.at) < spot.r + foot) problems.Add(q + "stands in a cave's furnishings at " + spot.at);
-                // Where it belongs.
-                if (def.look == "windfall" && !z.groves.Any(g => g != null && g.kind != "orchard" && (def.id != "node.oak" || g.kind == "broadleaf") && OutsideRect(at, g.center, g.size) < 6 && OutsideRect(at, g.center, g.size) > -4))
+                // Where it belongs. The Lowtowns' salvage (ZONE_LOWTOWNS.md: slag-iron and cinder-beam are pulled from the fallen
+                // tenements, in a city with no crags or woods) stands by a fallen tenement: a slag heap within 4 m of the ruin's
+                // end, a burned beam within 5 m. Every other ore stands by a crag and every other windfall at a wood's edge.
+                bool salvage = def.id == "node.slagiron" || def.id == "node.cinderbeam";
+                if (salvage && !z.props.Any(p => p != null && p.kind == "ruin" && Vector2.Distance(p.at, at) < (p.size.x > 0 ? p.size.x : 6) / 2 + (def.look == "windfall" ? 5 : 4)))
+                    problems.Add(q + "is salvage with no fallen tenement by it");
+                if (!salvage && def.look == "windfall" && !z.groves.Any(g => g != null && g.kind != "orchard" && (def.id != "node.oak" || g.kind == "broadleaf") && OutsideRect(at, g.center, g.size) < 6 && OutsideRect(at, g.center, g.size) > -4))
                     problems.Add(q + (def.id == "node.oak" ? "is no windfall at a broadleaf wood's edge" : "is no windfall at a wood's edge"));
                 if (def.look == "herb")
                 {
                     if (i.kind == "node" && z.groves.Any(g => g != null && OutsideRect(at, g.center, g.size) < 0)) problems.Add(q + "is a herb in a wood, not in the open");
                     if (z.fields.Any(f => f != null && OutsideRect(at, f.center, f.size, f.rotation) < .5f)) problems.Add(q + "is a herb on a ploughed field");
                 }
-                if (def.look == "ore" && !z.props.Any(p => p != null && (p.kind == "cliff" || p.kind == "rock" || p.kind == "perch") && Vector2.Distance(p.at, at) < (p.kind == "cliff" ? (p.size.x > 0 ? p.size.x : 20) / 2 + 4 : 6))
+                if (!salvage && def.look == "ore" && !z.props.Any(p => p != null && (p.kind == "cliff" || p.kind == "rock" || p.kind == "perch") && Vector2.Distance(p.at, at) < (p.kind == "cliff" ? (p.size.x > 0 ? p.size.x : 20) / 2 + 4 : 6))
                     && !z.shapes.Any(sh => sh != null && sh.height > 8 && Vector2.Distance(sh.center, at) < sh.radius))
                     problems.Add(q + "is a seam with no crag or rock by it, and not on a ridge's crown");
             }
@@ -227,7 +243,7 @@ namespace Crulanda.Tests
         /// <summary>Each zone's stations (DESIGN 6.1): which kinds it has (the workplaces' and the inn's, and its own).</summary>
         static readonly Dictionary<string, string[]> StationKinds = new Dictionary<string, string[]> {
             { "zone.oakhaven", new[] { "bench", "fire", "forge" } }, { "zone.khaven", new[] { "bench", "fire" } }, { "zone.peaks", new[] { "fire", "forge" } },
-            { "zone.ashrim", new[] { "bench", "fire", "forge" } }, { "zone.verdant", new[] { "bench", "fire", "forge" } } };
+            { "zone.ashrim", new[] { "bench", "fire", "forge" } }, { "zone.verdant", new[] { "bench", "fire", "forge" } }, { "zone.lowtowns", new[] { "bench", "fire", "forge" } }, { "zone.crown", new[] { "bench", "fire", "forge" } } };   // the Lowtowns: the dyer's vats, the soup kettle and the Spoon, the market hearth
         /// <summary>
         /// The zone's stations (BUILD_PLAN step 9): the kinds DESIGN 6.1 gives it; every one can be walked to from the start, to
         /// within reach of it (EncounterSession.StationRange) and on its side of its walls (ZoneStationSpot.Reaches); its own (field anvils, benches, cookfires, under "Zone stations") one
@@ -250,6 +266,9 @@ namespace Crulanda.Tests
                     walked = NavReach.Walkable(start, hit.position);
                 }
                 if (!walked) problems.Add(q + "can't be walked to within reach from the start");
+                // Off the fields: no anvil, bench, oven or range stands on ploughed ground or stubble (the paint reaches a metre
+                // past a field's edge; Chris, 2026-10-17, "tools in the farmers field").
+                foreach (var f in z.fields) if (f != null && OutsideRect(new Vector2(st.position.x, st.position.z), f.center, f.size, f.rotation) < 1.5f) problems.Add(q + "stands in the field '" + f.name + "'");
             }
             var own = z.stations ?? new ZoneStation[0]; var container = zone.transform.Find("Zone stations");
             if (own.Length == 0) { if (container != null) problems.Add(zp + "builds stations it has none of"); return; }

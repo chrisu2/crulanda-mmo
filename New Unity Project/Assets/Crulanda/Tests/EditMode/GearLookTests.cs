@@ -47,7 +47,7 @@ namespace Crulanda.Tests
         {
             var looks = Looks();   // Parse refuses unknown families, palettes and variants anywhere in the file
             CollectionAssert.IsSubsetOf(new[] { "oakhaven", "concord", "sandthrone", "khaven", "tollroad", "pilgrim", "ashwalker", "cult", "veridian", "pale" }, new List<string>(looks.PaletteIds));
-            Assert.AreEqual(58, GearLooks.Families.Length, "54 shape families (DESIGN.md 2.3), the three model families (2026-10-05) and model.helm (2026-10-07).");
+            Assert.AreEqual(59, GearLooks.Families.Length, "54 shape families (DESIGN.md 2.3), the three model families (2026-10-05), model.helm (2026-10-07) and the Rogue's dirks (2026-10-11).");
             int variants = 0; var names = new HashSet<string>();
             foreach (var f in GearLooks.Families)
             {
@@ -57,7 +57,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(f.variants.Length, new HashSet<string>(f.variants).Count, f.name + " names each variant once.");
                 if (!f.name.StartsWith("model.")) variants += f.variants.Length;   // the drawn ones (the models are the packs')
             }
-            Assert.AreEqual(146, variants, "146 variants (DESIGN.md 2.3).");
+            Assert.AreEqual(150, variants, "150 variants: 146 (DESIGN.md 2.3) and the Rogue's dirks' four (2026-10-11).");
             foreach (var kv in looks.Explicit) Assert.IsTrue(looks.IsValid(kv.Value, out var why), kv.Key + ": " + why);
             foreach (var slot in ItemDatabase.SlotIds) Assert.IsFalse(looks.Resolve(new ItemDef { id = "test.nothing", slot = slot }).family == null, slot + " has a fallback.");
         }

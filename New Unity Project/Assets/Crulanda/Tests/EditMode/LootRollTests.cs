@@ -30,7 +30,7 @@ namespace Crulanda.Tests
             return LootContext.From("mob." + camp.tag + "." + zone + "." + c + "." + (elite && camp.elite ? 0 : 1), z.camps, level > 0 ? level : camp.levelMax, elite && camp.elite);
         }
         static bool Named(string id) { return loot.Meta(id) != null; }
-        static bool Epic(string id) { var d = items.Get(id); return d != null && d.quality == 4; }
+        static bool Epic(string id) { var d = items.Get(id); return d != null && d.quality >= 4; }   // epics and legendaries sit outside the cap (Loot.Roll: quality < 4)
         static string Key(List<LootDrop> drops) { return string.Join(",", drops.Select(d => d.ToString())); }
         /// <summary>How often each item drops over n seeded rolls (seeds 0..n-1).</summary>
         static Dictionary<string, int> Rates(LootContext c, int n, Func<string, bool> owned = null, float luck = 0)

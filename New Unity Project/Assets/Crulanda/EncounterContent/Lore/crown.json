@@ -1,0 +1,206 @@
+{
+  "zone": "zone.crown",
+  "canonStatus": "GAME-ONLY: the Crown's chapter of the book of lore, its lines the game's; Argentis, the Sky Bastion, the Crown of white stone and gold, the Lowtowns, the Spire and High Councilor Aethelgard are CANON (world_bible.md; the overworld and city maps; book1 ch.12), the rest as each line says.",
+  "entries": [
+    {
+      "id": "lore.crown.places.the-gilt-gate",
+      "chapter": "places",
+      "subject": "The Gilt Gate",
+      "line": "Gilt over white stone, and the Council's crown cut over the arch. The wardens look at your boots before they look at your face.",
+      "canonStatus": "GAME-ONLY: the gate; the Crown of white stone and gold is CANON (world_bible.md)."
+    },
+    {
+      "id": "lore.crown.places.the-processional-way",
+      "chapter": "places",
+      "subject": "The Processional Way",
+      "line": "White stone from the gate to the square, swept twice a day. Nobody in the Crown walks it in a hurry, so nobody does.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.places.the-grand-stair",
+      "chapter": "places",
+      "subject": "The Grand Stair",
+      "line": "Two hundred steps up to the Crown's own terrace. Petitioners count them going up. Nobody counts them coming down.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.places.the-crown-square",
+      "chapter": "places",
+      "subject": "The Crown Square",
+      "line": "The fountain, the keep, the domed hall and the library round one square of white stone. Every road in the Crown ends here.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.places.the-council-keep",
+      "chapter": "places",
+      "subject": "The Council Keep",
+      "more": "A fair copy of the High Councilor's words waits by its doors for petitioners to read: the Council's motto is one word, and the Greater Good is arithmetic.",
+      "page": "doc.crown.greater_good",
+      "canonStatus": "CANON (book1 ch.12:31): the High Council's motto and Aethelgard's Greater Good; the keep and the copy are GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.places.the-audience-hall",
+      "chapter": "places",
+      "subject": "The Audience Hall",
+      "line": "A long floor, a high throne and wardens either side. The High Councilor receives here. He does not get up.",
+      "canonStatus": "GAME-ONLY: the hall; High Councilor Aethelgard is CANON (world_bible.md; book1 ch.12)."
+    },
+    {
+      "id": "lore.crown.places.the-council-hall",
+      "chapter": "places",
+      "subject": "The Council Hall",
+      "more": "Its registers are copied fair by clerks who are told not to read them. One spoiled copy was hidden instead of burned: a list headed 'Resonance: candidates', with villages beside the names.",
+      "secret": "secret.crown.spoiled-copy",
+      "canonStatus": "GAME-ONLY: the register's copy. The Council's resonance candidates are CANON (Oakhaven's canon: the Council's abduction of resonance candidates)."
+    },
+    {
+      "id": "lore.crown.places.the-archive",
+      "chapter": "places",
+      "subject": "The Archive",
+      "more": "Its catalogue runs press by press, west to east, as the light comes. One press is empty: nobody brings anything up from below. The oldest stacks still carry their goblin shelf-marks.",
+      "page": "doc.crown.catalogue",
+      "canonStatus": "CANON-EXPANDED: the High City's archives and the goblins as its record-keepers (world_bible.md); the catalogue is GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.places.the-exchange",
+      "chapter": "places",
+      "subject": "The Exchange",
+      "more": "Its charter gives Port Caelum's factors a seat at no rent, for so long as the glass ships carry the Council's cargoes first. Read the clause twice, the factor says.",
+      "page": "doc.crown.exchange_charter",
+      "canonStatus": "CANON-EXPANDED: Port Caelum and its Trade Princes (world_bible.md; book1 ch.2); the charter is GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.places.the-treasury-vault",
+      "chapter": "places",
+      "subject": "The Treasury Vault",
+      "more": "A clerk of the Treasury once sat under the old garden tree every evening, digging. He left a purse among its roots and a note: 'For the day they come for me.'",
+      "secret": "secret.crown.clerks-purse",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.places.the-crafters-court",
+      "chapter": "places",
+      "subject": "The Crafters' Court",
+      "line": "Every trade's workshop round one court: the anvil, the loom, the still. The Crown buys from its own court first, and pays late.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.places.guild-row",
+      "chapter": "places",
+      "subject": "Guild Row",
+      "more": "The four guilds keep their rolls on one stand by Council order, so each can watch the others. A fifth name at the foot has been scraped away.",
+      "page": "doc.crown.guild_rolls",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.places.the-gilded-lantern",
+      "chapter": "places",
+      "subject": "The Gilded Lantern",
+      "line": "The Crown's inn, gilded by the Council's leave. The guilds drink at its tables after a run and keep well apart.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.places.the-low-stair",
+      "chapter": "places",
+      "subject": "The Low Stair",
+      "more": "Shut from the evening bell to the morning bell, by order. Someone from below has scratched an answer under the Council's warning: they tell their children the Weave-Eaters come from up here.",
+      "page": "doc.crown.low_stair",
+      "canonStatus": "CANON-EXPANDED: the Lowtowns (world_bible.md) and their folklore of the Weave-Eaters (book1 ch.1); the Low Stair and its order are GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.places.the-spire",
+      "chapter": "places",
+      "subject": "The Spire",
+      "more": "From a gap in the south battlements it is a dark needle rising out of the smoke of the roofs below into its collar of cloud. Nobody in the Crown will tell you what it is for.",
+      "secret": "secret.crown.over-the-lowtowns",
+      "canonStatus": "CANON-EXPANDED: the Spire below the High City (the city map); its 'clutch' on the Lowtowns (world_bible.md). The gap in the wall is GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.places.the-crown-of-argentis",
+      "chapter": "places",
+      "subject": "The Crown of Argentis",
+      "more": "The old maps call Argentis the Sky Bastion, the highest walled place in the land. The pages learn a primer by heart: the Crown is white stone and gold, and a page does not ask what is below.",
+      "page": "doc.crown.sky_bastion",
+      "canonStatus": "CANON-EXPANDED: Argentis, the Sky Bastion, at the centre of the land (the overworld map); the Crown of white stone and gold (world_bible.md). The primer is GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.people.high-councilor-aethelgard",
+      "chapter": "people",
+      "subject": "High Councilor Aethelgard",
+      "line": "The face of the High Council: ancient, pale, robed in white silk. He receives; he does not visit.",
+      "more": "To a deputation from the east he said that efficiency is the only kindness that still works at this scale, and that the Greater Good is arithmetic, not opinion.",
+      "page": "doc.crown.greater_good",
+      "canonStatus": "CANON (book1 ch.12:31): Aethelgard, the face of the Council (world_bible.md), and the Greater Good; his words to the deputation are GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.people.clerk-odo-vantry",
+      "chapter": "people",
+      "subject": "Clerk Odo Vantry",
+      "more": "The fair copy of the High Councilor's words by the keep's doors is in his hand. The pencilled line under it is not, he says, and he has not rubbed it out.",
+      "page": "doc.crown.greater_good",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.people.archivist-mirelle-dow",
+      "chapter": "people",
+      "subject": "Archivist Mirelle Dow",
+      "more": "She adds a line to the catalogue's first leaf most years and will never finish it. The Silent Pilgrims ask her for copies; the Council's answer is none.",
+      "page": "doc.crown.catalogue",
+      "canonStatus": "CANON-EXPANDED: the High City's archives and the Silent Pilgrims (world_bible.md); the archivist is GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.people.serafine-vael",
+      "chapter": "people",
+      "subject": "Serafine Vael",
+      "more": "Port Caelum's factor at the Exchange. Her note in the charter's margin asks who is doing whom the favour.",
+      "page": "doc.crown.exchange_charter",
+      "canonStatus": "CANON-EXPANDED: Port Caelum and the Trade Princes (world_bible.md); the factor is GAME-ONLY."
+    },
+    {
+      "id": "lore.crown.people.tallis-grend",
+      "chapter": "people",
+      "subject": "Tallis Grend",
+      "line": "The Exchange's clerk. An honest price sells by dusk; a dishonest one gathers dust, and he gathers the fee either way.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.people.ennis-harrowgate",
+      "chapter": "people",
+      "subject": "Ennis Harrowgate",
+      "more": "The clerk who kept the Treasury's counter before him left without notice one spring. Ennis keeps the old stool and will not sit on it.",
+      "secret": "secret.crown.clerks-purse",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.people.bertram-lisle",
+      "chapter": "people",
+      "subject": "Bertram Lisle",
+      "more": "Master of the Lantern Watch. He remembers when there were five names on the guilds' stand, and changes the subject.",
+      "page": "doc.crown.guild_rolls",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.people.rafe-marrick",
+      "chapter": "people",
+      "subject": "Rafe Marrick",
+      "line": "Master of the Long Road, who runs the deep caves every night and keeps the tally in chalk.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.people.warden-garth-ollery",
+      "chapter": "people",
+      "subject": "Warden Garth Ollery",
+      "more": "He keeps the Low Stair, and was told to scrape the answer off the Council's warning. He hasn't.",
+      "page": "doc.crown.low_stair",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "lore.crown.people.herald-pell-corvane",
+      "chapter": "people",
+      "subject": "Herald Pell Corvane",
+      "more": "He reads the edicts at noon. He knows which register the spoiled copy came from, and has decided he does not.",
+      "secret": "secret.crown.spoiled-copy",
+      "canonStatus": "GAME-ONLY"
+    }
+  ]
+}

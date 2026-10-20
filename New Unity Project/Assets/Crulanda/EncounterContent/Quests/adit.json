@@ -31,7 +31,7 @@
       "id": "doc.adit.tally_book",
       "title": "Lusk's Tally Book",
       "text": "SEALED ADIT. LOWER WORKINGS.\nthe gang-boss's tally, H. Lusk\n\nWeek 3. Carts down: 41. Carts up: 38. Three lost on the stair; their men's pay docked.\nGeodes cut: 212 good, 30 split. Pressed hands: 23. Lost: 2 (one to the grey drift, one ran. Ran into the grey drift).\nSent down to the Quartermaster for the carriage: 190.\n\nWeek 4. The cult's lot took 12 for their fire again. Captain says let them. Captain says the fire keeps the hollow ones off the vent road.\nToll at the gate this week: 31 sovereigns.\nBy the carriage this week: not to be written down.\n\nNB. The toll is for the look of it. Keep it honest.",
-      "canonStatus": "GAME-ONLY (the Sandthrone toll on the Peaks is CANON, book1 ch.5; aether-geodes are CANON, book1 ch.3)"
+      "canonStatus": "GAME-ONLY (the Sandthrone toll on the Peaks is CANON-EXPANDED, the draft chapter_5.md; aether-geodes are CANON, book1 ch.3)"
     },
     {
       "id": "doc.adit.echoes",
@@ -44,6 +44,30 @@
       "title": "A Letter Under Seal",
       "text": "To the Company's Commander, by the rail and no other road.\n\nCommander,\nForty crates this month by the dead line, as last month, to the hub at the coast. The Council's factor there weighs them and pays on the nail and asks nothing, as you said he would.\nThe toll above keeps the Peaks looking at the gate and not at the ground. Keep it honest. It is the cheapest lie we tell.\nThe goblins are near done. The old ones will not work and the young ones run into the grey. The Weaver woman says the stones are full of people. I have told her the stones are full of money.\nThe cult takes its share for its fire. I would stop it, but they keep the vent road clear of the hollow things and they pay their own way.\nI will want more men below before the snows. The Breach is moving: two drifts gone this month, and a foreman with them, and he is still down there, walking.\n\nYour servant on the line,\nO. Danner, Rail-Captain",
       "canonStatus": "PROVISIONAL: the letter is GAME-ONLY; the mag-rail south to a coastal hub (book2 ch.19) and the Council burning geodes (book1 ch.3) are CANON. DUNGEON_DESIGN.md says the letter names the Sandthrone's commander (CANON); the name is left out until it is checked against the books."
+    },
+    {
+      "id": "doc.adit.pilgrim_note",
+      "title": "A Pilgrim's Slate",
+      "text": "Chalk on a slate, in the small careful hand the Silent Pilgrims write in, since they do not speak:\n\nThe great cave below sings three notes, and the miners' door at its north end is cut to hear them. Amber from the hall where they break the stones. Red from the house of the fire. Grey from the drift where the stone forgets.\n\nSet the three and the door will answer. The stone wants all three notes, and then it wants holding.\n\nUnder it, rubbed half out: We did not go down again.",
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims are CANON (world_bible); this slate and what it says are GAME-ONLY"
+    },
+    {
+      "id": "doc.adit.censored_history",
+      "title": "The Struck-Out Pages",
+      "text": "A history of the Order of the Ember, copied fair, with whole pages inked over by a later hand. One page the censor missed:\n\n...and the first of us did not come to the fire to worship it. They came because the grey was coming down the valley, and the fire was the only thing the grey would not touch. They kept it burning to keep the grey back, and nothing more. It was the second generation who began to feed it things, and the third who began to feed it people, and called that faith.\n\nIn the margin, in red: Not to be copied. Not to be read aloud. By order of the Loremaster.",
+      "canonStatus": "GAME-ONLY (the Cult of Ash and the Wasting are CANON; this history is not)"
+    },
+    {
+      "id": "doc.adit.kettle_tally",
+      "title": "A Pitch-Boiler's Tally",
+      "text": "Chalked on a board by the platform's end, the chalk smeared by a sleeve:\n\nPITCH FOR THE SLEEPERS AND THE AXLES.\nBarrels boiled: 14. Barrels sent up: 11. Barrels \"lost\": 3.\nWho boils it: Old Kettle, north-west, past the stacked sleepers. Knock first. Do not knock twice.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "doc.adit.lamp_oil",
+      "title": "The Lamp-Men's Mixing Card",
+      "text": "A greasy card pinned inside the niche, the lamp-men's own mixing card, every line of it thumbed:\n\nGALLERY OIL, ONE CASK\nRendered mule fat, four parts. Pitch from the boiler, one part (no more: it smokes). Salt, a fistful, against the damp.\nWarm it, do not boil it. Stir with a stick, not a hand.\nFill to the second ring of the lamp and no higher, or it climbs the wick and you will be up the trestle in the dark.\n\nUnder it, in another hand: Pay day is the seventh shift. The niche is not a bank. Lock it.",
+      "canonStatus": "GAME-ONLY (a lamp-men's card; the old workings' lamps are CANON, book2 ch.19)"
     }
   ],
   "quests": [
@@ -127,7 +151,7 @@
       "complete": "Pib listens to you with his whole face. When you get to the fifth cage he puts both hands over it. \"Old Quillet. She was in that one? She's the oldest of us. If she's out, she'll not run. She'll go down.\" His ears flatten. \"She'll want to put her hand on whatever they're loading those stones into. She'll want to make it stop singing.\"\n\n\"If you go back down, look for her. She'll owe you, and she pays.\"",
       "steps": [
         {
-          "text": "Open the five goblin cages in the first great drift of the Old Workings, under the Sealed Adit.",
+          "text": "Open the five goblin cages at the bottom of the Cage Bowl, the first great chamber of the Old Workings under the Sealed Adit.",
           "objectives": [
             {
               "type": "interact",
@@ -169,7 +193,7 @@
         "side.adit.pressed"
       ],
       "canonStatus": "CANON-EXPANDED: the goblins and the locks they hum open are CANON (the Weavers of the Warrens); Mother Quillet, the carriage's resonance lock and the walk down the platform are GAME-ONLY.",
-      "summary": "Mother Quillet, the eldest of the pressed goblins, went down to the Rail Hall instead of running. Have the freed goblins open the platform gate quietly, then walk her down to the carriage and keep the Company off her while she matches its lock.",
+      "summary": "Mother Quillet, the eldest of the pressed goblins, went down to the Rail Hall instead of running. Have the freed goblins open the platform gate quietly, then walk her down to the carriage and keep the Company off her while she matches its lock. With the lock matched (or Rail-Captain Danner dead on his barge, down the line in the Black Cove) the goblins will walk the carriage up the line and you with it.",
       "offer": "Pib is where you left him, behind the barrels, but he is not hiding now. He is packing a very small bag. \"She went down. Old Quillet. I knew she would.\" He pulls the strap tight with his teeth.\n\n\"There's a lock on that carriage, a singing lock, and she's the only one of us old enough to know its note. Every stone they load is somebody's memory, cut out of the mountain and sold south. She'll match the lock and let them go, if the Company lets her live long enough.\" He looks up at you. \"Our people will open the gate at the bottom for you, quiet, and she'll be waiting by it. Walk her down. Don't let her stop to think. She hates that.\"",
       "progress": "\"Is she still down there? Then go back down. I'll not sleep till you do.\"",
       "complete": "Pib hears it all with his whole face again. When you tell him the stones went dark he sits down on the bag he packed. \"Let go. All of them.\" He wipes his nose on his wrist. \"She'll be insufferable now. She was insufferable before.\"\n\nHe presses a fistful of small coins into your hand, warm from his pocket. \"From the Warrens. Everyone that's left put something in.\"",
@@ -220,7 +244,7 @@
       "complete": "Brother Cael sets each jar to his brass tube, one by one, and listens with his eyes shut. At the fourth his shoulders begin to shake, and you cannot tell if it is weeping or laughter. When he is done he writes a long time, then copies it out on a clean page and gives it to you.\n\nThe last line he underlines twice: Do not let them burn it.",
       "steps": [
         {
-          "text": "Find six pilgrims' echo-jars on the floor of the Singing Gallery, under the Sealed Adit.",
+          "text": "Find six of the seven pilgrims' echo-jars on the floor of the Singing Gallery, the great singing cave at the heart of the Sealed Adit.",
           "objectives": [
             {
               "type": "collect",
@@ -266,13 +290,13 @@
       "level": 11,
       "minLevel": 10,
       "canonStatus": "GAME-ONLY quest and cell; CANON cult (the Cult of Ash)",
-      "summary": "Tamsin Rook, who keeps Khaven's gallows, has seen the Cult of Ash's mark burnt into the road north. Follow it to the Ember Vent off the Sealed Adit, bring down Cinder-Warden Ysolt, and bring back her brand.",
+      "summary": "Tamsin Rook, who keeps Khaven's gallows, has seen the Cult of Ash's mark burnt into the road north. Follow it down the Sealed Adit to the Cult of Ash's chapter-house off the Singing Gallery, bring down Cinder-Warden Ysolt in the Chapel of Embers, and bring back her brand.",
       "offer": "The gallows-keeper is oiling the drop's hinges, which do not need it. \"Every month the Company sends a cart north up the toll road. Every month there's a mark burnt in the road where it stopped for the night. Here.\" She draws it in the dirt with her boot: a ring, and a flame inside it. \"I know that mark. My brother took it, before he burned.\"\n\n\"The Cult of Ash, riding in Sandthrone carts. Up to the Peaks, and down into the old mine there.\" She stamps the mark out. \"There's one who leads them, a warden. Burns the mark into the new ones herself. Bring me her iron, and I'll know it's done.\"",
       "progress": "\"No iron, no end. They make another warden quick enough.\"",
       "complete": "Tamsin takes the brand by its handle and turns it over. The mark is still warm. She walks to the gallows tree and drops the iron in the trough beneath the drop, where it hisses for a long time.\n\n\"That's for my brother.\" She wipes her hands. \"The cart will still go north. But it will have one less fire to go to.\"",
       "steps": [
         {
-          "text": "Follow the Cult of Ash down the Sealed Adit to the Ember Vent, bring down Cinder-Warden Ysolt by her lake of fire, and take her brand.",
+          "text": "Follow the Cult of Ash down the Sealed Adit to their chapter-house off the Singing Gallery: through the Ash Garden and the Scriptorium or the Muster Yard to the Chapel of Embers. Bring down Cinder-Warden Ysolt by her lake of fire (mind the priestess at her side), and take her brand.",
           "objectives": [
             {
               "type": "kill",
@@ -322,14 +346,14 @@
       "zone": "zone.peaks",
       "level": 11,
       "minLevel": 10,
-      "canonStatus": "CANON-EXPANDED: the Salt-Menders, the Wasting and the unmade are CANON (world_bible, book2 ch.18); Lisle Tamber, the Grey Breach and its Foreman are GAME-ONLY.",
-      "summary": "Lisle Tamber, a Salt-Mender scholar, wants to know how far the Wasting has eaten into the Peaks. Go down to the Grey Breach under the Sealed Adit and bring a shard of unmade stone from the Foreman Who Forgot.",
-      "offer": "The scholar has a satchel of papers, all written in a cipher of salt-marks, and ink on every finger. \"Quill sends her regards from Oakhaven, if you know Quill. If you don't, then a traveller sends hers.\"\n\n\"The Peaks hold back the grey. Everyone says so, and everyone's right, for now. But the miners down the old adit broke into a drift on the east side, and my people hear that the rock there isn't rock any more.\" She lowers her voice. \"There's a foreman down there, a Company man who went into the grey and didn't come out, and didn't die either. Wherever he walks, the stone forgets itself. Bring me a piece of what it forgets into. I need to know how fast.\"",
+      "canonStatus": "CANON-EXPANDED: the Wasting and the unmade are CANON (world_bible, book2 ch.18), the Salt-Menders here their forerunners (CANON-EXPANDED, book 3); Lisle Tamber, the Grey Breach and its Foreman are GAME-ONLY.",
+      "summary": "Lisle Tamber, a Salt-Mender scholar, wants to know how far the Wasting has eaten into the Peaks. Go down to the Grey Breach under the Sealed Adit, past the Sunless River and bring a shard of unmade stone from the Foreman Who Forgot.",
+      "offer": "The scholar has a satchel of papers, all written in a cipher of salt-marks, and ink on every finger. \"Quill sends her regards from Oakhaven, if you know Quill. If you don't, then a traveller sends hers.\"\n\n\"The Peaks hold back the grey. Everyone says so, and everyone's right, for now. But the miners down the old adit broke into a drift past the old river, up the falls, and my people hear that the rock there isn't rock any more.\" She lowers her voice. \"There's a foreman down there, a Company man who went into the grey and didn't come out, and didn't die either. Wherever he walks, the stone forgets itself. Bring me a piece of what it forgets into. I need to know how fast.\"",
       "progress": "\"Don't hold it long. Carry it in something you don't need.\"",
       "complete": "Lisle sets the shard on a paper of salt and watches. The salt round it goes grey, grain by grain, a finger's width, then stops. She lets out a breath. \"Salt still holds it. Good. That's the first good news since spring.\"\n\nShe folds the shard up in the salt like a sweet in a twist of paper. \"A drift a month, the Company's own captain says. If the Peaks go, there's nothing between the grey and the west but the Ash Rim and a lot of frightened people.\" She looks at you. \"You've a good head for going where you oughtn't. I'll remember that.\"",
       "steps": [
         {
-          "text": "Go down to the Grey Breach under the Sealed Adit, bring down the Foreman Who Forgot, and take a shard of unmade stone from what is left of him.",
+          "text": "Go down to the Grey Breach under the Sealed Adit: west out of the Singing Gallery along the Sunless River and up the falls. Bring down the Foreman Who Forgot, and take a shard of unmade stone from what is left of him.",
           "objectives": [
             {
               "type": "kill",
@@ -388,14 +412,14 @@
       "requires": [
         "side.adit.toll"
       ],
-      "canonStatus": "CANON-EXPANDED: the mag-rail south under the range (book2 ch.19) and the Sandthrone (book1 ch.5) are CANON; the Rail Hall, the carriage, Sorrel and Danner are GAME-ONLY.",
-      "summary": "The geodes go south on the old mag-rail, from a hall at the bottom of the Sealed Adit. Go down to the Rail Hall and stop the carriage: bring down Quartermaster Brannigan Sorrel and Rail-Captain Orsk Danner.",
+      "canonStatus": "CANON-EXPANDED: the mag-rail south under the range (book2 ch.19) and the Sandthrone (world_bible) are CANON; the Rail Hall, the carriage, Sorrel and Danner are GAME-ONLY.",
+      "summary": "The geodes go south on the old mag-rail, from a hall at the bottom of the Sealed Adit. Go down to the Rail Hall and stop the carriage: bring down Quartermaster Brannigan Sorrel there, and Rail-Captain Orsk Danner on his ore barge in the Black Cove, where the dead line runs on to the water.",
       "offer": "Yara has a map of the pass spread on her counter, the old kind, with the mine-workings inked under it in red. She has her finger on a line that runs south off the bottom of the page. \"The old line. Everyone knows it's dead. The Company said so, the year they bricked the adit.\"\n\n\"It isn't dead. It's how two hundred geodes a week go south without passing my counter or anyone's.\" She rolls the map up. \"Somewhere at the bottom of that mine there's a carriage, and a quartermaster loading it, and a captain riding it. Stop it. I'll find you something worth the walk. I've a few pieces put by that I can't sell on this pass without questions.\"",
       "progress": "\"Still running, is it? I can hear it, some nights. Or I think I can.\"",
       "complete": "Yara hears you out, then goes to the back of the shop and comes out with three things wrapped in sacking. \"I've been keeping these for someone. Take your pick, and don't tell me where you'll carry it.\"\n\nShe sits. \"No carriage. So no geodes south, and no Company pay this winter, and fifty hungry mercenaries on my pass.\" She laughs, short. \"That'll be interesting. Find out who that letter's for. Someone up the chain is going to want their money.\"",
       "steps": [
         {
-          "text": "Go down the cage-lift to the Rail Hall at the bottom of the Sealed Adit. Bring down Quartermaster Brannigan Sorrel and Rail-Captain Orsk Danner on his carriage.",
+          "text": "Go down past the singing door at the Singing Gallery's north end (its three sockets want the rail sigils) to the Rail Hall at the bottom of the Sealed Adit. Bring down Quartermaster Brannigan Sorrel in the Rail Hall, then follow the Dead Line on into the Black Cove and bring down Rail-Captain Orsk Danner on the stern castle of his ore barge.",
           "objectives": [
             {
               "type": "kill",
@@ -411,7 +435,7 @@
               "target": "mob.railcaptain.adit.*",
               "count": 1,
               "text": "Rail-Captain Orsk Danner",
-              "say": "Danner goes over the carriage's rail and does not get up. The geodes in their crates flicker, and go on glowing."
+              "say": "Danner goes down on the planks of his stern castle and does not get up. In the barge's waist the geodes in their crates flicker, and go on glowing."
             },
             {
               "type": "collect",

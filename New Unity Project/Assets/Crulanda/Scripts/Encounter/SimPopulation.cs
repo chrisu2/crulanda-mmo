@@ -31,6 +31,10 @@ namespace Crulanda.Encounter
             bool testRun = Application.isEditor && (Application.isBatchMode || System.Array.IndexOf(System.Environment.GetCommandLineArgs(), "-runTests") >= 0);
             Lively = LifeOverride ?? !(testRun || EncounterCapture.Requested && !LifeCapture.Requested);   // the life capture watches them live
             World = SimRoster.LoadOrCreate(root);
+            // The Exchange ran on while you were away (the real time since the world was saved, as world-hours, two days at most).
+            if (Lively) Exchange.CatchUp(World, System.DateTime.UtcNow, WorldClock.Hour, Session.Items, Session.Professions?.Db); else Exchange.Ensure(World).clockAt = WorldClock.Hour;
+            Session.ExchangeNotices(true);   // and what happened there while you were away, once
+            Exchange.Wore = s => { var f = Find(s.id); if (f != null) SimGear.Dress(f.visual, s, Session.Items); };   // a piece bought on the Exchange shows on the sim
             gameObject.AddComponent<SimChatter>().Init(this);   // the sims talking (zone chat, playtest note 62)
             Refresh();
             RestoreParty(World.party);
@@ -46,7 +50,10 @@ namespace Crulanda.Encounter
             foreach (var id in new List<string>(ids))
             {
                 var s = World.sims.Find(x => x.id == id); if (s == null || Session.InParty(id)) continue;
-                if (!s.IsOnlineAt(hour)) { Session.Message(s.name + " has logged off since."); continue; }
+                // A sim the dungeon queue brought (EncounterSession.Queue): it comes into the run's dungeon online or not, and anywhere else
+                // the run is over, so it goes back where it came from.
+                if (Session.QueueSim(id) && Session.QueueRunZone != ZoneId) { Session.SendQueueSimHome(s); continue; }
+                if (!s.IsOnlineAt(hour) && !Session.QueueSim(id)) { Session.Message(s.name + " has logged off since."); continue; }
                 var at = Session.Player.transform.position - Session.Player.transform.forward * (2 + k) + Session.Player.transform.right * (k % 2 == 0 ? 1.5f : -1.5f); k++;
                 s.zone = ZoneId; s.x = at.x; s.z = at.z; Refresh();
                 if (Session.Invite(id, true)) back.Add(s.name);
@@ -54,7 +61,7 @@ namespace Crulanda.Encounter
             if (back.Count > 0) Session.Message("Your party is with you: " + string.Join(", ", back) + ".");
             World.party.Clear(); foreach (var c in Session.PartySims) if (c != null) World.party.Add(c.sim.id);
         }
-        void OnDestroy() { if (Active == this) Active = null; }
+        void OnDestroy() { if (Active == this) { Active = null; Exchange.Wore = null; } }
         public string ZoneId { get { return Session != null && Session.Zone != null ? Session.Zone.Zone.id : null; } }
         public SimFigure Find(string simId) { return Figures.Find(f => f != null && f.sim.id == simId); }
         public SimFigure FindByName(string name) { return Figures.Find(f => f != null && f.sim.name == name); }
@@ -100,10 +107,12 @@ namespace Crulanda.Encounter
         /// <summary>
         /// The unseen living on (5.4, 2026-10-07): each world-clock hour a sim in another zone and online hunts, gathers and trades
         /// in the rough, by its personality: the bold take experience as from a few kills of their level (a level when it adds
-        /// up: no ding is heard from another zone), the careful gather their trade's first material and sell it now and then,
-        /// coin buys the gear upgrades (SimEconomy), and the smiths forge what they can. Nothing happens while offline, and a
+        /// up: no ding is heard from another zone; a leatherworker brings home a hide or two), the careful gather their trade's first
+        /// material and sell it now and then, coin buys the gear upgrades (SimEconomy), and the crafters make what they can. Nothing happens while offline, and a
         /// sim here, seen, lives for real instead. Called from <see cref="Refresh"/>.
         /// </summary>
+        /// <summary>The chance in an hour's hunting away that a sim turns up a found recipe's leaf (it lists it on the Exchange).</summary>
+        public const float LeafChance = .03f;
         public static void LiveAway(SimAdventurer s, float hour, ItemDatabase items, ProfessionDatabase db)
         {
             if (s.lastAwayHour < 0) { s.lastAwayHour = hour; return; }
@@ -121,17 +130,22 @@ namespace Crulanda.Encounter
                         s.experience = Mathf.Max(s.experience, EncounterProgress.XpForLevel(s.level)) + kills * EncounterProgress.KillXp(s.level, s.level, false) / 2;
                         while (s.level < EncounterProgress.LevelCap && s.experience >= EncounterProgress.XpForLevel(s.level + 1)) s.level++;
                     }
+                    if (SimEconomy.CraftTrade(s.classId) == "leatherworking") SimEconomy.Add(s, SimEconomy.HideFor(s.level), 1 + r.NextInt(0, 2));   // skinned (Phase 8.6)
+                    if (r.NextFloat() < .4f) SimEconomy.Add(s, SimEconomy.MeatFor(s.level), 1 + r.NextInt(0, 2));   // the meat of the kill, for the hearth
+                    if (r.NextFloat() < LeafChance) { var leaf = SimEconomy.LeafFor(s.level, db, items, r.NextInt(0, 1000)); if (leaf != null) SimEconomy.Add(s, leaf, 1); }   // a leaf from a boss or a cache: for the Exchange
                 }
                 else
                 {
                     string trade = SimEconomy.GatherTrade(s.classId); string mat = trade == "mining" ? "mat.copper_ore" : trade == "woodcutting" ? "mat.oak_log" : "mat.yarrow";
                     SimEconomy.Add(s, mat, 2 + r.NextInt(0, 4));
                 }
-                if (SimEconomy.GoodsCount(s) >= 8 && r.NextFloat() < .5f)
+                SimEconomy.Cook(s, db, items);   // the meat cooked at the hearth: its pack's dish, the rest to sell
+                if (SimEconomy.SellableCount(s, items) >= 8 && r.NextFloat() < .5f)
                 {
                     var recipe = SimEconomy.Craftable(s, db, items);
                     if (recipe != null) SimEconomy.Craft(s, recipe, items); else SimEconomy.SellAll(s, items);
                     SimEconomy.Upgrade(s);
+                    SimEconomy.Stock(s, items);   // its pack for the bosses (BossBuffs)
                 }
             }
         }
@@ -141,9 +155,11 @@ namespace Crulanda.Encounter
             string zone = ZoneId; if (zone == null || World == null) return;
             float hour = WorldClock.Hour;
             if (Lively) foreach (var s in World.sims) if (s.zone != zone && s.IsOnlineAt(hour)) { LiveAway(s, hour, Session.Items, Session.Professions?.Db); TickAway(s, hour); }
+            if (Lively) Exchange.Follow(World, hour, Session.Items, Session.Professions?.Db);   // the capital's market keeps the world clock wherever you are (Exchange.cs)
+            Session.ExchangeNotices(false);   // your lots sold, run out, outbid on, won: told as they happen
             foreach (var s in World.sims)
             {
-                bool here = s.zone == zone && s.IsOnlineAt(hour) && !Session.InParty(s.id);   // one in your party is with you, not standing about
+                bool here = s.zone == zone && (s.IsOnlineAt(hour) || Session.QueueSim(s.id)) && !Session.InParty(s.id);   // one in your party is with you, not standing about; a queued sim is summoned, online or not
                 var f = Find(s.id);
                 if (here && f == null) { Figures.Add(SimFigure.Spawn(this, s)); SimChatter.Active?.Arrived(s); }
                 else if (!here && f != null) { if (!s.IsOnlineAt(hour)) SimChatter.Active?.LoggedOff(s); Figures.Remove(f); Destroy(f.gameObject); }
@@ -156,11 +172,14 @@ namespace Crulanda.Encounter
             foreach (var f in Figures) if (f != null) { f.sim.x = f.transform.position.x; f.sim.z = f.transform.position.z; }
             foreach (var c in Session.PartySims) if (c != null) { c.sim.x = c.transform.position.x; c.sim.z = c.transform.position.z; }
             World.party.Clear(); foreach (var c in Session.PartySims) if (c != null) World.party.Add(c.sim.id);   // the party, kept (round 27)
+            Exchange.Stamp(World, System.DateTime.UtcNow);   // so the next start knows how long you were away
             try { SimRoster.Save(Root, World); } catch (System.Exception e) { Debug.LogWarning("World save failed: " + e.Message); }
         }
         /// <summary>A place to stand in this zone: near one of its named places (a landmark), on the NavMesh.</summary>
         public Vector3 Spot(SimAdventurer s, int pick)
         {
+            // A guild's member idles in its hall where this zone has one (the capital's Guild Row; EncounterSession.HallSpots), two times in three.
+            if (Session != null && !string.IsNullOrEmpty(s.guild) && pick % 3 != 2) { var hall = Session.HallSpots(s.guild); if (hall.Count > 0) return hall[Mathf.Abs(s.variant + pick) % hall.Count]; }
             var zb = Session.Zone; var marks = zb != null ? zb.Zone.landmarks : null;
             Vector2 at = marks != null && marks.Length > 0 ? marks[Mathf.Abs(s.variant * 7 + pick) % marks.Length].at : Vector2.zero;
             var r = new Crulanda.Core.SeededRandom(s.variant * 31 + pick);

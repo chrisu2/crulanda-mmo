@@ -72,7 +72,7 @@ namespace Crulanda.Tests
         {
             Assert.AreEqual("class.paladin", session.ClassDef.id); Assert.AreEqual("class.paladin", session.Progress.classId);
             Assert.AreEqual(Crulanda.Core.ResourceKind.Mana, session.ClassDef.resource);
-            Assert.AreEqual(13, session.Kit.ActionCount, "ten, and the Vanguard's three");
+            Assert.AreEqual(14, session.Kit.ActionCount, "ten, the Vanguard's three, and the Mending Oath (2026-10-13)");
             Assert.AreEqual("paladin.smite", session.Kit.ActionAt(Smite).id); Assert.AreEqual("paladin.censure", session.Kit.ActionAt(Censure).id);
             Assert.AreEqual("Talent", session.Kit.ActionLockLabel(Censure), "Censure waits on its talent.");
             Assert.AreEqual("Level 5", session.Kit.ActionLockLabel(LayOn), "Lay On comes at level 5.");

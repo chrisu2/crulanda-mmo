@@ -48,9 +48,38 @@
       "id": "item.shore_salt",
       "name": "Salt of the First Shore",
       "description": "A cake of grey-white salt-crust from the flats. Held close, it hums very faintly, like a Keeper's staff."
+    },
+    {
+      "id": "item.treenails",
+      "name": "Bundle of treenails",
+      "description": "Pegs of fallen ghost-oak heartwood, each as long as your hand, bound with root-fibre. Driven wet, they swell and hold. Iron on the Shore cannot say as much."
+    },
+    {
+      "id": "item.wystan_mask",
+      "name": "Brother Wystan's mask",
+      "description": "A pilgrim's mask of silver, gone dull, dented over the mouth. Scratched inside, small and careful: WYSTAN."
+    },
+    {
+      "id": "item.green_heartwood",
+      "name": "Greyheart's green heart",
+      "description": "A knot of living heartwood the size of a fist, wet and green and faintly warm. If you hold very still, it beats."
     }
   ],
   "documents": [
+    {
+      "id": "doc.verdant.tale_book",
+      "kind": "lore",
+      "title": "A Tale from the Bower's Book",
+      "text": "From the book on the root-stand by the glade path, which the Keepers read aloud at dusk to whoever sits. One tale, set down in a careful flesh-folk hand under the Keepers' spiral-script:\n\nOnce a Keeper found a seed that shone, and was afraid it would be lost, and kept it in her hand. She kept it a hundred years. The seed did not grow, because it was in her hand, and the Keeper did not grow, because her hand was full.\n\nWhen she opened her hand at last, the seed was only a seed. It had shone because she was holding it.\n\nSo we do not keep things, the tale ends. We plant them, or we give them, or we let the river have them. A full hand cannot be held.\n\nUnder it, in another hand: Read to the flesh-folk on the ninth night. They laughed at the end. That is allowed.",
+      "canonStatus": "CANON-EXPANDED: the Veridian Keepers and their rule against hoarding are CANON (book3 ch.2, 7; world_bible.md); the book and this tale are GAME-ONLY."
+    },
+    {
+      "id": "doc.verdant.ore_hunter",
+      "kind": "lore",
+      "title": "An Ore-Hunter's Reckoning",
+      "text": "A page from the sack of the man against the root wall, in a hand that started neat:\n\nDown the root-stair with a lamp, a pick and a sack. The Keepers said the green ore is the Mother's and not for selling. The Keepers say a lot.\n\nA vein as thick as my arm in the hall of root columns. I filled the sack by the second lamp.\n\nThe sack is too heavy to climb with. I'll rest first.\n\nIt is cold here, and it should not be. The root is warm everywhere else. The cold is further down, at the bottom, and it is coming up the way I came down.\n\nI'll rest a little longer. The root has my boots. It's kind about it.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother (book3) and the cold in the root (book3 ch.6-7), shown before their time; the ore-hunter and his page are GAME-ONLY."
+    },
     {
       "id": "doc.verdant.first_cycle",
       "title": "The Song of the First Cycle",
@@ -80,6 +109,26 @@
       "title": "What the Root-Mother Dreams",
       "text": "Set down by Sister Iselle of the Archive of Silence, from the lips of Willow-Whisper, Voice of the Wood, who would not call it a song:\n\nShe dreams of rain. Not the rain that falls; the rain that is still deciding to. She dreams of every root in the Shore at once, which is why the Shore grows the way it does, and why nothing here knows when to stop.\n\nWhen the cold got into her root she dreamed of a mirror, and in the mirror the Shore, with no green in it. Thorn-Hand went down to see and did not come up. The roots closed over the stair. We told ourselves she had closed them.\n\nA short flesh-folk went down and salted the cold. She dreams of rain again.\n\nI have asked the Voice what the mirror was. She says the Pale have a king who wears one. She says it the way you would say the name of a disease.",
       "canonStatus": "CANON-EXPANDED: the Root-Mother, the Silent Pilgrims, the Archive of Silence and the King of Mirrors are CANON (Book 3); this page, Thorn-Hand and the dream are GAME-ONLY."
+    },
+    {
+      "id": "doc.verdant.wystan",
+      "title": "Brother Wystan's Last Page",
+      "text": "Folded small in the lining of a silver mask, in a hand that grows larger and less careful as it goes:\n\nBelow the root-stair. I have lost count of the days; the light of the sap does not change.\nIselle is right that there is a gap where the Third Note should be. She is wrong that it is empty. Something is in it. It is very low and very cold and very patient, and it fits the gap exactly. Too exactly, I think. A key that fits a lock is not always the key.\n\nThe note is louder here. I must hear it closer.\n\nThe fog is in the lower rooms. It is not unpleasant. It is quiet. It takes things away one at a time, and you do not miss them as they go.\n\nI have scratched my name inside my mask, in case.\n\n(Under that there are no more words: only three circles, the third filled in.)",
+      "canonStatus": "GAME-ONLY: Brother Wystan and his page. The Silent Pilgrims, their silver masks and the Original Song's three notes are CANON (book3 ch.5); the cold note under the Temple is PROVISIONAL foreshadowing of the Pale."
+    },
+    {
+      "id": "doc.verdant.lantern_count",
+      "title": "The Lantern Count",
+      "kind": "lore",
+      "text": "Cut into a shelf of bark and left on the mossy rock above the glade, in Moss-Lantern's small, even strokes:\n\nThe First Cycle: the Root-Mother dreamed, and the dream had light in it, and the light was kept. That is the first lantern.\n\nThe cycle before this one ended in cold. The trees remember it in their rings and will show you, if you ask and do not take. That is the second lantern, and it is lit for what was lost.\n\nThis cycle: the glade's caps make their own light, and the Keepers borrow it, a little at a time, and give it back at dawn. That is the third lantern, and it is the one your kind never understands. You keep what you take. We give back what we borrow. That is the whole of the difference between us, and it is enough.\n\nThere is a cold in the east again. I have begun to make a fourth lantern. I do not yet know what it is for.",
+      "canonStatus": "CANON-EXPANDED: the Root-Mother, the First Cycle, the trees that remember and the Keepers' rule against hoarding are CANON (book3 ch.2, 6-7; world_bible.md); Moss-Lantern and her count are GAME-ONLY, the fourth lantern PROVISIONAL foreshadowing."
+    },
+    {
+      "id": "doc.verdant.falls_remember",
+      "title": "What the Falls Remember",
+      "kind": "lore",
+      "text": "Pressed into the moss at the lip of the falls, a strip of pale bark in Willow-Whisper's spiral-script, which the wood reads out for whoever asks:\n\nThe river has run over this lip since the Root-Mother first dreamed water. It remembers every face that looked down from here. Most of them were ours.\n\nI have looked down from here and seen, far off, a line of white that is the sea; and I have seen the sea turn black in a dream, and the air fill with ash, and people come over the ridge with nothing, and ask. I have seen a pine grow where nothing should. I have seen a wall of salt.\n\nI do not know when. The river does not know when. It only knows that it will still be running. I have left this here so that when they come, and climb, and look down, they will know that someone looked first and did not turn them away.\n\nThe wood will keep this leaf green. It keeps what is asked of it, and gives it back.",
+      "canonStatus": "PROVISIONAL foreshadowing within CANON: the Root-Mother, the Verdant Ocean running to the sea, the survivors who crest the Ridge of Long Shadows, the First Seed and the Salt-Wall are CANON (book3 ch.1-4, 7; world_bible.md), shown before their time; Willow-Whisper's leaf is GAME-ONLY."
     }
   ],
   "quests": [
@@ -488,6 +537,9 @@
             "faction": "keepers",
             "amount": 250
           }
+        ],
+        "bagItems": [
+          "leaf.tempered_veridian_cloth"
         ]
       }
     },
@@ -711,7 +763,7 @@
       "summary": "Go down the Temple's root-stair into the Root-Mother's Deep, through the withered Keepers and the mist-walkers that have got in, bring down the Hollow Root-Warden in the Heart, and salt the cold that has lodged in the root.",
       "offer": "\"The fog came up out of the ground, not down off the ridge. I know where.\" Willow-Whisper stands a long time with her hand flat on her own trunk, listening. \"Under the Temple. The root-stair the living roots closed. They closed it because something was wrong below, and we did not go and see. We are very old, and very slow, and we did not go and see.\"\n\n\"Go down. The Warden of the roots will not let you pass; he is not himself. Nor are the others. Lay them to rest. And at the bottom, where the Root-Mother dreams, there will be a cold thing in her root. Salt it. Grohl's salt, the First Shore's salt, any salt. Salt remembers what a thing was before.\"",
       "progress": "\"Is it done? No. I can hear it still, down in the roots, like a tooth going bad.\"",
-      "complete": "Willow-Whisper lets out a breath that goes on for a long time, and all through Rootfast the lanterns flare green and settle. \"She is dreaming of rain again.\" She looks down at you, and the knots of her eyes are bright. \"The Warden was Thorn-Hand. He planted the Guest-Tree. We will grow him a new one.\"\n\n\"When the flesh-folk come over the ridge, and they will, I shall tell them a short one came first, and asked, and went down into the dark for us. Go and sit by the sap-pool. You have earned the warm.\"",
+      "complete": "Willow-Whisper lets out a breath that goes on for a long time, and all through Rootfast the lanterns flare green and settle. \"She is dreaming of rain again.\" She looks down at you, and the knots of her eyes are bright. \"The Warden was Thorn-Hand. He planted the Guest-Tree. We will grow him a new one.\"\n\n\"When the flesh-folk come over the ridge, and they will, I shall tell them a short one came first, and asked, and went down into the dark for us. Go and sit by the sap-pool. You have earned the warm.\"\n\nShe is quiet a moment. \"And then go home, short one. Your elder in Oakhaven has been asking the wind after you. There is a road south-east from your village to the city on the mountain, and two of your young went down it and did not come back. The roots say he means to ask you to follow.\"",
       "steps": [
         {
           "text": "Go down the Temple's root-stair into the Root-Mother's Deep.",
@@ -1048,6 +1100,619 @@
           {
             "faction": "keepers",
             "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.alderknot.treenails",
+      "title": "Rust-Lace",
+      "kind": "npc",
+      "giver": "Alder-Knot",
+      "turnIn": "Ondine Varro",
+      "zone": "zone.verdant",
+      "level": 13,
+      "minLevel": 12,
+      "canonStatus": "CANON-EXPANDED: on the Shore iron turns to rust-lace in days (book3 ch.3), and Port Caelum's glass ships (world_bible.md) are CANON; Alder-Knot's treenails and this errand are GAME-ONLY.",
+      "giveOnAccept": [
+        "item.treenails"
+      ],
+      "summary": "Take Alder-Knot's bundle of heartwood treenails to Ondine Varro at the scout's camp on the Salt-Flats, whose boat is coming apart as its iron nails rust through.",
+      "offer": "Alder-Knot sights down a peg of pale wood as if it were an arrow. \"The glass-ship woman on the flats. Her boat is pinned together with iron, and on the Shore iron does not last the season. It goes to rust-lace. You can read through it.\"\n\n\"I heard her kick the hull this morning, and I was here.\" He knots a cord of root-fibre round a bundle of the pegs. \"Treenails. Fallen ghost-oak, the heartwood, dry as last year's leaves. Drive them wet and they swell tight and stay. Willow says we wait to be asked. A boat on the bottom of the sea asks nothing, so take these to her before it gets there.\"",
+      "progress": "\"Treenails. From the carver? What does he want for them?\"",
+      "complete": "Ondine turns a treenail over, then another, and for a while says nothing at all. Then she sets one in a split plank and drives it home with the heel of her hand. It goes in with a squeal and sits there as if it had grown. \"Wooden nails. My grandfather would have laughed. My grandfather never saw what this coast does to iron.\"\n\n\"Tell the carver...\" She stops, and starts again, more carefully. \"Tell him I asked. Late. But I asked.\"",
+      "steps": [
+        {
+          "text": "Take the treenails to Ondine Varro at the scout's camp on the Salt-Flats.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Ondine Varro",
+              "item": "item.treenails",
+              "text": "Bring the treenails to Ondine Varro",
+              "say": "\"From the wood-folk? For me?\" She looks at the bundle as if it might be a trick. \"Give it here.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 480,
+        "gold": 110,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 150
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.reedsong.reeds",
+      "title": "Salt in the Reeds",
+      "kind": "npc",
+      "giver": "Reed-Song",
+      "turnIn": "Reed-Song",
+      "zone": "zone.verdant",
+      "level": 13,
+      "requires": [
+        "npc.reedsong.boars"
+      ],
+      "canonStatus": "CANON-EXPANDED: glass-frogs in the undergrowth (book3 ch.2) and the Salt-Flats of the western coast (book3 ch.3) are CANON; the Wending, its reeds and the rinsed salt are GAME-ONLY.",
+      "summary": "The glass-frogs of the lower Wending have gone quiet from the Reed-bed footbridge down to the sea. Walk the river's reeds for Reed-Song, and ask the glass-ship scout on the flats what her people have been doing at its mouth.",
+      "offer": "Reed-Song does not look up from the water. \"The mere sings again. Good. Now the river does not.\" She tips her head toward the north-west, where the Wending slides away to the sea. \"The frogs of the lower river have gone quiet, from the reed-bed bridge to the mouth. A whole river of them, all at once. Frogs do nothing all at once unless something makes them.\"\n\n\"Walk the reeds. Look at the roots, not the tops; the tops lie. And there is a woman of the glass ships camped on the flats by the mouth. Flesh-folk notice what flesh-folk do. Ask her.\"",
+      "progress": "\"Look at the roots. The tops lie.\"",
+      "complete": "Reed-Song hears all of it with her eyes shut, which is how she hears everything. \"Salt in the reeds. The mere does not like salt, and the river likes it less.\" A long pause, the length of a frog's patience. \"The tidal pools, she said? Good. The pools are the sea's already. Let the sea have its own salt back.\"\n\n\"Come back in a moon and listen. If they are singing, I will tell you so. If they are not, I will tell you that too.\"",
+      "steps": [
+        {
+          "text": "Walk the reeds of the lower Wending, from the Reed-bed footbridge down to the river's mouth.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": -85,
+                "y": 3
+              },
+              "radius": 7,
+              "text": "Look at the reeds under the Reed-bed footbridge",
+              "say": "Reeds grow thick round the footbridge piles, and among them not one frog. At the waterline every reed-root is rimmed with something white and gritty. You touch a finger of it to your tongue: salt."
+            },
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": -140,
+                "y": -12
+              },
+              "radius": 8,
+              "text": "Look at the reeds at the Wending's mouth",
+              "say": "At the mouth the reeds stand white to the knee, crusted like a hedge in a hard frost. In the mud of the bank are a dozen hollows the shape of sacks, and a trodden path runs from them through the shallows toward the scout's camp on the flats."
+            }
+          ]
+        },
+        {
+          "text": "Ask the glass-ship scout on the Salt-Flats what her people have been doing at the river's mouth.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.verdant",
+              "target": "Ondine Varro",
+              "text": "Ask Ondine Varro about the salt in the reeds",
+              "say": "\"Rinsing it.\" Ondine has the grace to look caught. \"Salt off the flats is grey, and Port Caelum pays for white, so the crew rinse the sacks in the river and let the river carry the grey away.\" She looks toward the mouth, where the reeds are white. \"Frogs. Nobody ever tells you about the frogs. Very well: the tidal pools from now on. The sea won't miss a little more salt.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 520,
+        "gold": 120,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 200
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.alderknot.briarheart",
+      "title": "What Makes a Briar Hunt",
+      "kind": "npc",
+      "giver": "Alder-Knot",
+      "turnIn": "Alder-Knot",
+      "zone": "zone.verdant",
+      "level": 13,
+      "minLevel": 12,
+      "canonStatus": "GAME-ONLY: the creeping briars and what Alder-Knot finds in one. The cold of the Pale is CANON (book3 ch.2-8); its reaching the Shore this early is PROVISIONAL foreshadowing.",
+      "summary": "Bring Alder-Knot two briar-heart knots from the creeping briars of the Briar Way or the Fern Hollow, so he can cut one open and see what makes a briar hunt.",
+      "offer": "Alder-Knot is whittling, and not looking at what he whittles. \"Willow says briars creep. Briars do not hunt. Oak-Bane says a briar on the old way took a fawn. Both of them are older than anything you have ever met, and one of them is wrong.\"\n\n\"In the middle of every creeping briar there is a knot, root and thorn wound round itself, where a briar keeps whatever it has instead of a heart. Bring me two. I will cut one open. The other I will keep shut, in case the first tells me something I do not like.\"",
+      "progress": "\"Two knots. They are in the thick of the thing, where the thorns are worst. Naturally.\"",
+      "complete": "Alder-Knot sets one knot on his carving-stump and opens it with three careful cuts, like a nut. The outside is green wood, wet and stringy. The middle is grey and dry as ash, and at the very centre sits a grain of something white that does not melt in the warmth of his palm.\n\n\"Frost,\" he says. \"In a briar. In summer.\" He drops the other knot into a jar of resin and stoppers it, and does not look at it again. \"Willow is right. Briars do not hunt. Something is hunting with them.\"",
+      "steps": [
+        {
+          "text": "Cut briar-heart knots from the creeping briars of the Briar Way or the Fern Hollow.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.verdant",
+              "target": "Alder-Knot",
+              "item": "junk.briar_heart",
+              "count": 2,
+              "text": "Briar-heart knots",
+              "say": "\"Two. Good. Put them on the stump, not in my hand.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 540,
+        "gold": 125,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.ondine.hides",
+      "title": "Light Through Leaves",
+      "kind": "side",
+      "giver": "Ondine Varro",
+      "turnIn": "Ondine Varro",
+      "zone": "zone.verdant",
+      "level": 13,
+      "minLevel": 12,
+      "canonStatus": "CANON-EXPANDED: Port Caelum and the Gilded Bay, where the Trade Princes keep their pleasure barges, are CANON (world_bible.md); Ondine's trade in stag hides is GAME-ONLY.",
+      "summary": "Bring Ondine Varro three dappled hides from the stags of the Antler Meadow, north of Rootfast, for the Trade Princes of the Gilded Bay.",
+      "offer": "Ondine has a ledger open on a crate and is frowning at it the way other people frown at the weather. \"When the ship sails she'll have salt in her hold, and salt pays, but it pays like salt. I want one thing aboard that makes a Trade Prince of the Gilded Bay forget to haggle.\"\n\n\"There are stags in a meadow north of the wood-folk's village with hides dappled like sun through leaves. Nobody on the Bay has ever seen one. Bring me three and I'll pay for them as if they were glass. The wood-folk say the herd is too big this year, so even the trees shouldn't sulk.\"",
+      "progress": "\"Dappled. Not torn. A Trade Prince can find a hole from across a room.\"",
+      "complete": "Ondine spreads a hide over the crate and stands back, and the dapple seems to move as the leaves overhead move, as if the light were still on it. \"Oh, they'll pay for that.\" She rolls it up with the others, quickly, the way you cover a good hand of cards. \"On the Bay they'll say it came from the edge of the world. For once they'll be right.\"",
+      "steps": [
+        {
+          "text": "Take dappled hides from the stags of the Antler Meadow.",
+          "objectives": [
+            {
+              "type": "bring",
+              "zone": "zone.verdant",
+              "target": "Ondine Varro",
+              "item": "junk.dappled_hide",
+              "count": 3,
+              "text": "Dappled stag hides",
+              "say": "\"Let me see the dapple. Yes. Oh, yes.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 520,
+        "gold": 190
+      }
+    },
+    {
+      "id": "side.iselle.brother",
+      "title": "The Brother Who Went Listening",
+      "kind": "side",
+      "giver": "Sister Iselle",
+      "turnIn": "Sister Iselle",
+      "zone": "zone.verdant",
+      "level": 14,
+      "requires": [
+        "side.iselle.notes"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Silent Pilgrims and their brass listening-tubes (book3 ch.5), the Veridian Temple's stair of calcified roots (book3 ch.7) and Oak-Bane are CANON; Brother Wystan is GAME-ONLY.",
+      "summary": "Brother Wystan, who came west with Sister Iselle, went to listen at the Veridian Temple and has not come back. Ask Oak-Bane, who keeps the Temple way, and find where Wystan sat.",
+      "offer": "Sister Iselle has her brass tube in her lap and is not listening through it. \"I did not come to the Shore alone. Brother Wystan came with me. He has the better ear; he always had. When I found the gap where the third note should be, he said the gap was not empty. He said it was leaning. Toward the Temple, and down.\"\n\n\"He went to listen there with a day's bread. A pilgrim can go a long while on a day's bread, but not this long. The Keeper with the staff watches the Temple way. Ask him. And find where Wystan sat. He will have left something. He always leaves something.\"",
+      "progress": "\"A mark, a bowl, a page. He is tidy in his habits, if in nothing else.\"",
+      "complete": "Sister Iselle studies the circles you copied for her for a long time: three of them, the third filled in so hard the point went through the moss to the wood.\n\n\"He heard it.\" She does not sound glad. \"He heard the third note, and he went down to hear it closer, and the roots let him.\" She lifts her brass tube and points it at the ground, and listens, and lowers it again. \"I cannot hear him. That means nothing. The ground is very thick.\"",
+      "steps": [
+        {
+          "text": "Ask Oak-Bane on the Temple way whether he saw Brother Wystan.",
+          "objectives": [
+            {
+              "type": "talk",
+              "zone": "zone.verdant",
+              "target": "Oak-Bane",
+              "text": "Ask Oak-Bane about Brother Wystan",
+              "say": "\"The flesh-folk in yellow linen, with the brass ear.\" Oak-Bane's voice is a branch settling under snow. \"He sat under the Ghost-Oaks west of the stair for four days, and did not eat what I left him. Then the roots let him down, and closed behind him. I did not stop him. He asked. He asked very politely.\""
+            }
+          ]
+        },
+        {
+          "text": "Find where Brother Wystan sat, under the Ghost-Oaks west of the Temple's root-stair.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": -128,
+                "y": 106
+              },
+              "radius": 8,
+              "text": "Find where Brother Wystan sat",
+              "say": "Between the roots of a Ghost-Oak, a hollow worn to the shape of a sitting man. A wooden bowl, Oak-Bane's food still in it, gone to moss. And scratched deep into the moss of the root, three circles side by side, the third filled in so hard the point went through to the wood. You copy them as best you can."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 560,
+        "gold": 130
+      }
+    },
+    {
+      "id": "npc.mosslantern.greying",
+      "title": "Lanterns for the Laid-Down",
+      "kind": "npc",
+      "giver": "Moss-Lantern",
+      "turnIn": "Moss-Lantern",
+      "zone": "zone.verdant",
+      "level": 14,
+      "requires": [
+        "main.verdant.3",
+        "side.iselle.notes"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Keepers and the forest's glowing growth are CANON (book3 ch.2, 4, 7); the Keepers' custom of hanging a lantern where one of them went back into the soil is GAME-ONLY.",
+      "summary": "Pick three caps of glade-light for Moss-Lantern's grave-lanterns. Then lay the withered Keepers of the Greying down again, and hang the lanterns in the grove's grey heart after dark.",
+      "offer": "Moss-Lantern's fingers are busy with rind and resin, making a lantern smaller than any on the trunks. \"When one of us goes back into the soil, we hang a lantern where they stood, so the roots know where to look for them. Three of ours went into the Greying to sing. You laid them down. Nobody has hung their lanterns.\"\n\n\"Sap will not burn in that grove; the grey drinks the light out of it. Glade-light will. The Pilgrim showed you how to pick it so it does not remember being picked. Bring me three caps and I will make the lanterns. They must be hung after dark, in the grey heart of the grove. And the grey keeps lifting the dead up again, so you will have to lay them down first.\"",
+      "progress": "\"Three caps. Gently. Then the dark, and the grey heart.\"",
+      "complete": "Moss-Lantern listens with her hands folded over her middle, as if she were warming them. \"Three lights in the grey. Good. The roots will find them now.\"\n\n\"They were not easy kin, those three. Greyheart once argued with the rain for a whole spring.\" She very nearly smiles. \"Go and sit by the Hearth-Tree fire. There are sap-cakes. You will not want one, after that grove. Eat one anyway.\"",
+      "steps": [
+        {
+          "text": "Pick glade-light from the glowing caps in the Whispering Glade.",
+          "say": "The three caps hum against each other in your hand like bees in a jar.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "Glowing caps",
+              "item": "item.glade_light",
+              "count": 3,
+              "text": "Glade-light"
+            }
+          ]
+        },
+        {
+          "text": "Bring the glade-light to Moss-Lantern.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Moss-Lantern",
+              "item": "item.glade_light",
+              "count": 3,
+              "text": "Bring the glade-light to Moss-Lantern",
+              "say": "\"Hold still.\" She seats a glowing cap in each little lantern and seals it with resin, and the light steadies, green and patient. \"There. Three. Carry them by the cord, not the cup.\""
+            }
+          ]
+        },
+        {
+          "text": "Lay the withered Keepers of the Greying down again, and hang the lanterns in the grove's grey heart after dark.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.withered.verdant*",
+              "count": 3,
+              "text": "Withered Keepers laid down again"
+            },
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 98,
+                "y": 152
+              },
+              "radius": 8,
+              "night": true,
+              "text": "Hang the lanterns in the Greying's grey heart, after dark",
+              "say": "You hang the three lanterns from a grey branch over the bare heart of the grove. Their light is small and green and does not flicker. Under your feet, very faintly, something in the roots turns toward it, the way a sleeper turns toward a voice."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 620,
+        "gold": 145,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 300
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.reedsong.south",
+      "title": "The Quiet in the South Wood",
+      "kind": "npc",
+      "giver": "Reed-Song",
+      "turnIn": "Reed-Song",
+      "zone": "zone.verdant",
+      "level": 14,
+      "requires": [
+        "npc.reedsong.reeds"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Void-Touchers in the mists below the ridge, where the grass turns to ash as they pass (book3 ch.2, 4), and glass-frogs (book3 ch.2) are CANON; the walkers straying into the south wood are GAME-ONLY.",
+      "summary": "The glass-frogs of the far south wood have stopped singing along a line that runs from Palemist Hollow toward the Mistmere. Find the line for Reed-Song, then follow it back and break what walks it.",
+      "offer": "Reed-Song has one hand flat on the water, the way Willow lays hers on a trunk. \"Listen south.\" You listen. \"No. Further. Past the ferns, in the big trees.\" There is nothing to hear. \"That is what I mean. A line of nothing, from the cold hollow under the ridge toward my mere. Every frog along it has stopped. Something walks that way, slowly. It is in no hurry, and it is not going to stop.\"\n\n\"Find the line in the south wood. Then find what walks it.\"",
+      "progress": "\"Still nothing on the line. And it is nearer the mere than it was.\"",
+      "complete": "Reed-Song lifts her hand from the water and listens south for a long time. \"There,\" she says at last. \"One frog. A small one, and not very good at it. It will do.\"\n\n\"Ash in the grass, you said. A line of it.\" She looks at her own long reed-coloured fingers. \"Willow says the cold has a hand on it. I did not believe her. I am an old fool, and the mere is older, and the mere believed her first.\"",
+      "steps": [
+        {
+          "text": "Find the line of silence in the far south wood.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 60,
+                "y": -148
+              },
+              "radius": 12,
+              "text": "Find the line of silence in the south wood",
+              "say": "Under the giant trees of the far south wood a path of grey runs through the green, a stride wide and straight as a pulled rope, the grass on it gone to ash. On either side the undergrowth is loud with glass-frogs. On it, nothing. It runs east toward the ridge and west toward the Mistmere."
+            }
+          ]
+        },
+        {
+          "text": "Follow the line of ash back toward Palemist Hollow, and break the mist-walkers walking it.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.mistwalker.verdant.6.*",
+              "count": 5,
+              "text": "Mist-walkers broken"
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 600,
+        "gold": 140,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "side.iselle.mask",
+      "title": "A Name in the Fog",
+      "kind": "side",
+      "giver": "Sister Iselle",
+      "turnIn": "Sister Iselle",
+      "zone": "zone.verdant",
+      "level": 15,
+      "requires": [
+        "side.iselle.brother",
+        "main.verdant.4"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Void-Touchers, who have forgotten their human names (book3 ch.2), and the Silent Pilgrims' masks of polished silver (book3 ch.5) are CANON; Brother Wystan, his fate and the Pilgrims' custom with their masks are GAME-ONLY, and the Pale's fog in the deep before the books is PROVISIONAL.",
+      "summary": "The fog came up from under the Temple, where Brother Wystan went down. Go into the Root-Mother's Deep, find him among the mist-walkers of the Sap Well, and bring Sister Iselle his mask.",
+      "offer": "Sister Iselle has taken off her mask. The face beneath it is younger than her voice, and very tired. \"The Keeper told me where the fog comes from. From under the Temple. Where Wystan went to listen.\"\n\n\"You have seen the walkers. People who have forgotten their names.\" She turns the silver mask over in her hands. \"We polish our masks every morning, so that the face behind them is never seen and the voice behind them is never vain. Fog polishes nothing. If he is down there, you will know him by the mask. Let him go, if he is. And bring it back to me. I would not have it walk about without him.\"",
+      "progress": "\"You will know him by the mask. He will not have polished it.\"",
+      "complete": "Sister Iselle takes the mask in both hands. She rubs at the dent over the mouth with her thumb, as if it might come out. Then she turns it over and reads the name scratched inside, and her shoulders go down slowly, like a sail when the wind drops.\n\n\"He wrote it in. In case.\" Folded in the lining is a page. She reads it, and gives it to you without a word, and puts her own mask back on, and for a long while does not trust her voice.",
+      "steps": [
+        {
+          "text": "Go down into the Root-Mother's Deep and find Brother Wystan among the mist-walkers of the Sap Well.",
+          "say": "Among the walkers of the Sap Well one still wears a mask of silver, gone dull, dented over the mouth. When it falls the mask comes away in your hand. Inside, scratched small and careful: WYSTAN.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "kill:mob.deepwalker.verdant*",
+              "item": "item.wystan_mask",
+              "text": "Brother Wystan's mask"
+            }
+          ]
+        },
+        {
+          "text": "Bring the mask to Sister Iselle.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Sister Iselle",
+              "item": "item.wystan_mask",
+              "text": "Bring the mask to Sister Iselle",
+              "say": "\"Let me see it. Please.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 760,
+        "gold": 180,
+        "documents": [
+          "doc.verdant.wystan"
+        ]
+      }
+    },
+    {
+      "id": "side.iselle.name",
+      "title": "What the Wood Remembers",
+      "kind": "side",
+      "giver": "Sister Iselle",
+      "turnIn": "Sister Iselle",
+      "zone": "zone.verdant",
+      "level": 15,
+      "requires": [
+        "side.iselle.mask"
+      ],
+      "canonStatus": "CANON-EXPANDED: trees that remember everything (book3 ch.2) and Willow-Whisper are CANON; giving a lost name to the wood to keep is GAME-ONLY.",
+      "giveOnAccept": [
+        "item.wystan_mask"
+      ],
+      "summary": "Carry Brother Wystan's mask to Willow-Whisper, so the wood will keep the name the fog took from him. Then listen for it in the Whispering Glade after dark.",
+      "offer": "Sister Iselle holds out the dented mask. \"The Archive keeps the masks of its dead in a long room in the south, in rows, each with its name. It is a very quiet room. It is a very long way from here.\"\n\n\"The Keepers say the trees remember everything. The fog makes people forget. It seems to me that the trees should have him, then, and not a shelf.\" She puts the mask in your hands and closes your fingers over it. \"Take it to the Voice of the Wood. Ask her to keep his name. Then come and listen with me, after dark. I want to know if they say it right.\"",
+      "progress": "\"Has she taken it? Then wait for the dark. The glade talks after dark.\"",
+      "complete": "You find Sister Iselle sitting in the glade with her brass tube in her lap, not using it. She has no need to. The leaves are saying it plainly enough.\n\n\"They say it the way he did,\" she says. \"With the weight on the wrong half. He was always so pleased with his name.\" She is quiet a long time. \"Thank you. The Archive would have kept him in a row. This is better. This is a great deal better.\"",
+      "steps": [
+        {
+          "text": "Take Brother Wystan's mask to Willow-Whisper.",
+          "say": "Willow-Whisper sets the mask in a fork of her tree, and the bark closes over it slowly, like water over a stone.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Willow-Whisper",
+              "item": "item.wystan_mask",
+              "text": "Give the mask to Willow-Whisper",
+              "say": "\"Say his name. Once, and slowly, so the bark can hear it.\" You say it. \"There. Now the wood has him. Go and listen.\""
+            }
+          ]
+        },
+        {
+          "text": "Listen in the Whispering Glade after dark.",
+          "objectives": [
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 40,
+                "y": 108
+              },
+              "radius": 14,
+              "night": true,
+              "text": "Listen in the Whispering Glade after dark",
+              "say": "The leaves move without wind, as they did before, and the sound they make is very nearly a word. It takes you a moment to know it. They are saying his name, over and over, softly, the way you would say the name of someone asleep."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 640,
+        "gold": 150,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 250
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.oakbane.salt",
+      "title": "Salt Remembers",
+      "kind": "npc",
+      "giver": "Oak-Bane",
+      "turnIn": "Oak-Bane",
+      "zone": "zone.verdant",
+      "level": 15,
+      "requires": [
+        "main.verdant.4"
+      ],
+      "canonStatus": "CANON-EXPANDED: the Keepers' staves of white salt-wood (book3 ch.2) and salt that drives the unmaking off like water on hot iron (book3 ch.4) are CANON; Oak-Bane's test at the cold heart of Palemist Hollow is GAME-ONLY.",
+      "summary": "The fog drew back from Oak-Bane's staff of salt-wood. Break salt-crust on the Salt-Flats and carry it into the cold heart of Palemist Hollow, past the pale shadows that stand there, to see what salt does to the fog.",
+      "offer": "Oak-Bane holds out his staff of white salt-wood, which he has never once let you near before. \"I walked to the edge of the cold hollow. Only the edge. The fog came for me the way water comes for a dry root. Then it touched this.\" He knocks the staff's foot on the stone. \"And it drew back. A hand's width. As if it had burned itself.\"\n\n\"The staff is salt-wood. It grows in the salt of the flats. So: salt. Break two cakes of the crust on the flats and carry them to the heart of the hollow, where it is coldest. The shadows that stand there will not like it. Good. See what the fog does, and come and tell me. Do not embroider. I can tell.\"",
+      "progress": "\"Well? Did it draw back?\"",
+      "complete": "Oak-Bane hears it all without moving, which for him is a kind of shouting. \"It hissed. It drew back. The ground under it remembered being earth, for a breath.\" He looks at his staff as if it had told him a secret. \"Salt remembers what a thing was before. The cold makes things forget. When the one meets the other, the forgetting loses.\"\n\n\"Tell Willow. No. I will tell Willow. She will want to sing about it, and I would rather be there to stop her.\"",
+      "steps": [
+        {
+          "text": "Break two cakes of salt-crust on the Salt-Flats.",
+          "say": "You wrap the two cakes of salt in a broad leaf. Held close they hum, very faintly, like Oak-Bane's staff.",
+          "objectives": [
+            {
+              "type": "interact",
+              "zone": "zone.verdant",
+              "target": "Salt-crust",
+              "count": 2,
+              "text": "Salt-crust broken"
+            }
+          ]
+        },
+        {
+          "text": "Carry the salt into the cold heart of Palemist Hollow, past the pale shadows that stand there.",
+          "objectives": [
+            {
+              "type": "kill",
+              "zone": "zone.verdant",
+              "target": "mob.paleshadow.verdant*",
+              "count": 2,
+              "text": "Pale shadows dispersed"
+            },
+            {
+              "type": "visit",
+              "zone": "zone.verdant",
+              "at": {
+                "x": 132,
+                "y": -126
+              },
+              "radius": 6,
+              "text": "Scatter the salt on the cold heart of Palemist Hollow",
+              "say": "You crumble the salt over the bare grey ground at the hollow's heart. It hisses like water on hot iron and smokes white, and the violet fog draws back from it an arm's length all round. Where the salt lies, for as long as it takes to breathe in and out, the ground is the dark brown of wet earth. Then the grey creeps back."
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 720,
+        "gold": 165,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 300
+          }
+        ]
+      }
+    },
+    {
+      "id": "npc.willow.heartwood",
+      "title": "A Heart Still Green",
+      "kind": "npc",
+      "giver": "Willow-Whisper",
+      "turnIn": "Oak-Bane",
+      "zone": "zone.verdant",
+      "level": 15,
+      "requires": [
+        "main.verdant.5"
+      ],
+      "canonStatus": "GAME-ONLY: Greyheart, Thorn-Hand and the Guest-Tree, and that a Keeper is grown from a heart still green. The Veridian Keepers, beings of living wood and moss (book3 ch.2), are CANON.",
+      "summary": "Willow-Whisper promised to grow Thorn-Hand anew. A Keeper is grown from a heart that is still green, and the only one left is deep in Greyheart, whom the Greying keeps lifting up. Take it from him and bring it to Oak-Bane to plant.",
+      "offer": "\"I said we would grow Thorn-Hand a new one.\" Willow-Whisper's leaves stir. \"I did not say how. A Keeper is not planted from a seed. A Keeper is grown from a heart that is still green, and Thorn-Hand's was cold all through. There is nothing of him left to plant.\"\n\n\"But Greyheart, in the Greying. The cold took all of him but the middle. I felt it when you laid him down: one knot of green, deep in, that the grey never reached. The grove keeps lifting him up again, and the green is still there. Take it from him. Two old friends in one sapling. They will argue, but they always did. Bring it to Oak-Bane. Planting in the deep wood is his work.\"",
+      "progress": "\"Green? In Greyheart? Show me.\"",
+      "complete": "Oak-Bane cups the green heart in both hands like water he does not mean to spill. He kneels, which you have never seen him do, and presses it into the black earth beside his stone, at the head of the Temple way, where the root-stair goes down to the place Thorn-Hand lay.\n\n\"Greyheart and Thorn-Hand,\" he says. \"One argued with the rain, and one planted a tree for strangers. Now they will have to share a trunk.\" Something in the dry crack of his voice might be a laugh. \"It will grow crooked. Good. I would not know it otherwise.\"",
+      "steps": [
+        {
+          "text": "Take the heart that is still green from Greyheart, in the Greying.",
+          "say": "Greyheart goes down, and in the split grey heartwood of his chest, deep in, past where the cold glass lay, something is green: a knot of living wood the size of a fist, wet and warm, beating very slowly.",
+          "objectives": [
+            {
+              "type": "collect",
+              "zone": "zone.verdant",
+              "target": "kill:mob.greyheart.verdant*",
+              "item": "item.green_heartwood",
+              "text": "Greyheart's green heart"
+            }
+          ]
+        },
+        {
+          "text": "Bring the green heart to Oak-Bane on the Temple way.",
+          "objectives": [
+            {
+              "type": "deliver",
+              "zone": "zone.verdant",
+              "target": "Oak-Bane",
+              "item": "item.green_heartwood",
+              "text": "Bring the green heart to Oak-Bane",
+              "say": "\"Green. In Greyheart.\" Oak-Bane's amber eyes burn very bright. \"Give it here. Slowly.\""
+            }
+          ]
+        }
+      ],
+      "rewards": {
+        "xp": 780,
+        "gold": 180,
+        "reputation": [
+          {
+            "faction": "keepers",
+            "amount": 400
           }
         ]
       }

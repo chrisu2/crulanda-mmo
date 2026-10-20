@@ -44,7 +44,7 @@ namespace Crulanda.Tests
         }
         public static QuestDatabase Quests() { return QuestDatabase.Parse(Texts(Directory.GetFiles(Path.Combine(Content, "Quests"), "*.json"))); }
         /// <summary>The five zones' short names in loot ids, and their zone ids without "zone.".</summary>
-        public static readonly (string shortId, string zone)[] ZoneShorts = { ("oak", "oakhaven"), ("kha", "khaven"), ("pea", "peaks"), ("ash", "ashrim"), ("ver", "verdant"), ("adit", "adit") };
+        public static readonly (string shortId, string zone)[] ZoneShorts = { ("oak", "oakhaven"), ("kha", "khaven"), ("pea", "peaks"), ("ash", "ashrim"), ("ver", "verdant"), ("adit", "adit"), ("hal", "hallows") };
         /// <summary>Items on any signature list.</summary>
         public static HashSet<string> Signature(LootDatabase loot)
         {
@@ -63,22 +63,31 @@ namespace Crulanda.Tests
     /// </summary>
     public class LootDataTests
     {
-        static readonly Regex IdScheme = new Regex(@"^loot\.(oak|kha|pea|ash|ver|adit|world)\.[a-z0-9_]+$");
-        static readonly Dictionary<string, string> FileShort = new Dictionary<string, string> { { "oakhaven", "oak" }, { "khaven", "kha" }, { "peaks", "pea" }, { "ashrim", "ash" }, { "verdant", "ver" }, { "world", "world" }, { "adit", "adit" } };
+        static readonly Regex IdScheme = new Regex(@"^loot\.(oak|kha|pea|ash|ver|adit|hal|low|world|set)\.[a-z0-9_]+$");
+        static readonly Dictionary<string, string> FileShort = new Dictionary<string, string> { { "oakhaven", "oak" }, { "khaven", "kha" }, { "peaks", "pea" }, { "ashrim", "ash" }, { "verdant", "ver" }, { "world", "world" }, { "adit", "adit" }, { "hallows", "hal" }, { "lowtowns", "low" }, { "sets", "set" } };
+        /// <summary>The class sets' pieces (loot.sets.json, DESIGN.md 3.8): eleven classes, six pieces each.</summary>
+        const int ClassPieces = 66;
+        /// <summary>Hallow's Creek's signature pieces (loot.hallows.json, 2026-10-16) and its elites (three of them rares).</summary>
+        const int HallowsPieces = 23, HallowsElites = 15, LowtownsElites = 3;
+        /// <summary>Hallow's Creek's secrets' three rings (2026-10-16, the second pass): rare named gear a secret holds, not a boss's.</summary>
+        const int HallowsSecrets = 3;
+        /// <summary>The Lowtowns' elites' signature pieces (loot.lowtowns.json, Phase 9.1): two each from the Mother of Drains and Knuckle
+        /// Brannoc, one from the rare Lantern-Eater. Too few for every slot, so the Lowtowns are not in ZoneShorts' every-slot check.</summary>
+        const int LowtownsPieces = 5;
 
         [Test] public void Every_item_file_parses_together()
         {
             var paths = LootTestData.LootPaths();
-            Assert.AreEqual(7, paths.Count, "Seven loot files: " + string.Join(", ", paths.Select(Path.GetFileName)));
+            Assert.AreEqual(10, paths.Count, "Ten loot files (loot.sets.json the class sets', 2026-10-15; loot.hallows.json Hallow's Creek's, 2026-10-16; loot.lowtowns.json the Lowtowns' elites', Phase 9.1): " + string.Join(", ", paths.Select(Path.GetFileName)));
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items, LootTestData.Looks());
             var named = items.Items.Keys.Where(k => k.StartsWith("loot.", StringComparison.Ordinal)).ToList();
-            Assert.AreEqual(136, named.Count, "104 named items (ITEMS_V1.md), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), its set of five and The Dead Line's three (web/adit-quests-loot), and the Quiet Miner's cap (D3).");
-            Assert.AreEqual(109 + 17 + 8 + 1 + 13, loot.Gear.Count,   // and the Sealed Adit's seventeen, its set of five and The Dead Line's three, and the Quiet Miner's cap
+            Assert.AreEqual(155 + HallowsPieces + HallowsSecrets + LowtownsPieces + ClassPieces, named.Count, "And the class sets' 66 (loot.sets.json), Hallow's Creek's twenty-three signature pieces (2026-10-16) and the Lowtowns' five (Phase 9.1). " + "104 named items (ITEMS_V1.md), the reworked Adit's nineteen (2026-10-14), the five legendaries (2026-10-05) and the Sentinel's Helm (2026-10-07), the Sealed Adit's seventeen (2026-10-08), its set of five and The Dead Line's three (web/adit-quests-loot), and the Quiet Miner's cap (D3).");
+            Assert.AreEqual(109 + 17 + 8 + 1 + 13 + 19 + HallowsPieces + HallowsSecrets + LowtownsPieces + ClassPieces, loot.Gear.Count,   // and the Sealed Adit's seventeen, its set of five and The Dead Line's three, the Quiet Miner's cap, and the reworked Adit's nineteen (2026-10-14)
  "A gear entry for each, and for the thirteen named items already in the game (the Sentinel's Helm the thirteenth, 2026-10-07).");
             Assert.AreEqual(12, loot.GearOrder.Count(g => g.legacy));
-            Assert.AreEqual(3, loot.Sets.Count, "Three sets: the Deserter King's Due, the Vigil and the Adit-Runner's Kit.");
+            Assert.AreEqual(3 + 11, loot.Sets.Count, "Three sets: the Deserter King's Due, the Vigil and the Adit-Runner's Kit; and the eleven class sets.");
             Assert.AreEqual(49, named.Count(id => items.Get(id).quality == 2), "49 uncommon.");
-            Assert.AreEqual(75, named.Count(id => items.Get(id).quality == 3), "75 rare (26 the Sealed Adit\'s, the Quiet Miner's cap the 26th) (the Sentinel's Helm the 49th, 2026-10-07).");
+            Assert.AreEqual(94 + HallowsPieces + HallowsSecrets + LowtownsPieces + ClassPieces, named.Count(id => items.Get(id).quality == 3), "And the class sets' 66 rares, Hallow's Creek's twenty-three and the Lowtowns' five. " + "94 rare (45 the Sealed Adit's: the Quiet Miner's cap the 26th, the rework's nineteen signature pieces of 2026-10-14) (the Sentinel's Helm the 49th, 2026-10-07).");
             Assert.AreEqual(7, named.Count(id => items.Get(id).quality == 4), "7 epic.");
         }
 
@@ -92,7 +101,8 @@ namespace Crulanda.Tests
             Assert.IsFalse(Directory.Exists(Path.Combine(LootTestData.Content, "Loot")), "EncounterContent/Loot is gone: the loot files are item files.");
             var guids = new Dictionary<string, string> {
                 { "loot.ashrim", "9f701a55d07c4f4299fbb7c48497aeb4" }, { "loot.khaven", "103ac81766944eeb9928acfa11d938c2" }, { "loot.oakhaven", "256143be1814496f9a1bddd5c4fc0913" },
-                { "loot.peaks", "af637de598024e20b5544b2751570efa" }, { "loot.verdant", "8551b0a84e6e40eabece9e15ae762d17" }, { "loot.world", "09624b8f2d254830aac358cd2c9554c3" } };
+                { "loot.peaks", "af637de598024e20b5544b2751570efa" }, { "loot.verdant", "8551b0a84e6e40eabece9e15ae762d17" }, { "loot.world", "09624b8f2d254830aac358cd2c9554c3" },
+                { "loot.sets", "828c5e19186c4397a85b26734a4ae70a" } };
             foreach (var kv in guids)
             {
                 string path = "Assets/Crulanda/EncounterContent/Items/" + kv.Key + ".json";
@@ -168,7 +178,7 @@ namespace Crulanda.Tests
                 Assert.AreEqual(gen.value, d.value, d.id + ": value is generated gear's.");
                 Assert.AreEqual(gen.level, d.level, d.id + ": required level is the curve level less one.");
             }
-            Assert.AreEqual(136, n, "110 of the five zones and the world, 26 of the Sealed Adit");
+            Assert.AreEqual(155 + HallowsPieces + HallowsSecrets + LowtownsPieces + ClassPieces, n, "5 of the Lowtowns, 23 of Hallow's Creek, 110 of the five zones and the world, 45 of the Sealed Adit, 66 of the class sets");
         }
 
         [Test] public void Named_gear_stat_budgets_hold()
@@ -232,7 +242,7 @@ namespace Crulanda.Tests
             Assert.AreEqual(18, counts["quest"], "Eighteen quest rewards (three of them The Dead Line's, side.adit.dead_line).");
             Assert.AreEqual(5, counts["vendor"], "Five vendor pieces.");
             Assert.AreEqual(6, counts["world"], "Six world drops.");
-            Assert.AreEqual(63, counts["boss"], "42 signature pieces (18 the Sealed Adit's, the Quiet Miner's cap among them), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
+            Assert.AreEqual(82 + HallowsPieces + LowtownsPieces + ClassPieces, counts["boss"], "The Lowtowns' five and Hallow's Creek's 23 signature pieces; the class sets' 66 (each from an Adit boss); 61 signature pieces (37 the Sealed Adit's, the Quiet Miner's cap and the reworked Adit's nineteen among them), 5 from rare tables, 6 epics, 5 legendaries, and the Adit-Runner's Kit's five.");
             Assert.AreEqual(44, counts["mob"], "44 from ordinary mobs.");
         }
 
@@ -268,7 +278,7 @@ namespace Crulanda.Tests
                     var normal = ctx; normal.elite = false;
                     Assert.IsFalse(loot.Matching(normal).Any(d => d.groups.Any(g => g.signature)), c.mob + "'s pack mates do not roll the list.");
                 }
-            Assert.AreEqual(20, elites, "Twelve elites, and the Sealed Adit's eight (its rare among them).");
+            Assert.AreEqual(32 + LowtownsElites + HallowsElites, elites, "Twelve elites, the Sealed Adit's twenty since its rework (its rare among them), the Lowtowns' three (Phase 9.1) and Hallow's Creek's fifteen (three rares among them).");
         }
 
         [Test] public void Every_zone_has_named_gear_for_every_slot()
@@ -298,7 +308,8 @@ namespace Crulanda.Tests
                     }
                     if (g.signature) { Assert.AreEqual("elite", d.rank, d.id + ": signature lists are an elite's."); Assert.IsFalse(string.IsNullOrEmpty(d.mob), d.id + " names its elite."); Assert.IsFalse(g.lucky, d.id + ": luck does not touch a signature list."); }
                     bool epic = g.pick.All(k => items.Get(k.item).quality == 4);
-                    if (g.pity > 0) Assert.IsTrue(epic, d.id + ": only epics have a pity count.");
+                    if (g.pity > 0) Assert.IsTrue(epic || g.classSet, d.id + ": only epics and class set groups have a pity count.");
+                    if (g.classSet) { Assert.IsFalse(g.signature, d.id); Assert.AreEqual("elite", d.rank, d.id + ": a class set group is a boss's."); Assert.IsTrue(g.pick.All(k => !string.IsNullOrEmpty(items.Get(k.item).classOnly)), d.id + ": it picks class pieces only."); }
                     if (epic && !string.IsNullOrEmpty(d.mob)) { Assert.IsTrue(g.lucky, d.id); Assert.That(g.pity, Is.EqualTo(10).Or.EqualTo(25), d.id + ": certain by the 10th (dungeon) or 25th (outdoor) dry kill."); Assert.That(g.chance, Is.EqualTo(.1f).Or.EqualTo(.04f), d.id); }
                     if (!g.signature && !epic) Assert.IsTrue(g.lucky, d.id + ": every other group is lucky.");
                     if (g.pick.All(k => items.Get(k.item).quality == 5)) Assert.That(g.chance, Is.LessThanOrEqualTo(.005f), d.id + ": a legendary is one in two hundred by day at most (Chris, 2026-10-05; Loot.LegendaryNight by night).");
@@ -314,8 +325,8 @@ namespace Crulanda.Tests
         [Test] public void Sets_have_real_pieces_in_distinct_slots_and_rising_bonuses()
         {
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items);
-            CollectionAssert.AreEquivalent(new[] { "set.crowsfoot", "set.vigil", "set.adit_runner" }, loot.Sets.Keys);
-            foreach (var s in loot.SetOrder)
+            CollectionAssert.AreEquivalent(new[] { "set.crowsfoot", "set.vigil", "set.adit_runner" }, loot.Sets.Keys.Where(k => string.IsNullOrEmpty(loot.Sets[k].cls)));
+            foreach (var s in loot.SetOrder.Where(x => string.IsNullOrEmpty(x.cls)))   // the class sets: ClassSetTests
             {
                 bool adit = s.id == "set.adit_runner";
                 Assert.AreEqual(adit ? 5 : 4, s.pieces.Length, s.id + " has " + (adit ? "five" : "four") + " pieces.");
@@ -348,23 +359,26 @@ namespace Crulanda.Tests
             foreach (var e in effects)
             {
                 CollectionAssert.Contains(LootDatabase.EffectKinds, e.kind);
-                Assert.Greater(e.amount, 0, e.text); Assert.LessOrEqual(e.amount, GearEffects.Cap(e.kind), e.text);
+                Assert.Greater(e.amount, 0, e.text); Assert.LessOrEqual(e.amount, GearEffects.Cap(e.kind, e.percent), e.text);
                 Assert.IsFalse(string.IsNullOrEmpty(e.text));
                 if (e.kind == "stat") { Assert.IsTrue(Enum.TryParse(e.stat, out Crulanda.Core.StatType s), e.stat); CollectionAssert.Contains(LootDatabase.EffectStats, s, e.text); }
-                else Assert.IsFalse(e.percent, e.text + ": only stats take percentages.");
+                else if (!GearEffects.TakesPercent(e.kind)) Assert.IsFalse(e.percent, e.text + ": only stats and an ability's cost, cooldown and cast time take percentages.");
             }
             var carriers = loot.GearOrder.Where(g => g.effects != null && g.effects.Length > 0).ToList();
-            Assert.AreEqual(14, carriers.Count, "Fourteen items carry an effect: the seven epics and seven rares (the Quiet Miner's cap the seventh, D3).");
+            Assert.AreEqual(15, carriers.Count, "Fifteen items carry an effect: the seven epics and eight rares (the Quiet Miner's cap the seventh, D3; Hallow's Creek's Mortar Ring the eighth, its procRoot).");
             Assert.IsTrue(items.Items.Values.Where(d => d.quality == 4 && d.id.StartsWith("loot.", StringComparison.Ordinal)).All(d => carriers.Any(c => c.id == d.id)), "Every epic has an effect.");
             Assert.IsTrue(carriers.All(c => items.Get(c.id).quality >= 3), "Only rares and epics carry effects.");
         }
 
+        /// <summary>The plain crafted pieces (craft.*) stay under the named rares of their band. A luck charm (the Harrow Wood Luck-Knot) is
+        /// worth its luck, not its stats, so it is not a measure (Phase 8.6: the copper torc beats a generated uncommon by a step and
+        /// carries more points than the knot's four).</summary>
         [Test] public void Crafted_gear_stays_under_named_rares_of_its_band()
         {
             var items = LootTestData.Items(); var loot = LootTestData.Loot(items);
             var crafted = items.Items.Values.Where(d => d.id.StartsWith("craft.", StringComparison.Ordinal) && d.kind == "gear").ToList();
             if (crafted.Count == 0) Assert.Ignore("No crafted gear yet (the professions work adds it).");
-            var rares = loot.GearOrder.Where(g => !g.legacy).Select(g => items.Get(g.id)).Where(d => d.quality == 3).ToList();
+            var rares = loot.GearOrder.Where(g => !g.legacy && !(g.effects ?? new GearEffect[0]).Any(e => e.kind == "luck")).Select(g => items.Get(g.id)).Where(d => d.quality == 3).ToList();
             foreach (var c in crafted)
                 foreach (var r in rares.Where(r => r.slot == c.slot && GearLooks.BandOf(r.level + 1) == GearLooks.BandOf(c.level + 1) && r.level >= c.level))
                 {
@@ -372,6 +386,83 @@ namespace Crulanda.Tests
                     Assert.LessOrEqual(c.armor, r.armor, c.id + " stays under " + r.id + " in armour.");
                     Assert.Less(c.stamina + c.strength + c.agility + c.intellect + c.spirit, r.stamina + r.strength + r.agility + r.intellect + r.spirit, c.id + " has fewer stat points than " + r.id + ".");
                 }
+        }
+
+        // ---------- the leaves: found recipes (Phase 8.6 step 5) ----------
+        /// <summary>
+        /// Leaves the zones' secrets should hold, by secret id: the secrets are another helper's work (Docs/PHASE8_6_LIVING_WORLD.md 3c, 3e),
+        /// so these are listed here until each secret's item is set. Each leaf named here has another source too.
+        /// </summary>
+        public static readonly Dictionary<string, string> SecretLeaves = new Dictionary<string, string> {
+            { "secret.oakhaven.shepherds-tin", "leaf.harvest_feast" },        // the plan: "the Shepherd's Tin a cheese" (the Harvest Home board's cheese)
+            { "secret.verdant.tappers-stump", "leaf.sap_venison" },           // "the Tapper's Stump the sap glaze"
+            { "secret.ashrim.carvers-bundle", "leaf.tempered_ashsteel_bow" }, // "the Bone-Carver's Bundle": a bone-backed bow
+        };
+        /// <summary>The Lowtowns' sources of slag-iron's leaves (Items/trades.json): Ketta Rune and Old Wulf sell one each, the Mother of
+        /// Drains ("drainmother") and Knuckle Brannoc ("brannoc") drop the rest. The zone's file must give them these names and tags.</summary>
+        public static readonly HashSet<string> LowtownsSources = new HashSet<string> { "Ketta Rune", "Old Wulf", "drainmother", "brannoc" };
+        /// <summary>
+        /// Every leaf can be had (the plan's sources, Docs/PHASE8_6_LIVING_WORLD.md 3c; decision 11, coin only): sold by a named villager
+        /// who lives in a zone (never by a whole trade, and nothing in a vendor entry asks for standing), dropped from a boss-only table
+        /// (LootTableDef.elite) whose tag is an elite camp's, given by a quest, held by a secret, or listed for a secret above; between them
+        /// 30-40 leaves, and each source names a real leaf.
+        /// </summary>
+        [Test] public void Every_leaf_is_in_a_table_a_vendor_a_quest_or_a_secret()
+        {
+            var items = LootTestData.Items(); var zones = LootTestData.Zones(); var quests = LootTestData.Quests();
+            var leaves = items.Items.Values.Where(d => d.kind == "recipe").Select(d => d.id).ToList();
+            Assert.That(leaves.Count, Is.InRange(30, 45), "The plan's 30-40 leaves, and slag-iron's five for the cap of 20 (" + leaves.Count + ").");
+            // Slag-iron's leaves (tier 6, 2026-10-16) come from the Lowtowns' people and elites (ZONE_LOWTOWNS.md 3, 4): until that zone's
+            // file lands (another branch, Phase 9.1) its sellers and its elites' tags are taken on trust; once it is here they are checked.
+            bool lowtownsHere = zones.Any(z => z.id == "zone.lowtowns");
+            bool Pending(string who) { return !lowtownsHere && LowtownsSources.Contains(who); }
+            bool Lives(string npc)
+            {
+                if (Pending(npc)) return true;
+                foreach (var z in zones)
+                {
+                    if (z.life == null) continue;
+                    var names = z.life.names != null && z.life.names.Length > 0 ? z.life.names : VillageLife.DefaultNames;
+                    if (z.life.villagers > 0 && Array.IndexOf(names, npc) >= 0) return true;
+                    if ((z.life.residents ?? new ZoneResident[0]).Any(r => r != null && r.name == npc)) return true;
+                    if ((z.life.households ?? new ZoneHousehold[0]).Any(h => h != null && (h.members ?? new ZoneMember[0]).Any(m => m != null && m.name == npc))) return true;
+                }
+                return false;
+            }
+            var sources = leaves.ToDictionary(l => l, l => new List<string>());
+            foreach (var v in items.Vendors)
+                foreach (var id in v.items ?? new string[0])
+                {
+                    if (!sources.ContainsKey(id)) continue;
+                    Assert.IsFalse(string.IsNullOrEmpty(v.npc), id + " is sold by a named villager (the trade's own), not by every " + v.role + ".");
+                    Assert.IsTrue(Lives(v.npc), v.npc + ", who sells " + id + ", lives in a zone.");
+                    sources[id].Add("sold by " + v.npc);
+                }
+            foreach (var t in items.Loot)
+                foreach (var e in t.entries ?? new LootEntry[0])
+                {
+                    if (!sources.ContainsKey(e.item)) continue;
+                    Assert.IsTrue(t.elite, e.item + ": a leaf drops only from a boss (an elite-only table, tag " + t.tag + ").");
+                    Assert.IsTrue(Pending(t.tag) || zones.Any(z => (z.camps ?? new ZoneCamp[0]).Any(c => c != null && c.elite && LootContext.CampTag(c) == t.tag && c.levelMin >= t.levelMin && c.levelMax <= t.levelMax)),
+                        e.item + ": an elite camp carries the tag " + t.tag + ".");
+                    Assert.That(e.chance, Is.InRange(.01f, .5f), e.item + ": a chance, not a certainty.");
+                    sources[e.item].Add("dropped by " + t.tag);
+                }
+            foreach (var q in quests.Quests.Values)
+                foreach (var b in q.rewards?.bagItems ?? new string[0]) if (sources.ContainsKey(b)) sources[b].Add("quest " + q.id);
+            foreach (var z in zones)
+                foreach (var s in z.secrets ?? new ZoneSecret[0]) if (s != null && !string.IsNullOrEmpty(s.item) && sources.ContainsKey(s.item)) sources[s.item].Add("secret " + s.id);
+            foreach (var kv in SecretLeaves)
+            {
+                Assert.IsTrue(sources.ContainsKey(kv.Value), kv.Key + " is to hold " + kv.Value + ", a leaf.");
+                Assert.IsTrue(zones.Any(z => (z.secrets ?? new ZoneSecret[0]).Any(s => s != null && s.id == kv.Key)), kv.Key + " is a secret.");
+                sources[kv.Value].Add("for " + kv.Key);
+            }
+            var none = sources.Where(kv => kv.Value.Count == 0).Select(kv => kv.Key).ToList();
+            Assert.IsEmpty(none, "Leaves nobody gives:\n" + string.Join("\n", none));
+            Assert.GreaterOrEqual(items.Vendors.Where(v => (v.items ?? new string[0]).Any(sources.ContainsKey)).Select(v => v.npc).Distinct().Count(), 6, "Sold by the trades' own villagers in every zone.");
+            Assert.GreaterOrEqual(sources.Values.Count(s => s.Any(x => x.StartsWith("quest "))), 4, "A few in quest rewards.");
+            Assert.GreaterOrEqual(sources.Values.Count(s => s.Any(x => x.StartsWith("dropped "))), 10, "Bosses, elites and the dungeons' bosses drop them.");
         }
     }
 }

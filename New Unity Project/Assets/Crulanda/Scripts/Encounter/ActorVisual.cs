@@ -1,10 +1,10 @@
-using UnityEngine;
+﻿using UnityEngine;
 
 namespace Crulanda.Encounter
 {
-    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater }
+    public enum ActorLook { Warrior, Druid, Healer, Collector, Warden, Sentry, Outrider, Pale, Villager, Hollow, Cultist, Wolf, Boar, WeaveEater, Deserter, BanditKing, Keeper, Stag, Spider, Bramble, Bear, Skeleton, Paladin, Ranger, Mage, RockEater, SaltMender, Eel, Croc, Imp, Puglin }
     /// <summary>Body language layered over walking: working a hoe or bucket, talking, sitting, cowering.</summary>
-    public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump }
+    public enum ActorPose { None, Work, Talk, Sit, Cower, Hammer, Chop, Gather, Knead, Swim, Sneak, Drink, Slump, Mine }
 
     /// <summary>
     /// Placeholder humanoid built from primitives under the actor's "Body" (so death poses and form scaling still apply
@@ -22,6 +22,10 @@ namespace Crulanda.Encounter
         Vector3 lastPosition; float phase, speed;
 
         public ActorPose Pose;
+        /// <summary>Riding in a saddle (Nix on the Rock-Eater, EncounterEnemy.HideInside): seated, its legs still, however fast its mount goes.</summary>
+        public bool Riding;
+        /// <summary>Carried along the ground without a step (a Hallow's Creek Hollow's shift, b1 ch.4:109; EncounterEnemy.Hollow): the legs stay still.</summary>
+        public bool Gliding;
         int variant; bool child, posed; string role; float stoop, swimLean, swimPhase;
         /// <summary>Held weapon/shield/staff parts, and the same kit slung on the back (shown instead while swimming).</summary>
         Transform[] held, stowed; bool gearStowed;
@@ -31,17 +35,21 @@ namespace Crulanda.Encounter
         /// <summary>The bare figure's parts that worn armour recolours, hides or tucks away (see ActorVisual.GearArmor.cs): torso, chest and shoulders; sleeves; hands; legs and hips; boots; the belt; the hair (the long fall and the bun tuck under a cap); the Druid's cloak.</summary>
         Renderer[] baseChest, baseSleeves, baseHands, baseLegs, baseBoots; Renderer baseBelt; Transform[] hairParts; Transform hairLong, hairBun, druidCloak;
         /// <summary>Villagers pass their trade (<paramref name="role"/>) to get its outfit and tool; see <see cref="Dress"/>.</summary>
-        public static ActorVisual Attach(GameObject actor, ActorLook look, int variant = 0, bool child = false, string role = null)
+        public static ActorVisual Attach(GameObject actor, ActorLook look, int variant = 0, bool child = false, string role = null, bool orc = false)
         {
-            var v = actor.AddComponent<ActorVisual>(); v.variant = variant; v.child = child; v.role = role; v.Build(look); return v;
+            var v = actor.AddComponent<ActorVisual>(); v.variant = variant; v.child = child; v.role = role; v.orc = orc; v.Build(look); return v;
         }
+        /// <summary>An orc (Docs/RACES.md): green, tusked, taller (ActorVisual.Model.cs, Orcish and Tusks).</summary>
+        public bool Orc { get { return orc; } }
+        bool orc;
         /// <summary>Trades with a recognisable outfit. Others (gossip, drinker, child) wear plain clothes with a random hat or apron.</summary>
         public static bool HasOutfit(string role)
         {
             switch (role)
             {
                 case "blacksmith": case "merchant": case "baker": case "henwife": case "farmer": case "hunter": case "leatherworker":
-                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": case "innkeeper": return true;
+                case "skinner": case "lumberjack": case "herbalist": case "miller": case "elder": case "drinker": case "stranger": case "warden": case "pilgrim": case "innkeeper": case "goblin":
+                case "councilor": case "scholar": return true;   // the Crown's costumes (a resident's look, WorldLife)
                 default: return false;
             }
         }
@@ -111,7 +119,7 @@ namespace Crulanda.Encounter
             }
         }
         /// <summary>Not humanoid: no clothes or kit, and a little lighter in health (EncounterEnemy.MobHealth). Weave-Eaters count, though they are no animal.</summary>
-        public static bool IsBeast(ActorLook look) { return look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.WeaveEater || look == ActorLook.Stag || look == ActorLook.Spider || look == ActorLook.Bramble || look == ActorLook.Bear; }
+        public static bool IsBeast(ActorLook look) { return look == ActorLook.Wolf || look == ActorLook.Boar || look == ActorLook.WeaveEater || look == ActorLook.Stag || look == ActorLook.Spider || look == ActorLook.Bramble || look == ActorLook.Bear || look == ActorLook.Eel || look == ActorLook.Croc; }
 
         /// <summary>
         /// Four-legged creatures. The front legs use the arm pivots and the hind legs the leg pivots, so the walk cycle
@@ -407,14 +415,16 @@ namespace Crulanda.Encounter
             var capsule = body.GetComponent<MeshRenderer>(); if (capsule != null) capsule.enabled = false;
             if (look == ActorLook.WeaveEater) { BuildEater(); lastPosition = transform.position; return; }
             if (look == ActorLook.Pale) { BuildPale(); lastPosition = transform.position; return; }
-            if (look == ActorLook.RockEater) { BuildRockEater(); lastPosition = transform.position; return; }   // the goblin boring-engine (ActorVisual.Machine.cs)
-            if ((look == ActorLook.Wolf || look == ActorLook.Stag || look == ActorLook.Boar || look == ActorLook.Bear || look == ActorLook.Spider) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
+            if ((look == ActorLook.Wolf || look == ActorLook.Stag || look == ActorLook.Boar || look == ActorLook.Bear || look == ActorLook.Spider || look == ActorLook.RockEater) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // ActorVisual.Beasts.cs
             if (look == ActorLook.Stag) { BuildStag(); lastPosition = transform.position; return; }
             if (look == ActorLook.Spider) { BuildSpider(); lastPosition = transform.position; return; }
             if (look == ActorLook.Bramble) { BuildBramble(); lastPosition = transform.position; return; }
+            if (look == ActorLook.Eel || look == ActorLook.Croc) { BuildRiverBeast(look); lastPosition = transform.position; return; }   // the Chemical River's (ActorVisual.River.cs)
             if (look == ActorLook.Keeper) { if (!BuildModelBeast(look) && capsule != null) capsule.enabled = true; lastPosition = transform.position; return; }   // a treant (ActorVisual.Beasts.cs)
             if (IsBeast(look)) { BuildBeast(look); lastPosition = transform.position; return; }
+            if (orc && OrcKind(look) != null && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // a whole orc (ActorVisual.Beasts.cs)
             if (look == ActorLook.Skeleton) { if (BuildModelBeast(look)) { lastPosition = transform.position; return; } look = ActorLook.Hollow; }   // the risen dead (ActorVisual.Beasts.cs); a Hollow Man without the model
+            if ((look == ActorLook.Imp || look == ActorLook.Puglin) && BuildModelBeast(look)) { lastPosition = transform.position; return; }   // the Bestiary kit's monsters (ActorVisual.Beasts.cs); without it, a plain figure
             Material skin = Mat(new Color(.76f, .6f, .48f));
             Color clothC, accentC, legC;
             switch (look)
@@ -424,6 +434,8 @@ namespace Crulanda.Encounter
                 // The classes of Phase 5.1 (2026-10-05; GAME-ONLY looks): the Paladin in ivory and gold, the Ranger in forest green, the Mage in violet.
                 case ActorLook.Paladin: clothC = new Color(.88f, .84f, .72f); accentC = new Color(.86f, .68f, .22f); legC = new Color(.3f, .26f, .2f); break;
                 case ActorLook.Ranger: clothC = new Color(.24f, .42f, .2f); accentC = new Color(.46f, .3f, .15f); legC = new Color(.3f, .24f, .15f); break;
+                // The Salt-Mender (2026-10-12; GAME-ONLY look): salt-white robe, a sea-grey hood and sash, the brown of the earth below.
+                case ActorLook.SaltMender: clothC = new Color(.86f, .85f, .79f); accentC = new Color(.34f, .44f, .5f); legC = new Color(.36f, .32f, .27f); break;
                 case ActorLook.Mage: clothC = new Color(.28f, .2f, .52f); accentC = new Color(.82f, .7f, .3f); legC = new Color(.18f, .15f, .3f); break;
                 case ActorLook.Healer: clothC = new Color(.1f, .44f, .36f); accentC = new Color(.95f, .86f, .6f); legC = new Color(.1f, .3f, .27f); break;
                 case ActorLook.Collector: clothC = new Color(.14f, .22f, .54f); accentC = new Color(.76f, .78f, .82f); legC = new Color(.12f, .14f, .24f); break;
@@ -439,7 +451,15 @@ namespace Crulanda.Encounter
                 case ActorLook.BanditKing: clothC = new Color(.13f, .09f, .09f); accentC = new Color(.84f, .6f, .2f); legC = new Color(.36f, .1f, .08f); skin = Mat(new Color(.7f, .53f, .4f)); break;
                 case ActorLook.Villager:
                     clothC = VillagerCloth[Mathf.Abs(variant) % VillagerCloth.Length]; accentC = VillagerCloth[Mathf.Abs(variant * 3 + 2) % VillagerCloth.Length] * .8f;
-                    legC = new Color(.3f, .25f, .2f) * (.8f + (variant % 3) * .15f); skin = Mat(Skins[Mathf.Abs(variant * 7) % Skins.Length]); break;
+                    legC = new Color(.3f, .25f, .2f) * (.8f + (variant % 3) * .15f); skin = Mat(Skins[Mathf.Abs(variant * 7) % Skins.Length]);
+                    // A goblin (PROVISIONAL look until the goblins have a figure: the pressed goblins in the Adit's cages, note 125): grey-green
+                    // skin, rags the colour of rock dust.
+                    if (role == "goblin") { clothC = new Color(.36f, .32f, .26f); accentC = new Color(.27f, .24f, .2f); legC = new Color(.25f, .22f, .18f); skin = Mat(new Color(.5f, .6f, .42f)); }
+                    // The High Councilor (CANON look, book1 ch.12:365: "ancient", "pale skin pulled tight against his skull", robes of white
+                    // silk): white robes, gold for the trim, the skin pale and a little grey. His clerk (GAME-ONLY): a dark robe.
+                    if (role == "councilor") { clothC = new Color(.95f, .94f, .9f); accentC = new Color(.92f, .72f, .24f); legC = new Color(.92f, .9f, .84f); skin = Mat(new Color(.86f, .8f, .74f)); }
+                    if (role == "scholar") { clothC = new Color(.13f, .12f, .17f); accentC = new Color(.9f, .88f, .82f); legC = new Color(.1f, .09f, .12f); }
+                    break;
                 default: clothC = new Color(.6f, .27f, .18f); accentC = new Color(.4f, .35f, .3f); legC = new Color(.28f, .2f, .16f); break;
             }
             bool metalAccent = look == ActorLook.Warrior || look == ActorLook.Paladin || look == ActorLook.Warden || look == ActorLook.Collector;
@@ -478,6 +498,18 @@ namespace Crulanda.Encounter
                     var staffM = HeldModel("Cartoon_Staff_01", armR, new Vector3(0, -.62f, .1f), new Vector3(0, 90, 0), 1, .4f);
                     var slungM = HeldModel("Cartoon_Staff_01", body, new Vector3(.1f, .25f, -.27f), new Vector3(0, 0, -30), 1, .4f);
                     held = staffM != null ? new[] { staffM } : new Transform[0]; stowed = slungM != null ? new[] { slungM } : new Transform[0];
+                    break;
+                }
+                case ActorLook.SaltMender:   // a plain staff, the salt pouch at the right hip, a salt-stone on a cord at the chest
+                {
+                    var pouch = Part(PrimitiveType.Sphere, body, new Vector3(.2f, -.08f, .09f), new Vector3(.15f, .17f, .11f), accent);
+                    var tie = Part(PrimitiveType.Cylinder, body, new Vector3(.2f, .01f, .09f), new Vector3(.07f, .02f, .07f), Mat(new Color(.95f, .95f, .9f)));
+                    var charm = Part(PrimitiveType.Cube, body, new Vector3(0, .5f, .19f), new Vector3(.06f, .08f, .04f), Mat(new Color(.95f, .95f, .9f), .6f), new Vector3(0, 0, 45));
+                    var staffS = HeldModel("Cartoon_Staff_01", armR, new Vector3(0, -.62f, .1f), new Vector3(0, 90, 0), 1, .4f);
+                    var slungS = HeldModel("Cartoon_Staff_01", body, new Vector3(.1f, .25f, -.27f), new Vector3(0, 0, -30), 1, .4f);
+                    var kit = modelled && model.Hood != null ? new[] { pouch.transform, tie.transform, charm.transform, model.Hood.transform } : new[] { pouch.transform, tie.transform, charm.transform };
+                    classKit = kit;
+                    held = staffS != null ? new[] { staffS } : new Transform[0]; stowed = slungS != null ? new[] { slungS } : new Transform[0];
                     break;
                 }
                 case ActorLook.Ranger:   // the bow in the left hand, limbs up and down in front of the fist; slung across the back for swimming
@@ -536,9 +568,11 @@ namespace Crulanda.Encounter
                     if (child) body.localScale = new Vector3(.68f, .66f, .68f);
                     break;
                 case ActorLook.Hollow:
-                    // A Hollow Man (CANON, book1 ch.4): a villager turned to grey stone, cracked, with a violet shard where the heart was.
-                    for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3((i - 2) * .08f, .25f + (i % 2) * .15f, .15f), new Vector3(.02f, .25f, .01f), Mat(new Color(.22f, .22f, .23f)), new Vector3(0, 0, i * 30 - 60));
-                    var shard = Mat(new Color(.7f, .4f, 1f), .9f); shard.EnableKeyword("_EMISSION"); shard.SetColor("_EmissionColor", new Color(.65f, .3f, 1f) * 2.5f);
+                    // A Hollow Man (CANON creature, book1 ch.4): an apparition of a villager (GAME-ONLY look, Chris: "should be ghostly"), see-
+                    // through grey (ModelFigure.Ghost), and inside it the violet shard where the heart was, glowing through. (The stone cracks
+                    // of the statue it was are gone with the stone.) Without the model, the old grey figure keeps them.
+                    if (!modelled) for (int i = 0; i < 5; i++) Part(PrimitiveType.Cube, body, new Vector3((i - 2) * .08f, .25f + (i % 2) * .15f, .15f), new Vector3(.02f, .25f, .01f), Mat(new Color(.22f, .22f, .23f)), new Vector3(0, 0, i * 30 - 60));
+                    var shard = Mat(new Color(.7f, .4f, 1f), .9f); shard.EnableKeyword("_EMISSION"); shard.SetColor("_EmissionColor", new Color(.65f, .3f, 1f) * (modelled ? 4f : 2.5f));
                     Part(PrimitiveType.Cube, body, new Vector3(-.06f, .42f, .15f), new Vector3(.07f, .12f, .04f), shard, new Vector3(0, 0, 20));
                     body.localEulerAngles = new Vector3(10, 0, 0); stoop = 10;
                     break;
@@ -740,23 +774,40 @@ namespace Crulanda.Encounter
             void Skirt(Material m) { if (!modelled) Part(PrimitiveType.Cylinder, body, new Vector3(0, -.45f, 0), new Vector3(.5f, .42f, .42f), m); }
             void Bare(Transform arm) { if (!modelled) Part(PrimitiveType.Capsule, arm, new Vector3(0, -.47f, 0), new Vector3(.15f, .15f, .15f), skin); }
             Transform Hood(Material m, Vector3 pos, Vector3 scale) { return modelled ? null : Part(PrimitiveType.Sphere, body, pos, scale, m); }
-            // A tool held in the right hand, pointing forward like a carried hammer or axe (it swings with the arm).
-            void HandTool(Material handle, float length, Material head, Vector3 headScale, float headAt = 1)
+            // A tool in the right hand; CarryTool puts it in the fist every frame. A long tool (the farmer's fork, the woodcutter's axe)
+            // is held upright like a staff, head at the top, gripped a little over half way up, the arm bent to hold it out beside the
+            // body (StaffArm); at work it runs on from the fist along the forearm. A short one (a hammer, a sickle) hangs head-down from
+            // the fist and at work turns with the hand. (Playtest notes 95, 109 and 119; Chris, 2026-10-11: "farmers hoes still going
+            // thru the arm and not held like a staff". The farmer's fork had never been put on this holder, and on a modelled figure the
+            // holder rode the upper arm, so a bent elbow put the shaft through the forearm.)
+            Transform HandTool(Material handle, float length, Material head, Vector3 headScale, float headAt = 1)
             {
-                // A long tool (the farmer's hoe) is carried upright like a staff, the hand a third of the way up the shaft, the head
-                // at the top (playtest note 95, 2026-10-08: "should not be walking like this with hoe in hand, should be like a staff").
-                if (length >= .7f)
+                tradeTool = new GameObject("Trade tool").transform; tradeTool.SetParent(armR, false);
+                tradeToolLong = length >= .7f;
+                if (tradeToolLong)
                 {
-                    float shaft = length * 1.9f;
-                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.64f + shaft * .17f, .06f), new Vector3(.045f, shaft / 2, .045f), handle);
-                    if (head != null) Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f + shaft * .67f, .06f + headScale.z * .4f), new Vector3(headScale.x, headScale.z, headScale.y), head);
-                    return;
+                    float shaft = length * 1.9f; tradeToolShaft = shaft;
+                    tradeTool.localPosition = new Vector3(0, -.64f, .06f);
+                    Part(PrimitiveType.Cylinder, tradeTool, new Vector3(0, shaft * (.5f - ToolGrip), 0), new Vector3(.045f, shaft / 2, .045f), handle);
+                    if (head != null) Part(PrimitiveType.Cube, tradeTool, new Vector3(0, shaft * (1 - ToolGrip), headScale.z * .4f), new Vector3(headScale.x, headScale.z, headScale.y), head);
+                    return tradeTool;
                 }
-                Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.64f, length / 2 - .08f), new Vector3(.045f, length / 2, .045f), handle, new Vector3(90, 0, 0));
-                if (head != null) Part(PrimitiveType.Cube, armR, new Vector3(0, -.64f + headScale.y * .25f, (length - .08f) * headAt), headScale, head);
+                tradeTool.localPosition = new Vector3(0, -.64f, 0);
+                Part(PrimitiveType.Cylinder, tradeTool, new Vector3(0, 0, length / 2 - .08f), new Vector3(.045f, length / 2, .045f), handle, new Vector3(90, 0, 0));
+                if (head != null) Part(PrimitiveType.Cube, tradeTool, new Vector3(0, headScale.y * .25f, (length - .08f) * headAt), headScale, head);
+                return tradeTool;
             }
             switch (trade)
             {
+                case "goblin":
+                    // Long pointed ears out from the head, swept back (on a model they ride its head frame, as a hat does).
+                    foreach (int side in new[] { -1, 1 })
+                    {
+                        var ear = new GameObject("Ear", typeof(MeshFilter), typeof(MeshRenderer)).transform; ear.SetParent(body, false);
+                        ear.GetComponent<MeshFilter>().sharedMesh = Crulanda.World.ZoneMeshes.Cone(1, 1); ear.GetComponent<MeshRenderer>().sharedMaterial = skin;
+                        ear.localPosition = new Vector3(side * .15f, .83f, -.02f); ear.localRotation = Quaternion.Euler(-20, 0, -side * 72); ear.localScale = new Vector3(.07f, .22f, .035f);
+                    }
+                    break;
                 case "blacksmith":
                     // Broad, soot-dark shirt with bare forearms, a long leather apron, a skullcap, and a hammer.
                     cloth.color = new Color(.24f, .22f, .22f); legs.color = new Color(.2f, .17f, .15f);
@@ -808,9 +859,14 @@ namespace Crulanda.Encounter
                         foreach (int s in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(s * .12f, .5f, .15f), new Vector3(.04f, .2f, .02f), M(.17f, .28f, .52f));
                     }
                     Brim(M(.9f, .74f, .32f), .62f, .26f, .07f);
-                    Part(PrimitiveType.Cylinder, armR, new Vector3(0, -.45f, .08f), new Vector3(.035f, .85f, .035f), wood);
-                    for (int i = -1; i <= 1; i++) Part(PrimitiveType.Cube, armR, new Vector3(i * .05f, -1.37f, .08f), new Vector3(.02f, .2f, .02f), iron);
-                    Part(PrimitiveType.Cube, armR, new Vector3(0, -1.28f, .08f), new Vector3(.14f, .02f, .02f), iron);
+                    {
+                        // A draw hoe on the tool holder (note 155: the pitchfork was the wrong tool for hoeing): a flat iron blade hung at a
+                        // right angle from the shaft's end, its edge toward the user; carried upright, the blade stands out ahead.
+                        var hoe = HandTool(wood, 1.0f, null, Vector3.zero); float top = tradeToolShaft * (1 - ToolGrip);   // a long handle (note 157): the back hand at its end, the front one 45-60 cm lower, the blade still reaching the soil
+                        Part(PrimitiveType.Cube, hoe, new Vector3(0, top - .01f, .03f), new Vector3(.05f, .05f, .07f), iron).name = "Hoe neck";
+                        Part(PrimitiveType.Cube, hoe, new Vector3(0, top, .09f), new Vector3(.17f, .014f, .13f), iron).name = "Hoe blade";
+                        tradeToolHeadReach = .15f;   // the blade's edge, out from the shaft's end (the stroke sets it in: notes 150, 155)
+                    }
                     break;
                 case "hunter":
                     // Green hood and cape, leather jerkin, bow and quiver on the back.
@@ -926,6 +982,61 @@ namespace Crulanda.Encounter
                     Part(PrimitiveType.Cylinder, body, new Vector3(.25f, -.04f, .08f), new Vector3(.1f, .01f, .1f), iron, new Vector3(0, 0, 90)); // ring of keys
                     Beard(new Color(.36f, .24f, .14f), .3f);
                     break;
+                case "councilor":
+                {
+                    // The High Councilor's robes of state (2026-10-16, Chris: "he needs more regal attire"). CANON look (book1 ch.12:365):
+                    // ancient, pale, "elegant robes of pure white silk, heavily embroidered with highly complex geometric patterns". GAME-ONLY:
+                    // the gold of them, the high collar, the chain of office and the rings. No crown: he is a councillor, not a king.
+                    var silk = M(.96f, .95f, .91f, .35f); var gilt = M(1f, .8f, .36f, .7f, .8f); var gem = M(.55f, .08f, .12f, .8f, .3f);
+                    cloth.color = new Color(.95f, .94f, .9f); legs.color = new Color(.92f, .9f, .84f);
+                    // The robe: to the floor all round (on the hips, so it hangs from them sitting too: seated, its foot is in the seat), and a
+                    // mantle from the shoulders down the back. Kept on a model too (its kit: a board or a drum is otherwise left off, Remap).
+                    var robe = Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.52f, .42f, .44f), silk); robe.name = "Robe";
+                    var hem = Part(PrimitiveType.Cylinder, body, new Vector3(0, -.9f, 0), new Vector3(.56f, .02f, .48f), gilt); hem.name = "Robe hem";
+                    var mantle = Part(PrimitiveType.Cube, body, new Vector3(0, .05f, -.18f), new Vector3(.6f, 1.05f, .04f), silk, new Vector3(-4, 0, 0)); mantle.name = "Mantle";
+                    var mantleHem = Part(PrimitiveType.Cube, body, new Vector3(0, -.46f, -.2f), new Vector3(.6f, .06f, .05f), gilt, new Vector3(-4, 0, 0));
+                    classKit = new[] { robe, hem, mantle, mantleHem };
+                    // The front: a gold band down the robe's opening, worked either side in gold lozenges (the embroidery).
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .2f, .165f), new Vector3(.1f, .62f, .02f), gilt);
+                    Part(PrimitiveType.Cube, body, new Vector3(0, -.48f, .235f), new Vector3(.1f, .76f, .02f), gilt);
+                    for (int i = 0; i < 4; i++) foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(sx * .13f, .38f - i * .16f, .162f), new Vector3(.045f, .045f, .015f), gilt, new Vector3(0, 0, 45));
+                    for (int i = 0; i < 4; i++) foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(sx * .14f, -.22f - i * .18f, .19f), new Vector3(.05f, .05f, .015f), gilt, new Vector3(0, 0, 45));
+                    // A high standing collar, white edged in gold, round the back and sides of the neck.
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .6f, -.1f), new Vector3(.34f, .22f, .03f), silk, new Vector3(-14, 0, 0)).name = "Collar";
+                    foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(sx * .16f, .59f, -.01f), new Vector3(.03f, .2f, .18f), silk, new Vector3(0, 0, sx * 10));
+                    Part(PrimitiveType.Cube, body, new Vector3(0, .705f, -.12f), new Vector3(.35f, .025f, .04f), gilt, new Vector3(-14, 0, 0));
+                    // The chain of office: gold links from shoulder to shoulder across the breast, a medallion with a red stone on it.
+                    for (int i = 0; i <= 8; i++)
+                    {
+                        float a = (i / 8f - .5f) * Mathf.PI * .8f;
+                        Part(PrimitiveType.Sphere, body, new Vector3(Mathf.Sin(a) * .22f, .38f + (1 - Mathf.Cos(a)) * .3f, .165f - (1 - Mathf.Cos(a)) * .08f), Vector3.one * .055f, gilt).name = "Chain of office";
+                    }
+                    Part(PrimitiveType.Cylinder, body, new Vector3(0, .31f, .18f), new Vector3(.12f, .012f, .12f), gilt, new Vector3(90, 0, 0)).name = "Medallion";
+                    Part(PrimitiveType.Sphere, body, new Vector3(0, .31f, .19f), Vector3.one * .045f, gem);
+                    // Rings: gold with a red stone, one on each hand.
+                    foreach (var (hand, arm) in new[] { (handL, armL), (handR, armR) })
+                    {
+                        var on = hand != null ? hand : arm; var at = hand != null ? new Vector3(0, -.07f, .02f) : new Vector3(0, -.6f, .05f);
+                        if (on == null) continue;
+                        Part(PrimitiveType.Sphere, on, at, Vector3.one * .035f, gilt).name = "Ring"; Part(PrimitiveType.Sphere, on, at + new Vector3(0, 0, .015f), Vector3.one * .02f, gem);
+                    }
+                    break;
+                }
+                case "scholar":
+                {
+                    // A clerk of the Council (GAME-ONLY): a dark scholar's robe to the floor, white bands at the throat, the ledger under the
+                    // arm, an inkhorn and a quill at the belt.
+                    var dark = M(.12f, .11f, .16f); var paper = M(.93f, .9f, .8f);
+                    cloth.color = new Color(.13f, .12f, .17f); legs.color = new Color(.1f, .09f, .12f);
+                    var robe = Part(PrimitiveType.Cylinder, body, new Vector3(0, -.5f, 0), new Vector3(.5f, .42f, .42f), dark); robe.name = "Robe";
+                    classKit = new[] { robe };   // kept on a model (Remap)
+                    foreach (int sx in new[] { -1, 1 }) Part(PrimitiveType.Cube, body, new Vector3(sx * .03f, .5f, .165f), new Vector3(.05f, .14f, .015f), paper);   // the bands
+                    Part(PrimitiveType.Cube, armL, new Vector3(0, -.42f, .12f), new Vector3(.08f, .32f, .24f), M(.45f, .18f, .1f)).name = "Ledger";
+                    Part(PrimitiveType.Cube, armL, new Vector3(-.005f, -.42f, .12f), new Vector3(.07f, .3f, .22f), paper);
+                    Part(PrimitiveType.Cylinder, body, new Vector3(.24f, -.02f, .1f), new Vector3(.05f, .06f, .05f), M(.2f, .14f, .1f));   // the inkhorn
+                    Part(PrimitiveType.Cube, body, new Vector3(.25f, .1f, .1f), new Vector3(.01f, .2f, .03f), paper, new Vector3(0, 0, -12));   // a quill
+                    break;
+                }
                 case "drinker":
                     // (The tankard is not part of the outfit: it is in the hand only at the inn, see Villager.DrinkRound.)
                     if (variant % 2 == 0) Hood(accent, new Vector3(0, .84f, -.02f), new Vector3(.33f, .3f, .34f));
@@ -936,13 +1047,64 @@ namespace Crulanda.Encounter
 
         // Timed for the performance probe (playtest note 23).
         static readonly Unity.Profiling.ProfilerMarker perfMark = new Unity.Profiling.ProfilerMarker("PERF.ActorVisual");
-        void LateUpdate() { using (perfMark.Auto()) LateUpdateTimed(); }
+        void LateUpdate() { using (perfMark.Auto()) { try { LateUpdateTimed(); } finally { CarryTool(); } } }
+        Transform tradeTool; bool tradeToolLong; float tradeToolShaft;
+        /// <summary>How far up a long tool's shaft the fist holds it, from the butt: a staff's hold.</summary>
+        const float ToolGrip = .55f;
+        /// <summary>The trade's tool is put away (seated, carrying a load, swimming, dead): set each frame by a modelled figure.</summary>
+        bool toolAway;
+        /// <summary>The trade's tool is at work this frame (the hoe's stroke, the hammer's blow, the axe's swing; walking wins over a
+        /// work pose, so not while moving). Set by a modelled figure.</summary>
+        public bool ToolAtWork { get; private set; }
+        bool WorkPose { get { return Pose == ActorPose.Work || Pose == ActorPose.Hammer || Pose == ActorPose.Chop || Pose == ActorPose.Mine; } }
+        /// <summary>The middle of the right fist: past the wrist by a third of the forearm (a modelled figure), or the old arm's end.</summary>
+        Vector3 Fist(out Vector3 along)
+        {
+            if (model != null && handR != null && foreR != null)
+            {
+                var wrist = handR.position; along = wrist - foreR.position; float len = along.magnitude;
+                along = len > 1e-4f ? along / len : -body.up;
+                return wrist + along * len * .3f;
+            }
+            along = -armR.up; return armR.TransformPoint(new Vector3(0, -.64f, .06f));
+        }
+        /// <summary>After the arms have moved, the trade's tool in the right fist: a long one upright like a staff, a short one hanging
+        /// head-down; at work a long one runs on from the fist along the forearm (the hands near its butt), a short one turns with the
+        /// hand. Put away while seated, carrying a load or swimming.</summary>
+        void CarryTool()
+        {
+            if (tradeTool == null || body == null) return;
+            if (tradeTool.gameObject.activeSelf == toolAway) tradeTool.gameObject.SetActive(!toolAway);
+            if (toolAway) return;
+            bool working = model != null ? ToolAtWork : WorkPose;
+            var fist = Fist(out var along);
+            if (tradeToolLong && hoeActive)
+            {
+                var face = Vector3.Cross(body.right, hoeDir); if (face.sqrMagnitude < 1e-4f) face = body.forward;
+                tradeTool.rotation = Quaternion.LookRotation(face, hoeDir);
+                tradeTool.position = hoeButt + hoeDir * (tradeToolShaft * ToolGrip * tradeTool.lossyScale.y);
+            }
+            else if (tradeToolLong)
+            {
+                if (working)
+                {
+                    var side = Vector3.Cross(along, body.right); if (side.sqrMagnitude < 1e-4f) side = body.forward;
+                    tradeTool.rotation = Quaternion.LookRotation(side, along);
+                    tradeTool.position = fist + along * (tradeToolShaft * ToolGrip - .1f) * tradeTool.lossyScale.y;
+                }
+                else { tradeTool.rotation = body.rotation * Quaternion.Euler(-4, 0, 0); tradeTool.position = model != null && staffHold > .5f && StaffGrip(out var grip) ? grip : fist; }
+            }
+            else
+            {
+                tradeTool.position = fist;
+                tradeTool.rotation = working ? (model != null && handR != null ? handR.rotation : armR.rotation) : Quaternion.LookRotation(Vector3.down, body.forward);
+            }
+        }
         void LateUpdateTimed()
         {
             if (core != null) { Drift(); return; }
             if (beastModel != null) { BeastLate(); return; }
-            if (model != null) { ModelLate(); return; }
-            if (drill != null) { MachineLate(); return; }
+            if (model != null) { GroundFeet(); ModelLate(); return; }   // feet onto the ground first, so the arms' IK works on the settled figure
             if (body == null || legL == null) return;
             // Swimming: the kit goes on the back, so no sword stands out of the water like a mast; out of a fight too (playtest note 79).
             bool stow = Pose == ActorPose.Swim || (Fighting != null && !Fighting(gameObject) && !Casting);
@@ -953,6 +1115,8 @@ namespace Crulanda.Encounter
                 if (stowed != null) foreach (var g in stowed) g.gameObject.SetActive(stow);
             }
             var delta = transform.position - lastPosition; delta.y = 0; lastPosition = transform.position;
+            // gliding (a Hollow's shift): no stride
+            if (Gliding) delta = Vector3.zero;
             float target = Time.deltaTime > 0 ? delta.magnitude / Time.deltaTime : 0;
             speed = Mathf.Lerp(speed, target, Time.deltaTime * 8);
             float stride = Mathf.Clamp01(speed / 4.5f);
@@ -1035,7 +1199,7 @@ namespace Crulanda.Encounter
                     lean += 62 + Mathf.Sin(t * .6f) * 1.5f; break;
             }
             // Sitting lowers the whole figure onto the seat; everything else stands.
-            body.localPosition = new Vector3(0, Pose == ActorPose.Sit || Pose == ActorPose.Drink || Pose == ActorPose.Slump ? -.45f * (child ? .66f : 1) : Pose == ActorPose.Sneak ? -.28f : Pose == ActorPose.Swim ? -.15f : 0, 0);
+            body.localPosition = new Vector3(0, Pose == ActorPose.Sit || Pose == ActorPose.Drink || Pose == ActorPose.Slump ? -.45f * (child ? .66f : 1) + SeatRise : Pose == ActorPose.Sneak ? -.28f : Pose == ActorPose.Swim ? -.15f : 0, 0);
             body.localEulerAngles = new Vector3(lean, 0, 0);
         }
         /// <summary>

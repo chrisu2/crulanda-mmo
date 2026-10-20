@@ -41,6 +41,20 @@ namespace Crulanda.Tests
             CollectionAssert.AreEqual(new[] { 5, 7, 7, 7 }, ticks);
             Assert.AreEqual(true, completed); Assert.AreEqual(0, fx.Count);
         }
+        [Test] public void A_refresh_before_the_first_tick_keeps_the_rhythm()
+        {
+            // 2026-10-13: Seedling recast every 1.8 s on its 2 s tick never healed (each recast restarted the clock).
+            var fx = new PeriodicEffects(); var target = new object(); int ticks = 0;
+            float cast = 0;
+            for (int f = 0; f <= 101; f++)   // a frame every 0.1 s for 10 s, a recast every 1.8 s
+            {
+                float t = f * .1f;
+                if (t >= cast - .001f) { fx.Add("seedling", target, t, 2, 5, 10, (e, i) => { ticks++; return true; }); cast += 1.8f; }
+                fx.Tick(t);
+            }
+            Assert.GreaterOrEqual(ticks, 5, "a 2 s heal kept up by recasts ticks every 2 s (at 2, 4, 6, 8 and 10 s)");
+            Assert.AreEqual(1, fx.Count, "still one copy");
+        }
         [Test] public void Periodic_effect_can_stop_early_and_tolerates_removal_during_tick()
         {
             var fx = new PeriodicEffects(); var a = new object(); var b = new object(); int hits = 0; bool? done = null;

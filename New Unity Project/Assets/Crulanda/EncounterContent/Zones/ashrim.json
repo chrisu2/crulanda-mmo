@@ -3,7 +3,7 @@
   "displayName": "The Ashland Rim",
   "subtitle": "Grey ash at the edge of the Wasting, where the Ash-Walkers hold the Eastern Ridge",
   "canonStatus": "CANON-EXPANDED",
-  "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement. Grown to 360 m (2026-09-30): the Silent Statue is a canon kind (faceless monoliths in the Wasting, world_bible.md), placed here GAME-ONLY. GAME-ONLY: Wain's Rest and the old salt road, the Last Orchard, the Drowned Leviathan (harpoons of petrified leviathan bone are canon), the Walled Mouth, the Ash Pit and its Ash-Deacon, the Fraying, the Reach-Stones and the Hunters' Knoll. The filled-out rim (2026-10-04): Sandthrone salt-raiders on the old salt road by Wain's Rest (CANON company, GAME-ONLY camp), Hollow Men out of the Walled Mouth (CANON creature), pale shadows among the Reach-Stones (CANON-EXPANDED: the Pale Things as watchers), Old Cinder-Jaw in the far west, and their quests; all placement GAME-ONLY.",
+  "canonNote": "Canon (book1 ch.20): the Ash-Walkers live along the Wasting and fight the Weave-Eaters with Salt of the First Sea; Chieftain Grohl and Mother Vane, the Salt-Speaker, lead them from an enclave in the deep caves of the Eastern Ridge, across a plain of petrified ash. The Cult of Ash (Torvyn Embercloak, Vorn) and its iron-wired bone masks are canon (book1 ch.10, series_bible.md); the purple tear is the later House of Ash's symbol (series_bible.md), used here early (GAME-ONLY). The books also call Torvyn's cultists 'Ashwalkers'; the game keeps the Ash-Walkers of ch.20 and the Cult of Ash apart. The canon Ashlands take their full form after the Spoke fires (series_bible.md), so this pre-erasure rim is PROVISIONAL. GAME-ONLY: the zone's name and its roads to the Peaks and Oakhaven, the cult shrine's location, Cinderfold, the old ribcage, the ash hounds, the brood, and all placement. Grown to 360 m (2026-09-30): the Silent Statue is a canon kind (faceless monoliths in the Wasting, world_bible.md), placed here GAME-ONLY. GAME-ONLY: Wain's Rest and the old salt road, the Last Orchard, the Drowned Leviathan (harpoons of petrified leviathan bone are canon), the Walled Mouth, the Ash Pit and its Ash-Deacon, the Fraying, the Reach-Stones and the Hunters' Knoll. The filled-out rim (2026-10-04): Sandthrone salt-raiders on the old salt road by Wain's Rest (CANON company, GAME-ONLY camp), Hollow Men out of the Walled Mouth (CANON creature), pale shadows among the Reach-Stones (CANON-EXPANDED: the Pale Things as watchers), Old Cinder-Jaw in the far west, and their quests; all placement GAME-ONLY. The residents' and villagers' stories, and the secrets' clues and hints (2026-10-15), are GAME-ONLY lines about the canon things named here; the book of lore's two pages here are labelled on the page.",
   "size": 430,
   "levelMin": 12,
   "levelMax": 15,
@@ -28,7 +28,7 @@
   ],
   "worldMapPosition": {
     "x": 0.72,
-    "y": 0.8
+    "y": 0.765
   },
   "worldMapNote": "Placed at the northern edge of the Ashlands on the game map, south of Oakhaven; exact spot provisional.",
   "flatRadius": 36,
@@ -45,7 +45,8 @@
     "fogColor": "#A4A1AE",
     "fogStart": 32,
     "fogEnd": 105,
-    "skyTint": "#9987A1"
+    "skyTint": "#9987A1",
+    "aurora": true
   },
   "spawns": {
     "player": {
@@ -191,7 +192,7 @@
         "x": -141,
         "y": 76
       },
-      "radius": 11,
+      "radius": 14,
       "height": 0,
       "blend": 6
     },
@@ -1208,7 +1209,7 @@
       "variant": 1
     },
     {
-      "kind": "ruined_house",
+      "kind": "inn",
       "name": "Wain's Rest",
       "at": {
         "x": -146,
@@ -1218,7 +1219,9 @@
       "size": {
         "x": 10,
         "y": 6
-      }
+      },
+      "variant": 2,
+      "was": "ruined_house"
     },
     {
       "kind": "ruined_house",
@@ -2017,6 +2020,7 @@
       "canonStatus": "CANON-EXPANDED (the Bureau and the Seekers post their wanted bills; the village its bounties)"
     }
   ],
+  "woods": { "cover": 0.35, "from": 60, "ramp": 50, "spacing": 10, "edge": 12, "scale": 80, "deepAbove": 1, "oaks": 0, "snags": 1, "pineAbove": 1, "floor": 0.4 },
   "groves": [
     {
       "name": "Ashen snags",
@@ -2524,7 +2528,12 @@
         "at": {
           "x": 62,
           "y": 4
-        }
+        },
+        "stories": [
+          "My father's father walked here when the plain was forest. The ash came in one night, they say, and the sea the Leviathan swam went with it. We stayed. Somebody has to hold a line.",
+          "A Weave-Eater takes the thread out of a thing. Salt puts it back long enough to strike. That is all our war is: putting back, striking, putting back.",
+          "Vorn came to the enclave once with his bone mask under his arm and asked us to join the Patriarch. I showed him the salt line. He laughed. He is the only man who ever laughed at it."
+        ]
       },
       {
         "name": "Mother Vane",
@@ -2533,7 +2542,12 @@
         "at": {
           "x": 62,
           "y": -4
-        }
+        },
+        "stories": [
+          "Salt of the First Sea. Not the salt you eat. The salt that was in the water when the water was first told to be water. We have a little. We will not have more.",
+          "The cult paint a purple tear on everything and say the Void hungers for the light. They are not wrong about the hunger. They are wrong about whose side they are on.",
+          "The last-light grows where something refused to be unmade. I have never picked one. I want there to be one more thing that refused."
+        ]
       },
       {
         "name": "Sefa Brine",
@@ -2542,7 +2556,12 @@
         "at": {
           "x": 57,
           "y": -14
-        }
+        },
+        "stories": [
+          "Cinderfold was a village with an orchard and a press. Hollin's press. The cider went to Oakhaven. The grey came over the orchard in a season, and the ones who stayed are still there. Walking.",
+          "The Sandthrone take the salt carts on the old road and sell the salt in Khaven for a hundred times the price, to people who need it for their dead. I'd hang them myself if there were a gallows left standing.",
+          "I trade salt for everything the enclave can't make: iron, cloth, bread. The carts come less. One day I'll stand at the waystation and nothing will come at all, and that will be the news."
+        ]
       },
       {
         "name": "Oska",
@@ -2551,7 +2570,12 @@
         "at": {
           "x": 54,
           "y": 20
-        }
+        },
+        "stories": [
+          "Leviathan bone takes an edge that iron won't, and the Eaters feel it, the way you'd feel a word in your own tongue. My grandmother carved. Her harpoons are still in use.",
+          "My nephew Kesh went up the Knoll to watch for Eaters and the cult took him. His harpoon would not burn in their pit. Bone remembers the sea. That is why.",
+          "We give our dead to the old sea, what's left of it: the Leviathan's bones and the ash where the water was. There was nothing of Kesh to give. I said his name to the ribs instead. They heard."
+        ]
       }
     ]
   },
@@ -2567,6 +2591,8 @@
       "radius": 5,
       "rotation": 83,
       "text": "A line of salt runs across the gap in the Ridge, laid fresh and often by the look of it. Past it the ash goes on a little way, and then it doesn't.",
+      "clue": "Through the gap in the ridge to the south-east, a line of salt runs across the ground, laid fresh. Past it the ash goes on a little way, and then it doesn't.",
+      "hint": "Mother Vane lays salt across the gap in the ridge south-east of the enclave, fresh and often. Go and stand at the line, she says, and look past it. Then you'll know why.",
       "xp": 180,
       "canonStatus": "CANON-EXPANDED: the Ash-Walkers binding Weave-Eaters with salt is CANON (book1 ch.20); the salt line across the gap is GAME-ONLY."
     },
@@ -2581,6 +2607,8 @@
       },
       "rotation": 135,
       "text": "A bundle crusted white with salt, tucked between two stones in the lee of the great rock: an Ash-Walker hunters' cache, left for any of their own caught out at dusk. The red cord knotted round it means take what you need.",
+      "clue": "In the lee of the great rock south of the enclave, between two stones, a salt-crusted bundle tied with red cord: take what you need.",
+      "hint": "Chieftain Grohl says the hunters keep caches for any of their own caught out at dusk. One's in the lee of the big rock south of the enclave. Red cord means take what you need.",
       "item": "item.bone_harpoon",
       "xp": 170,
       "canonStatus": "CANON-EXPANDED: Ash-Walker harpoons of petrified leviathan bone are CANON (book1 ch.20); the hunters' caches are GAME-ONLY."
@@ -2597,6 +2625,8 @@
       "rotation": 130,
       "height": 1.0,
       "text": "Pushed into a gap in the cult hut's wall, where the others wouldn't look: a letter, with a little money folded in it for the road. Someone meant to run.",
+      "clue": "In the wall of a cultist's hut by the tear-marked ground in the south-west, where the others wouldn't look, a letter with money folded in it. Someone meant to run.",
+      "hint": "Sefa Brine says not every bone-mask at the shrine in the south-west believes. One of them wrote a letter and hid it in a hut wall there, with money for the road. They never ran.",
       "document": "doc.ashrim.doubter",
       "xp": 160,
       "gold": 30,
@@ -2612,6 +2642,8 @@
         "y": 62
       },
       "text": "Pale flowers pushing up through the ash among the dead snags, faintly lit, the only living thing for a mile. The Ash-Walkers call it last-light and say it grows where something refused to be unmade.",
+      "clue": "Among the dead snags north of the enclave, pale flowers push up through the ash, faintly lit: the only living thing for a mile.",
+      "hint": "Mother Vane says last-light grows where something refused to be unmade. There's a patch among the dead snags north of here. She'd rather you didn't pick it. She'd rather you knew it was there.",
       "item": "herb.last_light",
       "xp": 150,
       "canonStatus": "GAME-ONLY"
@@ -2627,6 +2659,8 @@
       },
       "rotation": 45,
       "text": "A tin buried shallow among the dead trees of Cinderfold's orchard, where some animal has scraped the ash back. Whoever buried it meant to come back once the grey had passed. The grey did not pass.",
+      "clue": "In the dead orchard of the ruined village to the north-west, some animal has scraped the ash back from a tin that was buried to be dug up once the grey had passed.",
+      "hint": "Sefa Brine says the folk of the village north-west buried what they couldn't carry in their orchard, meaning to come back. The hounds have been digging there. Something's showing.",
       "item": "potion.salt",
       "xp": 160,
       "gold": 45,
@@ -2644,6 +2678,8 @@
       "rotation": 0,
       "height": 1.0,
       "text": "A page torn out of the waystation's waybook and pushed into a crack in the back wall, as if whoever kept the book meant someone to find it. Nobody came along the road to find it.",
+      "clue": "In the back wall of the waystation on the old salt road, far to the west, a page torn from the waybook is pushed into a crack for someone to find. Nobody came.",
+      "hint": "Oska says the keeper at the waystation on the old salt road kept the waybook to the last, and tore a page out and hid it in the back wall for whoever came next along the road. Nobody did.",
       "document": "doc.ashrim.waybook",
       "xp": 170,
       "gold": 20,
@@ -2660,6 +2696,8 @@
       },
       "rotation": 18,
       "text": "Under a flat stone in the lee of a great rib, an Ash-Walker carver's bundle: harpoon blanks roughed out of the leviathan's bone, a coil of amber cord, and a charm of leviathan tooth, finished and never collected.",
+      "clue": "Under a flat stone in the lee of one of the great ribs in the far south, a carver left harpoon blanks, amber cord and a finished charm, and never came for them.",
+      "hint": "Oska says a carver before him kept a bundle under a flat stone in the lee of the great ribs in the south. Blanks, cord, a charm he'd finished. He went out on the flats one dusk and the bundle's still there.",
       "item": "item.leviathan_charm",
       "xp": 180,
       "gold": 25,
@@ -2675,9 +2713,94 @@
         "y": -60
       },
       "text": "A few pale bells in the ash below the standing stone, faintly lit, with the grey already in the ground all round them. The Ash-Walkers say last-light grows where something refused to be unmade. Here it has company.",
+      "clue": "Below the standing stone at the grey's edge in the east, with the grey already in the ground round them, a few pale bells refuse to be unmade.",
+      "hint": "Chieftain Grohl says last-light grows at the foot of the standing stone by the grey, east of the ridge, where nothing should. He wants it looked at. He won't go himself.",
       "item": "herb.last_light",
       "xp": 160,
       "canonStatus": "CANON-EXPANDED: the Silent Statues, faceless monoliths in the Wasting, are CANON (world_bible.md); last-light and this patch are GAME-ONLY."
+    },
+    {
+      "id": "secret.ashrim.line-rite",
+      "name": "The Salt-Speaker's Slab",
+      "kind": "note",
+      "prompt": "Scrape the ash off the slab",
+      "at": {
+        "x": 83.7,
+        "y": -49.2
+      },
+      "rotation": 240,
+      "text": "A slab of petrified bark laid flat beside the line, ash drifted over it: scratched into it, in the Salt-Speaker's hand, how a salt line is walked down, and the one rule that is manners rather than law.",
+      "clue": "At the gap in the ridge to the south-east, where the salt is walked down fresh, a slab of petrified bark says how it is done.",
+      "hint": "Mother Vane says the rules for laying the line are scratched on a slab at the gap in the ridge, south-east of here, for whoever comes after her. Nobody has come after her yet. She'd like you to read it anyway.",
+      "document": "doc.ashrim.salt_line",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers binding Weave-Eaters with Salt of the First Sea and the chant are CANON (book1 ch.20); the laying of a line and the slab are GAME-ONLY."
+    },
+    {
+      "id": "secret.ashrim.watch-page",
+      "name": "The Chieftain's Watch",
+      "kind": "note",
+      "prompt": "Lift the stone off the page",
+      "at": {
+        "x": 131.3,
+        "y": -59.2
+      },
+      "rotation": 100,
+      "text": "A page under a stone at the standing stone's foot, in Chieftain Grohl's square hand: his third watch on the faceless thing, and what he has begun to think it is doing.",
+      "clue": "At the foot of the standing stone by the grey in the east, beside the pale bells that refuse to be unmade, the chieftain left a page from his watch.",
+      "hint": "Chieftain Grohl keeps a watch on the standing stone by the grey, east of the ridge, and writes it down. He left one page at the stone's foot, he says, for whoever watches next. He doesn't say why he thinks there'll be one.",
+      "document": "doc.ashrim.faceless",
+      "xp": 60,
+      "canonStatus": "CANON-EXPANDED: the Silent Statues, faceless monoliths in the Wasting, are CANON (world_bible.md), and so are the Ash-Walkers (book1 ch.20); Grohl's watch and this page are GAME-ONLY."
+    },
+    {
+      "id": "secret.ashrim.salt-slates",
+      "name": "The Salt-Slates",
+      "kind": "read",
+      "prompt": "Read the slates by the harpoon rack",
+      "at": {
+        "x": 46,
+        "y": 22
+      },
+      "rotation": 0,
+      "text": "Slates leaned against a stone by the harpoon rack, chalked over and over: every Eater bound, every line of salt laid, and the names of who laid it. The Walkers' tally of their war.",
+      "clue": "By the rack where the harpoons hang outside the caves, slates lean on a stone, chalked with every Eater bound and every line of salt laid.",
+      "hint": "Oska says the slates by the harpoon rack are the Walkers' tally: every Eater bound, every line of salt, who laid it. Read them if you like, Oska says. Just don't rub any out.",
+      "document": "doc.ashrim.salt_slates",
+      "xp": 170,
+      "canonStatus": "CANON-EXPANDED: the Ash-Walkers and their salt against the Weave-Eaters are CANON (book1 ch.20); the slates are GAME-ONLY."
+    },
+    {
+      "id": "secret.ashrim.heights-stone",
+      "name": "The Heights on the Doorstone",
+      "kind": "carving",
+      "prompt": "Look at the heights cut in the stone",
+      "at": {
+        "x": -52,
+        "y": 90
+      },
+      "rotation": 270,
+      "text": "A doorstone from a house the grey went through, set up on end by somebody. Up one edge, a tick for every year a child stood against it, and a letter by each. The ticks stop.",
+      "clue": "In the hamlet the grey went through, a doorstone stands on end with a child's heights cut up its edge. The ticks stop.",
+      "hint": "Sefa Brine says somebody stood a doorstone on end in the grey hamlet north-west of the caves, a child's heights cut up it, year on year. They stop the year the grey came. Sefa won't go and look.",
+      "xp": 160,
+      "canonStatus": "GAME-ONLY: the doorstone and the child. The Wasting unmaking rather than destroying is CANON (book1 ch.20)."
+    },
+    {
+      "id": "secret.ashrim.orchard-grave",
+      "name": "The Orchard-Wife's Stone",
+      "kind": "grave",
+      "prompt": "Read the stone by the press",
+      "at": {
+        "x": 36,
+        "y": 128
+      },
+      "rotation": 90,
+      "text": "Under the last tree that bore, by the old press: a stone for the orchard-keeper's wife, cut by his own hand, the letters going deeper as he went. HERE SHE WAITS FOR THE BLOSSOM.",
+      "clue": "North, by the press where the grey trees stand to the root, a husband cut his wife's stone himself. The letters go deeper as he went.",
+      "hint": "Mother Vane says the orchard-keeper buried his wife under the last tree that bore, by the press, north along the road. He cut the stone himself. Then he walked into the grey.",
+      "xp": 160,
+      "canonStatus": "GAME-ONLY: the orchard-keeper, his wife and her stone."
     }
   ],
   "nodes": [

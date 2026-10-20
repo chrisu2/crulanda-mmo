@@ -9,10 +9,13 @@ namespace Crulanda.Encounter
     public static class EncounterInput
     {
         /// <summary>Action-bar key for a slot: 1-9 then 0 (slot index 9), matching the HUD labels.</summary>
-        public static KeyCode SlotKey(int slot) { return slot == 12 ? KeyCode.LeftBracket : slot == 11 ? KeyCode.Equals : slot == 10 ? KeyCode.Minus : slot == 9 ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha1 + slot); }   // slots 12 and 13 (the Vanguard's): = and [
-        public static string SlotLabel(int slot) { return slot == 12 ? "[" : slot == 11 ? "=" : slot == 10 ? "-" : slot == 9 ? "0" : (slot + 1).ToString(); }
-        /// <summary>True while you type in the chat (EncounterHud.DrawChat): no key moves you or works the bar.</summary>
-        public static bool Typing;
+        public static KeyCode SlotKey(int slot) { return slot == 13 ? KeyCode.RightBracket : slot == 12 ? KeyCode.LeftBracket : slot == 11 ? KeyCode.Equals : slot == 10 ? KeyCode.Minus : slot == 9 ? KeyCode.Alpha0 : (KeyCode)((int)KeyCode.Alpha1 + slot); }   // slots 12 and 13 (the Vanguard's): = and [
+        public static string SlotLabel(int slot) { return slot == 13 ? "]" : slot == 12 ? "[" : slot == 11 ? "=" : slot == 10 ? "-" : slot == 9 ? "0" : (slot + 1).ToString(); }
+        /// <summary>True while you type in the chat (EncounterHud.DrawChat sets it each time it draws the chat): no key moves you or works
+        /// the bar. It lapses two frames after the chat was last drawn, so a chat line put away by anything else never holds the keys (the
+        /// tester's note 115: "the game ignored keys until I clicked inside the window").</summary>
+        public static bool Typing { get { return typing && Time.frameCount - typingFrame <= 2; } set { typing = value; typingFrame = Time.frameCount; } }
+        static bool typing; static int typingFrame;
         public static bool Press(KeyCode key)
         {
             if (Typing) return false;
@@ -30,6 +33,7 @@ namespace Crulanda.Encounter
                 case KeyCode.K: return k.kKey.wasPressedThisFrame;
                 case KeyCode.L: return k.lKey.wasPressedThisFrame;
                 case KeyCode.O: return k.oKey.wasPressedThisFrame;   // the who list
+                case KeyCode.J: return k.jKey.wasPressedThisFrame;   // the dungeon queue (bound as GameKey.Queue; this is its fallback)
                 case KeyCode.C: return k.cKey.wasPressedThisFrame;
                 case KeyCode.Escape: return k.escapeKey.wasPressedThisFrame;
                 case KeyCode.F5: return k.f5Key.wasPressedThisFrame;
@@ -50,6 +54,8 @@ namespace Crulanda.Encounter
                 case KeyCode.Minus: return k.minusKey.wasPressedThisFrame;   // the eleventh slot (2026-10-08)
                 case KeyCode.Equals: return k.equalsKey.wasPressedThisFrame;   // the twelfth and thirteenth (the Paladin's Vanguard, 2026-10-09)
                 case KeyCode.LeftBracket: return k.leftBracketKey.wasPressedThisFrame;
+                case KeyCode.RightBracket: return k.rightBracketKey.wasPressedThisFrame;   // the fourteenth slot, the last bought with AA (2026-10-13)
+                case KeyCode.P: return k.pKey.wasPressedThisFrame;   // the spellbook (Docs/ACTION_BAR.md)
                 case KeyCode.Space: return k.spaceKey.wasPressedThisFrame;
                 case KeyCode.Slash: return k.slashKey.wasPressedThisFrame || k.numpadDivideKey.wasPressedThisFrame;   // the run toggle
             }
@@ -57,6 +63,18 @@ namespace Crulanda.Encounter
 #else
             return Input.GetKeyDown(key);
 #endif
+        }
+        /// <summary>Held Shift: 1-4 work the stance bar (the Druid's forms; Docs/ACTION_BAR.md).</summary>
+        public static bool Shifted
+        {
+            get {
+                if (Typing) return false;
+#if ENABLE_INPUT_SYSTEM
+                var k = Keyboard.current; return k != null && (k.leftShiftKey.isPressed || k.rightShiftKey.isPressed);
+#else
+                return Input.GetKey(KeyCode.LeftShift) || Input.GetKey(KeyCode.RightShift);
+#endif
+            }
         }
         /// <summary>Held Ctrl: sneak.</summary>
         public static bool Sneak

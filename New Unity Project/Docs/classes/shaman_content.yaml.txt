@@ -1,0 +1,201 @@
+# abilities
+  - id: shaman.squall
+    name: Squall
+    description: "A cold squall struck at a foe up to 30 metres off; each builds a charge."
+    effect: 0
+    power: 9
+    cost: 8
+    cooldown: 0
+    range: 30
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: shaman.tide_mend
+    name: Tide Mend
+    description: "A slow tide of rain-water that mends the most hurt of the party."
+    effect: 3
+    power: 14
+    cost: 12
+    cooldown: 0
+    range: 30
+    castTime: 2
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: shaman.rain_call
+    name: Rain Call
+    description: "Rain falls where you stand, mending everyone under it every 2 s."
+    effect: 3
+    power: 5
+    cost: 20
+    cooldown: 12
+    range: 0
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 10
+    statusId: 
+  - id: shaman.chain_mend
+    name: Chain Mend
+    description: "A mend that leaps from the most hurt to the next, three times, weaker each leap."
+    effect: 3
+    power: 10
+    cost: 16
+    cooldown: 0
+    range: 30
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: shaman.thunderhead
+    name: Thunderhead
+    description: "Spends every Squall charge in one stroke of thunder."
+    effect: 0
+    power: 8
+    cost: 14
+    cooldown: 6
+    range: 30
+    castTime: 1
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: shaman.hailfall
+    name: Hailfall
+    description: "Hail on the ground about your target for 5 s."
+    effect: 0
+    power: 4
+    cost: 22
+    cooldown: 12
+    range: 30
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 5
+    statusId: 
+  - id: shaman.earthskin
+    name: Earthskin
+    description: "Stone over your skin: a barrier, and less harm taken for 12 s."
+    effect: 2
+    power: 10
+    cost: 12
+    cooldown: 20
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 12
+    statusId: 
+  - id: shaman.rooting_stamp
+    name: Rooting Stamp
+    description: "A heavy stamp: harms and slows every foe within 8 m and draws them to you."
+    effect: 1
+    power: 6
+    cost: 10
+    cooldown: 8
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 4
+    statusId: 
+  - id: shaman.cairn
+    name: Cairn
+    description: "A cairn of stone stands over the most hurt: a barrier for 12 s."
+    effect: 2
+    power: 12
+    cost: 16
+    cooldown: 15
+    range: 30
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 12
+    statusId: 
+  - id: shaman.moor_wind
+    name: Moor Wind
+    description: "A cold wind off the moor harms and slows every foe within 8 m."
+    effect: 0
+    power: 5
+    cost: 12
+    cooldown: 10
+    range: 0
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 5
+    statusId: 
+  - id: shaman.mist
+    name: Mist
+    description: "Mist about your target: every foe in it is held fast for 3 s."
+    effect: 4
+    power: 0
+    cost: 14
+    cooldown: 15
+    range: 30
+    castTime: 1
+    globalCooldown: 1.5
+    duration: 3
+    statusId: 
+  - id: shaman.barrow_call
+    name: Barrow-call
+    description: "The old dead hold one foe fast for 5 s."
+    effect: 4
+    power: 0
+    cost: 16
+    cooldown: 20
+    range: 30
+    castTime: 1.5
+    globalCooldown: 1.5
+    duration: 5
+    statusId: 
+# class
+  - definition:
+      id: class.shaman
+      displayName: Shaman
+      role: 1
+      resource: 1
+      maxResource: 100
+      combatRegen: 4
+      restingRegen: 20
+      stats:
+        baseHealth: 175
+        healthPerLevel: 20
+        healthPerStamina: 5
+        baseAttackPower: 8
+        attackPowerPerLevel: 1
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 2
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: shaman.squall
+        level: 1
+        talentId: 
+      - abilityId: shaman.tide_mend
+        level: 1
+        talentId: 
+      - abilityId: shaman.rain_call
+        level: 2
+        talentId: 
+      - abilityId: shaman.chain_mend
+        level: 3
+        talentId: 
+      - abilityId: shaman.thunderhead
+        level: 4
+        talentId: 
+      - abilityId: shaman.hailfall
+        level: 5
+        talentId: 
+      - abilityId: shaman.earthskin
+        level: 4
+        talentId: 
+      - abilityId: shaman.rooting_stamp
+        level: 5
+        talentId: 
+      - abilityId: shaman.cairn
+        level: 6
+        talentId: 
+      - abilityId: shaman.moor_wind
+        level: 4
+        talentId: 
+      - abilityId: shaman.mist
+        level: 6
+        talentId: 
+      - abilityId: shaman.barrow_call
+        level: 8
+        talentId: 
+    talentTree: {fileID: 4900000, guid: 1a8b9b2f52d342858f00c3b297a913ef, type: 3}

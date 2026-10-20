@@ -65,6 +65,18 @@ namespace Crulanda.Tests
             first.TryStart(a, 0, n => true, () => {});
             Assert.AreEqual(AbilityStartResult.Started, second.TryStart(a, 0, n => true, () => {}));
         }
+        /// <summary>A Scoundrel's favour (2026-10-14): the longest personal wait is read and cut, never past now.</summary>
+        [Test]
+        public void The_longest_wait_can_be_cut_but_never_past_now()
+        {
+            var r = new AbilityRuntime(); var a = Spell("a"); a.cooldown = 30; var b = Spell("b"); b.cooldown = 10; b.globalCooldown = 0;
+            r.TryStart(a, 0, n => true, () => {}); r.TryStart(b, 0, n => true, () => {});
+            Assert.AreEqual(30, r.Longest(0, out var id), 1e-4f); Assert.AreEqual("a", id);
+            r.Shorten("a", 12, 0); Assert.AreEqual(18, r.Remaining(a, 0), 1e-4f);
+            r.Shorten("a", 99, 5); Assert.AreEqual(0, r.Remaining(a, 5), 1e-4f, "never before now");
+            Assert.AreEqual(5, r.Longest(5, out id), 1e-4f); Assert.AreEqual("b", id);
+            Assert.AreEqual(0, new AbilityRuntime().Longest(0, out id)); Assert.IsNull(id);
+        }
         [Test]
         public void Invalid_data_is_rejected_without_spending_or_effects()
         {

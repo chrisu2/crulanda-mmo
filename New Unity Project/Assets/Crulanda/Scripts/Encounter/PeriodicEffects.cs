@@ -30,8 +30,12 @@ namespace Crulanda.Encounter
         public Effect Add(string key, object target, float now, float interval, int ticks, int value, Func<Effect, int, bool> onTick, Action<Effect, bool> onEnd = null, bool tickImmediately = false)
         {
             if (string.IsNullOrEmpty(key) || target == null || interval <= 0 || ticks <= 0 || onTick == null) throw new ArgumentException("Invalid periodic effect.");
+            // A refresh keeps the old copy's rhythm: its next tick comes no later than it would have (2026-10-13: the Druid's Seedling,
+            // recast every 1.8 s on its 2 s tick, restarted its clock each time and never healed, so no Sap, no Quickbloom, 8 HPS).
+            var old = Find(key, target); float next = tickImmediately ? now : now + interval;
+            if (!tickImmediately && old != null && old.next > now && old.next < next) next = old.next;
             Remove(key, target, false);
-            var e = new Effect { key = key, target = target, interval = interval, next = tickImmediately ? now : now + interval,
+            var e = new Effect { key = key, target = target, interval = interval, next = next,
                 ticksLeft = ticks, totalTicks = ticks, value = value, onTick = onTick, onEnd = onEnd };
             effects.Add(e); return e;
         }

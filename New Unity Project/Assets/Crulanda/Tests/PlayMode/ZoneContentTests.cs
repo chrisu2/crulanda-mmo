@@ -72,13 +72,28 @@ namespace Crulanda.Tests
                 s.Zone.OpenGates(); for (int i = 0; i < 3; i++) yield return null;
                 if (NavMesh.SamplePosition(s.Zone.Ground(z.spawns.player), out var start, 2.5f, NavMesh.AllAreas))
                 {
-                    var path = new NavMeshPath();
+                    // The places reached so far (hop starts) and those the single walk from the start missed.
+                    var reached = new List<Vector3> { start.position };
+                    var missed = new List<(string what, Vector3 at)>();
                     foreach (var e in z.exits)
-                        if (!NavMesh.SamplePosition(s.Zone.Ground(e.at), out var to, Mathf.Max(2.5f, e.radius), NavMesh.AllAreas) || !NavReach.Walkable(start.position, to.position))
-                            problems.Add(p + "exit to " + e.to + " can't be walked to from the start");
-                    foreach (var camp in z.camps)   // where the camp stands: on the land, or on a cave's floor under it (StandAt, as it spawns)
-                        if (!NavMesh.SamplePosition(s.Zone.StandAt(camp.center, float.NegativeInfinity), out var to, Mathf.Max(2.5f, camp.radius), NavMesh.AllAreas) || !NavReach.Walkable(start.position, to.position))
-                            problems.Add(p + "camp '" + camp.name + "' can't be walked to from the start");
+                    {
+                        if (!NavMesh.SamplePosition(s.Zone.Ground(e.at), out var to, Mathf.Max(2.5f, e.radius), NavMesh.AllAreas)) { problems.Add(p + "exit to " + e.to + " can't be walked to from the start (no navmesh there)"); continue; }
+                        if (NavReach.Walkable(start.position, to.position)) reached.Add(to.position);
+                        else missed.Add(("exit to " + e.to, to.position));
+                    }
+                    // Where the camp stands: on the land, or on a cave's floor under it, or up on its deck there (StandAt, as it spawns:
+                    // the Adit rework's trestle, bridge tower and catwalks).
+                    foreach (var camp in z.camps)
+                    {
+                        if (!NavMesh.SamplePosition(s.Zone.StandAt(camp.center, EncounterSession.DeckHeight(camp, camp.center)), out var to, Mathf.Max(2.5f, camp.radius), NavMesh.AllAreas)) { problems.Add(p + "camp '" + camp.name + "' can't be walked to from the start (no navmesh at its ground)"); continue; }
+                        if (NavReach.Walkable(start.position, to.position)) reached.Add(to.position);
+                        else missed.Add(("camp '" + camp.name + "'", to.position));
+                    }
+                    // One search from the start gives up part way on the Adit's long cave web (PathPartial) though parties reach every
+                    // camp there in play. A missed place counts as reached when a chain of hops arrives: each hop a complete path from a
+                    // place already reached (the start, a reached camp or exit, a cave breadcrumb the start reaches by complete hops), so
+                    // every hop starts where the one before ended. Places nothing reaches stay problems: a genuinely cut-off place fails.
+                    if (missed.Count > 0) foreach (var (what, at) in HopReach(start.position, reached, missed)) problems.Add(p + what + " can't be walked to from the start (its ground " + at + "; no chain of complete hops arrives)");
                 }
                 // Camps: most of each pack must find walkable ground; levels inside the zone's band.
                 string shortId = id.Replace("zone.", "");
@@ -86,7 +101,7 @@ namespace Crulanda.Tests
                 {
                     var camp = z.camps[c];
                     int spawned = s.Enemies.Count(e => e.Camp && e.persistentId.Contains("." + shortId + "." + c + "."));
-                    if (camp.rare <= 0 && spawned < Mathf.CeilToInt(camp.count * .75f)) problems.Add(p + "camp '" + camp.name + "' spawned " + spawned + "/" + camp.count);
+                    if (camp.rare <= 0 && string.IsNullOrEmpty(camp.after) && spawned < Mathf.CeilToInt(camp.count * .75f)) problems.Add(p + "camp '" + camp.name + "' spawned " + spawned + "/" + camp.count);
                     if (camp.levelMin < z.levelMin - 1 || camp.levelMax > z.levelMax + (camp.harder ? 3 : 1)) problems.Add(p + "camp '" + camp.name + "' levels " + camp.levelMin + "-" + camp.levelMax + " outside " + z.levelMin + "-" + z.levelMax);
                 }
                 // Quest people and props that the zone is responsible for.
@@ -119,6 +134,52 @@ namespace Crulanda.Tests
                 if (life != null) foreach (var v in life.Villagers) if (!NavMesh.SamplePosition(v.transform.position, out _, 2, NavMesh.AllAreas)) problems.Add(p + v.Name + " stands off the navmesh");
             }
             Assert.IsEmpty(problems, string.Join("\n", problems));
+        }
+
+        /// <summary>The missed places no chain of complete hops reaches. The hop starts are the reached places, plus (underground) the
+        /// cave and deck breadcrumbs the start reaches crumb to crumb by complete paths (NavReach.CaveCrumbs, the hop map of
+        /// AditNavDiagnostics). A missed place is reached when a complete path, or legs each picking up where a partial one ended,
+        /// joins it to a hop start; it then becomes a hop start itself, pass after pass until nothing changes.</summary>
+        static List<(string what, Vector3 at)> HopReach(Vector3 start, List<Vector3> reached, List<(string what, Vector3 at)> missed)
+        {
+            var from = new List<Vector3>(reached);
+            if (Hollow.All != null && Hollow.All.Count > 0)
+            {
+                var crumbs = NavReach.CaveCrumbs(start, out var reach);
+                foreach (var i in reach) from.Add(crumbs[i]);
+            }
+            var left = new List<(string what, Vector3 at)>(missed);
+            var path = new NavMeshPath(); bool changed = true;
+            while (changed && left.Count > 0)
+            {
+                changed = false;
+                for (int m = left.Count - 1; m >= 0; m--)
+                {
+                    var target = left[m].at;
+                    // The nearest dozen hop starts: a short hop is the one the search finishes.
+                    foreach (var a in from.OrderBy(v => (v - target).sqrMagnitude).Take(12).ToList())
+                    {
+                        if (!Legs(a, target, path)) continue;
+                        from.Add(target); left.RemoveAt(m); changed = true; break;
+                    }
+                }
+            }
+            return left;
+        }
+
+        /// <summary>True when the navmesh joins <paramref name="a"/> to <paramref name="b"/>: a complete path, or partial legs each
+        /// starting at the last corner of the one before and getting somewhere, the last of them complete.</summary>
+        static bool Legs(Vector3 a, Vector3 b, NavMeshPath path)
+        {
+            for (int leg = 0; leg < 16; leg++)
+            {
+                if (!NavMesh.CalculatePath(a, b, NavMesh.AllAreas, path) || path.corners.Length == 0) return false;
+                if (path.status == NavMeshPathStatus.PathComplete) return true;
+                var end = path.corners[path.corners.Length - 1];
+                if ((end - a).sqrMagnitude < 1) return false;
+                a = end;
+            }
+            return false;
         }
     }
 }

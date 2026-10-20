@@ -18,7 +18,9 @@
     {"id": "tg-second-sap", "name": "Second Sap", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "chain", "desc": "Sap costs 5 less Focus per rank.", "emphasis": {"control": 1}, "impl": true},
     {"id": "tg-shadow-shift", "name": "Shadow Shift", "tier": 2, "col": 1, "max": 2, "req": null, "kind": "passive", "icon": "moon", "desc": "Vanish's cooldown is 30 seconds shorter per rank.", "emphasis": {"control": 1}, "impl": true},
     {"id": "tg-pickpocket", "name": "Light Fingers", "tier": 2, "col": 2, "max": 2, "req": null, "kind": "passive", "icon": "hand", "desc": "A Sap lifts a few coins from the mob's pocket; more per rank.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "tg-graces-end", "name": "Thief's Grace", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "capstone", "icon": "star", "desc": "Once a fight, a blow that would drop you misses instead.", "emphasis": {"control": 1}, "impl": true}
+    {"id": "tg-graces-end", "name": "Thief's Grace", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "capstone", "icon": "star", "desc": "Once a fight, a blow that would drop you misses instead.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "tg-gone-clean", "name": "Gone Clean", "tier": 3, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "moon", "desc": "Vanish gives back 10 Focus per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "tg-unremarked", "name": "Unremarked", "tier": 3, "col": 2, "max": 2, "req": null, "kind": "passive", "icon": "eye", "desc": "Mobs notice you 1 metre closer per rank.", "emphasis": {"control": 1}, "impl": true}
    ]
   },
   {
@@ -34,7 +36,9 @@
     {"id": "sw-quick-blades", "name": "Quick Blades", "tier": 2, "col": 0, "max": 2, "req": null, "kind": "passive", "icon": "clock", "desc": "You swing 5% faster per rank.", "emphasis": {"control": 1}, "impl": true},
     {"id": "sw-relentless", "name": "Relentless", "tier": 2, "col": 1, "max": 2, "req": null, "kind": "passive", "icon": "spiral", "desc": "Eviscerate gives back 4 Focus per combo point spent, per rank.", "emphasis": {"control": 1}, "impl": true},
     {"id": "sw-spent-shards", "name": "Spent Shards", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "passive", "icon": "crystal", "desc": "Eviscerate hits a stunned, silenced or fleeing mob 30% harder.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "sw-cut-deep", "name": "Cut Deep", "tier": 3, "col": 2, "max": 1, "req": null, "kind": "capstone", "icon": "drop", "desc": "A five-point Eviscerate leaves the wound bleeding for 8 seconds.", "emphasis": {"control": 1}, "impl": true}
+    {"id": "sw-cut-deep", "name": "Cut Deep", "tier": 3, "col": 2, "max": 1, "req": null, "kind": "capstone", "icon": "drop", "desc": "A five-point Eviscerate leaves the wound bleeding for 8 seconds.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "sw-spare-motion", "name": "Spare Motion", "tier": 3, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Sinister Strike costs 3 less Focus per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "sw-close-work", "name": "Close Work", "tier": 3, "col": 3, "max": 1, "req": null, "kind": "signature", "icon": "dagger", "desc": "Sinister Strike on a foe under 30% health builds two combo points.", "emphasis": {"control": 1}, "impl": true}
    ]
   },
   {
@@ -50,7 +54,30 @@
     {"id": "lk-ward-break", "name": "Ward-break", "tier": 1, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "shield", "desc": "Kick hits 50% harder per rank.", "emphasis": {"control": 1}, "impl": true},
     {"id": "lk-tumblers", "name": "Tumblers", "tier": 2, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "gear", "desc": "Gouge holds 1 second longer per rank.", "emphasis": {"control": 1}, "impl": true},
     {"id": "lk-hum", "name": "The Hum", "tier": 2, "col": 2, "max": 1, "req": null, "kind": "passive", "icon": "note", "desc": "Kick also stuns for 1 second.", "emphasis": {"control": 1}, "impl": true},
-    {"id": "lk-vibration", "name": "Vibration-locking", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "capstone", "icon": "bolt", "desc": "Kick silences twice as long.", "emphasis": {"control": 1}, "impl": true}
+    {"id": "lk-vibration", "name": "Vibration-locking", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "capstone", "icon": "bolt", "desc": "Kick silences twice as long.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "lk-practised-hands", "name": "Practised Hands", "tier": 3, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "hand", "desc": "Kick costs 4 less Focus per rank.", "emphasis": {"control": 1}, "impl": true},
+    {"id": "lk-pocket-dust", "name": "Pocket of Dust", "tier": 3, "col": 2, "max": 2, "req": null, "kind": "passive", "icon": "eye", "desc": "Blind comes back 10 seconds sooner per rank.", "emphasis": {"control": 1}, "impl": true}
+   ]
+  },
+  {
+   "id": "swashbuckler",
+   "name": "Swashbuckler",
+   "role": "support",
+   "loop": "Open the foe up with Opening Cut so the whole party hits it harder, spend the combo on a Rallying Flourish to quicken you and Mira, and Tumble to its back for the blow that counts.",
+   "tradeoff": "Points spent on the party's pace are points not spent on Eviscerate: the Swashbuckler makes the fight quicker, not its own blows bigger.",
+   "nodes": [
+    {"id": "bk-showmanship", "name": "Showmanship", "tier": 0, "col": 1, "max": 3, "req": null, "kind": "passive", "icon": "clock", "desc": "Opening Cut leaves the target Exposed 2s longer per rank.", "emphasis": {"support": 1}, "impl": true},
+    {"id": "bk-light-blade", "name": "Light Blade", "tier": 0, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "dagger", "desc": "Opening Cut costs 5 less Focus per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "bk-from-behind", "name": "From Behind", "tier": 1, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "eye", "desc": "Your strikes from behind a foe land 4% harder per rank.", "emphasis": {"damage": 1}, "impl": true},
+    {"id": "bk-long-flourish", "name": "Long Flourish", "tier": 1, "col": 2, "max": 2, "req": null, "kind": "modifier", "icon": "clock", "desc": "Rallying Flourish lasts 3s longer per rank.", "emphasis": {"support": 1}, "impl": true},
+    {"id": "bk-tumble", "name": "Tumble", "tier": 2, "col": 1, "max": 1, "req": null, "kind": "active", "icon": "wind", "desc": "New action: Tumble: roll past the target to its back; your next blow within 4s lands 30% harder, as from behind.", "emphasis": {"tempo": 1.5, "damage": 1}, "impl": true},
+    {"id": "bk-wide-open", "name": "Wide Open", "tier": 2, "col": 2, "max": 3, "req": null, "kind": "passive", "icon": "target", "desc": "An Exposed foe takes 2% more from the party per rank.", "emphasis": {"support": 1, "damage": 0.5}, "impl": true},
+    {"id": "bk-encore", "name": "Encore", "tier": 3, "col": 1, "max": 1, "req": null, "kind": "signature", "icon": "heart", "desc": "A five-point Rallying Flourish also mends everyone in your party for 5% of their health.", "emphasis": {"support": 2, "sustain": 1}, "impl": true},
+    {"id": "bk-dashing", "name": "Dashing", "tier": 3, "col": 2, "max": 3, "req": null, "kind": "modifier", "icon": "bolt", "desc": "Tumble's cooldown is 3s shorter per rank.", "emphasis": {"tempo": 1}, "impl": true},
+    {"id": "bk-panache", "name": "Panache", "tier": 4, "col": 1, "max": 1, "req": null, "kind": "modifier", "icon": "star", "desc": "Opening Cut gives two combo points.", "emphasis": {"tempo": 1.5}, "impl": false},
+    {"id": "bk-crowd-pleaser", "name": "Crowd Pleaser", "tier": 3, "col": 0, "max": 3, "req": null, "kind": "passive", "icon": "crystal", "desc": "A foe dropped while Exposed gives back 10 Focus per rank.", "emphasis": {"sustain": 1}, "impl": true},
+    {"id": "bk-riposte", "name": "Riposte", "tier": 5, "col": 1, "max": 3, "req": "bk-tumble", "kind": "passive", "icon": "sword", "desc": "For 2s after Tumble a blow at you is answered by a cut, per rank one more.", "emphasis": {"damage": 1, "mitigation": 1}, "impl": false},
+    {"id": "bk-grand-finale", "name": "Grand Finale", "tier": 6, "col": 1, "max": 1, "req": "bk-riposte", "kind": "capstone", "icon": "star", "desc": "Eviscerate on an Exposed foe Exposes every foe within 8m.", "emphasis": {"support": 3}, "impl": false}
    ]
   }
  ]

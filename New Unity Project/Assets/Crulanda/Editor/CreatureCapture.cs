@@ -13,11 +13,22 @@ namespace Crulanda.EditorTools
     /// </summary>
     public static class CreatureCapture
     {
-        const string Out = @"C:\Users\chris\Documents\Codex\2026-09-28\hel\work\ui-captures\figures";
+        const string Out = @"D:\crulanda-work\ui-captures\creatures";   // 2026-10-13: the old folder went with C:
         static Camera cam;
         static Transform stage;
 
-        public static void Run()
+        /// <summary>Chris's assets of 2026-10-13 22:50 ("Use Toon RS Unit - Undead for the bonecaller's pet. Living Birds to replace all birds
+        /// in game. Wild Boar to replace the boars. Furry Squirrel to put in forest areas."): each in its motions, a man for scale.</summary>
+        public static void Brief1013()
+        {
+            Stage();
+            Row("brief-boars", new[] { P(ActorLook.Warrior, 0, null, 0), Named(B(ActorLook.Boar, 0, "idle", .5f), "Wild boar"), Named(B(ActorLook.Boar, 1, "walk", .3f), "Wild boar"), Named(B(ActorLook.Boar, 2, "run", .2f), "Carrion boar"), Named(B(ActorLook.Boar, 3, "attack", .4f), "Mire boar"), Named(B(ActorLook.Boar, 4, "death", 1.2f), "Rockhide boar") }, 2.4f);
+            Row("brief-thrall", new[] { P(ActorLook.Mage, 0, null, 0), Named(B(ActorLook.Skeleton, 0, "idle", .5f), "Bone thrall"), Named(B(ActorLook.Skeleton, 0, "walk", .3f), "Bone thrall"), Named(B(ActorLook.Skeleton, 0, "attack", .4f), "Bone thrall"), Named(B(ActorLook.Skeleton, 0, "idle", .5f), "Drowned dead") }, 2.2f);
+            Row("brief-birds", new[] { K("crow", .1f, "idle", .5f), K("crow", .35f, "eat", .5f), K("crow", .5f, "idle", .7f), K("crow", .6f, "idle2", .5f), K("crow", .72f, "walk", .2f), K("crow", .85f, "idle", .3f), K("crow", .95f, "eat", .3f) }, .7f);
+            Row("brief-squirrels", new[] { K("squirrel", .2f, "idle", .5f), K("squirrel", .5f, "walk", .2f), K("squirrel", .8f, "idle2", .5f), K("squirrel", .4f, "death", 1f) }, .9f);
+            Debug.Log("CREATURE_CAPTURE_DONE");
+        }
+        static void Stage()
         {
             Directory.CreateDirectory(Out); CharacterImport.Prepare();
             EditorSceneManager.NewScene(NewSceneSetup.EmptyScene, NewSceneMode.Single);
@@ -30,6 +41,10 @@ namespace Crulanda.EditorTools
             cam = new GameObject("Camera").AddComponent<Camera>(); cam.fieldOfView = 28; cam.clearFlags = CameraClearFlags.SolidColor; cam.backgroundColor = new Color(.62f, .7f, .8f);
             cam.nearClipPlane = .05f; cam.farClipPlane = 200;
             QualitySettings.shadowDistance = 60;
+        }
+        public static void Run()
+        {
+            Stage();
 
             Row("beasts-1", new[] { P(ActorLook.Warrior, 0, null, 0), B(ActorLook.Wolf, 0, "idle", .5f), B(ActorLook.Wolf, 1, "idle", 1.1f), Named(B(ActorLook.Wolf, 0, "idle", .8f), "Old Whitefoot (elite)"), B(ActorLook.Stag, 0, "idle", .5f), B(ActorLook.Stag, 1, "idle", .8f), D(.2f, "eat", 1), D(.8f, "idle", .4f) }, 1.9f);
             Row("beasts-before", new[] { Old(ActorLook.Wolf, 0), B(ActorLook.Wolf, 0, "idle", .5f), Old(ActorLook.Wolf, 1), B(ActorLook.Wolf, 1, "idle", .5f), Old(ActorLook.Stag, 0), B(ActorLook.Stag, 0, "idle", .5f), Old(ActorLook.Stag, 1), B(ActorLook.Stag, 1, "idle", .5f) }, 1.7f);

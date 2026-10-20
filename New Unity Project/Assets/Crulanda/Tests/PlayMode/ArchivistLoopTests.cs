@@ -1,4 +1,4 @@
-#if UNITY_EDITOR
+﻿#if UNITY_EDITOR
 using System;
 using System.Collections;
 using System.IO;
@@ -43,7 +43,7 @@ namespace Crulanda.Tests
         [UnityTest] public IEnumerator The_Archivist_is_its_own_character()
         {
             Assert.AreEqual("class.archivist", session.ClassDef.id); Assert.AreEqual(Crulanda.Core.ResourceKind.Mana, session.ClassDef.resource);
-            Assert.AreEqual(10, session.Kit.ActionCount, "seven, and the Cantor's three"); Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Lull));
+            Assert.AreEqual(14, session.Kit.ActionCount, "seven, the Cantor's three, Unwrite, Erasure, Stillness, and the Mending Verse (2026-10-13)"); Assert.AreEqual("Level 2", session.Kit.ActionLockLabel(Lull));
             Assert.AreEqual("Talent", session.Kit.ActionLockLabel(Chorus), "the Chorus waits on its talent");
             Assert.IsFalse(session.Kit.MeleeAutoAttacks); Assert.AreEqual(ActorLook.Mage, EncounterSession.LookForClass("class.archivist"));
             yield return null;

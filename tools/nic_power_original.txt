@@ -1,0 +1,6 @@
+# Realtek PCIe 5GbE (Ethernet) power options before Chris's change, 2026-10-12 21:46
+# Revert: Set-NetAdapterAdvancedProperty -Name Ethernet -DisplayName '<name>' -DisplayValue '<value>' (admin)
+Energy-Efficient Ethernet = Enabled  (registry *EEE=1)
+Green Ethernet = Enabled  (registry EnableGreenEthernet=1)
+Power Saving Mode = Enabled  (registry PowerSavingMode=1)
+# Changed 2026-10-12 21:47 at Chris's approval: all three now Disabled (verified); link Up 1 Gbps after the reset.

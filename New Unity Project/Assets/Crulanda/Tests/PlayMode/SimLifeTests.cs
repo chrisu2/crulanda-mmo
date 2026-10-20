@@ -39,11 +39,11 @@ namespace Crulanda.Tests
             yield return SceneManager.UnloadSceneAsync("Oakhaven");
             if (Directory.Exists(root)) Directory.Delete(root, true);
         }
-        /// <summary>One sim, online all day in Oakhaven, standing at a point.</summary>
-        SimFigure SimAt(Vector3 at, int level, string classId = "class.warrior")
+        /// <summary>One sim, online all day in Oakhaven (or the zone given), standing at a point.</summary>
+        SimFigure SimAt(Vector3 at, int level, string classId = "class.warrior", string zone = "zone.oakhaven")
         {
             var pop = SimPopulation.Active; var s = pop.World.sims.First();
-            s.zone = "zone.oakhaven"; s.onlineFrom = 0; s.onlineHours = 24; s.level = level; s.classId = classId; s.x = at.x; s.z = at.z;
+            s.zone = zone; s.onlineFrom = 0; s.onlineHours = 24; s.level = level; s.classId = classId; s.x = at.x; s.z = at.z;
             var old = pop.Find(s.id); if (old != null) { pop.Figures.Remove(old); UnityEngine.Object.Destroy(old.gameObject); }
             pop.Refresh(); var f = pop.Find(s.id); Assert.NotNull(f); return f;
         }
@@ -87,6 +87,37 @@ namespace Crulanda.Tests
             Assert.IsTrue(f.Hidden, "inside");
             Assert.IsNull(SimPopulation.Active.FighterActor(f.sim.id), "no mob can fight one inside");
             StringAssert.Contains("inside the inn", session.InviteRefusal(f.sim));
+        }
+
+        /// <summary>
+        /// Somewhere to rest indoors in every zone with folk (Phase 8.6 step 3, 2026-10-15: "taprooms in every zone"): a sim stood in front
+        /// of the zone's inn (the Golden Cask, the Cracked Hearth, the Peaks' Pilgrims' Rest and the Rim's Wain's Rest as waystations, the
+        /// Shore's hearth-house in the Hearth-Tree) goes in through its door's lane and rests inside the walls, out of every mob's reach.
+        /// </summary>
+        [UnityTest, Timeout(600000)] public IEnumerator In_every_zone_a_sim_rests_indoors()
+        {
+            foreach (var id in new[] { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns" })
+            {
+                ZoneBuilder.RequestedZoneId = id;
+                SceneManager.sceneLoaded += OnLoaded;
+                yield return SceneManager.LoadSceneAsync("Oakhaven", LoadSceneMode.Single);
+                SceneManager.sceneLoaded -= OnLoaded;
+                for (int i = 0; i < 3; i++) yield return null;
+                session = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); var zone = session.Zone;
+                Assert.AreEqual(id, zone.Zone.id); Assert.AreEqual(root, session.SaveDirectoryOverride, "This test saves to its own folder.");
+                Assert.IsTrue(SimPopulation.Active.Lively, id + ": the sims live their day");
+                Assert.IsNotEmpty(zone.Inns, id + " has somewhere to rest indoors");
+                var inn = zone.Inns[0]; var way = inn.door.Way; Assert.NotNull(way, id + ": " + inn.name + "'s door has its lanes");
+                var at = way.Outside - way.inward * 3 + way.across * 1.5f;
+                var f = SimAt(at, 4, "class.warrior", id); yield return null;
+                Assert.AreSame(inn, f.Inn, id + ": the sim's inn is " + inn.name);
+                f.Begin(SimFigure.Doing.Inn);
+                float t = 0; bool crossed = false;
+                while (t < 40 && !f.Hidden) { t += Time.deltaTime; if (Vector3.Dot(f.transform.position - way.middle, way.inward) > 0) crossed = true; yield return null; }
+                Assert.IsTrue(f.Hidden, id + ": " + f.sim.name + " rests inside " + inn.name + " (" + f.Doings + " at " + f.transform.position + ")");
+                Assert.IsTrue(crossed || inn.Contains(f.transform.position), id + ": in through the door, inside the walls");
+                Assert.IsNull(SimPopulation.Active.FighterActor(f.sim.id), id + ": no mob can fight one inside");
+            }
         }
 
         [UnityTest] public IEnumerator The_bold_choose_to_hunt()

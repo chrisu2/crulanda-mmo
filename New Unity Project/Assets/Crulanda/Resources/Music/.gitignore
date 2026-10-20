@@ -1,0 +1,2 @@
+# The music packs (2026-10-15): 593 MB of WAV would exhaust GitHub LFS; they live here on disk and in the E: backup, not in git.
+*.wav

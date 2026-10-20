@@ -43,7 +43,14 @@ namespace Crulanda.Encounter
             float ratio = actor.Health.Pool.Ratio;
             TickBoss();   // phases, rings, blinks, calls (EncounterEnemy.Boss)
             if (!Enraged && ratio <= Move.enrageAt) Enrage();
-            if (!rallied && ratio <= Move.callAt) { rallied = true; if (!string.IsNullOrEmpty(Move.call)) session.Rally(this, Victim); }
+            if (!rallied && ratio <= Move.callAt)
+            {
+                rallied = true;
+                int came = string.IsNullOrEmpty(Move.call) ? 0 : session.Rally(this, Victim);
+                // (The Adit rework, 2026-10-15) A camp let loose at its call (ZoneCamp.after "loose:<this elite>": Hollowsong's choir, the Whisperer's
+                // flock) comes now, with the call's line when Rally said nothing (nobody else answered); EncounterSession.Release.cs.
+                session.ReleaseAfter("loose:" + MobName, Victim, this, came > 0 ? null : Move.call, 0);
+            }
             if (!WindingUp) return false;
             if (agent.isOnNavMesh) { agent.isStopped = true; agent.velocity = Vector3.zero; }
             // It turns with whoever it is fighting, and leans back as the blow gathers.
@@ -78,7 +85,7 @@ namespace Crulanda.Encounter
                 session.Message(v == session.Player ? "You step clear of " + Move.name + "." : Move.name + " falls on empty ground.");
                 return;
             }
-            int damage = session.Kit.ResolveEnemyHit(this, v, Mathf.RoundToInt(HitBase * Move.blow * weaponUp * OverHitNow * GroupDamageScale));
+            int damage = session.Kit.ResolveEnemyHit(this, v, CappedBlow(v, Mathf.RoundToInt(HitBase * Move.blow * weaponUp * OverHitNow * GroupDamageScale * BlowScale)));
             AfterBlow(v);   // knockback, disarm (EncounterEnemy.Boss)
             session.FloatText(v.transform.position + Vector3.up * .3f, Move.name + " −" + damage, RageColor);
             session.Message(Name + "'s " + Move.name + " hits " + (v == session.Player ? "you" : v.DisplayName) + " for " + damage + ".");
@@ -105,6 +112,6 @@ namespace Crulanda.Encounter
             if (!Enraged) return;
             Enraged = false; transform.localScale = calmScale;
         }
-        void OnDestroy() { if (mark != null) Destroy(mark.gameObject); }
+        void OnDestroy() { if (mark != null) Destroy(mark.gameObject); if (holdMark != null) Destroy(holdMark.gameObject); DestroyTrickMarks(); }
     }
 }

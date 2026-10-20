@@ -87,6 +87,7 @@ namespace Crulanda.Encounter
             new GearFamily("sword.leaf", "mainhand", 2, "bronze", "root"),
             new GearFamily("sword.great", "mainhand", 0, "steel", "wood", "living"),
             new GearFamily("knife", "mainhand", 2, "hooked", "needle", "glass", "sickle"),
+            new GearFamily("knife.off", "offhand", 2, "hooked", "needle", "glass", "sickle"),   // a second knife in the left fist (the Rogue's pair, 2026-10-11)
             new GearFamily("axe.hand", "mainhand", 2, "wedge", "hatchet"),
             new GearFamily("axe.bearded", "mainhand", 2, "plain", "hooked"),
             new GearFamily("axe.crescent", "mainhand", 2, "plain", "spiked"),
@@ -328,8 +329,9 @@ namespace Crulanda.Encounter
             material = n.Substring(0, space); piece = n.Substring(space + 1);
             return true;
         }
-        /// <summary>The resolver's own copy of the level bands (ItemDatabase's is private): 1-2, 3-5, 6-8, 9-10, 11-13.</summary>
-        public static int BandOf(int level) { return level <= 5 ? 0 : level <= 9 ? 1 : level <= 12 ? 2 : level <= 14 ? 3 : 4; }   // round 29 bands (the Rim and the Shore share the cap: 15 is the Shore's)
+        /// <summary>The look's level bands (its tier): 1-5, 6-9, 10-12, 13-14, 15, and 16-20 (the Lowtowns', the cap of 20). The last band has
+        /// no new art yet: its pieces take the top band's families (a word's family list is clamped) and every "tier 4 or more" part.</summary>
+        public static int BandOf(int level) { return level <= 5 ? 0 : level <= 9 ? 1 : level <= 12 ? 2 : level <= 14 ? 3 : level <= 15 ? 4 : 5; }   // round 29 bands (the Rim and the Shore share 15), and 16-20 (2026-10-16)
         /// <summary>A short key for a resolved look (family, variant, palette, quality, glow, metal, detail and tier), for caching rendered icons.</summary>
         public static string LookKey(GearLook l)
         {

@@ -157,11 +157,59 @@ namespace Crulanda.Encounter
                     case "/friends": ListFriends(); return;
                     case "/assist": case "/a": Assist(arg); return;
                     case "/lead": case "/run": Lead(arg); return;
-                    case "/dungeon": LeadDungeon(); return;
+                    case "/dungeon": LeadDungeon(arg); return;   // "/dungeon quick", "/dungeon full" (the Adit rework)
+                    case "/buff": BuffUp(); return;   // buff up before a boss (2026-10-15, BossBuffs): eat, drink, your class's buff on the party
+                    case "/queue":   // the dungeon queue (Gather a Party; EncounterSession.Queue): alone the window, "/queue <dungeon>|any" queues, "/queue leave" stops
+                        if (arg.Length == 0) { QueueOpen = !QueueOpen; return; }
+                        if (string.Equals(arg, "leave", StringComparison.OrdinalIgnoreCase)) { if (QueuedFor != null) LeaveQueue(); else if (QueueRunZone != null) DisbandQueue("You leave the queued party."); else Message("You are not queued."); return; }
+                        JoinQueue(arg); return;
+                    case "/lockouts": case "/lockout": if (string.Equals(arg, "clear", StringComparison.OrdinalIgnoreCase)) TesterClearLockouts(); else ListLockouts(); return;   // the bosses and elites locked for you (Lockouts); "clear" is a tester's, as /level
+                    case "/exit": case "/quit": Quit(); return;   // Chris 2026-10-14: "all need an exit command to close the .exe"
+                    case "/scorecard": ScorecardOpen = !ScorecardOpen; if (ScorecardOpen && ScorecardTitle == null) ScorecardTitle = (Meter.RunName ?? "The run") + " so far"; return;
+                    case "/level": TesterLevel(arg); return;   // Chris, 2026-10-13: "i need a way to fast level for testing" / "and then reset to 1 when not testing"
+                    case "/aa": TesterAa(arg); return;
+                    case "/archive": TesterArchive(); return;   // the Archive's reading room where you stand (the capital's halls, EncounterSession.Halls)
+                    case "/bank": TesterBank(); return;   // the Treasury Vault where you stand, before the castle's clerk (2026-10-15)
+                    case "/exchange": case "/ex": TesterExchange(); return;   // the Exchange where you stand
+                    case "/meter": if (arg == "reset") { Meter.Reset(); Message("Meter reset."); } else { MeterOpen = !MeterOpen; Message(MeterOpen ? "Damage and healing meter shown (/meter reset clears it)." : "Meter hidden."); } return;
                     case "/guild": if (arg.Length == 0) { GuildRoster(); return; } break;
                     case "/groster": case "/ginfo": GuildRoster(); return;
                     case "/gquit": LeaveGuild(); return;
                     case "/invis": Unseen = !Unseen; Message(Unseen ? "Unseen: mobs will not notice you (until you hit one). /invis again to be seen." : "Seen again."); return;
+                    case "/lowtowns":   // a tester's way there (2026-10-16, Chris: "just let me know when i can test/see the new zone"), at level 17 at least
+                        {
+                            var to = Zone != null ? Zone.FindZone("zone.lowtowns") : null; if (to == null) { Message("The Lowtowns is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            if (Progress.Level < 17) { Progress.experience = EncounterProgress.XpForLevel(17); ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); }
+                            Message("To The Lowtowns at level " + Progress.Level + "...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.lowtowns", name = "/lowtowns", arrive = to.spawns.player });
+                            return;
+                        }
+                    case "/hallows":   // a tester's way there (2026-10-16, Chris: "just let me know when i can test/see the new zone"), at level 16 at least
+                        {
+                            var to = Zone != null ? Zone.FindZone("zone.hallows") : null; if (to == null) { Message("Hallow's Creek is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            if (Progress.Level < 16) { Progress.experience = EncounterProgress.XpForLevel(16); ApplyLevel(); Player.Health.ApplyHealing(Player.Health.Pool.Max); }
+                            Message("To Hallow's Creek at level " + Progress.Level + "...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.hallows", name = "/hallows", arrive = to.spawns.player });
+                            return;
+                        }
+                    case "/oakhaven":   // home: Oakhaven's green (Chris, 2026-10-17: "is there a command to get to oakhaven?")
+                        {
+                            var oak = Zone != null ? Zone.FindZone("zone.oakhaven") : null; if (oak == null) { Message("Oakhaven is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            Message("To Oakhaven...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.oakhaven", name = "/oakhaven", arrive = oak.spawns.player });
+                            return;
+                        }
+                    case "/crown":   // a tester's way to the capital (2026-10-16, Chris's castle preview: the bat took him to the Adit)
+                        {
+                            var crown = Zone != null ? Zone.FindZone("zone.crown") : null; if (crown == null) { Message("The Crown of Argentis is not in this build."); return; }
+                            if (InCombat) { Message("Not in a fight."); return; }
+                            Message("To the Crown of Argentis...");
+                            TravelTo(new Crulanda.World.ZoneExit { to = "zone.crown", name = "/crown", arrive = crown.spawns.player });
+                            return;
+                        }
                     case "/adit":   // a tester's way in (Chris, 2026-10-08): level 11 and straight to the Sealed Adit's yard
                         {
                             var adit = Zone != null ? Zone.FindZone("zone.adit") : null; if (adit == null) { Message("The Sealed Adit is not in this build."); return; }
@@ -172,7 +220,26 @@ namespace Crulanda.Encounter
                             TravelTo(new Crulanda.World.ZoneExit { to = "zone.adit", name = "/adit", arrive = adit.spawns.player });
                             return;
                         }
-                    case "/help": Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon (a sim leads you through the dungeon); /g guild chat, /guild (who is in it), /gquit."); return;
+                    case "/loc":   // where you stand, in the map's terms (2026-10-15, Chris: "a complete map of the dungeon? so i can verify locations"; tools/wip/dungeon/adit_map.py)
+                        {
+                            var at = Player.transform.position; string cave = null;
+                            foreach (var h in Crulanda.World.Hollow.All) if (h.Inside(at, .5f)) { cave = h.Name; break; }
+                            Message("You are at x " + at.x.ToString("0.0") + ", z " + at.z.ToString("0.0") + ", height " + at.y.ToString("0.0") + (cave != null ? " (" + cave + ")" : "") + ".");
+                            return;
+                        }
+                    case "/music":   // the zone's music (2026-10-15, Chris's three packs; ZoneMusic): /music <0-1> sets the level, /music off silences it
+                        {
+                            if (arg.Length == 0) { Message("Music is at " + Mathf.RoundToInt(Crulanda.World.ZoneMusic.Volume * 100) + "%: /music <0-1> sets it, /music off silences it."); return; }
+                            if (arg == "off") { Crulanda.World.ZoneMusic.Volume = 0; Message("Music off (/music on brings it back)."); return; }
+                            if (arg == "on") { Crulanda.World.ZoneMusic.Volume = Crulanda.World.ZoneMusic.DefaultVolume; Message("Music on, at " + Mathf.RoundToInt(Crulanda.World.ZoneMusic.DefaultVolume * 100) + "%."); return; }
+                            if (float.TryParse(arg.TrimEnd('%'), System.Globalization.NumberStyles.Float, System.Globalization.CultureInfo.InvariantCulture, out float level))
+                            {
+                                if (level > 1) level /= 100;   // "/music 50" reads as a half
+                                Crulanda.World.ZoneMusic.Volume = level; Message(level <= 0 ? "Music off (/music on brings it back)." : "Music at " + Mathf.RoundToInt(Mathf.Clamp01(level) * 100) + "%."); return;
+                            }
+                            Message("/music <0-1> sets the music's level; /music off silences it."); return;
+                        }
+                    case "/help": Message("Testing: /level <1-" + EncounterProgress.LevelCap + "> sets your level (down to 1 starts over), /aa <n> gives alternate advancement points at the cap, /lockouts clear ends every lockout, /archive opens the Archive's reading room, /bank the Treasury Vault and /exchange the Exchange where you stand."); Message("Chat: /s say, /z zone, /t trade, /lfg, /p party, /w <name> <words> whisper, /r reply; /invite <name> (anyone online, anywhere), /leave [name], /who, /friend <name>, /friends, /assist [name], /lead [name] (a sim leads a run to a camp), /dungeon [quick|full] (a sim leads you through the dungeon: quick takes only what must be done, full every side room too), /queue [dungeon|any|leave] (the dungeon queue, J: a party of your level to a dungeon's door), /buff (eat, drink and lay your class's buff on the party: the leader stops to buff up before a boss); /lockouts (the bosses and elites locked for you); /g guild chat, /guild (who is in it), /gquit."); Message("Music: /music <0-1> sets its level, /music off silences it."); return;
                     case "/s": case "/say": case "/z": case "/zone": case "/ooc": case "/t": case "/trade": case "/lfg": case "/l": case "/p": case "/party": case "/g": case "/gu": break;
                     default: Message("Unknown command " + cmd + ". /help lists them."); return;
                 }

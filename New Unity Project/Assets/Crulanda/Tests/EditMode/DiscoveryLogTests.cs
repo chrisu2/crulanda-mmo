@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using NUnit.Framework;
 using UnityEngine;
 using Crulanda.Encounter;
@@ -34,7 +35,9 @@ namespace Crulanda.Tests
     /// <summary>
     /// Discoveries: the save keeps them (format 7; a real v6 save migrates with nothing lost), and the rules of finding: pays once,
     /// a chest waits for its key, full bags keep the find for later, the book counts every secret but names only the found, and
-    /// the zones' secrets are sound.
+    /// the zones' secrets are sound. Phase 8.6 (step 8): the five new kinds and their rules, a rare herb that grows back a game day
+    /// after it is picked (picked with Herbalism at its level), a wayshrine that takes a crown for its blessing, and the count by
+    /// region (decision 6).
     /// </summary>
     public class DiscoveryLogTests
     {
@@ -228,12 +231,112 @@ namespace Crulanda.Tests
                 new ZoneSecret { id = "secret.test.loop-a", name = "A", kind = "cache", prompt = "Search", needs = "secret.test.loop-b", canonStatus = "GAME-ONLY" },
                 new ZoneSecret { id = "secret.test.loop-b", name = "B", kind = "cache", prompt = "Search", needs = "secret.test.loop-a", canonStatus = "GAME-ONLY" },
                 new ZoneSecret { id = "secret.test.view", name = "View", kind = "vista", radius = 0, item = "no.such.item", document = "no.such.page" },
+                new ZoneSecret { id = "secret.test.told", name = "Told", kind = "cache", prompt = "Search", canonStatus = "GAME-ONLY", clue = "Look behind the old well.", hint = "Jory says it's by the OLD WELL." },   // 2026-10-15: a clue or hint that names a landmark
             };
             string all = string.Join("\n", DiscoveryLog.Validate(new[] { bad }, Items(), Quests()));
             foreach (var expected in new[] { "Duplicate secret id 'secret.test.well'", "its id should be secret.test.<slug>", "unknown kind 'urn'", "no prompt for E",
                 "needs unknown secret 'secret.test.nowhere'", "a key that no chest needs", "go round in a circle", "a lookout needs a radius", "no canonStatus",
-                "unknown item 'no.such.item'", "unknown Chronicle page 'no.such.page'", "a landmark has its name" })
+                "unknown item 'no.such.item'", "unknown Chronicle page 'no.such.page'", "a landmark has its name", "Secret 'secret.test.told': its clue or hint names the landmark 'The Old Well'" })
                 StringAssert.Contains(expected, all);
+        }
+
+        // ---------- Phase 8.6: the new kinds, the herbs that grow back, the wayshrines, the count by region ----------
+        [Test] public void The_new_kinds_are_known_and_their_rules_checked()
+        {
+            foreach (var k in new[] { "carving", "read", "grave", "remains", "shrine" }) CollectionAssert.Contains(DiscoveryLog.Kinds, k);
+            Assert.IsTrue(DiscoveryLog.Pocketed(Secret("bones", "remains")), "The satchel is taken; the bones stay.");
+            foreach (var k in new[] { "carving", "read", "grave", "shrine" }) Assert.IsFalse(DiscoveryLog.Pocketed(Secret(k, k)), k + " stays where it is.");
+            Assert.IsTrue(DiscoveryLog.Lingers(new ZoneSecret { kind = "herb", item = "herb.moonbell" })); Assert.IsTrue(DiscoveryLog.Lingers(Secret("s", "shrine")));
+            Assert.IsFalse(DiscoveryLog.Lingers(Secret("c", "cache"))); Assert.IsFalse(DiscoveryLog.Lingers(Secret("h", "herb")), "A herb with no item has nothing to grow back.");
+            var bad = new ZoneDefinition { id = "zone.test" };
+            bad.secrets = new[] {
+                new ZoneSecret { id = "secret.test.book", name = "Book", kind = "read", prompt = "Read", canonStatus = "GAME-ONLY" },
+                new ZoneSecret { id = "secret.test.bones", name = "Bones", kind = "remains", prompt = "Search", canonStatus = "GAME-ONLY" },
+                new ZoneSecret { id = "secret.test.mark", name = "Mark", kind = "carving", prompt = "Look", canonStatus = "GAME-ONLY" },
+                new ZoneSecret { id = "secret.test.stone", name = "Stone", kind = "grave", prompt = "Read", canonStatus = "GAME-ONLY" },
+                new ZoneSecret { id = "secret.test.shrine", name = "Shrine", kind = "shrine", prompt = "Kneel", item = "potion.minor", canonStatus = "GAME-ONLY" },
+                new ZoneSecret { id = "secret.test.bells", name = "Bells", kind = "herb", prompt = "Pick", canonStatus = "GAME-ONLY" },
+            };
+            string all = string.Join("\n", DiscoveryLog.Validate(new[] { bad }));
+            foreach (var expected in new[] { "'secret.test.book': a read with no page", "'secret.test.bones': a remains with no page", "'secret.test.mark': a carving with nothing written",
+                "'secret.test.stone': a grave with nothing written", "'secret.test.shrine': a shrine gives its blessing", "'secret.test.bells': a herb with no item" })
+                StringAssert.Contains(expected, all);
+            StringAssert.DoesNotContain("unknown kind", all);
+        }
+
+        [Test] public void A_found_rare_herb_grows_back_a_day_after_it_is_picked()
+        {
+            var log = Fresh(out _, out _); var p = log.Progress; p.days = 4;
+            var bells = Secret("bells", "herb", xp: 10, item: "herb.moonbell");
+            Assert.IsFalse(log.Regrown(bells), "Not found yet: nothing to grow back.");
+            Assert.AreEqual(DiscoveryLog.Result.Found, log.Discover(bells));
+            Assert.AreEqual(1, Inventory.Count(p, "herb.moonbell"));
+            Assert.IsFalse(log.Regrown(bells), "Picked today.");
+            p.days = 5; Assert.IsTrue(log.Regrown(bells), "The clock past six in the morning: it has grown back.");
+            log.Picked(bells); Assert.IsFalse(log.Regrown(bells), "Picked again.");
+            p.days = 6; Assert.IsTrue(log.Regrown(bells));
+            log.Bind(p); Assert.IsFalse(log.Regrown(bells), "After a load it is counted as picked that day.");
+            p.days = 7; Assert.IsTrue(log.Regrown(bells));
+            // Picked with Herbalism, at the herb's level (no node of the trades' for it: one is made).
+            var items = Items(); var node = DiscoveryLog.HerbNode(bells, null, items);
+            Assert.AreEqual("herbalism", node.profession); Assert.AreEqual("herb.moonbell", node.item); Assert.AreEqual(10, node.skill); Assert.AreEqual(1, node.max);
+            Assert.AreEqual(75, DiscoveryLog.HerbNode(Secret("moss", "herb", item: "herb.lantern_moss"), null, items).skill, "Lantern-moss (level 14) asks Herbalism 75.");
+            var trades = ProfessionDatabase.Parse(Texts("Professions").Concat(new[] { "{\"nodes\":[{\"id\":\"node.test_moonbell\",\"name\":\"Moonbell\",\"profession\":\"herbalism\",\"skill\":25,\"item\":\"herb.moonbell\",\"min\":1,\"max\":2}]}" }), items);
+            var own = DiscoveryLog.HerbNode(bells, trades, items);
+            Assert.AreEqual("herb.moonbell", own.item); Assert.AreNotEqual("node.rare.bells", own.id, "The trades' own node for it, when the content has one.");
+            Assert.IsNull(DiscoveryLog.HerbNode(Secret("bare", "herb"), null, items), "No item, no node.");
+        }
+
+        [Test] public void A_wayshrine_blesses_for_a_crown_once_found()
+        {
+            var log = Fresh(out _, out _); var p = log.Progress; p.gold = 0;
+            var shrine = Secret("shrine", "shrine", xp: 20);
+            Assert.IsFalse(log.Offer(shrine, out _), "Not found yet.");
+            log.Discover(shrine);
+            Assert.IsFalse(log.Offer(shrine, out var why)); Assert.AreEqual(DiscoveryLog.NoCrownLine, why);
+            p.gold = 3; Assert.IsTrue(log.Offer(shrine, out _)); Assert.AreEqual(3 - DiscoveryLog.Offering, p.gold, "One crown in the dish.");
+            Assert.IsFalse(log.Offer(Secret("cache", "cache"), out _), "Only a shrine takes an offering.");
+            var b = DiscoveryLog.Blessing();
+            Assert.AreEqual(DiscoveryLog.BlessingId, b.id); Assert.AreEqual(DiscoveryLog.BlessingName, b.name); Assert.AreEqual(600, b.duration);
+            Assert.That(b.incomingDamageMultiplier, Is.InRange(.9f, .99f), "Small: a little less from every blow.");
+        }
+
+        [Test] public void The_count_by_region_names_the_nearest_great_place()
+        {
+            var landmarks = new[] {
+                new ZoneLabel { name = "The Mastwood", at = new Vector2(0, 100), radius = 18 }, new ZoneLabel { name = "Thornshaw", at = new Vector2(100, 0), radius = 16 },
+                new ZoneLabel { name = "The Old Orchard", at = new Vector2(-100, 0), radius = 14 }, new ZoneLabel { name = "A small well", at = new Vector2(0, 92), radius = 6 } };
+            ZoneSecret At(string slug, float x, float y) { var s = Secret(slug, "cache"); s.at = new Vector2(x, y); return s; }
+            var hidden = new[] { At("a", 2, 95), At("b", -10, 110), At("c", 90, 5), At("d", -95, 2), At("e", 5, 80) };
+            var regions = DiscoveryLog.Regions(hidden, landmarks);
+            CollectionAssert.AreEqual(new[] { ("The Mastwood", 3), ("The Old Orchard", 1), ("Thornshaw", 1) }, regions, "By the great places only (the well is small), most first.");
+            Assert.AreEqual("3 hidden about the Mastwood", DiscoveryLog.RegionLine("The Mastwood", 3)); Assert.AreEqual("1 hidden about Thornshaw", DiscoveryLog.RegionLine("Thornshaw", 1));
+            var log = Fresh(out _, out _); log.Discover(hidden[0]); log.Discover(hidden[1]);
+            var t = log.TallyOf("zone.oakhaven", "Oakhaven", hidden, true, landmarks);
+            Assert.AreEqual(t.Hidden, t.regions.Sum(r => r.count), "The regions count the hidden, and only them.");
+            Assert.AreEqual(("The Mastwood", 1), t.regions.Find(r => r.place == "The Mastwood"));
+            Assert.IsEmpty(log.TallyOf("zone.oakhaven", "Oakhaven", hidden).regions, "No places given, no regions.");
+            var few = DiscoveryLog.Regions(hidden, new[] { landmarks[3], new ZoneLabel { name = "Hut", at = new Vector2(90, 0), radius = 6 } });
+            Assert.AreEqual(2, few.Count, "A zone with few great places counts by all its places.");
+        }
+
+        [Test] public void Every_zone_has_its_target_of_secrets_with_the_new_kinds_spread_among_them()
+        {
+            var zones = new List<ZoneDefinition>(); foreach (var json in Texts("Zones")) zones.Add(JsonUtility.FromJson<ZoneDefinition>(json));
+            int Count(string id) { return zones.Find(z => z.id == id).secrets.Length; }
+            // Decision 7 (2026-10-15): about 90 in all; Oakhaven up to 20 (it had 25 already), Khaven, the Peaks and the Rim 8-14 each, the
+            // Shore 6-14, the Sealed Adit's (13 since its rework) kept, the Root-Mother's Deep up to three, Crowsfoot Hollow its two.
+            Assert.GreaterOrEqual(Count("zone.oakhaven"), 20);
+            // (2026-10-18) The Lowtowns may hold fifteen: the carvings under the moss in the drowned vaults' crawl (pick 11).
+            foreach (var id in new[] { "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns" }) Assert.That(Count(id), Is.InRange(8, id == "zone.lowtowns" ? 15 : 14), id);
+            int total = zones.Sum(z => z.secrets.Length); Assert.That(total, Is.InRange(110, 126), "About ninety in all, the Lowtowns' fourteen (Phase 9.1), Hallow's Creek's eight (2026-10-16) and the Crown's three.");
+            var shore = zones.Find(z => z.id == "zone.verdant");
+            Assert.AreEqual(3, shore.secrets.Count(s => s.cave == "The Root-Mother's Deep"), "Three in the Root-Mother's Deep.");
+            var oak = zones.Find(z => z.id == "zone.oakhaven");
+            Assert.AreEqual(2, oak.secrets.Count(s => Vector2.Distance(s.at, new Vector2(-75, 246)) < 20), "Crowsfoot Hollow keeps its two (the key and the strongbox).");
+            foreach (var k in new[] { "carving", "read", "grave", "remains", "shrine" }) Assert.GreaterOrEqual(zones.Sum(z => z.secrets.Count(s => s.kind == k)), 2, "At least two of kind " + k + ".");
+            foreach (var id in new[] { "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant" })
+                Assert.GreaterOrEqual(zones.Find(z => z.id == id).secrets.Count(s => System.Array.IndexOf(new[] { "carving", "read", "grave", "remains", "shrine" }, s.kind) >= 0), 3, id + " has three of the new kinds.");
         }
     }
 }

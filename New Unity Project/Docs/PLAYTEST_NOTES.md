@@ -980,3 +980,5 @@ un-captures.
 - 298 (2026-10-19 ~20:15) The new classes (Docs/CLASSES_9_2.md, branch classes-92); his picks at the question prompt (verbatim): first class
   "Pact-Blade"; the Seer's paths "Maker/Keeper/Breaker (Recommended)"; names "Seer + Sight (Recommended)"; races "Seer human, Ash-Walker orc
   (Recommended)". Pact-Blade (Veyra's Iron Pact two-sword fighting, pure damage in heavy armour) is built first.
+- 299 (2026-10-19 ~20:20) The Forge District (branch forge-district; ZONE_FORGE_DISTRICT.md): his answers (verbatim) levels "19-22
+  (Recommended)", the Spoke "Seen, not entered (Recommended)", the inn "Fully its own now (Recommended)", Rook "Not yet (Recommended)".

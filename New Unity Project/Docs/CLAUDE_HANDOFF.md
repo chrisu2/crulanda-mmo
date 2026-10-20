@@ -17,9 +17,13 @@ the brazier flame out of batching): NOT published and not re-captured since the 
   fix painted on trunk in tools/art/make_icons.py, then merge into the branches). Back up Chris's save before merging either.
 - forge-district (D:\code\mmo-forge-district, 709baee1): zone.forge, 360 m, mobs 19-22, the Spoke seen not entered, no dungeon; the
   Rust & Ruin its own inn (variant 5, ZoneBuilder.RustRuin.cs); world-map pin; Chris's answers in ZONE_FORGE_DISTRICT.md. Headless
-  R258 running (ForgeDistrict, InnLayout, WorldMapLabel, IconCoverage, InnSeat). Then capture the inn inside and out.
+  R260 at 88fa6cfb: EditMode 23/23, PlayMode 8/8 (InnSeat in the Rust & Ruin included). Next: capture the inn inside and out.
 - classes-92 (D:\code\mmo-classes-92, ea391dce+): Docs/CLASSES_9_2.md; Chris: Pact-Blade first, Seer paths Maker/Keeper/Breaker,
-  Seer + Sight, Seer human, Ash-Walker orc. The Pact-Blade's build in progress (kit, creation, trainer, sims, tests).
+  Seer + Sight, Seer human, Ash-Walker orc. The Pact-Blade BUILT (bccf7348): kit, Vital-Aether, 15 abilities, three paths,
+  creation, trainer Hessa Vell (Crown Hall of Arms, x 74: check in game), sims 89-96. Headless: EditMode 57/57; PactBladeLoopTests 4/5:
+  Every_ability_casts_at_twenty_with_its_path runs out of foes ("A living mob" null at R262); the test must spawn a fresh foe per
+  cast. The Scoundrel sim's 3.5% dummy miss (SimDummyTests) is older than this branch (r213-r215). Player damage scale not tuned;
+  wears the Warrior figure tinted grey.
 - kaykit-weapons (4b0a43e0): fixed, not re-captured. angular-gear (590cce32): helms Chris calls pitiful; waits on the Quaternius
   Source pack.
 Next: R258's results; the Pact-Blade's tests; captures of the Forge and the trunk art, then publish (save backed up first); merge

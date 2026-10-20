@@ -91,6 +91,8 @@ namespace Crulanda.Tests
             Assert.AreEqual("sword.arming", looks.Resolve(db.Get("item.pact_sword")).family);
             Assert.AreEqual("sword.off", looks.Resolve(db.Get("item.pact_second_sword")).family, "the second sword drawn in the left fist");
             Assert.IsTrue(SimGear.CarriesWeapon("class.pactblade"));
+            var worn = SimGear.For(new SimAdventurer { id = "t", name = "Test", classId = "class.pactblade", level = 5, gearSeed = 3 }, db);
+            Assert.Contains("item.pact_sword", worn, "a sim Pact-Blade carries the right sword"); Assert.Contains("item.pact_second_sword", worn, "and the left");
         }
         [Test] public void Vital_Aether_burns_and_spends_by_the_numbers()
         {

@@ -63,8 +63,13 @@ namespace Crulanda.Tests
             BuyPath("white-whirl");
             for (int slot = Edge; slot <= Ring; slot++) Assert.AreEqual(slot >= Whirl && slot <= Turning ? null : "Talent", session.Kit.ActionLockLabel(slot), "a White Whirl: " + session.Kit.ActionAt(slot).id);
             Assert.IsTrue(session.Kit.MeleeAutoAttacks);
-            Assert.AreEqual("item.pact_sword", session.Progress.equipment[(int)EquipSlot.MainHand].item, "a sword in the right hand");
-            Assert.AreEqual("item.pact_second_sword", session.Progress.equipment[(int)EquipSlot.OffHand].item, "and one in the left");
+            // Two swords from the first: a new character is armed in a zone (ArmNewCharacter); this scene has none, so the sims' kit
+            // stands for it there (PactBladeRulesTests.Two_swords_one_for_each_hand), as the Rogue's test does.
+            if (session.Zone != null)
+            {
+                Assert.AreEqual("item.pact_sword", session.Progress.equipment[(int)EquipSlot.MainHand].item, "a sword in the right hand");
+                Assert.AreEqual("item.pact_second_sword", session.Progress.equipment[(int)EquipSlot.OffHand].item, "and one in the left");
+            }
             yield return null;
         }
         [UnityTest] public IEnumerator Measured_Cut_builds_Vital_Aether_and_Aether_Edge_spends_it_all()
@@ -107,10 +112,11 @@ namespace Crulanda.Tests
                 {
                     if (session.Kit.ActionLockLabel(slot) != null) continue;
                     var id = session.Kit.ActionAt(slot).id;
-                    if (id == "pactblade.minimum_movement") { Near(e, 8); yield return null; }
                     if (!e.actor.IsAlive) { e = Foe(); Near(e, 2); yield return null; }
                     session.Player.Resource.Pool.SetCurrent(100); session.Player.Health.Pool.Fill();
                     yield return Ready();
+                    // The stride wants ground to close: stood 8 m off just before it (in the wait the foe would walk back into reach).
+                    if (id == "pactblade.minimum_movement") { if (!e.actor.IsAlive) e = Foe(); Near(e, 8); }
                     bool used = session.UseAbility(slot);
                     if (id == "pactblade.answering_cut") Assert.AreEqual(Kit.CanAnswer, used, "the Answering Cut only after a blow on you");
                     else Assert.IsTrue(used, path + ": " + id + " casts");

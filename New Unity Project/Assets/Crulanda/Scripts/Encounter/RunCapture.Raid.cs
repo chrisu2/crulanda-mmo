@@ -81,7 +81,10 @@ namespace Crulanda.Encounter
                 float waitFrom = Time.time;
                 while ((s.UnravellerFoe == null || s.UnravellerRising || !s.UnravellerFoe.actor.IsAlive) && Time.time - waitFrom < 120) yield return null;
                 var e = s.UnravellerFoe; if (e == null) { Log("Pull " + pull + ": she did not rise."); break; }
+                // Every pull a fresh one (tune-11: her second wipe of the visit sank her at the next pull's start, read as "KILL in 0:01").
+                var clock = s.WorldBossNow; if (clock != null) clock.wipes = 0;
                 if (!s.Player.IsAlive) s.Recover();
+                if (!s.Player.IsAlive) { s.Player.Health.Revive(s.Player.Health.Pool.Max); Log("Pull " + pull + ": you were still down; up by the run"); }
                 motor.Teleport(stand + Vector3.up * 1.05f);
                 foreach (var c in s.PartySims) if (c != null) { if (!c.actor.IsAlive) c.actor.Health.Revive(c.actor.Health.Pool.Max); c.actor.Health.ApplyHealing(c.actor.Health.Pool.Max); c.actor.Resource?.Pool.Fill(); RaidCall.BuyKit(c.sim, id => s.Items?.Get(id)?.value ?? 1); var ag = c.GetComponent<NavMeshAgent>(); if (ag != null && ag.isOnNavMesh && NavMesh.SamplePosition(stand + UnityEngine.Random.insideUnitSphere * 4, out var h, 4, NavMesh.AllAreas)) ag.Warp(h.position); }
                 s.Player.Health.ApplyHealing(s.Player.Health.Pool.Max); s.Player.Resource.Pool.Fill();
@@ -102,6 +105,10 @@ namespace Crulanda.Encounter
                 string buffs = members + " up: class buffs " + (members > 0 ? (cb / (float)members).ToString("0.0") : "0") + " each, fed " + fedN + ", elixir " + elixN;
                 Log("Pull " + pull + " buffs: " + buffs + "; " + string.Join("; ", s.PartyActors().Where(a => a != null && a.IsAlive).Select(a => { var b = s.BuffsOn(a); return (a == s.Player ? "you" : a.DisplayName.Split(' ')[0]) + " " + b.classBuffs + (b.fed ? " fed" : "") + (b.elixir ? " elixir" : ""); })));
                 buffLines.Add("Pull " + pull + ": " + buffs);
+                // Her again, as she is now (she may have sunk and risen while the raid buffed): the pull is on her or on nobody.
+                e = s.UnravellerFoe;
+                if (e == null || !e.actor.IsAlive || s.UnravellerSinking || s.UnravellerRising) { Log("Pull " + pull + ": she was not up at the pull; not counted"); lines.Add("Pull " + pull + ": not pulled (she was not up)"); continue; }
+                int killsBefore = clock != null ? clock.kills : 0;
                 // The pull: the tanks go first; the bot follows a moment after.
                 var tanks = s.PartySims.Where(c => c != null && c.Role == SimCompanion.PartyRole.Tank).ToList();
                 foreach (var tk in tanks) e.threat.Add(tk.actor.EntityId.Value, 50 - 10 * tanks.IndexOf(tk));
@@ -114,7 +121,8 @@ namespace Crulanda.Encounter
                 while (Time.time - start < PullLimit)
                 {
                     float t = Time.time - start;
-                    if (e == null || !e.actor.IsAlive) { won = true; break; }
+                    // A kill only when she was killed (the clock's kills went up): not a sinking, not a body gone (tune-11's "KILL in 0:01").
+                    if (e == null || !e.actor.IsAlive) { won = clock == null ? e != null : clock.kills > killsBefore; if (!won) ended = true; break; }
                     if (e.PullAt >= 0) lastRatio = e.actor.Health.Pool.Ratio;   // her health as the fight ends (a wipe makes her whole again)
                     if (Time.time - start > 5 && e.PullAt < 0) { ended = true; break; }   // her fight over without her death: a wipe, the feast, a reset
                     if (e.RaidPhase > phaseSeen) { phaseSeen = e.RaidPhase; Log(Clock(t) + "  phase " + phaseSeen + " (" + UnravellerRules.PhaseNames[phaseSeen] + ") at " + Mathf.RoundToInt(e.actor.Health.Pool.Ratio * 100) + "%"); Shot(s, directory, "pull" + pull + "-phase" + phaseSeen, ref shots, null); }

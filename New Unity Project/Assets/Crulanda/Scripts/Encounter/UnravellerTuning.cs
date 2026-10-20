@@ -58,8 +58,11 @@ namespace Crulanda.Encounter
         /// <summary>The most good effects a landed Feeding counts for its heal and her growth (tune-9: a buffed raid gave her 38 at once, 77%
         /// heavier blows from one Feeding).</summary>
         public int feedEatenMost = 8;
+        /// <summary>The Shaman's mends in her fight (tune-11: 26 a second healed to the Cleric's 45 and the Druid's 39; it has the most else to do:
+        /// the Barrow-wake, the Weave's work).</summary>
+        public float shamanMendLift = 1.5f;
         // ---------- the sims (3.5) ----------
-        public float simRaidLift = 1.2f; public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;
+        public float simRaidLift = 1.4f; public int harpooners = 3, interrupters = 3; public float harpoonLead = 2;
         /// <summary>The chance a sim misses its part of a mechanic now and then: at 18, at 20, and what a careless one (rash: nerve over .75) adds.</summary>
         public float simMissAt18 = .12f, simMissAt20 = .04f, simMissCareless = .06f;
 

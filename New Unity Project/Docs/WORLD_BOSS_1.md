@@ -883,6 +883,21 @@ guilds, the exchange). No world timer is saved today. Item kinds are strings ("g
      gathering, 2 s in the air), at least twice the run from the rings' middle past the outer ring (5 m at 5.2 m/s); a test holds it.
      Whoever is still under her body as she lands dies; anyone else in the outer ring takes the 35% and is thrown. The marked sim, the
      sims near it and the bot step out of the rings from the first moment. The fixed 30-41 m pick is gone (`leapRangeMin/Max` dropped).
+   - **Parked after tune-11** (2026-10-19; Chris: this is the last tuning run for now). Where it stands, GAME-ONLY and PROVISIONAL:
+     - **Tune-11** (her 306,000 after Chris's "cut about 10% health"; the marked leap): three real pulls wiped at 12:53, 12:05 and 13:17
+       with her at 13%, 27% and 12%, about 345 a second on her. Pulls 2 and 4 read "KILL in 0:01": not kills. The run's second wipe of the
+       visit sank her at the next pull's start, and a body gone read as a kill. Fixed in the run tool: every pull is a fresh one (the visit's
+       wipes set back to none), she is looked up again at the pull, a kill counts only when she was killed, and you are up for every pull.
+     - **Damage a living second in her fight**: Rogue 40, Scoundrel 40, Ranger 53, Mage 62 (band 88); Archivist 54 (its 62); tanks about 30
+       (63); healing: Cleric 45, Druid 39, Shaman 26.
+     - **The one adjustment**: the sims' blows x1.4 in her fight (`simRaidLift`, was 1.2) rather than less health: 345 x 1.17 is about 400
+       a second, a kill near 12:40 for a disciplined raid, inside 12-14 minutes and before the feast at 16:00. And the Shaman's mends x1.5
+       in her fight (`shamanMendLift`), toward the other two.
+     - **The numbers now** (`EncounterContent/Raids/unraveller.json`): health 306,000; feast at 16:00; pins 12 to 7 s; the pulse 1.2% +0.03%
+       a pulse from phase 3 (after a 6 s quiet); the leap at 75/50/25%, marked on the farthest, 4 s; brood 3 a wave; unmade ground 6% +6% a
+       second; spikes warned 3 s; the hunt 4 s; a Feeding counts at most 8 good effects.
+     - **What's next**: the next batch must check the kill window: sims alone 25-35% of pulls, kills at 12-14 minutes. Steps 7-8 (her loot,
+       her lockout) are on branch `wb-loot`.
 6. **The balance** (M): the group run tool at 10 in the Lowtowns, ten seeds, the targets of 3.6 (sims alone 30-40%, with you about 50%); read
    each wipe first; tune only the data file. *Chris watches a run (HUD, meter, scorecard on).*
 7. **The loot** (M; the character save change): the component kind and bag, the drops and counters, her signature epics, format 12 with a

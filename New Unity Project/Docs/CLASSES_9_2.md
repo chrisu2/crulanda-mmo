@@ -1,4 +1,10 @@
-# Phase 9.2: new classes to level 20 (design, 2026-10-19; nothing built)
+# Phase 9.2: new classes to level 20 (design, 2026-10-19)
+
+## Chris's answers (2026-10-19, play note 298, verbatim)
+- First class: **"Pact-Blade"** (not the recommended Seer). Its build spec is section 4; built 2026-10-19 (CLASS_STATUS.md).
+- Seer paths: **"Maker/Keeper/Breaker (Recommended)"**.
+- Names: **"Seer + Sight (Recommended)"**.
+- Races: **"Seer human, Ash-Walker orc (Recommended)"**.
 
 Chris, 2026-10-19 ~20:08 (verbatim): "just want everything up to level 20 for now with classes" (PLAYTEST_NOTES 297; ROADMAP "Next, after
 the Unraveller's tuning"). Phase 9.2 (ROADMAP): new class kits with talents, AI rotations, looks and sim support, modelled on the books'
@@ -281,3 +287,76 @@ exists for interrupts; the ground warnings are the raid's telegraph rings (note 
   `SimDummyTests` (a Breaker sim within 3% of its aim; a Keeper sim heals in the party test); `BossBuffTests` (the Silver Dawn's buff);
   `IconCoverageTests`.
 - Targeted runs only (test budget), headless; no save-format change (a new class id), but Chris's save backed up before the first build.
+
+---
+
+## 4. The Pact-Blade: build spec (Chris's pick, 2026-10-19; built the same day, see CLASS_STATUS.md)
+
+**Label:** CANON roots (Veyra's Iron Pact sword-work and Vital-Aether, B1F:1310, 2765, 4471; the world bible's "Dual-sword master",
+Talira Frostveil "Sword master", the Iron Citadel "the primary military training ground"; Kaelith's grace, book2/chapter_29.md:21), the
+class CANON-EXPANDED, every number GAME-ONLY, names PROVISIONAL. It takes in ROADMAP 9.2's Knight. No healing, no tanking, no oaths
+(those are the Paladin's and the Warrior's); "Stormlight" is not used; Veyra's sword Truth-Taker is hers, not a class ability.
+
+### Shape
+- **id** `class.pactblade`, "Pact-Blade". A **pure** damage class (not in `HybridClasses`): its damage paths aim at the pure band
+  (62-72 at 15, 79-92 at 20); its control path at the control band (45-52 at 15).
+- **Resource: Vital-Aether** (`ResourceKind.Focus`, named "Vital-Aether", 100). "The incredibly hot spark of Vital-Aether that every
+  Iron-Born fiercely carried in their blood" (B1F:1310). Built only by its cuts (no Aether from a plain swing, as Chris ruled for the
+  Scoundrel's Nerve), spent on the aether-cuts; it starts a fight at nothing and drains away six seconds after it.
+  **Burning Blood**: above 80 Aether your cuts land 10% harder and you lose 0.5% of your health a second (never below a tenth).
+- **Two swords**: the Pact Sword in the right hand, the Second Sword in the left (a new held family, `sword.off`, drawn as the arming
+  sword and mounted as the Rogue's second knife is). Heavy armour (`SimGear` "heavy"), Strength its stat, blacksmithing its trade.
+- **Base stats** (Innate): (18 + 3L/2, 19 + 2L, 15 + L, 8 + L/2, 10 + L/2); health 175 + 22 a level.
+- **Party buff**: **Iron-Born Blood**, +3% Strength for half an hour.
+- **Race**: human (the North's Iron-Born). **Trainer**: Brannoc Vell, Pact-Blade Trainer, at the end of the Hall of Arms' row in the
+  Crown (x 74, its banner crossed swords on steel-grey; GAME-ONLY). The Iron Citadel takes the trainer when it is built.
+- Look: the Warrior's heavy figure for now (`ActorLook.Warrior`), a steel-grey surcoat over it; its own figure in the figure round.
+
+### Abilities (WD is the weapon's hit: attack power)
+Base unlocks at 1-10; the path abilities by talent (as the Scoundrel's), from 1, 4 (tier 1) and 9 (tier 2).
+| Slot | Ability | Unlock | Cost / cooldown / reach | Does |
+|---|---|---|---|---|
+| 1 | **Measured Cut** | 1 | 0 / none / 3.2 m | 5 + 0.35 WD; +12 Aether; starts the swings ("minimum wasted movement", B1F:2765) |
+| 2 | **Second Blade** | 2 | 0 / 6 s / 3.2 m | the left sword follows: 4 + 0.55 WD; +10 Aether |
+| 3 | **Minimum Movement** | 4 | 0 / 15 s / 4-15 m | a dash to the target; +10 Aether |
+| 4 | **Hilt Blow** | 6 | 10 / 12 s / 3.2 m | 3 + 0.2 WD; stops its cast, silenced 3 s (the interrupt) |
+| 5 | **Iron Vow** | 8 | 0 / 60 s / self | 6 s: you take 20% less (Veyra's sheet: the Iron Vow) |
+| 6 | **Sentinel's Stop** | 10 | 20 / 20 s / 3.2 m | 4 + 0.3 WD; rooted 4 s (an elite once a fight, half), slowed 40% (the hold) |
+| 7 | Aether Edge | Twin-Blade tier 0 | 30+ / none / 3.2 m | spends all Aether: (8 + 0.5 WD) x spent / 30 |
+| 8 | Afterimage | Twin-Blade tier 1 | 25 / 10 s / 3.2 m | 0.9 WD now; its gold afterimage strikes again 2 s later for 60% ("burning afterimages of bright gold", B1F:2765) |
+| 9 | Blood-Vow | Twin-Blade tier 2 | 0 / 90 s / self | 12 s: your cuts 20% harder; you lose 1% of your health a second (Veyra's Blood-Vow, her sheet) |
+| 10 | White Whirl | White Whirl tier 0 | 30 / none / 5 m | every foe within 5 m: 4 + 0.55 WD ("a whirlwind of... blinding white light", B1F:2765) |
+| 11 | Afterglow | White Whirl tier 1 | 20 / 12 s / 4 m | gold light left round you 6 s: foes in it take 3 + 0.12 WD a second |
+| 12 | Turning Steel | White Whirl tier 2 | 15 / 45 s / self | 8 s: Measured Cut and Second Blade also cut up to 2 more foes within 4 m of the target, at 60% |
+| 13 | Answering Cut | Sentinel tier 0 | 10 / 6 s / 3.2 m | only within 4 s of a blow taken: 0.8 WD, the foe slowed 30% 4 s |
+| 14 | Disarming Cut | Sentinel tier 1 | 20 / 15 s / 3.2 m | 0.5 WD; its blows 25% lighter for 8 s (a boss's 10%) |
+| 15 | Iron Ring | Sentinel tier 2 | 30 / 30 s / 6 m | every foe within 6 m rooted 3 s and slowed 30% (the Pact's defensive circle) |
+
+### Talents (`Talents/pactblade.json`; tiers 0-4; 22 ranks a branch, 21 points at 20)
+**Twin-Blade** (damage, single target): tb-aether-edge (active), tb-keen-pair 5 (Measured Cut, Second Blade and Aether Edge 4% a rank),
+tb-quick-blood 3 (Measured Cut +2 Aether a rank); tb-afterimage (active), tb-bright-wake 3 (the afterimage +10% a rank); tb-blood-vow
+(active), tb-hot-blood 2 (Burning Blood +5% a rank); tb-measured-end (signature: Aether Edge spent at 80+ gives back 20), tb-redclaw 3
+(+3% a rank on foes under 35%: Zygnar's Redclaw Codex), tb-no-wasted (Second Blade 2 s sooner); tb-twin-vow (capstone: Second Blade
+leaves an afterimage too, at 40%).
+**White Whirl** (damage, area: at least x1.7 against three): ww-whirl (active), ww-wide-turn 5 (the Whirl 4% a rank), ww-reach 3 (+0.5 m
+a rank); ww-afterglow (active), ww-lingering 3 (+1 s a rank); ww-turning-steel (active), ww-blinding 2 (the Whirl slows 10% a rank, 3 s);
+ww-white-light (signature: each foe the Whirl strikes gives 3 Aether), ww-long-turn 3 (Turning Steel +1 s a rank), ww-steady-feet (10% less
+taken while Turning Steel); ww-ring-of-gold (capstone: the Whirl leaves a free Afterglow, once each 12 s).
+**Sentinel** (control): sn-answering-cut (active), sn-watchful 5 (Answering Cut 4% a rank), sn-long-stop 3 (Sentinel's Stop +1 s a rank);
+sn-disarming-cut (active), sn-heavy-hand 3 (Disarming Cut 3% lighter again a rank); sn-iron-ring (active), sn-held-ground 2 (Iron Ring
++1 s a rank); sn-sentinel (signature: a rooted or slowed foe takes 15% more from your cuts; Veyra's Sentinel, her sheet), sn-patient 3
+(Hilt Blow 1 s sooner a rank), sn-goad (Answering Cut turns the foe on you 3 s: the Goading of her sheet); sn-iron-vow-kept (capstone:
+Iron Vow roots every foe within 5 m for 3 s).
+
+### Sims (dungeon and raid)
+- A melee damage-dealer (`BossBuffs.NominalRole`: Damage; `EncounterSession.Queue.DamageClasses`, so the group finder and the raid fill
+  count it in the damage part); an Interrupter (Hilt Blow); it carries both swords; heavy armour. Its blow is the pure band's middle at its
+  level (SimCompanion.Damage), so a Pact-Blade sim matches a Rogue's. Area blow: "White Whirl". Eight sims, 89-96, over the bands.
+- In a raid it stands at the boss's side with the melee, moves out of the red as every sim does, and kicks casts.
+
+### Tests
+EditMode `PactBladeRulesTests` (the tree parses at 15 and 20 with the kit's ids; each branch 22 ranks, tier 4 reachable at 20 points; the
+class selectable, human only; the path abilities gated by talent; the Burning Blood and Aether Edge numbers); PlayMode `PactBladeLoopTests`
+(every bar ability casts at 20; Aether built and spent; the Whirl hits three; Sentinel's Stop roots); `SimDummyTests` (a Pact-Blade sim in
+the pure band at 11, 15, 17 and 20); TalentDataTests, RaceTests, SimRosterTests, CrownZoneTests, IconCoverageTests take it in.
+The player's band scale (`BuildDamageScale`) for its three builds is 1 until the balance harness measures them.

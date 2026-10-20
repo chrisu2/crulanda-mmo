@@ -197,7 +197,7 @@ LANDMARKS = [
     L("The Slag Fields", (120, -125), 30, "Heaps of black slag cracked with ember, tipped out of the furnaces for a hundred years. The hounds live in them.",
       "CANON-EXPANDED: slag-piles (book1 ch.16:349); the fields GAME-ONLY", (98, -96), 15, 18),
 ]
-EXITS = [{"to": "zone.lowtowns", "name": "West through the Tithe Gate to the Lowtowns", "at": V(-172, 0), "arrive": V(192, 0), "radius": 5}]
+EXITS = [{"to": "zone.lowtowns", "name": "West through the Tithe Gate to the Lowtowns", "at": V(-172, 0), "arrive": V(191, 0), "radius": 5}]
 SPAWN = (-158, 1)
 
 def R(name, title, x, z, stories, role="stranger", label=GO, **kw):

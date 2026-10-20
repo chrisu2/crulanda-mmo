@@ -63,7 +63,7 @@ namespace Crulanda.World
         /// </summary>
         public sealed class InnPlan
         {
-            public float w, d, doorW, doorH, wall = .3f; public bool waystation, city, spoon;
+            public float w, d, doorW, doorH, wall = .3f; public bool waystation, city, spoon, ruin;
             /// <summary>Tavern: the bar's middle and size (x along it, y its depth), the innkeeper's place, the rooms door's x.</summary>
             public Vector2 bar, barSize, stand; public float roomsX;
             /// <summary>The hearth's footprint (middle, size), its fire (the light, and a station), and the bench before it.</summary>
@@ -107,6 +107,7 @@ namespace Crulanda.World
             {
                 if (variant == 3) return City(size);
                 if (variant == SpoonVariant) return Spoon(size);
+                if (variant == RuinVariant) return Ruin(size);
                 var p = new InnPlan { w = size.x, d = size.y, doorW = doorW, waystation = variant == 2 };
                 float w = p.w, d = p.d;
                 if (p.waystation)
@@ -241,6 +242,44 @@ namespace Crulanda.World
             }
             /// <summary>The Spoon's inn variant (ZoneProp.variant of "inn").</summary>
             public const int SpoonVariant = 4;
+            /// <summary>The Forge District's Rust & Ruin (ZoneBuilder.RustRuin): inn variant 5.</summary>
+            public const int RuinVariant = 5;
+            /// <summary>
+            /// The Rust & Ruin (variant 5; the tavern is CANON, book1 ch.24:81-140: an iron-banded oak door on a shadowed alley, the crews of
+            /// the Lowtowns' rogues, smugglers and Copper-Tithe gathered there, "Ring the bell"; its plan GAME-ONLY; Chris, 2026-10-19: "Fully its
+            /// own now"): a long, low stone taproom 16 x 10. The bar down the +x end (the Spoon's is down the -x end, the taverns' along the back
+            /// wall), four stools before it, the keeper past its back end, the rooms door past him; a round fire-pit hearth out in the floor
+            /// under an iron hood (no other inn's hearth stands free), its bench on the door's side; the crews' long table across the back of
+            /// the -x half, a bench down either side; two stone booths against the -x end; three small tables of three. Laid out so every seat
+            /// is clear and a way 0.9 m wide runs from every place to the door (ForgeDistrictTests, InnLayoutTests).
+            /// </summary>
+            static InnPlan Ruin(Vector2 size)
+            {
+                var p = new InnPlan { w = size.x, d = size.y, doorW = InnDoorW, doorH = InnDoorH, wall = .4f, ruin = true, seatTop = .47f, stoolTop = .76f, benchTop = .47f };
+                float hx = p.w / 2 - p.wall / 2, hz = p.d / 2 - p.wall / 2;
+                p.bar = new Vector2(hx - 1.4f, .4f); p.barSize = new Vector2(.8f, 4);
+                foreach (float z in new[] { -1.2f, -.2f, .8f, 1.8f }) p.stools.Add((new Vector2(p.bar.x - p.barSize.x / 2 - 1, z), new Vector2(p.bar.x, z)));
+                p.stand = new Vector2(hx - 1.5f, hz - 1.2f); p.roomsX = 4.4f;
+                p.hearth = new Vector2(1.5f, 1.8f); p.hearthSize = new Vector2(1.8f, 1.8f); p.fire = p.hearth;
+                p.bench = new Vector2(1.5f, .35f); p.woodpile = new Vector2(3.2f, hz - .5f);
+                foreach (float x in new[] { 1.1f, 1.9f }) p.benchSeats.Add((new Vector2(x, .35f), new Vector2(x, p.hearth.y)));
+                p.longTable = new Vector2(-3.4f, 2.7f); p.longTableSize = new Vector2(5, .9f);
+                foreach (int sz in new[] { -1, 1 })
+                    for (int i = 0; i < 5; i++) { float x = p.longTable.x - p.longTableSize.x / 2 + (i + .5f) * p.longTableSize.x / 5; p.seats.Add((new Vector2(x, p.longTable.y + sz * .7f), new Vector2(x, p.longTable.y))); }
+                // The booths: a table against the -x wall, a settle either side of it, two on each (facing the table).
+                foreach (float z in new[] { -2.9f, -.1f })
+                {
+                    var at = new Vector2(-hx + .95f, z); p.tables.Add(at); p.turns.Add(90);
+                    foreach (int sz in new[] { -1, 1 }) foreach (float dx in new[] { -.4f, .4f }) p.seats.Add((new Vector2(at.x + dx, z + sz), at));
+                }
+                // Three small tables of three on the open floor, clear of the doorway.
+                foreach (var (at, from) in new[] { (new Vector2(-4, -2.7f), 30f), (new Vector2(3.7f, -2.9f), 90f), (new Vector2(3.5f, -.4f), 90f) })
+                {
+                    p.tables.Add(at); p.turns.Add(from);
+                    for (int k = 0; k < 3; k++) { float a = (from + k * 120) * Mathf.Deg2Rad; p.seats.Add((at + new Vector2(Mathf.Cos(a), Mathf.Sin(a)) * SeatRadius, at)); }
+                }
+                return p;
+            }
             /// <summary>What stands on the floor, each as a box (middle, half size) in the room's frame: the bar, the hearth, the tables,
             /// the long table and the bunks, and in a city inn its columns, its stair and its range (the tests keep the seats and each
             /// other clear of them).</summary>

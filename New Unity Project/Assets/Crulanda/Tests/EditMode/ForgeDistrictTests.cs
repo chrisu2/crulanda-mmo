@@ -39,7 +39,7 @@ namespace Crulanda.Tests
 
         [Test] public void Its_buildings_are_its_own()
         {
-            var shared = new HashSet<string> { "inn", "ruin" };   // the inn's floor plan (in soot stone and iron, ZONE_FORGE_DISTRICT.md question 3) and fallen rubble
+            var shared = new HashSet<string> { "inn", "ruin" };   // the inn (its own variant 5, ZoneBuilder.RustRuin) and fallen rubble
             foreach (var p in z.props)
                 Assert.IsTrue(ZoneBuilder.ForgeKinds.Contains(p.kind) || shared.Contains(p.kind), p.name + ": '" + p.kind + "' is none of the Forge District's kinds.");
             foreach (var k in new[] { "the_spoke", "spoke_yard", "crucible", "foundry_hall", "furnace", "fire_pit", "slag_heap", "lodging_row", "molten_channel", "forge_bridge", "forge_gate" })
@@ -116,6 +116,61 @@ namespace Crulanda.Tests
             string Key(string[] a) { return string.Join("|", (a ?? new string[0]).OrderBy(s => s)); }
             foreach (var kv in ZoneMusic.Sets.Where(kv => kv.Key != "zone.forge"))
                 Assert.AreNotEqual(Key(mine.day), Key(kv.Value.day), "No other zone plays the Forge District's day set (" + kv.Key + ").");
+        }
+
+        /// <summary>
+        /// The Rust &amp; Ruin is its own inn (Chris, 2026-10-19: "Fully its own now"): variant 5, its own plan (the bar down the +x end, the fire
+        /// pit out in the floor, the crews' long table, the booths), and no pocket: over the plan's solids (the walls, the bar, the fire pit)
+        /// a grid flood from inside the door through every point keeping NavPad + the agent's radius + half a way of 0.9 m; every seat,
+        /// stool, bench seat, the keeper's place and the rooms door lie within a step of that way (as the Rusty Spoon's, InnLayoutTests).
+        /// </summary>
+        [Test] public void The_Rust_and_Ruin_is_its_own_inn_with_a_wide_way_to_the_door()
+        {
+            var inn = z.props.Single(p => p.kind == "inn" && p.name == "The Rust & Ruin");
+            Assert.AreEqual(ZoneBuilder.InnPlan.RuinVariant, inn.variant, "Inn variant 5, its own house (ZoneBuilder.RustRuinInn).");
+            var plan = ZoneBuilder.InnPlan.For(inn.size, inn.variant); var inner = plan.Inner;
+            Assert.IsTrue(plan.ruin && !plan.spoon && !plan.city && !plan.waystation, "Its own plan.");
+            Assert.AreEqual(2.6f, plan.doorW, 1e-4f, "The double door every inn has.");
+            Assert.Greater(plan.bar.x, inner.x - 2, "The bar stands down the +x end (the Spoon's is down the -x end, the taverns' along the back wall).");
+            Assert.Greater(plan.barSize.y, plan.barSize.x, "It runs along z.");
+            Assert.Less(Mathf.Abs(plan.hearth.x), inner.x - 3, "The fire pit stands out in the floor, not against a wall.");
+            Assert.Less(Mathf.Abs(plan.hearth.y), inner.y - 2);
+            Assert.Greater(plan.longTableSize.x, 4, "The crews' long table."); Assert.AreEqual(10, plan.seats.Count(s => Mathf.Abs(s.face.y - plan.longTable.y) < .01f && Mathf.Abs(s.face.x - plan.longTable.x) < plan.longTableSize.x / 2));
+            Assert.AreEqual(4, plan.stools.Count); Assert.AreEqual(2, plan.benchSeats.Count); Assert.GreaterOrEqual(plan.seats.Count, 24);
+            foreach (var (at, _) in plan.stools) Assert.Less(at.x, plan.bar.x - plan.barSize.x / 2, "A stool stands before the bar, on the room's side.");
+            Assert.Greater(plan.stand.y, plan.bar.y + plan.barSize.y / 2 + .5f, "The keeper keeps the bar's back end.");
+            Assert.AreEqual("bar", z.life.residents.Single(r => r.name == "Berrow Orr").place, "Berrow Orr works the bar.");
+            const float way = .9f, step = .05f; float keep = ZoneBuilder.NavPad + ZoneBuilder.NavAgentRadius + way / 2, reach = way / 2 + .15f;
+            var solids = plan.Furniture().Where(f => f.what == "the bar" || f.what == "the hearth").ToList();
+            Assert.AreEqual(2, solids.Count, "The bar and the fire pit (the tables, benches and stools are walked between).");
+            float Outside(Vector2 p, Vector2 at, Vector2 half) { return new Vector2(Mathf.Max(0, Mathf.Abs(p.x - at.x) - half.x), Mathf.Max(0, Mathf.Abs(p.y - at.y) - half.y)).magnitude; }
+            float Clear(Vector2 p) { float c = Mathf.Min(inner.x - Mathf.Abs(p.x), inner.y - Mathf.Abs(p.y)); foreach (var (_, at, half) in solids) c = Mathf.Min(c, Outside(p, at, half)); return c; }
+            int nx = Mathf.CeilToInt(2 * inner.x / step), nz = Mathf.CeilToInt(2 * inner.y / step);
+            Vector2 Cell(int i, int j) { return new Vector2(-inner.x + (i + .5f) * step, -inner.y + (j + .5f) * step); }
+            var wide = new bool[nx, nz]; for (int i = 0; i < nx; i++) for (int j = 0; j < nz; j++) wide[i, j] = Clear(Cell(i, j)) >= keep;
+            var reached = new bool[nx, nz]; var queue = new Queue<(int, int)>(); var seed = (nx / 2, Mathf.FloorToInt((keep + .1f) / step));
+            Assert.IsTrue(wide[seed.Item1, seed.Item2], "The way starts inside the door."); reached[seed.Item1, seed.Item2] = true; queue.Enqueue(seed);
+            while (queue.Count > 0)
+            {
+                var (i, j) = queue.Dequeue();
+                foreach (var (a, b) in new[] { (i + 1, j), (i - 1, j), (i, j + 1), (i, j - 1) })
+                    if (a >= 0 && b >= 0 && a < nx && b < nz && wide[a, b] && !reached[a, b]) { reached[a, b] = true; queue.Enqueue((a, b)); }
+            }
+            float ToWay(Vector2 p)
+            {
+                float best = float.MaxValue; int r = Mathf.CeilToInt(2 / step), ci = Mathf.FloorToInt((p.x + inner.x) / step), cj = Mathf.FloorToInt((p.y + inner.y) / step);
+                for (int i = Mathf.Max(0, ci - r); i < Mathf.Min(nx, ci + r); i++) for (int j = Mathf.Max(0, cj - r); j < Mathf.Min(nz, cj + r); j++) if (reached[i, j]) best = Mathf.Min(best, Vector2.Distance(p, Cell(i, j)));
+                return best;
+            }
+            var places = plan.seats.Select(s => ("a seat", s.at)).Concat(plan.stools.Select(s => ("a stool", s.at))).Concat(plan.benchSeats.Select(s => ("a bench seat", s.at)))
+                .Concat(new[] { ("the keeper's place", plan.stand), ("the rooms door", new Vector2(plan.roomsX, plan.d / 2 - .7f)) });
+            var problems = new List<string>();
+            foreach (var (what, at) in places)
+            {
+                float dd = ToWay(at); if (dd > reach) problems.Add(what + " at " + at + " is " + (dd > 2 ? "over 2" : dd.ToString("0.00")) + " m from a way " + way + " m wide to the door");
+                foreach (var (f, fat, half) in solids) if (Outside(at, fat, half) < (what.StartsWith("a ") ? .3f : .5f)) problems.Add(what + " at " + at + " is in " + f);
+            }
+            Assert.IsEmpty(problems, string.Join("\n", problems));
         }
 
         static float Dist(Vector2 p, Vector2[] pts)

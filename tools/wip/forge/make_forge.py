@@ -53,7 +53,7 @@ P("molten_channel", "The Molten Vein", 0, 0, size=(CHANNEL_W, 0), points=[V(*q) 
 BRIDGES = [("The Aureum Bridge", -80, 2, 90), ("The Low Aureum Bridge", -58.3, -95, 90), ("The North Vein Bridge", 23.9, 110, 90), ("The Slag Bridge", 58.9, -55, 90)]
 for n, x, z, r in BRIDGES: P("forge_bridge", n, x, z, r, size=(16, 7))
 P("forge_gate", "The Tithe Gate", -166, 0, 90, size=(8, 0))
-P("inn", "The Rust & Ruin", -132, 24, 0, size=(14, 10))
+P("inn", "The Rust & Ruin", -132, 24, 0, size=(16, 10), variant=5)   # its own house (ZoneBuilder.RustRuin; Chris 2026-10-19: "Fully its own now")
 P("the_spoke", "The Spoke", SPOKE[0], SPOKE[1], 0, size=(14, 48), canonStatus="CANON: the Spoke, a rune-carved stone monolith (world_bible.md Magic), raised in the Forge District's Foundry (book1 ch.7:237); its look GAME-ONLY from the author's map")
 P("spoke_yard", "The Spoke's yard", SPOKE[0], SPOKE[1], 90, size=(YARD_R, 0))
 # the Forge Warrens: smelters' lodgings either side of Warrens Lane

@@ -614,9 +614,10 @@
       },
       "rotation": 0,
       "size": {
-        "x": 14,
+        "x": 16,
         "y": 10
-      }
+      },
+      "variant": 5
     },
     {
       "kind": "the_spoke",

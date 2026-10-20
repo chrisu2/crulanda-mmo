@@ -21,7 +21,7 @@ namespace Crulanda.Tests
     /// </summary>
     public class InnLayoutTests
     {
-        static readonly string[] Files = { "oakhaven", "khaven", "peaks", "ashrim", "verdant", "lowtowns" };   // the Lowtowns' Rusty Spoon (Phase 9.1)
+        static readonly string[] Files = { "oakhaven", "khaven", "peaks", "ashrim", "verdant", "lowtowns", "forge" };   // the Lowtowns' Rusty Spoon (Phase 9.1); the Forge District's Rust & Ruin (2026-10-19)
         static ZoneDefinition Zone(string file) { return JsonUtility.FromJson<ZoneDefinition>(File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Zones/" + file + ".json"))); }
         static IEnumerable<(string file, ZoneProp p)> Inns()
         {
@@ -49,7 +49,7 @@ namespace Crulanda.Tests
                 Assert.Greater(plan.NavGap, 1.4f, file + ": " + p.name + "'s way through");
                 Assert.Less(plan.doorW, plan.w - 2, file + ": " + p.name + "'s door leaves wall either side");
             }
-            Assert.AreEqual(5, n, "The Golden Cask, the Cracked Hearth, Pilgrims' Rest, Wain's Rest and the Rusty Spoon.");
+            Assert.AreEqual(6, n, "The Golden Cask, the Cracked Hearth, Pilgrims' Rest, Wain's Rest, the Rusty Spoon and the Rust & Ruin.");
             Assert.Greater(ZoneBuilder.NavGap(ZoneBuilder.InnDoorW), 1.4f, "The Hearth-Tree's hearth-house has the same door.");
         }
 
@@ -118,7 +118,7 @@ namespace Crulanda.Tests
                     for (int j = i + 1; j < seats.Count; j++) if (Vector2.Distance(at, seats[j].at) < 2 * body - .02f) problems.Add(s + "is in the lap of the seat at " + seats[j].at);
                     if ((face - at).magnitude < .2f) problems.Add(s + "faces nothing");
                 }
-                if (!plan.waystation && !plan.spoon)
+                if (!plan.waystation && !plan.spoon && !plan.ruin)
                 {
                     // The tavern's own places: the innkeeper behind the open end of the bar, the rooms door past it, the stools before it
                     // (the Spoon's bar runs down its end wall: The_Rusty_Spoon_is_its_own_inn_variant).
@@ -139,7 +139,7 @@ namespace Crulanda.Tests
         {
             var spoon = Zone("lowtowns").props.Single(p => p != null && p.name == "The Rusty Spoon");
             Assert.AreEqual("inn", spoon.kind); Assert.AreEqual(ZoneBuilder.InnPlan.SpoonVariant, spoon.variant, "The Spoon is inn variant 4, its own house (ZoneBuilder.SpoonInn).");
-            var taverns = new[] { ("oakhaven", "The Golden Cask"), ("khaven", "The Cracked Hearth"), ("crown", "The Gilded Lantern"), ("lowtowns", "The Rusty Spoon") }
+            var taverns = new[] { ("oakhaven", "The Golden Cask"), ("khaven", "The Cracked Hearth"), ("crown", "The Gilded Lantern"), ("lowtowns", "The Rusty Spoon"), ("forge", "The Rust & Ruin") }
                 .Select(x => Zone(x.Item1).props.Single(p => p != null && p.name == x.Item2 && p.kind == "inn")).ToList();
             Assert.AreEqual(taverns.Count, taverns.Select(p => p.variant).Distinct().Count(), "No two zones share an inn: " + string.Join(", ", taverns.Select(p => p.name + " " + p.variant)));
             var plan = Plan(spoon); var cask = Plan(taverns[0]);

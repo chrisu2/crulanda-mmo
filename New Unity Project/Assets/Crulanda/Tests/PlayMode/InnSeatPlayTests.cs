@@ -29,7 +29,7 @@ namespace Crulanda.Tests
     /// </summary>
     public class InnSeatPlayTests
     {
-        static readonly string[] Zones = { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns", "zone.crown" };
+        static readonly string[] Zones = { "zone.oakhaven", "zone.khaven", "zone.peaks", "zone.ashrim", "zone.verdant", "zone.lowtowns", "zone.crown", "zone.forge" };
         string root;
         void OnLoaded(Scene scene, LoadSceneMode mode) { var s = UnityEngine.Object.FindFirstObjectByType<EncounterSession>(); if (s != null) s.SaveDirectoryOverride = root; }
         IEnumerator Open(string zoneId)

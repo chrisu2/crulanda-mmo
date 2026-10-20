@@ -196,6 +196,15 @@ namespace Crulanda.Tests
             Debug.Log("Sims on the dummy:\n" + string.Join("\n", report));
         }
 
+        /// <summary>The Pact-Blade (2026-10-19, Docs/CLASSES_9_2.md section 4): a pure melee damage-dealer with two swords, in the pure band at
+        /// 11, 15, 17 and 20 (the levels the party is measured at), beside a Rogue to hold it to the same mark.</summary>
+        [UnityTest, Timeout(600000)] public IEnumerator A_pact_blade_sim_sustains_the_pure_band()
+        {
+            var report = new List<string>();
+            yield return Party(new[] { "class.pactblade", "class.rogue" }, null, report);
+            Debug.Log("Sims on the dummy:\n" + string.Join("\n", report));
+        }
+
         /// <summary>The last of a pack (the level-17 Hallow's Creek run, 2026-10-17: a quarter of the fighting the Rogue, the Ranger and the
         /// healer stood at your side while the tank fought the last mob alone, the one held under the moon): the held mob waits while another
         /// fights the party, then the party fights it and the moon comes off.</summary>

@@ -73,3 +73,20 @@ brief's target is up to 15 classes, and which merge or drop is undecided. Chris 
 - Saves: TalentMigration refunds retired ar- and sv- picks. Chris's save (ar-resonance, sv-quick-hush) was backed up first.
 - Open: the Original Song (Lull) and the old Hush talents can no longer be reached.
 - Status: UNVERIFIED (needs Chris).
+
+## The Pact-Blade (built 2026-10-19; Chris's first 9.2 pick, play note 298; Docs/CLASSES_9_2.md section 4)
+- What: class.pactblade, a pure damage class in heavy armour with two swords (CANON-EXPANDED: Veyra's Iron Pact sword-work and
+  Vital-Aether, book 1 ch. 4 and 10; Talira Frostveil; it takes in the old Knight candidate). Human. Resource Vital-Aether (Focus, 100):
+  built by the cuts only, spent on the aether-cuts, starts each fight at nothing and drains after; above 80 the blood burns (cuts 10%
+  harder, a little health lost each second).
+- Paths (Talents/pactblade.json, 22 ranks each, tiers 0-4, capstone at 20 points): Twin-Blade (single target), White Whirl (area),
+  Sentinel (control). 15 abilities: six base (Measured Cut 1, Second Blade 2, Minimum Movement 4, Hilt Blow 6 the interrupt, Iron Vow 8,
+  Sentinel's Stop 10 the hold), three a path by talent.
+- Code: PactBladeKit.cs; Encounter.asset (class and abilities; selectable at character creation); two starter swords (item.pact_sword,
+  item.pact_second_sword; the new held family sword.off); the Hall of Arms trainer Hessa Vell and banner in the Crown; eight sims (89-96,
+  roster 96), melee damage part, interrupter, both swords, heavy armour, blacksmiths; the group finder's damage list; class buff
+  Iron-Born Blood (+3% Strength); icons copied from close abilities (own art later).
+- Tests: PactBladeRulesTests (EditMode), PactBladeLoopTests (PlayMode), SimDummyTests.A_pact_blade_sim_sustains_the_pure_band (11, 15,
+  17, 20); TalentDataTests, SimRosterTests, CrownZoneTests, GearLookTests and GearVisualTests updated.
+- Status: BUILT (compiles with Unity's Roslyn, 0 errors). Not run in Unity, not seen by Chris. Open: the player's band scale for its three
+  builds (BuildDamageScale) is 1 until the balance harness measures them; its own figure (it wears the Warrior's) and painted icons.

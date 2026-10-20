@@ -977,3 +977,6 @@ un-captures.
   stays 20; new classes up to 20; the Forge District as a zone within 20, no dungeon yet).
   Then (verbatim): "new zone still up to lvl 22"; asked, he chose "Keep cap 20": the Forge District's mobs run to 22 (harder ground for
   geared level-20s), no levels past 20.
+- 298 (2026-10-19 ~20:15) The new classes (Docs/CLASSES_9_2.md, branch classes-92); his picks at the question prompt (verbatim): first class
+  "Pact-Blade"; the Seer's paths "Maker/Keeper/Breaker (Recommended)"; names "Seer + Sight (Recommended)"; races "Seer human, Ash-Walker orc
+  (Recommended)". Pact-Blade (Veyra's Iron Pact two-sword fighting, pure damage in heavy armour) is built first.

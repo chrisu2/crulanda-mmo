@@ -102,6 +102,8 @@
     { "item": "item.rogues_dirk",            "look": "knife:needle/oakhaven" },
     { "item": "item.rogues_second_dirk",     "look": "knife.off:needle/oakhaven" },
     { "item": "item.scoundrels_dirk",        "look": "knife:needle/tollroad" },
+    { "item": "item.pact_sword",             "look": "sword.arming:straight/oakhaven" },
+    { "item": "item.pact_second_sword",      "look": "sword.off:straight/oakhaven" },
     { "item": "item.apprentice_wand",        "look": "model.weapon:Wand_Basic/oakhaven" },
     { "item": "item.hunting_bow",            "look": "model.weapon:Bow_Basic/oakhaven" },
     { "item": "item.poachers_hood",          "look": "head.hood:oilskin/oakhaven" },

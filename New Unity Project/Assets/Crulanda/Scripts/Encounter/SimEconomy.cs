@@ -22,7 +22,7 @@ namespace Crulanda.Encounter
         public static string GatherTrade(string classId) { return classId == "class.warrior" || classId == "class.paladin" ? "mining" : Leatherworker(classId) ? "woodcutting" : "herbalism"; }
         public static string CraftTrade(string classId)
         {
-            if (classId == "class.warrior" || classId == "class.paladin") return "blacksmithing";
+            if (classId == "class.warrior" || classId == "class.paladin" || classId == "class.pactblade") return "blacksmithing";
             if (Leatherworker(classId)) return "leatherworking";
             if (classId == "class.mage" || classId == "class.archivist" || classId == "class.cleric") return "weaving";
             return "alchemy";

@@ -42,12 +42,12 @@ namespace Crulanda.Encounter
         public Vector3? Leading { get; private set; }
         public string LeadingName { get; private set; }
         float nextTaunt;
-        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue" || sim.classId == "class.scoundrel"; } }
+        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue" || sim.classId == "class.scoundrel" || sim.classId == "class.pactblade"; } }
         /// <summary>A Rogue or an Archivist (CC_DESIGN section 3): holds the moon in a fight of two or more.</summary>
         public bool Controller { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.scoundrel"; } }
         float nextHold, nextKick;
         /// <summary>Has an interrupt (Kick, Hush, Shield Bash, Censure, Quench): stops a cast in its reach every 12 s.</summary>
-        public bool Interrupter { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.mage" || sim.classId == "class.scoundrel"; } }
+        public bool Interrupter { get { return sim.classId == "class.rogue" || sim.classId == "class.archivist" || sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.mage" || sim.classId == "class.scoundrel" || sim.classId == "class.pactblade"; } }
         /// <summary>Its longest wait in seconds (a hold, a kick, a heal, a taunt), for a Scoundrel's favour (ScoundrelKit, 2026-10-14).</summary>
         public float LongestWait { get { return Mathf.Max(0, Mathf.Max(Mathf.Max(Mathf.Max(nextHold, nextKick), Mathf.Max(nextHeal, nextTaunt)), nextClassHold) - Time.time); } }   // its class's hold too (SimCompanion.Fight)
         /// <summary>A Scoundrel's favour called in: its longest wait comes up to <paramref name="seconds"/> sooner. The seconds taken off.</summary>

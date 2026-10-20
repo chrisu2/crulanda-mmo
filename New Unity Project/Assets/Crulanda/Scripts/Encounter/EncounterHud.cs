@@ -701,6 +701,7 @@ namespace Crulanda.Encounter
                 case "class.cleric": return new Color(1f, .95f, .72f);
                 case "class.shaman": return new Color(.4f, .6f, 1f);
                 case "class.scoundrel": return new Color(.86f, .36f, .44f);   // claret and rose (2026-10-14)
+                case "class.pactblade": return new Color(.72f, .8f, .92f);   // white steel (2026-10-19)
                 default: return new Color(.78f, .61f, .43f);
             }
         }

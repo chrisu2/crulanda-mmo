@@ -518,7 +518,7 @@ namespace Crulanda.Encounter
             parts.Add(hops + " hops and " + sidesteps + " side-steps in the four seconds" + (swimming ? "; swimming" : ""));
             return string.Join("; ", parts);
         }
-        static bool MeleeClass(EncounterSession s) { var id = s.ClassDef != null ? s.ClassDef.id : ""; return id == "class.warrior" || id == "class.paladin" || id == "class.rogue" || id == "class.scoundrel"; }
+        static bool MeleeClass(EncounterSession s) { var id = s.ClassDef != null ? s.ClassDef.id : ""; return id == "class.warrior" || id == "class.paladin" || id == "class.rogue" || id == "class.scoundrel" || id == "class.pactblade"; }
         /// <summary>
         /// Every talent point the bot has, spent as the balance harness buys a build: all in its class's first path for the part it plays
         /// (EncounterSession.PlayerRole: a tank's path, a healer's or a damage path; the Paladin with a Warrior along deals damage, the

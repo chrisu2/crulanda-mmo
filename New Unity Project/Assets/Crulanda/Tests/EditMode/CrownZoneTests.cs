@@ -99,7 +99,7 @@ namespace Crulanda.Tests
                 var hall = crown.props.Where(p => p != null && p.kind == "guild_hall").OrderBy(p => Vector2.Distance(p.at, m.at)).First();
                 Assert.IsTrue(Inside(hall, m.at) && Inside(hall, spot.at), g + "'s master and members in " + hall.name + ".");
             }
-            foreach (var c in new[] { "warrior", "druid", "paladin", "ranger", "mage", "rogue", "archivist", "saltmender", "cleric", "scoundrel", "shaman" })
+            foreach (var c in new[] { "warrior", "druid", "paladin", "ranger", "mage", "rogue", "archivist", "saltmender", "cleric", "scoundrel", "shaman", "pactblade" })
             {
                 var t = Role("trainer:class." + c); Assert.IsNotNull(t, "A trainer for class." + c + ".");
                 Assert.IsTrue(Inside(Prop("The Hall of Arms"), t.at), t.name + " in the Hall of Arms.");

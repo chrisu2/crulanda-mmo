@@ -63,6 +63,30 @@
       "canonStatus": "GAME-ONLY"
     },
     {
+      "id": "item.pact_sword",
+      "name": "Pact Sword",
+      "kind": "gear",
+      "slot": "mainhand",
+      "quality": 2,
+      "level": 1,
+      "value": 5,
+      "weaponDamage": 7,
+      "description": "A plain straight sword of the Iron Pact's drill-yard, one of a pair. The Pact-Blade's first.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
+      "id": "item.pact_second_sword",
+      "name": "Pact Sword (the second)",
+      "kind": "gear",
+      "slot": "offhand",
+      "quality": 2,
+      "level": 1,
+      "value": 4,
+      "weaponDamage": 3,
+      "description": "The other of the pair, for the left hand: the Pact teaches both.",
+      "canonStatus": "GAME-ONLY"
+    },
+    {
       "id": "item.training_blade",
       "name": "Tempered Trailblade",
       "kind": "gear",

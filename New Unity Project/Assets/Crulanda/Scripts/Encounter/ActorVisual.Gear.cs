@@ -193,7 +193,7 @@ namespace Crulanda.Encounter
                 if (main && bow) { parent = armL; pos = new Vector3(0, -.62f, .1f); rot = Quaternion.identity; }   // a bow: in the left fist, limbs up and down, as the Ranger's own
                 else if (main) { parent = armR; pos = tall ? new Vector3(0, -.62f, .085f) : new Vector3(0, -.62f, 0); rot = tall ? Quaternion.Euler(8, 0, 0) : Quaternion.Euler(110, 0, 0) * Quaternion.Euler(0, 20, 0); }
                 else if (hung) { parent = armL; pos = new Vector3(0, -.65f, 0); rot = Quaternion.identity; }
-                else if (family == "knife.off") { parent = armL; pos = new Vector3(0, -.62f, 0); rot = Quaternion.Euler(110, 0, 0) * Quaternion.Euler(0, -20, 0); }   // a second knife in the left fist, the main hand's mirror (the Rogue's pair)
+                else if (family == "knife.off" || family == "sword.off") { parent = armL; pos = new Vector3(0, -.62f, 0); rot = Quaternion.Euler(110, 0, 0) * Quaternion.Euler(0, -20, 0); }   // a second knife in the left fist, the main hand's mirror (the Rogue's pair)
                 else { parent = armL; pos = new Vector3(-.1f, -.38f, .05f); rot = Quaternion.Euler(0, 0, 90); }
             }
             else
@@ -201,6 +201,7 @@ namespace Crulanda.Encounter
                 parent = model != null ? chestFrame : body;
                 if (main && tall) { pos = new Vector3(0, .25f, -.27f); rot = Quaternion.Euler(0, 0, -40) * Quaternion.Euler(0, 90, 0); }
                 else if (main && shortOne) { pos = new Vector3(.29f, .1f, .05f); rot = Quaternion.Euler(0, 0, 12) * Quaternion.Euler(180, 0, 0); }   // at the right hip, point down, a little out from the thigh
+                else if (family == "sword.off") { pos = new Vector3(-.26f, .66f, -.2f); rot = Quaternion.Euler(0, 0, -145) * Quaternion.Euler(0, 90, 0); }   // its pair across the back, hilt over the left shoulder (the Pact-Blade's, 2026-10-19)
                 else if (family == "knife.off") { pos = new Vector3(-.29f, .1f, .05f); rot = Quaternion.Euler(0, 0, -12) * Quaternion.Euler(180, 0, 0); }   // its pair at the left hip
                 else if (main) { pos = new Vector3(.26f, .66f, -.2f); rot = Quaternion.Euler(0, 0, 145) * Quaternion.Euler(0, 90, 0); }
                 else if (hung) { pos = new Vector3(-.31f, .08f, -.12f); rot = Quaternion.Euler(0, 90, 0); }   // clear of the hip and thigh; a balance's beam runs fore and aft
@@ -213,7 +214,7 @@ namespace Crulanda.Encounter
             t.SetParent(parent, false); t.localPosition = pos; t.localRotation = rot;
             // Heroic proportions, the classic-MMO way: what is held reads larger than life (in the first wardrobe line-up a life-size
             // blade at the hip read as a twig). The grip stays in the fist; the piece grows out from it.
-            if (main || family == "knife.off") t.localScale = Vector3.one * HeldScale; else if (slot == EquipSlot.OffHand) t.localScale = Vector3.one * (hung ? 1.1f : ShieldScale);
+            if (main || family == "knife.off" || family == "sword.off") t.localScale = Vector3.one * HeldScale; else if (slot == EquipSlot.OffHand) t.localScale = Vector3.one * (hung ? 1.1f : ShieldScale);
             return t;
         }
 

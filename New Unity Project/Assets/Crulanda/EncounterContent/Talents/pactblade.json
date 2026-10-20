@@ -1,0 +1,532 @@
+{
+ "id": "pactblade",
+ "name": "Pact-Blade",
+ "resource": "Vital-Aether",
+ "resourceDesc": "Vital-Aether, a pool of a hundred: the heat in an Iron-Born's blood, built by your cuts (never by a plain swing) and spent on the aether-cuts. It starts a fight at nothing and drains after. Above 80 it burns: your cuts land harder and you lose a little health each second.",
+ "identity": "Two swords and the heat of the blood: the Iron Pact's sword-work. CANON-EXPANDED: Veyra's Vital-Aether, 'the incredibly hot spark ... that every Iron-Born fiercely carried in their blood' (book 1 ch. 4), her whirl of white light and gold afterimages (book 1 ch. 10), the world bible's dual-sword master and Talira Frostveil, sword master; the Iron Citadel, the Pact's training ground. Pure damage in heavy armour; no healing, no oaths. No machines.",
+ "canonStatus": "CANON-EXPANDED",
+ "branches": [
+  {
+   "id": "twin-blade",
+   "name": "Twin-Blade",
+   "role": "dps",
+   "loop": "Measured Cut and Second Blade for Vital-Aether, Afterimage on cooldown, and Aether Edge when the blood runs hot.",
+   "tradeoff": "One foe at a time; a pack is cut down one throat at a time.",
+   "nodes": [
+    {
+     "id": "tb-aether-edge",
+     "name": "Aether Edge",
+     "tier": 0,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "sword",
+     "desc": "Learn Aether Edge: a cut that spends all your Vital-Aether (30 at least); the more spent, the harder.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-keen-pair",
+     "name": "Keen Pair",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "target",
+     "desc": "Measured Cut, Second Blade and Aether Edge deal 3% more per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-quick-blood",
+     "name": "Quick Blood",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Measured Cut builds 2 more Vital-Aether per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-afterimage",
+     "name": "Afterimage",
+     "tier": 1,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "sword",
+     "desc": "Learn Afterimage: a cut whose gold afterimage strikes the foe again 2 seconds later.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-bright-wake",
+     "name": "Bright Wake",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "star",
+     "desc": "The afterimage strikes for a tenth more of the cut per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-blood-vow",
+     "name": "Blood-Vow",
+     "tier": 2,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "flame",
+     "desc": "Learn the Blood-Vow: for 12 seconds your cuts land harder, and your blood burns you a little each second.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-hot-blood",
+     "name": "Hot Blood",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "flame",
+     "desc": "Burning Blood (above 80 Vital-Aether) makes your cuts 3% harder again per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-measured-end",
+     "name": "Measured to the End",
+     "tier": 3,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "sword",
+     "desc": "Aether Edge spent at 80 Vital-Aether or more gives 20 back.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-redclaw",
+     "name": "The Redclaw Codex",
+     "tier": 3,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "target",
+     "desc": "Your cuts on a foe under 35% health deal 3% more per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-no-wasted",
+     "name": "No Wasted Motion",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "bolt",
+     "desc": "Second Blade is ready 2 seconds sooner.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "tb-twin-vow",
+     "name": "The Twin Vow",
+     "tier": 4,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "Second Blade leaves a gold afterimage too, striking again for 40% of it.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    }
+   ]
+  },
+  {
+   "id": "white-whirl",
+   "name": "White Whirl",
+   "role": "dps",
+   "loop": "Build Vital-Aether, then turn the White Whirl through the pack; Afterglow under them and Turning Steel for the long fights.",
+   "tradeoff": "Strong against many, ordinary against one.",
+   "nodes": [
+    {
+     "id": "ww-whirl",
+     "name": "White Whirl",
+     "tier": 0,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "star",
+     "desc": "Learn the White Whirl: both swords turned in a ring of white light, cutting every foe within 5 metres.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-wide-turn",
+     "name": "Wide Turn",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "target",
+     "desc": "The White Whirl deals 3% more per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-reach",
+     "name": "Long Reach",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "The White Whirl reaches half a metre further per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-afterglow",
+     "name": "Afterglow",
+     "tier": 1,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "star",
+     "desc": "Learn Afterglow: gold light left on the ground round you for 6 seconds burns the foes in it every second.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-lingering",
+     "name": "Lingering Gold",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "star",
+     "desc": "Afterglow lasts a second longer per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-turning-steel",
+     "name": "Turning Steel",
+     "tier": 2,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "sword",
+     "desc": "Learn Turning Steel: for 8 seconds Measured Cut and Second Blade also cut two more foes near the target.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-blinding",
+     "name": "Blinding Turn",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "modifier",
+     "icon": "eye",
+     "desc": "The White Whirl slows the foes it cuts by a tenth per rank for 3 seconds.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-white-light",
+     "name": "White Light",
+     "tier": 3,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "star",
+     "desc": "Each foe the White Whirl cuts gives you 3 Vital-Aether.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-long-turn",
+     "name": "Long Turn",
+     "tier": 3,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Turning Steel lasts a second longer per rank.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-steady-feet",
+     "name": "Steady Feet",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "shield",
+     "desc": "While Turning Steel lasts you take 5% less.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "ww-ring-of-gold",
+     "name": "Ring of Gold",
+     "tier": 4,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "star",
+     "desc": "The White Whirl leaves an Afterglow of its own, once every 12 seconds.",
+     "emphasis": {
+      "dps": 1
+     },
+     "impl": true
+    }
+   ]
+  },
+  {
+   "id": "sentinel",
+   "name": "Sentinel",
+   "role": "control",
+   "loop": "Stop what runs, answer what strikes, ring the pack in iron and kick the casts.",
+   "tradeoff": "Its worth is holds and lighter blows, not the meter.",
+   "nodes": [
+    {
+     "id": "sn-answering-cut",
+     "name": "Answering Cut",
+     "tier": 0,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "sword",
+     "desc": "Learn the Answering Cut: within 4 seconds of a blow on you, a cut back that slows the foe.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-watchful",
+     "name": "Watchful",
+     "tier": 0,
+     "col": 1,
+     "max": 5,
+     "req": null,
+     "kind": "passive",
+     "icon": "eye",
+     "desc": "The Answering Cut deals 3% more per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-long-stop",
+     "name": "Long Stop",
+     "tier": 0,
+     "col": 2,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "chain",
+     "desc": "Sentinel's Stop holds a second longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-disarming-cut",
+     "name": "Disarming Cut",
+     "tier": 1,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "hand",
+     "desc": "Learn the Disarming Cut: the foe's blows land lighter for 8 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-heavy-hand",
+     "name": "Heavy Hand",
+     "tier": 1,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "hand",
+     "desc": "The Disarming Cut takes 3% more off the foe's blows per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-iron-ring",
+     "name": "Iron Ring",
+     "tier": 2,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "active",
+     "icon": "chain",
+     "desc": "Learn the Iron Ring: every foe within 6 metres held where it stands for 3 seconds and slowed.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-held-ground",
+     "name": "Held Ground",
+     "tier": 2,
+     "col": 1,
+     "max": 2,
+     "req": null,
+     "kind": "passive",
+     "icon": "chain",
+     "desc": "The Iron Ring holds a second longer per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-sentinel",
+     "name": "Sentinel",
+     "tier": 3,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "signature",
+     "icon": "shield",
+     "desc": "Your cuts on a held or slowed foe deal 5% more.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-patient",
+     "name": "Patient Hilt",
+     "tier": 3,
+     "col": 1,
+     "max": 3,
+     "req": null,
+     "kind": "passive",
+     "icon": "bolt",
+     "desc": "Hilt Blow is ready a second sooner per rank.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-goad",
+     "name": "Goading",
+     "tier": 3,
+     "col": 2,
+     "max": 1,
+     "req": null,
+     "kind": "modifier",
+     "icon": "banner",
+     "desc": "The Answering Cut turns the foe on you for 3 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    },
+    {
+     "id": "sn-iron-vow-kept",
+     "name": "The Iron Vow Kept",
+     "tier": 4,
+     "col": 0,
+     "max": 1,
+     "req": null,
+     "kind": "capstone",
+     "icon": "shield",
+     "desc": "The Iron Vow also holds every foe within 5 metres where it stands for 3 seconds.",
+     "emphasis": {
+      "control": 1
+     },
+     "impl": true
+    }
+   ]
+  }
+ ]
+}

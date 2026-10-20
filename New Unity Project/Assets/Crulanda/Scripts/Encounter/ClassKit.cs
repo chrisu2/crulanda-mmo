@@ -86,6 +86,7 @@ namespace Crulanda.Encounter
                 case "class.saltmender": return new SaltMenderKit(session, definition, catalog);   // Phase 9.2, the first class from the canon (2026-10-11)
                 case "class.cleric": return new ClericKit(session, definition, catalog);
                 case "class.scoundrel": return new ScoundrelKit(session, definition, catalog);   // 2026-10-14, Docs/CLASS_SCOUNDREL.md
+                case "class.pactblade": return new PactBladeKit(session, definition, catalog);   // 2026-10-19, Docs/CLASSES_9_2.md section 4
                 case "class.shaman": return new ShamanKit(session, definition, catalog);   // orc-only (Races), 2026-10-12   // 2026-10-12, Docs/CLASS_CLERIC_SHAMAN.md
                 default: throw new ArgumentException("No class kit for '" + classId + "'.");
             }

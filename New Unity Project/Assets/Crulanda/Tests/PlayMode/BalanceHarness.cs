@@ -26,7 +26,7 @@ namespace Crulanda.Tests
     public class BalanceHarness
     {
         public static float FightSeconds = 180, Step = .05f; public static int Seeds = 3;   // three minutes: long enough to average the cooldown cycles (the training-dummy practice Chris pointed to, 2026-10-13); was 90   // game seconds a frame (Time.captureDeltaTime): as fast as the editor runs, the same steps every run
-        static readonly string[] AllClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender", "class.cleric", "class.shaman", "class.scoundrel" };
+        static readonly string[] AllClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender", "class.cleric", "class.shaman", "class.scoundrel", "class.pactblade" };
         /// <summary>CRULANDA_BALANCE_CLASSES=mage,archivist runs those only (about two a chunk); each set writes its own balance-<set>.csv.</summary>
         static string[] Classes { get { var f = Environment.GetEnvironmentVariable("CRULANDA_BALANCE_CLASSES"); if (string.IsNullOrEmpty(f)) return AllClasses;
             var want = f.Split(',').Select(x => x.Trim().ToLowerInvariant()).Select(x => x.StartsWith("class.") ? x : "class." + x).ToList(); return want.Where(AllClasses.Contains).ToArray(); } }

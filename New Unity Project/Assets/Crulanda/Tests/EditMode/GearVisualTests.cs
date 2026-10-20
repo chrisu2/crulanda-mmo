@@ -376,7 +376,7 @@ namespace Crulanda.Tests
                         foreach (var r in parts) { var mesh = r is SkinnedMeshRenderer sk ? sk.sharedMesh : r.GetComponent<MeshFilter>().sharedMesh; Assert.NotNull(mesh, what + " has every mesh."); Assert.Greater(mesh.vertexCount, 0, what + ": no empty part."); Assert.NotNull(r.sharedMaterial, what + ": every part has a material."); }
                     }
             }
-            Assert.AreEqual(150 * combos.Length, built, "150 variants (146 before the Rogue's dirks of 2026-10-11: 47 main-hand, 19 off-hand, 80 armour), seven quality and level pairs each.");
+            Assert.AreEqual(151 * combos.Length, built, "151 variants (146 before the Rogue's dirks of 2026-10-11 and the Pact-Blade's second sword of 2026-10-19: 47 main-hand, 19 off-hand, 80 armour), seven quality and level pairs each.");
         }
 
         [Test] public void Armour_sits_on_the_figure()

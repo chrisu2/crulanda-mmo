@@ -12,7 +12,7 @@ namespace Crulanda.Encounter
     {
         public const string Human = "race.human", Orc = "race.orc";
         public sealed class Race { public string id, name, canonStatus; public string[] classes; }
-        static readonly string[] HumanClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender", "class.cleric", "class.scoundrel" };
+        static readonly string[] HumanClasses = { "class.warrior", "class.druid", "class.paladin", "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.saltmender", "class.cleric", "class.scoundrel", "class.pactblade" };
         static readonly string[] OrcClasses = { "class.warrior", "class.ranger", "class.rogue", "class.mage", "class.shaman", "class.scoundrel" };   // the Scoundrel: races open (Chris 2026-10-13), both peoples for now   // Chris 2026-10-12 23:31: no orc Druid; the Shaman is orc-only
         public static readonly Race[] All = {
             new Race { id = Human, name = "Human", canonStatus = "CANON", classes = HumanClasses },

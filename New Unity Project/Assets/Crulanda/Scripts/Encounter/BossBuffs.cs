@@ -43,7 +43,7 @@ namespace Crulanda.Encounter
     public static class ClassBuffs
     {
         public static readonly string[] ClassIds = { "class.warrior", "class.paladin", "class.druid", "class.ranger", "class.mage", "class.rogue",
-            "class.archivist", "class.saltmender", "class.cleric", "class.scoundrel", "class.shaman" };
+            "class.archivist", "class.saltmender", "class.cleric", "class.scoundrel", "class.shaman", "class.pactblade" };
         public static ClassBuff For(string classId)
         {
             switch (classId)
@@ -58,6 +58,7 @@ namespace Crulanda.Encounter
                 case "class.saltmender": return SaltMenderKit.Standing;
                 case "class.cleric": return ClericKit.Standing;
                 case "class.scoundrel": return ScoundrelKit.Standing;
+                case "class.pactblade": return PactBladeKit.Standing;
                 case "class.shaman": return ShamanKit.Standing;
                 default: return null;
             }
@@ -102,7 +103,7 @@ namespace Crulanda.Encounter
         /// Scoundrel, Intellect for the casters.</summary>
         public static StatType MainStat(string classId)
         {
-            if (classId == "class.warrior" || classId == "class.paladin") return StatType.Strength;
+            if (classId == "class.warrior" || classId == "class.paladin" || classId == "class.pactblade") return StatType.Strength;
             if (classId == "class.ranger" || classId == "class.rogue" || classId == "class.scoundrel") return StatType.Agility;
             return StatType.Intellect;
         }
@@ -116,6 +117,7 @@ namespace Crulanda.Encounter
                 case "class.druid": return "breath";
                 case "class.ranger": case "class.rogue": return "focus";
                 case "class.scoundrel": return "nerve";
+                case "class.pactblade": return "vital-aether";
                 case "class.saltmender": return "salt";
                 case null: return null;
                 default: return "mana";

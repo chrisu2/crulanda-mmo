@@ -137,6 +137,7 @@ namespace Crulanda.Encounter
                 case "class.cleric": return new Color(.93f, .88f, .7f);   // a hill shrine's undyed wool and gold thread
                 case "class.shaman": return new Color(.36f, .42f, .5f);   // rain on the high moors
                 case "class.scoundrel": return new Color(.42f, .12f, .16f);   // a claret doublet, wine-dark (2026-10-14)
+                case "class.pactblade": return new Color(.36f, .38f, .44f);   // the Iron Pact's steel-grey surcoat (2026-10-19)
                 default: return new Color(.2f, .58f, .72f);
             }
         }
@@ -2414,6 +2415,7 @@ namespace Crulanda.Encounter
                 case "class.saltmender": return (17 + (3 * L) / 2, 12 + L, 10 + L / 2, 16 + 2 * L, 18 + 2 * L);
                 case "class.cleric": return (16 + (3 * L) / 2, 12 + L, 14 + L, 18 + 2 * L, 20 + 2 * L);   // 2026-10-13: its own (it had the Warrior's); balance-neutral (ApplyInnate)
                 case "class.shaman": return (18 + (3 * L) / 2, 15 + L, 14 + L, 17 + 2 * L, 18 + 2 * L);
+                case "class.pactblade": return (18 + (3 * L) / 2, 19 + 2 * L, 15 + L, 8 + L / 2, 10 + L / 2);   // the Iron-Born: strong and hardy (2026-10-19); balance-neutral (ApplyInnate)
                 case "class.scoundrel": return (15 + (3 * L) / 2, 12 + L, 20 + 2 * L, 12 + L, 16 + 2 * L);   // quick hands and a ready tongue (2026-10-14); balance-neutral (ApplyInnate)
                 default: return (20 + 2 * L, 20 + 2 * L, 15 + L, 8 + L / 2, 10 + L / 2);   // the Warrior
             }

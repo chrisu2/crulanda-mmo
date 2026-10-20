@@ -208,6 +208,7 @@ namespace Crulanda.Encounter
                 case "class.paladin": return "Wide Judgement";
                 case "class.rogue": return "Shard Spray";
                 case "class.scoundrel": return "Knife Round";
+                case "class.pactblade": return "White Whirl";
                 case "class.ranger": return "Spread Loose";
                 case "class.mage": return "Spreading Flame";
                 case "class.archivist": return "Echo Burst";

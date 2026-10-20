@@ -2567,6 +2567,20 @@
         ]
       },
       {
+        "name": "Hessa Vell",
+        "role": "trainer:class.pactblade",
+        "title": "Pact-Blade Trainer",
+        "at": {
+          "x": 74,
+          "y": 42.6
+        },
+        "canonStatus": "GAME-ONLY",
+        "stories": [
+          "Two swords, one breath. The Citadel drilled it into us until the blades moved before the thought did.",
+          "Feel the heat in your blood when you cut? That's the Vital-Aether. Spend it before it spends you."
+        ]
+      },
+      {
         "name": "Perrin Gallow",
         "role": "dresser",
         "title": "Dresser of the Armoury",

@@ -1792,6 +1792,186 @@ MonoBehaviour:
     globalCooldown: 1.5
     duration: 0
     statusId: 
+  - id: pactblade.measured_cut
+    name: Measured Cut
+    description: "A measured cut with the right sword: no wasted movement. Builds 12 Vital-Aether, and starts automatic weapon attacks."
+    effect: 0
+    power: 5
+    cost: 0
+    cooldown: 0
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: pactblade.second_blade
+    name: Second Blade
+    description: "The left sword follows the right. Builds 10 Vital-Aether."
+    effect: 0
+    power: 4
+    cost: 0
+    cooldown: 6
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: pactblade.minimum_movement
+    name: Minimum Movement
+    description: "Across the ground to the foe in one stride, 4 to 15 metres. Builds 10 Vital-Aether."
+    effect: 0
+    power: 0
+    cost: 0
+    cooldown: 15
+    range: 15
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: pactblade.hilt_blow
+    name: Hilt Blow
+    description: "The hilt in the foe's face: its cast is stopped and it is silenced for 3 seconds. The interrupt."
+    effect: 4
+    power: 3
+    cost: 10
+    cooldown: 12
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 3
+    statusId: 
+  - id: pactblade.iron_vow
+    name: Iron Vow
+    description: "The Iron Vow sworn again: for 6 seconds you take a fifth less."
+    effect: 2
+    power: 0
+    cost: 0
+    cooldown: 60
+    range: 0
+    castTime: 0
+    globalCooldown: 1
+    duration: 6
+    statusId: 
+  - id: pactblade.sentinels_stop
+    name: Sentinel's Stop
+    description: "A low cut that stops the foe where it stands: held for 4 seconds and slowed. The hold."
+    effect: 4
+    power: 4
+    cost: 20
+    cooldown: 20
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 4
+    statusId: 
+  - id: pactblade.aether_edge
+    name: Aether Edge
+    description: "The blood's heat poured into one cut: spends all your Vital-Aether (30 at least); the more spent, the harder."
+    effect: 0
+    power: 8
+    cost: 30
+    cooldown: 0
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: pactblade.afterimage
+    name: Afterimage
+    description: "A bright cut whose gold afterimage strikes the foe again 2 seconds later, for 60% of it."
+    effect: 0
+    power: 0
+    cost: 25
+    cooldown: 10
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 0
+    statusId: 
+  - id: pactblade.blood_vow
+    name: Blood-Vow
+    description: "A vow in blood: for 12 seconds your cuts land a fifth harder, and you lose 1% of your health each second."
+    effect: 2
+    power: 0
+    cost: 0
+    cooldown: 90
+    range: 0
+    castTime: 0
+    globalCooldown: 1
+    duration: 12
+    statusId: 
+  - id: pactblade.white_whirl
+    name: White Whirl
+    description: "Both swords turned in a ring of white light: every foe within 5 metres is cut."
+    effect: 0
+    power: 4
+    cost: 30
+    cooldown: 0
+    range: 5
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 0
+    statusId: 
+  - id: pactblade.afterglow
+    name: Afterglow
+    description: "Gold light left on the ground round you for 6 seconds: the foes within 4 metres burn every second."
+    effect: 0
+    power: 3
+    cost: 20
+    cooldown: 12
+    range: 4
+    castTime: 0
+    globalCooldown: 1
+    duration: 6
+    statusId: 
+  - id: pactblade.turning_steel
+    name: Turning Steel
+    description: "For 8 seconds Measured Cut and Second Blade also cut up to two more foes within 4 metres of the target, at 60%."
+    effect: 7
+    power: 0
+    cost: 15
+    cooldown: 45
+    range: 0
+    castTime: 0
+    globalCooldown: 1
+    duration: 8
+    statusId: 
+  - id: pactblade.answering_cut
+    name: Answering Cut
+    description: "Only within 4 seconds of a blow on you: a cut back, and the foe slowed by 30% for 4 seconds."
+    effect: 0
+    power: 0
+    cost: 10
+    cooldown: 6
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 4
+    statusId: 
+  - id: pactblade.disarming_cut
+    name: Disarming Cut
+    description: "A cut at the sword-arm: the foe's blows land a quarter lighter for 8 seconds (a boss's a tenth)."
+    effect: 0
+    power: 0
+    cost: 20
+    cooldown: 15
+    range: 3.2
+    castTime: 0
+    globalCooldown: 1
+    duration: 8
+    statusId: 
+  - id: pactblade.iron_ring
+    name: Iron Ring
+    description: "The Pact's circle: every foe within 6 metres held where it stands for 3 seconds and slowed by 30%."
+    effect: 4
+    power: 0
+    cost: 30
+    cooldown: 30
+    range: 6
+    castTime: 0
+    globalCooldown: 1.5
+    duration: 3
+    statusId: 
   playerClass:
     id: class.warrior
     displayName: Warrior
@@ -2447,6 +2627,71 @@ MonoBehaviour:
         level: 1
         talentId: fx-favour
     talentTree: {fileID: 4900000, guid: 212336acfcfe4e88afaeed050f8430bf, type: 3}
+  - definition:
+      id: class.pactblade
+      displayName: Pact-Blade
+      role: 2
+      resource: 3
+      resourceName: Vital-Aether
+      maxResource: 100
+      combatRegen: 0
+      restingRegen: 0
+      stats:
+        baseHealth: 175
+        healthPerLevel: 22
+        healthPerStamina: 5
+        baseAttackPower: 12
+        attackPowerPerLevel: 2
+        attackPowerPerStrength: 1
+        spellPowerPerIntellect: 1
+        armorPerAgility: 1
+      unlocks:
+      - abilityId: pactblade.measured_cut
+        level: 1
+        talentId: 
+      - abilityId: pactblade.second_blade
+        level: 2
+        talentId: 
+      - abilityId: pactblade.minimum_movement
+        level: 4
+        talentId: 
+      - abilityId: pactblade.hilt_blow
+        level: 6
+        talentId: 
+      - abilityId: pactblade.iron_vow
+        level: 8
+        talentId: 
+      - abilityId: pactblade.sentinels_stop
+        level: 10
+        talentId: 
+      - abilityId: pactblade.aether_edge
+        level: 1
+        talentId: tb-aether-edge
+      - abilityId: pactblade.afterimage
+        level: 1
+        talentId: tb-afterimage
+      - abilityId: pactblade.blood_vow
+        level: 1
+        talentId: tb-blood-vow
+      - abilityId: pactblade.white_whirl
+        level: 1
+        talentId: ww-whirl
+      - abilityId: pactblade.afterglow
+        level: 1
+        talentId: ww-afterglow
+      - abilityId: pactblade.turning_steel
+        level: 1
+        talentId: ww-turning-steel
+      - abilityId: pactblade.answering_cut
+        level: 1
+        talentId: sn-answering-cut
+      - abilityId: pactblade.disarming_cut
+        level: 1
+        talentId: sn-disarming-cut
+      - abilityId: pactblade.iron_ring
+        level: 1
+        talentId: sn-iron-ring
+    talentTree: {fileID: 4900000, guid: 1693f6b0a7ea4933aafe9e804c11859e, type: 3}
   questFiles:
   - {fileID: 4900000, guid: dadeaa3314444542a04b4e17d9dbc0c4, type: 3}
   - {fileID: 4900000, guid: 2f37ccf5ed8d46928976a7b5854444ed, type: 3}

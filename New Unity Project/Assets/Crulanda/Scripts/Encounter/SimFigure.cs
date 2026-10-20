@@ -38,7 +38,7 @@ namespace Crulanda.Encounter
         float until, nextAct, nextHeal, stuckSince, workUntil, downSince, lastTrade, healAt; int pick, goal, practised; Renderer[] renderers; Transform corpse;
         EncounterSession Session { get { return population.Session; } }
         public bool Walking { get { return agent != null && agent.isOnNavMesh && !agent.isStopped && agent.remainingDistance > agent.stoppingDistance + .1f; } }
-        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue" || sim.classId == "class.scoundrel"; } }
+        public bool Melee { get { return sim.classId == "class.warrior" || sim.classId == "class.paladin" || sim.classId == "class.rogue" || sim.classId == "class.pactblade" || sim.classId == "class.scoundrel"; } }
         public bool Healer { get { return sim.classId == "class.druid" || sim.classId == "class.paladin" || sim.classId == "class.cleric" || sim.classId == "class.shaman" || sim.classId == "class.saltmender"; } }
         public string Doings
         {

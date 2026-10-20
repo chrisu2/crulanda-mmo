@@ -19,7 +19,7 @@ namespace Crulanda.Tests
         static readonly Dictionary<string, string[]> Kits = new Dictionary<string, string[]> {
             { "archivist", ArchivistKit.ImplementedIds }, { "cleric", ClericKit.ImplementedIds }, { "druid", DruidKit.ImplementedIds },
             { "mage", MageKit.ImplementedIds }, { "paladin", PaladinKit.ImplementedIds }, { "ranger", RangerKit.ImplementedIds },
-            { "rogue", RogueKit.ImplementedIds }, { "saltmender", SaltMenderKit.ImplementedIds }, { "scoundrel", ScoundrelKit.ImplementedIds },
+            { "rogue", RogueKit.ImplementedIds }, { "saltmender", SaltMenderKit.ImplementedIds }, { "scoundrel", ScoundrelKit.ImplementedIds }, { "pactblade", PactBladeKit.ImplementedIds },
             { "shaman", ShamanKit.ImplementedIds }, { "warrior", WarriorKit.ImplementedIds } };
         static string Json(string id) { return File.ReadAllText(Path.Combine(Application.dataPath, "Crulanda/EncounterContent/Talents/" + id + ".json")); }
         static TalentTree Tree(string id) { return TalentTree.Parse("class." + id, Json(id), EncounterProgress.TalentCap, Kits[id]); }

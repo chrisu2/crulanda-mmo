@@ -130,6 +130,8 @@ namespace Crulanda.Encounter
             if (ClassDef != null && ClassDef.id == "class.rogue") starter = "item.rogues_dirk";   // the Rogue's pair of dirks (Chris, 2026-10-11)
             if (ClassDef != null && ClassDef.id == "class.scoundrel") starter = "item.scoundrels_dirk";   // one dirk, and a voice (2026-10-14)
             if (Progress.equipment[(int)EquipSlot.MainHand].Empty) Progress.equipment[(int)EquipSlot.MainHand] = new ItemStack { item = starter, count = 1 };
+            if (ClassDef != null && ClassDef.id == "class.pactblade") starter = "item.pact_sword";   // the Pact-Blade's two swords (2026-10-19)
+            if (ClassDef != null && ClassDef.id == "class.pactblade" && Progress.equipment[(int)EquipSlot.OffHand].Empty) Progress.equipment[(int)EquipSlot.OffHand] = new ItemStack { item = "item.pact_second_sword", count = 1 };
             if (ClassDef != null && ClassDef.id == "class.rogue" && Progress.equipment[(int)EquipSlot.OffHand].Empty) Progress.equipment[(int)EquipSlot.OffHand] = new ItemStack { item = "item.rogues_second_dirk", count = 1 };
         }
         /// <summary>What taking says when the bags could not hold everything.</summary>

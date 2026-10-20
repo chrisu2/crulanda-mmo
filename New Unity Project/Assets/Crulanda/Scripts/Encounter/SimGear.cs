@@ -21,7 +21,7 @@ namespace Crulanda.Encounter
 
         public static string Weight(string classId)
         {
-            return classId == "class.warrior" || classId == "class.paladin" ? "heavy" : classId == "class.ranger" || classId == "class.rogue" || classId == "class.shaman" || classId == "class.scoundrel" ? "leather" : "cloth";
+            return classId == "class.warrior" || classId == "class.paladin" || classId == "class.pactblade" ? "heavy" : classId == "class.ranger" || classId == "class.rogue" || classId == "class.shaman" || classId == "class.scoundrel" ? "leather" : "cloth";
         }
         /// <summary>The class that always tanks a party (SimCompanion.Role, the Warrior).</summary>
         public static bool Tank(string classId) { return classId == "class.warrior"; }
@@ -30,7 +30,7 @@ namespace Crulanda.Encounter
         /// mantle, but never the tank, which owns all seven (2026-10-16: the Warrior tank bareheaded had the least armour of the mail in the party).
         /// </summary>
         static bool Bare(SimAdventurer s, int i) { return i <= 2 && !Tank(s.classId) && Mathf.Abs(s.gearSeed + i * 13) % 5 == 0; }
-        public static bool CarriesWeapon(string classId) { return classId == "class.warrior" || classId == "class.paladin" || classId == "class.rogue" || classId == "class.scoundrel"; }
+        public static bool CarriesWeapon(string classId) { return classId == "class.pactblade" || classId == "class.warrior" || classId == "class.paladin" || classId == "class.rogue" || classId == "class.scoundrel"; }
         /// <summary>Whether a piece by its name is of the class's weight (a Hauberk for the mail classes, a Jerkin for leather, a Tunic for cloth).</summary>
         public static bool Suits(string classId, string name)
         {
@@ -63,6 +63,7 @@ namespace Crulanda.Encounter
                 if (id != null) ids.Add(id);
             }
             if (s.classId == "class.rogue" && items.Get("item.rogues_dirk") != null && items.Get("item.rogues_second_dirk") != null) { ids.Add("item.rogues_dirk"); ids.Add("item.rogues_second_dirk"); }   // a Rogue's pair of dirks (2026-10-11); a database without them falls through to a weapon at the level
+            else if (s.classId == "class.pactblade" && items.Get("item.pact_sword") != null && items.Get("item.pact_second_sword") != null) { ids.Add("item.pact_sword"); ids.Add("item.pact_second_sword"); }   // a Pact-Blade's two swords (2026-10-19)
             else if (s.classId == "class.scoundrel" && items.Get("item.scoundrels_dirk") != null) ids.Add("item.scoundrels_dirk");   // a Scoundrel's one dirk (2026-10-14)
             else if (CarriesWeapon(s.classId))
             {

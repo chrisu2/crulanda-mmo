@@ -28,7 +28,7 @@ namespace Crulanda.Encounter
             switch (l.family)
             {
                 case "sword.short": SwordShort(k, root); break;
-                case "sword.arming": SwordArming(k, root); break;
+                case "sword.arming": case "sword.off": SwordArming(k, root); break;
                 case "sword.falchion": Falchion(k, root); break;
                 case "sword.sabre": Sabre(k, root); break;
                 case "sword.leaf": SwordLeaf(k, root); break;

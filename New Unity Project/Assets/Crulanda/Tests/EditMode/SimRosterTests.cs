@@ -24,7 +24,10 @@ namespace Crulanda.Tests
             Assert.AreEqual(8, a.Count(s => s.classId == "class.cleric")); Assert.AreEqual(8, a.Count(s => s.classId == "class.shaman"));
             Assert.IsTrue(a.Where(s => s.classId == "class.shaman").All(s => s.Race == Races.Orc), "every Shaman an orc");
             // 2026-10-14: eight Scoundrels after the eighty (sims 81-88).
-            Assert.AreEqual(8, a.Count(s => s.classId == "class.scoundrel")); Assert.IsTrue(a.Skip(80).All(s => s.classId == "class.scoundrel"));
+            Assert.AreEqual(8, a.Count(s => s.classId == "class.scoundrel")); Assert.IsTrue(a.Skip(80).Take(8).All(s => s.classId == "class.scoundrel"));
+            // 2026-10-19: eight Pact-Blades after the Scoundrels (sims 89-96), every one human, two at home in the Lowtowns.
+            Assert.AreEqual(8, a.Count(s => s.classId == "class.pactblade")); Assert.IsTrue(a.Skip(88).All(s => s.classId == "class.pactblade"));
+            Assert.IsTrue(a.Where(s => s.classId == "class.pactblade").All(s => s.Race == Races.Human), "every Pact-Blade human");
             Assert.GreaterOrEqual(a.Skip(56).Count(s => s.level >= 9), 15, "the 24 new mostly in the higher zones");
             foreach (var s in a)
             {

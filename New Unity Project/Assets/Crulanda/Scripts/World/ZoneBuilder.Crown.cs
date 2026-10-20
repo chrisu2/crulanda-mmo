@@ -300,7 +300,7 @@ namespace Crulanda.World
         /// <summary>A guild's banner (GAME-ONLY): its field, a band of its second colour, and its sign: the Lantern Watch a lantern, Oak and
         /// Ember an oak leaf over an ember, the Long Road a road running up it, the Scree Hounds a hound's head.</summary>
         /// <summary>The callings of the Hall of Arms' row, in the trainers' order along it (ZoneLife: warrior, paladin, ranger, druid,
-        /// mage, rogue, archivist, salt-mender, cleric, scoundrel, shaman): each banner's field, its mark's colour and the mark's shape.</summary>
+        /// mage, rogue, archivist, salt-mender, cleric, scoundrel, shaman, pact-blade): each banner's field, its mark's colour and the mark's shape.</summary>
         static readonly (Color field, Color mark, int shape)[] ClassBanners =
         {
             (new Color(.55f, .1f, .08f), new Color(.85f, .82f, .78f), 0),
@@ -314,6 +314,7 @@ namespace Crulanda.World
             (new Color(.92f, .92f, .9f), new Color(.8f, .64f, .25f), 8),
             (new Color(.32f, .12f, .38f), new Color(.86f, .7f, .3f), 9),
             (new Color(.6f, .3f, .1f), new Color(.98f, .8f, .3f), 10),
+            (new Color(.34f, .36f, .42f), new Color(.95f, .95f, 1f), 0),   // the Pact-Blade (2026-10-19): two white swords crossed on steel-grey
         };
         /// <summary>
         /// A calling's banner over its trainer (GAME-ONLY; 2026-10-17): a gilt rod, a field of the calling's colour 1.3 m wide and

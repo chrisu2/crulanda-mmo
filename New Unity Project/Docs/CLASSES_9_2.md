@@ -308,7 +308,7 @@ class CANON-EXPANDED, every number GAME-ONLY, names PROVISIONAL. It takes in ROA
   sword and mounted as the Rogue's second knife is). Heavy armour (`SimGear` "heavy"), Strength its stat, blacksmithing its trade.
 - **Base stats** (Innate): (18 + 3L/2, 19 + 2L, 15 + L, 8 + L/2, 10 + L/2); health 175 + 22 a level.
 - **Party buff**: **Iron-Born Blood**, +3% Strength for half an hour.
-- **Race**: human (the North's Iron-Born). **Trainer**: Brannoc Vell, Pact-Blade Trainer, at the end of the Hall of Arms' row in the
+- **Race**: human (the North's Iron-Born). **Trainer**: Hessa Vell, Pact-Blade Trainer, at the end of the Hall of Arms' row in the
   Crown (x 74, its banner crossed swords on steel-grey; GAME-ONLY). The Iron Citadel takes the trainer when it is built.
 - Look: the Warrior's heavy figure for now (`ActorLook.Warrior`), a steel-grey surcoat over it; its own figure in the figure round.
 

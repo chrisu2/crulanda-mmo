@@ -32,7 +32,7 @@ namespace Crulanda.Encounter
         public const int QueueLevelGap = InviteLevelGap;
         static readonly string[] TankClasses = { "class.warrior", "class.paladin" };   // a Paladin tanks when no Warrior is along (SimCompanion.Role)
         static readonly string[] HealerClasses = { "class.druid", "class.cleric", "class.shaman" };
-        static readonly string[] DamageClasses = { "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.scoundrel" };   // never one whose part shifts with the party (a Paladin, a Salt-Mender)
+        static readonly string[] DamageClasses = { "class.ranger", "class.mage", "class.rogue", "class.archivist", "class.scoundrel", "class.pactblade" };   // never one whose part shifts with the party (a Paladin, a Salt-Mender)
 
         SimCompanion.PartyRole? queueRole;
         /// <summary>The part you take in a queued party: your choice in the window, else your class's (<see cref="RoleForClass"/>).</summary>

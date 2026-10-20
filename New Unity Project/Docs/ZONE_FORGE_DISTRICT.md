@@ -6,7 +6,14 @@ Inquisitors and the Silencers belong to the Transit Hub**; **the Copper-Tithe ar
 Teeth as foes belong to the Sludge-Tunnels**; short Anglo-Saxon or Germanic names; no WoW names) and labels every line CANON,
 CANON-EXPANDED, GAME-ONLY or PROVISIONAL.
 
-## Open questions for Chris (short; the recommended answer first, and what the first pass built)
+## Chris's answers (2026-10-19, the question prompt, verbatim where he wrote them)
+- Band: "19-22 (Recommended)". The Spoke: "Seen, not entered (Recommended)". The inn: "Fully its own now (Recommended)". Rook: "Not
+  yet (Recommended)". The other six (5-10 below) take the recommended answers: the Unraveller stays where he is; the Lowtowns' top
+  nodes are reused; no imps; the elites as level-20 elites (next pass: their moves and loot); new music tracks for the Forge (to find);
+  the world-map pin east of the Lowtowns (built: .5, .46, its label clear of the others by WorldMapLabelTests' layout).
+- Built since: the Rust & Ruin is its own inn (variant 5, ZoneBuilder.RustRuin; section 9).
+
+## The questions as asked (the recommended answer first, and what the first pass built)
 1. **Band:** mobs **19-22** (Recommended; ROADMAP's road and the Lowtowns' gate sign say 19-22), or 18-22? Built: 19-22.
 2. **The Spoke in the middle** (the author's map draws it there; book 1 ch.7 builds it in the Forge District): a rune-carved stone
    monolith on a walled yard, glowing runes, **never entered** (Recommended), or leave it out until the Spire? Built: in, not entered.
@@ -147,8 +154,15 @@ Smog by day (fog close and amber-brown), orange underlight; by night the fog thi
 smoke from below. Soot falls. Music: its own day and night tracks from the packs, none another zone plays (ZoneMusic). Weather:
 overcast, mist, ash squalls, rain.
 
+## 8a. Tynara Embercoil's night forge (a note for the merge)
+Branch wb-loot puts Tynara Embercoil's night forge (CANON: Tynara, a Forgeborn engineer, world_bible.md; the night forge GAME-ONLY) in
+the Lowtowns at (197.5, -14), under the Forge District's wall. **When wb-loot and forge-district are both merged, it moves inside the
+Forge District's gate**: into the Forge District near the Tithe Gate (about (-150, -20), clear of the gate's road, the camps and the
+nodes; make_forge.py's checks place it), and the Lowtowns keep only a sign by their gate pointing through. Until then it stays where
+wb-loot put it. (Her explosives are not used: no machines; her craft here is the forge.)
+
 ## 9. Built 2026-10-19 (the first playable pass; not yet run in Unity)
-See CHANGELOG. Differences from the plan above: no elites yet (question 8); the main chain's quests are levels 19-21 (the
+See CHANGELOG. **The Rust & Ruin** (2026-10-19, Chris: "Fully its own now"; inn variant 5, ZoneBuilder.RustRuin, InnPlan.Ruin): a long low house of soot-black stone, 16 x 10, a shallow iron roof, barred slits, the iron-banded oak double door (book1 ch.24:81) under a stone lintel, a broken rusted crucible for its sign, an iron flue through the roof; inside, under low beams, the bar down the +x end with casks behind and the bell by the keeper (ch.24: "Ring the bell"), a round fire pit out in the floor under an iron hood with its bench, the crews' long table, two stone booths, three small tables; 27 seats, 4 stools and the bench, every one with its seat mark; a 0.9 m way from every place to the door (ForgeDistrictTests). Differences from the plan above: no elites yet (question 8); the main chain's quests are levels 19-21 (the
 quest log offers a quest up to three levels early, and the cap is 20); quests use talking, visiting and fighting only (no quest
 items: each new item needs an icon); no bounties yet (they need a notice board and a rare courier posting); three hidden finds only
 (the world's total is held at 126 by DiscoveryLogTests). The zone data is written by `tools/wip/forge/make_forge.py`; its buildings by `ZoneBuilder.Forge.cs` (its own kinds:

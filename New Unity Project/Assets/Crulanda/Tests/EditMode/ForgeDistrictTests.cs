@@ -35,6 +35,8 @@ namespace Crulanda.Tests
             foreach (var n in new[] { "The Tithe Gate", "The Rust & Ruin", "The Forge Warrens", "The Foundry", "The Spoke", "The River Aureum", "The Molten Vein", "The Great Crucible", "The Slag Fields" })
                 Assert.IsTrue(z.landmarks.Any(l => l.name == n), n + " is a landmark.");
             foreach (var l in z.landmarks) Assert.IsFalse(string.IsNullOrEmpty(l.canonStatus), l.name + " is labelled.");
+            var low = Zone("lowtowns").worldMapPosition; var crown = Zone("crown").worldMapPosition;
+            Assert.Greater(z.worldMapPosition.x, low.x, "Pinned east of the Lowtowns (Chris, 2026-10-19)."); Assert.Greater(z.worldMapPosition.y, crown.y, "Below the floating city.");
         }
 
         [Test] public void Its_buildings_are_its_own()

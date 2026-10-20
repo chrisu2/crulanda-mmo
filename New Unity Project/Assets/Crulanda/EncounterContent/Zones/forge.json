@@ -31,10 +31,10 @@
     }
   ],
   "worldMapPosition": {
-    "x": -1,
-    "y": -1
+    "x": 0.5,
+    "y": 0.46
   },
-  "worldMapNote": "Behind the Lowtowns' east wall, at the foot of Argentis; the game map does not draw it, and the pin waits for a place clear of the Crown's and the Lowtowns' plates (PROVISIONAL).",
+  "worldMapNote": "Behind the Lowtowns' east wall, at the foot of Argentis under the floating city; the game map does not draw it, so the pin is provisional (placed 2026-10-19 where its label clears the Crown's and the Lowtowns', WorldMapLabelTests).",
   "flatRadius": 400,
   "hillHeight": 0,
   "seed": 2219,

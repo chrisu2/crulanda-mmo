@@ -8,8 +8,7 @@
   Molten Vein behind stone kerbs with four bridges, the Foundry's halls, the Spoke in its walled yard (not entered), the Slag Fields.
 - **Its own buildings** (`ZoneBuilder.Forge`): foundry halls, bottle-kiln furnaces, crucibles, fire pits, slag heaps, smelters'
   lodgings, the district wall and gate, molten channels and bridges, cinder lamps, ingot stacks, the Spoke; soot ground, a wall for
-  an edge, stacks and the Crown past it. No machines: hand bellows, ladles, carried loads. The inn shares the common inn floor plan in
-  its own soot stone and iron roof (question 3).
+  an edge, stacks and the Crown past it. No machines: hand bellows, ladles, carried loads. The Rust & Ruin is an inn of its own (variant 5, ZoneBuilder.RustRuin; Chris: "Fully its own now"): bar down the +x end, a fire pit under an iron hood, the crews' long table, stone booths, the bell; pinned on the world map at (.5, .46).
 - **Camps**: slag-hounds (19-20), Blacklegs (19-21), foundry overseers (20-22), Weave-Eaters at the Spoke (21-22), the Iron Pact at the
   yard (21-22), two rares (Old Clinker 20, the Spoke-Leech 22). No elites yet (question 8). New moves: Slag-hound, Blackleg, Foundry
   overseer, Old Clinker, the Spoke-Leech.

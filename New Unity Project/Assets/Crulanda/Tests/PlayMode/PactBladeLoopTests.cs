@@ -112,14 +112,17 @@ namespace Crulanda.Tests
                 {
                     if (session.Kit.ActionLockLabel(slot) != null) continue;
                     var id = session.Kit.ActionAt(slot).id;
-                    if (!e.actor.IsAlive) { e = Foe(); Near(e, 2); yield return null; }
-                    session.Player.Resource.Pool.SetCurrent(100); session.Player.Health.Pool.Fill();
                     yield return Ready();
-                    // The stride wants ground to close: stood 8 m off just before it (in the wait the foe would walk back into reach).
-                    if (id == "pactblade.minimum_movement") { if (!e.actor.IsAlive) e = Foe(); Near(e, 8); }
+                    // Each cast set up on its own, after the wait (the foe walks, the pool drains out of a fight): a living foe selected
+                    // and in reach (8 m off for the stride, which wants ground to close), a full pool and full health.
+                    if (!e.actor.IsAlive) e = Foe();
+                    Near(e, id == "pactblade.minimum_movement" ? 8 : 1.8f); yield return null;
+                    session.Player.Resource.Pool.SetCurrent(100); session.Player.Health.Pool.Fill();
                     bool used = session.UseAbility(slot);
-                    if (id == "pactblade.answering_cut") Assert.AreEqual(Kit.CanAnswer, used, "the Answering Cut only after a blow on you");
-                    else Assert.IsTrue(used, path + ": " + id + " casts");
+                    string why = " (cooldown " + session.CooldownRemaining(slot).ToString("0.00") + " s, " + session.Distance(e).ToString("0.0") + " m off, Aether " + Kit.Aether
+                        + ", foe alive " + e.actor.IsAlive + ", last line: " + (session.Messages.Count > 0 ? session.Messages[session.Messages.Count - 1] : "none") + ")";
+                    if (id == "pactblade.answering_cut") Assert.AreEqual(Kit.CanAnswer, used, "the Answering Cut only after a blow on you" + why);
+                    else Assert.IsTrue(used, path + ": " + id + " casts" + why);
                     if (id == "pactblade.minimum_movement") Assert.Less(Vector3.Distance(session.Player.transform.position, e.transform.position), 4, "the stride closes the ground");
                 }
             }

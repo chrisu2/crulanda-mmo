@@ -2,6 +2,29 @@
 
 ## Start here
 
+**Update 2026-10-19 ~20:40: the raid parked; the new phases started (Chris: "last tuning run for now then we move on to new zones,
+new classes, and pending phases"; "just want everything up to level 20 for now with classes. can do forge district but no dungeon for
+now"; "new zone still up to lvl 22"; cap kept at 20). Trunk (feet-bow-adit-kit) has preview-1019 merged (dry trees and the Gallows Tree
+as Dry4910, the wood barrel, alchemy, the Lowtowns village houses, music vol.3, the canopy at the pack's own size, the stylized skies,
+the brazier flame out of batching): NOT published and not re-captured since the last fixes. Branches still apart, in their worktrees:**
+- wb-fight (D:\code\mmo-wb-fight, 8c5443c5): the first world boss, the Unraveller (Docs/WORLD_BOSS_1.md, every tuning round), the
+  raid group and frames, the Drain Reach, world save format 3. Parked after tune-11: health 306,000, enrage 16:00, sims x1.4 in her fight
+  and the Shaman's mends x1.5 for a kill near 12:40. Next raid batch (5 pulls on Chris's screen) should show kills in about a third of
+  pulls at 12-14 min. The "KILL 0:01" lines were a run-tool bug, fixed.
+- wb-loot (D:\code\mmo-wb-loot, wb-fight merged in at 149feda6): the legendary pieces (steps 7-8), character save format 12,
+  Tynara Embercoil's night forge, /legend. Headless R257 (run before the merge): EditMode 152/155, PlayMode 4/4; two reds were the
+  old raid numbers (fixed by the merge), one real: no icon for Lissa's chalk (item.sweep_chalk, from the Sweep; also missing on trunk;
+  fix painted on trunk in tools/art/make_icons.py, then merge into the branches). Back up Chris's save before merging either.
+- forge-district (D:\code\mmo-forge-district, 709baee1): zone.forge, 360 m, mobs 19-22, the Spoke seen not entered, no dungeon; the
+  Rust & Ruin its own inn (variant 5, ZoneBuilder.RustRuin.cs); world-map pin; Chris's answers in ZONE_FORGE_DISTRICT.md. Headless
+  R258 running (ForgeDistrict, InnLayout, WorldMapLabel, IconCoverage, InnSeat). Then capture the inn inside and out.
+- classes-92 (D:\code\mmo-classes-92, ea391dce+): Docs/CLASSES_9_2.md; Chris: Pact-Blade first, Seer paths Maker/Keeper/Breaker,
+  Seer + Sight, Seer human, Ash-Walker orc. The Pact-Blade's build in progress (kit, creation, trainer, sims, tests).
+- kaykit-weapons (4b0a43e0): fixed, not re-captured. angular-gear (590cce32): helms Chris calls pitiful; waits on the Quaternius
+  Source pack.
+Next: R258's results; the Pact-Blade's tests; captures of the Forge and the trunk art, then publish (save backed up first); merge
+wb-fight and wb-loot after a raid batch; the Seer and Ash-Walker after the Pact-Blade.
+
 **Update 2026-10-18 ~21:50: new art and fixes, tested headless, pictures waiting (Chris is playing another game: "please test headless").**
 Branch preview-1018c (worktree D:\code\mmo-preview-1018c) = feet-bow-adit-kit + bestiary + megakit-dress + fix-lowtown-trades +
 inn-seats + angular-gear. Headless round chainR228: EditMode 104/104, PlayMode 23/23. NOT yet built and looked at as a whole:

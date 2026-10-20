@@ -2172,6 +2172,8 @@ QUEST = {
     'item.reckoners_slate': (shard, ('#e4e8ee', 'gem'), dict(glowc='#c8d4ff')), 'item.rest_candles': (sack, ('#8a7456', '#f0e6c0'), dict(tie='#5a3f28', knots=2)),
     'item.treenails': (log, ('#9a8462', '#efe0bc'), dict(ring='#b89a6a')), 'item.wystan_mask': (maskpiece,),
     'item.green_heartwood': (log, ('#8a8a8c', '#cfe4a4'), dict(ring='#5f9a48', glowc='#7fe08a')),
+    # the Sweep (2026-10-19): Lissa's chalk, a worn white stick (the Rules chalked by the spout)
+    'item.sweep_chalk': (shard, ('#ecebe4',), dict(thin=True)),
 }
 # what a kind looks like when an item has no picture of its own (new content): the resolver's second step
 KINDS = {

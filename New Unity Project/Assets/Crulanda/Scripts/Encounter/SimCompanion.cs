@@ -1056,7 +1056,7 @@ namespace Crulanda.Encounter
         /// <summary>For a test's log: the headway it measures to its camp (its best so far, by which measure, and seconds since it last improved).</summary>
         public string HeadwayNote { get { return "best " + leadBest.ToString("0") + " m (" + (leadKind == 2 ? "caves' way" : leadKind == 1 ? "path" : "straight") + "), " + (Time.time - leadBestAt).ToString("0") + " s since better"; } }
         /// <summary>A mend: the party's healer gives a sixth of the healed one's health (or its old flat sum, if more); a tank's is the flat sum.</summary>
-        public int MendFor(Actor who) { return Mathf.RoundToInt((Role == PartyRole.Healer ? Mathf.Max(HealAmount, Mathf.RoundToInt(who.Health.Pool.Max * .16f)) : HealAmount) * (1 + MendEdge)); }
+        public int MendFor(Actor who) { return Mathf.RoundToInt((Role == PartyRole.Healer ? Mathf.Max(HealAmount, Mathf.RoundToInt(who.Health.Pool.Max * .16f)) : HealAmount) * (1 + MendEdge) * (sim.classId == "class.shaman" && session.UnravellerFighting != null ? UnravellerTuning.Current.shamanMendLift : 1)); }   // (her fight: tune-11)
 
         // ---------- buffing up before a boss (Chris, 2026-10-15: "we should use food buffs, alchemy buffs, class buffs,etc to beat the bosses"; BossBuffs) ----------
         /// <summary>Stopped short of a boss or an elite camp, leading, while the party buffs up.</summary>

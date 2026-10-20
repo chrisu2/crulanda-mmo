@@ -26,7 +26,7 @@ namespace Crulanda.Tests
             Assert.IsTrue(File.Exists(File_), "the data file");
             var t = UnravellerTuning.Parse(File.ReadAllText(File_));
             var d = new UnravellerTuning();
-            Assert.AreEqual(d.health, t.health); Assert.AreEqual(340000, t.health, "play note 286: a 10-15 minute kill; tune-6 dealt her about 500 a second");
+            Assert.AreEqual(d.health, t.health); Assert.AreEqual(306000, t.health, "play note 286: a 10-15 minute kill; then Chris: \"cut about 10% health\" (tune-10)"); Assert.AreEqual(1.4f, t.simRaidLift, 1e-4f, "tune-11: the sims x1.4 in her fight for a kill near 12:40");
             Assert.AreEqual(960, t.enrageSeconds, "the feast at 16:00 (play note 286: \"needs to be a 10-15min kill at least\")");
             Assert.AreEqual(9, t.blinkEvery); Assert.AreEqual(12, t.blinkReach); Assert.AreEqual(.1f, t.lighthouseShare, 1e-4f, "run 1: .18 lost her to the casters");
             Assert.AreEqual(12, t.pinFirst); Assert.AreEqual(7, t.pinLeast); Assert.AreEqual(3, t.steelStacks);
